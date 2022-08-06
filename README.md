@@ -1,6 +1,6 @@
 # MakerFrame跨平台游戏引擎框架编辑器_RPG+APRG+棋牌+策略战棋+即时战略+AVG+文字等
 
-<img src="images/game.png" style="margin-top:30px;"/>
+<img src="Images/game.png" style="margin-top:30px;"/>
 
 #### 介绍
 
@@ -107,7 +107,7 @@
 5. Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6. Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
 
-<img src="images/main.png" style="margin-top:30px;"/>
-<img src="images/map_editor.png" style="margin-top:30px;"/>
-<img src="images/role.png" style="margin-top:30px;"/>
-<img src="images/fight_role.png" style="margin-top:30px;"/>
+<img src="Images/main.png" style="margin-top:30px;"/>
+<img src="Images/map_editor.png" style="margin-top:30px;"/>
+<img src="Images/role.png" style="margin-top:30px;"/>
+<img src="Images/fight_role.png" style="margin-top:30px;"/>
