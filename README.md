@@ -1,10 +1,10 @@
-# MakerFrame跨平台游戏引擎框架编辑器_RPG+APRG+棋牌+策略战棋+即时战略+AVG+文字等
+# MakerFrame框架编辑器_跨平台游戏引擎-RPG+ARPG+策略战棋+即时战略+文字等
 
 <img src="Images/game.png" style="margin-top:30px;"/>
 
 #### 介绍
 
-* 一款使用Qt/QML/JAVA构建的供二次开发的软件/游戏框架。
+* MakerFrame是一款 使用Qt/QML/JAVA构建的供二次开发的软件/游戏的制作及运行的跨平台框架。
 
 #### 作者的话
 
