@@ -1,0 +1,27 @@
+FileItem 1.0 FileItem.qml
+DirList 1.0 DirList.qml
+
+Message 1.0 Message.qml
+GameMenu 1.0 GameMenu.qml
+Joystick 1.0 Joystick.qml
+GameButton 1.0 GameButton.qml
+
+GameMenuWindow 1.0 GameMenuWindow.qml
+
+GameCommonAlgorithm 1.0 GameCommonAlgorithm.qml
+
+Role 1.0 Role.qml
+RoleEditor 1.0 RoleEditor.qml
+
+SpriteEffect 1.0 SpriteEffect.qml
+SpriteEditor 1.0 SpriteEditor.qml
+
+MapEditor 1.0 MapEditor.qml
+
+GameScene 1.0 GameScene.qml
+FightScene 1.0 FightScene.qml
+
+
+singleton GameMakerGlobal 1.0 GameMakerGlobal.qml
+
+File 1.0 File.js
