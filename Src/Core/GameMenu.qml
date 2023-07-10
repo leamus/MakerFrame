@@ -31,6 +31,8 @@ Rectangle {
     property color colorTitleColor: "#EE00CC99" //标题颜色
     property color colorTitleFontColor: "white" //标题文字颜色
 
+    property var itemAlignment: Text.AlignHCenter //每个项目对齐方式
+
 
     //property var arrChoiceList  //要显示的列表
     property var arrList: []    //所有列表
@@ -87,7 +89,8 @@ Rectangle {
 
         refresh();
 
-        s_Choice(index);
+        if(index >= 0)
+            s_Choice(index);
     }
 
 
@@ -189,7 +192,7 @@ Rectangle {
     color: "#CF6699FF"
     //color: "#9900CC99"
     //implicitWidth: columnChoices.implicitWidth
-    implicitHeight: (rectMenuTitle.visible ? rectMenuTitle.height : 0) +
+    implicitHeight: (rectMenuTitle.visible ? rectMenuTitle.implicitHeight : 0) +
                     (rectPage.visible ? rectPage.height : 0) +
                     columnChoices.height
     //implicitHeight: columnRoot.implicitHeight
@@ -216,7 +219,7 @@ Rectangle {
 
                 textFormat: TextEdit.RichText
 
-                horizontalAlignment: Text.AlignHCenter
+                horizontalAlignment: root.itemAlignment
                 verticalAlignment: Text.AlignVCenter
 
                 MouseArea {

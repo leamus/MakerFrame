@@ -1627,8 +1627,8 @@ $$buffs$$
 
         //检查技能（有4个阶段会调用：选择时、攻击时、敌人和我方遍历时）；
         //返回：true表示可以使用；字符串表示不能使用并提示的信息（只有选择时）；
-        //stage为0表示选择时，为1表示选择后（在阶段1减去MP的作用：道具的技能可以跳过减MP）；
-        $check: function(skill, combatant, stage) {
+        //stage为0表示选择时，为1表示选择某战斗角色（我方或敌方，此时targetCombatant不为null，其他情况为null），为10表示战斗中（在阶段10减去MP的作用：道具的技能可以跳过减MP）；
+        $check: function(skill, combatant, targetCombatant, stage) {
 $$check$$
         },
     };
@@ -1650,8 +1650,8 @@ $$check$$
             if(combatant.$$properties.MP[0] < $$MP$$)
                 return '技能点不足';
 
-            //阶段1时减去MP
-            if(stage === 1)
+            //阶段10时减去MP
+            if(stage === 10)
                 game.addprops(combatant, {'MP': [-$$MP$$]});
 
             return true;

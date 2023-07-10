@@ -386,7 +386,7 @@ Item {
 
 
                     let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
-                    let goodsInfo = game.objGoods[goods.$rid];
+                    let goodsInfo = game.$sys.resources.goods[goods.$rid];
 
                     if(goodsInfo.$commons.$equipScript)
                         game.run(goodsInfo.$commons.$equipScript(goods, goodsInfo));
@@ -495,7 +495,7 @@ Item {
 
                 let hero = game.gd["$sys_fight_heros"][0];
                 let position = rectEquipInfo.positions[rectEquipInfo.choicePosition];
-                textEquipInfo.text = game.objGoods[hero.$equipment[position].$rid].$description;
+                textEquipInfo.text = game.$sys.resources.goods[hero.$equipment[position].$rid].$description;
 
                 rectEquipInfo.visible = true;
             }
@@ -624,8 +624,8 @@ Item {
             let hero = game.gd["$sys_fight_heros"][heroIndex];
             for(let position in hero.$equipment) {
                 rectEquipInfo.positions.push(position);
-                arrEquipment.push('%1：%2'.arg(position).arg(game.objGoods[hero.$equipment[position].$rid].$properties.name) );
-                //textEquipment.text = textEquipment.text + equipment + "  " + game.objGoods[hero.$equipment[position].$rid].$properties.name + "\r\n";
+                arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.resources.goods[hero.$equipment[position].$rid].$properties.name) );
+                //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.resources.goods[hero.$equipment[position].$rid].$properties.name + "\r\n";
             }
 
             //for(let i = 0; i < 2; ++i)

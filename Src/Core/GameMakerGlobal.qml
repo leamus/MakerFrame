@@ -20,7 +20,7 @@ QtObject {
     property string separator: '/'  //Platform.separator()
 
     //版本
-    property string version: "1.2.16"
+    property string version: "1.4.8"
 
 
     //配置
@@ -30,10 +30,11 @@ QtObject {
         property bool debug: true
 
         //当前项目名称
-        property alias strCurrentProjectName: settings.strCurrentProjectName
+        property alias strCurrentProjectName: settings.strCurrentProjectName    //"Project"
 
         //项目根目录
         property string strProjectRootPath: Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "Projects"
+        //property string strProjectRootPath: Qt.platform.os === "android" ? "assets:" : "."  //qrc:
 
         //存档目录
         property string strSaveDataPath: Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName

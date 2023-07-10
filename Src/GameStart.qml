@@ -189,7 +189,7 @@ yield game.msg('欢迎来到鹰歌Maker，这是一个最简单的demo，如果�
                 onButtonClicked: {
                     //enabled = false;
 
-                    loaderGameScene.source = './GameScene.qml';
+                    loaderGameScene.source = './Core/GameScene.qml';
 
                 }
             }

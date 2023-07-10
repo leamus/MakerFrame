@@ -15,16 +15,28 @@ Item {
     id: root
 
     property int nFightHeroIndex: 0         //当前角色
+    property string strTeamName: '$sys_fight_heros'
     property var arrEquipmentPositions: []   //穿戴位置列表（用于索引用）
 
     property alias maskFightRoleInfo: maskFightRoleInfo
 
 
 
-    function init(n=0) {
-        if(game.gd["$sys_fight_heros"].length === 0) {
+    function init(params) {
+        let n = 0, teamName='$sys_fight_heros';
+
+        if(GlobalLibraryJS.isArray(params)) {   //多参数
+            n = params[0] || 0;
+            teamName = params[1] || '$sys_fight_heros';
+        }
+        else    //一个参数
+            n = params;
+
+
+        if(game.gd[teamName].length === 0) {
             return;
         }
+        strTeamName = teamName;
 
         nFightHeroIndex = n;
         refresh();
@@ -40,9 +52,9 @@ Item {
 
 
     function refresh() {
-        let fighthero = game.gd["$sys_fight_heros"][root.nFightHeroIndex];
+        let fighthero = game.gd[strTeamName][root.nFightHeroIndex];
         let fightHeroPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-        textFightHeroName.text = GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_combatant_name"](fighthero));
+        textFightHeroName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](fighthero));
 
 
         /*textFightHeroInfo.text = "HP：" + fighthero.$$propertiesWithExtra.remainHP + "/" + fighthero.$$propertiesWithExtra.healthHP + "/" + fighthero.$$propertiesWithExtra.HP + ' ' +
@@ -56,12 +68,12 @@ Item {
             "级别：" + fighthero.$properties.level;
         */
 
-        textFightHeroInfo.text = game.objCommonScripts["combatant_info"](fighthero);
+        textFightHeroInfo.text = game.$sys.resources.commonScripts["combatant_info"](fighthero);
 
 
         //装备
 
-        let equipReservedSlots = fighthero['$equip_reserved_slots'] || game.objCommonScripts["equip_reserved_slots"];
+        let equipReservedSlots = fighthero['$equip_reserved_slots'] || game.$sys.resources.commonScripts["equip_reserved_slots"];
         root.arrEquipmentPositions = [];
         let arrEquipment = [];  //显示的
 
@@ -74,18 +86,18 @@ Item {
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](fighthero.$equipment[position], {image: true, color: true}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](fighthero.$equipment[position], {image: true, color: true}));
             if(tIndex > -1) {
-                //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.objGoods[fighthero.$equipment[position].$rid].$properties.name);
+                //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.resources.goods[fighthero.$equipment[position].$rid].$properties.name);
                 arrEquipment[tIndex] = '%1：%2'.arg(position).arg(tgoodsName);
                 root.arrEquipmentPositions[tIndex] = position;
             }
             else {
-                //arrEquipment.push('%1：%2'.arg(position).arg(game.objGoods[fighthero.$equipment[position].$rid].$properties.name) );
+                //arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.resources.goods[fighthero.$equipment[position].$rid].$properties.name) );
                 arrEquipment.push('%1：%2'.arg(position).arg(tgoodsName) );
                 root.arrEquipmentPositions.push(position);
             }
-            //textEquipment.text = textEquipment.text + equipment + "  " + game.objGoods[fighthero.$equipment[position].$rid].$properties.name + "\r\n";
+            //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.resources.goods[fighthero.$equipment[position].$rid].$properties.name + "\r\n";
         }
         for(let ti = 0; ti < equipReservedSlots.length; ++ti)
             if(arrEquipment[ti] === undefined)
@@ -185,7 +197,7 @@ Item {
                         border.width: 1
 
                         onButtonClicked: {
-                            if(game.gd["$sys_fight_heros"].length - 1 > root.nFightHeroIndex) {
+                            if(game.gd[strTeamName].length - 1 > root.nFightHeroIndex) {
                                 ++root.nFightHeroIndex;
                                 root.refresh();
                             }
@@ -272,9 +284,9 @@ Item {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
-                    let combatant = game.gd["$sys_fight_heros"][root.nFightHeroIndex];
+                    let combatant = game.gd[strTeamName][root.nFightHeroIndex];
                     let position = root.arrEquipmentPositions[index];
-                    //msgDetail.text = game.objGoods[hero.$equipment[position].$rid].$properties.description;
+                    //msgDetail.text = game.$sys.resources.goods[hero.$equipment[position].$rid].$properties.description;
                     msgDetail.text = combatant.$equipment[position].$description;
                 }
 
@@ -282,7 +294,7 @@ Item {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
-                    //let hero = game.gd["$sys_fight_heros"][0];
+                    //let hero = game.gd[strTeamName][0];
                     game.getgoods(game.unload(root.nFightHeroIndex, root.arrEquipmentPositions[index]));
 
                     root.refresh();
@@ -298,8 +310,8 @@ Item {
                 Layout.fillHeight: true
 
                 onS_Choice: {
-                    let combatant = game.gd["$sys_fight_heros"][root.nFightHeroIndex];
-                    //msgDetail.text = game.objSkills[combatant.$skills[index].$rid].$properties.description;
+                    let combatant = game.gd[strTeamName][root.nFightHeroIndex];
+                    //msgDetail.text = game.$sys.resources.skills[combatant.$skills[index].$rid].$properties.description;
                     msgDetail.text = combatant.$skills[index].$description;
                 }
             }

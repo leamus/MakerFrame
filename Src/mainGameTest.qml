@@ -242,7 +242,7 @@ Rectangle {
         focus: true
 
 
-        source: "./GameScene.qml"
+        source: "./Core/GameScene.qml"
         asynchronous: false
 
 

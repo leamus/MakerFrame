@@ -12,6 +12,7 @@ import _Global.Button 1.0
 import "qrc:/QML"
 
 
+import "Core"
 //import "File.js" as File
 
 
@@ -208,7 +209,7 @@ Rectangle {
             }
 
             ColorButton {
-                visible: false
+                visible: true
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
@@ -1541,8 +1542,8 @@ Rectangle {
             role.moveSpeed = parseFloat(textRoleSpeed.text);
 
 
-            rectRole.Layout.preferredWidth = parseInt(textRoleWidth.text)
-            rectRole.Layout.preferredHeight = parseInt(textRoleHeight.text)
+            rectRole.Layout.preferredWidth = rectRole.width = parseInt(textRoleWidth.text);
+            rectRole.Layout.preferredHeight = rectRole.height = parseInt(textRoleHeight.text);
 
 
             role.refresh();

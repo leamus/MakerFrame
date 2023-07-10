@@ -158,7 +158,7 @@ Rectangle {
 //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
 //style为样式；
 //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
-//  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
+//  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
 //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
 //buttonNum为按钮数量（0-2，目前没用）。
@@ -169,7 +169,7 @@ Rectangle {
 //pretext为已显示的文字（role为空的情况下）；
 //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
 //style为样式；
-//  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
+//  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
 //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
 <font color='yellow'>game.talk(role, msg, interval=20, pretext='', keeptime=0, style={}, pauseGame=true);</font>
@@ -179,7 +179,7 @@ Rectangle {
 //pretext为已显示的文字（role为空的情况下）；
 //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
 //style为样式；
-//  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor）；
+//  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor）；
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
 //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
 readonly property var say: function(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
@@ -204,24 +204,24 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 
 //创建主角；
 //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-//  其他参数：$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
-//  $name为游戏名；
-//成功返回true。
+//  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
+//  $name为游戏显示名；
+//成功返回 对象。
 <font color='yellow'>game.createhero(role={});</font>
 
 //返回 主角；
-//hero可以是下标，或主角的$name，或主角对象，-1表示所有主角；
+//hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
 //props：需要修改的 单个主角属性（有$name、$showName、$speed、$scale、$avatar、$avatarSize，$x，$y、$bx、$by）；
 //  $action：为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
 //返回经过props修改的 主角 或 所有主角的列表；如果没有则返回null；
 <font color='yellow'>game.hero(hero=-1, props={});</font>
 
-<font color='yellow'>game.delhero(hero=-1)</font>：删除主角；hero可以是下标，或主角的name，或主角对象，-1表示所有主角；
+<font color='yellow'>game.delhero(hero=-1)</font>：删除主角；hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
 <font color='yellow'>game.movehero(bx, by)</font>：将主角移动到地图 x、y 位置。
 
 //创建NPC；
 //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-//其他参数：$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
+//其他参数：$id、$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
 //  $name为游戏名；
 //  $action为0表示静止，为1表示随机移动；
 //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
@@ -230,7 +230,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.createrole(role={});</font>
 
 //返回 角色；
-//role可以是下标，或角色的$name，或角色对象，-1表示所有角色；
+//role可以是下标，或角色的$id，或角色对象，-1表示所有角色；
 //props：需要修改的 单个主角属性（有 $name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by）；
 //  $action：为0表示静止；为1表示随机移动；为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
 //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
@@ -381,6 +381,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.control(config={});</font>
 
 <font color='yellow'>game.scale(n)</font>：将场景缩放n倍；可以是小数。
+<font color='yellow'>game.setscenerole(r)</font>：场景跟随某个角色。
 <font color='yellow'>game.pause()</font>：暂停游戏。
 <font color='yellow'>game.goon()</font>：继续游戏。
 <font color='yellow'>game.setinterval(interval)</font>：设置游戏刷新率（interval毫秒）。
@@ -678,7 +679,7 @@ NPC事件的四种写法（前两种支持同步调用）：
     4、剪切板操作（FrameManager.sl_qml_SetClipboardText）；
     5、动态载入卸载QRC资源：FrameManager.registerResource、FrameManager.unRegisterResource；
     6、登录、联机、远程存档等；
-    7、特定系统功能（二维码、摄像头、GPS、屏幕旋转、屏幕常量、请求权限等）；
+    7、本地系统功能（二维码、摄像头、GPS、屏幕旋转、屏幕常量、请求权限等）；
     8、播放音频视频；
     9、远程MySQL数据库操作；
     10、本地SQLite操作；

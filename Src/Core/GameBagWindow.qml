@@ -30,7 +30,7 @@ Item {
         let fightheros = game.fighthero(-1, 1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
-            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_combatant_name"](tf)));
+            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](tf)));
         }
         gameFightHeroMenu.show(arrFightHerosName);
         if(arrFightHerosName.length > 0)
@@ -67,10 +67,10 @@ Item {
         case 1:
             gameGoodsMenu.arrGoods = [];
             for(let goods of game.gd["$sys_goods"]) {
-                let goodsInfo = game.objGoods[goods.$rid];
+                let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$useScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                 }
             }
 
@@ -78,10 +78,10 @@ Item {
         case 2:
             gameGoodsMenu.arrGoods = [];
             for(let goods of game.gd["$sys_goods"]) {
-                let goodsInfo = game.objGoods[goods.$rid];
+                let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$equipScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                 }
             }
 
@@ -89,10 +89,10 @@ Item {
         case 3:
             gameGoodsMenu.arrGoods = [];
             for(let goods of game.gd["$sys_goods"]) {
-                let goodsInfo = game.objGoods[goods.$rid];
+                let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$fightScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                 }
             }
             break;
@@ -100,10 +100,10 @@ Item {
         case 4:
             gameGoodsMenu.arrGoods = [];
             for(let goods of game.gd["$sys_goods"]) {
-                //let goodsInfo = game.objGoods[goods.$rid];
+                //let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goods.$price && goods.$price[1] !== undefined) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                 }
             }
             break;
@@ -111,10 +111,10 @@ Item {
         case 5:
             gameGoodsMenu.arrGoods = [];
             for(let goods of game.gd["$sys_goods"]) {
-                //let goodsInfo = game.objGoods[goods.$rid];
+                //let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goods.$type === 4) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                 }
             }
             break;
@@ -123,7 +123,7 @@ Item {
         default:
             gameGoodsMenu.arrGoods = game.gd["$sys_goods"];
             for(let goods of game.gd["$sys_goods"]) {
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
             }
 
             break;
@@ -431,7 +431,7 @@ Item {
 
                         //gameGoodsMenu.nChoiceIndex = index;
 
-                        let goodsInfo = game.objGoods[gameGoodsMenu.arrGoods[index].$rid];
+                        let goodsInfo = game.$sys.resources.goods[gameGoodsMenu.arrGoods[index].$rid];
                         buttonUse.visible = (goodsInfo.$commons.$useScript ? true : false);
                         buttonEquip.visible = (goodsInfo.$commons.$equipScript ? true : false);
                         textGoodsInfo.text = gameGoodsMenu.arrGoods[index].$description;
@@ -491,11 +491,18 @@ Item {
                     //_private.close();
 
                     let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    let goodsInfo = game.objGoods[goods.$rid];
+                    let goodsInfo = game.$sys.resources.goods[goods.$rid];
 
-                    if(goodsInfo.$commons.$equipScript)
-                        game.run(goodsInfo.$commons.$equipScript(goods, gameFightHeroMenu.nChoiceIndex));
+                    if(goodsInfo.$commons.$equipScript) {
+                        let tfh;
+                        if(gameFightHeroMenu.nChoiceIndex < 0)
+                            tfh = null;
+                        else
+                            tfh = game.fighthero(gameFightHeroMenu.nChoiceIndex);
+
+                        game.run(goodsInfo.$commons.$equipScript(goods, tfh));
                         //game.run(goodsInfo.$commons.$equipScript(goods.$rid));
+                    }
 
                     //脚本执行完毕后刷新背包
                     game.run(function(){root.showGoods(root.nlastShowType);});
@@ -516,7 +523,7 @@ Item {
                         return;
 
                     let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    //let goodsInfo = game.objGoods[goods.$rid];
+                    //let goodsInfo = game.$sys.resources.goods[goods.$rid];
 
                     game.removegoods(goods);
 

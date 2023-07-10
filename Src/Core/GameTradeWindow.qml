@@ -31,7 +31,10 @@ Item {
 
         for(let g of goods) {
             let tgoods = game.$sys.getGoodsObject(g, true);
-            arrSaleGoods.push(tgoods);
+            if(!tgoods)
+                console.warn('没有道具：', g)
+            else
+                arrSaleGoods.push(tgoods);
         }
 
         root.mygoodsinclude = mygoodsinclude;
@@ -61,7 +64,7 @@ Item {
 
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](g, {image: true, color: true, count: (g.$count >= 0 ? true : false)}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: (g.$count >= 0 ? true : false)}));
             arrShowSaleGoods.push(tgoodsName + ' ￥' + g.$price[0]);
         }
 
@@ -77,7 +80,7 @@ Item {
                 price = g.$price[1];
 
             let tgoods = game.$sys.getGoodsObject(g, false);
-            arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](g)) + ' ￥' + price);
+            arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g)) + ' ￥' + price);
             arrMyGoods.push(g);
         }
         gamemenuMyGoods.show(arrShowMyGoods, arrMyGoods);

@@ -52,7 +52,7 @@ Item {
         //流程：手动或自动 游戏结束，调用依次_private.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
         readonly property var over: function(result) {
             if(result !== undefined && result !== null) {
-                let fightResult = game.objCommonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
+                let fightResult = game.$sys.resources.commonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
                 fightResult.result = result;
                 _private.fightOver(fightResult);
             }
@@ -114,6 +114,20 @@ Item {
         }
 
         property var d: ({})
+
+
+        readonly property var $sys: ({
+            container: itemRolesContainer,
+
+            components: {
+                menuSkillsOrGoods: menuSkillsOrGoods,
+                menuFightRoleChoice: menuFightRoleChoice,
+
+                spriteEffectMyCombatants: repeaterMyCombatants,
+                spriteEffectEnemies: repeaterEnemies,
+            },
+
+        })
     }
 
 
@@ -220,7 +234,7 @@ Item {
 
 
         //data = GlobalJS.Eval(data.FightScript);
-        //let data = game.objFightScripts[fightScriptName];
+        //let data = game.$sys.resources.fightScripts[fightScriptName];
         //_private.fightInfo = data;
         //_private.fightRoundScript = fightScript.$commons.$fightRoundScript || '';
         //_private.fightStartScript = fightScript.$commons.$fightStartScript || '';
@@ -280,7 +294,7 @@ Item {
                 tIndex = i % fightScript.$enemiesData.length;
 
             //创建敌人
-            _private.enemies[i] = _public.getFightRoleObject(fightScript.$enemiesData[tIndex], true);
+            _private.enemies[i] = rootGameScene._public.getFightRoleObject(fightScript.$enemiesData[tIndex], true);
 
             //从 propertiesWithExtra 设置人物的 HP和MP
             game.run(function() {
@@ -290,8 +304,8 @@ Item {
 
 
         //初始化脚本
-        if(game.objCommonScripts["fight_init_script"]) {
-            yield game.run([game.objCommonScripts["fight_init_script"], 'fight_init_script'], -2, [_private.myCombatants, _private.enemies], fightScript)
+        if(game.$sys.resources.commonScripts["fight_init_script"]) {
+            yield game.run([game.$sys.resources.commonScripts["fight_init_script"], 'fight_init_script'], -2, [_private.myCombatants, _private.enemies], fightScript)
         }
 
 
@@ -342,7 +356,7 @@ Item {
 
 
             /*/读取ActionData
-            let fightroleInfo = game.objFightRoles[_private.myCombatants[i].$rid];
+            let fightroleInfo = game.$sys.resources.fightRoles[_private.myCombatants[i].$rid];
             if(fightroleInfo) {
                 for(let tn in fightroleInfo.ActionData) {
                     _private.myCombatants[i].$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
@@ -381,7 +395,7 @@ Item {
             /*/随机取敌人（不重复）
             let arrRandomEnemiesID = GlobalLibraryJS.GetDifferentNumber(0, fightScript.$enemiesData.length, enemyCount);
             for(let i in arrRandomEnemiesID) {
-                let e = new game.objCommonScripts["combatant_class"]();
+                let e = new game.$sys.resources.commonScripts["combatant_class"]();
 
                 /*let enemiesData = fightScript.$enemiesData[arrRandomEnemiesID[i]];
                 for(let tp in enemiesData) {  //给敌人赋值
@@ -390,12 +404,12 @@ Item {
 
                 GlobalLibraryJS.copyPropertiesToObject(e, fightScript.$enemiesData[arrRandomEnemiesID[i]]);
 
-                game.objCommonScripts["refresh_combatant"](e);
+                game.$sys.resources.commonScripts["refresh_combatant"](e);
                 _private.enemies.push(e);
             }*/
             /*/随机取敌人（可重复）
             for(let i = 0; i < enemyCount; ++i) {
-                let e = new game.objCommonScripts["combatant_class"]();
+                let e = new game.$sys.resources.commonScripts["combatant_class"]();
                 _private.enemies.push(e);
             }*/
 
@@ -425,7 +439,7 @@ Item {
             //_private.enemies.$rid = fightScript.$enemiesData[tIndex].$rid;
 
             /*/初始化 和 读取ActionData
-            let fightroleInfo = game.objFightRoles[_private.enemies[i].$rid];
+            let fightroleInfo = game.$sys.resources.fightRoles[_private.enemies[i].$rid];
             if(fightroleInfo) {
                 for(let tn in fightroleInfo.ActionData) {
                     _private.enemies[i].$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
@@ -459,7 +473,7 @@ Item {
 
 
 
-        yield fight.run([game.objCommonScripts["fight_start_script"]([_private.myCombatants, _private.enemies,], _private.fightData), 'fight start1'], -2);
+        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([_private.myCombatants, _private.enemies,], _private.fightData), 'fight start1'], -2);
 
 
         //GlobalLibraryJS.setTimeout(function() {
@@ -643,9 +657,11 @@ Item {
                             menuFightRoleChoice.nChoiceFightRole = modelData;
 
                             //菜单位置
+                            /*跟随战士
                             menuFightRoleChoice.parent = parent;
                             menuFightRoleChoice.anchors.left = parent.right;
                             menuFightRoleChoice.anchors.top = parent.top;
+                            */
 
                             menuFightRoleChoice.show(_private.arrMenu);
                         }
@@ -655,6 +671,21 @@ Item {
 
                             if(menuFightRoleChoice.nChoiceFightRole < 0 || menuFightRoleChoice.nChoiceFightRole >= _private.myCombatants.length)
                                 return;
+
+
+                            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](_private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$attackSkill, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], _private.myCombatants[modelData], 1);
+                            if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
+                                fight.msg(checkSkill || "不能选择", 50);
+                                return;
+                            }
+                            if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
+                                fight.msg(...checkSkill);
+                                return;
+                            }
+                            if(checkSkill !== true) {   //如果技能不可用
+                                //fight.msg("不能选择", 50);
+                                return;
+                            }
 
 
                             _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$target = [_private.myCombatants[modelData]];
@@ -693,15 +724,7 @@ Item {
                 }
 
                 onS_playEffect: {
-                    if(game.objCacheSoundEffects[soundeffectSource]) {
-                        if(rootGameScene._private.config.nSoundConfig !== 0)
-                            return;
-
-                        //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
-                        if(game.objCacheSoundEffects[soundeffectSource].playing)
-                            game.objCacheSoundEffects[soundeffectSource].stop();
-                        game.objCacheSoundEffects[soundeffectSource].play();
-                    }
+                    rootGameScene._public.playSoundEffect(soundeffectSource);
                 }
             }
         }
@@ -771,6 +794,21 @@ Item {
                             return;
 
 
+                        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](_private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$attackSkill, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], _private.enemies[modelData], 1);
+                        if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
+                            fight.msg(checkSkill || "不能选择", 50);
+                            return;
+                        }
+                        if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
+                            fight.msg(...checkSkill);
+                            return;
+                        }
+                        if(checkSkill !== true) {   //如果技能不可用
+                            //fight.msg("不能选择", 50);
+                            return;
+                        }
+
+
                         _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$target = [_private.enemies[modelData]];
                         _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$lastTarget = [_private.enemies[modelData]];
 
@@ -791,15 +829,7 @@ Item {
                 }
 
                 onS_playEffect: {
-                    if(game.objCacheSoundEffects[soundeffectSource]) {
-                        if(rootGameScene._private.config.nSoundConfig !== 0)
-                            return;
-
-                        //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
-                        if(game.objCacheSoundEffects[soundeffectSource].playing)
-                            game.objCacheSoundEffects[soundeffectSource].stop();
-                        game.objCacheSoundEffects[soundeffectSource].play();
-                    }
+                    rootGameScene._public.playSoundEffect(soundeffectSource);
                 }
 
                 Component.onCompleted: {
@@ -837,9 +867,10 @@ Item {
         //目前我方选择的人物
         property int nChoiceFightRole: -1
 
+        visible: false
         width: 100
         height: implicitHeight
-        visible: false
+        anchors.centerIn: parent
 
         onS_Choice: {
             //hide();
@@ -860,7 +891,7 @@ Item {
                     if(type === 1) {
                         let tWeapon = _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$equipment['武器'];
                         if(tWeapon)
-                            tlistSkills = game.objGoods[tWeapon.$rid].$skills;
+                            tlistSkills = game.$sys.resources.goods[tWeapon.$rid].$skills;
                     }
                     //人物本身技能
                     else if(type === 0) {
@@ -980,7 +1011,7 @@ Item {
 
                     //如果是true，则调用通用逃跑算法
                     if(_private.runAway === true) {
-                        if(game.objCommonScripts["common_run_away_algorithm"](_private.myCombatants, -1)) {
+                        if(game.$sys.resources.commonScripts["common_run_away_algorithm"](_private.myCombatants, -1)) {
                             fight.over(-2);
                             return;
                         }
@@ -1158,31 +1189,27 @@ Item {
             radius: height / 20
 
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
+            GameMenu {
+                id: menuSkillsOrGoods
+                //保存类型；0为普通技能，1为技能，2为物品
+                property int nType: -1
 
-                GameMenu {
-                    id: menuSkillsOrGoods
-                    //保存类型；0为普通技能，1为技能，2为物品
-                    property int nType: -1
+                //radius: rectMenu.radius
 
-                    //radius: rectMenu.radius
+                width: parent.width
+                height: parent.height
+                //Layout.preferredHeight: implicitHeight
+                //Layout.fillHeight: true
 
-                    Layout.preferredWidth: parent.width
-                    Layout.preferredHeight: implicitHeight
-                    //Layout.fillHeight: true
+                strTitle: "选择"
+                //height: parent.height / 2
+                //anchors.centerIn: parent
 
-                    strTitle: "选择"
-                    //height: parent.height / 2
-                    //anchors.centerIn: parent
+                onS_Choice: {
+                    rectSkills.visible = false;
+                    //menuSkillsOrGoods.hide();
 
-                    onS_Choice: {
-                        rectSkills.visible = false;
-                        //menuSkillsOrGoods.hide();
-
-                        _private.choicedSkillOrGoods(arrData[index], nType);
-                    }
+                    _private.choicedSkillOrGoods(arrData[index], nType);
                 }
             }
         }
@@ -1429,11 +1456,11 @@ Item {
                             /*let skill;
                             if(GlobalLibraryJS.isString(tskill)) {
                                 skill = {$rid: tskill};
-                                GlobalLibraryJS.copyPropertiesToObject(skill, game.objSkills[tskill].$properties);
+                                GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.resources.skills[tskill].$properties);
                             }
                             else {
                                 skill = {$rid: tskill.RId};
-                                GlobalLibraryJS.copyPropertiesToObject(skill, game.objSkills[tskill.RId].$properties);
+                                GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.resources.skills[tskill.RId].$properties);
                                 GlobalLibraryJS.copyPropertiesToObject(skill, tskill);
                             }*/
 
@@ -1455,11 +1482,11 @@ Item {
                             /*let skill;
                             if(GlobalLibraryJS.isString(tskill)) {
                                 skill = {$rid: tskill};
-                                GlobalLibraryJS.copyPropertiesToObject(skill, game.objSkills[tskill].$properties);
+                                GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.resources.skills[tskill].$properties);
                             }
                             else {
                                 skill = {$rid: tskill.RId};
-                                GlobalLibraryJS.copyPropertiesToObject(skill, game.objSkills[tskill.RId].$properties);
+                                GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.resources.skills[tskill.RId].$properties);
                                 GlobalLibraryJS.copyPropertiesToObject(skill, tskill);
                             }*/
 
@@ -1515,10 +1542,10 @@ Item {
 
                 //显示所有战斗可用的道具
                 for(let goods of game.gd["$sys_goods"]) {
-                    //let goodsInfo = game.objGoods[goods.$rid];
+                    //let goodsInfo = game.$sys.resources.goods[goods.$rid];
                     if(goods.$commons.$fightScript) {
                         arrGoods.push(goods);
-                        arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.objCommonScripts["show_goods_name"](goods)));
+                        arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
                     }
                 }
 
@@ -1534,7 +1561,7 @@ Item {
         function choicedSkillOrGoods(used, type) {
 
             //console.debug("~~~~~~~~~weapon", JSON.stringify(tWeapon))
-            //console.debug("~~~~~~~~~weapon", JSON.stringify(game.objGoods[tWeapon.RId]))
+            //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.resources.goods[tWeapon.RId]))
 
 
 
@@ -1544,17 +1571,26 @@ Item {
             //console.debug('!!!1', JSON.stringify(used))
             //检测技能
             if(type === 0 || type === 1) {
-                checkSkill = game.objCommonScripts["common_check_skill"](used, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], 0);
-                if(checkSkill !== true) {   //如果技能不可用
-                    fight.msg(checkSkill || "技能不能使用", 50);
+                checkSkill = game.$sys.resources.commonScripts["common_check_skill"](used, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], null, 0);
+                if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
+                    fight.msg(checkSkill || "不能选择", 50);
                     return;
                 }
+                if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
+                    fight.msg(...checkSkill);
+                    return;
+                }
+                if(checkSkill !== true) {   //如果技能不可用
+                    fight.msg("不能选择", 50);
+                    return;
+                }
+
                 if(used.$commons.$choiceScript)
                     game.run(used.$commons.$choiceScript(used, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole]));
             }
             //检测道具
             else if(type === 2) {
-                //let goodsInfo = game.objGoods[used.$rid];
+                //let goodsInfo = game.$sys.resources.goods[used.$rid];
                 do {
                     if(GlobalLibraryJS.isArray(used.$commons.$fightScript)) {
                         if(used.$commons.$fightScript[1] === true) {
@@ -1658,7 +1694,7 @@ Item {
         function readFightRole(role) {
             //console.debug("[FightScene]readFightRole");
 
-            let data = game.objFightRoles[role.$rid];
+            let data = game.$sys.resources.fightRoles[role.$rid];
             if(data) {
                 GlobalLibraryJS.copyPropertiesToObject(role, data.$createData());
 
@@ -1716,7 +1752,7 @@ Item {
 
             let spriteEffect = fightrole.$$fightData.$info.$spriteEffect;
 
-            if(!_public.loadSpriteEffect(actions[action], spriteEffect, loop)) {
+            if(!rootGameScene._public.loadSpriteEffect(actions[action], spriteEffect, loop)) {
                 console.warn("[FightScene]载入战斗精灵动作失败：" + action);
                 return false;
             }
@@ -1730,7 +1766,7 @@ Item {
         //读取技能文件
         function loadFightSkillInfo(fightSkillName) {
             //console.debug("[FightScene]loadFightSkillInfo0");
-            return game.objSkills[fightSkillName];
+            return game.$sys.resources.skills[fightSkillName];
 
             /*if(fightSkillName) {
 
@@ -1768,21 +1804,23 @@ Item {
         //重置所有Roles位置
         function resetRolesPosition() {
             for(let i = 0; i < repeaterMyCombatants.nCount; ++i) {
+                let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](0, i);
                 let tRoleSpriteEffect = repeaterMyCombatants.itemAt(i);
-                tRoleSpriteEffect.x = itemRolesContainer.width / 4 - tRoleSpriteEffect.width / 2;
-                tRoleSpriteEffect.y = itemRolesContainer.height * (i + 1) / (repeaterMyCombatants.nCount + 1) - tRoleSpriteEffect.height / 2;
+                tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
+                tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
             }
 
             for(let i = 0; i < repeaterEnemies.nCount; ++i) {
+                let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](1, i);
                 let tRoleSpriteEffect = repeaterEnemies.itemAt(i);
-                tRoleSpriteEffect.x = itemRolesContainer.width * 3 / 4 - tRoleSpriteEffect.width / 2;
-                tRoleSpriteEffect.y = itemRolesContainer.height * (i + 1) / (repeaterEnemies.nCount + 1) - tRoleSpriteEffect.height / 2;
+                tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
+                tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
             }
 
         }
 
         //获取 某战斗角色 中心位置
-        //teamID、index是战斗角色的；cols表示有几列（战场分布）；
+        /*/teamID、index是战斗角色的；cols表示有几列（战场分布）；
         function getCombatantPosition(teamID, index, cols=4) {
             //let teamID = combatant.$$fightData.$info.$teamID[0];
             //let index = combatant.$$fightData.$info.$index;
@@ -1794,6 +1832,7 @@ Item {
                 return Qt.point(itemRolesContainer.width * (cols-1) / cols, itemRolesContainer.height * (index + 1) / (repeaterEnemies.nCount + 1));
             }
         }
+        */
 
 
 
@@ -1803,7 +1842,7 @@ Item {
             let role1 = team1[roleIndex1];
             let role2 = team2[roleIndex2];
 
-            let skillEffectResult = game.objCommonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
+            let skillEffectResult = game.$sys.resources.commonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
             //for(let t in skillEffectResult) {
             //}
             return skillEffectResult;
@@ -1859,7 +1898,7 @@ Item {
             //msgbox.textArea.append(name2 + "使用" + role2.$$fightData.defenseProp + "防御");
 
 
-            harm = game.objCommonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
+            harm = game.$sys.resources.commonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
 
 
             str = "属性使用";
@@ -1906,7 +1945,7 @@ Item {
                 //循环每个队伍，开始遍历运行 Buff
                 for(let tcombatant of [..._private.myCombatants, ..._private.enemies]) {
 
-                    let combatantRoundScript = game.objCommonScripts["combatant_round_script"](tcombatant, _private.nRound, 0);
+                    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](tcombatant, _private.nRound, 0);
 
                     if(combatantRoundScript === null) {
 
@@ -1928,12 +1967,12 @@ Item {
 
 
                     //重新计算属性
-                    game.objCommonScripts["refresh_combatant"](tcombatant);
+                    game.$sys.resources.commonScripts["refresh_combatant"](tcombatant);
                 }
 
 
 
-                fightResult = game.objCommonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
+                fightResult = game.$sys.resources.commonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
                 //战斗结束
                 if(fightResult.result !== 0) {
                     _private.fightOver(fightResult);
@@ -1951,7 +1990,7 @@ Item {
 
                 //通用回合开始脚本
                 //console.debug("运行回合事件!!!", _private.nRound)
-                fight.run([game.objCommonScripts["fight_round_script"](_private.nRound, 0, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round11']);
+                fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round11']);
 
 
 
@@ -1993,7 +2032,7 @@ Item {
 
                 //通用回合开始脚本
                 //console.debug("运行回合事件!!!", _private.nRound)
-                fight.run([game.objCommonScripts["fight_round_script"](_private.nRound, 1, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round12']);
+                fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round12']);
 
 
 
@@ -2022,7 +2061,7 @@ Item {
 
                 //计算 攻击 顺序
                 let allCombatants = _private.myCombatants.concat(_private.enemies);
-                allCombatants.sort(game.objCommonScripts["sort_fight_algorithm"]);
+                allCombatants.sort(game.$sys.resources.commonScripts["sort_fight_algorithm"]);
                 //console.debug("[FightScene]all", allCombatants.length, JSON.stringify(allCombatants));
 
                 /*/敌人 选择防御
@@ -2049,7 +2088,7 @@ Item {
 
 
                         //执行 战斗人物回合 脚本
-                        let combatantRoundScript = game.objCommonScripts["combatant_round_script"](combatant, _private.nRound, 1);
+                        let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, 1);
 
                         if(combatantRoundScript === null) {
                             break;
@@ -2102,7 +2141,7 @@ Item {
                                     if(!bFind)
                                         ;
                                     //如果技能可用
-                                    else if(true === game.objCommonScripts["common_check_skill"](combatant.$$fightData.$attackSkill, combatant, 1)) {
+                                    else if(true === game.$sys.resources.commonScripts["common_check_skill"](combatant.$$fightData.$attackSkill, combatant, null, 10)) {
                                         break;
                                     }
 
@@ -2115,7 +2154,7 @@ Item {
 
                                 //判断道具是否可用
                                 let goods = combatant.$$fightData.$attackSkill;
-                                let goodsInfo = game.objGoods[goods.$rid];
+                                let goodsInfo = game.$sys.resources.goods[goods.$rid];
                                 do {
                                     //如果没这个道具，则不能用
                                     if(!game.goods(goods))
@@ -2159,7 +2198,7 @@ Item {
                                         break;
                                     }
 
-                                    let checkSkill = game.objCommonScripts["common_check_skill"](skill, combatant, 1);
+                                    let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skill, combatant, null, 10);
                                     if(checkSkill === true) {   //如果技能符合可用
                                         combatant.$$fightData.$choiceType = 0;
                                         combatant.$$fightData.$attackSkill = skill;
@@ -2201,7 +2240,7 @@ Item {
                             if(combatant.$$fightData.$choiceType === 3)   //如果没有可选的技能，则下一个角色
                                 break;
 
-                            game.objCommonScripts["enemy_choice_skill_algorithm"](combatant);
+                            game.$sys.resources.commonScripts["enemy_choice_skill_algorithm"](combatant);
 
                             if(combatant.$$fightData.$choiceType === 3)   //如果没有可选的技能，则下一个角色
                                 break;
@@ -2377,7 +2416,7 @@ Item {
                         if(combatant.$$fightData.$choiceType === 2) {
 
                             let goods = combatant.$$fightData.$attackSkill;
-                            let goodsInfo = game.objGoods[goods.$rid];
+                            let goodsInfo = game.$sys.resources.goods[goods.$rid];
 
 
                             let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
@@ -2436,7 +2475,7 @@ Item {
 
 
                         //if(harm !== 0) {   //对方生命为0
-                        fightResult = game.objCommonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
+                        fightResult = game.$sys.resources.commonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
                         //战斗结束
                         if(fightResult.result !== 0) {
                             _private.fightOver(fightResult);
@@ -2449,7 +2488,7 @@ Item {
 
 
                     //执行 战斗人物回合 脚本
-                    let combatantRoundScript = game.objCommonScripts["combatant_round_script"](combatant, _private.nRound, 2);
+                    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, 2);
 
                     if(combatantRoundScript === null) {
                         continue;
@@ -2489,7 +2528,7 @@ Item {
                 /*/运行两个回合脚本（阶段3）
 
                 //通用回合开始脚本
-                if(GlobalJS.createScript(_private.asyncScript, 0, 0, game.objCommonScripts["fight_round_script"].call({game, fight}, _private.nRound, 1)) === 0)
+                if(GlobalJS.createScript(_private.asyncScript, 0, 0, game.$sys.resources.commonScripts["fight_round_script"].call({game, fight}, _private.nRound, 1)) === 0)
                     _private.asyncScript.run();
 
                 //回合开始脚本
@@ -2550,7 +2589,7 @@ Item {
                 //    fight.run([_private.fightEndScript, 'fight end'], -1, result, [_private.myCombatants, _private.enemies,], _private.fightData);
                 //}
 
-                fight.run([game.objCommonScripts["fight_end_script"](result, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight end2']);
+                fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight end2']);
             //}
         }
 
@@ -2561,6 +2600,7 @@ Item {
         function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             combatant = combatantActionSpriteData.Combatant || combatant;
+            //目标战士或队伍
             let targetCombatantOrTeamIndex = combatantActionSpriteData.Target;
             let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
 
@@ -2574,7 +2614,7 @@ Item {
                 //refreshAllFightRoleInfo();
 
                 for(let tc of [..._private.myCombatants, ..._private.enemies]) {
-                    game.objCommonScripts["refresh_combatant"](tc);
+                    game.$sys.resources.commonScripts["refresh_combatant"](tc);
                 }
 
                 //if(tRoleSpriteEffect2.propertyBar)
@@ -2593,7 +2633,7 @@ Item {
                 //break;
 
             case 3:    //结算 技能效果
-                SkillEffectResult = game.objCommonScripts["fight_skill_algorithm"](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
+                SkillEffectResult = game.$sys.resources.commonScripts["fight_skill_algorithm"](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
                 //SkillEffectResult = (doSkillEffect(role1.$$fightData.$team, role1.$$fightData.$index, role2.$$fightData.$team, role2.$$fightData.$index, tSkillEffect));
 
                 return SkillEffectResult;
@@ -2601,7 +2641,7 @@ Item {
 
             case 4:
                 //隐藏死亡角色
-                game.objCommonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
+                game.$sys.resources.commonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
 
                 return 0;
 
@@ -2643,33 +2683,50 @@ Item {
 
                 //是否跑动
                 if(combatantActionSpriteData.Run !== undefined && combatantActionSpriteData.Duration > 0) {
-                    let offset;
+
+                    //移动位置偏移
+                    let offset = [0, 0];
+                    if(GlobalLibraryJS.isArray(combatantActionSpriteData.Offset)) {
+                        if(GlobalLibraryJS.isValidNumber(combatantActionSpriteData.Offset[0])) {
+                            offset[0] = combatantActionSpriteData.Offset[0];
+                        }
+                        if(GlobalLibraryJS.isValidNumber(combatantActionSpriteData.Offset[1])) {
+                            offset[1] = combatantActionSpriteData.Offset[1];
+                        }
+                    }
+
+                    let position;
                     switch(combatantActionSpriteData.Run) {
                     case 0:
-                        offset = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
-                        combatantSpriteEffect.numberanimationSpriteEffectX.to = offset.x - combatantSpriteEffect.width / 2;
-                        combatantSpriteEffect.numberanimationSpriteEffectY.to = offset.y - combatantSpriteEffect.height / 2;
+                        //位置
+                        position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
+                        combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
+                        combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
                         break;
 
                     case 1:
-                        let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
+                        position = game.$sys.resources.commonScripts["fight_combatant_melee_position_algorithm"](combatant, targetCombatantOrTeamIndex);
+                        /*let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
+                        //x偏移一下
                         let tx = combatantSpriteEffect.x < targetCombatantSpriteEffect.x ? -combatantSpriteEffect.width : combatantSpriteEffect.width;
-                        offset = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
-                        combatantSpriteEffect.numberanimationSpriteEffectX.to = offset.x + combatantSpriteEffect.x;
-                        combatantSpriteEffect.numberanimationSpriteEffectY.to = offset.y + combatantSpriteEffect.y;
 
-                        //combatantSpriteEffect.x = offset.x + combatantSpriteEffect.x;
-                        //combatantSpriteEffect.y = offset.y + combatantSpriteEffect.y;
+                        position = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+                        */
+                        combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x + offset[0];
+                        combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y + offset[1];
 
-                        //console.debug("!!!", offset, combatantSpriteEffect.x, offset.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
+                        //combatantSpriteEffect.x = position.x + combatantSpriteEffect.x;
+                        //combatantSpriteEffect.y = position.y + combatantSpriteEffect.y;
+
+                        //console.debug("!!!", position, combatantSpriteEffect.x, position.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
 
                         break;
 
                     case 2:
-                        offset = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], (combatant.$$fightData.$info.$team[targetCombatantOrTeamIndex].length - 1) / 2, 3);
-                        combatantSpriteEffect.numberanimationSpriteEffectX.to = offset.x - combatantSpriteEffect.width / 2;
-                        combatantSpriteEffect.numberanimationSpriteEffectY.to = offset.y - combatantSpriteEffect.height / 2;
+                        position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], -1);
+                        combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
+                        combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
                         break;
 
                     }
@@ -2697,7 +2754,7 @@ Item {
                 break;
 
             case 20: {   //Sprite
-                    let spriteEffect = _public.loadSpriteEffect(combatantActionSpriteData.Name, undefined, combatantActionSpriteData.Loops, itemRolesContainer);
+                    let spriteEffect = rootGameScene._public.loadSpriteEffect(combatantActionSpriteData.Name, undefined, combatantActionSpriteData.Loops, itemRolesContainer);
 
                     if(spriteEffect === null)
                         break;
@@ -2759,18 +2816,18 @@ Item {
                         let position;
                         switch(combatantActionSpriteData.Position) {
                         case 0:
-                            position = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
+                            position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
                             spriteEffect.x = position.x - spriteEffect.width / 2;
                             spriteEffect.y = position.y - spriteEffect.height / 2;
                             break;
                         case 1:
-                            position = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
+                            position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
                             spriteEffect.x = position.x - spriteEffect.width / 2;
                             spriteEffect.y = position.y - spriteEffect.height / 2;
 
                             break;
                         case 2:
-                            position = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], (combatant.$$fightData.$info.$team[targetCombatantOrTeamIndex].length - 1) / 2);
+                            position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], -1);
                             spriteEffect.x = position.x - spriteEffect.width / 2;
                             spriteEffect.y = position.y - spriteEffect.height / 2;
 
@@ -2780,35 +2837,49 @@ Item {
 
                     //是否跑动
                     if(combatantActionSpriteData.Run !== undefined && combatantActionSpriteData.Duration > 0) {
-                        let offset;
+
+                        //移动位置偏移
+                        let offset = [0, 0];
+                        if(GlobalLibraryJS.isArray(combatantActionSpriteData.Offset)) {
+                            if(GlobalLibraryJS.isValidNumber(combatantActionSpriteData.Offset[0])) {
+                                offset[0] = combatantActionSpriteData.Offset[0];
+                            }
+                            if(GlobalLibraryJS.isValidNumber(combatantActionSpriteData.Offset[1])) {
+                                offset[1] = combatantActionSpriteData.Offset[1];
+                            }
+                        }
+
+                        let position;
                         switch(combatantActionSpriteData.Run) {
                         case 0:
-                            offset = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
-
-                            spriteEffect.numberanimationSpriteEffectX.to = offset.x - spriteEffect.width / 2;
-                            spriteEffect.numberanimationSpriteEffectY.to = offset.y - spriteEffect.height / 2;
+                            position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
+                            spriteEffect.numberanimationSpriteEffectX.to = position.x - spriteEffect.width / 2 + offset[0];
+                            spriteEffect.numberanimationSpriteEffectY.to = position.y - spriteEffect.height / 2 + offset[1];
                             break;
 
                         case 1:
+                            position = game.$sys.resources.commonScripts["fight_skill_melee_position_algorithm"](targetCombatantOrTeamIndex, spriteEffect);
+                            /*
                             let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
                             let tx = spriteEffect.x < targetCombatantSpriteEffect.x ? -spriteEffect.width : spriteEffect.width;
-                            offset = spriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
-                            spriteEffect.numberanimationSpriteEffectX.to = offset.x + spriteEffect.x;
-                            spriteEffect.numberanimationSpriteEffectY.to = offset.y + spriteEffect.y;
+                            position = spriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+                            */
 
-                            //spriteEffect.x = offset.x + spriteEffect.x;
-                            //spriteEffect.y = offset.y + spriteEffect.y;
+                            spriteEffect.numberanimationSpriteEffectX.to = position.x + offset[0];
+                            spriteEffect.numberanimationSpriteEffectY.to = position.y + offset[1];
 
-                            //console.debug("!!!", offset, spriteEffect.x, offset.x + spriteEffect.x, AnimatedSprite.Infinite);
+                            //spriteEffect.x = position.x + spriteEffect.x;
+                            //spriteEffect.y = position.y + spriteEffect.y;
+
+                            //console.debug("!!!", position, spriteEffect.x, position.x + spriteEffect.x, AnimatedSprite.Infinite);
 
                             break;
 
                         case 2:
-                            offset = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], (combatant.$$fightData.$info.$team[targetCombatantOrTeamIndex].length - 1) / 2, 3);
-
-                            spriteEffect.numberanimationSpriteEffectX.to = offset.x - combatantSpriteEffect.width / 2;
-                            spriteEffect.numberanimationSpriteEffectY.to = offset.y - combatantSpriteEffect.height / 2;
+                            position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[targetCombatantOrTeamIndex], -1);
+                            spriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
+                            spriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
                             break;
 
                         }
@@ -2907,14 +2978,14 @@ Item {
                     let position;
                     switch(combatantActionSpriteData.Position) {
                     case 1:
-                        /*position = _private.getCombatantPosition(role2.$$fightData.$teamID, role2.$$fightData.$index);
+                        /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role2.$$fightData.$teamID, role2.$$fightData.$index);
                         spriteEffect.x = position.x - spriteEffect.width / 2;
                         spriteEffect.y = position.y - spriteEffect.height / 2;
                         */
 
                         break;
                     case 4:
-                        /*position = _private.getCombatantPosition(role1.$$fightData.$teamID, role1.$$fightData.$index);
+                        /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role1.$$fightData.$teamID, role1.$$fightData.$index);
                         spriteEffect.x = position.x - spriteEffect.width / 2;
                         spriteEffect.y = position.y - spriteEffect.height / 2;
                         */
@@ -2922,7 +2993,7 @@ Item {
                     }
                 }
                 else {
-                    let position = _private.getCombatantPosition(combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
+                    let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
                 }
@@ -3028,7 +3099,11 @@ Item {
 
         repeaterMyCombatants.model.clear();
         repeaterEnemies.model.clear();
+
+        delete FrameManager.globalObject().fight;
+
         //console.debug("[main]Component.onDestruction");
+
     }
 
 }

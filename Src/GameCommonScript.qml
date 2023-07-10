@@ -47,11 +47,16 @@ Rectangle {
 //注意：game.$globalLibraryJS
 
 //.import 'level_chain.js' as JSLevelChain       //导入另一个js文件
+//let jsLevelChain = JSLevelChain;    //让外部可访问
 
 
 
 //配置
 let $config = {
+    $map: {
+        opacity: 0.6,   //人物遮挡透明度
+    },
+
     //摇杆
     $joystick: {
         //位置
@@ -492,7 +497,7 @@ function computeCombatantPropertiesWithExtra(combatant) {
         if(!combatant.$equipment[tg])
             continue;
 
-        let goodsInfo = game.objGoods[combatant.$equipment[tg].$rid];
+        let goodsInfo = game.$sys.resources.goods[combatant.$equipment[tg].$rid];
         //计算新属性
         if(goodsInfo.$equipEffectAlgorithm)
             goodsInfo.$equipEffectAlgorithm(combatant.$equipment[tg], combatant);
@@ -631,16 +636,16 @@ function $enemyChoiceSkillAlgorithm(combatant) {
         /*let attackSkill;
         if(game.$globalLibraryJS.isString(skill)) {
             attackSkill = {$rid: skill};
-            game.$globalLibraryJS.copyPropertiesToObject(attackSkill, game.objSkills[skill].$properties);
+            game.$globalLibraryJS.copyPropertiesToObject(attackSkill, game.$sys.resources.skills[skill].$properties);
         }
         else {
             attackSkill = {$rid: skill.RId};
-            game.$globalLibraryJS.copyPropertiesToObject(attackSkill, game.objSkills[skill.RId].$properties);
+            game.$globalLibraryJS.copyPropertiesToObject(attackSkill, game.$sys.resources.skills[skill.RId].$properties);
             game.$globalLibraryJS.copyPropertiesToObject(attackSkill, skill);
         }*/
 
-        //let checkSkill = game.objCommonScripts['common_check_skill'](skill, combatant, 1);
-        let checkSkill = $commonCheckSkill(skill, combatant, 1);
+        //let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](skill, combatant, 1);
+        let checkSkill = $commonCheckSkill(skill, combatant, null, 1);
         if(checkSkill === true) {   //如果技能符合可用
             combatant.$$fightData.$choiceType = skill.$type;
             combatant.$$fightData.$attackSkill = skill;
@@ -968,8 +973,8 @@ function *combatantRoundEffects(combatant, round, stage) {
 
 //检测 技能/攻击 是否可用（有4个阶段会调用：选择时、攻击时、敌人和我方遍历时）；
 //返回：true表示可以使用；字符串表示不能使用并提示的信息（只有选择时）；
-//stage为0表示选择时，为1表示选择后；
-function $commonCheckSkill(fightSkill, combatant, stage) {
+//stage为0表示选择时，为1表示选择某战斗角色（我方或敌方，此时targetCombatant不为null，其他情况为null），为10表示战斗中；
+function $commonCheckSkill(fightSkill, combatant, targetCombatant, stage) {
 
     let buffs = combatant.$$fightData.$buffs;
     /*if(buffs['$$Sleep']) {
@@ -1003,7 +1008,7 @@ function $commonCheckSkill(fightSkill, combatant, stage) {
     }
 
 
-    return fightSkill.$check(fightSkill, combatant, stage);
+    return fightSkill.$check(fightSkill, combatant, targetCombatant, stage);
     //return true;
 }
 
@@ -1049,12 +1054,12 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
                     /*let g;
                     if(game.$globalLibraryJS.isObject(teq)) { //如果直接是对象
                         g = {$rid: teq.RId};
-                        game.$globalLibraryJS.copyPropertiesToObject(g, game.objGoods[teq.RId].$properties);
+                        game.$globalLibraryJS.copyPropertiesToObject(g, game.$sys.resources.goods[teq.RId].$properties);
                         game.$globalLibraryJS.copyPropertiesToObject(g, teq);
                     }
                     else if(game.$globalLibraryJS.isString(teq)) { //
                         g = {$rid: teq};
-                        game.$globalLibraryJS.copyPropertiesToObject(g, game.objGoods[teq].$properties);
+                        game.$globalLibraryJS.copyPropertiesToObject(g, game.$sys.resources.goods[teq].$properties);
                     }*/
                     totalGoods.push(goods);
                 }
@@ -1319,6 +1324,54 @@ function *$commonFightEndScript(r, teams, fightData) {
     });
 
     //console.debug(JSON.stringify(r), r.exp, r.money);
+}
+
+
+
+//获取 某战斗角色 中心位置
+//teamID、index是战斗角色的；cols表示有几列（战场分布）；
+function $fightCombatantPositionAlgorithm(teamID, index) {
+    //let teamID = combatant.$$fightData.$info.$teamID[0];
+    //let index = combatant.$$fightData.$info.$index;
+
+    if(index === -1) {    //全体时的位置
+        let cols = 3;
+        if(teamID === 0)    //我方
+            return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height / 2);
+        else    //敌方
+            return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height / 2);
+    }
+
+    //单个人物位置
+    let cols = 4;
+    if(teamID === 0) {    //我方
+        return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height * (index + 1) / (fight.$sys.components.spriteEffectMyCombatants.nCount + 1));
+    }
+    else {  //敌方
+        return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height * (index + 1) / (fight.$sys.components.spriteEffectEnemies.nCount + 1));
+    }
+}
+
+//战斗角色近战 坐标
+function $fightCombatantMeleePositionAlgorithm(combatant, targetCombatant) {
+    let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
+    let targetCombatantSpriteEffect = targetCombatant.$$fightData.$info.$spriteEffect;
+
+    //x偏移（targetCombatant的左或右边）
+    let tx = combatantSpriteEffect.x < targetCombatantSpriteEffect.x ? -combatantSpriteEffect.width : combatantSpriteEffect.width;
+    let position = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+
+    return Qt.point(position.x + combatantSpriteEffect.x, position.y + combatantSpriteEffect.y);
+}
+//特效在战斗角色的 坐标
+function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
+    let targetCombatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
+
+    //x偏移（spriteEffect的左或右边）
+    let tx = spriteEffect.x < targetCombatantSpriteEffect.x ? -spriteEffect.width : spriteEffect.width;
+    let position = spriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+
+    return Qt.point(position.x + spriteEffect.x, position.y + spriteEffect.y);
 }
 
 

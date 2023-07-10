@@ -12,6 +12,7 @@ import _Global.Button 1.0
 import "qrc:/QML"
 
 
+import "./Core"
 //import "File.js" as File
 
 

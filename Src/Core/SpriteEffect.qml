@@ -15,10 +15,9 @@ import "qrc:/QML"
 
 /*
 
-  ////鹰：由于Sprite的 source 和 frameX、frameY 修改无效，所以只能用Component进行创建，使用refresh进行删除重建。
+    //如果是循环播放（循环播放没有开始和结束信号）
 
-            //如果是循环播放（循环播放没有开始和结束信号）
-
+    SoundEffect：
     //鹰：play可以停止前面的播放，然后重新开始播放
     //给source赋值时，会从硬盘读取；start时内存才会增加!!
     //多个SoundEffect，同时赋值source会比同时start更卡；
@@ -36,11 +35,12 @@ Item {
     property size sizeFrame: Qt.size(0,0)     //一帧的宽高
     property int nFrameCount: 3 //一个方向有几张图片
     property int interval: 100  //帧切换速度
-    property point offsetIndex: Qt.point(0, 0)  //上右下左 的 行、列 偏移
+    property point offsetIndex: Qt.point(0, 0)  //行、列 偏移
     property real rXScale: 1        //1为原图，-1为X轴镜像，其他值为X轴缩放
     property real rYScale: 1        //1为原图，-1为Y轴镜像，其他值为Y轴缩放
 
     property alias animatedsprite: animatedsprite
+    property alias running: animatedsprite.running
     property alias numberanimationSpriteEffectX: numberanimationSpriteEffectX
     property alias numberanimationSpriteEffectY: numberanimationSpriteEffectY
 
@@ -84,8 +84,8 @@ Item {
 
         animatedsprite.start();
 
-        if(soundeffectName)
-            timerSound.start();
+        //if(soundeffectName)
+        //    timerSound.start();
 
         if(animatedsprite.frameCount === 1) {
             timerInterval.interval = interval;
@@ -165,6 +165,7 @@ Item {
         }
 
         onFinished: {
+            timerSound.stop();
             root.s_finished();
             if(test)
                 console.debug('!!!onFinished:', loops, soundeffect.source, finished, spriteSrc);
@@ -186,8 +187,13 @@ Item {
                     }
                 }
             //}*/
-            if(currentFrame === frameCount - 1)    //结束信号
+            if(currentFrame === 0)
+                if(soundeffectName)
+                    timerSound.restart();
+
+            if(currentFrame === frameCount - 1) {    //结束信号
                 root.s_looped();
+            }
 
             if(test)
                 console.debug('!!!onCurrentFrameChanged:', currentFrame);
@@ -205,7 +211,7 @@ Item {
         }
     }
 
-    //闪烁
+    //闪烁（颜色）
     ColorOverlay {
         id: colorOverlay
 
@@ -265,11 +271,14 @@ Item {
     //鹰：play可以停止前面的播放，然后重新开始播放
     //给source赋值时，会从硬盘读取；start时内存才会增加!!
     //多个SoundEffect，同时赋值source会比同时start更卡；
-    SoundEffect {
+    /*SoundEffect {
         id: soundeffect
         onStatusChanged: {
             //console.debug("~~~~~~~SoundEffect1", status);
         }
+    }*/
+    Audio {
+        id: soundeffect
     }
 
 
@@ -303,6 +312,7 @@ Item {
             //console.debug('timerInterval Triggerd:', spriteSrc);
 
             animatedsprite.stop();
+            timerSound.stop();
             root.s_looped();
             root.s_finished();
 

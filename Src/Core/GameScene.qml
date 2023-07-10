@@ -57,36 +57,39 @@ import "GameMakerGlobal.js" as GameMakerGlobalJS
     game.gd["$sys_goods"]: 道具道具 列表（存的是{$rid: goodsRId, $count: count}）
     game.gd["$sys_map"]: 当前地图信息
     game.gd["$sys_fps"]: 当前FPS
-    game.gd["$sys_main_roles"]: 当前主角列表，保存了主角属性（{$rid、$index、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y 等}）
+    game.gd["$sys_main_roles"]: 当前主角列表，保存了主角属性（{$rid、$id、$name、$index、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y 等}）
     game.gd["$sys_music"]: 当前播放的音乐名
     game.gd["$sys_scale"]: 当前缩放大小
     game.gd["$sys_random_fight"]：随机战斗
 
-    game.objCommonScripts["combatant_class"] = tCommoncript.$Combatant;
-    game.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
-    game.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
-    game.objCommonScripts["fight_skill_algorithm"]：战斗算法
-    game.objCommonScripts["enemy_choice_skill_algorithm"]：敌人出技能算法
-    game.objCommonScripts["game_over_script"];   //游戏结束脚本
-    game.objCommonScripts["common_run_away_algorithm"]：逃跑算法
-    game.objCommonScripts["fight_start_script"]：战斗开始通用脚本
-    game.objCommonScripts["fight_round_script"]：战斗回合通用脚本
-    game.objCommonScripts["fight_end_script"]：战斗结束通用脚本（升级经验、获得金钱）
-    game.objCommonScripts["resume_event_script"]
-    //game.objCommonScripts["get_goods_script"]
-    //game.objCommonScripts["use_goods_script"]
-    game.objCommonScripts["equip_reserved_slots"] //装备预留槽位
-    game.objCommonScripts["sort_fight_algorithm"]
-    game.objCommonScripts["combatant_info"]
-    game.objCommonScripts["show_goods_name"]
-    game.objCommonScripts["show_combatant_name"]
-    game.objCommonScripts["common_check_skill"]
-    game.objCommonScripts["combatant_round_script"]
-    //game.objCommonScripts["events"]
+    _private.objCommonScripts["combatant_class"] = tCommoncript.$Combatant;
+    _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
+    _private.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
+    _private.objCommonScripts["fight_skill_algorithm"]：战斗算法
+    _private.objCommonScripts["enemy_choice_skill_algorithm"]：敌人出技能算法
+    _private.objCommonScripts["game_over_script"];   //游戏结束脚本
+    _private.objCommonScripts["common_run_away_algorithm"]：逃跑算法
+    _private.objCommonScripts["fight_start_script"]：战斗开始通用脚本
+    _private.objCommonScripts["fight_round_script"]：战斗回合通用脚本
+    _private.objCommonScripts["fight_end_script"]：战斗结束通用脚本（升级经验、获得金钱）
+    _private.objCommonScripts["fight_combatant_position_algorithm"]：//获取 某战斗角色 中心位置
+    _private.objCommonScripts["fight_combatant_melee_position_algorithm"]：//战斗角色近战 坐标
+    _private.objCommonScripts["fight_skill_melee_position_algorithm"]//特效在战斗角色的 坐标
+    //_private.objCommonScripts["resume_event_script"]
+    //_private.objCommonScripts["get_goods_script"]
+    //_private.objCommonScripts["use_goods_script"]
+    _private.objCommonScripts["equip_reserved_slots"] //装备预留槽位
+    _private.objCommonScripts["sort_fight_algorithm"]
+    _private.objCommonScripts["combatant_info"]
+    _private.objCommonScripts["show_goods_name"]
+    _private.objCommonScripts["show_combatant_name"]
+    _private.objCommonScripts["common_check_skill"]
+    _private.objCommonScripts["combatant_round_script"]
+    //_private.objCommonScripts["events"]
 
 
-    //game.objCommonScripts["levelup_script"]：升级脚本（经验等条件达到后升级和结果）
-    //game.objCommonScripts["level_Algorithm"]：升级算法（直接升级对经验等条件的影响）
+    //_private.objCommonScripts["levelup_script"]：升级脚本（经验等条件达到后升级和结果）
+    //_private.objCommonScripts["level_Algorithm"]：升级算法（直接升级对经验等条件的影响）
 
 */
 
@@ -129,7 +132,6 @@ Rectangle {
             itemContainer.mapEventsTriggering = {};
 
 
-            game.gd["$sys_map"].$name = mapName;
             let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
             let mapInfo = openMap(mapPath);
 
@@ -150,7 +152,7 @@ Rectangle {
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
         //style为样式；
         //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
-        //  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
+        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
         //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
         //buttonNum为按钮数量（0-2，目前没用）。
@@ -198,7 +200,7 @@ Rectangle {
         //pretext为已显示的文字（role为空的情况下）；
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
         //style为样式；
-        //  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
+        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
         //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
         readonly property var talk: function(role, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true) {
@@ -234,10 +236,10 @@ Rectangle {
 
 
             if(role !== null) {
-                if(role.$name && style.Name)
-                    pretext = role.$name + "：" + pretext;
-                if(role.$avatar && style.Avatar)
-                    pretext = GlobalLibraryJS.showRichTextImage(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(role.$avatar)), role.$avatarSize.width, role.$avatarSize.height) + pretext;
+                if(role.$data.$name && style.Name)
+                    pretext = role.$data.$name + "：" + pretext;
+                if(role.$data.$avatar && style.Avatar)
+                    pretext = GlobalLibraryJS.showRichTextImage(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
             }
             dialogRoleMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
@@ -249,7 +251,7 @@ Rectangle {
         //pretext为已显示的文字（role为空的情况下）；
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
         //style为样式；
-        //  如果为对象，则可以修改BackgoundColor、BorderColor、FontSize、FontColor、MaskColor）；
+        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
         //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
         readonly property var say: function(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
@@ -270,7 +272,7 @@ Rectangle {
             //样式
             if(!style)
                 style = {};
-            role.message.color = style.BackgoundColor || '#BF6699FF';
+            role.message.color = style.BackgroundColor || '#BF6699FF';
             role.message.border.color = style.BorderColor || 'white';
             role.message.textArea.font.pointSize = style.FontSize || 9;
             role.message.textArea.font.color = style.FontColor || 'white';
@@ -285,7 +287,7 @@ Rectangle {
         //显示一个菜单；
         //title为显示文字；
         //items为选项数组；
-        //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
+        //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
         //pauseGame是否暂停游戏；
         //返回值为选择的下标（0开始）；
         //注意：该脚本必须用yield才能暂停并接受返回值。
@@ -297,6 +299,8 @@ Rectangle {
             maskMenu.color = style.MaskColor || '#7FFFFFFF';
             menuGame.border.color = style.BorderColor || "white";
             menuGame.color = style.BackgroundColor || "#CF6699FF";
+            menuGame.nItemHeight = style.ItemHeight || 60;
+            menuGame.nTitleHeight = style.TitleHeight || 60;
             menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || 16;
             menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || "white";
             menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || "#00FFFFFF";
@@ -345,12 +349,12 @@ Rectangle {
 
 
 
-            rectGameInput.color = style.BackgoundColor || '#FFFFFF';
+            rectGameInput.color = style.BackgroundColor || '#FFFFFF';
             rectGameInput.border.color = style.BorderColor || '#60000000';
             textGameInput.font.pointSize = style.FontSize || 16;
             textGameInput.font.color = style.FontColor || 'black';
 
-            rectGameInputTitle.color = style.TitleBackgoundColor || '#EE00CC99';
+            rectGameInputTitle.color = style.TitleBackgroundColor || '#EE00CC99';
             rectGameInputTitle.border.color = style.TitleBorderColor || 'white';
             textGameInputTitle.font.pointSize = style.TitleFontSize || 16;
             textGameInputTitle.font.color = style.TitleFontColor || 'white';
@@ -369,27 +373,33 @@ Rectangle {
 
         //创建主角；
         //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-        //  其他参数：$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
-        //  $name为游戏名；
-        //成功返回true。
+        //  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
+        //  $name为游戏显示名；
+        //成功返回 对象。
         readonly property var createhero: function(role={}) {
             if(GlobalLibraryJS.isString(role)) {
-                role = {RId: role};
+                role = {RId: role, $id: role, $name: role};
             }
             if(!role.$name) {
                 role.$name = role.RId;
             }
+            if(!role.$id) {
+                if(role.$name)
+                    role.$id = role.$name;
+                else
+                    role.$id = role.RId + GlobalLibraryJS.randomString(6, 6, '0123456789');
+            }
 
 
             for(let th of _private.arrMainRoles) {
-                if(th.$name === role.$name) {
-                    console.warn('[!GameScene]已经有主角：', role.$name);
+                if(th.$id === role.$id) {
+                    console.warn('[!GameScene]已经有主角：', role.$id);
                     return false;
                 }
             }
 
             if(_private.arrMainRoles[0] !== undefined) {
-                console.warn('[!GameScene]已经有主角：', role.$name);
+                console.warn('[!GameScene]已经有主角：', role.$id);
                 return false;
             }
 
@@ -414,7 +424,9 @@ Rectangle {
             if(game.gd["$sys_main_roles"][index] === undefined) {
                 //mainRole.$name = role.$name;
 
-                game.gd["$sys_main_roles"][index] = {$rid: role.RId, $index: index, $name: role.$name, $showName: true, $speed: 0, $scale: [1,1], $avatar: '', $avatarSize: [0, 0], $x: 0, $y: 0};
+                game.gd["$sys_main_roles"][index] = {$rid: role.RId, $id: role.$id, $name: role.$name, $index: index, $showName: true, $speed: 0, $scale: [1,1], $avatar: '', $avatarSize: [0, 0], $x: 0, $y: 0};
+
+                role = game.gd["$sys_main_roles"][index];
 
                 role.$avatar = cfg.Avatar || '';
                 role.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
@@ -432,7 +444,8 @@ Rectangle {
                 role = game.gd["$sys_main_roles"][index];
             }
 
-            _private.arrMainRoles[index].$index = index;
+            //_private.arrMainRoles[index].$id = role.$id;
+            //_private.arrMainRoles[index].$index = index;
 
             game.gd["$sys_main_roles"][index].__proto__ = cfg;
 
@@ -455,9 +468,13 @@ Rectangle {
             mainRole.rectShadow.opacity = isNaN(parseFloat(cfg.ShadowOpacity)) ? 0.3 : parseFloat(cfg.ShadowOpacity);
             mainRole.penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
 
+            mainRole.$type = 1;
+
             mainRole.refresh();
 
 
+
+            mainRole.$data = role;
 
             if(role.$direction === undefined)
                 role.$direction = 2;
@@ -470,7 +487,7 @@ Rectangle {
         }
 
         //返回 主角；
-        //hero可以是下标，或主角的$name，或主角对象，-1表示所有主角；
+        //hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
         //props：需要修改的 单个主角属性（有$name、$showName、$speed、$scale、$avatar、$avatarSize，$direction、$x，$y、$bx、$by）；
         //  $action：为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
         //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
@@ -486,7 +503,7 @@ Rectangle {
             let index = -1;
             if(GlobalLibraryJS.isString(hero)) {
                 for(index = 0; index < _private.arrMainRoles.length; ++index) {
-                    if(_private.arrMainRoles[index].$name === hero) {
+                    if(_private.arrMainRoles[index].$data.$id === hero) {
                         break;
                     }
                 }
@@ -495,7 +512,7 @@ Rectangle {
                 index = hero;
             }
             else if(GlobalLibraryJS.isObject(hero)) {
-                index = hero.$index;
+                index = hero.$data.$index;
             }
             else {
                 return false;
@@ -523,7 +540,7 @@ Rectangle {
 
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
-                    hero.$name = heroComp.$name = props.$name;
+                    hero.$name = props.$name;
                 if(props.$showName === true)   //修改名字
                     hero.$showName = heroComp.textName.visible = true;
                 else if(props.$showName === false)
@@ -538,10 +555,10 @@ Rectangle {
                 }
                 //!!!这里要加入名字是否重复
                 if(props.$avatar !== undefined)   //修改头像
-                    hero.$avatar = heroComp.$avatar = props.$avatar;
+                    hero.$avatar/* = heroComp.$avatar*/ = props.$avatar;
                 if(props.$avatarSize !== undefined) {  //修改头像
-                    hero.$avatarSize[0] = heroComp.$avatarSize.width = props.$avatarSize[0];
-                    hero.$avatarSize[1] = heroComp.$avatarSize.height = props.$avatarSize[1];
+                    hero.$avatarSize[0]/* = heroComp.$avatarSize.width*/ = props.$avatarSize[0];
+                    hero.$avatarSize[1]/* = heroComp.$avatarSize.height*/ = props.$avatarSize[1];
                 }
 
                 if(props.$action !== undefined)
@@ -560,17 +577,20 @@ Rectangle {
                 if(props.$y !== undefined)   //修改y坐标
                     hero.$y = heroComp.y = props.$y;
                 if(props.$x !== undefined || props.$y !== undefined)
-                    setMapToRole(mainRole);
+                    if(heroComp === _private.sceneRole)setMapToRole(_private.sceneRole);
 
                 if(props.$bx || props.$by)
                     setMainRolePos(parseInt(props.$bx), parseInt(props.$by), hero.$index);
 
+
                 if(props.$direction !== undefined)
-                    //貌似必须10ms以上才可以使其转向
+                    heroComp.changeDirection(props.$direction);
+                    /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
                     GlobalLibraryJS.setTimeout(function() {
-                            heroComp.changeDirection(props.$direction);
+                            if(heroComp)
+                                heroComp.changeDirection(props.$direction);
                         },20,rootGameScene
-                    );
+                    );*/
 
             }
 
@@ -578,7 +598,7 @@ Rectangle {
         }
 
         //删除主角；
-        //hero可以是下标，或主角的name，或主角对象，-1表示所有主角；
+        //hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
         readonly property var delhero: function(hero=-1) {
 
             let tmpDelHero = function () {
@@ -594,10 +614,12 @@ Rectangle {
                 mainRole.rYScale = 1;
                 mainRole.moveSpeed = 0.1;
                 //mainRole.textName.text = '';
-                mainRole.$index = -1;
-                mainRole.$name = '';
-                mainRole.$avatar = '';
-                mainRole.$avatarSize = Qt.size(0, 0);
+                mainRole.$data = null;
+                //mainRole.$id = '';
+                //mainRole.$name = '';
+                //mainRole.$index = -1;
+                //mainRole.$avatar = '';
+                //mainRole.$avatarSize = Qt.size(0, 0);
 
                 //其他属性（用户自定义）
                 mainRole.$props = {};
@@ -632,7 +654,7 @@ Rectangle {
             let index = -1;
             if(GlobalLibraryJS.isString(hero)) {
                 for(index = 0; index < _private.arrMainRoles.length; ++index) {
-                    if(_private.arrMainRoles[index].$name === hero) {
+                    if(_private.arrMainRoles[index].$data.$id === hero) {
                         break;
                     }
                 }
@@ -640,7 +662,7 @@ Rectangle {
             else if(GlobalLibraryJS.isValidNumber(hero))
                 index = hero;
             else if(GlobalLibraryJS.isObject(hero)) {
-                index = hero.$index;
+                index = hero.$data.$index;
             }
             else {
                 return false;
@@ -669,7 +691,7 @@ Rectangle {
             //修正下标
             for(; index < game.gd["$sys_main_roles"].length; ++index) {
                 game.gd["$sys_main_roles"][index].$index = index;
-                _private.arrMainRoles[index].$index = index;
+                //_private.arrMainRoles[index].$index = index;
             }
 
 
@@ -694,7 +716,7 @@ Rectangle {
 
         //创建NPC；
         //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-        //其他参数：$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
+        //其他参数：$id、$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
         //  $name为游戏名；
         //  $action为0表示静止，为1表示随机移动；
         //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
@@ -703,13 +725,19 @@ Rectangle {
         readonly property var createrole: function(role={}) {
 
             if(GlobalLibraryJS.isString(role)) {
-                role = {RId: role};
+                role = {RId: role, $id: role, $name: role};
             }
             if(!role.$name) {
                 role.$name = role.RId;
             }
+            if(!role.$id) {
+                if(role.$name)
+                    role.$id = role.$name;
+                else
+                    role.$id = role.RId + GlobalLibraryJS.randomString(6, 6, '0123456789');
+            }
 
-            if(_private.objRoles[role.$name] !== undefined)
+            if(_private.objRoles[role.$id] !== undefined)
                 return false;
 
 
@@ -723,35 +751,44 @@ Rectangle {
             cfg = JSON.parse(cfg);
 
 
-            let roleObj = compRole.createObject(itemRoleContainer);
+            let roleComp = compRole.createObject(itemRoleContainer);
 
 
-            roleObj.spriteSrc = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
-            roleObj.sizeFrame = Qt.size(cfg.FrameSize[0], cfg.FrameSize[1]);
-            roleObj.nFrameCount = cfg.FrameCount;
-            roleObj.arrFrameDirectionIndex = cfg.FrameIndex;
-            roleObj.interval = cfg.FrameInterval;
-            //roleObj.implicitWidth = cfg.RoleSize[0];
-            //roleObj.implicitHeight = cfg.RoleSize[1];
-            roleObj.width = cfg.RoleSize[0];
-            roleObj.height = cfg.RoleSize[1];
-            roleObj.x1 = cfg.RealOffset[0];
-            roleObj.y1 = cfg.RealOffset[1];
-            roleObj.width1 = cfg.RealSize[0];
-            roleObj.height1 = cfg.RealSize[1];
-            roleObj.rectShadow.opacity = isNaN(parseFloat(cfg.ShadowOpacity)) ? 0.3 : parseFloat(cfg.ShadowOpacity);
-            roleObj.penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
+            roleComp.spriteSrc = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+            roleComp.sizeFrame = Qt.size(cfg.FrameSize[0], cfg.FrameSize[1]);
+            roleComp.nFrameCount = cfg.FrameCount;
+            roleComp.arrFrameDirectionIndex = cfg.FrameIndex;
+            roleComp.interval = cfg.FrameInterval;
+            //roleComp.implicitWidth = cfg.RoleSize[0];
+            //roleComp.implicitHeight = cfg.RoleSize[1];
+            roleComp.width = cfg.RoleSize[0];
+            roleComp.height = cfg.RoleSize[1];
+            roleComp.x1 = cfg.RealOffset[0];
+            roleComp.y1 = cfg.RealOffset[1];
+            roleComp.width1 = cfg.RealSize[0];
+            roleComp.height1 = cfg.RealSize[1];
+            roleComp.rectShadow.opacity = isNaN(parseFloat(cfg.ShadowOpacity)) ? 0.3 : parseFloat(cfg.ShadowOpacity);
+            roleComp.penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
 
-            //roleObj.test = true;
+            //roleComp.test = true;
 
-
-            _private.objRoles[role.$name] = roleObj;
-
-
-            roleObj.refresh();
+            roleComp.sprite.s_playEffect.connect(_public.playSoundEffect);
+            roleComp.actionSprite.s_playEffect.connect(_public.playSoundEffect);
 
 
-            //roleObj.$name = role.$name;
+
+            _private.objRoles[role.$id] = roleComp;
+
+            roleComp.$type = 2;
+
+
+            roleComp.refresh();
+
+
+            //roleComp.$id = role.$id;
+            roleComp.$data = role;
+
+            //roleComp.$name = role.$name;
             role.$speed = parseFloat(cfg.MoveSpeed);
             role.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
 
@@ -761,15 +798,15 @@ Rectangle {
             if(role.$direction === undefined)
                 role.$direction = 2;
 
-            game.role(roleObj, role);
+            game.role(roleComp, role);
 
 
-            return roleObj;
+            return roleComp;
 
         }
 
         //返回 角色；
-        //role可以是下标，或角色的$name，或角色对象，-1表示所有角色；
+        //role可以是下标，或角色的$id，或角色对象，-1表示所有角色；
         //props：需要修改的 单个角色属性（有 $name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by）；
         //  $action：为0表示静止；为1表示随机移动；为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
         //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
@@ -799,7 +836,7 @@ Rectangle {
                 //role.refresh();
 
                 if(props.$name !== undefined)   //修改名字
-                    role.$name = props.$name;
+                    role.$data.$name = props.$name;
                 if(props.$showName === true)   //修改名字
                     role.textName.visible = true;
                 else if(props.$showName === false)
@@ -815,10 +852,11 @@ Rectangle {
 
                 //!!!这里要加入名字是否重复
                 if(props.$avatar !== undefined)   //修改头像
-                    role.$avatar = props.$avatar;
+                    role.$data.$avatar = props.$avatar;
                 if(props.$avatarSize !== undefined) {  //修改头像
-                    role.$avatarSize.width = props.$avatarSize[0];
-                    role.$avatarSize.height = props.$avatarSize[1];
+                    //role.$avatarSize.width = props.$avatarSize[0];
+                    //role.$avatarSize.height = props.$avatarSize[1];
+                    role.$data.$avatarSize = props.$avatarSize;
                 }
 
                 if(props.$action !== undefined)
@@ -828,18 +866,21 @@ Rectangle {
                     role.x = props.$x;
                 if(props.$y !== undefined)   //修改y坐标
                     role.y = props.$y;
+                if(props.$x !== undefined || props.$y !== undefined)
+                    if(role === _private.sceneRole)setMapToRole(_private.sceneRole);
 
                 if(props.$bx !== undefined || props.$by !== undefined)
                     setRolePos(role, props.$bx, props.$by);
                     //moverole(role, bx, by);
 
+
                 if(props.$targetBx !== undefined && props.$targetBy !== undefined) {
                     [role.targetPos.x, role.targetPos.y] = getMapBlockPos(props.$targetBx, props.$targetBy);
                 }
                 if(props.$targetX !== undefined)   //修改x坐标
-                    role.targetPos.x = props.$x;
+                    role.targetPos.x = props.$targetX;
                 if(props.$targetY !== undefined)   //修改y坐标
-                    role.targetPos.y = props.$y;
+                    role.targetPos.y = props.$targetY;
 
                 if(props.$start === true)
                     role.start();
@@ -847,11 +888,14 @@ Rectangle {
                     role.stop();
 
                 if(props.$direction !== undefined)
-                    //貌似必须10ms以上才可以使其转向
+                    role.changeDirection(props.$direction);
+                    /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
                     GlobalLibraryJS.setTimeout(function() {
-                            role.changeDirection(props.$direction);
+                            if(role)
+                                role.changeDirection(props.$direction);
                         },20,rootGameScene
                     );
+                    */
 
                 if(props.$realSize !== undefined) {
                     role.width1 = props.$realSize[0];
@@ -950,7 +994,7 @@ Rectangle {
             }
 
 
-            delete _private.objRoles[role.$name];
+            delete _private.objRoles[role.$data.$id];
 
             for(let c of role.$components) {
                 if(GlobalLibraryJS.isComponent(c))
@@ -998,10 +1042,10 @@ Rectangle {
             else
                 return {bx: Math.floor(centerX / sizeMapBlockSize.width),
                     by: Math.floor(centerY / sizeMapBlockSize.height),
-                    cx: centerX,
-                    cy: centerY,
                     x: role.x,
                     y: role.y,
+                    cx: centerX,
+                    cy: centerY,
                     rx: role.x1,
                     ry: role.y1,
                 };
@@ -1083,7 +1127,7 @@ Rectangle {
         }
 
         /*readonly property var createfightenemy: function(name) {
-            loaderFightScene.enemies.push(new game.objCommonScripts["combatant_class"](name));
+            loaderFightScene.enemies.push(new _private.objCommonScripts["combatant_class"](name));
 
         }*/
 
@@ -1214,8 +1258,10 @@ Rectangle {
                 //循环每个技能
                 for(let tskill of tSkills) {
                     //如果找到技能rid
-                    if(GlobalLibraryJS.isString(skill) && tskill.$rid !== skill)
+                    if(GlobalLibraryJS.isString(skill) && tskill.$rid !== skill) {
+                        fighthero.$skills.push(tskill);
                         continue;
+                    }
 
                     let bFilterFlag = true;
                     //有筛选
@@ -1288,8 +1334,10 @@ Rectangle {
                 //循环每个技能
                 for(let tskill of fighthero.$skills) {
                     //如果找到技能rid
-                    if(GlobalLibraryJS.isString(skill) && tskill.$rid !== skill)
+                    if(GlobalLibraryJS.isString(skill) && tskill.$rid !== skill) {
+                        //fighthero.$skills.push(tskill);
                         continue;
+                    }
 
 
                     let bFilterFlag = true;
@@ -1374,7 +1422,7 @@ Rectangle {
             */
 
             if(refresh)
-                game.objCommonScripts["refresh_combatant"](fighthero);
+                _private.objCommonScripts["refresh_combatant"](fighthero);
 
             return fighthero;
         }
@@ -1637,7 +1685,10 @@ Rectangle {
             //if(fighthero < 0)
             //    return false;
 
-            fighthero = game.fighthero(fighthero);
+            if(fighthero < 0)
+                fighthero = null;
+            else
+                fighthero = game.fighthero(fighthero);
             //if(!fighthero)
             //    return false;
 
@@ -1649,8 +1700,8 @@ Rectangle {
             //计算新属性
             let continueScript = function() {
                 //计算新属性
-                for(let fighthero of game.gd["$sys_fight_heros"])
-                    game.objCommonScripts["refresh_combatant"](fighthero);
+                for(let tfh of game.gd["$sys_fight_heros"])
+                    _private.objCommonScripts["refresh_combatant"](tfh);
                 //刷新战斗时人物数据
                 //loaderFightScene.refreshAllFightRoleInfo();
             }
@@ -1695,7 +1746,7 @@ Rectangle {
                     return newCount;
                 else if(newCount === 0) {
                     /*
-                    if(game.objCommonScripts["equip_reserved_slots"].indexOf(newPosition) !== -1)
+                    if(_private.objCommonScripts["equip_reserved_slots"].indexOf(newPosition) !== -1)
                         fighthero.$equipment[newPosition] = undefined;
                     else
                         delete fighthero.$equipment[newPosition];
@@ -1706,7 +1757,7 @@ Rectangle {
                     oldEquip.$count = newCount;
 
                 //计算新属性
-                game.objCommonScripts["refresh_combatant"](fighthero);
+                _private.objCommonScripts["refresh_combatant"](fighthero);
                 //刷新战斗时人物数据
                 //loaderFightScene.refreshAllFightRoleInfo();
 
@@ -1718,7 +1769,7 @@ Rectangle {
                 fighthero.$equipment[newPosition] = goods;
 
                 //计算新属性
-                game.objCommonScripts["refresh_combatant"](fighthero);
+                _private.objCommonScripts["refresh_combatant"](fighthero);
                 //刷新战斗时人物数据
                 //loaderFightScene.refreshAllFightRoleInfo();
             }
@@ -1748,7 +1799,7 @@ Rectangle {
             let oldEquip = fighthero.$equipment[positionName];
 
             /*
-            if(game.objCommonScripts["equip_reserved_slots"].indexOf(positionName) !== -1)
+            if(_private.objCommonScripts["equip_reserved_slots"].indexOf(positionName) !== -1)
                 fighthero.$equipment[positionName] = undefined;
             else
                 delete fighthero.$equipment[positionName];
@@ -1757,17 +1808,17 @@ Rectangle {
 
 
             //计算新属性
-            game.objCommonScripts["refresh_combatant"](fighthero);
+            _private.objCommonScripts["refresh_combatant"](fighthero);
             //刷新战斗时人物数据
             //loaderFightScene.refreshAllFightRoleInfo();
 
             return oldEquip;
         }
 
-        //返回某 fighthero 的装备；如果positionName为null，则返回所有装备；
+        //返回某 fighthero 的装备；如果positionName为null，则返回所有装备的数组；
         //fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //返回格式：单个：装备对象，多个：单个的数组；
-        //错误返回null。
+        //返回格式：全部装备的数组 或 某一个位置的装备；
+        //错误返回false。
         readonly property var equipment: function(fighthero, positionName=null) {
 
             if(fighthero < 0)
@@ -2405,7 +2456,7 @@ Rectangle {
                 image.height = h;
             */
 
-            //let data = game.objSprites[spriteEffectRId];
+            //let data = _private.objSprites[spriteEffectRId];
             //properties.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
 
 
@@ -2702,9 +2753,20 @@ Rectangle {
         //将场景缩放n倍；可以是小数。
         readonly property var scale: function(n) {
             gameScene.scale = parseFloat(n);
-            setMapToRole(mainRole);
+            setMapToRole(_private.sceneRole);
 
             game.gd["$sys_scale"] = n;
+        }
+
+        //场景跟随某个角色
+        readonly property var setscenerole: function(r) {
+            let role = game.hero(r);
+            if(!role)
+                role = game.role(r);
+            if(role) {
+                _private.sceneRole = role;
+                setMapToRole(_private.sceneRole);
+            }
         }
 
         //暂停游戏。
@@ -2931,7 +2993,7 @@ Rectangle {
             }
 
             //开始移动地图
-            setMapToRole(mainRole);
+            //setMapToRole(_private.sceneRole);
 
             //其他
             game.setinterval(game.gd["$sys_fps"]);
@@ -2953,7 +3015,7 @@ Rectangle {
 
         //游戏结束（调用游戏结束脚本）；
         readonly property var gameover: function(params) {
-            game.run(game.objCommonScripts["game_over_script"](params));
+            game.run(_private.objCommonScripts["game_over_script"](params));
         }
 
 
@@ -3106,7 +3168,7 @@ Rectangle {
             scene: gameScene,   //会改变大小
             container: itemContainer,   //会改变大小和随地图移动
 
-            interact: _private.buttonAClicked,
+            interact: _private.buttonAClicked,  //交互函数
 
             reloadFightHero: function() {
                 //重新创建（修复继承链），并计算新属性
@@ -3115,16 +3177,16 @@ Rectangle {
 
 
                     /*let t = game.gd["$sys_fight_heros"][tIndex];
-                    game.gd["$sys_fight_heros"][tIndex] = new game.objCommonScripts["combatant_class"](t.$rid, t.$name);
+                    game.gd["$sys_fight_heros"][tIndex] = new _private.objCommonScripts["combatant_class"](t.$rid, t.$name);
                     GlobalLibraryJS.copyPropertiesToObject(game.gd["$sys_fight_heros"][tIndex], t);
 
-                    //game.gd["$sys_fight_heros"][tIndex].__proto__ = game.objCommonScripts["combatant_class"].prototype;
+                    //game.gd["$sys_fight_heros"][tIndex].__proto__ = _private.objCommonScripts["combatant_class"].prototype;
                     //game.gd["$sys_fight_heros"][tIndex].$$fightData = {};
                     //game.gd["$sys_fight_heros"][tIndex].$$fightData.$buffs = {};
                     */
 
 
-                    game.objCommonScripts["refresh_combatant"](game.gd["$sys_fight_heros"][tIndex]);
+                    _private.objCommonScripts["refresh_combatant"](game.gd["$sys_fight_heros"][tIndex]);
                 }
             },
             reloadGoods: function() {
@@ -3138,6 +3200,15 @@ Rectangle {
             getFightRoleObject: _public.getFightRoleObject,
             getFightScriptObject: _public.getFightScriptObject,
 
+            components: {
+                joystick: joystick,
+                buttons: itemButtons,
+                fps: itemFPS,
+                map: [canvasBackMap, canvasFrontMap],
+            },
+
+            //资源
+            resources: $resources,
         })
 
 
@@ -3146,15 +3217,14 @@ Rectangle {
         readonly property size $mapSize: Qt.size(itemContainer.width, itemContainer.height)
         readonly property size $sceneSize: Qt.size(rootGameScene.width, rootGameScene.height)
 
+        //上次帧间隔时长
+        property int $frameDuration: 0
+
         //property real fAspectRatio: Screen.width / Screen.height
 
 
-        //readonly property alias objRoles: _private.objRoles
-        //readonly property alias arrMainRoles: _private.arrMainRoles
 
-
-
-        //资源
+        //资源（!!!!!!鹰：过时：兼容旧代码用）
         readonly property alias objGoods: _private.objGoods
         readonly property alias objSkills: _private.objSkills
         readonly property alias objFightScripts: _private.objFightScripts
@@ -3164,16 +3234,41 @@ Rectangle {
 
         readonly property alias objCommonScripts: _private.objCommonScripts
 
-        //readonly property alias objTmpImages: _private.objTmpImages
-        //readonly property alias objTmpSprites: _private.objTmpSprites
 
-        //readonly property alias objImages: _private.objImages
-        //readonly property alias objMusic: _private.objMusic
-        //readonly property alias objVideos: _private.objVideos
+
+        readonly property QtObject $resources: QtObject {
+            readonly property alias goods: _private.objGoods
+            readonly property alias skills: _private.objSkills
+            readonly property alias fightScripts: _private.objFightScripts
+            readonly property alias fightRoles: _private.objFightRoles
+            readonly property alias sprites: _private.objSprites
+            readonly property alias cacheSoundEffects: _private.objCacheSoundEffects
+
+            readonly property alias commonScripts: _private.objCommonScripts
+
+
+            //readonly property alias objTmpImages: _private.objTmpImages
+            //readonly property alias objTmpSprites: _private.objTmpSprites
+
+            //readonly property alias objImages: _private.objImages
+            //readonly property alias objMusic: _private.objMusic
+            //readonly property alias objVideos: _private.objVideos
+
+
+
+            //readonly property alias objRoles: _private.objRoles
+            //readonly property alias arrMainRoles: _private.arrMainRoles
+
+        }
 
     }
 
-    property Item mainRole: compRole.createObject(itemRoleContainer);
+    property Item mainRole: {
+        let r = compRole.createObject(itemRoleContainer);
+        r.sprite.s_playEffect.connect(_public.playSoundEffect);
+        r.actionSprite.s_playEffect.connect(_public.playSoundEffect);
+        return r;
+    }
 
 
     property alias _public: _public
@@ -3246,10 +3341,10 @@ Rectangle {
 
         //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
         //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
-        GlobalLibraryJS.setTimeout(function() {
-                setMapToRole(mainRole);
-            },10,rootGameScene
-        );
+        //GlobalLibraryJS.setTimeout(function() {
+        //        setMapToRole(_private.sceneRole);
+        //    },10,rootGameScene
+        //);
     }
 
     //载入资源
@@ -3279,6 +3374,9 @@ Rectangle {
             _private.objCommonScripts["fight_start_script"] = tCommoncript.$commonFightStartScript;
             _private.objCommonScripts["fight_round_script"] = tCommoncript.$commonFightRoundScript;
             _private.objCommonScripts["fight_end_script"] = tCommoncript.$commonFightEndScript;
+            _private.objCommonScripts["fight_combatant_position_algorithm"] = tCommoncript.$fightCombatantPositionAlgorithm;
+            _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
+            _private.objCommonScripts["fight_skill_melee_position_algorithm"] = tCommoncript.$fightSkillMeleePositionAlgorithmt;
             //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
             //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
             //_private.objCommonScripts["use_goods_script"] = tCommoncript.commonUseGoodsScript;
@@ -3372,6 +3470,27 @@ Rectangle {
             console.debug("[GameScene]载入战斗回合脚本OK");
         if(!_private.objCommonScripts["fight_end_script"]) {
             _private.objCommonScripts["fight_end_script"] = GameMakerGlobalJS.$commonFightEndScript;
+            console.debug("[!GameScene]载入系统战斗结束脚本");
+        }
+        else
+            console.debug("[GameScene]载入战斗结束脚本OK");
+
+        if(!_private.objCommonScripts["fight_combatant_position_algorithm"]) {
+            _private.objCommonScripts["fight_combatant_position_algorithm"] = GameMakerGlobalJS.$fightCombatantPositionAlgorithm;
+            console.debug("[!GameScene]载入系统战斗结束脚本");
+        }
+        else
+            console.debug("[GameScene]载入战斗结束脚本OK");
+
+        if(!_private.objCommonScripts["fight_combatant_melee_position_algorithm"]) {
+            _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = GameMakerGlobalJS.$fightCombatantMeleePositionAlgorithm;
+            console.debug("[!GameScene]载入系统战斗结束脚本");
+        }
+        else
+            console.debug("[GameScene]载入战斗结束脚本OK");
+
+        if(!_private.objCommonScripts["fight_skill_melee_position_algorithm"]) {
+            _private.objCommonScripts["fight_skill_melee_position_algorithm"] = GameMakerGlobalJS.$fightSkillMeleePositionAlgorithm;
             console.debug("[!GameScene]载入系统战斗结束脚本");
         }
         else
@@ -3488,7 +3607,8 @@ Rectangle {
             if(ts.data) {
                 _private.objGoods[item] = ts.data;
                 _private.objGoods[item].$rid = item;
-                _private.objGoods[item].__proto__ = _private.objGoods[item].$commons;
+                if(_private.objGoods[item].$commons)
+                    _private.objGoods[item].__proto__ = _private.objGoods[item].$commons;
 
                 console.debug("[GameScene]载入Goods", item);
             }
@@ -3582,9 +3702,9 @@ Rectangle {
             if(ts) {
                 _private.objFightRoles[item] = ts.data;
                 _private.objFightRoles[item].$rid = item;
-                //_private.objFightRoles[item].__proto__ = game.objCommonScripts["combatant_class"].prototype;
+                //_private.objFightRoles[item].__proto__ = _private.objCommonScripts["combatant_class"].prototype;
                 _private.objFightRoles[item].__proto__ = _private.objFightRoles[item].$commons;
-                _private.objFightRoles[item].$commons.__proto__ = game.objCommonScripts["combatant_class"].prototype;
+                _private.objFightRoles[item].$commons.__proto__ = _private.objCommonScripts["combatant_class"].prototype;
 
                 //_private.objFightRoles[item].$createData = ts.$createData;
                 //_private.objFightRoles[item].$commons = ts.$commons;
@@ -3756,6 +3876,11 @@ Rectangle {
 
 
 
+        let mapOpacity = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', 'opacity');
+        if(GlobalLibraryJS.isValidNumber(mapOpacity))
+            _private.config.rMapOpacity = mapOpacity;
+        else
+            _private.config.rMapOpacity = 0.6;
 
         //安卓配置
         do {
@@ -4055,6 +4180,10 @@ Rectangle {
         _private.objTimers = {};
         _private.objGlobalTimers = {};
 
+
+        _private.sceneRole = mainRole;
+
+
         _private.nStage = 0;
 
 
@@ -4207,7 +4336,11 @@ Rectangle {
 
         //console.debug("itemContainer.mapEventBlocks", JSON.stringify(itemContainer.mapEventBlocks))
 
-        //game.map.$name = mapInfo.MapName;
+        //game.$sys_map.$name = mapInfo.MapName;
+        game.gd["$sys_map"].$name = itemContainer.mapInfo.MapName;
+        game.gd["$sys_map"].$$columns = itemContainer.mapInfo.MapSize[0];
+        game.gd["$sys_map"].$$rows = itemContainer.mapInfo.MapSize[1];
+        game.gd["$sys_map"].$$info = itemContainer.mapInfo;
 
 
 
@@ -4307,6 +4440,8 @@ Rectangle {
         else
             role.y = targetY - role.y1 - role.height1 / 2;
         //role.y = by * sizeMapBlockSize.height - role.y1;
+
+        if(role === _private.sceneRole)setMapToRole(_private.sceneRole);
     }
 
     //设置主角坐标（块坐标）
@@ -4314,13 +4449,16 @@ Rectangle {
         let mainRole = _private.arrMainRoles[index];
 
         setRolePos(mainRole, bx, by);
-        setMapToRole(mainRole);
+        //setMapToRole(_private.sceneRole);
+        if(mainRole === _private.sceneRole)setMapToRole(_private.sceneRole);
 
         game.gd["$sys_main_roles"][index].$x = mainRole.x;
         game.gd["$sys_main_roles"][index].$y = mainRole.y;
     }
 
     function setMapToRole(role) {
+        if(!role)
+            return;
 
         //计算角色移动时，地图移动的 左上角和右下角 的坐标
 
@@ -4488,8 +4626,10 @@ Rectangle {
                 return;
             }
 
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
                 _private.doAction(1, event.key);
+                mainRole.nActionType = 1;
+            }
 
             event.accepted = true;
 
@@ -4746,9 +4886,10 @@ Rectangle {
                         for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
                             //console.debug("k:", k);
 
-                            //跳过不属于这一层的
-                            if(k >= itemContainer.mapInfo.MapOfRole)
-                                continue;
+                            if(_private.config.rMapOpacity !== 1)
+                                //跳过不属于这一层的
+                                if(k >= itemContainer.mapInfo.MapOfRole)
+                                    continue;
 
                             for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
                             //	console.debug("j:", j);
@@ -4860,6 +5001,8 @@ Rectangle {
                 Canvas {
                     id: canvasFrontMap
                     anchors.fill: parent
+
+                    opacity: _private.config.rMapOpacity
 
 
                     onPaint: {  //绘制地图
@@ -5002,6 +5145,8 @@ Rectangle {
                 let realinterval = game.date().getTime() - nLastTime;
                 nLastTime = nLastTime + realinterval;
 
+                game.$frameDuration = realinterval;
+
                 //console.debug("!!!realinterval", realinterval)
 
 
@@ -5109,14 +5254,14 @@ Rectangle {
                             _private.stopSprite(role);
 
 
-                            let eventName = `$${role.$name}_arrive`;
+                            let eventName = `$${role.$data.$id}_arrive`;
                             let tScript = itemContainer.mapInfo.$$Script[eventName];
                             if(!tScript)
                                 tScript = game.f[eventName];
                             if(!tScript)
                                 tScript = game.gf[eventName];
                             if(tScript)
-                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色事件:' + role.$name], role);
+                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色事件:' + role.$data.$id], role);
                                 //game.run([tScript, role.$name]);
 
                             //console.debug('!!!ok, getup')
@@ -5281,7 +5426,7 @@ Rectangle {
                                 Qt.rect(_private.objRoles[r].x + _private.objRoles[r].x1, _private.objRoles[r].y + _private.objRoles[r].y1, _private.objRoles[r].width1, _private.objRoles[r].height1),
                             )
                         ) {
-                            let eventName = `$${role.$name}_collide`;
+                            let eventName = `$${role.$data.$id}_collide`;
                             let tScript = itemContainer.mapInfo.$$Script[eventName];
                             if(!tScript)
                                 tScript = game.f[eventName];
@@ -5291,7 +5436,7 @@ Rectangle {
                                 //keep：是否是持续碰撞；
                                 //key：
                                 let keep = false;
-                                let key = 'role_' + _private.objRoles[r].$name;
+                                let key = 'role_' + _private.objRoles[r].$data.$id;
                                 if(role.$$collideRoles[key] !== undefined) {
                                     keep = true;
                                     collideRoles[key] = role.$$collideRoles[key] + realinterval;
@@ -5299,7 +5444,7 @@ Rectangle {
                                 else
                                     collideRoles[key] = realinterval;
 
-                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞角色事件:' + role.$name], role, _private.objRoles[r], keep);
+                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞角色事件:' + role.$data.$id], role, _private.objRoles[r], keep);
                             }
                         }
                     }
@@ -5319,7 +5464,7 @@ Rectangle {
                                 Qt.rect(_private.arrMainRoles[r].x + _private.arrMainRoles[r].x1, _private.arrMainRoles[r].y + _private.arrMainRoles[r].y1, _private.arrMainRoles[r].width1, _private.arrMainRoles[r].height1),
                             )
                         ) {
-                            let eventName = `$${role.$name}_collide`;
+                            let eventName = `$${role.$data.$id}_collide`;
                             let tScript = itemContainer.mapInfo.$$Script[eventName];
                             if(!tScript)
                                 tScript = game.f[eventName];
@@ -5329,14 +5474,14 @@ Rectangle {
                                 //keep：是否是持续碰撞；
                                 //key：
                                 let keep = false;
-                                let key = 'hero_' + _private.arrMainRoles[r].$name;
+                                let key = 'hero_' + _private.arrMainRoles[r].$data.$id;
                                 if(role.$$collideRoles[key] !== undefined) {
                                     keep = true;
                                     collideRoles[key] = role.$$collideRoles[key] + realinterval;
                                 }
                                 else
                                     collideRoles[key] = realinterval;
-                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞主角事件:' + role.$name], role, _private.arrMainRoles[r], keep);
+                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞主角事件:' + role.$data.$id], role, _private.arrMainRoles[r], keep);
                             }
                         }
                     }
@@ -5363,16 +5508,16 @@ Rectangle {
                     //自动行走
                     if(mainRole.nActionType === 2) {
                         if(mainRole.targetPos.x < centerX) {
-                            _private.doAction(1, Qt.Key_Left);
+                            _private.doAction(2, Qt.Key_Left);
                         }
                         else if(mainRole.targetPos.x > centerX) {
-                            _private.doAction(1, Qt.Key_Right);
+                            _private.doAction(2, Qt.Key_Right);
                         }
                         else if(mainRole.targetPos.y < centerY) {
-                            _private.doAction(1, Qt.Key_Up);
+                            _private.doAction(2, Qt.Key_Up);
                         }
                         else if(mainRole.targetPos.y > centerY) {
-                            _private.doAction(1, Qt.Key_Down);
+                            _private.doAction(2, Qt.Key_Down);
                         }
                         else {
                             mainRole.nActionType = 0;
@@ -5380,14 +5525,14 @@ Rectangle {
                             _private.stopAction(1, -1);
 
 
-                            let eventName = `$${mainRole.$name}_arrive`;
+                            let eventName = `$${mainRole.$data.$id}_arrive`;
                             let tScript = itemContainer.mapInfo.$$Script[eventName];
                             if(!tScript)
                                 tScript = game.f[eventName];
                             if(!tScript)
                                 tScript = game.gf[eventName];
                             if(tScript)
-                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '主角事件:' + mainRole.$name], mainRole);
+                                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '主角事件:' + mainRole.$data.$id], mainRole);
                                 //game.run([tScript, mainRole.$name]);
 
                             //console.debug('!!!ok, getup')
@@ -5395,15 +5540,20 @@ Rectangle {
                     }
 
                     //console.debug('moveDirection:', mainRole.moveDirection)
-                    else if(!mainRole.sprite.running)
+
+
+                    //如果主角不移动，则跳出移动部分
+                    if(!mainRole.sprite.running)
                         break;
 
+
+                    //下面是移动代码
 
                     //计算真实移动偏移，初始为 角色速度 * 时间差
                     let offsetMove = Math.round(mainRole.moveSpeed * realinterval);
 
                     //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-                    if(_private.config.rJoystickSpeed > 0 && GlobalLibraryJS.objectIsEmpty(_private.keys)) {
+                    if(_private.config.rJoystickSpeed > 0 && mainRole.nActionType === 10 && GlobalLibraryJS.objectIsEmpty(_private.keys)) {
                         let tOffset;    //遥感百分比
                         if(mainRole.moveDirection === Qt.Key_Left || mainRole.moveDirection === Qt.Key_Right) {
                             tOffset = Math.abs(joystick.pointInput.x);
@@ -5512,9 +5662,6 @@ Rectangle {
 
 
 
-
-                    //开始移动地图
-                    setMapToRole(mainRole);
 
 
                     /*/
@@ -5650,6 +5797,10 @@ Rectangle {
                     ;
 
                 }while(0);
+
+
+                //开始移动地图
+                setMapToRole(_private.sceneRole);
 
 
 
@@ -5807,6 +5958,7 @@ Rectangle {
                         else
                             _private.doAction(0, Qt.Key_Up);
                     }
+                    mainRole.nActionType = 10;
 
                     //console.debug("[GameScene]onPointInputChanged", pointInput);
                 }
@@ -6035,7 +6187,7 @@ Rectangle {
 
         function show(msg, pretext, interval, keeptime, style) {
 
-            messageRole.color = style.BackgoundColor || '#BF6699FF';
+            messageRole.color = style.BackgroundColor || '#BF6699FF';
             messageRole.border.color = style.BorderColor || 'white';
             messageRole.textArea.font.pointSize = style.FontSize || 16;
             messageRole.textArea.font.color = style.FontColor || 'white';
@@ -6187,7 +6339,7 @@ Rectangle {
 
         function show(msg, pretext, interval, keeptime, style) {
 
-            messageGame.color = style.BackgoundColor || '#BF6699FF';
+            messageGame.color = style.BackgroundColor || '#BF6699FF';
             messageGame.border.color = style.BorderColor || 'white';
             messageGame.textArea.font.pointSize = style.FontSize || 16;
             messageGame.textArea.font.color = style.FontColor || 'white';
@@ -6554,7 +6706,10 @@ Rectangle {
 
     //调试
     Rectangle {
-        width: Platform.compileType() === "debug" ? rootGameScene.width / 3 : rootGameScene.width / 2
+        id: itemFPS
+        //width: Platform.compileType() === "debug" ? rootGameScene.width / 3 : rootGameScene.width / 2
+        //width: textFPS.width + textPos.width
+        width: 150
         height: Platform.compileType() === "debug" ? textFPS.implicitHeight : textFPS.implicitHeight
         color: "#90FFFFFF"
 
@@ -6564,14 +6719,16 @@ Rectangle {
             Text {
                 id: textFPS
                 //y: 0
-                width: 100
+                width: 60
+                //width: contentWidth + 50
                 height: textFPS.implicitHeight
             }
 
             Text {
                 id: textPos
                 //y: 15
-                width: 100
+                width: 90
+                //width: contentWidth + 50
                 height: textFPS.implicitHeight
 
                 //visible: Platform.compileType() === "debug"
@@ -6580,7 +6737,8 @@ Rectangle {
         Text {
             id: textPos1
             y: 15
-            width: 200
+            //width: 200
+            width: 120
             height: 15
 
             visible: Platform.compileType() === "debug"
@@ -6711,6 +6869,20 @@ Rectangle {
 
     QtObject {  //公有数据,函数,对象等
         id: _public
+
+
+
+        function playSoundEffect(soundeffectSource) {
+            if(_private.objCacheSoundEffects[soundeffectSource]) {
+                if(_private.config.nSoundConfig !== 0)
+                    return;
+
+                //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
+                if(_private.objCacheSoundEffects[soundeffectSource].isPlaying)
+                    _private.objCacheSoundEffects[soundeffectSource].stop();
+                _private.objCacheSoundEffects[soundeffectSource].play();
+            }
+        }
 
 
         //创建Skill对象
@@ -6863,7 +7035,7 @@ Rectangle {
 
                 //创建战斗人物
                 retFightRole = {$rid: fightrole};
-                GlobalLibraryJS.copyPropertiesToObject(retFightRole, new game.objCommonScripts["combatant_class"](fightrole));
+                GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole));
                 if(_private.objFightRoles[fightrole].$createData)
                     GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole].$createData());
                 retFightRole.__proto__ = _private.objFightRoles[fightrole];
@@ -6874,10 +7046,10 @@ Rectangle {
                     if(forceNew === false)
                         return fightrole;
 
-                    retFightRole = new game.objCommonScripts["combatant_class"](fightrole.$rid);
+                    retFightRole = new _private.objCommonScripts["combatant_class"](fightrole.$rid);
                     //if(_private.objFightRoles[fightrole.$rid].$createData)
                     //    GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole.$rid].$createData());
-                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole/*, true*/);
+                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {$$fightData: undefined, Params: undefined}}/*, true*/);
                     if(GlobalLibraryJS.isObject(forceNew))
                         GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
                     retFightRole.__proto__ = _private.objFightRoles[fightrole.$rid];
@@ -6892,12 +7064,12 @@ Rectangle {
                 else {
                     //创建战斗人物
                     retFightRole = {$rid: fightrole.RId};
-                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, new game.objCommonScripts["combatant_class"](fightrole.RId));
+                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole.RId));
                     if(_private.objFightRoles[fightrole.RId].$createData)
                         GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole.RId].$createData(fightrole.Params));
                     //delete fightrole.RId;
                     //delete fightrole.Params;
-                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
+                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {RId: undefined, Params: undefined, $$fightData: undefined}, filterRecursion: false});
                     retFightRole.__proto__ = _private.objFightRoles[fightrole.RId];
                 }
             }
@@ -6935,7 +7107,7 @@ Rectangle {
             }
 
             //刷新
-            game.objCommonScripts["refresh_combatant"](retFightRole);
+            _private.objCommonScripts["refresh_combatant"](retFightRole);
 
 
             return retFightRole;
@@ -6968,7 +7140,7 @@ Rectangle {
                         retFightScript = {};
                     */
                     retFightScript = {};
-                    //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new game.objCommonScripts["combatant_class"](fightscript.$rid));
+                    //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts["combatant_class"](fightscript.$rid));
                     GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript/*, true*/);
                     if(GlobalLibraryJS.isObject(forceNew))
                         GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
@@ -7011,22 +7183,12 @@ Rectangle {
             let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
             */
 
-            let data = game.objSprites[spriteEffectRId];
+            let data = _private.objSprites[spriteEffectRId];
 
             if(data) {
                 if(!spriteEffect) {
                     spriteEffect = compCacheSpriteEffect.createObject(parent);
-                    spriteEffect.s_playEffect.connect(function(soundeffectSource) {
-                        if(_private.objCacheSoundEffects[soundeffectSource]) {
-                            if(_private.config.nSoundConfig !== 0)
-                                return;
-
-                            //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
-                            if(_private.objCacheSoundEffects[soundeffectSource].playing)
-                                _private.objCacheSoundEffects[soundeffectSource].stop();
-                            _private.objCacheSoundEffects[soundeffectSource].play();
-                        }
-                    });
+                    spriteEffect.s_playEffect.connect(_public.playSoundEffect);
                 }
 
                 spriteEffect.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
@@ -7077,6 +7239,9 @@ Rectangle {
             property real rJoystickSpeed: 0.2   //开启摇杆加速功能（最低速度比例）
             //键盘是否可以操作
             property bool bKeyboard: true
+
+            //前景地图遮挡人物透明度
+            property real rMapOpacity: 1
         }
 
         //存档m5的盐
@@ -7124,6 +7289,9 @@ Rectangle {
         property var objGlobalTimers: ({})        //{定时器名: [间隔,触发次数,是否全局,剩余时长]}
 
 
+        property var sceneRole: mainRole
+
+
 
         //异步脚本（整个游戏的脚本队列系统）
         property var asyncScript: new GlobalLibraryJS.Async(rootGameScene)
@@ -7140,7 +7308,7 @@ Rectangle {
         //键盘处理
         property var keys: ({}) //保存按下的方向键
 
-        //type为0表示按钮，type为1表示键盘（会保存key）
+        //type为0表示按钮，type为1表示键盘（会保存key），2为自动行走
         function doAction(type, key) {
             switch(key) {
             case Qt.Key_Down:
@@ -7250,7 +7418,7 @@ Rectangle {
             let maxDistance;
 
             //人物方向
-            switch(mainRole.stopDirection) {
+            switch(mainRole.moveDirection) {
             case Qt.Key_Up:
                 maxDistance = sizeMapBlockSize.height / 3;
                 usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
@@ -7303,15 +7471,15 @@ Rectangle {
                     Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
                     0
                 )) {
-                    console.debug("[GameScene]触发NPC事件：", objRoles[r].$name);
+                    console.debug("[GameScene]触发NPC事件：", objRoles[r].$data.$id);
 
                     //获得脚本（地图脚本优先级 > game.f定义的）
-                    let tScript = itemContainer.mapInfo.$$Script[objRoles[r].$name];
+                    let tScript = itemContainer.mapInfo.$$Script[objRoles[r].$data.$id];
                     if(!tScript)
-                        tScript = game.f[objRoles[r].$name];
+                        tScript = game.f[objRoles[r].$data.$id];
                     if(tScript) {
-                        game.run([tScript, objRoles[r].$name], objRoles[r]);
-                        //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(objRoles[r].$name));
+                        game.run([tScript, objRoles[r].$data.$id], objRoles[r]);
+                        //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(objRoles[r].$data.$id));
 
                         return; //!!只执行一次事件
                     }
@@ -7925,15 +8093,19 @@ Rectangle {
 
                 font.pointSize: 9
                 font.bold: true
-                text: $name
+                text: (rootRole.$data && rootRole.$data.$name) ? rootRole.$data.$name : ''
                 wrapMode: Text.NoWrap
             }
 
             //属性
-            property int $index: -1
-            property string $name: ''
-            property string $avatar: ''
-            property size $avatarSize: Qt.size(0, 0)
+            //property int $index: -1
+            //property string $id: ''
+
+            property var $data: null
+            //property string $name: ''
+            //property string $avatar: ''
+            //property size $avatarSize: Qt.size(0, 0)
+            property int $type: -1  //角色类型（1为主角，2为NPC）
 
             //保存上个Interval碰撞的角色名（包含主角）
             property var $$collideRoles: ({})
@@ -7951,7 +8123,7 @@ Rectangle {
 
 
             //行动类别；
-            //0为停止；1为缓慢走；2为动向移动
+            //0为停止；1为正常行走；2为动向移动；10为摇杆行走
             property int nActionType: 1
 
             property point targetPos: Qt.point(-1,-1)
@@ -7975,10 +8147,23 @@ Rectangle {
             //nFrameCount: 4
             //arrFrameDirectionIndex: [[0,3],[0,2],[0,0],[0,1]]
 
-            mouseArea.onClicked: {
-                console.debug("[GameScene]触发NPC事件：", $name);
 
-                let eventName = `$${$name}_click`;
+            function action(tsprite) {
+                _public.loadSpriteEffect(tsprite.RId, rootRole.actionSprite, tsprite.$loops);
+                if(GlobalLibraryJS.isValidNumber(tsprite.width))
+                    rootRole.actionSprite.width = tsprite.width;
+                if(GlobalLibraryJS.isValidNumber(tsprite.height))
+                    rootRole.actionSprite.height = tsprite.height;
+                rootRole.actionSprite.x = tsprite.x || 0;
+                rootRole.actionSprite.y = tsprite.y || 0;
+                rootRole.actionSprite.playAction();
+            }
+
+
+            mouseArea.onClicked: {
+                console.debug("[GameScene]触发NPC事件：", $data.$id);
+
+                let eventName = `$${$data.$id}_click`;
                 //获得脚本（地图脚本优先级 > game.f定义的）
                 let tScript = itemContainer.mapInfo.$$Script[eventName];
                 if(!tScript)
@@ -7986,7 +8171,7 @@ Rectangle {
                 if(!tScript)
                     tScript = game.gf[eventName];
                 if(tScript) {
-                    game.run([tScript, $name], rootRole);
+                    game.run([tScript, $data.$id], rootRole);
                     //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(objRoles[r].$name));
 
                     return; //!!只执行一次事件
@@ -8006,7 +8191,17 @@ Rectangle {
 
     Component {
         id: compCacheSoundEffect
-        SoundEffect {
+        /*SoundEffect {
+            property bool isPlaying: playing
+        }*/
+        Audio {
+            property bool isPlaying: playbackState === Audio.PlayingState
+            onPlaying: {
+            }
+            onStopped: {
+            }
+            onPaused: {
+            }
         }
     }
     Component {
@@ -8131,8 +8326,10 @@ Rectangle {
     Component.onCompleted: {
 
         //console.debug("[GameScene]globalObject：", FrameManager.globalObject().game);
+
         FrameManager.globalObject().game = game;
         //FrameManager.globalObject().g = g;
+
         //console.debug("[GameScene]globalObject：", FrameManager.globalObject().game);
 
         console.debug("[GameScene]Component.onCompleted");
@@ -8140,6 +8337,8 @@ Rectangle {
 
     Component.onDestruction: {
         //release();
+
+        delete FrameManager.globalObject().game;
 
         console.debug("[GameScene]Component.onDestruction");
     }

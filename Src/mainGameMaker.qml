@@ -19,6 +19,7 @@ import _Global.Button 1.0
 import "qrc:/QML"
 
 
+import "Core"
 //import "File.js" as File
 
 
@@ -1601,8 +1602,8 @@ Rectangle {
 
 
                     textArea.background: Rectangle {
-                        implicitWidth: 200
-                        implicitHeight: 40
+                        //implicitWidth: 200
+                        //implicitHeight: 40
                         color: 'black'
                         border.color: textDebugInfo.textArea.enabled ? "#21be2b" : "transparent"
                     }
@@ -1616,6 +1617,30 @@ Rectangle {
                 }
             }
 
+            TextField {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+
+                placeholderText: '输入命令'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+
+                Keys.onEnterPressed: {
+                    let t = text;
+                    //text = '';
+                    selectAll();
+                    console.info(eval(t));
+                }
+                Keys.onReturnPressed: {
+                    let t = text;
+                    //text = '';
+                    selectAll();
+                    console.info(eval(t));
+                }
+            }
 
             RowLayout {
                 Layout.fillWidth: true
@@ -1676,7 +1701,7 @@ Rectangle {
 
 
         //显示调试窗口
-        function showDebugWindow(msgType, msg) {
+        function showConsoleWindow(msgType, msg) {
 
             //消息类型
             switch(msgType) {
@@ -1725,6 +1750,7 @@ Rectangle {
                     break;
 
                 textDebugInfo.text += ("<font color='yellow'>【Warning】" + msg + "</font><BR>");
+                textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
                 //rectDebugWindow.forceActiveFocus();
@@ -1732,6 +1758,7 @@ Rectangle {
                 break;
             case FrameManagerClass.QtCriticalMsg:
                 textDebugInfo.text += ("<font color='red'>【Critical】" + msg + "</font><BR>");
+                textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
                 //rectDebugWindow.forceActiveFocus();
@@ -1739,6 +1766,7 @@ Rectangle {
                 break;
             case FrameManagerClass.QtFatalMsg:
                 textDebugInfo.text += ("<font color='red'>【Fatal】" + msg + "</font><BR>");
+                textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
                 //rectDebugWindow.forceActiveFocus();
@@ -1747,6 +1775,7 @@ Rectangle {
 
             case FrameManagerClass.QtInfoMsg:
                 textDebugInfo.text += ("<font color='white'>【Info】" + msg + "</font><BR>");
+                textDebugInfo.toEnd();
 
                 ++rectDebugButton.nCount;
                 break;
@@ -1757,6 +1786,7 @@ Rectangle {
 
             default:
                 textDebugInfo.text += (msgType + msg);
+                textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
                 //rectDebugWindow.forceActiveFocus();
@@ -1799,7 +1829,7 @@ Rectangle {
 
     Component.onCompleted: {
 
-        rootWindow.s_MessageHandler.connect(_private.showDebugWindow);
+        rootWindow.s_MessageHandler.connect(_private.showConsoleWindow);
 
 
         if(!GameMakerGlobal.settings.value('RunTimes')) {
@@ -1817,14 +1847,18 @@ Rectangle {
 
 
 
-        console.debug("[mainGameMaker]Component.onCompleted");
         //let d = console.debug;
         //console.debug = 123;
         //d("!!!!!!!!!!!", d, console.debug, d === console.debug);
+
+        console.debug("[mainGameMaker]Component.onCompleted");
     }
 
     Component.onDestruction: {
-        rootWindow.s_MessageHandler.disconnect(_private.showDebugWindow);
+        rootWindow.s_MessageHandler.disconnect(_private.showConsoleWindow);
+
+        delete FrameManager.globalObject().GameMakerGlobal;
+
         console.debug("[mainGameMaker]Component.onDestruction");
     }
 }
