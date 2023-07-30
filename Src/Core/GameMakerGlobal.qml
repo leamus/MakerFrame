@@ -20,14 +20,16 @@ QtObject {
     property string separator: '/'  //Platform.separator()
 
     //版本
-    property string version: "1.4.8"
+    property string version: "1.4.13"
 
 
     //配置
     property QtObject config: QtObject {
         //调试（显示一些调试功能）
         //property bool debug: parseInt(FrameManager.config.DEBUG) === 0 ? false : true
+        //property bool debug: parseInt(Platform.config('DEBUG', 0, 'File')) === 0 ? false : true
         property bool debug: true
+
 
         //当前项目名称
         property alias strCurrentProjectName: settings.strCurrentProjectName    //"Project"

@@ -74,7 +74,7 @@ let $config = {
             $color: 'red',
             $opacity: 0.6,
             $image: '',
-            $clicked: function() {
+            $clicked: function*() {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
@@ -90,7 +90,7 @@ let $config = {
             $color: 'blue',
             $opacity: 0.6,
             $image: '',
-            $clicked: function() {
+            $clicked: function*() {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
@@ -117,6 +117,18 @@ let $config = {
     ],
     //窗口
     $window: {
+        //窗口显示事件
+        $show: function(newFlags, windowFlags) {
+            //if(newFlags & 1)
+            //    game.showimage('FightScene2.jpg', {$width: -1, $height: -1}, 'aaa');
+        },
+        //窗口隐藏事件
+        $hide: function(newFlags, windowFlags) {
+            //if(newFlags & 1)
+            //    game.delimage('aaa');
+        },
+    },
+    $style: {
         //主菜单窗口
         $main: {
             $maskColor: '#7FFFFFFF',
@@ -148,15 +160,68 @@ let $config = {
             $titleText: '',
         },
 
-        //窗口显示事件
-        $show: function(newFlags, windowFlags) {
-            //if(newFlags & 1)
-            //    game.showimage('FightScene2.jpg', {$width: -1, $height: -1}, 'aaa');
+        $say: {
+            $backgroundColor: '#BF6699FF',
+            $borderColor: 'white',
+            $fontSize: 9,
+            $fontColor: 'white',
         },
-        //窗口隐藏事件
-        $hide: function(newFlags, windowFlags) {
-            //if(newFlags & 1)
-            //    game.delimage('aaa');
+        $talk: {
+            $name: true,
+            $avatar: true,
+            $backgroundColor: '#BF6699FF',
+            $borderColor: 'white',
+            $fontSize: 16,
+            $fontColor: 'white',
+            $maskColor: 'transparent',
+        },
+        $msg: {
+            $backgroundColor: '#BF6699FF',
+            $borderColor: 'white',
+            $fontSize: 16,
+            $fontColor: 'white',
+            $maskColor: '#7FFFFFFF',
+            $type: 0b10,
+        },
+        $menu: {
+            $maskColor: '#7FFFFFFF',
+            $borderColor: 'white',
+            $backgroundColor: '#CF6699FF',
+            $itemHeight: 60,
+            $titleHeight: 60,
+            $itemFontSize: 16,
+            $itemFontColor: 'white',
+            $itemBackgroundColor1: '#00FFFFFF',
+            $itemBackgroundColor2: '#66FFFFFF',
+            $titleFontSize: 16,
+            $titleBackgroundColor: '#EE00CC99',
+            $titleFontColor: 'white',
+            $itemBorderColor: '#60FFFFFF',
+        },
+        $input: {
+            $backgroundColor: '#FFFFFF',
+            $borderColor: '#60000000',
+            $fontSize: 16,
+            $fontColor: 'black',
+            $titleBackgroundColor: '#EE00CC99',
+            $titleBorderColor: 'white',
+            $titleFontSize: 16,
+            $titleFontColor: 'white',
+            $maskColor: '#7FFFFFFF',
+        },
+        $fight_menu: {
+            $borderColor: 'white',
+            $backgroundColor: '#CF6699FF',
+            $itemHeight: 60,
+            $titleHeight: 60,
+            $itemFontSize: 16,
+            $itemFontColor: 'white',
+            $itemBackgroundColor1: '#00FFFFFF',
+            $itemBackgroundColor2: '#66FFFFFF',
+            $titleFontSize: 16,
+            $titleBackgroundColor: '#EE00CC99',
+            $titleFontColor: 'white',
+            $itemBorderColor: '#60FFFFFF',
         },
     },
     //安卓配置
@@ -1373,6 +1438,40 @@ function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
 
     return Qt.point(position.x + spriteEffect.x, position.y + spriteEffect.y);
 }
+
+
+//战斗菜单
+let $fightMenu = {
+    $menu: ['普通攻击', '技能', '物品', '信息', '休息'],
+    $actions: [
+        function(combatantIndex) {
+            fight.$sys.showSkillsOrGoods(0);
+        },
+        function(combatantIndex) {
+            fight.$sys.showSkillsOrGoods(1);
+        },
+        function(combatantIndex) {
+            fight.$sys.showSkillsOrGoods(2);
+        },
+        function(combatantIndex) {
+            fight.$sys.showFightRoleInfo(fight.myCombatants[combatantIndex].$index);
+        },
+        function(combatantIndex) {
+            let combatant = fight.myCombatants[combatantIndex];
+            combatant.$$fightData.$target = undefined;
+            combatant.$$fightData.$attackSkill = undefined;
+            combatant.$$fightData.$choiceType = 3;
+
+            combatant.$$fightData.$lastTarget = undefined;
+            combatant.$$fightData.$lastAttackSkill = undefined;
+            combatant.$$fightData.$lastChoiceType = 3;
+
+
+
+            fight.$sys.checkToFight();
+        },
+    ],
+};
 
 
 

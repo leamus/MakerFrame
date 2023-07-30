@@ -10,7 +10,7 @@ import _Global.Button 1.0
 
 import "qrc:/QML"
 
-import 'GameVirtualScript.js' as GameVirtualScriptJS
+import 'GameVisualScript.js' as GameVisualScriptJS
 
 
 
@@ -218,7 +218,14 @@ Rectangle {
                             //显示命令和参数
                             retString += "<font color='%1'>%2</font>  ".arg(tCmdString.command[5]).arg(GlobalLibraryJS.convertToHTML(tCmdString.command[0], ['<', '>']));
                             for(let i in Data.params) {
-                                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(Data.params[i], ['<', '>']));
+                                let paramValueText = Data.params[i];
+                                if(tCmdString.params[i][3] === 2) {
+                                    let tIndex = tCmdString.params[i][4][1].indexOf(Data.params[i]);
+                                    if(tIndex >= 0)
+                                        paramValueText = tCmdString.params[i][4][0][tIndex];
+                                }
+
+                                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(paramValueText, ['<', '>']));
                             }
                             if(!Data.status.enabled)
                                 retString += '</s>';
@@ -1104,7 +1111,13 @@ Rectangle {
             //显示命令和参数
             //retString += "<font color='%1'>%2</font>".arg(tCmdString.command[5]).arg(tCmdString.command[0]);
             for(let i in Data.params) {
-                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(Data.params[i], ['<', '>']));
+                let paramValueText = Data.params[i];
+                if(tCmdString.params[i][3] === 2) {
+                    let tIndex = tCmdString.params[i][4][1].indexOf(Data.params[i]);
+                    if(tIndex >= 0)
+                        paramValueText = tCmdString.params[i][4][0][tIndex];
+                }
+                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(paramValueText, ['<', '>']));
             }
             return retString;
         }
@@ -1365,8 +1378,8 @@ Rectangle {
             _private.loadExtraVisualScripts(VirtualScriptPath, false);
         }
         else {
-            root.sysCommands = GameVirtualScriptJS.data.sysCommands;
-            root.sysCommandsTree = GameVirtualScriptJS.data.sysCommandsTree;
+            root.sysCommands = GameVisualScriptJS.data.sysCommands;
+            root.sysCommandsTree = GameVisualScriptJS.data.sysCommandsTree;
         }
 
 

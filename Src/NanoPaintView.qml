@@ -26,12 +26,12 @@ Rectangle {
 
 
     L_NanoPaintedItem {
-        id: painter;
+        id: painter
 
-        //anchors.top: options.bottom;
-        //anchors.left: parent.left;
-        //anchors.right: parent.right;
-        //anchors.bottom: parent.bottom;
+        //anchors.top: options.bottom
+        //anchors.left: parent.left
+        //anchors.right: parent.right
+        //anchors.bottom: parent.bottom
         width: parent.width
         height: parent.height
     }

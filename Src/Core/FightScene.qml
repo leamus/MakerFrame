@@ -119,6 +119,10 @@ Item {
         readonly property var $sys: ({
             container: itemRolesContainer,
 
+            showSkillsOrGoods: _private.showSkillsOrGoods,
+            showFightRoleInfo: function(){s_showFightRoleInfo();},
+            checkToFight: _private.checkToFight,
+
             components: {
                 menuSkillsOrGoods: menuSkillsOrGoods,
                 menuFightRoleChoice: menuFightRoleChoice,
@@ -621,7 +625,8 @@ Item {
                 Text {
                     id: textMyCombatantsName
 
-                    y: -36
+                    anchors.bottom: loaderMyCombatantPropertyBar.bottom
+                    anchors.bottomMargin: 10
                     width: parent.width
 
                     color: "white"
@@ -629,7 +634,8 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    font.pointSize: 16
+                    textFormat: Text.RichText
+                    font.pointSize: 10
                     font.bold: true
                     //wrapMode: Text.Wrap
                 }
@@ -637,7 +643,8 @@ Item {
                 Loader {
                     id: loaderMyCombatantPropertyBar
 
-                    y: -10
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: 10
                     width: parent.width
                     height: _private.config.barHeight
 
@@ -663,7 +670,31 @@ Item {
                             menuFightRoleChoice.anchors.top = parent.top;
                             */
 
-                            menuFightRoleChoice.show(_private.arrMenu);
+
+
+                            //let style = game.$sys.resources.commonScripts["$fight_menu"].$style;
+                            let style = {};
+                            //样式
+                            if(!style)
+                                style = {};
+                            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$fight_menu') || {};
+                            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$fight_menu;
+
+                            //maskMenu.color = style.MaskColor || '#7FFFFFFF';
+                            menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                            menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                            menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+                            menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+                            menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+                            menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+                            menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+                            menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+                            menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                            menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+                            menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+                            menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
+                            //menuFightRoleChoice.show(_private.arrMenu);
+                            menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menu"].$menu);
                         }
 
                         //选择target人物
@@ -673,7 +704,18 @@ Item {
                                 return;
 
 
-                            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](_private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$attackSkill, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], _private.myCombatants[modelData], 1);
+                            let combatant = _private.myCombatants[menuFightRoleChoice.nChoiceFightRole];
+                            let skill;
+                            //如果选择的是技能
+                            if(combatant.$$fightData.$choiceType === 0 || combatant.$$fightData.$choiceType === 1) {
+                                skill = combatant.$$fightData.$attackSkill;
+                            }
+                            //如果选择的是道具
+                            else if(combatant.$$fightData.$choiceType === 2) {
+                                skill = combatant.$$fightData.$attackSkill.$fight[0];
+                            }
+
+                            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skill, combatant, _private.myCombatants[modelData], 1);
                             if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
                                 fight.msg(checkSkill || "不能选择", 50);
                                 return;
@@ -688,8 +730,8 @@ Item {
                             }
 
 
-                            _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$target = [_private.myCombatants[modelData]];
-                            _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$lastTarget = [_private.myCombatants[modelData]];
+                            combatant.$$fightData.$target = [_private.myCombatants[modelData]];
+                            combatant.$$fightData.$lastTarget = [_private.myCombatants[modelData]];
 
 
                             _private.nStep = 1;
@@ -758,7 +800,8 @@ Item {
                 Text {
                     id: textEnemyName
 
-                    y: -36
+                    anchors.bottom: loaderEnemyPropertyBar.bottom
+                    anchors.bottomMargin: 10
                     width: parent.width
 
                     color: "white"
@@ -766,7 +809,8 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    font.pointSize: 16
+                    textFormat: Text.RichText
+                    font.pointSize: 10
                     font.bold: true
                     //wrapMode: Text.Wrap
                 }
@@ -775,7 +819,8 @@ Item {
                 Loader {
                     id: loaderEnemyPropertyBar
 
-                    y: -10
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: 10
                     width: parent.width
                     height: _private.config.barHeight
 
@@ -876,6 +921,9 @@ Item {
             //hide();
             menuFightRoleChoice.visible = false;
 
+            game.$sys.resources.commonScripts["fight_menu"].$actions[index](nChoiceFightRole);
+            return;
+
             //console.debug("clicked choice")
             switch(index) {
             //普通攻击
@@ -911,7 +959,7 @@ Item {
 
             //信息
             case 3:
-                s_showFightRoleInfo(_private.myCombatants[nChoiceFightRole].$index);
+                fight.$sys.showFightRoleInfo(_private.myCombatants[nChoiceFightRole].$index);
 
                 break;
 
@@ -928,13 +976,14 @@ Item {
                 let ret = _private.genHuiHe.run();
                 */
 
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$target = undefined;
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$attackSkill = undefined;
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$choiceType = 3;
+                let combatant = _private.myCombatants[nChoiceFightRole];
+                combatant.$$fightData.$target = undefined;
+                combatant.$$fightData.$attackSkill = undefined;
+                combatant.$$fightData.$choiceType = 3;
 
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$lastTarget = undefined;
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$lastAttackSkill = undefined;
-                _private.myCombatants[menuFightRoleChoice.nChoiceFightRole].$$fightData.$lastChoiceType = 3;
+                combatant.$$fightData.$lastTarget = undefined;
+                combatant.$$fightData.$lastAttackSkill = undefined;
+                combatant.$$fightData.$lastChoiceType = 3;
 
 
 
@@ -1301,6 +1350,8 @@ Item {
             text: "退出战斗"
             onButtonClicked: {
                 fight.over(-2);
+                //强制退出后，由于执行逻辑变化（没有按正常逻辑走），导致多次执行game.msg，返回地图模式会被暂停，所以加一个正常继续
+                game.run(() => {game.goon(true);})
             }
         }
     }
@@ -1385,7 +1436,7 @@ Item {
 
 
         //我方按钮
-        property var arrMenu: ["普通攻击", "技能", "物品", '信息', "休息"]
+        //property var arrMenu: ["普通攻击", "技能", "物品", '信息', "休息"]
 
 
 
@@ -1592,13 +1643,22 @@ Item {
             else if(type === 2) {
                 //let goodsInfo = game.$sys.resources.goods[used.$rid];
                 do {
-                    if(GlobalLibraryJS.isArray(used.$commons.$fightScript)) {
+                    //if(GlobalLibraryJS.isArray(used.$commons.$fightScript)) {
+                    if(GlobalLibraryJS.isArray(used.$commons.$fightScript) || GlobalLibraryJS.isObject(used.$commons.$fightScript)) {
                         if(used.$commons.$fightScript[1] === true) {
                             checkSkill = true;
                             break;
                         }
                         else if(GlobalLibraryJS.isFunction(used.$commons.$fightScript[1])) {
                             checkSkill = used.$commons.$fightScript[1](used, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], 0);
+                            break;
+                        }
+                        else if(used.$commons.$fightScript['$check'] === true) {
+                            checkSkill = true;
+                            break;
+                        }
+                        else if(GlobalLibraryJS.isFunction(used.$commons.$fightScript['$check'])) {
+                            checkSkill = used.$commons.$fightScript['$check'](used, _private.myCombatants[menuFightRoleChoice.nChoiceFightRole], 0);
                             break;
                         }
                     }
@@ -1613,6 +1673,8 @@ Item {
 
                 if(used.$commons.$fightScript[0])
                     game.run(used.$commons.$fightScript[0]);
+                else if(used.$commons.$fightScript['$choiceScript'])
+                    game.run(used.$commons.$fightScript['$choiceScript']);
             }
 
 
@@ -2160,12 +2222,19 @@ Item {
                                     if(!game.goods(goods))
                                         ;
                                     //如果有脚本
-                                    else if(GlobalLibraryJS.isArray(goodsInfo.$commons.$fightScript)) {
+                                    else if(GlobalLibraryJS.isArray(goodsInfo.$commons.$fightScript) || GlobalLibraryJS.isObject(goodsInfo.$commons.$fightScript)) {
                                         //如果直接为true，则可用
                                         if(goodsInfo.$commons.$fightScript[1] === true)
                                             break;
                                         //如果有脚本且返回为true
                                         if(GlobalLibraryJS.isFunction(goodsInfo.$commons.$fightScript[1]) && goodsInfo.$commons.$fightScript[1](goods, combatant, 1) === true) {
+                                            break;
+                                        }
+                                        //如果直接为true，则可用
+                                        if(goodsInfo.$commons.$fightScript['$check'] === true)
+                                            break;
+                                        //如果有脚本且返回为true
+                                        if(GlobalLibraryJS.isFunction(goodsInfo.$commons.$fightScript['$check']) && goodsInfo.$commons.$fightScript['$check'](goods, combatant, 1) === true) {
                                             break;
                                         }
                                     }
@@ -2422,7 +2491,11 @@ Item {
                             let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
                             //得到技能生成器函数
                             //let genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
-                            _private.asyncScript.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$fightScript', -1);
+                            if(goodsInfo.$commons.$fightScript[2])
+                                _private.asyncScript.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$fightScript', -1);
+                            else if(goodsInfo.$commons.$fightScript['$overScript'])
+                                _private.asyncScript.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$fightScript', -1);
+
                             while(1) {
 
                                 //一个特效

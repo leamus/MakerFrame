@@ -134,6 +134,7 @@ Rectangle {
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
             l_list.open({
+                RemoveButtonVisible: false,
                 Data: Object.keys(menuJS.plugins),
                 OnClicked: (index, item)=>{
                     if(!GlobalLibraryJS.isObject(menuJS.plugins[item])) {

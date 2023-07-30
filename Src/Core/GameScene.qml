@@ -75,6 +75,7 @@ import "GameMakerGlobal.js" as GameMakerGlobalJS
     _private.objCommonScripts["fight_combatant_position_algorithm"]：//获取 某战斗角色 中心位置
     _private.objCommonScripts["fight_combatant_melee_position_algorithm"]：//战斗角色近战 坐标
     _private.objCommonScripts["fight_skill_melee_position_algorithm"]//特效在战斗角色的 坐标
+    _private.objCommonScripts["fight_menu"]//战斗菜单
     //_private.objCommonScripts["resume_event_script"]
     //_private.objCommonScripts["get_goods_script"]
     //_private.objCommonScripts["use_goods_script"]
@@ -222,7 +223,7 @@ Rectangle {
 
             //样式
             if(!style)
-                style = {Name: true, Avatar: true};
+                style = {};
 
 
             //是否暂停游戏
@@ -235,10 +236,12 @@ Rectangle {
             }
 
 
+            let bShowName = GlobalLibraryJS.shortCircuit(1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$style', '$talk', '$name'));
+            let bShowAvatar = GlobalLibraryJS.shortCircuit(1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$style', '$talk', '$avatar'));
             if(role !== null) {
-                if(role.$data.$name && style.Name)
+                if(role.$data.$name && bShowName)
                     pretext = role.$data.$name + "：" + pretext;
-                if(role.$data.$avatar && style.Avatar)
+                if(role.$data.$avatar && bShowAvatar)
                     pretext = GlobalLibraryJS.showRichTextImage(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
             }
             dialogRoleMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
@@ -272,10 +275,13 @@ Rectangle {
             //样式
             if(!style)
                 style = {};
-            role.message.color = style.BackgroundColor || '#BF6699FF';
-            role.message.border.color = style.BorderColor || 'white';
-            role.message.textArea.font.pointSize = style.FontSize || 9;
-            role.message.textArea.font.color = style.FontColor || 'white';
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$say') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$say;
+
+            role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            role.message.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            role.message.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             //role.message.visible = true;
             role.message.show(GlobalLibraryJS.convertToHTML(msg.toString()), GlobalLibraryJS.convertToHTML(pretext.toString()), interval, keeptime, 0b11);
@@ -296,19 +302,22 @@ Rectangle {
             //样式
             if(!style)
                 style = {};
-            maskMenu.color = style.MaskColor || '#7FFFFFFF';
-            menuGame.border.color = style.BorderColor || "white";
-            menuGame.color = style.BackgroundColor || "#CF6699FF";
-            menuGame.nItemHeight = style.ItemHeight || 60;
-            menuGame.nTitleHeight = style.TitleHeight || 60;
-            menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || 16;
-            menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || "white";
-            menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || "#00FFFFFF";
-            menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || "#66FFFFFF";
-            menuGame.nTitleFontSize = style.TitleFontSize || style.FontSize || 16;
-            menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || "#EE00CC99";
-            menuGame.colorTitleFontColor = style.TitleFontColor || style.BackgroundColor || "white";
-            menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || "#60FFFFFF";
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$menu') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$menu;
+
+            maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+            menuGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            menuGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            menuGame.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+            menuGame.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+            menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+            menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+            menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+            menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+            menuGame.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+            menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+            menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+            menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
 
 
             //是否暂停游戏
@@ -338,6 +347,8 @@ Rectangle {
             //样式
             if(style === undefined || style === null)
                 style = {};
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$input') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$input;
 
 
             //是否暂停游戏
@@ -349,18 +360,17 @@ Rectangle {
 
 
 
-            rectGameInput.color = style.BackgroundColor || '#FFFFFF';
-            rectGameInput.border.color = style.BorderColor || '#60000000';
-            textGameInput.font.pointSize = style.FontSize || 16;
-            textGameInput.font.color = style.FontColor || 'black';
+            rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            textGameInput.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
-            rectGameInputTitle.color = style.TitleBackgroundColor || '#EE00CC99';
-            rectGameInputTitle.border.color = style.TitleBorderColor || 'white';
-            textGameInputTitle.font.pointSize = style.TitleFontSize || 16;
-            textGameInputTitle.font.color = style.TitleFontColor || 'white';
+            rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+            rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
+            textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+            textGameInputTitle.font.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
 
-
-            maskGameInput.color = style.MaskColor || '#7FFFFFFF';
+            maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
 
 
@@ -424,7 +434,7 @@ Rectangle {
             if(game.gd["$sys_main_roles"][index] === undefined) {
                 //mainRole.$name = role.$name;
 
-                game.gd["$sys_main_roles"][index] = {$rid: role.RId, $id: role.$id, $name: role.$name, $index: index, $showName: true, $speed: 0, $scale: [1,1], $avatar: '', $avatarSize: [0, 0], $x: 0, $y: 0};
+                game.gd["$sys_main_roles"][index] = {$rid: role.RId, $id: role.$id, $name: role.$name, $index: index, $showName: true, $speed: 0, $scale: [1,1], $avatar: '', $avatarSize: [0, 0], $x: mainRole.x, $y: mainRole.y};
 
                 role = game.gd["$sys_main_roles"][index];
 
@@ -3377,6 +3387,7 @@ Rectangle {
             _private.objCommonScripts["fight_combatant_position_algorithm"] = tCommoncript.$fightCombatantPositionAlgorithm;
             _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
             _private.objCommonScripts["fight_skill_melee_position_algorithm"] = tCommoncript.$fightSkillMeleePositionAlgorithmt;
+            _private.objCommonScripts["fight_menu"] = tCommoncript.$fightMenu;
             //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
             //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
             //_private.objCommonScripts["use_goods_script"] = tCommoncript.commonUseGoodsScript;
@@ -3477,24 +3488,32 @@ Rectangle {
 
         if(!_private.objCommonScripts["fight_combatant_position_algorithm"]) {
             _private.objCommonScripts["fight_combatant_position_algorithm"] = GameMakerGlobalJS.$fightCombatantPositionAlgorithm;
-            console.debug("[!GameScene]载入系统战斗结束脚本");
+            console.debug("[!GameScene]载入系统战斗坐标算法");
         }
         else
-            console.debug("[GameScene]载入战斗结束脚本OK");
+            console.debug("[GameScene]载入战斗坐标算法OK");
 
         if(!_private.objCommonScripts["fight_combatant_melee_position_algorithm"]) {
             _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = GameMakerGlobalJS.$fightCombatantMeleePositionAlgorithm;
-            console.debug("[!GameScene]载入系统战斗结束脚本");
+            console.debug("[!GameScene]载入系统战斗近战坐标算法");
         }
         else
-            console.debug("[GameScene]载入战斗结束脚本OK");
+            console.debug("[GameScene]载入战斗近战坐标算法OK");
 
+        _private.objCommonScripts["fight_menu"] = tCommoncript.$fightMenu;
         if(!_private.objCommonScripts["fight_skill_melee_position_algorithm"]) {
             _private.objCommonScripts["fight_skill_melee_position_algorithm"] = GameMakerGlobalJS.$fightSkillMeleePositionAlgorithm;
-            console.debug("[!GameScene]载入系统战斗结束脚本");
+            console.debug("[!GameScene]载入系统战斗特效坐标算法");
         }
         else
-            console.debug("[GameScene]载入战斗结束脚本OK");
+            console.debug("[GameScene]载入战斗特效坐标算法OK");
+
+        if(!_private.objCommonScripts["fight_menu"]) {
+            _private.objCommonScripts["fight_menu"] = GameMakerGlobalJS.$fightMenu;
+            console.debug("[!GameScene]载入系统战斗菜单");
+        }
+        else
+            console.debug("[GameScene]载入战斗菜单OK");
 
         /*if(!_private.objCommonScripts["resume_event_script"]) {
             _private.objCommonScripts["resume_event_script"] = GameMakerGlobalJS.$resumeEventScript;
@@ -6187,11 +6206,14 @@ Rectangle {
 
         function show(msg, pretext, interval, keeptime, style) {
 
-            messageRole.color = style.BackgroundColor || '#BF6699FF';
-            messageRole.border.color = style.BorderColor || 'white';
-            messageRole.textArea.font.pointSize = style.FontSize || 16;
-            messageRole.textArea.font.color = style.FontColor || 'white';
-            maskMessageRole.color = style.MaskColor || 'transparent';
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$talk;
+
+            messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
             //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
             dialogRoleMsg.nKeepTime = keeptime || 0;
@@ -6339,12 +6361,15 @@ Rectangle {
 
         function show(msg, pretext, interval, keeptime, style) {
 
-            messageGame.color = style.BackgroundColor || '#BF6699FF';
-            messageGame.border.color = style.BorderColor || 'white';
-            messageGame.textArea.font.pointSize = style.FontSize || 16;
-            messageGame.textArea.font.color = style.FontColor || 'white';
-            maskMessageGame.color = style.MaskColor || '#7FFFFFFF';
-            let type = style.Type || 0b10;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$msg') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$msg;
+
+            messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            messageGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            messageGame.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            messageGame.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+            let type = GlobalLibraryJS.shortCircuit(1, style.Type, styleUser.$type, styleSystem.$type);
 
             //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
             dialogGameMsg.nKeepTime = keeptime || 0;
@@ -6904,8 +6929,10 @@ Rectangle {
             else if(GlobalLibraryJS.isObject(skill)) {
                 //如果已是 技能对象，直接返回
                 if(skill.$rid && _private.objSkills[skill.$rid] !== undefined) {
-                    if(forceNew === false)
+                    if(forceNew === false) {
+                        skill.__proto__ = _private.objSkills[skill.$rid];
                         return skill;
+                    }
 
                     /*if(_private.objSkills[skill.$rid].$createData)
                         retSkill = _private.objSkills[skill.$rid].$createData();
@@ -6962,8 +6989,10 @@ Rectangle {
             else if(GlobalLibraryJS.isObject(goods)) {
                 //如果已是 道具对象
                 if(goods.$rid && _private.objGoods[goods.$rid] !== undefined) {
-                    if(forceNew === false)
+                    if(forceNew === false) {
+                        goods.__proto__ = _private.objGoods[goods.$rid];
                         return goods;
+                    }
 
                     /*
                     if(_private.objGoods[goods.$rid].$createData)
@@ -7043,8 +7072,10 @@ Rectangle {
             else if(GlobalLibraryJS.isObject(fightrole)) {
                 //如果已是 战斗人物对象，直接返回
                 if(fightrole.$rid && _private.objFightRoles[fightrole.$rid] !== undefined) {
-                    if(forceNew === false)
+                    if(forceNew === false) {
+                        fightrole.__proto__ = _private.objFightRoles[fightrole.$rid];
                         return fightrole;
+                    }
 
                     retFightRole = new _private.objCommonScripts["combatant_class"](fightrole.$rid);
                     //if(_private.objFightRoles[fightrole.$rid].$createData)
@@ -7130,8 +7161,10 @@ Rectangle {
             else if(GlobalLibraryJS.isObject(fightscript)) {
                 //如果已是 战斗脚本对象，直接返回
                 if(fightscript.$rid && _private.objFightScripts[fightscript.$rid] !== undefined) {
-                    if(forceNew === false)
+                    if(forceNew === false) {
+                        fightscript.__proto__ = _private.objFightScripts[fightscript.$rid];
                         return fightscript;
+                    }
 
                     /*
                     if(_private.objFightScripts[fightscript.$rid].$createData)

@@ -125,7 +125,7 @@ let data = (function() {
             return -1;
         },
         //这样写不会显示 使用 选项
-        //$useScript: false,
+        //$useScript: null,
 
         /*/装备脚本
         $equipScript: function*(goods, combatant) {
@@ -139,27 +139,27 @@ let data = (function() {
             console.debug(goods, c);
         },*/
         //这样写不会显示 装备 选项
-        $equipScript: false,
+        $equipScript: null,
 
 
-        //战斗脚本；数组内容分别是：0，检测是否可用；1，收尾代码；
-        $fightScript: [
+        //战斗脚本；数组内容分别是：0，选择道具脚本；1，检测是否可用；2，收尾代码；
+        $fightScript: {
             //选择道具时脚本
-            function *$choiceScript(goods, combatant) {
+            $choiceScript: function *(goods, combatant) {
                 return;
             },
             //是否可用
-            function $check(goods, combatant, stage){
+            $check: function (goods, combatant, stage){
                 return true;
             },
             //收尾代码
-            function *$overScript(goods, combatant){
+            $overScript: function *(goods, combatant){
                 game.removegoods(goods, 1);	//背包道具-1
                 return;
             },
-        ],
+        },
         //这样写不会显示 战时 选项
-        //$fightScript: false,
+        //$fightScript: null,
     };
 
 

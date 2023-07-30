@@ -11,10 +11,11 @@ let data = (function() {
     //      command: [命令显示, 命令, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表]],
     //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]}
     //          其中：
-    //              类型：string、number、bool、string|number、name、json、unformatted、code
+    //              类型：string、number、bool、string|number、name、json、unformatted、code、label
     //                  string、number、bool、string|number、name、json、unformatted 可以长按选择；
     //                  编译时 string 带引号，bool会自动转换，string|number表示如果可以转换为number，则不带引号，否则带引号；
-    //              输入类型：输入类型：为0表示只给默认值（输入参数为默认值）；为1表示选择某目录下的文件夹，输入参数为目录路径；为2表示选择预选选项（输入参数为[[选项], [对应值], 默认值]）；为9表示固定值；
+    //                  label 为增加一个提示框
+    //              输入类型：为0表示只给默认值（输入参数为默认值）；为1表示选择某目录下的文件夹，输入参数为目录路径；为2表示选择预选选项（输入参数为[[选项], [对应值], 默认值]）；为9表示固定值；
     //数据格式：
     //  [命令Key名, 额外设置（enabled为是否注释）, 参数值1, ...]
     let sysCommands = ({
@@ -28,7 +29,7 @@ let data = (function() {
                                 '信息': {
                                     command: ['显示信息', 'yield game.msg(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@信息', 'string', true, 2, [['文字', '变量', '地图变量', '全局变量'], ['内容', '${变量1}', '${game.d["变量1"]}', '${game.gd["变量1"]}']], 'green'],
+                                        ['*@信息', 'string', true, 2, [['文字', '变量', '地图变量', '全局变量'], ['', '${变量1}', '${game.d["变量1"]}', '${game.gd["变量1"]}']], 'green'],
                                         ['文字间隔', 'number', '60', 0, '60', 'blue'],
                                         ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                                         ['持续时间', 'number', '1000', 0, '', 'lightblue'],
@@ -40,7 +41,7 @@ let data = (function() {
                                     command: ['对话', 'yield game.talk(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['角色名', 'string', undefined, 0, '', 'darkgreen'],
-                                        ['*@信息', 'string', true, 2, [['文字', '变量', '地图变量', '全局变量'], ['内容', '${变量1}', '${game.d["变量1"]}', '${game.gd["变量1"]}']], 'green'],
+                                        ['*@信息', 'string', true, 2, [['文字', '变量', '地图变量', '全局变量'], ['', '${变量1}', '${game.d["变量1"]}', '${game.gd["变量1"]}']], 'green'],
                                         ['文字间隔', 'number', '60', 0, '', 'blue'],
                                         ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                                         ['持续时间', 'number', '1000', 0, '', 'lightblue'],
@@ -83,20 +84,20 @@ let data = (function() {
                                 '主角信息': {
                                     command: ['主角信息', 'game.hero(%1)', '主角信息', 0, false, 'red', 'white'],
                                     params: [
-                                        ['*@主角名', 'string|number', true, 2, [['全部', '角色名1'], ['-1', '角色名1'], '角色名1'], 'green'],
+                                        ['*@主角名', 'string|number', true, 2, [['全部', '角色名'], ['-1', ''], ''], 'green'],
                                     ],
                                 },
                                 '修改主角': {
                                     command: ['修改主角', 'game.hero(%1, %2);', '修改主角', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@主角名', 'string', true, 2, [['角色名1'], ['角色名1'], '角色名1'], 'green'],
+                                        ['*@主角名', 'string', true, 2, [['角色名'], [''], ''], 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                     ],
                                 },
                                 '删除主角': {
                                     command: ['删除主角', 'game.delhero(%1);', '删除主角', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@主角名', 'string|number', true, 2, [['全部', '角色名1'], ['-1', '角色名1'], '-1'], 'green'],
+                                        ['*@主角名', 'string|number', true, 2, [['全部', '角色名'], ['-1', ''], ''], 'green'],
                                     ],
                                 },
                                 '移动主角': {
@@ -127,20 +128,20 @@ let data = (function() {
                                 'NPC信息': {
                                     command: ['NPC信息', 'game.role(%1)', 'NPC信息', 0, false, 'red', 'white'],
                                     params: [
-                                        ['*@NPC名', 'string|number', true, 2, [['全部', 'NPC名'], ['-1', 'NPC名'], 'NPC名'], 'green'],
+                                        ['*@NPC名', 'string|number', true, 2, [['全部', 'NPC名'], ['-1', ''], ''], 'green'],
                                     ],
                                 },
                                 '修改NPC': {
                                     command: ['修改NPC', 'game.role(%1,%2);', '修改NPC', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@NPC名', 'string', true, 2, [['NPC名'], ['NPC名'], 'NPC名'], 'green'],
+                                        ['*@NPC名', 'string', true, 2, [['NPC名'], [''], ''], 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                     ],
                                 },
                                 '删除NPC': {
                                     command: ['删除NPC', 'game.delrole(%1);', '', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@NPC名', 'string|number', true, 2, [['全部', 'NPC1'], ['-1', 'NPC1'], '-1'], 'green'],
+                                        ['*@NPC名', 'string|number', true, 2, [['全部', 'NPC名'], ['-1', ''], ''], 'green'],
                                     ],
                                 },
 
@@ -275,44 +276,44 @@ let data = (function() {
                                 '删除战斗主角': {
                                     command: ['删除战斗主角', 'game.delfighthero(%1);', '删除战斗主角', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）', '全部'], ['名字', '0', '-1']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）', '全部'], ['', '-1']], 'darkgreen'],
                                     ],
                                 },
                                 '战斗主角信息': {
                                     command: ['战斗主角信息', 'game.fighthero(%1,%2)', '战斗主角信息', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）', '全部'], ['名字', '0', '-1']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）', '全部'], ['', '-1']], 'darkgreen'],
                                         ['@方式', 'number', '1', 2, [['返回对象', '返回名字'], ['1', '2'], '1'], 'darkgreen'],
                                     ],
                                 },
                                 '获得技能': {
                                     command: ['获得技能', 'game.getskill(%1,%2,%3);', '获得技能', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@技能名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
-                                        ['@位置', 'number', '-1', 2, [['追加', '替换(输入数字下标)'], ['-1', ''], '-1'], 'darkgreen'],
+                                        ['*@位置', 'number', true, 2, [['追加', '替换(输入数字下标)'], ['-1', ''], '-1'], 'darkgreen'],
                                     ],
                                 },
                                 '移除技能': {
                                     command: ['移除技能', 'game.removeskill(%1,%2,%3);', '移除技能', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@技能名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
-                                        ['@类型', 'json', '{}', 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
+                                        ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
                                     ],
                                 },
                                 '技能信息': {
                                     command: ['技能信息', 'game.skill(%1,%2,%3)', '技能信息', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@技能名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
-                                        ['@类型', 'json', '{}', 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
+                                        ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
                                     ],
                                 },
                                 '修改战斗角色属性': {
                                     command: ['修改战斗角色属性', 'game.addprops(%1,{"%2": %3},%4);', '修改战斗角色属性', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@属性', 'name', true, 2, [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'], ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']], 'darkgreen'],
                                         ['*值', 'number', true, 0, undefined, 'darkgreen'],
                                         ['*@恢复方式', 'number', true, 2, [['增加数值', '倍率', '赋值', '满值（多段）'], ['1', '2', '3', '0'], '1'], 'darkgreen'],
@@ -321,7 +322,7 @@ let data = (function() {
                                 '升级': {
                                     command: ['升级', 'game.$userscripts.levelup(%1,%2);', '升级', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*级别', 'number', true, 0, '1', 'darkgreen'],
                                     ],
                                 },
@@ -346,42 +347,42 @@ let data = (function() {
                                 '道具信息': {
                                     command: ['道具信息', 'game.goods(%1,%2)', '道具信息', 0, false, 'red', 'white'],
                                     params: [
-                                        ['*@道具资源名或下标或-1', 'string|number', true, 2, [['道具资源名', '下标', '所有'], ['', '', '-1'], '-1'], 'darkgreen'],
+                                        ['*@道具资源名或下标或-1', 'string|number', true, 2, [['道具资源名或下标（数字）', '所有'], ['', '-1'], '-1'], 'darkgreen'],
                                         ['筛选', 'json', '{}', 0, '{}', 'darkgreen'],
                                     ],
                                 },
                                 '道具个数': {
                                     command: ['道具个数', 'game.getgoods(%1,0)', '道具个数', 0, false, 'red', 'white'],
                                     params: [
-                                        ['*@道具资源名或下标', 'string|number', true, 2, [['道具资源名', '下标'], ['', '']], 'darkgreen'],
+                                        ['*@道具资源名或下标', 'string|number', true, 2, [['道具资源名或下标（数字）'], ['']], 'darkgreen'],
                                     ],
                                 },
                                 '使用道具': {
                                     command: ['使用道具', 'game.usegoods(%1,%2);', '使用道具', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                                     ],
                                 },
                                 '装备道具': {
                                     command: ['装备道具', 'game.equip(%1,%2);', '装备道具', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                                     ],
                                 },
                                 '卸下装备': {
                                     command: ['卸下装备', 'game.unload(%1,%2);', '卸下装备', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@部位', 'string', true, 2, [['武器', '头戴', '身穿', '鞋子'], ['武器', '头戴', '身穿', '鞋子']], 'darkgreen'],
                                     ],
                                 },
                                 '装备信息': {
                                     command: ['装备信息', 'game.equipment(%1,%2);', '装备信息', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
-                                        ['*@部位', 'string', '', 2, [['武器', '头戴', '身穿', '鞋子', '所有'], ['武器', '头戴', '身穿', '鞋子', '']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
+                                        ['@部位', 'string', '', 2, [['武器', '头戴', '身穿', '鞋子', '所有'], ['武器', '头戴', '身穿', '鞋子', '']], 'darkgreen'],
                                     ],
                                 },
                                 '交易': {
@@ -410,8 +411,8 @@ let data = (function() {
                                     params: [
                                         ['*@战斗脚本', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                                         ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 函数名']], 'green'],
-                                        ['@几率', 'number', '5', 0, '5', 'darkgreen'],
-                                        ['@方式', 'number', '3', 2, [['全部开启', '主角静止时遇敌', '主角行动时遇敌'], [3, 2, 1], 3], 'darkgreen'],
+                                        ['几率(百分之)', 'number', '5', 0, '5', 'darkgreen'],
+                                        ['@方式', 'number', '3', 2, [['全部开启', '主角静止时遇敌', '主角行动时遇敌'], ['3', '2', '1'], '3'], 'darkgreen'],
                                     ],
                                 },
                                 '关闭随机战斗': {
@@ -423,7 +424,7 @@ let data = (function() {
                                 '添加地图定时器': {
                                     command: ['添加地图定时器', 'game.addtimer(%1,%2,%3);', '添加地图定时器', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@名字', 'string', true, 2, [['定时器1', '定时器2', '定时器3'], ['定时器1', '定时器2', '定时器3'], '定时器1'], 'darkgreen'],
+                                        ['*@名字', 'string', true, 2, [['定时器1', '定时器2', '定时器3'], ['定时器1', '定时器2', '定时器3'], ''], 'darkgreen'],
                                         ['间隔', 'number', '1000', 0, '1000', 'darkgreen'],
                                         ['次数', 'number', '-1', 0, '-1', 'darkgreen'],
                                     ],
@@ -431,13 +432,13 @@ let data = (function() {
                                 '删除地图定时器': {
                                     command: ['删除地图定时器', 'game.deltimer(%1);', '删除地图定时器', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@名字', 'string', true, 2, [['定时器1', '定时器2', '定时器3'], ['定时器1', '定时器2', '定时器3'], '定时器1'], 'darkgreen'],
+                                        ['*@名字', 'string', true, 2, [['定时器1', '定时器2', '定时器3'], ['定时器1', '定时器2', '定时器3'], ''], 'darkgreen'],
                                     ],
                                 },
                                 '添加全局定时器': {
                                     command: ['添加全局定时器', 'game.addtimer(%1,%2,%3,true);', '添加全局定时器', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@名字', 'string', true, 2, [['全局定时器1', '全局定时器2', '全局定时器3'], ['全局定时器1', '全局定时器2', '全局定时器3'], '全局定时器1'], 'darkgreen'],
+                                        ['*@名字', 'string', true, 2, [['全局定时器1', '全局定时器2', '全局定时器3'], ['全局定时器1', '全局定时器2', '全局定时器3'], ''], 'darkgreen'],
                                         ['间隔', 'number', '1000', 0, '1000', 'darkgreen'],
                                         ['次数', 'number', '-1', 0, '-1', 'darkgreen'],
                                     ],
@@ -445,7 +446,7 @@ let data = (function() {
                                 '删除全局定时器': {
                                     command: ['删除全局定时器', 'game.deltimer(%1,true);', '删除全局定时器', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@名字', 'string', true, 2, [['全局定时器1', '全局定时器2', '全局定时器3'], ['全局定时器1', '全局定时器2', '全局定时器3'], '全局定时器1'], 'darkgreen'],
+                                        ['*@名字', 'string', true, 2, [['全局定时器1', '全局定时器2', '全局定时器3'], ['全局定时器1', '全局定时器2', '全局定时器3'], ''], 'darkgreen'],
                                     ],
                                 },
 
@@ -521,9 +522,9 @@ let data = (function() {
                                         ['@定义', 'name', '', 2, [['var（推荐）', 'let'], ['var', 'let']], 'green'],
                                         ['*@变量1', 'name', true, 2, [['地图变量（不用定义）', '全局变量（不用定义）', '变量（第一次使用必须定义）'], ['game.d["变量名1"]', 'game.gd["变量名1"]', '变量名1']], 'green'],
                                         ['*@符号', 'name', true, 2, [['赋值', '加赋值', '减赋值', '乘赋值', '除赋值', '取余赋值', '位与赋值', '位或赋值', '左移赋值', '右移赋值'], ['=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '%=', '<<=', '>>='], '='], 'black'],
-                                        ['*@变量2', 'name', '', 2, [['值', '字符串', '变量2', '地图变量1', '全局变量2', '随机数'], ['', '``', '变量2', 'game.d["变量2"]', 'game.gd["变量2"]', 'game.rnd(m,n)']], 'green'],
+                                        ['@变量2', 'name', '', 2, [['值', '字符串', '变量2', '地图变量1', '全局变量2', '随机数'], [' ', '``', '变量2', 'game.d["变量2"]', 'game.gd["变量2"]', 'game.rnd(m,n)']], 'green'],
                                         ['@运算符', 'name', '', 2, [['加', '减', '乘', '除', '取余', '位与', '位或', '左移位', '右移位'], ['+', '-', '*', '/', '%', '&', '|', '<<', '>>']], 'green'],
-                                        ['@变量3', 'name', '', 2, [['值', '字符串', '变量3', '地图变量3', '全局变量3', '随机数'], ['', '``', '变量3', 'game.d["变量3"]', 'game.gd["变量3"]', 'game.rnd(m,n)']], 'green'],
+                                        ['@变量3', 'name', '', 2, [['值', '字符串', '变量3', '地图变量3', '全局变量3', '随机数'], [' ', '``', '变量3', 'game.d["变量3"]', 'game.gd["变量3"]', 'game.rnd(m,n)']], 'green'],
                                     ],
                                 },
                                 '运算': {
@@ -532,9 +533,9 @@ let data = (function() {
                                         ['@定义', 'name', '', 2, [['var（推荐）', 'let'], ['var', 'let']], 'green'],
                                         ['*@变量1', 'name', true, 2, [['地图变量（不用定义）', '全局变量（不用定义）', '变量（第一次使用必须定义）'], ['game.d["变量名1"]', 'game.gd["变量名1"]', '变量名1']], 'green'],
                                         ['@符号', 'name', '', 2, [['赋值', '加赋值', '减赋值', '乘赋值', '除赋值', '取余赋值', '位与赋值', '位或赋值', '左移赋值', '右移赋值'], ['=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '%=', '<<=', '>>='], '='], 'black'],
-                                        ['@变量2', 'name', '', 2, [['值', '字符串', '变量2', '地图变量1', '全局变量2', '随机数'], ['', '``', '变量2', 'game.d["变量2"]', 'game.gd["变量2"]', 'game.rnd(m,n)']], 'green'],
+                                        ['@变量2', 'name', '', 2, [['值', '字符串', '变量2', '地图变量1', '全局变量2', '随机数'], [' ', '``', '变量2', 'game.d["变量2"]', 'game.gd["变量2"]', 'game.rnd(m,n)']], 'green'],
                                         ['@运算符', 'name', '', 2, [['加', '减', '乘', '除', '取余', '位与', '位或', '左移位', '右移位', 'in（循环用）', 'of（循环用）'], ['+', '-', '*', '/', '%', '&', '|', '<<', '>>', 'in', 'of']], 'green'],
-                                        ['@变量3', 'name', '', 2, [['值', '字符串', '变量3', '地图变量3', '全局变量3', '随机数'], ['', '``', '变量3', 'game.d["变量3"]', 'game.gd["变量3"]', 'game.rnd(m,n)']], 'green'],
+                                        ['@变量3', 'name', '', 2, [['值', '字符串', '变量3', '地图变量3', '全局变量3', '随机数'], [' ', '``', '变量3', 'game.d["变量3"]', 'game.gd["变量3"]', 'game.rnd(m,n)']], 'green'],
                                     ],
                                 },
 
@@ -542,7 +543,7 @@ let data = (function() {
                                 '函数/生成器{': {
                                     command: ['函数/生成器{', 'function %1(%2) {', '定义函数或生成器名', 4, true, 'red', 'white', ['块结束}']],
                                     params: [
-                                        ['*@函数名', 'name', true, 2, [['开始事件(游戏开始或载入地图)', '初始化事件(start脚本有效)', '存档保存事件(start脚本有效)', '存档载入事件(start脚本有效)', '事件1', '事件2', '事件3', '事件4', '事件5', '事件6'], ['*$start', '*$init', '*事件1', '*事件2', '*事件3', '*事件4', '*事件5', '*事件6']], 'green'],
+                                        ['*@函数名', 'name', true, 2, [['开始事件', '初始化事件(start脚本有效)', '存档保存事件(start脚本有效)', '存档载入事件(start脚本有效)', '事件1', '事件2', '事件3', '事件4', '事件5', '事件6'], ['*$start', '*$init', '*事件1', '*事件2', '*事件3', '*事件4', '*事件5', '*事件6']], 'green'],
                                         ['参数(,号分隔)', 'name', '', 0, '', 'blue'],
                                     ],
                                 },
@@ -570,7 +571,7 @@ let data = (function() {
                                 '战斗角色属性': {
                                     command: ['战斗角色属性', 'game.fighthero(%1).$properties.%2', '战斗角色属性', 0, false, 'red', 'white'],
                                     params: [
-                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名', '下标（数字）'], ['名字', '0']], 'darkgreen'],
+                                        ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                                         ['*@属性', 'name', true, 2, [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'], ['HP[0]','HP[1]','HP[2]','MP[0]','MP[1]','attack','defense','speed','luck','power']], 'darkgreen'],
                                     ],
                                 },

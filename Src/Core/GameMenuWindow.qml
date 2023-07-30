@@ -53,42 +53,45 @@ Item {
         let newFlags = 0;
 
         if((flags & 0b1) && !(nShowWindowFlags & 0b1)) {
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$main') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$main;
+
             maskMainMenu.color = style.MaskColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$maskColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$maskColor');
+                    styleUser.$maskColor ||
+                    styleSystem.$maskColor;
             gameMenu.border.color = style.BorderColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$borderColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$borderColor');
+                    styleUser.$borderColor ||
+                    styleSystem.$borderColor;
             gameMenu.color = style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$backgroundColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$backgroundColor');
+                    styleUser.$backgroundColor ||
+                    styleSystem.$backgroundColor;
             gameMenu.nItemFontSize = style.ItemFontSize || style.FontSize ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$itemFontSize') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$itemFontSize');
+                    styleUser.$itemFontSize ||
+                    styleSystem.$itemFontSize;
             gameMenu.colorItemFontColor = style.ItemFontColor || style.FontColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$itemFontColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$itemFontColor');
+                    styleUser.$itemFontColor ||
+                    styleSystem.$itemFontColor;
             gameMenu.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$itemBackgroundColor1') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$itemBackgroundColor1');
+                    styleUser.$itemBackgroundColor1 ||
+                    styleSystem.$itemBackgroundColor1;
             gameMenu.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$itemBackgroundColor2') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$itemBackgroundColor2');
+                    styleUser.$itemBackgroundColor2 ||
+                    styleSystem.$itemBackgroundColor2;
             gameMenu.nTitleFontSize = style.TitleFontSize || style.FontSize ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$titleFontSize') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$titleFontSize');
+                    styleUser.$titleFontSize ||
+                    styleSystem.$titleFontSize;
             gameMenu.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$titleBackgroundColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$titleBackgroundColor');
+                    styleUser.$titleBackgroundColor ||
+                    styleSystem.$titleBackgroundColor;
             gameMenu.colorTitleFontColor = style.TitleFontColor || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$titleFontColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$titleFontColor');
+                    styleUser.$titleFontColor ||
+                    styleSystem.$titleFontColor;
             gameMenu.colorItemBorderColor = style.ItemBorderColor || style.BorderColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$itemBorderColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$itemBorderColor');
+                    styleUser.$itemBorderColor ||
+                    styleSystem.$itemBorderColor;
             gameMenu.strTitle = style.TitleText ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$main', '$titleText') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$main', '$titleText');
+                    styleUser.$titleText ||
+                    styleSystem.$titleText;
 
             mainMenu.visible = true;
 
@@ -114,42 +117,45 @@ Item {
             newFlags |= 0b100;
         }
         if((flags & 0b1000) && !(nShowWindowFlags & 0b1000)) {
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$system') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$system;
+
             containerSystemMenu.maskSystemMenu.color = style.MaskColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$maskColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$maskColor');
+                    styleUser.$maskColor ||
+                    styleSystem.$maskColor;
             containerSystemMenu.gamemenuSystemMenu.border.color = style.BorderColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$borderColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$borderColor');
+                    styleUser.$borderColor ||
+                    styleSystem.$borderColor;
             containerSystemMenu.gamemenuSystemMenu.color = style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$backgroundColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$backgroundColor');
+                    styleUser.$backgroundColor ||
+                    styleSystem.$backgroundColor;
             containerSystemMenu.gamemenuSystemMenu.nItemFontSize = style.ItemFontSize || style.FontSize ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$itemFontSize') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$itemFontSize');
+                    styleUser.$itemFontSize ||
+                    styleSystem.$itemFontSize;
             containerSystemMenu.gamemenuSystemMenu.colorItemFontColor = style.ItemFontColor || style.FontColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$itemFontColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$itemFontColor');
+                    styleUser.$itemFontColor ||
+                    styleSystem.$itemFontColor;
             containerSystemMenu.gamemenuSystemMenu.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$itemBackgroundColor1') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$itemBackgroundColor1');
+                    styleUser.$itemBackgroundColor1 ||
+                    styleSystem.$itemBackgroundColor1;
             containerSystemMenu.gamemenuSystemMenu.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$itemBackgroundColor2') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$itemBackgroundColor2');
+                    styleUser.$itemBackgroundColor2 ||
+                    styleSystem.$itemBackgroundColor2;
             containerSystemMenu.gamemenuSystemMenu.nTitleFontSize = style.TitleFontSize || style.FontSize ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$titleFontSize') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$titleFontSize');
+                    styleUser.$titleFontSize ||
+                    styleSystem.$titleFontSize;
             containerSystemMenu.gamemenuSystemMenu.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$titleBackgroundColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$titleBackgroundColor');
+                    styleUser.$titleBackgroundColor ||
+                    styleSystem.$titleBackgroundColor;
             containerSystemMenu.gamemenuSystemMenu.colorTitleFontColor = style.TitleFontColor || style.BackgroundColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$titleFontColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$titleFontColor');
+                    styleUser.$titleFontColor ||
+                    styleSystem.$titleFontColor;
             containerSystemMenu.gamemenuSystemMenu.colorItemBorderColor = style.ItemBorderColor || style.BorderColor ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$itemBorderColor') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$itemBorderColor');
+                    styleUser.$itemBorderColor ||
+                    styleSystem.$itemBorderColor;
             containerSystemMenu.gamemenuSystemMenu.strTitle = style.TitleText ||
-                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$system', '$titleText') ||
-                    GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$system', '$titleText');
+                    styleUser.$titleText ||
+                    styleSystem.$titleText;
 
             containerSystemMenu.showSystemMenu();
 
