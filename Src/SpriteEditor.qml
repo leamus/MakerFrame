@@ -980,6 +980,7 @@ Rectangle {
 
     Dialog1.FileDialog {
         id: filedialogOpenSpriteSound
+
         title: "选择音效"
         selectMultiple: false
         //folder: shortcuts.home

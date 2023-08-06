@@ -182,7 +182,11 @@ Item {
 
                 onS_Choice: {
                     //let goodsInfo = _private.objGoods[arrData[index]];
-                    goodsDetail.text = arrData[index].$description;
+
+                    let description = arrData[index].$description;
+                    if(GlobalLibraryJS.isFunction(description))
+                        description = description(arrData[index]);
+                    goodsDetail.text = description;
                 }
                 onS_DoubleChoice: {
                     itemCountBox.tradeData.type = 1;
@@ -232,7 +236,10 @@ Item {
 
                 onS_Choice: {
                     //let goodsInfo = _private.objGoods[game.gd["$sys_goods"][index].$rid];
-                    goodsDetail.text = game.gd["$sys_goods"][index].$description;
+                    let description = game.gd["$sys_goods"][index].$description;
+                    if(GlobalLibraryJS.isFunction(description))
+                        description = description(game.gd["$sys_goods"][index]);
+                    goodsDetail.text = description;
                 }
                 onS_DoubleChoice: {
                     if(arrData[index].$price && GlobalLibraryJS.isValidNumber(arrData[index].$price[1])) {

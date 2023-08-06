@@ -171,8 +171,8 @@ Rectangle {
                             else {
                                 let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourceURL(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                                    //console.debug("[mainMusicEditor]Copy ERROR:", filepath);
+                                    Platform.showToast("重命名资源失败，是否目录不可写？" + newFileName);
+                                    console.error("[mainMusicEditor]RenameFile ERROR:", GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourceURL(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -280,7 +280,7 @@ Rectangle {
                         let ret = FrameManager.sl_qml_CopyFile(Global.toPath(path), GameMakerGlobal.musicResourceURL(newFileName), true);
                         if(ret <= 0) {
                             Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            //console.debug("[mainMusicEditor]Copy ERROR:", filepath);
+                            console.error("[mainMusicEditor]Copy ERROR:", fileUrl, path, Global.toPath(path), GameMakerGlobal.musicResourceURL(newFileName));
                             return;
                         }
                         _private.refresh();

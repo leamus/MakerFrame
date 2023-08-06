@@ -434,7 +434,11 @@ Item {
                         let goodsInfo = game.$sys.resources.goods[gameGoodsMenu.arrGoods[index].$rid];
                         buttonUse.visible = (goodsInfo.$commons.$useScript ? true : false);
                         buttonEquip.visible = (goodsInfo.$commons.$equipScript ? true : false);
-                        textGoodsInfo.text = gameGoodsMenu.arrGoods[index].$description;
+
+                        let description = gameGoodsMenu.arrGoods[index].$description;
+                        if(GlobalLibraryJS.isFunction(description))
+                            description = description(gameGoodsMenu.arrGoods[index]);
+                        textGoodsInfo.text = description;
                         //itemUseOrEquip.visible = true;
                     }
                 }

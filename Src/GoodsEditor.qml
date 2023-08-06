@@ -83,12 +83,14 @@ let data = (function() {
 
 
     //公用属性，用 goods.$commons 或 goods 来引用；
+    //可以用 计算属性，格式：get $description() {return this.xxx;},
     let $commons = {
 
         /*
         //游戏中显示的 名称和描述
         $name: '零食',
         $description: '好吃的（能刷钱），血+10',
+        //get $description() {return this.xxx;},
 
         $price: [20, 30],	//买卖金额，false表示不能买卖
         $type: 2,	//1为装备；2为普通使用；3为战斗使用；4为剧情类

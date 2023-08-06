@@ -8,6 +8,10 @@ import QtMultimedia 5.14
 import Qt.labs.settings 1.1
 
 
+//引入Qt定义的类
+import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
@@ -19,7 +23,7 @@ import "qrc:/QML"
 
 //import "GameMakerGlobal.js" as GameMakerGlobalJS
 
-//import "GameJS.js" as GameJS
+import "FightScene.js" as FightSceneJS
 //import "File.js" as File
 
 

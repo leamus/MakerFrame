@@ -26,8 +26,8 @@ QtObject {
     //配置
     property QtObject config: QtObject {
         //调试（显示一些调试功能）
-        //property bool debug: parseInt(FrameManager.config.DEBUG) === 0 ? false : true
-        //property bool debug: parseInt(Platform.config('DEBUG', 0, 'File')) === 0 ? false : true
+        //property bool debug: parseInt(FrameManager.config.Debug) === 0 ? false : true
+        //property bool debug: parseInt(FrameManager.configValue('Debug', 0, 'File')) === 0 ? false : true
         property bool debug: true
 
 

@@ -171,8 +171,8 @@ Rectangle {
                             else {
                                 let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourceURL(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                                    //console.debug("[mainImageEditor]Copy ERROR:", filepath);
+                                    Platform.showToast("重命名资源失败，是否目录不可写？" + newFileName);
+                                    console.error("[mainImageEditor]RenameFile ERROR:", GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourceURL(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -225,7 +225,7 @@ Rectangle {
     Dialog1.FileDialog {
         id: filedialog
 
-        title: "选择音乐文件"
+        title: "选择图片文件"
         selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Image files (*.jpg *.jpeg *.bmp *.gif *.png)", "All files (*)" ]
@@ -279,7 +279,7 @@ Rectangle {
                         let ret = FrameManager.sl_qml_CopyFile(Global.toPath(path), GameMakerGlobal.imageResourceURL(newFileName), true);
                         if(ret <= 0) {
                             Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            //console.debug("[mainImageEditor]Copy ERROR:", filepath);
+                            console.error("[mainImageEditor]Copy ERROR:", fileUrl, path, Global.toPath(path), GameMakerGlobal.imageResourceURL(newFileName));
                             return;
                         }
                         _private.refresh();

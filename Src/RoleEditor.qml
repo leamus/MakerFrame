@@ -962,6 +962,8 @@ Rectangle {
                     if(pressed === false) {
                         _private.stopAction(0);
                     }
+                    else
+                        forceActiveFocus();
                     console.debug("[RoleEditor]Joystick onPressedChanged:", pressed)
                 }
 
@@ -1039,6 +1041,7 @@ Rectangle {
 
     Dialog1.FileDialog {
         id: filedialogOpenRoleImage
+
         title: "选择角色图片"
         selectMultiple: false
         //folder: shortcuts.home

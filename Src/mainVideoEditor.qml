@@ -172,8 +172,8 @@ Rectangle {
                             else {
                                 let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourceURL(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                                    //console.debug("[mainVideoEditor]Copy ERROR:", filepath);
+                                    Platform.showToast("重命名资源失败，是否目录不可写？" + newFileName);
+                                    console.error("[mainVideoEditor]RenameFile ERROR:", GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourceURL(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -261,7 +261,7 @@ Rectangle {
     Dialog1.FileDialog {
         id: filedialog
 
-        title: "选择音乐文件"
+        title: "选择视频文件"
         selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Video files (*.mp4 *.mpeg *.rm *.rmvb *.wmv)", "All files (*)" ]
@@ -315,7 +315,7 @@ Rectangle {
                         let ret = FrameManager.sl_qml_CopyFile(Global.toPath(path), GameMakerGlobal.videoResourceURL(newFileName), true);
                         if(ret <= 0) {
                             Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            //console.debug("[mainVideoEditor]Copy ERROR:", filepath);
+                            console.error("[mainVideoEditor]Copy ERROR:", fileUrl, path, Global.toPath(path), GameMakerGlobal.videoResourceURL(newFileName));
                             return;
                         }
                         _private.refresh();

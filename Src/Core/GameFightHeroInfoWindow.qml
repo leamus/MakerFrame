@@ -287,7 +287,11 @@ Item {
                     let combatant = game.gd[strTeamName][root.nFightHeroIndex];
                     let position = root.arrEquipmentPositions[index];
                     //msgDetail.text = game.$sys.resources.goods[hero.$equipment[position].$rid].$properties.description;
-                    msgDetail.text = combatant.$equipment[position].$description;
+
+                    let description = combatant.$equipment[position].$description;
+                    if(GlobalLibraryJS.isFunction(description))
+                        description = description(combatant.$equipment[position]);
+                    msgDetail.text = description;
                 }
 
                 onS_DoubleChoice: {
@@ -312,7 +316,11 @@ Item {
                 onS_Choice: {
                     let combatant = game.gd[strTeamName][root.nFightHeroIndex];
                     //msgDetail.text = game.$sys.resources.skills[combatant.$skills[index].$rid].$properties.description;
-                    msgDetail.text = combatant.$skills[index].$description;
+
+                    let description = combatant.$skills[index].$description;
+                    if(GlobalLibraryJS.isFunction(description))
+                        description = description(combatant.$skills[index]);
+                    msgDetail.text = description;
                 }
             }
         }

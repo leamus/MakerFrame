@@ -23,7 +23,9 @@ GameFightHeroInfoWindow 1.0 GameFightHeroInfoWindow.qml
 GameTradeWindow 1.0 GameTradeWindow.qml
 
 GameScene 1.0 GameScene.qml
+GameSceneJS 1.0 GameScene.js
 FightScene 1.0 FightScene.qml
+FightSceneJS 1.0 FightScene.js
 
 
 GameMakerGlobalJS 1.0 GameMakerGlobal.js
