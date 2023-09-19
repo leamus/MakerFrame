@@ -19,13 +19,14 @@ QtObject {
 
     property string separator: '/'  //Platform.separator()
 
-    //版本
-    property string version: "1.4.13"
+    //引擎版本
+    property string version: "1.5.4.230916"
 
 
     //配置
     property QtObject config: QtObject {
         //调试（显示一些调试功能）
+        //property bool debug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool debug: parseInt(FrameManager.config.Debug) === 0 ? false : true
         //property bool debug: parseInt(FrameManager.configValue('Debug', 0, 'File')) === 0 ? false : true
         property bool debug: true
@@ -35,11 +36,30 @@ QtObject {
         property alias strCurrentProjectName: settings.strCurrentProjectName    //"Project"
 
         //项目根目录
-        property string strProjectRootPath: Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "Projects"
-        //property string strProjectRootPath: Qt.platform.os === "android" ? "assets:" : "."  //qrc:
+        property string strProjectRootPath: {
+            switch(Qt.platform.os) {
+            case 'android':
+                return Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "Projects";
+                //return "assets:";   //"."  //'qrc:'
+            case 'windows':
+            default:
+                return "RPGMaker" + separator + "Projects";
+                //return '.';
+            }
+        }
 
         //存档目录
-        property string strSaveDataPath: Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName
+        property string strSaveDataPath: {
+            switch(Qt.platform.os) {
+            case 'android':
+                return Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
+                //return Platform.getExternalDataPath() + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
+            case 'windows':
+            default:
+                return "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
+                //return "SaveData";
+            }
+        }
 
 
         //数据文件存储 目录名
@@ -63,6 +83,10 @@ QtObject {
         property string strVideoResourceDirName: strResourceDirName + separator + "Videos"
 
     }
+
+
+    //TapTap 开发者中心对应 Client ID，为空表示不使用tap验证
+    //property string tds_ClientID: 'wpgisjxcdrwf0nnzdr'
 
 
 

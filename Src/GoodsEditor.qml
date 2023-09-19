@@ -15,6 +15,8 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
+import './Core'
+
 
 //import 'File.js' as File
 
@@ -116,7 +118,7 @@ let data = (function() {
         //使用脚本
         $useScript: function *(goods, combatant) {
             if(combatant === undefined || combatant === null)
-                combatant = yield game.menu('选择角色', game.fighthero(-1, 0), true);	//选择角色
+                combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);	//选择角色
 
             game.addprops(combatant, {HP: [10, 5]});
 
@@ -132,7 +134,7 @@ let data = (function() {
         /*/装备脚本
         $equipScript: function*(goods, combatant) {
             if(combatant === undefined || combatant === null)
-                combatant = yield game.menu('选择角色', game.fighthero(-1, 0), true);	//选择角色
+                combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);	//选择角色
             game.getgoods(game.unload(combatant, goods.$position));	//脱下装备并放入背包
             game.equip(combatant, goods, null);	//装备；使用 goodsId 的 position 属性来装备；
             game.removegoods(goods, 1);	//背包道具-1
@@ -144,19 +146,25 @@ let data = (function() {
         $equipScript: null,
 
 
-        //战斗脚本；数组内容分别是：0，选择道具脚本；1，检测是否可用；2，收尾代码；
+        //战斗脚本；数组或对象，内容分别是：0，选择道具脚本；1，检测是否可用；2，完成代码；
         $fightScript: {
             //选择道具时脚本
             $choiceScript: function *(goods, combatant) {
-                return;
+                //调用技能的
+                let skill = goods.$fight[0];
+                yield *skill.$choiceScript(skill, combatant);
             },
             //是否可用
-            $check: function (goods, combatant, stage){
-                return true;
+            $check: function (goods, combatant, targetCombatant, stage) {
+                //调用技能的
+                let skill = goods.$fight[0];
+                return skill.$check(skill, combatant, targetCombatant, stage);
             },
-            //收尾代码
-            $overScript: function *(goods, combatant){
+
+            //完成代码（收尾用）
+            $completeScript: function *(goods, combatant) {
                 game.removegoods(goods, 1);	//背包道具-1
+                //yield fight.msg('...');
                 return;
             },
         },
@@ -282,18 +290,29 @@ let data = (function() {
 
                 text: '保存'
                 onButtonClicked: {
-                    if(textGoodsName.text.trim().length === 0)
+                    let newName = textGoodsName.text = textGoodsName.text.trim();
+
+                    if(newName.length === 0)
                         return;
 
-                    _private.strSavedName = textGoodsName.text.trim();
 
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.js';
+                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator;
 
-                    //!!!导出为文件
-                    //console.debug(JSON.stringify(outputData));
-                    //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGoodsScript.textDocument), filePath, 0);
-                    //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
+
+                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGoodsScript.textDocument), path + newName + GameMakerGlobal.separator + 'goods.js', 0);
+
+
+                    //复制可视化
+                    let oldName = _private.strSavedName.trim();
+                    if(oldName) {
+                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'goods.vjs';
+                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'goods.vjs', true);
+                        }
+                    }
+
+
+                    _private.strSavedName = newName;
 
                 }
             }

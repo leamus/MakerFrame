@@ -7,7 +7,7 @@ import QtQuick.Window 2.14
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 
@@ -80,7 +80,7 @@ Item {
                 price = g.$price[1];
 
             let tgoods = game.$sys.getGoodsObject(g, false);
-            arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g)) + ' ￥' + price);
+            arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: true})) + ' ￥' + price);
             arrMyGoods.push(g);
         }
         gamemenuMyGoods.show(arrShowMyGoods, arrMyGoods);

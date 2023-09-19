@@ -405,8 +405,8 @@ Rectangle {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
-                                    ['', 'HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
+                        let data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（装备后）','二段血（装备后）','三段血（装备后）','一段MP（装备后）','二段MP（装备后）','攻击（装备后）','防御（装备后）','速度（装备后）','幸运（装备后）','灵力（装备后）'],
+                                    ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
 
                         l_list.open({
                             Data: data[0],
@@ -1104,7 +1104,7 @@ Rectangle {
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
-                    console.debug(_private.filepath + '.js', jsScript);
+                    console.debug("[GameVisualFightSkill]compile:", _private.filepath, jsScript);
                 }
             }
             ColorButton {
@@ -1202,7 +1202,7 @@ Rectangle {
             data.Effects = effects;
             //data.Attack = textAttack.text.trim();
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1316,33 +1316,33 @@ Rectangle {
                 else {
                     playScript = strTemplate1playScript;
                 }
-                playScript = playScript.replace(/\$\$skilleffect\$\$/g, textSkillEffects.text.trim());
+                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffects.text.trim());
 
                 break;
 
             case 1:
                 type = '1';
                 check = _private.strTemplate2check;
-                check = check.replace(/\$\$MP\$\$/g, requiredMP);
+                check = GlobalLibraryJS.replaceAll(check, '$$MP$$', requiredMP);
 
                 //全体
                 if(targetCount === '-1') {
 
                     playScript = strTemplate4playScript;
                     if(targetFlag === 1)
-                        playScript = playScript.replace(/\$\$target\$\$/g, '0');
+                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$target$$', '0');
                     else if(targetFlag === 2)
-                        playScript = playScript.replace(/\$\$target\$\$/g, '1');
+                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$target$$', '1');
                     else
-                        playScript = playScript.replace(/\$\$target\$\$/g, '1');
+                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$target$$', '1');
                 }
                 //单体
                 else {
                     playScript = strTemplate3playScript;
                 }
-                playScript = playScript.replace(/\$\$skilleffect\$\$/g, textSkillEffects.text.trim());
-                playScript = playScript.replace(/\$\$property\$\$/g, textSkillEffects.text.trim());
-                playScript = playScript.replace(/\$\$effect\$\$/g, textSkillEffects.text.trim());
+                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffects.text.trim());
+                //playScript = playScript.replace(/\$\$property\$\$/g, textSkillEffects.text.trim());
+                //playScript = playScript.replace(/\$\$effect\$\$/g, textSkillEffects.text.trim());
 
 
                 //技能效果
@@ -1375,10 +1375,10 @@ Rectangle {
                         //let tvalue = (tarr[1] === '0' ? `[${tvalue}]` : `[${tarr[1]}, ${tvalue}]`);
                         props += '\r\n';
                         if(tcombatant === '0')
-                            props += `effect = combatant.$$properties.${treferenceproperty} * ${tvalue};\r\n`;
+                            props += `effect = combatant.${treferenceproperty} * ${tvalue};\r\n`;
                         else
-                            props += `effect = targetCombatant.$$properties.${treferenceproperty} * ${tvalue};\r\n`;
-                        props += `targetCombatant.$$properties.${teffectproperty} += effect;\r\n`;
+                            props += `effect = targetCombatant.${treferenceproperty} * ${tvalue};\r\n`;
+                        props += `targetCombatant.$properties.${teffectproperty} += effect;\r\n`;
                         //props += `game.addprops(targetCombatant, {'${tarr[0]}': ${tvalue}}, 2);`;
                         props += `yield ({Type: 30, Interval: 0, Color: 'red', Text: effect, FontSize: 20, Combatant: targetCombatant, Position: undefined});\r\n`;
                         props += `yield ({Type: 1});\r\n`;
@@ -1387,13 +1387,13 @@ Rectangle {
                     else {
                         //let tvalue = (tarr[1] === '0' ? `[${tvalue}]` : `[${tarr[1]}, ${tvalue}]`);
                         //props += `game.addprops(targetCombatant, {'${teffectproperty}': ${tvalue}});`;
-                        props += `targetCombatant.$$properties.${teffectproperty} += ${tvalue};\r\n`;
+                        props += `targetCombatant.$properties.${teffectproperty} += ${tvalue};\r\n`;
                         props += `yield ({Type: 30, Interval: 0, Color: 'red', Text: '${tvalue}', FontSize: 20, Combatant: targetCombatant, Position: undefined});`;
                         props += `yield ({Type: 1});`;
                         props += '\r\n';
                     }
                 }
-                playScript = playScript.replace(/\$\$addprops\$\$/g, props);
+                playScript = GlobalLibraryJS.replaceAll(playScript, '$$addprops$$', props);
 
 
                 break;
@@ -1438,25 +1438,25 @@ Rectangle {
                 switch(parseInt(typeTextFields[tt].text)) {
                 case 0:
                     let ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
-                    buffs += `game.$$userscripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
+                    buffs += `game.$userscripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 1:
-                    buffs += `game.$$userscripts.getBuff(targetCombatant, 2, {BuffName: '乱', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$userscripts.getBuff(targetCombatant, 2, {BuffName: '乱', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'orange', Text: '乱', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 2:
-                    buffs += `game.$$userscripts.getBuff(targetCombatant, 3, {BuffName: '封', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$userscripts.getBuff(targetCombatant, 3, {BuffName: '封', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'yellow', Text: '封', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 3:
-                    buffs += `game.$$userscripts.getBuff(targetCombatant, 4, {BuffName: '眠', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$userscripts.getBuff(targetCombatant, 4, {BuffName: '眠', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'blue', Text: '眠', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
@@ -1465,31 +1465,31 @@ Rectangle {
                     ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
                     switch(parseInt(typeTextFields[tt].text)) {
                     case 4:
-                        buffs += `game.$$userscripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 5:
-                        buffs += `game.$$userscripts.getBuff(targetCombatant, 5, {BuffName: '防', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['defense', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '防', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['defense', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '防', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 6:
-                        buffs += `game.$$userscripts.getBuff(targetCombatant, 5, {BuffName: '速', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['speed', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '速', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['speed', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '速', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 7:
-                        buffs += `game.$$userscripts.getBuff(targetCombatant, 5, {BuffName: '灵', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['power', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '灵', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['power', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '灵', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 8:
-                        buffs += `game.$$userscripts.getBuff(targetCombatant, 5, {BuffName: '幸', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['luck', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '幸', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['luck', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '幸', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
@@ -1502,7 +1502,7 @@ Rectangle {
 
             //全体
             if(targetCount === '-1') {
-                buffs = strTemplate4Buffs.replace(/\$\$buffs\$\$/g, buffs);
+                buffs = GlobalLibraryJS.replaceAll(strTemplate4Buffs, '$$buffs$$', buffs);
             }
             //单体
             else {
@@ -1511,22 +1511,22 @@ Rectangle {
 
 
 
-            let data = strTemplate.
-                replace(/\$\$name\$\$/g, textName.text.trim()).
-                replace(/\$\$description\$\$/g, textDescription.text.trim()).
-                replace(/\$\$type\$\$/g, type).
-                replace(/\$\$targetFlag\$\$/g, targetFlag).
-                replace(/\$\$targetCount\$\$/g, targetCount).
-                replace(/\$\$playScript\$\$/g, playScript).
-                replace(/\$\$buffs\$\$/g, buffs).
-                /*replace(/\$\$check\$\$/g, textLuck.text.trim()).
-                replace(/\$\$speed\$\$/g, textSpeed.text.trim()).
-                replace(/\$\$EXP\$\$/g, textEXP.text.trim()).
-                replace(/\$\$skills\$\$/g, GlobalLibraryJS.array2string(textSkills.text.trim().split(','))).
-                replace(/\$\$goods\$\$/g, GlobalLibraryJS.array2string(textGoods.text.trim().split(','))).
-                */
-                replace(/\$\$check\$\$/g, check)
-            ;
+            let data = strTemplate;
+            data = GlobalLibraryJS.replaceAll(data, '$$name$$', textName.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$description$$', textDescription.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$type$$', type);
+            data = GlobalLibraryJS.replaceAll(data, '$$targetFlag$$', targetFlag);
+            data = GlobalLibraryJS.replaceAll(data, '$$targetCount$$', targetCount);
+            data = GlobalLibraryJS.replaceAll(data, '$$playScript$$', playScript);
+            data = GlobalLibraryJS.replaceAll(data, '$$buffs$$', buffs);
+            /*data = GlobalLibraryJS.replaceAll(data, '$$check$$', textLuck.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$speed$$', textSpeed.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$EXP$$', textEXP.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$skills$$', GlobalLibraryJS.array2string(textSkills.text.trim().split(',')));
+            data = GlobalLibraryJS.replaceAll(data, '$$goods$$', GlobalLibraryJS.array2string(textGoods.text.trim().split(',')));
+            */
+            data = GlobalLibraryJS.replaceAll(data, '$$check$$', check);
+
 
             console.debug(data);
 
@@ -1606,6 +1606,7 @@ let data = (function() {
 
         //选择技能时脚本
         $choiceScript: function *(skill, combatant) {
+            //yield fight.msg('...');
             return;
         },
 
@@ -1647,7 +1648,7 @@ $$check$$
 
         //检查MP
         property string strTemplate2check: `
-            if(combatant.$$properties.MP[0] < $$MP$$)
+            if(combatant.$properties.MP[0] < $$MP$$)
                 return '技能点不足';
 
             //阶段10时减去MP
@@ -1660,9 +1661,9 @@ $$check$$
         //普通攻击单体
         property string strTemplate1playScript: `
             //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$$$fightData.$attackSkill;
+            //let skill = combatant.$$fightData.$attackSkill;
             //目标战斗人物
-            let targetCombatant = combatant.$$$$fightData.$$target[0];
+            let targetCombatant = combatant.$$fightData.$target[0];
 
             //返回战斗算法结果
             let SkillEffectResult;
@@ -1691,10 +1692,10 @@ $$check$$
         //普通攻击全体
         property string strTemplate2playScript: `
             //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$$$fightData.$$attackSkill;
+            //let skill = combatant.$$fightData.$attackSkill;
             //目标战斗人物
-            //let targetCombatant = combatant.$$$$fightData.$$target[0];
-            let targetCombatants = combatant.$$$$fightData.$$info.$$team[1];
+            //let targetCombatant = combatant.$$fightData.$target[0];
+            let targetCombatants = combatant.$$fightData.$info.$team[1];
 
             //返回战斗算法结果
             let SkillEffectResult;
@@ -1713,7 +1714,7 @@ $$check$$
             //每个被攻击显示 kill 特效
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$properties.HP[0] <= 0)
+                if(targetCombatant.$properties.HP[0] <= 0)
                     continue;
 
                 //kill 特效，1次，同步播放，对方位置，特效ID
@@ -1722,7 +1723,7 @@ $$check$$
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$properties.HP[0] <= 0)
+                if(targetCombatant.$properties.HP[0] <= 0)
                     continue;
                 //Params：传递给通用算法的参数
                 SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
@@ -1738,9 +1739,9 @@ $$check$$
         //技能单体
         property string strTemplate3playScript: `
             //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$$$fightData.$$attackSkill;
+            //let skill = combatant.$$fightData.$attackSkill;
             //目标战斗人物
-            let targetCombatant = combatant.$$$$fightData.$$target[0];
+            let targetCombatant = combatant.$$fightData.$target[0];
 
             //这里是计算方法
             let SkillEffectResult;
@@ -1759,10 +1760,10 @@ $$addprops$$
         //技能全体
         property string strTemplate4playScript: `
             //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$$$fightData.$$attackSkill;
+            //let skill = combatant.$$fightData.$attackSkill;
             //目标战斗人物
-            //let targetCombatant = combatant.$$$$fightData.$$target[0];
-            let targetCombatants = combatant.$$$$fightData.$$info.$$team[$$target$$];
+            //let targetCombatant = combatant.$$fightData.$target[0];
+            let targetCombatants = combatant.$$fightData.$info.$team[$$target$$];
 
             //这里是计算方法
             let SkillEffectResult;
@@ -1777,7 +1778,7 @@ $$addprops$$
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$properties.HP[0] <= 0)
+                if(targetCombatant.$properties.HP[0] <= 0)
                     continue;
                 //kill 特效，1次，等待播放结束，对方位置，特效ID
                 //yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 100, RId: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
@@ -1791,7 +1792,7 @@ $$addprops$$
             //每个被攻击Buffs
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$properties.HP[0] <= 0)
+                if(targetCombatant.$properties.HP[0] <= 0)
                     continue;
 $$buffs$$
             }

@@ -6,7 +6,7 @@ import QtQuick.Window 2.14
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 
@@ -78,7 +78,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        game.save('存档' + c, game.gd["$sys_map"].$name);
+                        game.save('存档' + c, game.gd["$sys_map"].$name, 1);
                         yield game.msg('存档成功');
                         break;
                     default:
@@ -117,29 +117,57 @@ Item {
             case 2:
 
                 continueScript = function*() {
-                    let musicInfo = '音乐状态：' + (itemBackgroundMusic.isPlaying() ? '开' : '关');
-                    let soundInfo = '音效状态：' + (rootGameScene._private.config.nSoundConfig === 0 ? '开' : '关');
+                    let musicInfo = '音乐状态：' + ((game.gd["$sys_sound"] & 0b1) ? '开' : '关');
+                    let soundInfo = '音效状态：' + ((game.gd["$sys_sound"] & 0b10) ? '开' : '关');
+                    //全局音乐
+                    //let musicInfo = '音乐状态：' + (GameMakerGlobal.settings.value('$PauseMusic') ? '开' : '关');
+                    //let soundInfo = '音效状态：' + (GameMakerGlobal.settings.value('$PauseSound') ? '开' : '关');
+
                     let c = yield game.menu('设 置', [musicInfo, soundInfo, '关闭']);
                     switch(c) {
                     case 0:
-                        if(itemBackgroundMusic.objMusicPause['$sys_pause'] === undefined) {
-                            itemBackgroundMusic.pause('$sys_pause');
+                        //存档音乐
+                        if(game.gd["$sys_sound"] & 0b1) {
+                            itemBackgroundMusic.pause(false);
                             yield game.msg('关闭音乐');
                         }
                         else {
-                            itemBackgroundMusic.resume('$sys_pause');
+                            itemBackgroundMusic.resume(false);
                             yield game.msg("打开音乐");
                         }
+                        /*
+                        //全局音乐
+                        if(GameMakerGlobal.settings.value('$PauseMusic')) {
+                            itemBackgroundMusic.resume(true);
+                            yield game.msg("打开音乐");
+                        }
+                        else {
+                            itemBackgroundMusic.pause(true);
+                            yield game.msg('关闭音乐');
+                        }
+                        */
                         break;
                     case 1:
-                        if(rootGameScene._private.config.nSoundConfig === 0) {
-                            rootGameScene._private.config.nSoundConfig = 1;
+                        //存档音效
+                        if(game.gd["$sys_sound"] & 0b10) {
+                            rootSoundEffect.pause(false);
                             yield game.msg('关闭音效');
                         }
                         else {
-                            --rootGameScene._private.config.nSoundConfig;
+                            rootSoundEffect.resume(false);
                             yield game.msg("打开音效");
                         }
+                        /*
+                        //全局音效
+                        if(GameMakerGlobal.settings.value('$PauseSound')) {
+                            rootSoundEffect.resume(true);
+                            yield game.msg("打开音效");
+                        }
+                        else {
+                            rootSoundEffect.pause(true);
+                            yield game.msg('关闭音效');
+                        }
+                        */
                         break;
                     default:
                         break;

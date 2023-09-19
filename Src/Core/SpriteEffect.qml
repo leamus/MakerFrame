@@ -6,7 +6,7 @@ import QtGraphicalEffects 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 import "qrc:/QML"
@@ -127,20 +127,25 @@ Item {
         colorOverlay.stop();
     }
 
+
     //width: 0
     //height: 0
 
     implicitWidth: animatedsprite.implicitWidth
     implicitHeight: animatedsprite.implicitHeight
 
+    smooth: false
+
+
 
     AnimatedSprite {
-
         id: animatedsprite
 
         width: root.width; height: root.height     //一个帧的大小，会缩放
 
         anchors.horizontalCenter: parent.horizontalCenter
+
+        smooth: true
 
         source: spriteSrc
         interpolate: false   //true（默认）：在帧之间插值，使帧切换更平滑

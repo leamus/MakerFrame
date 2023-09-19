@@ -297,19 +297,19 @@ Rectangle {
     Keys.onEscapePressed: {
         s_close();
 
-        console.debug("[mainGameTest]:Escape Key");
+        console.debug("[mainGameTest]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         s_close();
 
-        console.debug("[mainGameTest]:Back Key");
+        console.debug("[mainGameTest]Back Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameTest]:key:", event, event.key, event.text)
+        console.debug("[mainGameTest]key:", event, event.key, event.text)
     }
 
 

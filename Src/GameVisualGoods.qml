@@ -745,7 +745,7 @@ Rectangle {
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
-                    console.debug(_private.filepath + '.js', jsScript);
+                    console.debug("[GameVisualGoods]compile:", _private.filepath, jsScript);
                 }
             }
             ColorButton {
@@ -833,7 +833,7 @@ Rectangle {
 
             data.Properties = properties;
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1143,7 +1143,7 @@ $$equipEffectAlgorithm$$
     //装备脚本
     $$equipScript: function*(goods, combatant) {
         if(combatant === undefined || combatant === null)
-            combatant = yield game.menu('选择角色', game.fighthero(-1, 0), true);	//选择角色
+            combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);   //选择角色
         game.getgoods(game.unload(combatant, goods.$$position));	//脱下装备并放入背包
         game.equip(combatant, goods);	//装备；使用 goods 的 position 属性来装备；
         game.removegoods(goods, 1);	//背包道具-1
@@ -1163,7 +1163,7 @@ $$equipEffectAlgorithm$$
     //使用脚本
     $$useScript: function *(goods, combatant) {
         if(combatant === undefined || combatant === null)
-            combatant = yield game.menu('选择角色', game.fighthero(-1, 0), true);	//选择角色
+            combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);   //选择角色
 
 $$useEffect$$
 
@@ -1180,19 +1180,25 @@ $$useEffect$$
 `
 
         property string strTemplateFightScript1: `
-    //战斗时使用脚本；数组内容分别是：0，选择道具脚本；1，检测是否可用；2，收尾代码；
+    //战斗脚本；数组或对象，内容分别是：0，选择道具脚本；1，检测是否可用；2，完成代码；
     $$fightScript: {
         //选择道具时脚本
         $$choiceScript: function *(goods, combatant) {
-            return;
+            //调用技能的
+            let skill = goods.$fight[0];
+            yield *skill.$$choiceScript(skill, combatant);
         },
         //是否可用
-        $$check: function (goods, combatant, stage){
-            return true;
+        $$check: function (goods, combatant, targetCombatant, stage) {
+            //调用技能的
+            let skill = goods.$fight[0];
+            return skill.$$check(skill, combatant, targetCombatant, stage);
         },
-        //收尾代码
-        $$overScript: function *(goods, combatant){
+
+        //完成代码（收尾用）
+        $$completeScript: function *(goods, combatant) {
             game.removegoods(goods, 1);	//背包道具-1
+            //yield fight.msg('...');
             return;
         },
     },

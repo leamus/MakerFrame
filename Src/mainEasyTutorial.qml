@@ -90,19 +90,19 @@ Rectangle {
     Keys.onEscapePressed: {
         s_close();
 
-        console.debug("[mainGameTutorial]:Escape Key");
+        console.debug("[mainEasyTutorial]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         s_close();
 
-        console.debug("[mainGameTutorial]:Back Key");
+        console.debug("[mainEasyTutorial]Back Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameTutorial]:key:", event, event.key, event.text)
+        console.debug("[mainEasyTutorial]key:", event, event.key, event.text)
     }
 
 
@@ -253,7 +253,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //fightrole为战斗主角资源名 或 标准创建格式的对象（带有RId、Params和其他属性）。
 <font color='yellow'>game.createfighthero(fightrole);</font>
 <font color='yellow'>game.delfighthero(fighthero)</font>：删除一个战斗主角；fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（删除所有战斗主角）。
-<font color='yellow'>game.fighthero(fighthero=-1, type=1)</font>：返回战斗主角；fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（删除所有战斗主角）；type为0表示只返回名字（选择框用），为1表示返回对象。返回null表示没有或错误；
+<font color='yellow'>game.fighthero(fighthero=-1, type=1)</font>：返回战斗主角；fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（所有战斗主角）；type为0表示返回 对象，为1表示只返回名字（选择框用）。返回null表示没有，false错误；
 
 //获得技能；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
@@ -401,7 +401,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.date()</font>：返回 JS 的 new Date()对象。
 
 <font color='yellow'>game.checksave("文件名")</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>game.save("文件名", showName="")</font>：存档（将game.gd存为 文件），showName为显示名。
+<font color='yellow'>game.save("文件名", showName="", 是否压缩)</font>：存档（将game.gd存为 文件），showName为显示名。
 <font color='yellow'>game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
 <font color='yellow'>game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
 
@@ -444,9 +444,10 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>fight.scriptFirst(fileName, filePath);</font>
 
 //得到某个战斗角色的 所有 普通技能 和 技能；
-//0b1：战斗人物所有的普通攻击；0b10：战斗人物所有的技能；0b100：所有道具所有的普通攻击；0b1000：所有道具所有的技能；
+//types：技能的type，系统默认0为普通攻击，1为技能
+//flags：0b1，战斗人物自身拥有的技能：所有道具所有的普通攻击；0b10：战斗人物拥有的所有装备上附带的所有的技能；
 //返回数组：[技能名数组, 技能数组]。
-<font color='yellow'>fight.getCombatantSkills(combatant, flags=0b1111);</font>
+<font color='yellow'>fight.$sys.getCombatantSkills(combatant, types=[0, 1], flags=0b11);</font>
 
 
 

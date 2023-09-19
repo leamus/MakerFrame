@@ -15,6 +15,8 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
+import './Core'
+
 
 //import 'File.js' as File
 
@@ -88,6 +90,7 @@ let data = (function() {
 
         //选择技能时脚本
         $choiceScript: function *(skill, combatant) {
+            //yield fight.msg('...');
             return;
         },
 
@@ -285,19 +288,29 @@ let data = (function() {
 
                 text: '保存'
                 onButtonClicked: {
-                    if(textFightSkillName.text.trim().length === 0)
+                    let newName = textFightSkillName.text = textFightSkillName.text.trim();
+
+                    if(newName.length === 0)
                         return;
 
-                    _private.strSavedName = textFightSkillName.text.trim();
 
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_skill.js';
+                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator;
 
-                    //!!!导出为文件
-                    //console.debug(JSON.stringify(outputData));
-                    //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), filePath, 0);
-                    //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
+                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_skill.js', 0);
+
+
+                    //复制可视化
+                    let oldName = _private.strSavedName.trim();
+                    if(oldName) {
+                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_skill.vjs';
+                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_skill.vjs', true);
+                        }
+                    }
+
+
+                    _private.strSavedName = newName;
                 }
             }
             TextField {

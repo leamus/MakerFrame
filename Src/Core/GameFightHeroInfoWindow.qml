@@ -6,7 +6,7 @@ import QtQuick.Window 2.14
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 
@@ -54,7 +54,7 @@ Item {
     function refresh() {
         let fighthero = game.gd[strTeamName][root.nFightHeroIndex];
         let fightHeroPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-        textFightHeroName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](fighthero));
+        textFightHeroName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](fighthero, {avatar: true, color: true}));
 
 
         /*textFightHeroInfo.text = "HP：" + fighthero.$$propertiesWithExtra.remainHP + "/" + fighthero.$$propertiesWithExtra.healthHP + "/" + fighthero.$$propertiesWithExtra.HP + ' ' +

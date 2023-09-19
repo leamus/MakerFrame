@@ -546,17 +546,21 @@ Rectangle {
         }
 
         onRemoveClicked: {
-            /*let dirUrl = Platform.getExternalDataPath() + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Resources" + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
 
-            dialogCommon.text = "确认删除?";
-            dialogCommon.fOnAccepted = ()=>{
-                console.debug("[mainMapEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
-                removeItem(index);
-            };
-            dialogCommon.fOnRejected = ()=>{
-            };
-            dialogCommon.open();
-            */
+            dialogCommon.show({
+                Msg: '确认删除？',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function(){
+                    console.debug("[mainMapEditor]删除地图资源：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_DeleteFile(path));
+                    removeItem(index);
+
+                    root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    root.forceActiveFocus();
+                },
+            });
         }
     }
 

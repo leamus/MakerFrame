@@ -6,7 +6,7 @@ import QtQuick.Window 2.14
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 
@@ -25,12 +25,12 @@ Item {
     //初始化，主要是显示 战斗人物 和 所有的道具
     function init() {
 
-        //let fightheros = game.fighthero(-1, 0);
+        //let fightheros = game.fighthero(-1, 1);
         let fightHeroPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-        let fightheros = game.fighthero(-1, 1);
+        let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
-            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](tf)));
+            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](tf, {avatar: true, color: true})));
         }
         gameFightHeroMenu.show(arrFightHerosName);
         if(arrFightHerosName.length > 0)
@@ -70,7 +70,7 @@ Item {
                 let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$useScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
                 }
             }
 
@@ -81,7 +81,7 @@ Item {
                 let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$equipScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
                 }
             }
 
@@ -92,7 +92,7 @@ Item {
                 let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goodsInfo.$commons.$fightScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
                 }
             }
             break;
@@ -103,7 +103,7 @@ Item {
                 //let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goods.$price && goods.$price[1] !== undefined) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
                 }
             }
             break;
@@ -114,7 +114,7 @@ Item {
                 //let goodsInfo = game.$sys.resources.goods[goods.$rid];
                 if(goods.$type === 4) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
                 }
             }
             break;
@@ -123,7 +123,7 @@ Item {
         default:
             gameGoodsMenu.arrGoods = game.gd["$sys_goods"];
             for(let goods of game.gd["$sys_goods"]) {
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods)));
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
             }
 
             break;

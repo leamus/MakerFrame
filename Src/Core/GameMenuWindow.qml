@@ -24,7 +24,7 @@ import QtQuick.Window 2.14
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 
@@ -53,8 +53,8 @@ Item {
         let newFlags = 0;
 
         if((flags & 0b1) && !(nShowWindowFlags & 0b1)) {
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$main') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$main;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$main') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$main;
 
             maskMainMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||
@@ -117,8 +117,8 @@ Item {
             newFlags |= 0b100;
         }
         if((flags & 0b1000) && !(nShowWindowFlags & 0b1000)) {
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$system') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$system;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$system') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$system;
 
             containerSystemMenu.maskSystemMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||

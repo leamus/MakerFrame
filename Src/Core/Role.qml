@@ -23,6 +23,10 @@ Item {
     property var arrFrameDirectionIndex: [[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
     property alias interval: walkSprite.interval  //帧切换速度
 
+    //缩放
+    property alias rXScale: walkSprite.rXScale
+    property alias rYScale: walkSprite.rYScale
+
     property int penetrate: 0  //可穿透
 
 
@@ -36,10 +40,6 @@ Item {
 
     property alias rectShadow: rectShadow   //真实占用大小（影子）
     property alias mouseArea: mouseArea
-
-    //缩放
-    property alias rXScale: walkSprite.rXScale
-    property alias rYScale: walkSprite.rYScale
 
     property int moveDirection: Qt.Key_Up   //移动方向（键值）
     //property int stopDirection: moveDirection === -1 ? stopDirection : moveDirection    //停止方向
@@ -148,21 +148,20 @@ Item {
     }
 
 
-    focus: true
     width: 0
     height: 0
-
     //implicitWidth: width
     //implicitHeight: height
+
+    focus: true
+
+    smooth: false
 
 
 
     SpriteEffect {
         id: walkSprite
 
-        //width: root.width; height: root.height     //一个帧的大小，会缩放
-        anchors.horizontalCenter: parent.horizontalCenter
-        animatedsprite.loops: AnimatedSprite.Infinite
 
         function jumpTo(action) {
 
@@ -219,17 +218,22 @@ Item {
                 walkSprite.animatedsprite.currentFrame = 0;
             }
         }
-    }
 
 
-    SpriteEffect {
-        id: actionSprite
-
-        visible: false
         //width: root.width; height: root.height     //一个帧的大小，会缩放
         anchors.horizontalCenter: parent.horizontalCenter
 
+        smooth: true
+
         animatedsprite.loops: AnimatedSprite.Infinite
+
+    }
+
+
+    //动作精灵
+    SpriteEffect {
+        id: actionSprite
+
 
         function playAction() {
             walkSprite.visible = false;
@@ -241,6 +245,16 @@ Item {
             visible = false;
             walkSprite.visible = true;
         }
+
+
+        visible: false
+        //width: root.width; height: root.height     //一个帧的大小，会缩放
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        smooth: true
+
+        animatedsprite.loops: AnimatedSprite.Infinite
+
     }
 
 

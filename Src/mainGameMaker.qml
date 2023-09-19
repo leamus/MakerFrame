@@ -5,9 +5,6 @@ import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
-//import cn.Leamus.MakerFrame 1.0
-
-
 //引入Qt定义的类
 import cn.Leamus.MakerFrame 1.0
 
@@ -644,10 +641,10 @@ Rectangle {
                         let jsFiles = FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0);
                         jsFiles.sort();
                         let missingFiles = '';
-                        if(!jsFiles[0] || jsFiles[0].indexOf('MakerFramePackage') < 0)
-                            missingFiles += 'MakerFramePackage_xxx.zip ';
-                        if(!jsFiles[1] || jsFiles[1].indexOf('RPGRuntime') < 0)
-                            missingFiles += 'RPGRuntime_xxx.zip ';
+                        if(!jsFiles[0] || jsFiles[0].indexOf('Android_Package_') < 0)
+                            missingFiles += 'Android_Package_xxx.zip ';
+                        if(!jsFiles[1] || jsFiles[1].indexOf('Android_MakerFrame_RPGRuntime_') < 0)
+                            missingFiles += 'Android_MakerFrame_RPGRuntime_xxx.zip ';
 
                         if(missingFiles !== '') {
                             dialogCommon.show({
@@ -948,23 +945,23 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "简易教程"
+                text: "教程"
                 onButtonClicked: {
                     if(Platform.compileType() === "debug") {
                         if(Qt.platform.os === "windows")
-                            _private.loadModule("mainGameTutorial.qml");
+                            _private.loadModule("mainTutorial.qml");
                         else if(Qt.platform.os === "android")
-                            _private.loadModule("mainGameTutorial.qml");
-                        //userMainProject.source = "mainGameUpdateLog.qml";
+                            _private.loadModule("mainTutorial.qml");
+                        //userMainProject.source = "mainTutorial.qml";
                     }
                     else {
-                        _private.loadModule("mainGameTutorial.qml");
-                        //userMainProject.source = "mainGameUpdateLog.qml";
+                        _private.loadModule("mainTutorial.qml");
+                        //userMainProject.source = "mainTutorial.qml";
                     }
                 }
             }
 
-            ColorButton {
+            /*ColorButton {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -976,17 +973,18 @@ Rectangle {
                 onButtonClicked: {
                     if(Platform.compileType() === "debug") {
                         if(Qt.platform.os === "windows")
-                            _private.loadModule("mainGameAbout.qml");
+                            _private.loadModule("mainAbout.qml");
                         else if(Qt.platform.os === "android")
-                            _private.loadModule("mainGameAbout.qml");
-                        //userMainProject.source = "mainGameAbout.qml";
+                            _private.loadModule("mainAbout.qml");
+                        //userMainProject.source = "mainAbout.qml";
                     }
                     else {
-                        _private.loadModule("mainGameAbout.qml");
-                        //userMainProject.source = "mainGameAbout.qml";
+                        _private.loadModule("mainAbout.qml");
+                        //userMainProject.source = "mainAbout.qml";
                     }
                 }
             }
+            */
 
             ColorButton {
                 Layout.preferredWidth: 1
@@ -1000,14 +998,14 @@ Rectangle {
                 onButtonClicked: {
                     if(Platform.compileType() === "debug") {
                         if(Qt.platform.os === "windows")
-                            _private.loadModule("mainGameAgreement.qml");
+                            _private.loadModule("mainAgreement.qml");
                         else if(Qt.platform.os === "android")
-                            _private.loadModule("mainGameAgreement.qml");
-                        //userMainProject.source = "mainGameAgreement.qml";
+                            _private.loadModule("mainAgreement.qml");
+                        //userMainProject.source = "mainAgreement.qml";
                     }
                     else {
-                        _private.loadModule("mainGameAgreement.qml");
-                        //userMainProject.source = "mainGameAgreement.qml";
+                        _private.loadModule("mainAgreement.qml");
+                        //userMainProject.source = "mainAgreement.qml";
                     }
                 }
             }
@@ -1024,14 +1022,14 @@ Rectangle {
                 onButtonClicked: {
                     if(Platform.compileType() === "debug") {
                         if(Qt.platform.os === "windows")
-                            _private.loadModule("mainGameUpdateLog.qml");
+                            _private.loadModule("mainUpdateLog.qml");
                         else if(Qt.platform.os === "android")
-                            _private.loadModule("mainGameUpdateLog.qml");
-                        //userMainProject.source = "mainGameUpdateLog.qml";
+                            _private.loadModule("mainUpdateLog.qml");
+                        //userMainProject.source = "mainUpdateLog.qml";
                     }
                     else {
-                        _private.loadModule("mainGameUpdateLog.qml");
-                        //userMainProject.source = "mainGameUpdateLog.qml";
+                        _private.loadModule("mainUpdateLog.qml");
+                        //userMainProject.source = "mainUpdateLog.qml";
                     }
                 }
             }
@@ -1221,7 +1219,7 @@ Rectangle {
 
             _private.loadModule("");
             GameMakerGlobal.config.strCurrentProjectName = item;
-            //GameMakerGlobal.settings.setValue('ProjectName', item);
+            //GameMakerGlobal.settings.setValue('$ProjectName', item);
 
 
             //loader.visible = true;
@@ -1505,14 +1503,16 @@ Rectangle {
 
         property int nCount: 0
 
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        //anchors.right: parent.right
+        //anchors.bottom: parent.bottom
+        x: parent.width - width
+        y: parent.height - height
         width: 60
         height: 36
 
 
         radius: 10
-        color: '#10000000'
+        color: '#30000000'
 
 
 
@@ -1539,10 +1539,12 @@ Rectangle {
                 rectDebugWindow.visible = true;
                 rectDebugWindow.forceActiveFocus();
             }
+
+            drag.target: parent
         }
     }
 
-    //错误提示 界面
+    //调试 界面
     Rectangle {
         id: rectDebugWindow
 
@@ -1601,6 +1603,8 @@ Rectangle {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                    nMaximumBlockCount: 0
+
                     textArea.background: Rectangle {
                         //implicitWidth: 200
                         //implicitHeight: 40
@@ -1609,7 +1613,8 @@ Rectangle {
                     }
                     textArea.color: 'white'
                     //textArea.readOnly: true
-                    textArea.selectByMouse: false
+                    //textArea.selectByKeyboard: true
+                    //textArea.selectByMouse: true
 
 
                     textArea.text: ''
@@ -1625,7 +1630,7 @@ Rectangle {
 
                 //selectByKeyboard: true
                 selectByMouse: true
-                //wrapMode: TextEdit.Wrap
+                //wrapMode: TextField.Wrap
 
 
                 Keys.onEnterPressed: {
@@ -1703,53 +1708,14 @@ Rectangle {
         //显示调试窗口
         function showConsoleWindow(msgType, msg) {
 
+            if(Global.filterMessage(msgType, msg))
+                return;
+
             //消息类型
             switch(msgType) {
                 //跳过一部分 无关紧要 的 警告
             case FrameManagerClass.QtWarningMsg:
-                if(msg.indexOf('QML Connections: Implicitly defined onFoo properties in Connections are deprecated. Use this syntax instead: function onFoo(<arguments>) { ... }') >= 0)
-                    break;
-                if(msg.indexOf('Retrying to obtain clipboard.') >= 0)
-                    break;
-                if(msg.indexOf('libpng warning: iCCP: known incorrect sRGB profile') >= 0)
-                    break;
-                if(msg.indexOf('Model size of ') >= 0)
-                    break;
-                if(msg.indexOf('Context2D: The font families specified are invalid') >= 0)
-                    break;
-                if(msg.indexOf('inputMethodQuery(Qt::InputMethodQuery,QVariant)') >= 0)
-                    break;
-                if(msg.indexOf('QUnifiedTimer::stopAnimationDriver: driver is not running') >= 0)
-                    break;
-                if(msg.indexOf('QObject: Cannot create children for a parent that is in a different thread.') >= 0)
-                    break;
-                //if(msg.indexOf('Binding loop detected for property') >= 0)
-                //    break;
-                if(msg.indexOf('doRender: Unknown error 0x80040266') >= 0)
-                    break;
-                if(msg.indexOf('TouchPointPressed without previous release event QQuickEventPoint(accepted:false state:Pressed scenePos:') >= 0)
-                    break;
-                if(msg.indexOf('Accessible must be attached to an Item') >= 0)
-                    break;
-                if(msg.indexOf('Unhandled key code') >= 0)
-                    break;
-                if(msg.indexOf('QEGLPlatformContext: eglSwapBuffers failed:') >= 0)
-                    break;
-                if(msg.indexOf('doRender: Unknown error') >= 0)
-                    break;
-                //Unable to obtain clipboard；Retrying to obtain clipboard；
-                if(msg.indexOf('to obtain clipboard') >= 0)
-                    break;
-                if(msg.indexOf('OleSetClipboard: Failed to set mime data (text/plain) on clipboard: COM error') >= 0)
-                    break;
-                if(msg.indexOf('libpng warning: tRNS: invalid with alpha channel') >= 0)
-                    break;
-                if(msg.indexOf('DirectShowPlayerService::doSetUrlSource: Unresolved error code') >= 0)
-                    break;
-                if(msg.indexOf('depends on non-NOTIFYable properties') >= 0)
-                    break;
-
-                textDebugInfo.text += ("<font color='yellow'>【Warning】" + msg + "</font><BR>");
+                textDebugInfo.textArea.append("<font color='yellow'>【Warning】" + msg + "</font>");
                 textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
@@ -1757,7 +1723,7 @@ Rectangle {
                 ++rectDebugButton.nCount;
                 break;
             case FrameManagerClass.QtCriticalMsg:
-                textDebugInfo.text += ("<font color='red'>【Critical】" + msg + "</font><BR>");
+                textDebugInfo.textArea.append("<font color='red'>【Critical】" + msg + "</font>");
                 textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
@@ -1765,7 +1731,7 @@ Rectangle {
                 ++rectDebugButton.nCount;
                 break;
             case FrameManagerClass.QtFatalMsg:
-                textDebugInfo.text += ("<font color='red'>【Fatal】" + msg + "</font><BR>");
+                textDebugInfo.textArea.append("<font color='red'>【Fatal】" + msg + "</font>");
                 textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
@@ -1774,7 +1740,7 @@ Rectangle {
                 break;
 
             case FrameManagerClass.QtInfoMsg:
-                textDebugInfo.text += ("<font color='white'>【Info】" + msg + "</font><BR>");
+                textDebugInfo.textArea.append("<font color='white'>【Info】" + msg + "</font>");
                 textDebugInfo.toEnd();
 
                 ++rectDebugButton.nCount;
@@ -1785,7 +1751,7 @@ Rectangle {
                 break;
 
             default:
-                textDebugInfo.text += (msgType + msg);
+                textDebugInfo.textArea.append(msgType + msg);
                 textDebugInfo.toEnd();
 
                 //rectDebugWindow.visible = true;
@@ -1828,18 +1794,17 @@ Rectangle {
 
 
     Component.onCompleted: {
-
         rootWindow.s_MessageHandler.connect(_private.showConsoleWindow);
 
 
-        if(!GameMakerGlobal.settings.value('RunTimes')) {
+        if(!GameMakerGlobal.settings.value('$RunTimes')) {
             rectHelpWindow.showMsg('<font size=6>  初来乍到？先看看 简易教程 或 关于 来了解一下引擎吧，或者加群获取各种 示例工程 玩玩</font>');
-            GameMakerGlobal.settings.setValue('RunTimes', 1);
+            GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else
-            GameMakerGlobal.settings.setValue('RunTimes', parseInt(GameMakerGlobal.settings.value('RunTimes')) + 1);
-        //if(GameMakerGlobal.settings.value('ProjectName'))
-        //    GameMakerGlobal.config.strCurrentProjectName = GameMakerGlobal.settings.value('ProjectName');
+            GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes')) + 1);
+        //if(GameMakerGlobal.settings.value('$ProjectName'))
+        //    GameMakerGlobal.config.strCurrentProjectName = GameMakerGlobal.settings.value('$ProjectName');
 
 
 

@@ -15,7 +15,7 @@ import cn.Leamus.MakerFrame 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-import LGlobal 1.0
+//import LGlobal 1.0
 
 
 import "qrc:/QML"
@@ -60,6 +60,7 @@ import "GameScene.js" as GameSceneJS
     game.gd["$sys_fps"]: 当前FPS
     game.gd["$sys_main_roles"]: 当前主角列表，保存了主角属性（{$rid、$id、$name、$index、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y 等}）
     game.gd["$sys_music"]: 当前播放的音乐名
+    game.gd["$sys_sound"]: 从右到左：音乐、音效 播放状态
     game.gd["$sys_scale"]: 当前缩放大小
     game.gd["$sys_random_fight"]：随机战斗
 
@@ -106,12 +107,7 @@ Rectangle {
     signal s_close();
 
 
-    property alias _private: _private
-
-    property alias fightScene: loaderFightScene
-
-
-    property alias g: rootGameScene.game
+    //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
         //载入地图并执行地图载入事件；成功返回true。
@@ -131,7 +127,9 @@ Rectangle {
 
             _private.objTimers = {};
 
-            itemContainer.mapEventsTriggering = {};
+            mainRole.$$collideRoles = {};
+            mainRole.$$mapEventsTriggering = {};
+            _private.stopAction(1, -1);
 
 
             let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
@@ -192,7 +190,7 @@ Rectangle {
 
 
 
-            dialogGameMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
+            dialogGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
             return true;
         }
@@ -237,8 +235,8 @@ Rectangle {
             }
 
 
-            let bShowName = GlobalLibraryJS.shortCircuit(1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$style', '$talk', '$name'));
-            let bShowAvatar = GlobalLibraryJS.shortCircuit(1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$style', '$talk', '$avatar'));
+            let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
+            let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
             if(role !== null) {
                 if(role.$data.$name && bShowName)
                     pretext = role.$data.$name + "：" + pretext;
@@ -276,8 +274,8 @@ Rectangle {
             //样式
             if(!style)
                 style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$say') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$say;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$say') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$say;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -300,11 +298,32 @@ Rectangle {
         //注意：该脚本必须用yield才能暂停并接受返回值。
         readonly property var menu: function(title, items, style={}, pauseGame=true) {
 
+            let itemMenu = compMenu.createObject(itemMenus, {nIndex: itemMenus.nIndex});
+            let maskMenu = itemMenu.maskMenu;
+            let menuGame = itemMenu.menuGame;
+
+            itemMenu.s_Choice.connect(function(index) {
+                //gameMap.focus = true;
+
+                itemMenu.visible = false;
+                //menuGame.hide();
+
+                if(_private.config.objPauseNames['$menu' + itemMenu.nIndex] !== undefined) {
+                    game.goon('$menu' + itemMenu.nIndex);
+                    _private.asyncScript.run(index);
+
+                    itemMenu.destroy();
+                }
+
+                //FrameManager.goon();
+                //console.debug("!!!asyncScript.run", index);
+            });
+
             //样式
             if(!style)
                 style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$menu') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$menu;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
 
             maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
             menuGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -323,14 +342,15 @@ Rectangle {
 
             //是否暂停游戏
             if(pauseGame) {
-                game.pause('$menu');
+                game.pause('$menu' + itemMenus.nIndex);
             }
             else {
             }
 
 
 
-            rectMenu.visible = true;
+            ++itemMenus.nIndex;
+            itemMenu.visible = true;
             menuGame.strTitle = title;
             menuGame.show(items);
 
@@ -348,8 +368,8 @@ Rectangle {
             //样式
             if(style === undefined || style === null)
                 style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$input') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$input;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
 
 
             //是否暂停游戏
@@ -551,7 +571,7 @@ Rectangle {
 
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
-                    hero.$name = props.$name;
+                    hero.$name = heroComp.textName.text = props.$name;
                 if(props.$showName === true)   //修改名字
                     hero.$showName = heroComp.textName.visible = true;
                 else if(props.$showName === false)
@@ -783,8 +803,8 @@ Rectangle {
 
             //roleComp.test = true;
 
-            roleComp.sprite.s_playEffect.connect(_public.playSoundEffect);
-            roleComp.actionSprite.s_playEffect.connect(_public.playSoundEffect);
+            roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+            roleComp.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
 
 
 
@@ -822,101 +842,107 @@ Rectangle {
         //  $action：为0表示静止；为1表示随机移动；为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
         //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
         readonly property var role: function(role, props={}) {
+            let roleComp;
+
             if(role === -1/* || role === undefined || role === null*/)
                 return _private.objRoles;
 
 
             if(GlobalLibraryJS.isString(role)) {
-                role = _private.objRoles[role];
-                if(role === undefined)
+                roleComp = _private.objRoles[role];
+                if(roleComp === undefined)
                     return null;
             }
             else if(GlobalLibraryJS.isValidNumber(role))
                 return false;
             else if(GlobalLibraryJS.isObject(role)) {
+                roleComp = role;
             }
             else
                 return false;
 
 
+            role = roleComp.$data;
+
+
             if(!GlobalLibraryJS.objectIsEmpty(props)) {
                 //修改属性
-                //GlobalLibraryJS.copyPropertiesToObject(role, props, true);
+                //GlobalLibraryJS.copyPropertiesToObject(roleComp, props, true);
 
                 //!!!后期想办法把refresh去掉
-                //role.refresh();
+                //roleComp.refresh();
 
                 if(props.$name !== undefined)   //修改名字
-                    role.$data.$name = props.$name;
+                    role.$name = roleComp.textName.text = props.$name;
                 if(props.$showName === true)   //修改名字
-                    role.textName.visible = true;
+                    role.$showName = roleComp.textName.visible = true;
                 else if(props.$showName === false)
-                    role.textName.visible = false;
+                    role.$showName = roleComp.textName.visible = false;
                 if(props.$speed !== undefined)   //修改速度
-                    role.moveSpeed = parseFloat(props.$speed);
+                    roleComp.moveSpeed = parseFloat(props.$speed);
                 if(props.$scale && props.$scale[0] !== undefined) {
-                    role.rXScale = props.$scale[0];
+                    roleComp.rXScale = props.$scale[0];
                 }
                 if(props.$scale && props.$scale[1] !== undefined) {
-                    role.rYScale = props.$scale[1];
+                    roleComp.rYScale = props.$scale[1];
                 }
 
                 //!!!这里要加入名字是否重复
                 if(props.$avatar !== undefined)   //修改头像
-                    role.$data.$avatar = props.$avatar;
+                    role.$avatar = props.$avatar;
                 if(props.$avatarSize !== undefined) {  //修改头像
-                    //role.$avatarSize.width = props.$avatarSize[0];
-                    //role.$avatarSize.height = props.$avatarSize[1];
-                    role.$data.$avatarSize = props.$avatarSize;
+                    //roleComp.$avatarSize.width = props.$avatarSize[0];
+                    //roleComp.$avatarSize.height = props.$avatarSize[1];
+                    role.$avatarSize = props.$avatarSize;
                 }
 
                 if(props.$action !== undefined)
-                    role.nActionType = props.$action;
+                    roleComp.nActionType = props.$action;
 
                 if(props.$x !== undefined)   //修改x坐标
-                    role.x = props.$x;
+                    roleComp.x = props.$x;
                 if(props.$y !== undefined)   //修改y坐标
-                    role.y = props.$y;
+                    roleComp.y = props.$y;
                 if(props.$x !== undefined || props.$y !== undefined)
-                    if(role === _private.sceneRole)setMapToRole(_private.sceneRole);
+                    if(roleComp === _private.sceneRole)setMapToRole(_private.sceneRole);
 
                 if(props.$bx !== undefined || props.$by !== undefined)
-                    setRolePos(role, props.$bx, props.$by);
-                    //moverole(role, bx, by);
+                    setRolePos(roleComp, props.$bx, props.$by);
+                    //moverole(roleComp, bx, by);
 
 
                 if(props.$targetBx !== undefined && props.$targetBy !== undefined) {
-                    [role.targetPos.x, role.targetPos.y] = getMapBlockPos(props.$targetBx, props.$targetBy);
+                    [roleComp.targetPos.x, roleComp.targetPos.y] = getMapBlockPos(props.$targetBx, props.$targetBy);
                 }
                 if(props.$targetX !== undefined)   //修改x坐标
-                    role.targetPos.x = props.$targetX;
+                    roleComp.targetPos.x = props.$targetX;
                 if(props.$targetY !== undefined)   //修改y坐标
-                    role.targetPos.y = props.$targetY;
+                    roleComp.targetPos.y = props.$targetY;
 
                 if(props.$start === true)
-                    role.start();
+                    roleComp.start();
                 else if(props.$start === false)
-                    role.stop();
+                    roleComp.stop();
 
                 if(props.$direction !== undefined)
-                    role.changeDirection(props.$direction);
+                    roleComp.changeDirection(props.$direction);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
                     GlobalLibraryJS.setTimeout(function() {
-                            if(role)
-                                role.changeDirection(props.$direction);
+                            if(roleComp)
+                                roleComp.changeDirection(props.$direction);
                         },20,rootGameScene
                     );
                     */
 
                 if(props.$realSize !== undefined) {
-                    role.width1 = props.$realSize[0];
-                    role.height1 = props.$realSize[1];
+                    roleComp.width1 = props.$realSize[0];
+                    roleComp.height1 = props.$realSize[1];
                     //console.debug('!!!', props.$realSize)
                 }
             }
 
 
-            return role;
+            return roleComp;
         }
 
         //移动角色到bx，by。
@@ -928,19 +954,10 @@ Rectangle {
                     return false;
             }
 
+
             setRolePos(role, bx, by);
 
-            return true;
-        }
-        /*/移动角色到x，y。
-        readonly property var moverole123: function(role, bx, by) {
-
-            if(GlobalLibraryJS.isString(role)) {
-                role = _private.objRoles[role];
-                if(role === undefined)
-                    return false;
-            }
-
+            /*
             if(bx !== undefined && by !== undefined) {
                 //边界检测
 
@@ -971,11 +988,11 @@ Rectangle {
                 role.y = by * sizeMapBlockSize.height - role.y1;
 
             }
+            */
 
 
             return true;
         }
-        */
 
 
         //删除角色；
@@ -1143,10 +1160,10 @@ Rectangle {
         }*/
 
         //返回战斗主角；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（删除所有战斗主角）；
-        //type为0表示只返回名字（选择框用），为1表示返回对象。
+        //fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（返回所有战斗主角）；
+        //type为0表示返回 对象，为1表示只返回名字（选择框用）；
         //返回null表示没有，false错误；
-        readonly property var fighthero: function(fighthero=-1, type=1) {
+        readonly property var fighthero: function(fighthero=-1, type=0) {
             if(game.gd["$sys_fight_heros"] === undefined || game.gd["$sys_fight_heros"] === null)
                 return false;
 
@@ -1154,14 +1171,14 @@ Rectangle {
                 fighthero = -1;
 
             if(fighthero === -1) {
-                if(type === 0) {//只返回名字
+                if(type === 0)
+                    return game.gd["$sys_fight_heros"];
+                else {  //只返回名字
                     let arrName = [];
                     for(let th of game.gd["$sys_fight_heros"])
                         arrName.push(th.$name);
                     return arrName;
                 }
-                else
-                    return game.gd["$sys_fight_heros"];
             }
 
 
@@ -1191,11 +1208,11 @@ Rectangle {
 
 
 
-            if(type === 0) {//只返回名字
-                return fighthero.$name;
-            }
-            else
+            if(type === 0) {
                 return fighthero;
+            }
+            else    //只返回名字
+                return fighthero.$name;
 
         }
 
@@ -1401,7 +1418,7 @@ Rectangle {
         //战斗角色修改属性；
         //  fighthero为下标，或战斗角色的name，或战斗角色对象；
         //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
-        //    支持格式：{HP: 6, HP: [6,6,6], 'HP,3': 6}
+        //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
         //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
         //  成功返回战斗角色对象；失败返回false；
         readonly property var addprops: function(fighthero, props={}, type=1, refresh=true) {
@@ -1460,7 +1477,7 @@ Rectangle {
                 if(count === 0) {
                     for(let tg of game.gd["$sys_goods"]) {
                         //找到
-                        if(tg.$rid === goods) {
+                        if(tg && tg.$rid === goods) {
                             count += tg.$count;
                         }
                     }
@@ -1498,7 +1515,7 @@ Rectangle {
             //循环查找goods
             for(let tg of game.gd["$sys_goods"]) {
                 //找到
-                if(tg.$rid === goods.$rid && tg.$stackable) {
+                if(tg && tg.$rid === goods.$rid && tg.$stackable) {
                     tg.$count += goods.$count;
                     return tg.$count;
                 }
@@ -1622,7 +1639,7 @@ Rectangle {
                 let ret = [];
 
                 for(let tg of game.gd["$sys_goods"]) {
-                    if(GlobalLibraryJS.isString(goods) && goods !== tg.$rid)
+                    if(GlobalLibraryJS.isString(goods) && tg && goods !== tg.$rid)
                         continue;
 
                     let bFilterFlag = true;
@@ -1668,21 +1685,25 @@ Rectangle {
         readonly property var usegoods: function(fighthero, goods) {
             let goodsInfo = null;
             if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
-                goodsInfo = _private.objGoods[goods.$rid];
+                goodsInfo = GameSceneJS.objGoods(goods.$rid);
             }
             else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd["$sys_goods"].length)
                     return false;
 
                 goods = game.gd["$sys_goods"][goods];
-                goodsInfo = _private.objGoods[goods.$rid];
+                goodsInfo = GameSceneJS.objGoods(goods.$rid);
             }
             else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
-                goodsInfo = _private.objGoods[goods];
+                goodsInfo = GameSceneJS.objGoods(goods);
                 goods = _public.getGoodsObject(goods);
             }
             else
                 return false;
+
+            if(!goodsInfo || !goods)
+                return false;
+
 
             /*let heroProperty, heroPropertyNew;
 
@@ -1893,21 +1914,31 @@ Rectangle {
         //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
         //params是给战斗脚本$createData的参数。
         readonly property var fighting: function(fightScript) {
-            let fightHeros = game.fighthero();
-            if(fightHeros.length === 0) {
-                game.run(function *(){yield game.msg('没有战斗人物', 10);});
-                return;
-            }
 
-            //game.pause();
-            //_private.nStage = 1;
+            game.run(function*() {
+                let fightHeros = game.fighthero();
+                if(fightHeros.length === 0) {
+                    game.run(function *(){yield game.msg('没有战斗人物', 10);});
+                    return;
+                }
+
+                game.pause('$fight');
+                //_private.nStage = 1;
+                game.stage(1);
 
 
-            loaderFightScene.visible = true;
-            loaderFightScene.focus = true;
-            //loaderFightScene.test();
-            //loaderFightScene.init(_public.getFightScriptObject(fightScript));
-            game.run(loaderFightScene.init, -1, _public.getFightScriptObject(fightScript));
+                //loaderFightScene.test();
+                //loaderFightScene.init(_public.getFightScriptObject(fightScript));
+
+                fight.run(loaderFightScene.init, -1, _public.getFightScriptObject(fightScript));
+
+
+                //暂停脚本，直到stage为0
+                // 鹰：必须写在这里，因为如果有多个fighting同时运行，则会出错（因为Timer会一直game.run）
+                while(game.stage() !== 0)
+                    yield null;
+
+            });
         }
 
         //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
@@ -2048,11 +2079,26 @@ Rectangle {
         readonly property var musicplaying: function() {
             return itemBackgroundMusic.isPlaying();
         }
-        readonly property var musicpausing: function($name) {
-            return itemBackgroundMusic.objMusicPause[$name] !== undefined;
+        readonly property var musicpausing: function() {
+            //return itemBackgroundMusic.objMusicPause[$name] !== undefined;
+            if(GlobalLibraryJS.objectIsEmpty(itemBackgroundMusic.objMusicPause) &&
+                !GameMakerGlobal.settings.value('$PauseMusic') &&
+                (game.gd["$sys_sound"] & 0b1)
+            )
+                return false;
+
+            return true;
         }
+
+
         readonly property var soundeffectpausing: function() {
-            return rootGameScene._private.config.nSoundConfig !== 0;
+            //return _private.config.nSoundConfig !== 0;
+            if(GlobalLibraryJS.objectIsEmpty(rootSoundEffect.objSoundEffectPause) &&
+                !GameMakerGlobal.settings.value('$PauseSound') &&
+                (game.gd["$sys_sound"] & 0b10)
+            )
+                return false;
+            return true;
         }
 
 
@@ -2132,7 +2178,7 @@ Rectangle {
 
             if(_private.config.objPauseNames['$video'] !== undefined) {
                 game.goon('$video');
-                _private.asyncScript.run();
+                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             }
 
         }
@@ -2448,7 +2494,7 @@ Rectangle {
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示全屏的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
         //  $parent：0表示显示在屏幕上（默认）；1表示显示在屏幕上（受scale影响）；2表示显示在地图上；字符串表示显示在某个角色上；
         readonly property var showsprite: function(spriteEffectRId, properties={}, id=undefined) {
-            if(_private.objSprites[spriteEffectRId] === undefined)
+            if(!GameSceneJS.objSprite(spriteEffectRId))
                 return false;
 
             if(id === undefined || id === null)
@@ -2500,6 +2546,11 @@ Rectangle {
                 if(role) {
                     properties.$parent = role;
                     role.$components.push(sprite);
+                }
+                else {
+                    console.warn('找不到：', properties.$parent);
+                    delsprite(id);
+                    return;
                 }
             }
             //固定屏幕上
@@ -2781,7 +2832,7 @@ Rectangle {
         }
 
         //暂停游戏。
-        readonly property var pause: function(name='$user_pause') {
+        readonly property var pause: function(name='$user_pause', times=1) {
             if(name === undefined || name === null)
                 return !GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames);
             if(name === true)
@@ -2795,18 +2846,18 @@ Rectangle {
             _private.stopAction(1, -1);
 
             if(_private.config.objPauseNames[name] > 0) {
-                ++_private.config.objPauseNames[name];
-                console.warn('游戏被多次暂停 (%1：%2)，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？'.arg(name).arg(_private.config.objPauseNames[name]));
+                _private.config.objPauseNames[name] += times;
+                console.warn('游戏被(%1)多次暂停 %2 次，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？'.arg(name).arg(_private.config.objPauseNames[name]));
             }
             else
-                _private.config.objPauseNames[name] = 1;
+                _private.config.objPauseNames[name] = times;
             //_private.config.objPauseNames[name] = (_private.config.objPauseNames[name] ? _private.config.objPauseNames[name] + 1 : 1);
 
             //joystick.enabled = false;
             //buttonA.enabled = false;
         }
         //继续游戏。
-        readonly property var goon: function(name='$user_pause') {
+        readonly property var goon: function(name='$user_pause', times=-1) {
             //战斗模式不能设置
             //if(_private.nStage === 1)
             //    return;
@@ -2817,8 +2868,11 @@ Rectangle {
             }
             else {
                 if(_private.config.objPauseNames[name]) {
-                    --_private.config.objPauseNames[name];
-                    if(_private.config.objPauseNames[name] === 0)
+                    if(times > 0)
+                        _private.config.objPauseNames[name] -= times;
+                    else
+                        _private.config.objPauseNames[name] = 0;
+                    if(_private.config.objPauseNames[name] <= 0)
                         delete _private.config.objPauseNames[name];
                 }
                 else {
@@ -2911,17 +2965,35 @@ Rectangle {
             if(data !== "") {
                 data = JSON.parse(data);
 
-                if(GameMakerGlobal.config.debug === false && data.Verify !== Qt.md5(_private.strSaveDataSalt + JSON.stringify(data["Data"])))
-                    return false;
+                //压缩
+                if(data.Type === 1) {
+                    //debug下不检测存档
+                    if(GameMakerGlobal.config.debug === false && data.Verify !== Qt.md5(_private.strSaveDataSalt + data.Data)) {
+                        return false;
+                    }
+                    try {
+                        data.Data = JSON.parse(FrameManager.sl_qml_Uncompress(data.Data).toString());
+                    }
+                    catch(e) {
+                        return false;
+                    }
 
-                return data;
+                    return data;
+                }
+                else {
+                    //debug下不检测存档
+                    if(GameMakerGlobal.config.debug === false && data.Verify !== Qt.md5(_private.strSaveDataSalt + JSON.stringify(data.Data))) {
+                        return false;
+                    }
+                    return data;
+                }
             }
             return false;
         }
 
         //!!存档，showName为显示名。
         //game.gd 开头为 $$ 的键不会保存
-        readonly property var save: function(fileName="autosave", showName='') {
+        readonly property var save: function(fileName="autosave", showName='', type=1, compressionLevel=-1) {
             fileName = fileName.trim();
             if(!fileName)
                 fileName = "autosave";
@@ -2934,6 +3006,7 @@ Rectangle {
 
 
 
+            //过滤掉 $$ 开头的所有键
             let fSaveFilter = function(k, v) {
                 if(k.indexOf("$$") === 0)
                     return undefined;
@@ -2942,21 +3015,33 @@ Rectangle {
 
             let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + ".json";
 
-            let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
 
             let outputData = {};
+            let fileData;
 
             outputData.Version = "0.6";
-            outputData.Data = game.gd;
             outputData.Name = showName;
+            outputData.Type = type;
             outputData.Time = GlobalLibraryJS.formatDate();
-            outputData.Verify = Qt.md5(_private.strSaveDataSalt + GlobalDataString);
+            if(type === 1) {    //压缩
+                let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
+                outputData.Data = FrameManager.sl_qml_Compress(GlobalDataString, compressionLevel).toString();
+                outputData.Verify = Qt.md5(_private.strSaveDataSalt + outputData.Data);
+                fileData = JSON.stringify(outputData, fSaveFilter);
+            }
+            else {
+                let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
+                outputData.Data = game.gd;
+                outputData.Verify = Qt.md5(_private.strSaveDataSalt + GlobalDataString);
+                fileData = JSON.stringify(outputData, fSaveFilter);
+            }
+
 
 
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData, fSaveFilter), Global.toPath(filePath), 0);
+            let ret = FrameManager.sl_qml_WriteFile(fileData, Global.toPath(filePath), 0);
             //console.debug(itemContainer.arrCanvasMap[2].toDataURL())
 
 
@@ -2979,14 +3064,14 @@ Rectangle {
 
 
             release(false);
-            init(false, false);
+            init(false, false, ret['Data']);
 
 
             //game.gd = ret['Data'];
-            GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
+            //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
 
 
-            game.$sys.reloadFightHero();
+            game.$sys.reloadFightHeros();
 
             //刷新战斗时人物数据
             //loaderFightScene.refreshAllFightRoleInfo();
@@ -3009,7 +3094,15 @@ Rectangle {
             //其他
             game.setinterval(game.gd["$sys_fps"]);
             game.scale(game.gd["$sys_scale"]);
+
             game.playmusic(game.gd["$sys_music"]);
+
+            /*if(game.gd["$sys_sound"] & 0b10)
+                _private.config.nSoundConfig = 0;
+            else
+                _private.config.nSoundConfig = 1;
+            */
+
 
             if(game.gd["$sys_random_fight"]) {
                 game.fighton(...game.gd["$sys_random_fight"]);
@@ -3026,7 +3119,7 @@ Rectangle {
 
         //游戏结束（调用游戏结束脚本）；
         readonly property var gameover: function(params) {
-            game.run(_private.objCommonScripts["game_over_script"](params));
+            game.run(_private.objCommonScripts["game_over_script"](params), 0);
         }
 
 
@@ -3071,11 +3164,32 @@ Rectangle {
             }
 
             if(strScript === null) {
-                return _private.asyncScript.run();
+                return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             }
 
-            if(GlobalJS.createScript(_private.asyncScript, 0, priority, strScript, ...params) === 0)
-                return _private.asyncScript.run();
+            if(strScript === true) {
+                return GlobalLibraryJS.runNextEventLoop(function() {
+                    //game.goon('$event');
+                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }, 'game.run1');
+            }
+
+            //可以立刻执行
+            if(GlobalJS.createScript(_private.asyncScript, 0, priority, strScript, ...params) === 0) {
+                //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(null)，导致执行两次
+
+                //game.pause('$event');
+
+                //return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                /*return GlobalLibraryJS.setTimeout(function() {
+                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }, 0, rootGameScene, 'game.run');
+                */
+                return GlobalLibraryJS.runNextEventLoop(function() {
+                    //game.goon('$event');
+                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }, 'game.run');
+            }
         }
 
         //将脚本放入 系统脚本引擎（asyncScript）中 等候执行；一般用在编辑器中载入外部脚本文件
@@ -3088,7 +3202,7 @@ Rectangle {
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
             if(GlobalJS.createScript(_private.asyncScript, 1, priority, filePath) === 0)
-                return _private.asyncScript.run();
+                return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
         }
 
         //脚本上次返回的值
@@ -3175,16 +3289,28 @@ Rectangle {
             release: release,
             init: init,
 
-            screen: itemComponentsContainer,    //固定屏幕上
+            screen: itemComponentsContainer,    //固定屏幕上（所有，包含战斗场景）
             scene: gameScene,   //会改变大小
             container: itemContainer,   //会改变大小和随地图移动
 
-            interact: _private.buttonAClicked,  //交互函数
+            interact: GameSceneJS.buttonAClicked,  //交互函数
 
-            reloadFightHero: function() {
-                //重新创建（修复继承链），并计算新属性
-                for(let tIndex in game.gd["$sys_fight_heros"]) {
-                    game.gd["$sys_fight_heros"][tIndex] = _public.getFightRoleObject(game.gd["$sys_fight_heros"][tIndex], true);
+            //重新创建（修复继承链），并计算新属性
+            reloadFightHeros: function() {
+
+                let tFightHeros = game.gd["$sys_fight_heros"];
+                game.gd["$sys_fight_heros"] = [];
+
+                for(let tfh of tFightHeros) {
+                    //let tfh = tFightHeros[tIndex];
+                    if(tfh) {
+                        tfh = _public.getFightRoleObject(tfh, true);
+                        game.gd["$sys_fight_heros"].push(tfh);
+                        _private.objCommonScripts["refresh_combatant"](tfh);
+                    }
+                    else {
+                        console.warn('跳过错误存档战斗人物：', tfh);
+                    }
 
 
                     /*let t = game.gd["$sys_fight_heros"][tIndex];
@@ -3195,21 +3321,35 @@ Rectangle {
                     //game.gd["$sys_fight_heros"][tIndex].$$fightData = {};
                     //game.gd["$sys_fight_heros"][tIndex].$$fightData.$buffs = {};
                     */
-
-
-                    _private.objCommonScripts["refresh_combatant"](game.gd["$sys_fight_heros"][tIndex]);
                 }
             },
+
+            //重新创建（修复继承链）
             reloadGoods: function() {
-                //重新创建（修复继承链）
-                for(let tIndex in game.gd["$sys_goods"]) {
-                    game.gd["$sys_goods"][tIndex] = _public.getGoodsObject(game.gd["$sys_goods"][tIndex], true);
+
+                let tGoods = game.gd["$sys_goods"];
+                game.gd["$sys_goods"] = [];
+
+                for(let tg of tGoods) {
+                    //let tg = tGoods[tIndex];
+                    if(tg) {
+                        tg = _public.getGoodsObject(tg, true);
+                        game.gd["$sys_goods"].push(tg);
+                    }
+                    else {
+                        console.warn('跳过错误存档道具：', tg);
+                    }
                 }
             },
+
+            playSoundEffect: rootSoundEffect.playSoundEffect,
+
             getSkillObject: _public.getSkillObject,
             getGoodsObject: _public.getGoodsObject,
             getFightRoleObject: _public.getFightRoleObject,
             getFightScriptObject: _public.getFightScriptObject,
+
+            loadSpriteEffect: _public.loadSpriteEffect,
 
             components: {
                 joystick: joystick,
@@ -3241,6 +3381,7 @@ Rectangle {
         readonly property alias objFightScripts: _private.objFightScripts
         readonly property alias objFightRoles: _private.objFightRoles
         readonly property alias objSprites: _private.objSprites
+
         readonly property alias objCacheSoundEffects: _private.objCacheSoundEffects
 
         readonly property alias objCommonScripts: _private.objCommonScripts
@@ -3253,6 +3394,7 @@ Rectangle {
             readonly property alias fightScripts: _private.objFightScripts
             readonly property alias fightRoles: _private.objFightRoles
             readonly property alias sprites: _private.objSprites
+
             readonly property alias cacheSoundEffects: _private.objCacheSoundEffects
 
             readonly property alias commonScripts: _private.objCommonScripts
@@ -3276,13 +3418,21 @@ Rectangle {
 
     property Item mainRole: {
         let r = compRole.createObject(itemRoleContainer);
-        r.sprite.s_playEffect.connect(_public.playSoundEffect);
-        r.actionSprite.s_playEffect.connect(_public.playSoundEffect);
+        r.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+        r.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         return r;
     }
 
 
     property alias _public: _public
+
+    property alias config: _private.config
+    //property alias _private: _private
+
+    property alias fightScene: loaderFightScene
+
+    property alias asyncScript: _private.asyncScript
+
 
 
     //property alias mainRole: mainRole
@@ -3299,7 +3449,7 @@ Rectangle {
 
     //游戏开始脚本
     //startScript为true，则载入start.js；为字符串，则直接运行startScript
-    function init(startScript=true, bLoadResources=true) {
+    function init(startScript=true, bLoadResources=true, gameData=null) {
         game.gd["$sys_fight_heros"] = [];
         //game.gd["$sys_hidden_fight_heros"] = [];
         game.gd["$sys_money"] = 0;
@@ -3307,6 +3457,7 @@ Rectangle {
         game.gd["$sys_map"] = {};
         game.gd["$sys_fps"] = 16;
         game.gd["$sys_main_roles"] = [];
+        game.gd["$sys_sound"] = 0b11;
         game.gd["$sys_music"] = '';
         game.gd["$sys_scale"] = 1;
 
@@ -3314,14 +3465,8 @@ Rectangle {
             GameSceneJS.loadResources();
 
 
-        //插件初始化
-        for(let tp in _private.objPlugins) {
-            if(_private.objPlugins[tp].$init)
-                _private.objPlugins[tp].$init();
-        }
-
-
         //game.gf["$sys"] = _private.objCommonScripts;
+
 
         //读取 start.js 脚本
         if(startScript === true) {
@@ -3332,7 +3477,7 @@ Rectangle {
             //if(data === "")
             //    return false;
             if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
-                _private.asyncScript.run();
+                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             */
 
             if(_private.objCommonScripts["game_start_script"])
@@ -3341,12 +3486,30 @@ Rectangle {
         else if(startScript === false) {
 
         }
-        else {
+        else {  //是脚本
             game.run([startScript, 'start']);
         }
 
+
+        //恢复游戏数据
+        if(gameData)
+            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+
+
+        //init脚本
         if(_private.objCommonScripts["game_init_script"])
             game.run([_private.objCommonScripts["game_init_script"](), '$init']);
+
+
+        //所有插件初始化
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$init)
+                    _private.objPlugins[tc][tp].$init();
+
+
+        game.pause();
+        game.goon('$release');
 
         //game.run([function(){game.goon(true);}, 'goon']);
 
@@ -3363,23 +3526,24 @@ Rectangle {
     //释放所有资源
     function release(bUnloadResources=true) {
 
-        //释放插件
-        for(let tp in _private.objPlugins) {
-            if(_private.objPlugins[tp].$release)
-                _private.objPlugins[tp].$release();
-        }
-
-
         //timer.stop();
         _private.config.objPauseNames = {};
-        game.pause();
+        game.pause('$release');
+
+
+        //所有插件释放
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$release)
+                    _private.objPlugins[tc][tp].$release();
+
 
         game.scale(1);
 
         _private.asyncScript.clear(1);
-        //_private.asyncScript.run();
+        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
 
-        messageGame.stop();
+        dialogGameMsg.item.stop();
         messageRole.stop();
 
         game.delrole(-1);
@@ -3397,11 +3561,16 @@ Rectangle {
 
         gameMenuWindow.closeWindow(-1);
         //gameMenuWindow.visible = false;
-        dialogGameMsg.visible = false;
+        dialogGameMsg.item.visible = false;
         dialogRoleMsg.visible = false;
         dialogTrade.visible = false;
 
-        rectMenu.visible = false;
+        itemMenus.nIndex = 0;
+        for(let tim in itemMenus.children) {
+            itemMenus.children[tim].destroy();
+        }
+
+        //itemMenu.visible = false;
         //menuGame.hide();
 
         /*/
@@ -3431,6 +3600,8 @@ Rectangle {
 
 
         _private.sceneRole = mainRole;
+        mainRole.$$collideRoles = {};
+        mainRole.$$mapEventsTriggering = {};
 
 
         _private.nStage = 0;
@@ -3550,7 +3721,7 @@ Rectangle {
         //之前的
         //if(itemContainer.mapInfo.SystemEventData !== undefined && itemContainer.mapInfo.SystemEventData["$1"] !== undefined) {
         //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemContainer.mapInfo.SystemEventData["$1"]) === 0)
-        //        return _private.asyncScript.run();
+        //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
         //}
 
         //使用Component（太麻烦）
@@ -3844,7 +4015,7 @@ Rectangle {
 
 
             if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                _private.buttonAClicked();
+                GameSceneJS.buttonAClicked();
 
 
             event.accepted = true;
@@ -3897,503 +4068,471 @@ Rectangle {
 
 
 
-    //游戏场景(可视区域）
-    Rectangle {
-        id: gameScene
-
-
-        //场景的 人物的最大X、Y坐标（返回场景 / 地图 的较小值）；这个可以固定
-        //如果地图小于场景时，人物不会到达场景边缘
-        readonly property int nMaxMoveWidth: gameScene.width < itemContainer.width ? gameScene.width : itemContainer.width;
-        readonly property int nMaxMoveHeight: gameScene.height < itemContainer.height ? gameScene.height : itemContainer.height;
-
-        //地图场景的 最中央坐标（左上角的）；
-        //人物绘制在场景最中间（返回地图最中间 - 人物的一半）
-        readonly property int nRoleCenterInScenePosX: parseInt((gameScene.width - mainRole.width1) / 2);
-        readonly property int nRoleCenterInScenePosY: parseInt((gameScene.height - mainRole.height1) / 2);
-
-
-
-        //anchors.fill: parent
-        width: rootGameScene.width / scale
-        height: rootGameScene.height / scale
-
-        clip: true
-        color: "black"
-
-        transformOrigin: Item.TopLeft
-
-
-
-        Item {    //所有东西的容器
-            id: itemContainer
-
-
-            property var mapEventsTriggering: ({})    //保存正在触发的地图事件
-
-            property var mapInfo: ({})          //地图数据（map.json 和 map.js（$$Script） 的数据）
-            property var mapEventBlocks: ({})   //有事件的地图块ID（换算后的）
-
-            //property var image1: "1.jpg"
-            //property var image2: "2.png"
-
-
-            //地图事件触发
-            function gameEvent(eventName) {
-                let tScript = itemContainer.mapInfo.$$Script['$' + eventName];
-                if(!tScript)
-                    tScript = itemContainer.mapInfo.$$Script[eventName];
-                if(!tScript)
-                    tScript = game.f['$' + eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-
-                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件:' + eventName]);
-                //game.run([tScript, '地图事件:' + eventName]);
-
-                console.debug("[GameScene]gameEvent:", eventName);    //触发
-            }
-            //离开事件触发
-            function gameEventCanceled(eventName) {
-                let tScript = itemContainer.mapInfo.$$Script['$' + eventName + '_leave'];
-                if(!tScript)
-                    tScript = itemContainer.mapInfo.$$Script[eventName + '_leave'];
-                if(!tScript)
-                    tScript = game.f['$' + eventName + '_leave'];
-                if(!tScript)
-                    tScript = game.f[eventName + '_leave'];
-
-                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件离开:' + eventName + '_leave']);
-                //game.run([tScript, '地图事件离开:' + eventName + '_leave']);
-
-                console.debug("[GameScene]gameEventCanceled:", eventName + '_leave');    //触发
-            }
-
-
-
-            //width: 800
-            //height: 600
-
-            //scale: 2
-
-
-
-            //地图点击
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    let eventName = '$map_click';
-                    let tScript = itemContainer.mapInfo.$$Script[eventName];
-                    if(!tScript)
-                        tScript = game.f[eventName];
-                    if(!tScript)
-                        tScript = game.gf[eventName];
-                    if(tScript)
-                        game.run([tScript, eventName], -1, Math.floor(mouse.x / sizeMapBlockSize.width), Math.floor(mouse.y / sizeMapBlockSize.height), mouse.x, mouse.y);
-
-                    //console.debug(mouse.x, mouse.y,
-                    //              Math.floor(mouse.x / sizeMapBlockSize.width), Math.floor(mouse.y / sizeMapBlockSize.height))
-                }
-            }
-
-
-
-            Image { //预先载入图片
-                id: imageMapBlock
-                //source: "file:./1.png"
-                visible: false
-
-                onStatusChanged: {
-                    /*if(status === Image.Ready) {
-                        for(let tc in itemBackMapContainer.arrCanvas) {
-                            itemBackMapContainer.arrCanvas[tc].requestPaint();
-                        }
-                        for(let tc in itemFrontMapContainer.arrCanvas) {
-                            itemFrontMapContainer.arrCanvas[tc].requestPaint();
-                        }
-
-                        console.debug("[GameScene]Image.Ready");
-                    }
-                    */
-                }
-                Component.onCompleted: {
-                    console.debug("[GameScene]Image Component.onCompleted");
-                }
-            }
-
-
-            //背景地图容器
-            Item {
-                id: itemBackMapContainer
-                anchors.fill: parent
-                property var arrCanvas: [canvasBackMap]
-
-                Canvas {
-                    id: canvasBackMap
-                    anchors.fill: parent
-
-
-                    onPaint: {  //绘制地图
-
-                        //地图块没有准备好
-                        /*if(imageMapBlock.status !== Image.Ready) {
-                            console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
-                            return;
-                        }*/
-
-                        if(!available) {
-                            console.debug("[GameScene]canvasBackMap：地图块没有准备好：");
-                            return;
-                        }
-                        if(!isImageLoaded(imageMapBlock.source)) {
-                            console.debug("[GameScene]canvasBackMap：地图块图片没有载入：");
-                            //loadImage(imageMapBlock.source);
-                            return;
-                        }
-
-
-                        let ctx = getContext("2d");
-
-                        //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
-                        //ctx.fillRect(0, 0, width, height);
-                        ctx.clearRect(0, 0, width, height);
-
-                        //循环绘制地图块
-                        /* 之前的
-                        for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
-                        {
-                            //x1、y1为源，x2、y2为目标
-                            let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                            let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                            let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                            let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
-
-                            ctx.drawImage(imageMapBlock.source,
-                                          x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                          itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                          x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                          sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                            //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
-
-                            if(y2 > itemContainer.mapInfo.MapSize[1]) {
-                                console.warn("WARNING!!!too many rows");
-                                break;
-                            }
-                        }
-                        */
-
-                        //绘制每一层
-                        for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
-                            //console.debug("k:", k);
-
-                            if(_private.config.rMapOpacity !== 1)
-                                //跳过不属于这一层的
-                                if(k >= itemContainer.mapInfo.MapOfRole)
-                                    continue;
-
-                            for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
-                            //	console.debug("j:", j);
-                                //循环绘制地图块
-                                for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
-                            //		console.debug("i:", i);
-
-                                    ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                    //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                    if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
-                                        continue;
-
-                                    let _block = itemContainer.mapInfo.MapData[k][j][i];
-                                    //x1、y1为源，x2、y2为目标
-                                    let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                    let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * sizeMapBlockSize.width;
-                                    let y2 = j * sizeMapBlockSize.height;
-
-                                    //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                    //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
-
-                                    ctx.drawImage(imageMapBlock.source,
-                                                  x1, y1,
-                                                  itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                                  x2, y2,
-                                                  sizeMapBlockSize.width, sizeMapBlockSize.height
-                                    );
-                                }
-                            }
-                        }
-
-                        itemBackMapContainer.visible = true;
-
-                        console.debug("[GameScene]canvasMapBack onPaint");
-                    }
-
-                    onImageLoaded: {    //载入图片完成
-                        requestPaint(); //重新绘图
-
-                        console.debug("[GameScene]canvasMapBack onImageLoaded");
-                    }
-
-
-                    Component.onCompleted: {
-                        //loadImage(image1);  //载入图片
-                        //loadImage(image2);
-                        console.debug("[GameScene]canvasMapBack Component.onCompleted");
-                    }
-                }
-            }
-
-
-            //精灵容器
-            Item {
-                id: itemRoleContainer
-                anchors.fill: parent
-
-
-                /*Role {
-                    id: mainRole
-
-                    property Message message: Message {
-                        parent: mainRole
-                        visible: false
-                        width: parent.width
-                        height: parent.height * 0.2
-                        anchors.bottom: parent.top
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        nMaxHeight: 32
-
-                        onS_over: {
-                            visible = false;
-                        }
-                    }
-
-                    property string $name: ""
-
-                    //在场景中的坐标
-                    readonly property int sceneX: x + itemContainer.x
-                    readonly property int sceneY: y + itemContainer.y
-
-                    //其他属性（用户自定义）
-                    property var props: ({})
-
-
-
-                    z: y + y1
-
-
-
-                    Component.onCompleted: {
-                        //console.debug("[GameScene]Role Component.onCompleted");
-                    }
-                }
-                */
-
-            }
-
-
-            //前景地图容器
-            Item {
-                id: itemFrontMapContainer
-                anchors.fill: parent
-                property var arrCanvas: [canvasFrontMap]
-
-                Canvas {
-                    id: canvasFrontMap
-                    anchors.fill: parent
-
-                    opacity: _private.config.rMapOpacity
-
-
-                    onPaint: {  //绘制地图
-
-                        //地图块没有准备好
-                        /*if(imageMapBlock.status !== Image.Ready) {
-                            console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
-                            return;
-                        }*/
-
-                        if(!available) {
-                            console.debug("[GameScene]canvasFrontMap：地图块没有准备好：");
-                            return;
-                        }
-                        if(!isImageLoaded(imageMapBlock.source)) {
-                            console.debug("[GameScene]canvasFrontMap：地图块图片没有载入：");
-                            //loadImage(imageMapBlock.source);
-                            return;
-                        }
-
-
-                        let ctx = getContext("2d");
-
-                        //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
-                        //ctx.fillRect(0, 0, width, height);
-                        ctx.clearRect(0, 0, width, height);
-
-                        //循环绘制地图块
-                        /* 之前的
-                        for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
-                        {
-                            //x1、y1为源，x2、y2为目标
-                            let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                            let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                            let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                            let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
-
-                            ctx.drawImage(imageMapBlock.source,
-                                          x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                          itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                          x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                          sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                            //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
-
-                            if(y2 > itemContainer.mapInfo.MapSize[1]) {
-                                console.warn("WARNING!!!too many rows");
-                                break;
-                            }
-                        }
-                        */
-
-                        //绘制每一层
-                        for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
-                            //console.debug("k:", k);
-
-                            //跳过不属于这一层的
-                            if(k < itemContainer.mapInfo.MapOfRole)
-                                continue;
-
-                            for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
-                            //	console.debug("j:", j);
-                                //循环绘制地图块
-                                for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
-                            //		console.debug("i:", i);
-
-                                    ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                    //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                    if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
-                                        continue;
-
-                                    let _block = itemContainer.mapInfo.MapData[k][j][i];
-                                    //x1、y1为源，x2、y2为目标
-                                    let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                    let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * sizeMapBlockSize.width;
-                                    let y2 = j * sizeMapBlockSize.height;
-
-                                    //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                    //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
-
-                                    ctx.drawImage(imageMapBlock.source,
-                                                  x1, y1,
-                                                  itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                                  x2, y2,
-                                                  sizeMapBlockSize.width, sizeMapBlockSize.height
-                                    );
-                                }
-                            }
-                        }
-
-                        itemFrontMapContainer.visible = true;
-
-                        console.debug("[GameScene]canvasFrontMap onPaint");
-                    }
-
-                    onImageLoaded: {    //载入图片完成
-                        requestPaint(); //重新绘图
-
-                        console.debug("[GameScene]canvasFrontMap onImageLoaded");
-                    }
-
-
-                    Component.onCompleted: {
-                        //loadImage(image1);  //载入图片
-                        //loadImage(image2);
-                        console.debug("[GameScene]canvasFrontMap Component.onCompleted");
-                    }
-                }
-            }
-        }
-
-
-
-        //游戏FPS
-        Timer {
-            property var nLastTime: 0
-
-            id: timer
-            repeat: true
-            interval: 16
-            triggeredOnStart: false
-            running: false
-            onRunningChanged: {
-                if(running === true)
-                    nLastTime = game.date().getTime();
-            }
-
-            onTriggered: {
-                GameSceneJS.onTriggered();
-            }
-        }
-    }
-
-
-    /*/游戏对话框
-    Dialog {
-        id: dialogGameMsg
-
-        property alias textGameMsg: textGameMsg.text
-
-        title: ""
-        width: 300
-        height: 200
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        modal: true
-
-        anchors.centerIn: parent
-
-        Text {
-            id: textGameMsg
-            text: qsTr("")
-        }
-
-
-        MultiPointTouchArea {
-            anchors.fill: parent
-            enabled: dialogGameMsg.standardButtons === Dialog.NoButton
-            onPressed: {
-                //rootGameScene.forceActiveFocus();
-                dialogGameMsg.reject();
-            }
-        }
-
-
-        onAccepted: {
-            //gameMap.focus = true;
-            if(_private.config.bPauseGame)
-                game.goon();
-        }
-        onRejected: {
-            //gameMap.focus = true;
-            if(_private.config.bPauseGame)
-                game.goon();
-            //console.log("Cancel clicked");
-        }
-    }*/
-
-
-    //界面元素容器
+    //地图界面元素容器
     Item {
         id: itemComponentsContainer
         anchors.fill: parent
 
 
+
+        //游戏场景(可视区域）
+        Rectangle {
+            id: gameScene
+
+
+            //场景的 人物的最大X、Y坐标（返回场景 / 地图 的较小值）；这个可以固定
+            //如果地图小于场景时，人物不会到达场景边缘
+            readonly property int nMaxMoveWidth: gameScene.width < itemContainer.width ? gameScene.width : itemContainer.width;
+            readonly property int nMaxMoveHeight: gameScene.height < itemContainer.height ? gameScene.height : itemContainer.height;
+
+            //地图场景的 最中央坐标（左上角的）；
+            //人物绘制在场景最中间（返回地图最中间 - 人物的一半）
+            readonly property int nRoleCenterInScenePosX: parseInt((gameScene.width - mainRole.width1) / 2);
+            readonly property int nRoleCenterInScenePosY: parseInt((gameScene.height - mainRole.height1) / 2);
+
+
+
+            //anchors.fill: parent
+            //z: 0
+            width: rootGameScene.width / scale
+            height: rootGameScene.height / scale
+
+            clip: true
+            color: "black"
+
+            transformOrigin: Item.TopLeft
+
+
+
+            Item {    //所有东西的容器
+                id: itemContainer
+
+
+                property var mapInfo: ({})          //地图数据（map.json 和 map.js（$$Script） 的数据）
+                property var mapEventBlocks: ({})   //有事件的地图块ID（换算后的）
+
+                //property var image1: "1.jpg"
+                //property var image2: "2.png"
+
+
+                //width: 800
+                //height: 600
+
+                //scale: 2
+
+
+
+                //地图点击
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        GameSceneJS.mapClickEvent(mouse.x, mouse.y);
+                    }
+                }
+
+
+
+                Image { //预先载入图片
+                    id: imageMapBlock
+                    //source: "file:./1.png"
+                    visible: false
+
+                    onStatusChanged: {
+                        /*if(status === Image.Ready) {
+                            for(let tc in itemBackMapContainer.arrCanvas) {
+                                itemBackMapContainer.arrCanvas[tc].requestPaint();
+                            }
+                            for(let tc in itemFrontMapContainer.arrCanvas) {
+                                itemFrontMapContainer.arrCanvas[tc].requestPaint();
+                            }
+
+                            console.debug("[GameScene]Image.Ready");
+                        }
+                        */
+                    }
+                    Component.onCompleted: {
+                        console.debug("[GameScene]Image Component.onCompleted");
+                    }
+                }
+
+
+                //背景地图容器
+                Item {
+                    id: itemBackMapContainer
+                    anchors.fill: parent
+                    property var arrCanvas: [canvasBackMap]
+
+                    Canvas {
+                        id: canvasBackMap
+
+                        anchors.fill: parent
+
+                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
+
+
+                        onPaint: {  //绘制地图
+
+                            //地图块没有准备好
+                            /*if(imageMapBlock.status !== Image.Ready) {
+                                console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                                return;
+                            }*/
+
+                            if(!available) {
+                                console.debug("[GameScene]canvasBackMap：地图块没有准备好：");
+                                return;
+                            }
+                            if(!isImageLoaded(imageMapBlock.source)) {
+                                console.debug("[GameScene]canvasBackMap：地图块图片没有载入：");
+                                //loadImage(imageMapBlock.source);
+                                return;
+                            }
+
+
+                            let ctx = getContext("2d");
+
+                            //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
+                            //ctx.fillRect(0, 0, width, height);
+                            ctx.clearRect(0, 0, width, height);
+
+                            //循环绘制地图块
+                            /* 之前的
+                            for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
+                            {
+                                //x1、y1为源，x2、y2为目标
+                                let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
+                                let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
+                                let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
+                                let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
+
+                                ctx.drawImage(imageMapBlock.source,
+                                              x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
+                                              itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                              x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
+                                              sizeMapBlockSize.width, sizeMapBlockSize.height);
+
+                                //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
+
+                                if(y2 > itemContainer.mapInfo.MapSize[1]) {
+                                    console.warn("WARNING!!!too many rows");
+                                    break;
+                                }
+                            }
+                            */
+
+                            //绘制每一层
+                            for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
+                                //console.debug("k:", k);
+
+                                if(_private.config.rMapOpacity < 1) //如果前景色需要半透明，则背景的每一地图层都必须绘制
+                                    //跳过不属于这一层的
+                                    if(k >= itemContainer.mapInfo.MapOfRole)
+                                        continue;
+
+                                for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
+                                //	console.debug("j:", j);
+                                    //循环绘制地图块
+                                    for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
+                                //		console.debug("i:", i);
+
+                                        ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
+                                        //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
+
+                                        if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
+                                            continue;
+
+                                        let _block = itemContainer.mapInfo.MapData[k][j][i];
+                                        //x1、y1为源，x2、y2为目标
+                                        let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
+                                        let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
+                                        let x2 = i * sizeMapBlockSize.width;
+                                        let y2 = j * sizeMapBlockSize.height;
+
+                                        //console.debug(k,j,i, ":", x1,y1,x2,y2);
+                                        //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
+
+                                        ctx.drawImage(imageMapBlock.source,
+                                                      x1, y1,
+                                                      itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                                      x2, y2,
+                                                      sizeMapBlockSize.width, sizeMapBlockSize.height
+                                        );
+                                    }
+                                }
+                            }
+
+                            itemBackMapContainer.visible = true;
+
+                            console.debug("[GameScene]canvasMapBack onPaint");
+                        }
+
+                        onImageLoaded: {    //载入图片完成
+                            requestPaint(); //重新绘图
+
+                            console.debug("[GameScene]canvasMapBack onImageLoaded");
+                        }
+
+
+                        Component.onCompleted: {
+                            //loadImage(image1);  //载入图片
+                            //loadImage(image2);
+                            console.debug("[GameScene]canvasMapBack Component.onCompleted");
+                        }
+                    }
+                }
+
+
+                //精灵容器
+                Item {
+                    id: itemRoleContainer
+                    anchors.fill: parent
+
+
+                    /*Role {
+                        id: mainRole
+
+                        property Message message: Message {
+                            parent: mainRole
+                            visible: false
+                            width: parent.width
+                            height: parent.height * 0.2
+                            anchors.bottom: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            nMaxHeight: 32
+
+                            onS_over: {
+                                visible = false;
+                            }
+                        }
+
+                        property string $name: ""
+
+                        //在场景中的坐标
+                        readonly property int sceneX: x + itemContainer.x
+                        readonly property int sceneY: y + itemContainer.y
+
+                        //其他属性（用户自定义）
+                        property var props: ({})
+
+
+
+                        z: y + y1
+
+
+
+                        Component.onCompleted: {
+                            //console.debug("[GameScene]Role Component.onCompleted");
+                        }
+                    }
+                    */
+
+                }
+
+
+                //前景地图容器
+                Item {
+                    id: itemFrontMapContainer
+                    anchors.fill: parent
+                    property var arrCanvas: [canvasFrontMap]
+
+                    Canvas {
+                        id: canvasFrontMap
+
+                        anchors.fill: parent
+
+                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
+
+                        opacity: _private.config.rMapOpacity
+
+
+                        onPaint: {  //绘制地图
+
+                            //地图块没有准备好
+                            /*if(imageMapBlock.status !== Image.Ready) {
+                                console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                                return;
+                            }*/
+
+                            if(!available) {
+                                console.debug("[GameScene]canvasFrontMap：地图块没有准备好：");
+                                return;
+                            }
+                            if(!isImageLoaded(imageMapBlock.source)) {
+                                console.debug("[GameScene]canvasFrontMap：地图块图片没有载入：");
+                                //loadImage(imageMapBlock.source);
+                                return;
+                            }
+
+
+                            let ctx = getContext("2d");
+
+                            //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
+                            //ctx.fillRect(0, 0, width, height);
+                            ctx.clearRect(0, 0, width, height);
+
+                            //循环绘制地图块
+                            /* 之前的
+                            for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
+                            {
+                                //x1、y1为源，x2、y2为目标
+                                let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
+                                let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
+                                let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
+                                let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
+
+                                ctx.drawImage(imageMapBlock.source,
+                                              x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
+                                              itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                              x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
+                                              sizeMapBlockSize.width, sizeMapBlockSize.height);
+
+                                //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
+
+                                if(y2 > itemContainer.mapInfo.MapSize[1]) {
+                                    console.warn("WARNING!!!too many rows");
+                                    break;
+                                }
+                            }
+                            */
+
+                            //绘制每一层
+                            for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
+                                //console.debug("k:", k);
+
+                                //跳过不属于这一层的
+                                if(k < itemContainer.mapInfo.MapOfRole)
+                                    continue;
+
+                                for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
+                                //	console.debug("j:", j);
+                                    //循环绘制地图块
+                                    for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
+                                //		console.debug("i:", i);
+
+                                        ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
+                                        //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
+
+                                        if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
+                                            continue;
+
+                                        let _block = itemContainer.mapInfo.MapData[k][j][i];
+                                        //x1、y1为源，x2、y2为目标
+                                        let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
+                                        let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
+                                        let x2 = i * sizeMapBlockSize.width;
+                                        let y2 = j * sizeMapBlockSize.height;
+
+                                        //console.debug(k,j,i, ":", x1,y1,x2,y2);
+                                        //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
+
+                                        ctx.drawImage(imageMapBlock.source,
+                                                      x1, y1,
+                                                      itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                                      x2, y2,
+                                                      sizeMapBlockSize.width, sizeMapBlockSize.height
+                                        );
+                                    }
+                                }
+                            }
+
+                            itemFrontMapContainer.visible = true;
+
+                            console.debug("[GameScene]canvasFrontMap onPaint");
+                        }
+
+                        onImageLoaded: {    //载入图片完成
+                            requestPaint(); //重新绘图
+
+                            console.debug("[GameScene]canvasFrontMap onImageLoaded");
+                        }
+
+
+                        Component.onCompleted: {
+                            //loadImage(image1);  //载入图片
+                            //loadImage(image2);
+                            console.debug("[GameScene]canvasFrontMap Component.onCompleted");
+                        }
+                    }
+                }
+            }
+
+
+
+            //游戏FPS
+            Timer {
+                property var nLastTime: 0
+
+                id: timer
+                repeat: true
+                interval: 16
+                triggeredOnStart: false
+                running: false
+                onRunningChanged: {
+                    if(running === true)
+                        nLastTime = game.date().getTime();
+                }
+
+                onTriggered: {
+                    GameSceneJS.onTriggered();
+                    //使用脚本队列的话，人物移动就不能在asyncScript.wait下使用了
+                    //game.run(GameSceneJS.onTriggered);
+                    //game.run(true);
+                }
+            }
+        }
+
+
+        /*/游戏对话框
+        Dialog {
+            id: dialogGameMsg
+
+            property alias textGameMsg: textGameMsg.text
+
+            title: ""
+            width: 300
+            height: 200
+            standardButtons: Dialog.Ok | Dialog.Cancel
+            modal: true
+
+            anchors.centerIn: parent
+
+            Text {
+                id: textGameMsg
+                text: qsTr("")
+            }
+
+
+            MultiPointTouchArea {
+                anchors.fill: parent
+                enabled: dialogGameMsg.standardButtons === Dialog.NoButton
+                onPressed: {
+                    //rootGameScene.forceActiveFocus();
+                    dialogGameMsg.reject();
+                }
+            }
+
+
+            onAccepted: {
+                //gameMap.focus = true;
+                if(_private.config.bPauseGame)
+                    game.goon();
+            }
+            onRejected: {
+                //gameMap.focus = true;
+                if(_private.config.bPauseGame)
+                    game.goon();
+                //console.log("Cancel clicked");
+            }
+        }*/
+
+
+
+        //操控杆
         Item {
             id: itemGamePad
-            anchors.fill: parent
 
+            anchors.fill: parent
             z: 1
 
 
@@ -4545,669 +4684,594 @@ Rectangle {
             }
         }
 
-    }
 
 
+        //战斗场景
+        /*/Loader {
+            id: loaderFightScene
 
-    /*
-    //战斗场景
-    Loader {
-        id: loaderFightScene
-        anchors.fill: parent
+            source: "./FightScene.qml"
+            asynchronous: false
 
-        visible: false
+            Connections {
+                target: loaderFightScene.item
 
+                //!鹰：Loader每次载入的时候都会重新Connection一次，所以没有的会出现警告
+                function onS_FightOver() {
 
-        source: "./FightScene.qml"
-        asynchronous: false
+        */
+        FightScene {
+            id: loaderFightScene
 
-
-        Connections {
-            target: loaderFightScene.item
-
-            //!鹰：Loader每次载入的时候都会重新Connection一次，所以没有的会出现警告
-            function onS_FightOver() {
-                rootGameScene.focus = true;
-                loaderFightScene.visible = false;
-
-                //_private.nStage = 0;
-                //game.goon();
-
-                //升级检测
-                //for(let h in game.gd["$sys_fight_heros"]) {
-                //    game.levelup(game.gd["$sys_fight_heros"][h]);
-                //}
-            }
-
-            function onS_showFightRoleInfo(nIndex) {
-                gameMenuWindow.showWindow(0b10, nIndex);
-                //gameMenuWindow.showFightRoleInfo(nIndex);
-            }
-
-            //function onS_ShowSystemWindow() {
-            //    gameMenuWindow.show();
-            //}
-        }
-
-        onLoaded: {
-            loaderFightScene.item.asyncScript = _private.asyncScript;
-        }
-    }
-    */
-
-    //战斗场景
-    FightScene {
-        id: loaderFightScene
-        anchors.fill: parent
-
-        visible: false
-
-
-        //!鹰：Loader每次载入的时候都会重新Connection一次，所以没有的会出现警告
-        onS_FightOver: function() {
-            rootGameScene.focus = true;
-            loaderFightScene.visible = false;
-
-            //_private.nStage = 0;
-            //game.goon();
-
-            //升级检测
-            //for(let h in game.gd["$sys_fight_heros"]) {
-            //    game.levelup(game.gd["$sys_fight_heros"][h]);
-            //}
-        }
-
-        onS_showFightRoleInfo: function(nIndex) {
-            gameMenuWindow.showWindow(0b10, nIndex);
-            //gameMenuWindow.showFightRoleInfo(nIndex);
-        }
-
-        //function onS_ShowSystemWindow() {
-        //    gameMenuWindow.show();
-        //}
-
-        Component.onCompleted: {
-            loaderFightScene.asyncScript = _private.asyncScript;
-        }
-    }
-
-
-
-    //菜单
-    GameMenuWindow {
-        id: gameMenuWindow
-
-        visible: false
-        anchors.fill: parent
-
-        onS_close: {
-            gameMenuWindow.visible = false;
-
-            if(_private.config.objPauseNames['$menu_window'] !== undefined) {
-                game.goon('$menu_window');
-                //_private.asyncScript.run();
-            }
-
-        }
-        onS_show: {
-            let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
-            if(show)
-                show(newFlags, windowFlags);
-        }
-        onS_hide: {
-            let hide = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide');
-            if(hide)
-                hide(newFlags, windowFlags);
-        }
-    }
-
-
-    GameTradeWindow {
-        id: dialogTrade
-
-        anchors.fill: parent
-        visible: false
-
-    }
-
-
-
-    //角色对话框
-    Item {
-        id: dialogRoleMsg
-
-
-        //显示完全后延时
-        property int nKeepTime: 0
-        //显示状态：-1：停止；0：显示完毕；1：正在显示
-        property int nShowStatus: -1
-
-
-        signal accepted();
-        signal rejected();
-
-
-        function show(msg, pretext, interval, keeptime, style) {
-
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$talk') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$talk;
-
-            messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-            maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-
-            //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
-            dialogRoleMsg.nKeepTime = keeptime || 0;
-
-            dialogRoleMsg.nShowStatus = 1;
-
-
-
-            //console.debug("show1")
-            dialogRoleMsg.visible = true;
-            //touchAreaRoleMsg.enabled = false;
-            messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
-            //console.debug("show2")
-            //FrameManager.wait(-1);
-        }
-
-        function clicked() {
-            //显示完毕，则关闭
-            if(dialogRoleMsg.nShowStatus === 0)
-                dialogRoleMsg.rejected();
-            //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
-            else if(dialogRoleMsg.nShowStatus === 1 && dialogRoleMsg.nKeepTime === -1) {
-                dialogRoleMsg.nShowStatus = 0;
-                messageRole.stop(1);
-            }
-        }
-
-
-        anchors.fill: parent
-        visible: false
-
-
-        Mask {
-            id: maskMessageRole
-
+            visible: false
             anchors.fill: parent
+            z: 2
 
-            visible: color.a !== 0
-
-            color: "transparent"
-
-            mouseArea.onPressed: {
-                dialogRoleMsg.clicked();
+            Component.onCompleted: {
+                //loaderFightScene.asyncScript = _private.asyncScript;
             }
         }
 
 
-        Message {
-            id: messageRole
-            width: parent.width
-            height: parent.height * 0.1
-            //height: 90
-            anchors.bottom: parent.bottom
 
+        //菜单
+        GameMenuWindow {
+            id: gameMenuWindow
 
-            nMaxWidth: parent.width
-            nMaxHeight: parent.height * 0.2
-            //nMaxHeight: 90
-
-
-            textArea.enabled: false
-
-            textArea.onReleased: {
-                dialogRoleMsg.clicked();
-                //rootGameScene.forceActiveFocus();
-            }
-
-            onS_over: {
-                //自动关闭
-                if(dialogRoleMsg.nKeepTime > 0)
-                    dialogRoleMsg.rejected();
-                else
-                    dialogRoleMsg.nShowStatus = 0;
-            }
-        }
-
-
-        /*MultiPointTouchArea {
-            id: touchAreaRoleMsg
+            visible: false
             anchors.fill: parent
-            enabled: false
-            //enabled: dialogRoleMsg.standardButtons === Dialog.NoButton
+            z: 3
 
-            //onPressed: {
-            onReleased: {
-                //rootGameScene.forceActiveFocus();
-                //console.debug("MultiPointTouchArea1")
-                dialogRoleMsg.rejected();
-                //console.debug("MultiPointTouchArea2")
+            onS_close: {
+                gameMenuWindow.visible = false;
+
+                if(_private.config.objPauseNames['$menu_window'] !== undefined) {
+                    game.goon('$menu_window');
+                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+
             }
-        }*/
-
-
-        onAccepted: {
-            //gameMap.focus = true;
-            dialogRoleMsg.visible = false;
-
-            dialogRoleMsg.nShowStatus = -1;
-
-
-            if(_private.config.objPauseNames['$talk'] !== undefined) {
-                game.goon('$talk');
-                _private.asyncScript.run();
+            onS_show: {
+                let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
+                if(show)
+                    show(newFlags, windowFlags);
             }
-
-
-            //FrameManager.goon();
-        }
-        onRejected: {
-            //console.debug("onRejected1")
-            dialogRoleMsg.visible = false;
-
-            dialogRoleMsg.nShowStatus = -1;
-
-
-            if(_private.config.objPauseNames['$talk'] !== undefined) {
-                game.goon('$talk');
-                _private.asyncScript.run();
-            }
-
-
-            //FrameManager.goon();
-            //console.debug("onRejected2")
-        }
-    }
-
-
-    //游戏对话框
-    Item {
-        id: dialogGameMsg
-
-        //是否暂停了游戏
-        //property bool bPauseGame: true
-        //显示完全后延时
-        property int nKeepTime: 0
-        //显示状态：-1：停止；0：显示完毕；1：正在显示
-        property int nShowStatus: -1
-        //property alias textGameMsg: textGameMsg.text
-        //property int standardButtons: Dialog.Ok | Dialog.Cancel
-
-
-        signal accepted();
-        signal rejected();
-
-
-        function show(msg, pretext, interval, keeptime, style) {
-
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$style', '$msg') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$style.$msg;
-
-            messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            messageGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            messageGame.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            messageGame.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-            maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-            let type = GlobalLibraryJS.shortCircuit(1, style.Type, styleUser.$type, styleSystem.$type);
-
-            //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
-            dialogGameMsg.nKeepTime = keeptime || 0;
-
-            dialogGameMsg.nShowStatus = 1;
-
-
-
-            dialogGameMsg.visible = true;
-            //touchAreaGameMsg.enabled = false;
-            messageGame.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, dialogGameMsg.nKeepTime, type);
-            //FrameManager.wait(-1);
-
-        }
-
-        function clicked() {
-            //显示完毕，则关闭
-            if(dialogGameMsg.nShowStatus === 0)
-                dialogGameMsg.rejected();
-            //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
-            else if(dialogGameMsg.nShowStatus === 1 && dialogGameMsg.nKeepTime === -1) {
-                dialogGameMsg.nShowStatus = 0;
-                messageGame.stop(1);
+            onS_hide: {
+                let hide = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide');
+                if(hide)
+                    hide(newFlags, windowFlags);
             }
         }
 
 
-        anchors.fill: parent
-        visible: false
+        GameTradeWindow {
+            id: dialogTrade
 
-
-        Mask {
-            id: maskMessageGame
-
+            visible: false
             anchors.fill: parent
+            z: 4
 
-            visible: color.a !== 0
-
-            color: "#7FFFFFFF"
-
-            mouseArea.onPressed: {
-                dialogGameMsg.clicked();
-            }
         }
 
 
-        Message {
-            id: messageGame
 
-            width: parent.width * 0.7
-            height: parent.height * 0.7
-            anchors.centerIn: parent
+        //角色对话框
+        Item {
+            id: dialogRoleMsg
 
 
-            nMaxWidth: parent.width * 0.7
-            nMaxHeight: parent.height * 0.7
+            //显示完全后延时
+            property int nKeepTime: 0
+            //显示状态：-1：停止；0：显示完毕；1：正在显示
+            property int nShowStatus: -1
 
 
-            textArea.enabled: false
+            signal accepted();
+            signal rejected();
 
-            textArea.onReleased: {
-                dialogGameMsg.clicked();
-                //rootGameScene.forceActiveFocus();
+
+            function show(msg, pretext, interval, keeptime, style) {
+
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
+
+                messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+                messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+                maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+
+                //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
+                dialogRoleMsg.nKeepTime = keeptime || 0;
+
+                dialogRoleMsg.nShowStatus = 1;
+
+
+
+                //console.debug("show1")
+                dialogRoleMsg.visible = true;
+                //touchAreaRoleMsg.enabled = false;
+                messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
+                //console.debug("show2")
+                //FrameManager.wait(-1);
             }
 
-            onS_over: {
-                //自动关闭
-                if(dialogGameMsg.nKeepTime > 0)
-                    dialogGameMsg.rejected();
-                else
-                    dialogGameMsg.nShowStatus = 0;
-            }
-        }
-
-
-        /*MultiPointTouchArea {
-            id: touchAreaGameMsg
-            anchors.fill: parent
-            //enabled: dialogGameMsg.standardButtons === Dialog.NoButton
-            enabled: false
-
-            //onPressed: {
-            onReleased: {
-                //rootGameScene.forceActiveFocus();
+            function clicked() {
                 //显示完毕，则关闭
-                if(dialogGameMsg.nShowStatus === 0)
-                    dialogGameMsg.rejected();
+                if(dialogRoleMsg.nShowStatus === 0)
+                    dialogRoleMsg.rejected();
                 //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
-                else if(dialogGameMsg.nShowStatus === 1 && dialogGameMsg.nKeepTime === -1) {
-                    dialogGameMsg.nShowStatus = 0;
-                    messageGame.stop(1);
+                else if(dialogRoleMsg.nShowStatus === 1 && dialogRoleMsg.nKeepTime === -1) {
+                    dialogRoleMsg.nShowStatus = 0;
+                    messageRole.stop(1);
                 }
             }
-        }*/
 
 
-        onAccepted: {
-            //gameMap.focus = true;
-
-            dialogGameMsg.visible = false;
-
-            dialogGameMsg.nShowStatus = -1;
-
-
-            /*if(dialogGameMsg.bPauseGame && _private.config.bPauseGame) {
-                game.goon();
-                dialogGameMsg.bPauseGame = false;
-            }*/
-
-            if(_private.config.objPauseNames['$msg'] !== undefined) {
-                game.goon('$msg');
-                _private.asyncScript.run();
-            }
-
-
-            //FrameManager.goon();
-        }
-        onRejected: {
-            //gameMap.focus = true;
-
-            dialogGameMsg.visible = false;
-
-            dialogGameMsg.nShowStatus = -1;
-
-
-            /*if(dialogGameMsg.bPauseGame && _private.config.bPauseGame) {
-                game.goon();
-                dialogGameMsg.bPauseGame = false;
-            }*/
-
-            if(_private.config.objPauseNames['$msg'] !== undefined) {
-                game.goon('$msg');
-                _private.asyncScript.run();
-            }
-
-
-            //FrameManager.goon();
-        }
-    }
-
-    //游戏 选择框
-    Item {
-        id: rectMenu
-
-        anchors.fill: parent
-        visible: false
-
-        Mask {
-            id: maskMenu
-
+            visible: false
             anchors.fill: parent
-
-            visible: color.a !== 0
-
-            color: "#60000000"
-        }
-
-        Rectangle {
-            //width: parent.width * 0.5
-            width: Screen.width > Screen.height ? parent.width * 0.6 : parent.width * 0.9
-            //height: parent.height * 0.5
-            height: Math.min(menuGame.implicitHeight, parent.height * 0.5)
-            anchors.centerIn: parent
-
-            clip: true
-            color: "#00000000"
-            border.color: "white"
-            radius: height / 20
+            z: 5
 
 
-            GameMenu {
-                id: menuGame
+            Mask {
+                id: maskMessageRole
 
-                //radius: rectMenu.radius
+                anchors.fill: parent
 
+                visible: color.a !== 0
+
+                color: "transparent"
+
+                mouseArea.onPressed: {
+                    dialogRoleMsg.clicked();
+                }
+            }
+
+
+            Message {
+                id: messageRole
                 width: parent.width
-                height: parent.height
+                height: parent.height * 0.1
+                //height: 90
+                anchors.bottom: parent.bottom
 
-                colorTitleColor: "#EE00CC99"
-                strTitle: ''
 
-                //height: parent.height / 2
-                //anchors.centerIn: parent
+                nMaxWidth: parent.width
+                nMaxHeight: parent.height * 0.2
+                //nMaxHeight: 90
 
-                onS_Choice: {
-                    //gameMap.focus = true;
 
-                    rectMenu.visible = false;
-                    //menuGame.hide();
+                textArea.enabled: false
 
-                    if(_private.config.objPauseNames['$menu'] !== undefined) {
-                        game.goon('$menu');
-                        _private.asyncScript.run(index);
+                textArea.onReleased: {
+                    dialogRoleMsg.clicked();
+                    //rootGameScene.forceActiveFocus();
+                }
+
+                onS_over: {
+                    //自动关闭
+                    if(dialogRoleMsg.nKeepTime > 0)
+                        dialogRoleMsg.rejected();
+                    else
+                        dialogRoleMsg.nShowStatus = 0;
+                }
+            }
+
+
+            /*MultiPointTouchArea {
+                id: touchAreaRoleMsg
+                anchors.fill: parent
+                enabled: false
+                //enabled: dialogRoleMsg.standardButtons === Dialog.NoButton
+
+                //onPressed: {
+                onReleased: {
+                    //rootGameScene.forceActiveFocus();
+                    //console.debug("MultiPointTouchArea1")
+                    dialogRoleMsg.rejected();
+                    //console.debug("MultiPointTouchArea2")
+                }
+            }*/
+
+
+            onAccepted: {
+                //gameMap.focus = true;
+                dialogRoleMsg.visible = false;
+
+                dialogRoleMsg.nShowStatus = -1;
+
+
+                if(_private.config.objPauseNames['$talk'] !== undefined) {
+                    game.goon('$talk');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+
+
+                //FrameManager.goon();
+            }
+            onRejected: {
+                //console.debug("onRejected1")
+                dialogRoleMsg.visible = false;
+
+                dialogRoleMsg.nShowStatus = -1;
+
+
+                if(_private.config.objPauseNames['$talk'] !== undefined) {
+                    game.goon('$talk');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+
+
+                //FrameManager.goon();
+                //console.debug("onRejected2")
+            }
+        }
+
+
+        Loader {
+            id: dialogGameMsg
+
+            visible: true
+            anchors.fill: parent
+            z: 6
+
+            sourceComponent: compGameMsg
+            asynchronous: false
+
+            Connections {
+                target: dialogGameMsg.item
+
+                function onAccepted() {
+
+                    if(_private.config.objPauseNames['$msg'] !== undefined) {
+                        game.goon('$msg');
+                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }
+                }
+
+                function onRejected() {
+                    if(_private.config.objPauseNames['$msg'] !== undefined) {
+                        game.goon('$msg');
+                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }
+                }
+            }
+
+            onLoaded: {
+            }
+        }
+
+
+        Item {
+            id: itemMenus
+
+            //创建一个自增1
+            property int nIndex: 0
+
+            anchors.fill: parent
+            z: 7
+
+        }
+
+        //游戏 输入框
+        Item {
+            id: rectRootGameInput
+
+            visible: false
+            anchors.fill: parent
+            z: 8
+
+            Mask {
+                id: maskGameInput
+
+                anchors.fill: parent
+
+                visible: color.a !== 0
+
+                color: "#7FFFFFFF"
+
+                mouseArea.onPressed: {
+                    //rectRootGameInput.visible = false;
+                    //game.goon('$input');
+                    //_private.asyncScript.run(textGameInput.text);
+                }
+            }
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: parent.width * 0.6
+                //height: parent.height * 0.6
+
+                Rectangle {
+                    id: rectGameInputTitle
+
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: parent.width
+                    Layout.preferredHeight: 60
+                    //implicitHeight: 60
+
+                    //color: "darkred"
+                    color: "#EE00CC99"
+                    //radius: itemMenu.radius
+
+                    Text {
+                        id: textGameInputTitle
+
+                        anchors.fill: parent
+
+                        color: "white"
+
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        font.pointSize: 16
+                        font.bold: true
+
+                        wrapMode: Text.NoWrap
                     }
 
-                    //FrameManager.goon();
-                    //console.debug("!!!asyncScript.run", index);
+                }
+
+
+                Rectangle {
+                    id: rectGameInput
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width
+                    Layout.preferredHeight: textGameInput.implicitHeight
+
+
+                    color: "#FFFFFF"
+
+                    border {
+                        color: '#60000000'
+                    }
+
+
+                    TextArea {
+                        id: textGameInput
+
+                        anchors.fill: parent
+
+
+                        color: "black"
+
+                        //horizontalAlignment: Text.AlignHCenter
+                        //verticalAlignment: Text.AlignVCenter
+
+                        font.pointSize: 16
+                        font.bold: true
+
+                        selectByKeyboard: true
+                        selectByMouse: true
+                        wrapMode: Text.Wrap
+                    }
+                }
+
+                ColorButton {
+
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+                    text: '确定'
+                    onButtonClicked: {
+                        rectRootGameInput.visible = false;
+
+                        if(_private.config.objPauseNames['$input'] !== undefined) {
+                            game.goon('$input');
+                            _private.asyncScript.run(textGameInput.text);
+                        }
+
+                    }
+                }
+            }
+        }
+
+        //视频播放
+        Item {
+            id: itemVideo
+
+            visible: false
+            anchors.fill: parent
+            z: 9
+
+            MediaPlayer {
+                id: mediaPlayer
+
+                source: ""
+
+                onStopped: {
+                    game.stopvideo();
+                }
+            }
+
+            //渲染视频
+            VideoOutput{
+                id: videoOutput
+
+                anchors.centerIn: parent
+                source: mediaPlayer
+                //fillMode: VideoOutput.Stretch
+                //x: 0
+                //y: 0
+
+                //width: rootGameScene.width
+                //height: rootGameScene.height
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                        mediaPlayer.pause();
+                    else
+                        mediaPlayer.play();
+                }
+                onDoubleClicked: {
+                    game.stopvideo();
                 }
             }
         }
     }
 
-    //游戏 输入框
+
+
     Item {
-        id: rectRootGameInput
+        id: itemBackgroundMusic
 
-        anchors.fill: parent
-        visible: false
+        property var arrMusicStack: []  //播放音乐栈
 
-        Mask {
-            id: maskGameInput
+        property var objMusicPause: ({})    //暂停类型
 
-            anchors.fill: parent
 
-            visible: color.a !== 0
-
-            color: "#7FFFFFFF"
-
-            mouseArea.onPressed: {
-                //rectRootGameInput.visible = false;
-                //game.goon('$input');
-                //_private.asyncScript.run(textGameInput.text);
-            }
+        function isPlaying() {
+            return audioBackgroundMusic.playbackState === Audio.PlayingState;
         }
 
-        ColumnLayout {
-            anchors.centerIn: parent
-            width: parent.width * 0.6
-            //height: parent.height * 0.6
+        function play() {
+            //bPlay = true;
+            if(!game.musicpausing())
+                audioBackgroundMusic.play();
+            //nPauseTimes = 0;
+        }
 
-            Rectangle {
-                id: rectGameInputTitle
+        function stop() {
+            //bPlay = false;
+            audioBackgroundMusic.stop();
+            //nPauseTimes = 0;
+        }
 
-                Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: parent.width
-                Layout.preferredHeight: 60
-                //implicitHeight: 60
-
-                //color: "darkred"
-                color: "#EE00CC99"
-                //radius: rectMenu.radius
-
-                Text {
-                    id: textGameInputTitle
-
-                    anchors.fill: parent
-
-                    color: "white"
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    font.pointSize: 16
-                    font.bold: true
-
-                    wrapMode: Text.NoWrap
-                }
-
+        function pause(name='$user') {
+            if(name === true) { //全局
+                GameMakerGlobal.settings.setValue('$PauseMusic', 1);
             }
+            else if(name === false) { //存档
+                game.gd["$sys_sound"] &= ~0b1;
+            }
+            else if(name && GlobalLibraryJS.isString(name)) {
+                //if(objMusicPause[name] === 1)
+                //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
+                objMusicPause[name] = (objMusicPause[name] ? objMusicPause[name] + 1 : 1);
+                //objMusicPause[name] = 1;
+            }
+            else
+                return;
 
 
-            Rectangle {
-                id: rectGameInput
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                Layout.preferredWidth: parent.width
-                Layout.preferredHeight: textGameInput.implicitHeight
+            //if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
+                audioBackgroundMusic.pause();
 
 
-                color: "#FFFFFF"
+            //console.debug("!!!pause", nPauseTimes)
+        }
 
-                border {
-                    color: '#60000000'
+        function resume(name='$user') {
+            if(name === true) { //全局
+                GameMakerGlobal.settings.setValue('$PauseMusic', 0);
+            }
+            else if(name === false) { //存档
+                game.gd["$sys_sound"] |= 0b1;
+            }
+            else if(name === null) {    //清空
+                objMusicPause = {};
+            }
+            else if(name && GlobalLibraryJS.isString(name)) {
+                if(objMusicPause[name]) {
+                    --objMusicPause[name];
+                    if(objMusicPause[name] === 0)
+                        delete objMusicPause[name];
                 }
-
-
-                TextArea {
-                    id: textGameInput
-
-                    anchors.fill: parent
-
-
-                    color: "black"
-
-                    //horizontalAlignment: Text.AlignHCenter
-                    //verticalAlignment: Text.AlignVCenter
-
-                    font.pointSize: 16
-                    font.bold: true
-
-                    selectByKeyboard: true
-                    selectByMouse: true
-                    wrapMode: Text.Wrap
+                else {
+                    //rootGameScene.forceActiveFocus();
+                    //return;
                 }
             }
+            else
+                return;
 
-            ColorButton {
 
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+            if(GlobalLibraryJS.objectIsEmpty(objMusicPause) && !GameMakerGlobal.settings.value('$PauseMusic')) {
+                //if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
+                    audioBackgroundMusic.play();
+            }
 
-                text: '确定'
-                onButtonClicked: {
-                    rectRootGameInput.visible = false;
+            //console.debug("!!!resume", nPauseTimes, bPlay)
 
-                    if(_private.config.objPauseNames['$input'] !== undefined) {
-                        game.goon('$input');
-                        _private.asyncScript.run(textGameInput.text);
-                    }
+        }
 
-                }
+        Audio {
+            id: audioBackgroundMusic
+            loops: Audio.Infinite
+
+            onPlaybackStateChanged: {
             }
         }
     }
 
-    //视频播放
-    Item {
-        id: itemVideo
-        anchors.fill: parent
-        visible: false
+    QtObject {
+        id: rootSoundEffect
 
-        MediaPlayer {
-            id: mediaPlayer
+        property var objSoundEffectPause: ({})    //暂停类型
 
-            source: ""
 
-            onStopped: {
-                game.stopvideo();
+        function pause(name='$user') {
+            if(name === true) { //全局
+                GameMakerGlobal.settings.setValue('$PauseSound', 1);
+            }
+            else if(name === false) { //存档
+                game.gd["$sys_sound"] &= ~0b10;
+            }
+            else if(name && GlobalLibraryJS.isString(name)) {
+                //if(objSoundEffectPause[name] === 1)
+                //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
+                objSoundEffectPause[name] = (objSoundEffectPause[name] ? objSoundEffectPause[name] + 1 : 1);
+                //objSoundEffectPause[name] = 1;
+            }
+            else
+                return;
+
+            //console.debug("!!!pause", nPauseTimes)
+        }
+
+        function resume(name='$user') {
+            if(name === true) { //全局
+                GameMakerGlobal.settings.setValue('$PauseSound', 0);
+            }
+            else if(name === false) { //存档
+                game.gd["$sys_sound"] |= 0b10;
+            }
+            else if(name === null) {    //清空
+                objSoundEffectPause = {};
+            }
+            else if(name && GlobalLibraryJS.isString(name)) {
+                if(objSoundEffectPause[name]) {
+                    --objSoundEffectPause[name];
+                    if(objSoundEffectPause[name] === 0)
+                        delete objSoundEffectPause[name];
+                }
+                else {
+                    //rootGameScene.forceActiveFocus();
+                    //return;
+                }
+            }
+            else
+                return;
+
+            //console.debug("!!!resume", nPauseTimes, bPlay)
+        }
+
+
+
+        function playSoundEffect(soundeffectSource) {
+            if(_private.objCacheSoundEffects[soundeffectSource]) {
+                if(game.soundeffectpausing())
+                    return;
+
+                //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
+                if(_private.objCacheSoundEffects[soundeffectSource].isPlaying)
+                    _private.objCacheSoundEffects[soundeffectSource].stop();
+                _private.objCacheSoundEffects[soundeffectSource].play();
             }
         }
 
-        //渲染视频
-        VideoOutput{
-            id: videoOutput
-
-            anchors.centerIn: parent
-            source: mediaPlayer
-            //fillMode: VideoOutput.Stretch
-            //x: 0
-            //y: 0
-
-            //width: rootGameScene.width
-            //height: rootGameScene.height
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                    mediaPlayer.pause();
-                else
-                    mediaPlayer.play();
-            }
-            onDoubleClicked: {
-                game.stopvideo();
-            }
-        }
     }
 
 
@@ -5261,9 +5325,6 @@ Rectangle {
         }
     }
 
-
-
-
     //测试脚本对话框
     Dialog {
         id: dialogScript
@@ -5303,148 +5364,72 @@ Rectangle {
 
 
 
-
-    Item {
-        id: itemBackgroundMusic
-
-        property var arrMusicStack: []  //播放音乐栈
-
-        property var objMusicPause: ({})
-
-
-        function isPlaying() {
-            return audioBackgroundMusic.playbackState === Audio.PlayingState;
-        }
-
-        function play() {
-            //bPlay = true;
-            if(GlobalLibraryJS.objectIsEmpty(objMusicPause))
-                audioBackgroundMusic.play();
-            //nPauseTimes = 0;
-        }
-
-        function stop() {
-            //bPlay = false;
-            audioBackgroundMusic.stop();
-            //nPauseTimes = 0;
-        }
-
-        function pause(name='$user') {
-            //if(objMusicPause[name] === 1)
-            //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
-            //objMusicPause[name] = (objMusicPause[name] ? objMusicPause[name] + 1 : 1);
-            objMusicPause[name] = 1;
-
-            if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
-                audioBackgroundMusic.pause();
-            //console.debug("!!!pause", nPauseTimes)
-        }
-
-        function resume(name='$user') {
-            if(name === true) {
-                objMusicPause = {};
-            }
-            else {
-                if(objMusicPause[name]) {
-                    --objMusicPause[name];
-                    if(objMusicPause[name] === 0)
-                        delete objMusicPause[name];
-                }
-                else {
-                    //rootGameScene.forceActiveFocus();
-                    //return;
-                }
-            }
-
-
-            if(GlobalLibraryJS.objectIsEmpty(objMusicPause)) {
-                if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
-                    audioBackgroundMusic.play();
-            }
-
-            //console.debug("!!!resume", nPauseTimes, bPlay)
-        }
-
-        Audio {
-            id: audioBackgroundMusic
-            loops: Audio.Infinite
-
-            onPlaybackStateChanged: {
-            }
-        }
-    }
-
-
     QtObject {  //公有数据,函数,对象等
         id: _public
 
 
 
-        function playSoundEffect(soundeffectSource) {
-            if(_private.objCacheSoundEffects[soundeffectSource]) {
-                if(_private.config.nSoundConfig !== 0)
-                    return;
-
-                //!!!鹰：手机上，如果状态为playing，貌似后面play就没声音了。。。
-                if(_private.objCacheSoundEffects[soundeffectSource].isPlaying)
-                    _private.objCacheSoundEffects[soundeffectSource].stop();
-                _private.objCacheSoundEffects[soundeffectSource].play();
-            }
-        }
-
-
         //创建Skill对象
-        //forceNew：当skill为技能对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的技能对象返回；
+        //forceNew：当skill为技能对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的技能对象返回；skill为其他类型，则会复制forceNew的属性；
         function getSkillObject(skill, forceNew=true) {
             let retSkill = null;
             if(GlobalLibraryJS.isString(skill)) {
-                if(_private.objSkills[skill] === undefined) {
+                let objSkill = GameSceneJS.objSkill(skill);
+                if(!objSkill) {
                     console.warn('没有技能：', skill);
                     return null;
                 }
 
                 //创建技能
                 retSkill = {$rid: skill};
-                if(_private.objSkills[skill].$createData)
-                    GlobalLibraryJS.copyPropertiesToObject(retSkill, _private.objSkills[skill].$createData());
-                retSkill.__proto__ = _private.objSkills[skill];
+                if(objSkill.$createData)
+                    GlobalLibraryJS.copyPropertiesToObject(retSkill, objSkill.$createData());
+                if(GlobalLibraryJS.isObject(forceNew))
+                    GlobalLibraryJS.copyPropertiesToObject(retSkill, forceNew/*, true*/);
+                retSkill.__proto__ = objSkill;
             }
             else if(GlobalLibraryJS.isObject(skill)) {
+                let objSkill;
                 //如果已是 技能对象，直接返回
-                if(skill.$rid && _private.objSkills[skill.$rid] !== undefined) {
+                if(skill.$rid && (objSkill = GameSceneJS.objSkill(skill.$rid))) {
                     if(forceNew === false) {
-                        skill.__proto__ = _private.objSkills[skill.$rid];
-                        return skill;
+                        skill.__proto__ = objSkill;
+                        retSkill = skill;
+                        //return skill;
                     }
-
-                    /*if(_private.objSkills[skill.$rid].$createData)
-                        retSkill = _private.objSkills[skill.$rid].$createData();
-                    else
+                    else {
+                        /*if(objSkill.$createData)
+                            retSkill = objSkill.$createData();
+                        else
+                            retSkill = {};
+                        */
                         retSkill = {};
-                    */
-                    retSkill = {};
-                    GlobalLibraryJS.copyPropertiesToObject(retSkill, skill/*, true*/);
-                    if(GlobalLibraryJS.isObject(forceNew))
-                        GlobalLibraryJS.copyPropertiesToObject(retSkill, forceNew/*, true*/);
-                    retSkill.__proto__ = _private.objSkills[skill.$rid];
+                        GlobalLibraryJS.copyPropertiesToObject(retSkill, skill/*, true*/);
+                        if(GlobalLibraryJS.isObject(forceNew))
+                            GlobalLibraryJS.copyPropertiesToObject(retSkill, forceNew/*, true*/);
+                        retSkill.__proto__ = objSkill;
 
-                    //return retSkill;
-                }
-
-                else if(_private.objSkills[skill.RId] === undefined) {
-                    console.warn('没有技能：', skill.RId);
-                    return null;
+                        //return retSkill;
+                    }
                 }
 
                 else {
+                    objSkill = GameSceneJS.objSkill(skill.RId);
+                    if(!objSkill) {
+                        console.warn('没有技能：', skill.RId);
+                        return null;
+                    }
+
                     //创建技能
                     retSkill = {$rid: skill.RId};
-                    if(_private.objSkills[skill.RId].$createData)
-                        GlobalLibraryJS.copyPropertiesToObject(retSkill, _private.objSkills[skill.RId].$createData(skill.Params));
+                    if(objSkill.$createData)
+                        GlobalLibraryJS.copyPropertiesToObject(retSkill, objSkill.$createData(skill.Params));
                     //delete skill.RId;
                     //delete skill.Params;
                     GlobalLibraryJS.copyPropertiesToObject(retSkill, skill, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
-                    retSkill.__proto__ = _private.objSkills[skill.RId];
+                    if(GlobalLibraryJS.isObject(forceNew))
+                        GlobalLibraryJS.copyPropertiesToObject(retSkill, forceNew/*, true*/);
+                    retSkill.__proto__ = objSkill;
                 }
             }
             else
@@ -5455,56 +5440,65 @@ Rectangle {
         }
 
         //创建Goods对象
-        //forceNew：当goods为道具对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的道具对象返回
+        //forceNew：当goods为道具对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的道具对象返回；goods为其他类型，则会复制forceNew的属性；
         function getGoodsObject(goods, forceNew=true) {
             let retGoods = null;
             if(GlobalLibraryJS.isString(goods)) {
-                if(_private.objGoods[goods] === undefined) {
+                let objGoods = GameSceneJS.objGoods(goods);
+                if(!objGoods) {
                     console.warn('没有道具：', goods);
                     return null;
                 }
 
                 retGoods = {$rid: goods};
-                if(_private.objGoods[goods].$createData)
-                    GlobalLibraryJS.copyPropertiesToObject(retGoods, _private.objGoods[goods].$createData());
-                retGoods.__proto__ = _private.objGoods[goods];
+                if(objGoods.$createData)
+                    GlobalLibraryJS.copyPropertiesToObject(retGoods, objGoods.$createData());
+                if(GlobalLibraryJS.isObject(forceNew))
+                    GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
+                retGoods.__proto__ = objGoods;
             }
             else if(GlobalLibraryJS.isObject(goods)) {
+                let objGoods;
                 //如果已是 道具对象
-                if(goods.$rid && _private.objGoods[goods.$rid] !== undefined) {
+                if(goods.$rid && (objGoods = GameSceneJS.objGoods(goods.$rid))) {
                     if(forceNew === false) {
-                        goods.__proto__ = _private.objGoods[goods.$rid];
-                        return goods;
+                        goods.__proto__ = objGoods;
+                        retGoods = goods;
+                        //return goods;
                     }
-
-                    /*
-                    if(_private.objGoods[goods.$rid].$createData)
-                        retGoods = _private.objGoods[goods.$rid].$createData();
-                    else
+                    else {
+                        /*
+                        if(objGoods.$createData)
+                            retGoods = objGoods.$createData();
+                        else
+                            retGoods = {};
+                        */
                         retGoods = {};
-                    */
-                    retGoods = {};
-                    GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
-                    if(GlobalLibraryJS.isObject(forceNew))
-                        GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
-                    retGoods.__proto__ = _private.objGoods[goods.$rid];
+                        GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
+                        if(GlobalLibraryJS.isObject(forceNew))
+                            GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
+                        retGoods.__proto__ = objGoods;
 
-                    //return retGoods;
-                }
-
-                else if(_private.objGoods[goods.RId] === undefined) {
-                    console.warn('没有道具：', goods.RId);
-                    return null;
+                        //return retGoods;
+                    }
                 }
 
                 else {
+                    objGoods = GameSceneJS.objGoods(goods.RId);
+                    if(!objGoods) {
+                        console.warn('没有道具：', goods.RId);
+                        return null;
+                    }
+
                     retGoods = {$rid: goods.RId};
-                    if(_private.objGoods[goods.RId].$createData)
-                        GlobalLibraryJS.copyPropertiesToObject(retGoods, _private.objGoods[goods.RId].$createData(goods.Params));
+                    if(objGoods.$createData)
+                        GlobalLibraryJS.copyPropertiesToObject(retGoods, objGoods.$createData(goods.Params));
                     //delete goods.RId;
                     //delete goods.Params;
                     GlobalLibraryJS.copyPropertiesToObject(retGoods, goods, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
-                    retGoods.__proto__ = _private.objGoods[goods.RId];
+                    if(GlobalLibraryJS.isObject(forceNew))
+                        GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
+                    retGoods.__proto__ = objGoods;
                 }
             }
             else
@@ -5515,7 +5509,7 @@ Rectangle {
             if(retGoods.$skills) {
                 let tskills = [];
                 for(let tskill in retGoods.$skills) {
-                    let t = _public.getSkillObject(retGoods.$skills[tskill], true);
+                    let t = _public.getSkillObject(retGoods.$skills[tskill], forceNew);
                     if(t)
                         tskills.push(t);
                 }
@@ -5524,7 +5518,7 @@ Rectangle {
             if(retGoods.$fight) {
                 let tskills = [];
                 for(let tfight in retGoods.$fight) {
-                    let t = _public.getSkillObject(retGoods.$fight[tfight], true);
+                    let t = _public.getSkillObject(retGoods.$fight[tfight], forceNew);
                     if(t)
                         tskills.push(t);
                 }
@@ -5536,11 +5530,12 @@ Rectangle {
         }
 
         //创建FightRole对象
-        //forceNew：当FightRole为战斗人物对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的战斗人物对象返回
+        //forceNew：当FightRole为战斗人物对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的战斗人物对象返回；FightRole为其他类型，则会复制forceNew的属性；
         function getFightRoleObject(fightrole, forceNew=true) {
             let retFightRole = null;
             if(GlobalLibraryJS.isString(fightrole)) {
-                if(_private.objFightRoles[fightrole] === undefined) {
+                let objFightRole = GameSceneJS.objFightRole(fightrole);
+                if(!objFightRole) {
                     console.warn('没有战斗角色：', fightrole);
                     return null;
                 }
@@ -5548,43 +5543,51 @@ Rectangle {
                 //创建战斗人物
                 retFightRole = {$rid: fightrole};
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole));
-                if(_private.objFightRoles[fightrole].$createData)
-                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole].$createData());
-                retFightRole.__proto__ = _private.objFightRoles[fightrole];
+                if(objFightRole.$createData)
+                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, objFightRole.$createData());
+                if(GlobalLibraryJS.isObject(forceNew))
+                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
+                retFightRole.__proto__ = objFightRole;
             }
             else if(GlobalLibraryJS.isObject(fightrole)) {
+                let objFightRole;
                 //如果已是 战斗人物对象，直接返回
-                if(fightrole.$rid && _private.objFightRoles[fightrole.$rid] !== undefined) {
+                if(fightrole.$rid && (objFightRole = GameSceneJS.objFightRole(fightrole.$rid))) {
                     if(forceNew === false) {
-                        fightrole.__proto__ = _private.objFightRoles[fightrole.$rid];
-                        return fightrole;
+                        fightrole.__proto__ = objFightRole;
+                        retFightRole = fightrole;
+                        //return fightrole;
                     }
+                    else {
+                        retFightRole = new _private.objCommonScripts["combatant_class"](fightrole.$rid);
+                        //if(objFightRole.$createData)
+                        //    GlobalLibraryJS.copyPropertiesToObject(retFightRole, objFightRole.$createData());
+                        GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {$$fightData: undefined, Params: undefined}}/*, true*/);
+                        if(GlobalLibraryJS.isObject(forceNew))
+                            GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
+                        retFightRole.__proto__ = objFightRole;
 
-                    retFightRole = new _private.objCommonScripts["combatant_class"](fightrole.$rid);
-                    //if(_private.objFightRoles[fightrole.$rid].$createData)
-                    //    GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole.$rid].$createData());
-                    GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {$$fightData: undefined, Params: undefined}}/*, true*/);
-                    if(GlobalLibraryJS.isObject(forceNew))
-                        GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
-                    retFightRole.__proto__ = _private.objFightRoles[fightrole.$rid];
-
-                    //return retFightRole;
+                        //return retFightRole;
+                    }
                 }
 
-                else if(_private.objFightRoles[fightrole.RId] === undefined) {
-                    console.warn('没有战斗角色：', fightrole.RId);
-                    return null;
-                }
                 else {
+                    objFightRole = GameSceneJS.objFightRole(fightrole.RId);
+                    if(!objFightRole) {
+                        console.warn('没有战斗角色：', fightrole.RId);
+                        return null;
+                    }
                     //创建战斗人物
                     retFightRole = {$rid: fightrole.RId};
                     GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole.RId));
-                    if(_private.objFightRoles[fightrole.RId].$createData)
-                        GlobalLibraryJS.copyPropertiesToObject(retFightRole, _private.objFightRoles[fightrole.RId].$createData(fightrole.Params));
+                    if(objFightRole.$createData)
+                        GlobalLibraryJS.copyPropertiesToObject(retFightRole, objFightRole.$createData(fightrole.Params));
                     //delete fightrole.RId;
                     //delete fightrole.Params;
                     GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {RId: undefined, Params: undefined, $$fightData: undefined}, filterRecursion: false});
-                    retFightRole.__proto__ = _private.objFightRoles[fightrole.RId];
+                    if(GlobalLibraryJS.isObject(forceNew))
+                        GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
+                    retFightRole.__proto__ = objFightRole;
                 }
             }
             else
@@ -5595,7 +5598,7 @@ Rectangle {
             if(retFightRole.$skills) {
                 let tskills = [];
                 for(let tt in retFightRole.$skills) {
-                    let t = _public.getSkillObject(retFightRole.$skills[tt], true);
+                    let t = _public.getSkillObject(retFightRole.$skills[tt], forceNew);
                     if(t)
                         tskills.push(t);
                 }
@@ -5604,7 +5607,7 @@ Rectangle {
             if(retFightRole.$goods) {
                 let tGoods = [];
                 for(let tt in retFightRole.$goods) {
-                    let t = _public.getGoodsObject(retFightRole.$goods[tt], true);
+                    let t = _public.getGoodsObject(retFightRole.$goods[tt], forceNew);
                     if(t)
                         tGoods.push(t);
                 }
@@ -5613,7 +5616,7 @@ Rectangle {
             if(retFightRole.$equipment) {
                 let tequipment = {};
                 for(let tt in retFightRole.$equipment) {
-                    let t = _public.getGoodsObject(retFightRole.$equipment[tt], true);
+                    let t = _public.getGoodsObject(retFightRole.$equipment[tt], forceNew);
                     if(t)
                         tequipment[tt] = t;
                 }
@@ -5630,54 +5633,64 @@ Rectangle {
         function getFightScriptObject(fightscript, forceNew=true) {
             let retFightScript = null;
             if(GlobalLibraryJS.isString(fightscript)) {
-                if(_private.objFightScripts[fightscript] === undefined) {
+                let objFightScript = GameSceneJS.objFightScript(fightscript);
+                if(!objFightScript) {
                     console.warn('没有战斗脚本：', fightscript);
                     return null;
                 }
 
                 //创建战斗脚本
                 retFightScript = {$rid: fightscript};
-                if(_private.objFightScripts[fightscript].$createData)
-                    GlobalLibraryJS.copyPropertiesToObject(retFightScript, _private.objFightScripts[fightscript].$createData());
-                retFightScript.__proto__ = _private.objFightScripts[fightscript];
+                if(objFightScript.$createData)
+                    GlobalLibraryJS.copyPropertiesToObject(retFightScript, objFightScript.$createData());
+                if(GlobalLibraryJS.isObject(forceNew))
+                    GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
+                retFightScript.__proto__ = objFightScript;
             }
             else if(GlobalLibraryJS.isObject(fightscript)) {
+                let objFightScript;
                 //如果已是 战斗脚本对象，直接返回
-                if(fightscript.$rid && _private.objFightScripts[fightscript.$rid] !== undefined) {
+                if(fightscript.$rid && (objFightScript = GameSceneJS.objFightScript(fightscript.$rid))) {
                     if(forceNew === false) {
-                        fightscript.__proto__ = _private.objFightScripts[fightscript.$rid];
-                        return fightscript;
+                        fightscript.__proto__ = objFightScript;
+                        retFightScript = fightscript;
+                        //return fightscript;
+                    }
+                    else {
+                        /*
+                        if(objFightScript.$createData)
+                            retFightScript = objFightScript.$createData(fightscript.Params);
+                        else
+                            retFightScript = {};
+                        */
+                        retFightScript = {};
+                        //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts["combatant_class"](fightscript.$rid));
+                        GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript/*, true*/);
+                        if(GlobalLibraryJS.isObject(forceNew))
+                            GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
+                        retFightScript.__proto__ = objFightScript;
+
+                        //return retFightScript;
+                    }
+                }
+
+                else {
+                    objFightScript = GameSceneJS.objFightScript(fightscript.RId);
+                    if(!objFightScript) {
+                        console.warn('没有战斗脚本：', fightscript.RId);
+                        return null;
                     }
 
-                    /*
-                    if(_private.objFightScripts[fightscript.$rid].$createData)
-                        retFightScript = _private.objFightScripts[fightscript.$rid].$createData(fightscript.Params);
-                    else
-                        retFightScript = {};
-                    */
-                    retFightScript = {};
-                    //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts["combatant_class"](fightscript.$rid));
-                    GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript/*, true*/);
-                    if(GlobalLibraryJS.isObject(forceNew))
-                        GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
-                    retFightScript.__proto__ = _private.objFightScripts[fightscript.$rid];
-
-                    //return retFightScript;
-                }
-
-                else if(_private.objFightScripts[fightscript.RId] === undefined) {
-                    console.warn('没有战斗脚本：', fightscript.RId);
-                    return null;
-                }
-                else {
                     //创建战斗脚本
                     retFightScript = {$rid: fightscript.RId};
-                    if(_private.objFightScripts[fightscript.RId].$createData)
-                        GlobalLibraryJS.copyPropertiesToObject(retFightScript, _private.objFightScripts[fightscript.RId].$createData(fightscript.Params));
+                    if(objFightScript.$createData)
+                        GlobalLibraryJS.copyPropertiesToObject(retFightScript, objFightScript.$createData(fightscript.Params));
                     //delete fightscript.RId;
                     //delete fightscript.Params;
                     GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
-                    retFightScript.__proto__ = _private.objFightScripts[fightscript.RId];
+                    if(GlobalLibraryJS.isObject(forceNew))
+                        GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
+                    retFightScript.__proto__ = objFightScript;
                 }
             }
             else
@@ -5699,12 +5712,12 @@ Rectangle {
             let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
             */
 
-            let data = _private.objSprites[spriteEffectRId];
+            let data = GameSceneJS.objSprite(spriteEffectRId);
 
             if(data) {
                 if(!spriteEffect) {
                     spriteEffect = compCacheSpriteEffect.createObject(parent);
-                    spriteEffect.s_playEffect.connect(_public.playSoundEffect);
+                    spriteEffect.s_playEffect.connect(rootSoundEffect.playSoundEffect);
                 }
 
                 spriteEffect.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
@@ -5750,14 +5763,20 @@ Rectangle {
         //游戏配置/设置
         property var config: QtObject {
             property int nInterval: 16
+
             property var objPauseNames: ({})     //暂停游戏
-            property int nSoundConfig: 0        //0为播放，>0为暂停
+
             property real rJoystickSpeed: 0.2   //开启摇杆加速功能（最低速度比例）
+
             //键盘是否可以操作
             property bool bKeyboard: true
 
             //前景地图遮挡人物透明度
             property real rMapOpacity: 1
+
+            //是否游戏提前载入所有资源
+            property int nLoadAllResources: 0
+
         }
 
         //存档m5的盐
@@ -5775,6 +5794,7 @@ Rectangle {
         property var objFightRoles: ({})        //所有战斗角色信息
         property var objGoods: ({})         //所有道具信息；格式：key为 道具资源名，每个对象属性：$rid为 道具资源名，其他是脚本返回值（$commons）
         property var objSprites: ({})       //所有特效信息；格式：key为 特效资源名，每个对象属性：$rid为 为特效资源名，$$cache为缓存{image: Image组件, music: SoundEffect组件}
+
         property var objCacheSoundEffects: ({})       //所有音效信息
 
         property var objCommonScripts: ({})     //系统用到的 通用脚本（外部脚本优先，如果没有使用 GameMakerGlobal.js的）
@@ -5786,7 +5806,7 @@ Rectangle {
 
 
 
-        //创建的 角色NPC 和 主角
+        //创建的 角色NPC 和 主角 组件容器
         property var objRoles: ({})
         property var arrMainRoles: []
 
@@ -5922,87 +5942,6 @@ Rectangle {
 
         }*/
 
-        function buttonAClicked() {
-            console.debug("[GameScene]buttonAClicked");
-
-
-            //计算是否触发地图事件
-
-            //人物面向的有效矩形
-            let usePos = Qt.rect(0,0,0,0);
-
-            //可以触发事件的最远距离
-            let maxDistance;
-
-            //人物方向
-            switch(mainRole.moveDirection) {
-            case Qt.Key_Up:
-                maxDistance = sizeMapBlockSize.height / 3;
-                usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
-                break;
-            case Qt.Key_Right:
-                maxDistance = sizeMapBlockSize.width / 3;
-                usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
-                break;
-            case Qt.Key_Down:
-                maxDistance = sizeMapBlockSize.height / 3;
-                usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
-                break;
-            case Qt.Key_Left:
-                maxDistance = sizeMapBlockSize.width / 3;
-                usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
-                break;
-            default:
-                return;
-            }
-
-            //计算人物所占的地图块
-            let usedMapBlocks = _private.fComputeUseBlocks(usePos.x, usePos.y, usePos.x + usePos.width, usePos.y + usePos.height);
-
-
-            let mainRoleUseBlocks = [];
-
-            for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
-                for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                    mainRoleUseBlocks.push(xb + yb * itemContainer.mapInfo.MapSize[0]);
-                }
-            }
-
-            //console.debug("人物占用图块：", usedMapBlocks,mainRoleUseBlocks)
-
-            //循环地图事件（优先）
-            for(let event in itemContainer.mapEventBlocks) {
-                //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
-                if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {  //如果事件触发
-                    //console.debug("[GameScene]gameEvent触发:", event, mainRoleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-                    itemContainer.gameEvent(itemContainer.mapEventBlocks[event]);   //触发事件
-                    return; //!!只执行一次事件
-                }
-                //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
-            }
-
-            //循环NPC
-            for(let r in objRoles) {
-                if(GlobalLibraryJS.checkRectangleClashed(
-                    usePos,
-                    Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
-                    0
-                )) {
-                    console.debug("[GameScene]触发NPC事件：", objRoles[r].$data.$id);
-
-                    //获得脚本（地图脚本优先级 > game.f定义的）
-                    let tScript = itemContainer.mapInfo.$$Script[objRoles[r].$data.$id];
-                    if(!tScript)
-                        tScript = game.f[objRoles[r].$data.$id];
-                    if(tScript) {
-                        game.run([tScript, objRoles[r].$data.$id], objRoles[r]);
-                        //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(objRoles[r].$data.$id));
-
-                        return; //!!只执行一次事件
-                    }
-                }
-            }
-        }
 
 
         //开始播放某个方向的精灵
@@ -6497,7 +6436,7 @@ Rectangle {
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function(){
                     if(!bTest)
-                        game.save("");  //存档
+                        game.save();  //存档
 
                     let err;
                     try {
@@ -6515,7 +6454,7 @@ Rectangle {
                     console.debug("[GameScene]Close");
 
                     if(err) {
-                        console.warn("游戏没有正常退出，但并不碍事");
+                        console.warn("游戏没有正常退出，但并不碍事：", err);
                         throw err;
                     }
                 },
@@ -6533,13 +6472,260 @@ Rectangle {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-
-
-
     }
 
 
 
+    //游戏信息框
+    Component {
+        id: compGameMsg
+
+        //游戏对话框
+        Item {
+            id: rootGameMsgDialog
+
+
+            //是否暂停了游戏
+            //property bool bPauseGame: true
+            //显示完全后延时
+            property int nKeepTime: 0
+            //显示状态：-1：停止；0：显示完毕；1：正在显示
+            property int nShowStatus: -1
+            //property alias textGameMsg: textGameMsg.text
+            //property int standardButtons: Dialog.Ok | Dialog.Cancel
+
+
+            signal accepted();
+            signal rejected();
+
+
+            function stop(type=0) {
+                messageGame.stop(type);
+            }
+
+            function show(msg, pretext, interval, keeptime, style) {
+
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$msg') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$msg;
+
+                messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                messageGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                messageGame.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+                messageGame.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+                maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+                let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
+
+                //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
+                rootGameMsgDialog.nKeepTime = keeptime || 0;
+
+                rootGameMsgDialog.nShowStatus = 1;
+
+
+
+                rootGameMsgDialog.visible = true;
+                //touchAreaGameMsg.enabled = false;
+                messageGame.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, rootGameMsgDialog.nKeepTime, type);
+                //FrameManager.wait(-1);
+
+            }
+
+            function clicked() {
+                //显示完毕，则关闭
+                if(rootGameMsgDialog.nShowStatus === 0)
+                    rootGameMsgDialog.rejected();
+                //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
+                else if(rootGameMsgDialog.nShowStatus === 1 && rootGameMsgDialog.nKeepTime === -1) {
+                    rootGameMsgDialog.nShowStatus = 0;
+                    messageGame.stop(1);
+                }
+            }
+
+
+            visible: false
+            anchors.fill: parent
+            //z: 0
+
+
+            Mask {
+                id: maskMessageGame
+
+                anchors.fill: parent
+
+                visible: color.a !== 0
+
+                color: "#7FFFFFFF"
+
+                mouseArea.onPressed: {
+                    rootGameMsgDialog.clicked();
+                }
+            }
+
+
+            Message {
+                id: messageGame
+
+                width: parent.width * 0.7
+                height: parent.height * 0.7
+                anchors.centerIn: parent
+
+
+                nMaxWidth: parent.width * 0.7
+                nMaxHeight: parent.height * 0.7
+
+
+                textArea.enabled: false
+
+                textArea.onReleased: {
+                    rootGameMsgDialog.clicked();
+                    //rootGameScene.forceActiveFocus();
+                }
+
+                onS_over: {
+                    //自动关闭
+                    if(rootGameMsgDialog.nKeepTime > 0)
+                        rootGameMsgDialog.rejected();
+                    else
+                        rootGameMsgDialog.nShowStatus = 0;
+                }
+            }
+
+
+            /*MultiPointTouchArea {
+                id: touchAreaGameMsg
+                anchors.fill: parent
+                //enabled: rootGameMsgDialog.standardButtons === Dialog.NoButton
+                enabled: false
+
+                //onPressed: {
+                onReleased: {
+                    //rootGameScene.forceActiveFocus();
+                    //显示完毕，则关闭
+                    if(rootGameMsgDialog.nShowStatus === 0)
+                        rootGameMsgDialog.rejected();
+                    //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
+                    else if(rootGameMsgDialog.nShowStatus === 1 && rootGameMsgDialog.nKeepTime === -1) {
+                        rootGameMsgDialog.nShowStatus = 0;
+                        messageGame.stop(1);
+                    }
+                }
+            }*/
+
+
+            onAccepted: {
+                //gameMap.focus = true;
+
+                rootGameMsgDialog.visible = false;
+
+                rootGameMsgDialog.nShowStatus = -1;
+
+
+                /*/*if(rootGameMsgDialog.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    rootGameMsgDialog.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                    game.goon('$msg');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }*/
+
+
+                ////FrameManager.goon();
+            }
+            onRejected: {
+                //gameMap.focus = true;
+
+                rootGameMsgDialog.visible = false;
+
+                rootGameMsgDialog.nShowStatus = -1;
+
+
+                /*/*if(rootGameMsgDialog.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    rootGameMsgDialog.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                    game.goon('$msg');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }*/
+
+
+                //FrameManager.goon();
+            }
+        }
+
+    }
+
+
+    //游戏菜单
+    Component {
+        id: compMenu
+
+        //游戏 选择框
+        Item {
+            id: itemMenu
+
+
+            //第几个Menu
+            property int nIndex
+            property alias maskMenu: maskMenu
+            property alias menuGame: menuGame
+
+
+            signal s_Choice(int index)
+
+
+            anchors.fill: parent
+            visible: false
+
+            Mask {
+                id: maskMenu
+
+                anchors.fill: parent
+
+                visible: color.a !== 0
+
+                color: "#60000000"
+            }
+
+            Rectangle {
+                //width: parent.width * 0.5
+                width: Screen.width > Screen.height ? parent.width * 0.6 : parent.width * 0.9
+                //height: parent.height * 0.5
+                height: Math.min(menuGame.implicitHeight, parent.height * 0.5)
+                anchors.centerIn: parent
+
+                clip: true
+                color: "#00000000"
+                border.color: "white"
+                radius: height / 20
+
+
+                GameMenu {
+                    id: menuGame
+
+                    //radius: itemMenu.radius
+
+                    width: parent.width
+                    height: parent.height
+
+                    colorTitleColor: "#EE00CC99"
+                    strTitle: ''
+
+                    //height: parent.height / 2
+                    //anchors.centerIn: parent
+
+                    onS_Choice: {
+                        itemMenu.s_Choice(index);
+                    }
+                }
+            }
+        }
+    }
+
+
+    //游戏按键
     Component {
         id: compButtons
 
@@ -6573,12 +6759,14 @@ Rectangle {
     }
 
 
+    //角色
     Component {
         id: compRole
 
         Role {
             id: rootRole
 
+            //头顶消息
             property Message message: Message {
                 parent: rootRole
                 visible: false
@@ -6595,6 +6783,7 @@ Rectangle {
                 }
             }
 
+            //名字
             property Text textName: Text {
                 parent: rootRole
                 visible: true
@@ -6618,14 +6807,12 @@ Rectangle {
             //property int $index: -1
             //property string $id: ''
 
+            //自定义属性（系统包含一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
             property var $data: null
             //property string $name: ''
             //property string $avatar: ''
             //property size $avatarSize: Qt.size(0, 0)
             property int $type: -1  //角色类型（1为主角，2为NPC）
-
-            //保存上个Interval碰撞的角色名（包含主角）
-            property var $$collideRoles: ({})
 
             //其他属性（用户自定义）
             property var $props: ({})
@@ -6643,10 +6830,16 @@ Rectangle {
             //0为停止；1为正常行走；2为动向移动；10为摇杆行走
             property int nActionType: 1
 
+            //目标坐标
             property point targetPos: Qt.point(-1,-1)
 
             //状态持续时间
             property int nActionStatusKeepTime: 0
+
+            //保存上个Interval碰撞的角色名（包含主角）
+            property var $$collideRoles: ({})
+
+            property var $$mapEventsTriggering: ({})    //保存正在触发的地图事件
 
 
             z: y + y1
@@ -6658,6 +6851,11 @@ Rectangle {
             //y: 100
             //width: 50
             //height: 100
+
+
+            sprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
+            actionSprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
+
 
             //spriteSrc: "./Role2.png"
             //sizeFrame: Qt.size(32, 48)
@@ -6678,24 +6876,7 @@ Rectangle {
 
 
             mouseArea.onClicked: {
-                console.debug("[GameScene]触发NPC事件：", $data.$id);
-
-                let eventName = `$${$data.$id}_click`;
-                //获得脚本（地图脚本优先级 > game.f定义的）
-                let tScript = itemContainer.mapInfo.$$Script[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(tScript) {
-                    game.run([tScript, $data.$id], rootRole);
-                    //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(objRoles[r].$name));
-
-                    return; //!!只执行一次事件
-                }
-                else {
-                    mouse.accepted = false;
-                }
+                GameSceneJS.roleClickEvent(rootRole, mouse.x, mouse.y);
             }
 
 
@@ -6732,7 +6913,10 @@ Rectangle {
             property var clicked
             property var doubleClicked
 
+
             visible: false
+
+
 
             MouseArea {
                 anchors.fill: parent
@@ -6765,7 +6949,11 @@ Rectangle {
             property var looped
             property var finished
 
+
             //visible: false
+
+            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+
 
             MouseArea {
                 anchors.fill: parent
@@ -6814,7 +7002,7 @@ Rectangle {
                 //mainRole.moveDirection = -1;
 
                 itemBackgroundMusic.resume('$sys_inactive');
-                --rootGameScene._private.config.nSoundConfig;
+                rootSoundEffect.resume('$sys_inactive');
 
                 break;
             case Qt.ApplicationInactive:    //每次窗口非激活时触发
@@ -6822,7 +7010,7 @@ Rectangle {
                 //mainRole.moveDirection = -1;
 
                 itemBackgroundMusic.pause('$sys_inactive');
-                ++rootGameScene._private.config.nSoundConfig;
+                rootSoundEffect.pause('$sys_inactive');
 
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
@@ -6845,6 +7033,7 @@ Rectangle {
         //console.debug("[GameScene]globalObject：", FrameManager.globalObject().game);
 
         FrameManager.globalObject().game = game;
+        FrameManager.globalObject().g = game;
         //FrameManager.globalObject().g = g;
 
         //console.debug("[GameScene]globalObject：", FrameManager.globalObject().game);
@@ -6856,6 +7045,7 @@ Rectangle {
         //release();
 
         delete FrameManager.globalObject().game;
+        delete FrameManager.globalObject().g;
 
         console.debug("[GameScene]Component.onDestruction");
     }

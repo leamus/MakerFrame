@@ -8,7 +8,7 @@ let data = (function() {
 
     //命令格式：
     //  key: {
-    //      command: [命令显示, 命令, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表]],
+    //      command: [命令显示, 命令, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], 编译运行函数],
     //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]}
     //          其中：
     //              类型：string、number、bool、string|number、name、json、unformatted、code、label
@@ -283,7 +283,7 @@ let data = (function() {
                                     command: ['战斗主角信息', 'game.fighthero(%1,%2)', '战斗主角信息', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@战斗角色游戏名', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）', '全部'], ['', '-1']], 'darkgreen'],
-                                        ['@方式', 'number', '1', 2, [['返回对象', '返回名字'], ['1', '2'], '1'], 'darkgreen'],
+                                        ['@方式', 'number', '0', 2, [['返回对象', '返回名字'], ['0', '1'], '0'], 'darkgreen'],
                                     ],
                                 },
                                 '获得技能': {

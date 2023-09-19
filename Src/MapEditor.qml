@@ -9,11 +9,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
-import "./Core"
-//import "File.js" as File
+import './Core'
+
+
+//import 'File.js' as File
 
 
 
@@ -207,6 +209,7 @@ Rectangle {
         //_private.nMapScaled = cfg.MapScale || 1;
         textMapScale.text = cfg.MapScale || '1';
         textMapOfRole.text = cfg.MapOfRole || '2';
+        textMapName.text = _private.strMapName;
 
         //得到size
         config.sizeMapSize = Qt.size(cfg.MapSize[0], cfg.MapSize[1]);
@@ -449,31 +452,40 @@ Rectangle {
 
     //导出地图
     function exportMap() {
-        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName.trim();
+        let newName = textMapName.text = textMapName.text.trim();
 
-        if(FrameManager.sl_qml_DirExists(path))
+        if(newName.length === 0) {
+            Platform.showToast("地图名不能为空");
+            open();
+            return;
+        }
+
+
+        let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + newName;
+
+        if(FrameManager.sl_qml_DirExists(newPath))
             ;
-        FrameManager.sl_qml_CreateFolder(path);
+        FrameManager.sl_qml_CreateFolder(newPath);
 
 
         //绘制所有 0层及以上 canvas
         canvasOutput.bExport = true;
         canvasOutput.requestPaint();
 
-        //canvasMapContainer.arrCanvasMap[0].save(path + "/output_0.png");
-        //canvasMapContainer.arrCanvasMap[1].save(path + "/output_1.png");
+        //canvasMapContainer.arrCanvasMap[0].save(newPath + "/output_0.png");
+        //canvasMapContainer.arrCanvasMap[1].save(newPath + "/output_1.png");
 
 
         let i = 0;
 
         let tmpEventList = []; //保存所有事件名 对应的 显示关键字
-        for(let i = 0; i < listmodelEventsData.count; ++i) {
+        for(i = 0; i < listmodelEventsData.count; ++i) {
             tmpEventList.push(listmodelEventsData.get(i)["EventName"]);
         }
 
         let outputData = {};
         outputData.Version = "0.6";
-        outputData.MapName = _private.strMapName;
+        outputData.MapName = newName;
         outputData.MapType = 1; //地图类型
         outputData.MapScale = parseFloat(textMapScale.text) > 0 ? parseFloat(textMapScale.text) : 1;
         outputData.MapSize = [config.sizeMapSize.width, config.sizeMapSize.height];
@@ -511,15 +523,28 @@ Rectangle {
         //!!!导出为文件
         //console.debug(JSON.stringify(outputData));
         //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), path + GameMakerGlobal.separator + 'map.json', 0);
+        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
         //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
-        console.debug("[MapEditor]exportMap ret:", ret, path + GameMakerGlobal.separator + 'map.json');
+        console.debug("[MapEditor]exportMap ret:", ret, newPath + GameMakerGlobal.separator + 'map.json');
         console.debug("[MapEditor]exportMap:", JSON.stringify(outputData));
         //console.debug("[MapEditor]exportMap objEventsData:", JSON.stringify(objEventsData));
 
 
-        ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
+        ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), newPath + GameMakerGlobal.separator + 'map.js', 0);
+
+
+        //复制可视化
+        let oldName = _private.strMapName.trim();
+        if(oldName) {
+            let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + oldName + GameMakerGlobal.separator + 'map.vjs';
+            if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                ret = FrameManager.sl_qml_CopyFile(oldFilePath, newPath + GameMakerGlobal.separator + 'map.vjs', true);
+            }
+        }
+
+
+        _private.strMapName = newName;
     }
 
 
@@ -2486,15 +2511,7 @@ Rectangle {
             root.forceActiveFocus();
 
 
-            if(textMapName.text.length === 0) {
-                Platform.showToast("地图名不能为空");
-                open();
-                return;
-            }
-
-            _private.strMapName = textMapName.text;
-
-            exportMap(_private.strMapName);
+            exportMap();
 
         }
         onRejected: {

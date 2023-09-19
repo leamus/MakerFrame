@@ -15,6 +15,8 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
+import './Core'
+
 
 //import 'File.js' as File
 
@@ -59,6 +61,7 @@ let data = (function() {
         return {
             //背景图
             $backgroundImage: 'FightScene.jpg',
+            //播放音乐名，为true表示继续播放当前地图的音乐
             $music: 'fight.mp3',
             //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
             $runAway: true,
@@ -83,6 +86,7 @@ let data = (function() {
         /*
         //背景图
         $backgroundImage: 'FightScene.jpg',
+        //播放音乐名，为true表示继续播放当前地图的音乐
         $music: 'fight.mp3',
         //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
         $runAway: true,
@@ -100,15 +104,15 @@ let data = (function() {
         */
 
 
-        FightInitScript: function *(teams, fightData) {
-            //yield fight.msg('战斗初始化事件', 0);
+        $fightInitScript: function *(teams, fightData) {
+            yield fight.msg('战斗初始化事件', 0);
         },
 
-        FightStartScript: function *(teams, fightData) {
+        $fightStartScript: function *(teams, fightData) {
             yield fight.msg('战斗开始事件');
         },
 
-        FightRoundScript: function *(round, step, teams, fightData) {
+        $fightRoundScript: function *(round, step, teams, fightData) {
             switch(step) {  //step：0，回合开始；1，选择完毕
             case 0:
                 yield fight.msg('第%1回合'.arg(round));
@@ -118,7 +122,7 @@ let data = (function() {
             }
         },
 
-        FightEndScript: function *(r, step, teams, fightData) {
+        $fightEndScript: function *(r, step, teams, fightData) {
             //step：为0是战斗结束时调用；为1时返回地图时调用
             //r中包含：result（战斗结果）、money和exp
             //  这里可以修改r，然后会传递给 通用战斗结束函数
@@ -127,10 +131,10 @@ let data = (function() {
 
             switch(step) {  //step：0，回合开始；1，选择完毕
             case 0:
-                yield fight.msg('战斗结束事件：' + r.result);
+                //yield fight.msg('战斗结束事件：' + r.result);
                 break;
             case 1:
-                yield fight.msg('返回地图事件');
+                //yield game.msg('返回地图事件');
                 break;
             }
         },
@@ -254,18 +258,29 @@ let data = (function() {
 
                 text: '保存'
                 onButtonClicked: {
-                    if(textFightScriptName.text.trim().length === 0)
+                    let newName = textFightScriptName.text = textFightScriptName.text.trim();
+
+                    if(newName.length === 0)
                         return;
 
-                    _private.strSavedName = textFightScriptName.text.trim();
 
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.js';
+                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator;
 
-                    //!!!导出为文件
-                    //console.debug(JSON.stringify(outputData));
-                    //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), filePath, 0);
-                    //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
+
+                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_script.js', 0);
+
+
+                    //复制可视化
+                    let oldName = _private.strSavedName.trim();
+                    if(oldName) {
+                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_script.vjs';
+                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_script.vjs', true);
+                        }
+                    }
+
+
+                    _private.strSavedName = newName;
 
                 }
             }

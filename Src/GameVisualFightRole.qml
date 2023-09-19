@@ -739,7 +739,7 @@ Rectangle {
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
-                    console.debug(_private.filepath + '.js', jsScript);
+                    console.debug("[GameVisualFightRole]compile:", _private.filepath, jsScript);
                 }
             }
             ColorButton {
@@ -816,7 +816,7 @@ Rectangle {
             data.Actions = actions;
 
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
 
         }
 

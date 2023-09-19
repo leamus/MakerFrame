@@ -10,6 +10,10 @@ import _Global.Button 1.0
 
 import "qrc:/QML"
 
+
+import "Core"
+
+
 import 'GameVisualScript.js' as GameVisualScriptJS
 
 
@@ -26,11 +30,15 @@ Rectangle {
     property var sysCommandsTree: []
 
 
-    //载入可视化文件
-    function loadData(filePath) {
+    function clearData() {
         listmodel.clear();
         _private.listModelData.length = 0;
+    }
 
+    //载入可视化文件
+    function loadData(filePath) {
+
+        clearData();
 
         if(filePath)
             _private.filepath = filePath;
@@ -43,11 +51,45 @@ Rectangle {
         console.debug("[GameVisualScript]filePath：", filePath);
         //console.exception("????")
 
+        //读取
         if(data && data !== '[]') {
-            _private.listModelData = JSON.parse(data);
+            let tData = JSON.parse(data);
+            if(tData.Version !== undefined && tData.Type !== undefined && tData.Data !== undefined) {
+                if(_private.loadAllVisualScripts(tData.Name) < 0) {
+                    dialogCommon.show({
+                        Msg: '未下载【%1】命令集，请下载或选择其他命令集'.arg(tData.Name),
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function(){
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    _private.loadAllVisualScripts(null);
+
+                    _private.listModelData = [{"command":"函数/生成器{","params":["*start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
+                    _private.strCommandsName = '';
+                }
+                else {
+                    _private.listModelData = tData.Data;
+                    _private.strCommandsName = tData.Name || '';
+                }
+            }
+            else {    //!!兼容旧格式
+                _private.loadAllVisualScripts(null);
+
+                _private.listModelData = tData;
+                _private.strCommandsName = '';
+            }
         }
-        else
+        else {  //新增
+            _private.loadAllVisualScripts(null);
+
             _private.listModelData = [{"command":"函数/生成器{","params":["*start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
+            _private.strCommandsName = '';
+        }
 
         _private.refreshCommandTabCount();
 
@@ -68,7 +110,7 @@ Rectangle {
         }
         */
 
-        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(_private.listModelData), _private.filepath + '.vjs', 0);
+        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 1, TypeName: 'VisualScript', Name: _private.strCommandsName, Data: _private.listModelData}), _private.filepath + '.vjs', 0);
 
         //console.debug(_private.filepath + '.vjs', JSON.stringify(_private.listModelData))
     }
@@ -86,9 +128,41 @@ Rectangle {
 
         anchors.fill: parent
 
-        spacing: 6
+        spacing: 1
 
 
+
+        Rectangle {
+            Layout.preferredHeight: textCommandsName.implicitHeight + 10
+            Layout.fillWidth: true
+
+            color: 'lightgray'
+            border.color: '#7F000000'
+
+            Text {
+                id: textCommandsName
+
+                anchors.fill: parent
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+
+                text: _private.strCommandsName || '系统'
+                font.pointSize: 10
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    let virtualScriptPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
+                    let list = FrameManager.sl_qml_listDir(virtualScriptPath, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+                    list.unshift('【系统】');
+                    l_listCommands.showList(list);
+                    l_listCommands.visible = true;
+                    l_listCommands.focus = true;
+                }
+            }
+        }
 
         //图层列表
         ListView {
@@ -120,8 +194,9 @@ Rectangle {
 
             clip: true
 
+
             //snapMode: ListView.SnapOneItem
-            orientation:ListView.Vertical
+            orientation: ListView.Vertical
 
 
             //x: 300
@@ -153,23 +228,23 @@ Rectangle {
                     //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
                 }*/
 
-                contentItem: Row {
+                contentItem: RowLayout {
+
+                    spacing: 0
 
                     anchors.fill: parent
 
+                    //颜色条
                     Rectangle {
                         height: parent.height
                         width: 6
                         color: _private.getColor(_private.arrCommandTabCount[index]) || '';
                     }
 
-                    //显示
                     Label {
-                        //anchors.fill: parent
-
-                        height: parent.height
-                        width: parent.width
-                        //x: 6
+                        //Layout.minimumWidth: _private.listModelData.length.toString().length * 12
+                        Layout.minimumWidth: 36
+                        Layout.preferredHeight: parent.height
 
                         color: "red"
                         font.pointSize: 10
@@ -178,65 +253,104 @@ Rectangle {
 
                         background: Rectangle {
                             anchors.fill: parent
-                            color: listview.currentIndex === index ? "yellow" : "white"
+                            color: _private.listSelectedCommands[index] === true ? "lightgreen" : "white"
                             //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
                         }
 
-                        //textFormat: Label.PlainText
+                        text: index + 1 + '. '
+                    }
 
-                        //font.strikeout: true
-                        text: {
-                            if(!Data)
-                                return '';
+                    //ScrollView {
+                    Flickable {
+                        id: tFlickable
 
+                        //width: parent.width
+                        Layout.fillWidth: true
+                        height: parent.height
 
-                            //命令定义
-                            let tCmdString = sysCommands[Data.command];
-                            let retString = index + '. ';
+                        clip: true
 
-                            //循环显示每一项
+                        boundsBehavior: Flickable.StopAtBounds
+                        flickableDirection: Flickable.HorizontalFlick
+                        contentWidth: tLabel.implicitWidth
+                        contentHeight: parent.height
 
-                            /*/如果是第一条，则 缩进为0
-                            if(index === 0) {
-                                listview.vStatic.nTabCount = 0;
+                        //显示
+                        Label {
+                            id: tLabel
+                            //anchors.fill: parent
+                            //x: 6
+                            width: implicitWidth
+                            height: parent.height
+
+                            color: "red"
+                            font.pointSize: 10
+                            //horizontalAlignment: Label.AlignHCenter
+                            verticalAlignment: Label.AlignVCenter
+
+                            background: Rectangle {
+                                anchors.fill: parent
+                                color: listview.currentIndex === index ? "yellow" : "white"
+                                //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
                             }
-                            else {  //缩进
-                                //如果向左缩进，则提前缩进（如果不是注释 && 有缩进设置 && 缩进后 >= 0）
-                                if(Data.status.enabled === true && tCmdString.command[3] !== undefined && tCmdString.command[3] < 0 && listview.vStatic.nTabCount + tCmdString.command[3] >= 0)
-                                    listview.vStatic.nTabCount += tCmdString.command[3];
 
-                                retString += Array(listview.vStatic.nTabCount + 1).join('-');
-                            }*/
+                            //textFormat: Label.PlainText
 
-                            //console.debug(index, _private.arrCommandTabCount)
-                            retString += Array(_private.arrCommandTabCount[index] + 1).join('&nbsp;');
+                            //font.strikeout: true
+                            text: {
+                                if(!Data)
+                                    return '';
 
 
-                            //是否启用（删除线）
-                            if(!Data.status.enabled)
-                                retString += '<s>';
-                            //显示命令和参数
-                            retString += "<font color='%1'>%2</font>  ".arg(tCmdString.command[5]).arg(GlobalLibraryJS.convertToHTML(tCmdString.command[0], ['<', '>']));
-                            for(let i in Data.params) {
-                                let paramValueText = Data.params[i];
-                                if(tCmdString.params[i][3] === 2) {
-                                    let tIndex = tCmdString.params[i][4][1].indexOf(Data.params[i]);
-                                    if(tIndex >= 0)
-                                        paramValueText = tCmdString.params[i][4][0][tIndex];
+                                //命令定义
+                                let tCmdString = sysCommands[Data.command];
+                                //let retString = index + '. ';
+                                let retString = '';
+
+                                //循环显示每一项
+
+                                /*/如果是第一条，则 缩进为0
+                                if(index === 0) {
+                                    listview.vStatic.nTabCount = 0;
                                 }
+                                else {  //缩进
+                                    //如果向左缩进，则提前缩进（如果不是注释 && 有缩进设置 && 缩进后 >= 0）
+                                    if(Data.status.enabled === true && tCmdString.command[3] !== undefined && tCmdString.command[3] < 0 && listview.vStatic.nTabCount + tCmdString.command[3] >= 0)
+                                        listview.vStatic.nTabCount += tCmdString.command[3];
 
-                                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(paramValueText, ['<', '>']));
+                                    retString += Array(listview.vStatic.nTabCount + 1).join('-');
+                                }*/
+
+                                //console.debug(index, _private.arrCommandTabCount)
+                                retString += Array(_private.arrCommandTabCount[index] + 1).join('&nbsp;');
+
+
+                                //是否启用（删除线）
+                                if(!Data.status.enabled)
+                                    retString += '<s>';
+                                //显示命令和参数
+                                retString += "<font color='%1'>%2</font>  ".arg(tCmdString.command[5]).arg(GlobalLibraryJS.convertToHTML(tCmdString.command[0], ['<', '>']));
+                                for(let i in Data.params) {
+                                    let paramValueText = Data.params[i];
+                                    if(tCmdString.params[i][3] === 2) {
+                                        let tIndex = tCmdString.params[i][4][1].indexOf(Data.params[i]);
+                                        if(tIndex >= 0)
+                                            paramValueText = tCmdString.params[i][4][0][tIndex];
+                                    }
+
+                                    retString += "<font color='%1'>%2</font>  ".arg(tCmdString.params[i][5]).arg(GlobalLibraryJS.convertToHTML(paramValueText, ['<', '>']));
+                                }
+                                if(!Data.status.enabled)
+                                    retString += '</s>';
+
+
+                                /*/向右缩进个数（如果不是注释 && 有缩进设置 && 缩进后 >= 0）
+                                if(Data.status.enabled === true && tCmdString.command[3] !== undefined && tCmdString.command[3] > 0)
+                                    listview.vStatic.nTabCount += tCmdString.command[3];
+                                */
+
+                                return retString;
                             }
-                            if(!Data.status.enabled)
-                                retString += '</s>';
-
-
-                            /*/向右缩进个数（如果不是注释 && 有缩进设置 && 缩进后 >= 0）
-                            if(Data.status.enabled === true && tCmdString.command[3] !== undefined && tCmdString.command[3] > 0)
-                                listview.vStatic.nTabCount += tCmdString.command[3];
-                            */
-
-                            return retString;
                         }
                     }
 
@@ -244,12 +358,57 @@ Rectangle {
 
 
                 MouseArea {
+                    property int lastX: 0
+
                     anchors.fill: parent
+
+                    onPressed: {
+                        lastX = mouse.x;
+
+                    }
+
+                    onReleased: {
+                        lastX = 0;
+                    }
 
                     onClicked: {
                         listview.currentIndex = index;
+
+                        if(_private.bMultiple === true) {
+                            if(_private.listSelectedCommands[index] !== true)
+                                _private.listSelectedCommands[index] = true;
+                            else
+                                delete _private.listSelectedCommands[index];
+                            _private.listSelectedCommands = _private.listSelectedCommands;
+                        }
                     }
 
+                    //左右拖动
+                    onPositionChanged: {
+                        if(pressed) {
+                            var d = mouse.x - lastX;
+
+                            //不用移动
+                            if(tFlickable.contentWidth < tFlickable.width)
+                                ;
+                            //右移过头
+                            else if(-tFlickable.contentX + d >= 0)
+                                tFlickable.contentX = 0;
+                            //左移过头
+                            else if(-tFlickable.contentX + d < -(tFlickable.contentWidth - tFlickable.width)) {
+                                //tFlickable.contentX = -tFlickable.contentWidth;  //循环了
+                                tFlickable.contentX = tFlickable.contentWidth - tFlickable.width;
+                            }
+                            else
+                                tFlickable.contentX -= d;
+
+                            lastX = mouse.x;
+
+                            //console.debug(tFlickable.width, tFlickable.contentX);
+                        }
+                    }
+
+                    //编辑
                     onDoubleClicked: {
                         _private.fCreateCommandMenu(Data.command);
 
@@ -273,6 +432,7 @@ Rectangle {
                     }
 
                 }
+
                 onClicked: {
                 }
 
@@ -287,11 +447,12 @@ Rectangle {
             //ScrollIndicator.vertical: ScrollIndicator { }
 
 
-            Rectangle {
+            /*Rectangle {
                 anchors.fill: parent
                 color: "transparent"
-                border.color: 'black'
+                border.color: 'transparent'
             }
+            */
 
         }
 
@@ -416,49 +577,35 @@ Rectangle {
                     if(!cmd)
                         return;
 
+                    let insertIndex;
                     if(listview.currentIndex === -1) {
-                        _private.listModelData.push(cmd);
-                        _private.refreshCommandTabCount();
-                        listmodel.append({Type: 6, Data: cmd});
-
-
-                        //附带指令
-                        if(sysCommands[_private.strCurrentCommand].command[7]) {
-                            for(let tcmd of sysCommands[_private.strCurrentCommand].command[7]) {
-                                cmd = _private.createCommand(tcmd, false);
-                                if(!cmd)
-                                    return;
-
-                                _private.listModelData.push(cmd);
-                                _private.refreshCommandTabCount();
-                                listmodel.append({Type: 6, Data: cmd});
-                            }
-                        }
-
+                        insertIndex = _private.listModelData.length;
                     }
                     else {
-                        _private.listModelData.splice(listview.currentIndex, 0, cmd);
-                        _private.refreshCommandTabCount();
-                        listmodel.insert(listview.currentIndex, {Type: 6, Data: cmd});
+                        insertIndex = listview.currentIndex;
+                    }
+
+                    _private.listModelData.splice(insertIndex, 0, cmd);
+                    _private.refreshCommandTabCount();
+                    listmodel.insert(insertIndex, {Type: 6, Data: cmd});
 
 
-                        //附带指令
-                        if(sysCommands[_private.strCurrentCommand].command[7]) {
-                            for(let tcmd in sysCommands[_private.strCurrentCommand].command[7]) {
-                                cmd = _private.createCommand(sysCommands[_private.strCurrentCommand].command[7][tcmd], false);
-                                if(!cmd)
-                                    return;
+                    //附带指令
+                    if(sysCommands[_private.strCurrentCommand].command[7]) {
+                        for(let tcmd in sysCommands[_private.strCurrentCommand].command[7]) {
+                            cmd = _private.createCommand(sysCommands[_private.strCurrentCommand].command[7][tcmd], false);
+                            if(!cmd)
+                                return;
 
-                                _private.listModelData.splice(listview.currentIndex + parseInt(tcmd) + 1, 0, cmd);
-                                _private.refreshCommandTabCount();
-                                listmodel.insert(listview.currentIndex + parseInt(tcmd) + 1, {Type: 6, Data: cmd});
-                            }
+                            _private.listModelData.splice(insertIndex + parseInt(tcmd) + 1, 0, cmd);
+                            _private.refreshCommandTabCount();
+                            listmodel.insert(insertIndex + parseInt(tcmd) + 1, {Type: 6, Data: cmd});
                         }
-
                     }
 
                     //listview.refresh();
 
+                    _private.listSelectedCommands = [];
                 }
             }
 
@@ -524,12 +671,91 @@ Rectangle {
                 }
             }
 
+            ColorButton {
+                text: _private.bMultiple ? "多选" : "单选"
+                font.pointSize: 9
+                onButtonClicked: {
+                    _private.bMultiple = !_private.bMultiple;
+                    if(!_private.bMultiple)
+                        _private.listSelectedCommands = [];
+                }
+            }
         }
 
 
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
+
+            ColorButton {
+                text: '复制'
+                font.pointSize: 9
+                onButtonClicked: {
+                    if(_private.listSelectedCommands.length > 0) {
+                        let data = [];
+
+                        for(let tc in _private.listSelectedCommands) {
+                            data.push(_private.listModelData[tc]);
+                        }
+
+                        if(!GlobalLibraryJS.isObject(Global.frameData.$d.GameVisualScript))
+                            Global.frameData.$d.GameVisualScript = {};
+
+                        Global.frameData.$d.GameVisualScript.CopyCommands = data;
+
+
+                        dialogCommon.show({
+                            Msg: '复制成功',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function(){
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                    }
+                    else {
+                        if(!GlobalLibraryJS.isObject(Global.frameData.$d.GameVisualScript))
+                            Global.frameData.$d.GameVisualScript = {};
+                        Global.frameData.$d.GameVisualScript.CopyCommands = [];
+                    }
+                }
+            }
+
+            ColorButton {
+                text: '粘贴'
+                font.pointSize: 9
+                onButtonClicked: {
+                    //插入的地方
+                    let insertIndex;
+                    if(listview.currentIndex === -1) {
+                        insertIndex = _private.listModelData.length;
+                    }
+                    else {
+                        insertIndex = listview.currentIndex;
+                    }
+
+
+                    //如果没有复制过
+                    if(!GlobalLibraryJS.isObject(Global.frameData.$d.GameVisualScript)) {
+                        Global.frameData.$d.GameVisualScript = {};
+                        return;
+                    }
+                    //粘贴
+                    if(Global.frameData.$d.GameVisualScript.CopyCommands && Global.frameData.$d.GameVisualScript.CopyCommands.length > 0) {
+                        _private.listModelData.splice(insertIndex, 0, ...Global.frameData.$d.GameVisualScript.CopyCommands);
+                        for(let tc in Global.frameData.$d.GameVisualScript.CopyCommands) {
+                            _private.refreshCommandTabCount();
+                            listmodel.insert(insertIndex, {Type: 6, Data: Global.frameData.$d.GameVisualScript.CopyCommands[tc]});
+                            ++insertIndex;
+                        }
+                    }
+
+                    _private.listSelectedCommands = [];
+                }
+            }
 
             ColorButton {
                 text: "保存"
@@ -556,6 +782,17 @@ Rectangle {
                     console.debug(_private.filepath + '.js', jsScript);
                 }
             }
+
+            ColorButton {
+                text: "测试"
+                font.pointSize: 9
+                onButtonClicked: {
+                    let jsScript = _private.compile();
+                    console.debug(jsScript);
+                    eval('let __tJSScript__ = function(){%1}'.arg(jsScript));
+                }
+            }
+
             ColorButton {
                 text: "关闭"
                 font.pointSize: 9
@@ -572,8 +809,20 @@ Rectangle {
 可视化脚本说明：
   1、先点击 命令，然后 填写参数 或者 长按编辑框（大部分可以长按）选择参数，再点击 追加（到最后）或 插入（到当前指令上面）来完成指令编写；
   2、每次打开可视化编辑界面，会自动载入保存的脚本，也可以手动点击 载入 按钮来重新载入；
-  3、编写完成后可以点击 保存按钮 来保存当前脚本；点击 编译 来使用当前脚本（此时上一层界面会自动替换为编译后的脚本）；
-  4、双击某命令可以修改，点击”修改“按钮替换当前命令；
+  3、双击某命令可以修改，点击”修改“按钮替换当前命令；
+  4、编写完成后可以点击 测试 来测试当前可视化脚本语法，如果有报错右下角会出现红色数字，点击后可看到详细错误；
+  5、测试没问题后可点 保存按钮 来保存当前脚本；点击 编译 来使用当前脚本（此时上一层界面会自动替换为编译后的脚本）；
+  6、语法：
+    有缩进的命令（比如 函数/生成器、块开始 等），必须有 块结束 匹配，否则语法错误；
+    所有的代码尽量写在 函数/生成器 中，不同的 函数/生成器 有不同的作用，比如：
+      *$start：表示载入事件（地图载入或游戏载入）；
+      *$地图事件名：表示主角进入地图事件块时的事件；
+      *$地图事件名_leave：表示主角离开地图事件块时的事件；
+      *$NPC名：表示主角与NPC对话时的事件；
+      *$map_click：地图点击事件；
+      *$NPC名_click：NPC点击事件；
+      *$NPC名_collide：主角与NPC或NPC与NPC的触碰事件；
+      *$NPC名_arrive：主角或NPC自动行走到达目的地时触发的事件；
 注意：
   1、必须点击 编译 才可以使用；
   2、带 *号 的参数表示是必选，反之可以省略；带 @号 的参数表示可以长按选择；
@@ -905,8 +1154,103 @@ Rectangle {
     }
 
 
+
+    //显示 预定义好的 命令的参数 的选择列表
+    L_List {
+        id: l_listParam
+
+        //保存选中的参数控件
+        property var compParam
+
+        visible: false
+
+        onClicked: {
+            //参数下标
+            let paramID = compParam.nIndex;
+
+            //如果选择类型是1，则直接用值
+            if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 1)
+                compParam.text = item;
+            //如果选择类型是2，则在列表中选择对应值
+            else if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 2)
+                compParam.text = sysCommands[_private.strCurrentCommand].params[paramID][4][1][index];
+
+
+            l_listParam.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+        }
+
+        onCanceled: {
+            l_listParam.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+        }
+    }
+
+
+    //显示 预定义好的 命令的参数 的选择列表
+    L_List {
+        id: l_listCommands
+
+        visible: false
+
+        onClicked: {
+            l_listCommands.visible = false;
+
+
+            if(index === 0 && _private.strCommandsName === '')
+                return;
+            if(item === _private.strCommandsName)
+                return;
+
+            dialogCommon.show({
+                Msg: '切换命令集会清空当前脚本，确定？',
+                Buttons: Dialog.Yes | Dialog.No/* | Dialog.Discard*/,
+                OnAccepted: function() {
+                    if(index === 0) {
+                        item = null;
+                    }
+
+                    _private.strCommandsName = item || '';
+
+                    clearData();
+                    _private.unloadAllVisualScripts();
+                    _private.loadAllVisualScripts(item);
+
+
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                },
+                OnRejected: function() {
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                },
+                OnDiscarded: function() {
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                },
+            });
+        }
+
+        onCanceled: {
+            l_listCommands.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+        }
+    }
+
     QtObject {
         id: _private
+
+
+        //命令集的名字，系统的为空字符串
+        property string strCommandsName: ''
+
+        //多选状态
+        property bool bMultiple: false
+        //多选的指令下标
+        property var listSelectedCommands: []
 
 
         //JS引擎，用来载入外部JS文件
@@ -923,7 +1267,7 @@ Rectangle {
 
 
         //根据命令计算缩进数（存到 arrCommandTabCount数组 里）
-        //!!原理：命令的存放有两处：listModelData 和 listmodel，前者用来计算命令的缩进数，后者用来显示
+        //!!原理：命令的存放有两处：listModelData 和 listmodel，前者用来计算命令的缩进数，后者用来显示，所以有顺序要求!!!
         property var arrCommandTabCount: []
         function refreshCommandTabCount() {
             let tabCount = 0;
@@ -1146,86 +1490,99 @@ Rectangle {
                 }
                 //是数字
                 else if(GlobalLibraryJS.isValidNumber(tstrCmd)) {
-
                 }
                 //console.debug('~~~tstrCmd', tstrCmd, _private.arrCommandTabCount[i])
 
                 //console.debug('params:', cmd.command.length)
 
-                //循环参数
 
-                //输出的指令下标
-                //let tmpOutputIndex = 0;
-                //循环参数组件
-                for(let j = 0; j < cmd.params.length; ++j) {
-                    //if(sysCommands[cmdKey].params[j][2] === undefined)
-                    //    continue;
-
-                    //let tParam = GlobalLibraryJS.chineseSymbols2EnglishSymbols(cmd.params[j]);
-                    let tParam = cmd.params[j];
-                    //如果参数为空
-                    if(tParam === '') {
-                        //如果这个参数不需要
-                        if(sysCommands[cmdKey].params[j][2] === false)
-                            tstrCmd = tstrCmd.arg('');
-                        else if(sysCommands[cmdKey].params[j][2] === undefined)
-                            tstrCmd = tstrCmd.arg('undefined');
-                        else if(sysCommands[cmdKey].params[j][2] === null)
-                            tstrCmd = tstrCmd.arg('null');
-                        else    //有默认值
-                            tstrCmd = tstrCmd.arg("%1".arg(sysCommands[cmdKey].params[j][2]));
-
-                        continue;
+                //如果有处理函数
+                if(GlobalLibraryJS.isFunction(sysCommands[cmdKey].command[8])) {
+                    let params = [];
+                    for(let j = 0; j < cmd.params.length; ++j) {
+                        let tParamValue = cmd.params[j];
+                        params.push(tParamValue);
                     }
-
-                    //console.debug('param:', tParam)
-                    //第1个参数，加,号
-                    //if(j > 0)
-                    //    data += ',';
-
-                    //判断参数类型
-                    switch(sysCommands[cmdKey].params[j][1]) {
-                    case 'number':
-                        tstrCmd = tstrCmd.arg(tParam);
-                        break;
-                    case 'bool':
-                        if(tParam === '0' || tParam.toLowerCase() === 'false')
-                            tstrCmd = tstrCmd.arg('false');
-                        else
-                            tstrCmd = tstrCmd.arg('true');
-                        break;
-                    case 'string':
-                        tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
-                        break;
-                    case 'string|number':
-                        if(GlobalLibraryJS.isStringNumber(tParam))
-                            tstrCmd = tstrCmd.arg("%1".arg(tParam));
-                        else
-                            tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
-                        break;
-                    case 'name':
-                    case 'json':
-                    case 'unformatted':
-                    case 'code':
-                    default:
-                        tstrCmd = tstrCmd.arg("%1".arg(tParam));
-                    }
-
-                    /*
-                    if(sysCommands[cmdKey].params[j][1] === 'number')
-                    else if(sysCommands[cmdKey].params[j][1] === 'bool') {
-                    }
-                    else if(sysCommands[cmdKey].params[j][1] === 'string')
-                    else if(sysCommands[cmdKey].params[j][1] === 'json')
-                    else if(sysCommands[cmdKey].params[j][1] === 'code')
-                    else
-                        tstrCmd = tstrCmd.arg("%1".arg(tParam));
-                    */
+                    tstrCmd = sysCommands[cmdKey].command[8](tstrCmd, params);
                 }
+                //按默认处理
+                else {
 
-                //如果命令是字符串
-                //if(GlobalLibraryJS.isString(tstrCmd))
-                //    data += ');';
+                    //循环参数
+
+                    //输出的指令下标
+                    //let tmpOutputIndex = 0;
+                    //循环参数组件
+                    for(let j = 0; j < cmd.params.length; ++j) {
+                        //if(sysCommands[cmdKey].params[j][2] === undefined)
+                        //    continue;
+
+                        //let tParam = GlobalLibraryJS.chineseSymbols2EnglishSymbols(cmd.params[j]);
+                        let tParam = cmd.params[j];
+                        //如果参数为空
+                        if(tParam === '') {
+                            //如果这个参数不需要
+                            if(sysCommands[cmdKey].params[j][2] === false)
+                                tstrCmd = tstrCmd.arg('');
+                            else if(sysCommands[cmdKey].params[j][2] === undefined)
+                                tstrCmd = tstrCmd.arg('undefined');
+                            else if(sysCommands[cmdKey].params[j][2] === null)
+                                tstrCmd = tstrCmd.arg('null');
+                            else    //有默认值
+                                tstrCmd = tstrCmd.arg("%1".arg(sysCommands[cmdKey].params[j][2]));
+
+                            continue;
+                        }
+
+                        //console.debug('param:', tParam)
+                        //第1个参数，加,号
+                        //if(j > 0)
+                        //    data += ',';
+
+                        //判断参数类型
+                        switch(sysCommands[cmdKey].params[j][1]) {
+                        case 'number':
+                            tstrCmd = tstrCmd.arg(tParam);
+                            break;
+                        case 'bool':
+                            if(tParam === '0' || tParam.toLowerCase() === 'false')
+                                tstrCmd = tstrCmd.arg('false');
+                            else
+                                tstrCmd = tstrCmd.arg('true');
+                            break;
+                        case 'string':
+                            tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
+                            break;
+                        case 'string|number':
+                            if(GlobalLibraryJS.isStringNumber(tParam))
+                                tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                            else
+                                tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
+                            break;
+                        case 'name':
+                        case 'json':
+                        case 'unformatted':
+                        case 'code':
+                        default:
+                            tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                        }
+
+                        /*
+                        if(sysCommands[cmdKey].params[j][1] === 'number')
+                        else if(sysCommands[cmdKey].params[j][1] === 'bool') {
+                        }
+                        else if(sysCommands[cmdKey].params[j][1] === 'string')
+                        else if(sysCommands[cmdKey].params[j][1] === 'json')
+                        else if(sysCommands[cmdKey].params[j][1] === 'code')
+                        else
+                            tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                        */
+                    }
+
+                    //如果命令是字符串
+                    //if(GlobalLibraryJS.isString(tstrCmd))
+                    //    data += ');';
+                }
 
 
                 if(cmd.status.enabled === false)
@@ -1268,9 +1625,14 @@ Rectangle {
 
 
 
-        //载入自定义指令集
+        //载入一个目录下 可视化的自定义命令集
         //jsPrefix：指令的key 是否携带 js脚本名
         function loadExtraVisualScripts(path, jsPrefix=true) {
+            if(!path) {
+                root.sysCommands = GameVisualScriptJS.data.sysCommands;
+                root.sysCommandsTree = GameVisualScriptJS.data.sysCommandsTree;
+                return;
+            }
 
             //循环文件
             let jsFiles = FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0);
@@ -1307,42 +1669,68 @@ Rectangle {
 
                 sysCommandsTree.push(ts.data.groupInfo);
             }
-
-        }
-    }
-
-
-    //显示 预定义好的 命令的参数 的选择列表
-    L_List {
-        id: l_listParam
-
-        //保存选中的参数控件
-        property var compParam
-
-        visible: false
-
-        onClicked: {
-            //参数下标
-            let paramID = compParam.nIndex;
-
-            //如果选择类型是1，则直接用值
-            if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 1)
-                compParam.text = item;
-            //如果选择类型是2，则在列表中选择对应值
-            else if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 2)
-                compParam.text = sysCommands[_private.strCurrentCommand].params[paramID][4][1][index];
-
-
-            l_listParam.visible = false;
-            //root.focus = true;
-            root.forceActiveFocus();
         }
 
-        onCanceled: {
-            l_listParam.visible = false;
-            //root.focus = true;
-            root.forceActiveFocus();
+
+        //载入所有的可视化脚本命令集
+        function loadAllVisualScripts(name=null) {
+            let pluginsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
+            let virtualScriptPath = pluginsPath + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
+
+
+            //1.载入对应插件指令
+            if(name) {
+                if(FrameManager.sl_qml_DirExists(virtualScriptPath + name))
+                    _private.loadExtraVisualScripts(virtualScriptPath + name + GameMakerGlobal.separator, false);
+                else
+                    return -1;
+            }
+            else {  //载入默认命令集
+                _private.loadExtraVisualScripts(null, false);
+            }
+
+
+            //2.载入自定义指令（全局）
+            let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "MakerFrame" + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
+            //console.debug(path);
+            //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
+
+            _private.loadExtraVisualScripts(path);
+
+
+            //（工程）
+
+            //3.循环三方插件根目录
+            for(let tc0 of FrameManager.sl_qml_listDir(Global.toPath(pluginsPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+                if(tc0 === '$Leamus')
+                    continue;
+
+                //循环三方插件目录
+                for(let tc1 of FrameManager.sl_qml_listDir(Global.toPath(pluginsPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+
+                    path = pluginsPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'VisualScripts' + GameMakerGlobal.separator;
+
+                    //console.debug(path);
+                    //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
+
+                    _private.loadExtraVisualScripts(path);
+
+                }
+            }
+
+            //console.debug(ts);
+            //console.debug(ts, ts.a);
+
+            return 0;
         }
+
+        function unloadAllVisualScripts() {
+            root.sysCommands = {};
+            root.sysCommandsTree = [];
+
+            _private.jsEngine.clear();
+        }
+
     }
 
 
@@ -1371,55 +1759,9 @@ Rectangle {
 
     Component.onCompleted: {
 
-        let VirtualScriptPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
-
-        //如果有插件指令，则使用，否则使用内置
-        if(FrameManager.sl_qml_DirExists(VirtualScriptPath)) {
-            _private.loadExtraVisualScripts(VirtualScriptPath, false);
-        }
-        else {
-            root.sysCommands = GameVisualScriptJS.data.sysCommands;
-            root.sysCommandsTree = GameVisualScriptJS.data.sysCommandsTree;
-        }
-
-
-
-        //载入自定义指令（全局）
-        let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "MakerFrame" + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
-        //console.debug(path);
-        //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
-
-        _private.loadExtraVisualScripts(path);
-
-
-
-        //（工程）
-        let virtualScriptPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
-
-        //循环三方根目录
-        for(let tc0 of FrameManager.sl_qml_listDir(Global.toPath(virtualScriptPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
-            if(tc0 === '$Leamus')
-                continue;
-
-            //循环三方插件目录
-            for(let tc1 of FrameManager.sl_qml_listDir(Global.toPath(virtualScriptPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
-
-                path = virtualScriptPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'VisualScripts' + GameMakerGlobal.separator;
-
-                //console.debug(path);
-                //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
-
-                _private.loadExtraVisualScripts(path);
-
-            }
-        }
-
-        //console.debug(ts);
-        //console.debug(ts, ts.a);
     }
 
     Component.onDestruction: {
-        _private.jsEngine.clear();
     }
 }
 

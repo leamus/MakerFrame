@@ -12,7 +12,6 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-
 //import 'File.js' as File
 
 
@@ -55,9 +54,8 @@ game.setinterval(16);
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);
 //game.playmusic('音乐1mp3');
-yield game.msg('Hello World');
-yield game.msg('欢迎来到鹰歌Maker，这是一个最简单的demo，如果需要体验完整游戏请点击 示例工程 或加群下载更多工程！');
-//game.goon();
+yield game.msg('Hello World<br>欢迎来到鹰歌Maker，这是一个最简单的demo，如果需要体验完整游戏请点击 示例工程 或加群下载更多工程！');
+game.goon();
 ")
             );
             textGameStartScript.toBegin();
@@ -342,7 +340,7 @@ yield game.msg('欢迎来到鹰歌Maker，这是一个最简单的demo，如果�
             loaderGameScene.focus = true;
             loaderGameScene.item.focus = true;
 
-            loaderGameScene.item.init(true);
+            loaderGameScene.item.init(true, true);
 
         }
 
@@ -517,10 +515,14 @@ function *$load() {
 
 
     Component.onCompleted: {
+        //FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
 
+        console.debug("[GameStart]Component.onCompleted");
     }
 
     Component.onDestruction: {
+        //delete FrameManager.globalObject().GameMakerGlobal;
 
+        console.debug("[GameStart]Component.onDestruction");
     }
 }

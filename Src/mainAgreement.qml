@@ -90,19 +90,19 @@ Rectangle {
     Keys.onEscapePressed: {
         s_close();
 
-        console.debug("[mainGameAbout]:Escape Key");
+        console.debug("[mainAgreement]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         s_close();
 
-        console.debug("[mainGameAbout]:Back Key");
+        console.debug("[mainAgreement]Back Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameAbout]:key:", event, event.key, event.text)
+        console.debug("[mainAgreement]key:", event, event.key, event.text)
     }
 
 

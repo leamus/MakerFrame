@@ -12,11 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
+import './Core'
 
-//import "File.js" as File
+
+//import 'File.js' as File
 
 
 
@@ -32,7 +34,7 @@ Rectangle {
     function init(fightRoleName) {
 
         if(fightRoleName) {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + fightRoleName + GameMakerGlobal.separator + "fight_role.js";
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + fightRoleName + GameMakerGlobal.separator + 'fight_role.js';
             let data = FrameManager.sl_qml_ReadFile(filePath);
 
             if(data) {
@@ -44,7 +46,7 @@ Rectangle {
             }
         }
 
-        _private.strSavedName = textFightRoleName.text = "";
+        _private.strSavedName = textFightRoleName.text = '';
         FrameManager.setPlainText(notepadFightRoleProperty.textDocument, "
 
 //闭包写法
@@ -160,7 +162,7 @@ let data = (function() {
 
 
             textArea.text: ''
-            textArea.placeholderText: "输入脚本"
+            textArea.placeholderText: '输入脚本'
         }
 
 
@@ -175,7 +177,7 @@ let data = (function() {
 
                 //Layout.preferredWidth: 60
 
-                text: "V"
+                text: 'V'
                 onButtonClicked: {
                     if(!_private.strSavedName) {
                         dialogCommon.show({
@@ -190,7 +192,7 @@ let data = (function() {
                         });
                         return;
                     }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + "fight_role.vjs";
+                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
 
                     gameVisualFightRole.forceActiveFocus();
                     gameVisualFightRole.visible = true;
@@ -203,16 +205,32 @@ let data = (function() {
 
                 //Layout.preferredWidth: 60
 
-                text: "保存"
+                text: '保存'
                 onButtonClicked: {
-                    if(textFightRoleName.text.trim().length === 0)
+                    let newName = textFightRoleName.text = textFightRoleName.text.trim();
+
+                    if(newName.length === 0)
                         return;
 
-                    _private.strSavedName = textFightRoleName.text.trim();
 
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + "fight_role.js";
+                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
 
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), filePath, 0);
+
+                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), path + newName + GameMakerGlobal.separator + 'fight_role.js', 0);
+
+
+                    //复制可视化
+                    let oldName = _private.strSavedName.trim();
+                    if(oldName) {
+                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_role.vjs';
+                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_role.vjs', true);
+                        }
+                    }
+
+
+                    _private.strSavedName = newName;
+
                 }
             }
 
@@ -222,8 +240,8 @@ let data = (function() {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                text: ""
-                placeholderText: "战斗角色名"
+                text: ''
+                placeholderText: '战斗角色名'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -275,27 +293,27 @@ let data = (function() {
     Keys.onEscapePressed: {
         s_close();
 
-        console.debug("[GameFightRole]Escape Key");
+        console.debug('[GameFightRole]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         s_close();
 
-        console.debug("[GameFightRole]Back Key");
+        console.debug('[GameFightRole]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameFightRole]Keys.onPressed:", event.key);
+        console.debug('[GameFightRole]Keys.onPressed:', event.key);
     }
     Keys.onReleased: {
-        console.debug("[GameFightRole]Keys.onReleased:", event.key);
+        console.debug('[GameFightRole]Keys.onReleased:', event.key);
     }
 
 
 
     Component.onCompleted: {
-        console.debug("[GameFightRole]Component.onCompleted");
+        console.debug('[GameFightRole]Component.onCompleted');
     }
 }
