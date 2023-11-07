@@ -246,6 +246,72 @@ let $config = {
 
 
 
+//游戏初始化（游戏开始和载入存档时调用）
+function *$gameInit() {
+
+    //每秒恢复
+    function resumeEventScript(combatant) {
+
+        if(combatant.$$propertiesWithExtra.HP[0] <= 0)
+            return;
+
+        game.addprops(combatant, {'HP': [2], 'MP': [2]});
+    }
+
+    //每秒恢复事件
+    game.addtimer('resume_event', 1000, -1, true);
+    game.gf['resume_event'] = function() {
+        for(let h in game.gd['$sys_fight_heros']) {
+            resumeEventScript(game.gd['$sys_fight_heros'][h]);
+        }
+    }
+
+
+    //点击屏幕事件
+    game.gf['$map_click'] = function(bx, by, x, y) {
+        if(game.hero(0).nActionType !== -1) {
+            let rolePos = game.hero(0).pos();
+            //简单走
+            //game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});
+            //A*算法走
+            game.hero(0, {$action: 2, $targetBlocks: game.$gameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
+        }
+    }
+
+
+    yield game.msg('合理安排时间');
+
+    game.goon();
+
+    return true;
+}
+
+
+//存档前调用
+function *$beforeSave() {
+    //game.gd['save_datetime'] = Date.now();
+    return true;
+}
+
+
+//读档前调用
+function *$beforeLoad() {
+    return true;
+}
+
+//存档后调用
+function *$afterSave() {
+    return true;
+}
+
+
+//读档后调用
+function *$afterLoad() {
+    return true;
+}
+
+
+
 //战斗角色
 function $Combatant(fightRoleRId, showName) {
     //console.debug('[FightScene]$Combatant');
@@ -581,23 +647,23 @@ function computeCombatantPropertiesWithExtra(combatant) {
     //    行走速度 = game.gd['$sys_main_roles'][0].MoveSpeed;
 
     //循环装备
-    for(let tg in combatant.$equipment) {
+    for(let te in combatant.$equipment) {
         //跳过为空的
-        if(!combatant.$equipment[tg])
+        if(!combatant.$equipment[te])
             continue;
 
-        //let goodsInfo = game.$sys.getGoodsResource(combatant.$equipment[tg].$rid);
+        //let goodsInfo = game.$sys.getGoodsResource(combatant.$equipment[te].$rid);
         //计算新属性
-        if(combatant.$equipment[tg].$equipEffectAlgorithm)
-            combatant.$equipment[tg].$equipEffectAlgorithm(combatant.$equipment[tg], combatant);
+        if(combatant.$equipment[te].$equipEffectAlgorithm)
+            combatant.$equipment[te].$equipEffectAlgorithm(combatant.$equipment[te], combatant);
 
 
         //这里可以添加判断相关套装和增加的额外属性代码
 
 
         //行走速度改变示例代码2/3
-        //if(combatant.$index === 0 && combatant.$equipment[tg].行走速度)
-        //    行走速度 += combatant.$equipment[tg].行走速度;
+        //if(combatant.$index === 0 && combatant.$equipment[te].行走速度)
+        //    行走速度 += combatant.$equipment[te].行走速度;
 
     }
 
@@ -669,7 +735,7 @@ function *$fightRolesRound(round) {
     //循环每个战斗人物
     for(let c of arrTempLoopedAllFightHeros) {
         //如果在场且HP[0] > 0，则进行战斗人物回合
-        if(c.$$fightData.$info.$index >= 0 && c.$properties.HP[0] > 0)
+        if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
             yield [c];
     }
 
@@ -756,7 +822,7 @@ function $enemyChoiceSkillsAlgorithm(combatant) {
 //      BuffName：存储的 Buff 名称，如果不同则插入，如果相同则会覆盖；
 //      Override表示是否覆盖（如果不覆盖，则 Buff名 后加时间戳来防止重复）
 function getBuff(combatant, buffCode, params={}) {
-    let buffName;
+    let buffNameKey;
     let override = (params.Override === undefined ? true : false);
     let round = params.Round || 5;
     let flags = params.Flags;
@@ -766,11 +832,11 @@ function getBuff(combatant, buffCode, params={}) {
     case 1:
         if(!game.$globalLibraryJS.isString(params.BuffName))
             params.BuffName = '$$Poison';
-        buffName = params.BuffName;
+        buffNameKey = params.BuffName;
         if(!override)
-            buffName += new Date().getTime();
+            buffNameKey += new Date().getTime();
 
-        combatant.$$fightData.$buffs[buffName] = {
+        combatant.$$fightData.$buffs[buffNameKey] = {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
@@ -783,7 +849,7 @@ function getBuff(combatant, buffCode, params={}) {
                 }
                 //伤害类型：剩余HP的多少倍
                 else if(params.HarmType === 2) {
-                    harm = combatant.$properties.HP[0] * params.HarmValue;
+                    harm = combatant.$$propertiesWithExtra.HP[0] * params.HarmValue;
                 }
                 harm = Math.round(harm);
 
@@ -804,20 +870,21 @@ function getBuff(combatant, buffCode, params={}) {
     case 2:
         if(!game.$globalLibraryJS.isString(params.BuffName))
             params.BuffName = '$$Confusion';
-        buffName = params.BuffName;
+        buffNameKey = params.BuffName;
         if(!override)
-            buffName += new Date().getTime();
+            buffNameKey += new Date().getTime();
 
-        combatant.$$fightData.$buffs[buffName] = {
+        combatant.$$fightData.$buffs[buffNameKey] = {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffAnimationEffect: function*(combatant, objBuff) {
                 //技能为普通攻击的第一个
                 let skills = fight.$sys.getCombatantSkills(combatant, [0], 0b1)[1];
+                combatant.$$fightData.$choice.$type = 3;
                 combatant.$$fightData.$choice.$attack = skills[0];
                 //目标为自己
-                combatant.$$fightData.$choice.$targets = [[combatant]];
+                combatant.$$fightData.$lastChoice.$targets = [[combatant]];
 
                 //显示
                 yield ({Type: 30, Interval: 0, Color: 'yellow', Text: params.BuffName, FontSize: 20, Combatant: combatant, Position: undefined});
@@ -833,19 +900,20 @@ function getBuff(combatant, buffCode, params={}) {
     case 3:
         if(!game.$globalLibraryJS.isString(params.BuffName))
             params.BuffName = '$$Sealing';
-        buffName = params.BuffName;
+        buffNameKey = params.BuffName;
         if(!override)
-            buffName += new Date().getTime();
+            buffNameKey += new Date().getTime();
 
-        combatant.$$fightData.$buffs[buffName] = {
+        combatant.$$fightData.$buffs[buffNameKey] = {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffAnimationEffect: function*(combatant, objBuff) {
                 //技能为 普通攻击 的最后一个
                 let skills = fight.$sys.getCombatantSkills(combatant, [0])[1];
+                combatant.$$fightData.$choice.$type = 3;
                 combatant.$$fightData.$choice.$attack = skills.pop();
-                combatant.$$fightData.$choice.$targets = undefined;
+                //combatant.$$fightData.$choice.$targets = undefined;
 
                 //显示
                 yield ({Type: 30, Interval: 0, Color: 'yellow', Text: params.BuffName, FontSize: 20, Combatant: combatant, Position: undefined});
@@ -861,16 +929,16 @@ function getBuff(combatant, buffCode, params={}) {
     case 4:
         if(!game.$globalLibraryJS.isString(params.BuffName))
             params.BuffName = '$$Sleep';
-        buffName = params.BuffName;
+        buffNameKey = params.BuffName;
         if(!override)
-            buffName += new Date().getTime();
+            buffNameKey += new Date().getTime();
 
-        combatant.$$fightData.$buffs[buffName] = {
+        combatant.$$fightData.$buffs[buffNameKey] = {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffAnimationEffect: function*(combatant, objBuff) {
-                $fightCombatantChoice(combatant, 1, false);
+                $fightCombatantSetChoice(combatant, 1, false);
                 //combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
 
@@ -889,11 +957,11 @@ function getBuff(combatant, buffCode, params={}) {
     default:
         if(!game.$globalLibraryJS.isString(params.BuffName))
             params.BuffName = '$$Properties';
-        buffName = params.BuffName;
+        buffNameKey = params.BuffName;
         if(!override)
-            buffName += new Date().getTime();
+            buffNameKey += new Date().getTime();
 
-        combatant.$$fightData.$buffs[buffName] = {
+        combatant.$$fightData.$buffs[buffNameKey] = {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
@@ -935,8 +1003,8 @@ function $combatantRoundScript(combatant, round, stage) {
     switch(stage) {
     case 0:
         //下场 的或 没血的休息
-        if(combatant.$$fightData.$info.$index < 0 || combatant.$properties.HP[0] <= 0) {
-            $fightCombatantChoice(combatant, 1, false);
+        if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
+            $fightCombatantSetChoice(combatant, 1, false);
             //combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -945,7 +1013,7 @@ function $combatantRoundScript(combatant, round, stage) {
         break;
     case 1:
         //跳过下场 的或 没血的
-        if(combatant.$$fightData.$info.$index < 0 || combatant.$properties.HP[0] <= 0) {
+        if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             //console.debug('没血');
             return null;
         }
@@ -958,7 +1026,7 @@ function $combatantRoundScript(combatant, round, stage) {
 
 //战斗人物回合脚本（主要是剧情和Buff），会在两个阶段分别执行一次；
 //round为回合数；
-//stage：0为回合开始前；1为战斗人物行动前；
+//stage：0为回合开始前；1为战斗人物行动前；2为战斗人物行动后；
 function *combatantRoundEffects(combatant, round, stage) {
 
     let buffs = combatant.$$fightData.$buffs;
@@ -986,24 +1054,20 @@ function *combatantRoundEffects(combatant, round, stage) {
         //毒
         if(tbuff.flags & 0b1000) {
             if(stage === 0) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$properties.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
                     --tbuff.round;
 
                     //毒 的 方法和参数
-                    let gen = tbuff.buffAnimationEffect(combatant, tbuff);
-                    for(let tg of gen)
-                        yield tg;
+                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
                 }
             }
         }
         //乱
         if(tbuff.flags & 0b0100) {
             if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$properties.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
                     //乱 的 方法和参数
-                    let gen = tbuff.buffAnimationEffect(combatant, tbuff);
-                    for(let tg of gen)
-                        yield tg;
+                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
                 }
             }
             else if(stage === 2)
@@ -1012,11 +1076,9 @@ function *combatantRoundEffects(combatant, round, stage) {
         //封
         if(tbuff.flags & 0b0010) {
             if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$properties.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
                     //封 的 方法和参数
-                    let gen = tbuff.buffAnimationEffect(combatant, tbuff);
-                    for(let tg of gen)
-                        yield tg;
+                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
                 }
             }
             else if(stage === 2)
@@ -1025,11 +1087,9 @@ function *combatantRoundEffects(combatant, round, stage) {
         //眠
         if(tbuff.flags & 0b0001) {
             if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$properties.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
                     //眠 的 方法和参数
-                    let gen = tbuff.buffAnimationEffect(combatant, tbuff);
-                    for(let tg of gen)
-                        yield tg;
+                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
                 }
             }
             else if(stage === 2)
@@ -1038,11 +1098,9 @@ function *combatantRoundEffects(combatant, round, stage) {
         //其他
         if(tbuff.flags & 0b10000) {
             if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$properties.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
                     //其他 的 方法和参数
-                    let gen = tbuff.buffAnimationEffect(combatant, tbuff);
-                    for(let tg of gen)
-                        yield tg;
+                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
                 }
             }
             else if(stage === 2)
@@ -1166,7 +1224,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
     let nFlags = 0;
 
     for(let ti in myCombatants) {
-        if(myCombatants[ti].$$fightData.$info.$index >= 0 && myCombatants[ti].$properties.HP[0] > 0) {
+        if(myCombatants[ti].$$fightData.$info.$index >= 0 && myCombatants[ti].$$propertiesWithExtra.HP[0] > 0) {
             nFlags |= 0b1;
             //break;
         }
@@ -1182,7 +1240,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
     let totalGoods = [];
 
     for(let ti in enemies) {
-        if(enemies[ti].$$fightData.$info.$index >= 0 && enemies[ti].$properties.HP[0] > 0) {
+        if(enemies[ti].$$fightData.$info.$index >= 0 && enemies[ti].$$propertiesWithExtra.HP[0] > 0) {
             nFlags |= 0b10;
             //break;
         }
@@ -1405,11 +1463,12 @@ function *$commonFightEndScript(r, teams, fightData) {
         //fight.myCombatants[t].$properties.EXP += r.exp;
         game.addprops(tc, {'EXP': r.exp});
 
-        //将血量设置为1
+        /*/将血量设置为1
         if(tc.$properties.HP[1] <= 0)
             tc.$properties.HP[1] = 1;
         if(tc.$properties.HP[0] <= 0)
             tc.$properties.HP[0] = 1;
+        */
 
         //去掉buffs
         //tc.$$fightData.$buffs = {};
@@ -1527,7 +1586,7 @@ function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
 
 
 //设置 战斗人物的 初始化 或 休息
-function $fightCombatantChoice(combatant, type, bSaveLast) {
+function $fightCombatantSetChoice(combatant, type, bSaveLast) {
     switch(type) {
     case -1:    //未选择
         combatant.$$fightData.$choice.$type = -1;
@@ -1572,7 +1631,7 @@ let $fightMenu = {
         function(combatantIndex) {
             let combatant = fight.myCombatants[combatantIndex];
 
-            $fightCombatantChoice(combatant, 1, true);
+            $fightCombatantSetChoice(combatant, 1, true);
             //combatant.$$fightData.$choice.$type = 1;
             //combatant.$$fightData.$choice.$attack = undefined;
             //combatant.$$fightData.$choice.$targets = undefined;
@@ -1624,6 +1683,9 @@ function $readSavesInfo(count=3) {
 
     clip: true
 
+    color: Global.style.backgroundColor
+
+
 
     MouseArea {
         anchors.fill: parent
@@ -1674,11 +1736,18 @@ function $readSavesInfo(count=3) {
 
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: notepadGameFightScriptScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: notepadGameFightScriptScript.textArea.focus ? 2 : 1
+                }
             }
 
         }
 
-        ColorButton {
+        Button {
             id: buttonSave
 
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -1686,8 +1755,8 @@ function $readSavesInfo(count=3) {
             Layout.bottomMargin: 10
 
             text: "保存"
-            onButtonClicked: {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "common_script.js", 0);
+            onClicked: {
+                _private.save();
             }
         }
 
@@ -1740,6 +1809,31 @@ function $readSavesInfo(count=3) {
     QtObject {
         id: _private
 
+
+        function save() {
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "common_script.js", 0);
+
+            return true;
+        }
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(save())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
     //配置
@@ -1751,14 +1845,14 @@ function $readSavesInfo(count=3) {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        _private.close();
 
         console.debug("[GameCommonScript]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        _private.close();
 
         console.debug("[GameCommonScript]Back Key");
         event.accepted = true;

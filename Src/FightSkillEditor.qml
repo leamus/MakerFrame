@@ -95,7 +95,7 @@ let data = (function() {
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
         /*$choiceScript: function *(skill, combatant) {
             //选择敌方
-            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$properties.HP[0] > 0)return true;return false;}});
+            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
         },
         */
@@ -206,6 +206,9 @@ let data = (function() {
 
     clip: true
 
+    color: Global.style.backgroundColor
+
+
 
     MouseArea {
         anchors.fill: parent
@@ -256,6 +259,13 @@ let data = (function() {
 
                 textArea.text: ''
                 textArea.placeholderText: '请输入算法脚本'
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: notepadGameFightSkillScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: notepadGameFightSkillScript.textArea.focus ? 2 : 1
+                }
             }
 
         }
@@ -266,14 +276,14 @@ let data = (function() {
             Layout.preferredHeight: 50
             Layout.bottomMargin: 10
 
-            ColorButton {
+            Button {
                 id: buttonVisual
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 //Layout.preferredHeight: 50
 
                 text: 'V'
-                onButtonClicked: {
+                onClicked: {
                     if(!_private.strSavedName) {
                         dialogCommon.show({
                             Msg: '请先保存',
@@ -294,37 +304,15 @@ let data = (function() {
                     gameVisualFightSkill.init(filePath);
                 }
             }
-            ColorButton {
+            Button {
                 id: buttonSave
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 //Layout.preferredHeight: 50
 
                 text: '保存'
-                onButtonClicked: {
-                    let newName = textFightSkillName.text = textFightSkillName.text.trim();
-
-                    if(newName.length === 0)
-                        return;
-
-
-                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator;
-
-
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_skill.js', 0);
-
-
-                    //复制可视化
-                    let oldName = _private.strSavedName.trim();
-                    if(oldName) {
-                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_skill.vjs';
-                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_skill.vjs', true);
-                        }
-                    }
-
-
-                    _private.strSavedName = newName;
+                onClicked: {
+                    _private.save();
                 }
             }
             TextField {
@@ -374,6 +362,54 @@ let data = (function() {
 
         //保存后的名字
         property string strSavedName: ''
+
+
+        function save() {
+            let newName = textFightSkillName.text = textFightSkillName.text.trim();
+
+            if(newName.length === 0)
+                return false;
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator;
+
+
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_skill.js', 0);
+
+
+            //复制可视化
+            let oldName = _private.strSavedName.trim();
+            if(oldName) {
+                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_skill.vjs';
+                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_skill.vjs', true);
+                }
+            }
+
+
+            _private.strSavedName = newName;
+
+            return true;
+        }
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(save())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
     //配置
@@ -385,14 +421,14 @@ let data = (function() {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        _private.close();
 
         console.debug('[GameFightSkill]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        _private.close();
 
         console.debug('[GameFightSkill]Back Key');
         event.accepted = true;

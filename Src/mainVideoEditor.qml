@@ -39,6 +39,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -65,6 +67,8 @@ Rectangle {
             model: _private.arrVideos
 
             delegate: L_ListItem {
+                height: 6.9 * Screen.pixelDensity
+                colorText: Global.style.primaryTextColor
                 text: modelData
                 bSelected: index === listview.currentIndex
                 //removeButtonVisible: modelData !== "main.qml"
@@ -132,24 +136,24 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            ColorButton {
+            Button {
                 id: buttonAddVideo
 
                 //Layout.preferredWidth: 60
 
                 text: "新增"
-                onButtonClicked: {
+                onClicked: {
                     filedialog.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonModifyVideo
 
                 //Layout.preferredWidth: 60
 
                 text: "修改"
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 
@@ -186,13 +190,13 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonPlayVideo
 
                 //Layout.preferredWidth: 60
 
                 text: "播放"
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 
@@ -206,13 +210,13 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonStopVideo
 
                 //Layout.preferredWidth: 60
 
                 text: "停止"
-                onButtonClicked: {
+                onClicked: {
                     mediaPlayer.stop();
                     itemVideo.visible = false;
                     //mediaPlayer.source = Global.toURL(GameMakerGlobal.videoResourceURL(textVideoResourceName.text));

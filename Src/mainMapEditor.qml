@@ -30,6 +30,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -40,7 +42,11 @@ Rectangle {
 
     L_List {
         id: l_listMaps
+
         //visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onCanceled: {
@@ -158,7 +164,7 @@ Rectangle {
             RowLayout {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
-                Text {
+                Label {
                     text: qsTr("地图大小（宽*高）：")
                 }
 
@@ -172,7 +178,7 @@ Rectangle {
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
                 }
-                Text {
+                Label {
                     text: qsTr("*")
                 }
                 TextField {
@@ -191,7 +197,7 @@ Rectangle {
             RowLayout {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
-                Text {
+                Label {
                     text: qsTr("地图块大小（宽*高）：")
                 }
 
@@ -206,7 +212,7 @@ Rectangle {
                     //wrapMode: TextEdit.Wrap
                 }
 
-                Text {
+                Label {
                     text: qsTr("*")
                 }
 
@@ -268,22 +274,22 @@ Rectangle {
 
             RowLayout {
                 Layout.preferredWidth: parent.width * 0.6
-                Layout.maximumWidth:  parent.width * 0.6
+                //Layout.maximumWidth:  parent.width * 0.6
                 Layout.alignment: Qt.AlignHCenter
 
-                ColorButton {
+                Button {
                     text: "选择图片"
                     Layout.fillWidth: true
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogMapData.nChoiceType = 1;
                         filedialogOpenMapBlock.open();
                         //root.forceActiveFocus();
                     }
                 }
-                ColorButton {
+                Button {
                     text: "选择素材"
                     Layout.fillWidth: true
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogMapData.nChoiceType = 2;
 
                         let path = GameMakerGlobal.mapResourceURL();
@@ -504,7 +510,11 @@ Rectangle {
 
     L_List {
         id: l_listMapBlockResource
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {

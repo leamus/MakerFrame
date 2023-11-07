@@ -32,6 +32,15 @@ Rectangle {
     }
 
 
+    anchors.fill: parent
+
+    focus: true
+
+    clip: true
+
+    color: Global.style.backgroundColor
+
+
 
     Component {
         id: compBuff
@@ -243,10 +252,10 @@ Rectangle {
                     }
                 }
 
-                ColorButton {
+                Button {
                     id: tbutton
                     text: 'x'
-                    onButtonClicked: {
+                    onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRootBuff) {
                                 _private.arrCacheComponent.splice(tc, 1);
@@ -424,10 +433,10 @@ Rectangle {
                     }
                 }
 
-                ColorButton {
+                Button {
                     id: tbutton
                     text: 'x'
-                    onButtonClicked: {
+                    onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRootEffect) {
                                 _private.arrCacheComponent.splice(tc, 1);
@@ -762,13 +771,13 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
 
-                            ColorButton {
+                            Button {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: '增加Buff效果'
 
-                                onButtonClicked: {
+                                onClicked: {
                                     let c = compBuff.createObject(layoutBuff);
                                     _private.arrCacheComponent.push(c);
                                 }
@@ -789,13 +798,13 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
 
-                            ColorButton {
+                            Button {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: '增加技能效果'
 
-                                onButtonClicked: {
+                                onClicked: {
                                     let c = compEffect.createObject(layoutEffect);
                                     _private.arrCacheComponent.push(c);
                                 }
@@ -1082,24 +1091,24 @@ Rectangle {
             Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-            ColorButton {
+            Button {
                 text: "保存"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.saveData();
                 }
             }
-            ColorButton {
+            Button {
                 text: "读取"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.loadData();
                 }
             }
-            ColorButton {
+            Button {
                 text: "编译"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let jsScript = _private.compile();
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
@@ -1107,18 +1116,18 @@ Rectangle {
                     console.debug("[GameVisualFightSkill]compile:", _private.filepath, jsScript);
                 }
             }
-            ColorButton {
+            Button {
                 text: "关闭"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.close();
                 }
             }
 
-            ColorButton {
+            Button {
                 text: "帮助"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     rootGameMaker.showMsg('
 操作说明：
   1、带 *号 的参数表示是必选，反之可以省略；带 @号 的参数表示可以长按选择；
@@ -1611,7 +1620,7 @@ let data = (function() {
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
         /*$choiceScript: function *(skill, combatant) {
             //选择敌方
-            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$properties.HP[0] > 0)return true;return false;}});
+            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
         },
         */
@@ -1728,7 +1737,7 @@ $$check$$
             //每个被攻击显示 kill 特效
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$properties.HP[0] <= 0)
+                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
 
                 //kill 特效，1次，同步播放，对方位置，特效ID
@@ -1737,7 +1746,7 @@ $$check$$
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$properties.HP[0] <= 0)
+                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
                 //Params：传递给通用算法的参数
                 SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
@@ -1792,7 +1801,7 @@ $$addprops$$
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$properties.HP[0] <= 0)
+                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
                 //kill 特效，1次，等待播放结束，对方位置，特效ID
                 //yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 100, RId: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
@@ -1806,7 +1815,7 @@ $$addprops$$
             //每个被攻击Buffs
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$properties.HP[0] <= 0)
+                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
 $$buffs$$
             }

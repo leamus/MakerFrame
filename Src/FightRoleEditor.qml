@@ -124,6 +124,8 @@ let data = (function() {
 
     clip: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -163,6 +165,13 @@ let data = (function() {
 
             textArea.text: ''
             textArea.placeholderText: '输入脚本'
+
+            textArea.background: Rectangle {
+                //color: 'transparent'
+                color: Global.style.backgroundColor
+                border.color: notepadFightRoleProperty.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                border.width: notepadFightRoleProperty.textArea.focus ? 2 : 1
+            }
         }
 
 
@@ -172,13 +181,13 @@ let data = (function() {
             Layout.preferredHeight: 50
             Layout.bottomMargin: 10
 
-            ColorButton {
+            Button {
                 id: buttonVisual
 
                 //Layout.preferredWidth: 60
 
                 text: 'V'
-                onButtonClicked: {
+                onClicked: {
                     if(!_private.strSavedName) {
                         dialogCommon.show({
                             Msg: '请先保存',
@@ -200,37 +209,14 @@ let data = (function() {
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonSave
 
                 //Layout.preferredWidth: 60
 
                 text: '保存'
-                onButtonClicked: {
-                    let newName = textFightRoleName.text = textFightRoleName.text.trim();
-
-                    if(newName.length === 0)
-                        return;
-
-
-                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-
-
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), path + newName + GameMakerGlobal.separator + 'fight_role.js', 0);
-
-
-                    //复制可视化
-                    let oldName = _private.strSavedName.trim();
-                    if(oldName) {
-                        let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_role.vjs';
-                        if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                            ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_role.vjs', true);
-                        }
-                    }
-
-
-                    _private.strSavedName = newName;
-
+                onClicked: {
+                    _private.save();
                 }
             }
 
@@ -285,20 +271,68 @@ let data = (function() {
         id: _private
 
         property string strSavedName: ''
+
+
+        function save() {
+            let newName = textFightRoleName.text = textFightRoleName.text.trim();
+
+            if(newName.length === 0)
+                return false;
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
+
+
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), path + newName + GameMakerGlobal.separator + 'fight_role.js', 0);
+
+
+            //复制可视化
+            let oldName = _private.strSavedName.trim();
+            if(oldName) {
+                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_role.vjs';
+                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_role.vjs', true);
+                }
+            }
+
+
+            _private.strSavedName = newName;
+
+            return true;
+        }
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(save())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
 
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        _private.close();
 
         console.debug('[GameFightRole]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        _private.close();
 
         console.debug('[GameFightRole]Back Key');
         event.accepted = true;

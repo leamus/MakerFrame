@@ -121,6 +121,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -139,18 +141,20 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "角色图片"
-                onButtonClicked: {
+                text: "图片资源"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     dialogRoleData.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 visible: false
 
                 //Layout.fillWidth: true
@@ -158,42 +162,50 @@ Rectangle {
                 Layout.preferredHeight: 50
 
                 text: "刷新"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     _private.refreshRole();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "保存"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
 
                     dialogSaveRole.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "原图"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     if(textRoleImageURL.text)
                         _private.showImage();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "帮助"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
 
                     rootGameMaker.showMsg('
   角色大小：游戏中显示的大小（宽和高），根据你游戏整体风格来设置；
@@ -211,14 +223,16 @@ Rectangle {
                 }
             }
 
-            ColorButton {
-                visible: true
+            Button {
+                visible: Platform.compileType() === "debug" ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "Test"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     /*role.sprite.running = true;
                     console.debug("[Role]test", role.sprite, role.sprite.state, role.sprite.currentSprite)
                     console.debug(role.sprite.sprites);
@@ -241,7 +255,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "角色大小"
                 font.pointSize: _config.nLabelFontSize
@@ -252,7 +266,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "50"
                 font.pointSize: _config.nTextFontSize
@@ -269,7 +283,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "*"
                 font.pointSize: _config.nLabelFontSize
@@ -280,7 +294,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "80"
                 font.pointSize: _config.nTextFontSize
@@ -298,7 +312,7 @@ Rectangle {
                 font.pointSize: _config.nLabelFontSize
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
                 text: "X/Y轴缩放"
             }
 
@@ -307,7 +321,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "1"
                 font.pointSize: _config.nTextFontSize
@@ -326,7 +340,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "1"
                 font.pointSize: _config.nTextFontSize
@@ -349,7 +363,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "影子偏移坐标和大小"
                 font.pointSize: _config.nLabelFontSize
@@ -360,7 +374,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -379,7 +393,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -398,7 +412,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "50"
                 font.pointSize: _config.nTextFontSize
@@ -415,7 +429,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "*"
                 font.pointSize: _config.nLabelFontSize
@@ -426,7 +440,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 font.pointSize: _config.nTextFontSize
                 text: "80"
@@ -449,7 +463,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "每帧的宽高"
                 font.pointSize: _config.nLabelFontSize
@@ -460,7 +474,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "37"
                 font.pointSize: _config.nTextFontSize
@@ -477,7 +491,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "*"
                 font.pointSize: _config.nLabelFontSize
@@ -487,7 +501,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "58"
                 font.pointSize: _config.nTextFontSize
@@ -504,7 +518,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "每个方向帧数"
                 font.pointSize: _config.nLabelFontSize
@@ -515,7 +529,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "3"
                 font.pointSize: _config.nTextFontSize
@@ -540,7 +554,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "上向（列行）"
                 font.pointSize: _config.nLabelFontSize
@@ -551,7 +565,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -569,7 +583,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -585,7 +599,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "右向（列行）"
                 font.pointSize: _config.nLabelFontSize
@@ -596,7 +610,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -614,7 +628,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -637,7 +651,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "下向（列行）"
                 font.pointSize: _config.nLabelFontSize
@@ -648,7 +662,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -666,7 +680,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -682,7 +696,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "左向（列行）"
                 font.pointSize: _config.nLabelFontSize
@@ -693,7 +707,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -711,7 +725,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -734,7 +748,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "帧切换速度（ms）"
                 font.pointSize: _config.nLabelFontSize
@@ -745,7 +759,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "100"
                 font.pointSize: _config.nTextFontSize
@@ -762,7 +776,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "移动速度"
                 font.pointSize: _config.nLabelFontSize
@@ -773,7 +787,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0.1"
                 font.pointSize: _config.nTextFontSize
@@ -794,7 +808,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "影子透明度"
                 font.pointSize: _config.nLabelFontSize
@@ -805,7 +819,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0.5"
                 font.pointSize: _config.nTextFontSize
@@ -823,7 +837,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "可穿透"
                 font.pointSize: _config.nLabelFontSize
@@ -834,7 +848,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -857,7 +871,7 @@ Rectangle {
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
+                //Layout.preferredHeight: 10
 
                 text: "@头像和大小"
                 font.pointSize: _config.nLabelFontSize
@@ -869,7 +883,7 @@ Rectangle {
 
                 //Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
                 Layout.preferredWidth: 90
 
                 text: ''
@@ -905,7 +919,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: '60'
                 placeholderText: '头像宽'
@@ -930,7 +944,7 @@ Rectangle {
 
                 Layout.preferredWidth: 30
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: '60'
                 placeholderText: '头像高'
@@ -1159,17 +1173,17 @@ Rectangle {
                 Layout.preferredWidth: parent.width * 0.6
                 Layout.alignment: Qt.AlignHCenter
 
-                ColorButton {
+                Button {
                     text: "选择图片"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogRoleData.nChoiceType = 1;
                         filedialogOpenRoleImage.open();
                         //root.forceActiveFocus();
                     }
                 }
-                ColorButton {
+                Button {
                     text: "选择素材"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogRoleData.nChoiceType = 2;
 
                         let path = GameMakerGlobal.roleResourceURL();
@@ -1314,7 +1328,11 @@ Rectangle {
 
     L_List {
         id: l_listRoleResource
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {
@@ -1405,7 +1423,7 @@ Rectangle {
             width: parent.width
             RowLayout {
                 width: parent.width
-                Text {
+                Label {
                     text: qsTr("角色名：")
                 }
                 TextField {
@@ -1421,7 +1439,7 @@ Rectangle {
             }
             /*RowLayout {
                 width: parent.width
-                Text {
+                Label {
                     text: qsTr("地图缩放：")
                 }
                 TextField {
@@ -1496,8 +1514,8 @@ Rectangle {
             height: Math.min(implicitHeight, parent.height)
         }
 
-        Text {
-            color: 'white'
+        Label {
+            //color: 'white'
             text: image.implicitWidth + ' x ' + image.implicitHeight
             font.pointSize: 16
         }
@@ -1513,7 +1531,11 @@ Rectangle {
     QtObject {
         id: _private
 
+
+        property int nColumnHeight: 50
+
         //property string strRoleName: ""
+
 
         function showImage() {
             image.source = textRoleImageURL.text;
@@ -1578,7 +1600,7 @@ Rectangle {
             if(roleName.length === 0) {
                 Platform.showToast("角色名不能为空");
                 dialogSaveRole.open();
-                return;
+                return false;
             }
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
@@ -1639,7 +1661,10 @@ Rectangle {
             let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
-            console.debug("[RoleEditor]exportRole ret:", ret, filepath)
+            console.debug("[RoleEditor]exportRole ret:", ret, filepath);
+
+
+            return true;
         }
 
 
@@ -1742,6 +1767,26 @@ Rectangle {
             role.stop();
         }
 
+
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(exportRole())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
     //配置
@@ -1749,6 +1794,7 @@ Rectangle {
         id: _config
 
         property int nLabelFontSize: 10
+        property int nButtonFontSize: 12
         property int nTextFontSize: 10
     }
 
@@ -1759,12 +1805,12 @@ Rectangle {
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         console.debug("[RoleEditor]Escape Key");
-        s_close();
+        _private.close();
         event.accepted = true;
     }
     Keys.onBackPressed: {
         console.debug("[RoleEditor]Back Key");
-        s_close();
+        _private.close();
         event.accepted = true;
     }
     Keys.onPressed: {

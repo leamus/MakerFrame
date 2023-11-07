@@ -30,6 +30,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -46,7 +48,7 @@ Rectangle {
         spacing: 0
 
 
-        Text {
+        Label {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: 20
@@ -60,56 +62,56 @@ Rectangle {
             font.bold: true
             text: qsTr("教  程")
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
             text: "关于"
-            onButtonClicked: {
+            onClicked: {
                 loader.source = 'mainAbout.qml';
                 loader.visible = true;
             }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
             text: "简易教程"
-            onButtonClicked: {
+            onClicked: {
                 loader.source = 'mainEasyTutorial.qml';
                 loader.visible = true;
             }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
             text: "官方教程"
-            onButtonClicked: {
+            onClicked: {
                 Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame/blob/main/Tutorials/1/');
             }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
             text: "侠道仙缘（引擎上架游戏）"
-            onButtonClicked: {
+            onClicked: {
                 Qt.openUrlExternally('https://www.taptap.cn/app/261814');
             }
         }

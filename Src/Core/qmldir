@@ -2,9 +2,6 @@ module RPGMakerCore
 
 
 
-File 1.0 File.js
-
-
 Message 1.0 Message.qml
 GameMenu 1.0 GameMenu.qml
 Joystick 1.0 Joystick.qml

@@ -60,6 +60,9 @@ Rectangle {
 
     clip: true
 
+    color: Global.style.backgroundColor
+
+
 
     MouseArea {
         anchors.fill: parent
@@ -110,6 +113,13 @@ Rectangle {
 
                 textArea.text: ''
                 textArea.placeholderText: '请输入算法脚本'
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: notepadScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: notepadScript.textArea.focus ? 2 : 1
+                }
             }
 
         }
@@ -121,7 +131,7 @@ Rectangle {
             //Layout.maximumHeight: parent.height
             //Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 id: buttonVisual
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -129,13 +139,13 @@ Rectangle {
                 Layout.bottomMargin: 10
 
                 text: 'V'
-                onButtonClicked: {
+                onClicked: {
 
                     loaderVisualScript.show();
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonSave
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -143,33 +153,13 @@ Rectangle {
                 Layout.bottomMargin: 10
 
                 text: '保存'
-                onButtonClicked: {
-
-                    let filePath = textFilePath.text.trim();
-
-                    if(filePath.length === 0) {
-                        dialogCommon.show({
-                            Msg: '名称不能为空',
-                            Buttons: Dialog.Ok,
-                            OnAccepted: function(){
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-
-                        return;
-                    }
-
-                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + filePath;
-
-                    let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), path, 0);
+                onClicked: {
+                    _private.save();
                 }
             }
 
 
-            ColorButton {
+            Button {
                 id: buttonChoiceFile
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -177,7 +167,7 @@ Rectangle {
                 Layout.bottomMargin: 10
 
                 text: '选择文件'
-                onButtonClicked: {
+                onClicked: {
                     _private.strTmpPath = textFilePath.text;
                     _private.showList();
                 }
@@ -280,7 +270,11 @@ Rectangle {
 
     L_List {
         id: l_listExplorer
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {
@@ -403,6 +397,7 @@ Rectangle {
 
         property string strTmpPath
 
+
         function showList() {
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
@@ -419,6 +414,51 @@ Rectangle {
             l_listExplorer.visible = true;
             l_listExplorer.forceActiveFocus();
         }
+
+
+        function save() {
+            let filePath = textFilePath.text.trim();
+
+            if(filePath.length === 0) {
+                dialogCommon.show({
+                    Msg: '名称不能为空',
+                    Buttons: Dialog.Ok,
+                    OnAccepted: function(){
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
+
+                return false;
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + filePath;
+
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), path, 0);
+
+            return true;
+        }
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(save())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
     //配置
@@ -430,14 +470,14 @@ Rectangle {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        _private.close();
 
         console.debug('[mainScriptEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        _private.close();
 
         console.debug('[mainScriptEditor]Back Key');
         event.accepted = true;

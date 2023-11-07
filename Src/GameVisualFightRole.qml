@@ -32,6 +32,15 @@ Rectangle {
     }
 
 
+    anchors.fill: parent
+
+    focus: true
+
+    clip: true
+
+    color: Global.style.backgroundColor
+
+
 
     Component {
         id: comp
@@ -109,10 +118,10 @@ Rectangle {
                     }
                 }
 
-                ColorButton {
+                Button {
                     id: tbutton
                     text: 'x'
-                    onButtonClicked: {
+                    onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
                                 _private.arrCacheComponent.splice(tc, 1);
@@ -697,10 +706,10 @@ Rectangle {
                                 }
                             }
 
-                            ColorButton {
+                            Button {
                                 text: '增加'
 
-                                onButtonClicked: {
+                                onClicked: {
                                     let c = comp.createObject(layoutActionLayout);
                                     _private.arrCacheComponent.push(c);
                                 }
@@ -717,24 +726,24 @@ Rectangle {
             Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-            ColorButton {
+            Button {
                 text: "保存"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.saveData();
                 }
             }
-            ColorButton {
+            Button {
                 text: "读取"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.loadData();
                 }
             }
-            ColorButton {
+            Button {
                 text: "编译"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let jsScript = _private.compile();
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
@@ -742,18 +751,18 @@ Rectangle {
                     console.debug("[GameVisualFightRole]compile:", _private.filepath, jsScript);
                 }
             }
-            ColorButton {
+            Button {
                 text: "关闭"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.close();
                 }
             }
 
-            ColorButton {
+            Button {
                 text: "帮助"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     rootGameMaker.showMsg('
 操作说明：
   1、先点击 命令，然后 填写参数 或者 长按编辑框（大部分可以长按）选择参数，再点击 追加（到最后）或 插入（到当前指令上面）来完成指令编写；

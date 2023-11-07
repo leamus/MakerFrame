@@ -343,6 +343,13 @@ Item {
                 font.bold: true
                 text: ""
                 //wrapMode: Text.Wrap
+
+                textArea.background: Rectangle {
+                    color: 'transparent'
+                    //color: Global.style.backgroundColor
+                    //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    //border.width: debugMsg.textArea.focus ? 2 : 1
+                }
             }
 
             //战斗人物 和 道具 的竖布局

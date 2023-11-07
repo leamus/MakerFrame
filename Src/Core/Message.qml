@@ -180,11 +180,6 @@ Rectangle {
 
         color: 'transparent'
 
-        textArea.readOnly: true
-        textArea.color: 'white'
-        textArea.selectByKeyboard: false
-        textArea.selectByMouse: false
-        textArea.wrapMode: TextArea.WrapAnywhere
         font.pointSize: 16
 
         border {
@@ -192,9 +187,33 @@ Rectangle {
             //color: 'lightgray'
         }
 
+        textArea.readOnly: true
+        textArea.color: 'white'
+        textArea.selectByKeyboard: false
+        textArea.selectByMouse: false
+        textArea.wrapMode: TextArea.WrapAnywhere
+
+
+        /*
+        textArea.implicitHeight: textArea.contentHeight + 12
+        //textArea.padding : 6
+        textArea.leftPadding : 6
+        textArea.rightPadding : 6
+        textArea.topPadding : 6
+        textArea.bottomPadding: 6
+        */
+
+        textArea.background: Rectangle {
+            color: 'transparent'
+            //color: Global.style.backgroundColor
+            //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+            //border.width: debugMsg.textArea.focus ? 2 : 1
+        }
+
         /*textArea.onReleased: {
             root.s_mouseReleased();
         }*/
+
     }
 
     Timer {

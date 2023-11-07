@@ -101,9 +101,12 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
+
     //Keys.forwardTo: [canvasMapContainer]
     Keys.onEscapePressed: {
-        s_close();
+        _private.close();
 
         //focus = false;
         //loader.visible = false;
@@ -115,7 +118,7 @@ Rectangle {
         console.debug("[MapEditor]Escape Key");
     }
     Keys.onBackPressed: {
-        s_close();
+        _private.close();
 
         //focus = false;
         //loader.visible = false;
@@ -612,7 +615,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 45
                 Layout.maximumWidth: 45
                 Layout.fillWidth: true
@@ -620,13 +623,13 @@ Rectangle {
                 Layout.fillHeight: true
 
                 //x: 520
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "层+"
-                onButtonClicked: {
+                onClicked: {
                     _private.createCanvasMap(_private.initMapData([], [-1,-1,-1]));
                 }
             }
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 45
                 Layout.maximumWidth: 45
                 Layout.fillWidth: true
@@ -635,9 +638,9 @@ Rectangle {
 
                 //x: 520
                 //y: 30
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "层-"
-                onButtonClicked: {
+                onClicked: {
 
                     if(listmodelCanvasMap.count < 1)
                         return;
@@ -743,7 +746,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 55
                 Layout.maximumWidth: 55
                 Layout.fillWidth: true
@@ -753,9 +756,9 @@ Rectangle {
                 //x: 130
                 //width: 100
                 //height: 30
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "铺图"
-                onButtonClicked: {
+                onClicked: {
                     let nBlockImageCols = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width);
                     let nBlockImageRows = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.height / config.sizeMapBlockSize.height);
 
@@ -792,17 +795,17 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 60
                 Layout.maximumWidth: 60
-                //Layout.fillWidth: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 //x: 520
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "粘贴"
-                onButtonClicked: {
+                onClicked: {
                     //flickableMapBlock.visible = !flickableMapBlock.visible;
                     if(rectCopy.nCopyCanvasID >= canvasMapContainer.arrCanvasMap.length || rectCopy.nCopyCanvasID < 0)
                         return;
@@ -876,17 +879,17 @@ Rectangle {
             Layout.minimumHeight: 0
             Layout.maximumHeight: 30
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 65
                 Layout.maximumWidth: 70
-                //Layout.fillWidth: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 //x: 520
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "脚本"
-                onButtonClicked: {
+                onClicked: {
                     //textEventName.text = "$1";
                     //textCode.text = objSystemEventsData["$1"] || "";
                     //FrameManager.setPlainText(textCode.textDocument, objSystemEventsData["$1"] || "");
@@ -911,17 +914,17 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 65
                 Layout.maximumWidth: 70
-                //Layout.fillWidth: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 //x: 520
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "E+"
-                onButtonClicked: {
+                onClicked: {
                     textEventName.text = '';
 
                     dialogEvent.nEventIndex = -1;
@@ -929,18 +932,18 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 65
                 Layout.maximumWidth: 70
-                //Layout.fillWidth: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 //x: 520
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "E-"
 
-                onButtonClicked: {
+                onClicked: {
                     _private.deleteEvent(listviewEvents.currentIndex);
                 }
             }
@@ -1038,37 +1041,37 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 55
                 Layout.maximumWidth: 55
-                //Layout.fillWidth: true
-                Layout.fillHeight: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 //x: 130
                 //width: 100
                 //height: 30
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "测"
-                onButtonClicked: {
+                onClicked: {
                     loaderTestMap.item.init({map: _private.strMapName});
                     loaderTestMap.show();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 55
                 Layout.maximumWidth: 55
-                //Layout.fillWidth: true
-                Layout.fillHeight: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 //x: 130
                 //width: 100
                 //height: 30
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "H"
-                onButtonClicked: {
+                onClicked: {
 
                     rootGameMaker.showMsg('
 地图编辑器说明：
@@ -1102,19 +1105,19 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 55
                 Layout.maximumWidth: 55
+                //Layout.preferredWidth: 100
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                //Layout.preferredWidth: 100
 
                 //x: 130
                 //width: 100
                 //height: 30
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "保存"
-                onButtonClicked: {
+                onClicked: {
                     //console.debug("canvasMapContainer.nCurrentCanvasMap", canvasMapContainer.nCurrentCanvasMap);
                     //console.debug(arrMapData[canvasMapContainer.nCurrentCanvasMap][0][0]);
                     //console.debug(flickable.contentX, flickable.contentY,flickable.originX, flickable.originY);
@@ -1127,18 +1130,18 @@ Rectangle {
 
 
 
-            ColorButton {
+            Button {
                 //Layout.minimumWidth: 65
                 Layout.maximumWidth: 70
-                //Layout.fillWidth: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 visible: Platform.compileType() === "debug"
 
-                font.pointSize: _config.fontPointSize
+                font.pointSize: _config.nFontPointSize
                 text: "测试脚本"
-                onButtonClicked: {
+                onClicked: {
                     dialogRunScript.open();
                 }
             }
@@ -1146,9 +1149,9 @@ Rectangle {
             Rectangle {
                 Layout.minimumWidth: 30
                 Layout.maximumWidth: 30
-                //Layout.fillWidth: true
-                Layout.fillHeight: true
                 //Layout.preferredWidth: 100
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 //x: 130
                 //width: 100
@@ -2707,13 +2710,13 @@ Rectangle {
         ColumnLayout {
             anchors.fill: parent
 
-            ColorButton {
+            Button {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: 70
 
                 text: 'V'
 
-                onButtonClicked: {
+                onClicked: {
                     /*if(!_private.strMapName) {
                         dialogCommon.show({
                               Msg: '请先保存地图',
@@ -2750,6 +2753,13 @@ Rectangle {
 
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: textCode.textArea.focus ? 2 : 1
+                }
             }
         }
 
@@ -2889,10 +2899,10 @@ Rectangle {
 
         function show() {
             visible = true;
-            //forceActiveFocus();
+            forceActiveFocus();
             //item.forceActiveFocus();
-            focus = true;
-            item.focus = true;
+            //focus = true;
+            //item.focus = true;
         }
 
 
@@ -3145,7 +3155,24 @@ Rectangle {
             //listEventsData = listEventsData;
         }
 
-
+        function close() {
+            dialogCommon.show({
+                Msg: '退出地图编辑器？',
+                Buttons: Dialog.Yes | Dialog.No,
+                OnAccepted: function(){
+                    s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
 
@@ -3154,7 +3181,7 @@ Rectangle {
 
 
         //地图名 和 地图缩放倍数（暂存）
-        property int fontPointSize: 14
+        property int nFontPointSize: 9
 
     }
 

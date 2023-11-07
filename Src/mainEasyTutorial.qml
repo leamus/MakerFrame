@@ -30,6 +30,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -53,12 +55,8 @@ Rectangle {
             Layout.fillHeight: true
 
 
-            textArea.background: Rectangle {
-                implicitWidth: 200
-                implicitHeight: 40
-                color: "#80000000"
-                //border.color: debugMsg.textArea.enabled ? "#21be2b" : "transparent"
-            }
+            text: ''
+
             textArea.color: 'white'
             textArea.readOnly: true
 
@@ -68,17 +66,25 @@ Rectangle {
                 pointSize: 15
             }
 
-            text: ''
+            textArea.background: Rectangle {
+                //implicitWidth: 200
+                //implicitHeight: 40
+                color: "#80000000"
+                //color: 'transparent'
+                //color: Global.style.backgroundColor
+                border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                border.width: msgBox.textArea.focus ? 2 : 1
+            }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
             text: "返回"
-            onButtonClicked: {
+            onClicked: {
                 s_close();
             }
         }

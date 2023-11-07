@@ -1,18 +1,4 @@
-﻿//.pragma library //单例（只有一个实例的共享脚本，且没有任何QML文件的环境。如果不加这句，则每个引入此文件的QML都有一个此文件的实例，且环境为引入的QML文件环境）。
-//库文件不能使用 导入它的QML的上下文环境，包括C++注入的对象 和 注册的类，但全局对象可以（比如Qt）；给js全局对象注入的属性也可以（比如FrameManager.globalObject().game = game）。
-
-
-//.import "xxx.js" as Abc       //导入另一个js文件（必须有as，必须首字母大写）
-//.import "GlobalLibrary.js" as GlobalLibraryJS
-//.import "Global.js" as GlobalJS
-//let jsLevelChain = JSLevelChain;    //让外部可访问
-
-
-//.import QtQuick.Window 2.14 as Window   //导入QML模块（必须有as，必须首字母大写）
-//  （非库文件：如果没有任何.import语句，则貌似可以直接使用 QML组件，如果有一个.import，则必须导入每个对应组件才可以使用QML组件!!!）
-
-
-
+﻿
 //载入资源
 function loadResources() {
 
@@ -25,6 +11,11 @@ function loadResources() {
     if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'common_script.js')))
         tCommoncript = _private.jsEngine.load('common_script.js', Global.toURL(projectpath));
     if(tCommoncript) {
+        _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
+        _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
+        _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
+        _private.objCommonScripts["after_save"] = tCommoncript.$afterSave;
+        _private.objCommonScripts["after_load"] = tCommoncript.$afterLoad;
         _private.objCommonScripts["combatant_class"] = tCommoncript.$Combatant;
         _private.objCommonScripts["combatant_info"] = tCommoncript.$combatantInfo;
         _private.objCommonScripts["show_goods_name"] = tCommoncript.$showGoodsName;
@@ -43,7 +34,7 @@ function loadResources() {
         _private.objCommonScripts["fight_combatant_position_algorithm"] = tCommoncript.$fightCombatantPositionAlgorithm;
         _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
         _private.objCommonScripts["fight_skill_melee_position_algorithm"] = tCommoncript.$fightSkillMeleePositionAlgorithmt;
-        _private.objCommonScripts["fight_combatant_choice"] = tCommoncript.$fightCombatantChoice;
+        _private.objCommonScripts["fight_combatant_set_choice"] = tCommoncript.$fightCombatantSetChoice;
         _private.objCommonScripts["fight_menu"] = tCommoncript.$fightMenu;
         //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
         //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
@@ -75,6 +66,42 @@ function loadResources() {
         _private.objCommonScripts["use_goods_script"] = ret.commonUseGoodsScript;
         _private.objCommonScripts["equip_reserved_slots"] = ret.$equipReservedSlots;
     }*/
+    if(!_private.objCommonScripts["game_init"]) {
+        _private.objCommonScripts["game_init"] = GameMakerGlobalJS.$gameInit;
+        console.debug("[!GameScene]载入系统游戏初始化脚本");
+    }
+    else
+        console.debug("[GameScene]载入游戏初始化脚本OK");
+
+    if(!_private.objCommonScripts["before_save"]) {
+        _private.objCommonScripts["before_save"] = GameMakerGlobalJS.$beforeSave;
+        console.debug("[!GameScene]载入系统存档前脚本");
+    }
+    else
+        console.debug("[GameScene]载入存档前脚本OK");
+
+    if(!_private.objCommonScripts["before_load"]) {
+        _private.objCommonScripts["before_load"] = GameMakerGlobalJS.$beforeLoad;
+        console.debug("[!GameScene]载入系统读档前脚本");
+    }
+    else
+        console.debug("[GameScene]载入读档前脚本OK");
+
+    if(!_private.objCommonScripts["after_save"]) {
+        _private.objCommonScripts["after_save"] = GameMakerGlobalJS.$afterSave;
+        console.debug("[!GameScene]载入系统存档后脚本");
+    }
+    else
+        console.debug("[GameScene]载入存档后脚本OK");
+
+    if(!_private.objCommonScripts["after_load"]) {
+        _private.objCommonScripts["after_load"] = GameMakerGlobalJS.$afterLoad;
+        console.debug("[!GameScene]载入系统读档后脚本");
+    }
+    else
+        console.debug("[GameScene]载入读档后脚本OK");
+
+
     if(!_private.objCommonScripts["combatant_class"]) {
         _private.objCommonScripts["combatant_class"] = GameMakerGlobalJS.$Combatant;
         console.debug("[!GameScene]载入系统创建战斗角色脚本");
@@ -164,8 +191,8 @@ function loadResources() {
     else
         console.debug("[GameScene]载入战斗特效坐标算法OK");
 
-    if(!_private.objCommonScripts["fight_combatant_choice"]) {
-        _private.objCommonScripts["fight_combatant_choice"] = GameMakerGlobalJS.$fightCombatantChoice;
+    if(!_private.objCommonScripts["fight_combatant_set_choice"]) {
+        _private.objCommonScripts["fight_combatant_set_choice"] = GameMakerGlobalJS.$fightCombatantSetChoice;
         console.debug("[!GameScene]载入系统设置 战斗人物的 初始化 或 休息");
     }
     else
@@ -463,10 +490,10 @@ function loadResources() {
         //载入初始脚本
         let ts = _private.jsEngine.load('start.js', Global.toURL(projectpath));
         if(ts) {
-            _private.objCommonScripts["game_start_script"] = ts.$start || ts.start;
-            _private.objCommonScripts["game_init_script"] = ts.$init || ts.init;
-            _private.objCommonScripts["game_save_script"] = ts.$save || ts.save;
-            _private.objCommonScripts["game_load_script"] = ts.$load || ts.load;
+            _private.objCommonScripts["game_start"] = ts.$start || ts.start;
+            //_private.objCommonScripts["game_init"] = ts.$init || ts.init;
+            //_private.objCommonScripts["game_save_script"] = ts.$save || ts.save;
+            //_private.objCommonScripts["game_load_script"] = ts.$load || ts.load;
         }
     }
 
@@ -749,8 +776,9 @@ function loadResources() {
                 _private.objPlugins[tc0][tc1] = ts;
 
 
-                if(ts.$load)
+                if(ts.$load && ts.$autoLoad !== false) {
                     ts.$load();
+                }
             }
             catch(e) {
                 console.error('[!GameScene]', e);
@@ -773,7 +801,7 @@ function unloadResources() {
     //卸载扩展 插件、组件
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
-            if(_private.objPlugins[tc][tp].$unload)
+            if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false)
                 _private.objPlugins[tc][tp].$unload();
 
 
@@ -1717,40 +1745,48 @@ function onTriggered() {
         //定向移动
         if(role.nActionType === 2) {
 
-            if(role.targetPos.x < centerX) {
-                role.moveDirection = Qt.Key_Left;
-                _private.startSprite(role, role.moveDirection);
-            }
-            else if(role.targetPos.x > centerX) {
-                role.moveDirection = Qt.Key_Right;
-                _private.startSprite(role, role.moveDirection);
-            }
-            else if(role.targetPos.y < centerY) {
-                role.moveDirection = Qt.Key_Up;
-                _private.startSprite(role, role.moveDirection);
-            }
-            else if(role.targetPos.y > centerY) {
-                role.moveDirection = Qt.Key_Down;
-                _private.startSprite(role, role.moveDirection);
-            }
-            else {
-                //role.moveDirection = -1;
-                role.nActionType = 0;
-                _private.stopSprite(role);
+            do {
+                if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x < centerX) {
+                    role.moveDirection = Qt.Key_Left;
+                    _private.startSprite(role, role.moveDirection);
+                }
+                else if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x > centerX) {
+                    role.moveDirection = Qt.Key_Right;
+                    _private.startSprite(role, role.moveDirection);
+                }
+                else if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y < centerY) {
+                    role.moveDirection = Qt.Key_Up;
+                    _private.startSprite(role, role.moveDirection);
+                }
+                else if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y > centerY) {
+                    role.moveDirection = Qt.Key_Down;
+                    _private.startSprite(role, role.moveDirection);
+                }
+                else {
+                    role.targetsPos.shift();
+                    if(role.targetsPos.length === 0) {
+                        //role.moveDirection = -1;
+                        role.nActionType = 0;
+                        _private.stopSprite(role);
 
 
-                let eventName = `$${role.$data.$id}_arrive`;
-                let tScript = itemContainer.mapInfo.$$Script[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(tScript)
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色事件:' + role.$data.$id], role);
-                    //game.run([tScript, role.$name]);
+                        let eventName = `$${role.$data.$id}_arrive`;
+                        let tScript = itemContainer.mapInfo.$$Script[eventName];
+                        if(!tScript)
+                            tScript = game.f[eventName];
+                        if(!tScript)
+                            tScript = game.gf[eventName];
+                        if(tScript)
+                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色Arrive事件:' + role.$data.$id], role);
+                            //game.run([tScript, role.$name]);
+                    }
+                    else
+                        continue;
 
-                //console.debug('!!!ok, getup')
-            }
+                    //console.debug('!!!ok, getup')
+                }
+                break;
+            } while(1);
         }
 
 
@@ -1823,29 +1859,29 @@ function onTriggered() {
                 //人物移动计算（值为按键值）
                 switch(role.moveDirection) {
                 case Qt.Key_Left:
-                    if(role.targetPos.x < centerX && role.targetPos.x > centerX - offsetMove)
-                        role.x = role.targetPos.x - role.x1 - parseInt(role.width1 / 2);
+                    if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x < centerX && role.targetsPos[0].x > centerX - offsetMove)
+                        role.x = role.targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
                     else
                         role.x -= offsetMove;
                     break;
 
                 case Qt.Key_Right:
-                    if(role.targetPos.x > centerX && role.targetPos.x < centerX + offsetMove)
-                        role.x = role.targetPos.x - role.x1 - parseInt(role.width1 / 2);
+                    if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x > centerX && role.targetsPos[0].x < centerX + offsetMove)
+                        role.x = role.targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
                     else
                         role.x += offsetMove;
                     break;
 
                 case Qt.Key_Up: //同Left
-                    if(role.targetPos.y < centerY && role.targetPos.y > centerY - offsetMove)
-                        role.y = role.targetPos.y - role.y1 - parseInt(role.height1 / 2);
+                    if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y < centerY && role.targetsPos[0].y > centerY - offsetMove)
+                        role.y = role.targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
                     else
                         role.y -= offsetMove;
                     break;
 
                 case Qt.Key_Down:   //同Right
-                    if(role.targetPos.y > centerY && role.targetPos.y < centerY + offsetMove)
-                        role.y = role.targetPos.y - role.y1 - parseInt(role.height1 / 2);
+                    if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y > centerY && role.targetsPos[0].y < centerY + offsetMove)
+                        role.y = role.targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
                     else
                         role.y += offsetMove;
                     break;
@@ -2038,39 +2074,46 @@ function onTriggered() {
         let centerY = mainRole.y + mainRole.y1 + parseInt(mainRole.height1 / 2);
 
 
-        //自动行走
+        //定向移动
         if(mainRole.nActionType === 2) {
 
-            if(mainRole.targetPos.x < centerX) {
-                _private.doAction(2, Qt.Key_Left);
-            }
-            else if(mainRole.targetPos.x > centerX) {
-                _private.doAction(2, Qt.Key_Right);
-            }
-            else if(mainRole.targetPos.y < centerY) {
-                _private.doAction(2, Qt.Key_Up);
-            }
-            else if(mainRole.targetPos.y > centerY) {
-                _private.doAction(2, Qt.Key_Down);
-            }
-            else {
-                mainRole.nActionType = 0;
+            do {
+                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x < centerX) {
+                    _private.doAction(2, Qt.Key_Left);
+                }
+                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x > centerX) {
+                    _private.doAction(2, Qt.Key_Right);
+                }
+                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y < centerY) {
+                    _private.doAction(2, Qt.Key_Up);
+                }
+                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y > centerY) {
+                    _private.doAction(2, Qt.Key_Down);
+                }
+                else {
+                    mainRole.targetsPos.shift();
+                    if(mainRole.targetsPos.length === 0) {
+                        mainRole.nActionType = 0;
+                        _private.stopAction(1, -1);
 
-                _private.stopAction(1, -1);
 
+                        let eventName = `$${mainRole.$data.$id}_arrive`;
+                        let tScript = itemContainer.mapInfo.$$Script[eventName];
+                        if(!tScript)
+                            tScript = game.f[eventName];
+                        if(!tScript)
+                            tScript = game.gf[eventName];
+                        if(tScript)
+                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '主角Arrive事件:' + mainRole.$data.$id], mainRole);
+                            //game.run([tScript, mainRole.$name]);
+                    }
+                    else
+                        continue;
 
-                let eventName = `$${mainRole.$data.$id}_arrive`;
-                let tScript = itemContainer.mapInfo.$$Script[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(tScript)
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '主角事件:' + mainRole.$data.$id], mainRole);
-                    //game.run([tScript, mainRole.$name]);
-
-                //console.debug('!!!ok, getup')
-            }
+                    //console.debug('!!!ok, getup')
+                }
+                break;
+            } while(1);
         }
 
         //console.debug('moveDirection:', mainRole.moveDirection)
@@ -2130,31 +2173,31 @@ function onTriggered() {
             //人物移动计算（值为按键值）
             switch(mainRole.moveDirection) {
             case Qt.Key_Left:
-                if(mainRole.targetPos.x < centerX && mainRole.targetPos.x > centerX - offsetMove) {
-                    mainRole.x = mainRole.targetPos.x - mainRole.x1 - parseInt(mainRole.width1 / 2);
+                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x < centerX && mainRole.targetsPos[0].x > centerX - offsetMove) {
+                    mainRole.x = mainRole.targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
                 }
                 else
                     mainRole.x -= offsetMove;
                 break;
 
             case Qt.Key_Right:
-                if(mainRole.targetPos.x > centerX && mainRole.targetPos.x < centerX + offsetMove) {
-                    mainRole.x = mainRole.targetPos.x - mainRole.x1 - parseInt(mainRole.width1 / 2);
+                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x > centerX && mainRole.targetsPos[0].x < centerX + offsetMove) {
+                    mainRole.x = mainRole.targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
                 }
                 else
                     mainRole.x += offsetMove;
                 break;
 
             case Qt.Key_Up: //同Left
-                if(mainRole.targetPos.y < centerY && mainRole.targetPos.y > centerY - offsetMove)
-                    mainRole.y = mainRole.targetPos.y - mainRole.y1 - parseInt(mainRole.height1 / 2);
+                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y < centerY && mainRole.targetsPos[0].y > centerY - offsetMove)
+                    mainRole.y = mainRole.targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
                 else
                     mainRole.y -= offsetMove;
                 break;
 
             case Qt.Key_Down:   //同Right
-                if(mainRole.targetPos.y > centerY && mainRole.targetPos.y < centerY + offsetMove)
-                    mainRole.y = mainRole.targetPos.y - mainRole.y1 - parseInt(mainRole.height1 / 2);
+                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y > centerY && mainRole.targetsPos[0].y < centerY + offsetMove)
+                    mainRole.y = mainRole.targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
                 else
                     mainRole.y += offsetMove;
                 break;
@@ -2350,7 +2393,7 @@ function onTriggered() {
     //插件
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
-            if(_private.objPlugins[tc][tp].$timerTriggered)
+            if(_private.objPlugins[tc][tp].$timerTriggered && _private.objPlugins[tc][tp].$autoLoad !== false)
                 _private.objPlugins[tc][tp].$timerTriggered(realinterval);
 
     /*/精确控制下一帧（有问题）

@@ -29,6 +29,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -38,7 +40,11 @@ Rectangle {
 
     L_List {
         id: l_listSprite
+
         //visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onCanceled: {

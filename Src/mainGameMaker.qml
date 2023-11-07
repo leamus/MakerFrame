@@ -38,6 +38,8 @@ Rectangle {
 
     clip: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -51,10 +53,10 @@ Rectangle {
         width: parent.width * 0.9
         anchors.centerIn: parent
 
-        spacing: 10
+        spacing: 6
 
 
-        Text {
+        Label {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: 20
@@ -68,12 +70,12 @@ Rectangle {
             font.bold: true
             text: qsTr("鹰歌 RPG Maker 引擎")
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
         }
 
 
-        Text {
+        Label {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: 20
@@ -85,8 +87,8 @@ Rectangle {
             font.pointSize: 16
             text: qsTr("当前工程：" + GameMakerGlobal.config.strCurrentProjectName)
 
-            //horizontalAlignment: Text.AlignHCenter
-            //verticalAlignment: Text.AlignVCenter
+            //horizontalAlignment: Label.AlignHCenter
+            //verticalAlignment: Label.AlignVCenter
         }
 
 
@@ -98,7 +100,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -107,7 +109,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "新建工程"
-                onButtonClicked: {
+                onClicked: {
                     dialogCommon.msg = "输入工程名";
                     dialogCommon.input = '新建工程';
                     textinputDialogCommonInput.visible = true;
@@ -128,7 +130,7 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -137,7 +139,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "打开工程"
-                onButtonClicked: {
+                onClicked: {
                     l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, "*", 0x001 | 0x2000, 0x00);
                     l_listProjects.visible = true;
                     //l_listProjects.focus = true;
@@ -145,7 +147,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -153,8 +155,8 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "重命名工程"
-                onButtonClicked: {
+                text: "重命名"
+                onClicked: {
                     dialogCommon.msg = "输入工程名";
                     textinputDialogCommonInput.visible = true;
                     dialogCommon.input = GameMakerGlobal.config.strCurrentProjectName;
@@ -179,7 +181,7 @@ Rectangle {
 
 
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -187,8 +189,8 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            text: "地图编辑器"
-            onButtonClicked: {
+            text: "地  图"
+            onClicked: {
                 if(Platform.compileType() === "debug") {
                     _private.loadModule("mainMapEditor.qml");
                     //userMainProject.source = "mainMapEditor.qml";
@@ -208,7 +210,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -216,8 +218,8 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "角色编辑器"
-                onButtonClicked: {
+                text: "角  色"
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainRoleEditor.qml");
                         //userMainProject.source = "eventMaker.qml";
@@ -230,7 +232,7 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -238,8 +240,8 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "特效编辑器"
-                onButtonClicked: {
+                text: "特  效"
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainSpriteEditor.qml");
                         //userMainProject.source = "eventMaker.qml";
@@ -252,7 +254,7 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -260,8 +262,8 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "道具编辑器"
-                onButtonClicked: {
+                text: "道  具"
+                onClicked: {
                     /*textinputDialogCommonInput.visible = false;
                     dialogCommon.standardButtons = Dialog.Ok;
                     dialogCommon.fOnAccepted = ()=>{
@@ -297,7 +299,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -305,10 +307,10 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "战斗角色编辑器"
-                font.pointSize: 14
+                text: "战斗角色"
+                //font.pointSize: 14
 
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainFightRoleEditor.qml");
                         //userMainProject.source = "mainFightRoleEditor.qml";
@@ -321,7 +323,7 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -329,10 +331,10 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "战斗技能编辑器"
-                font.pointSize: 14
+                text: "战斗技能"
+                //font.pointSize: 14
 
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainFightSkillEditor.qml");
                         //userMainProject.source = "mainFightSkillEditor.qml";
@@ -345,7 +347,7 @@ Rectangle {
             }
 
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -353,10 +355,10 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "战斗脚本编辑器"
-                font.pointSize: 14
+                text: "战斗脚本"
+                //font.pointSize: 14
 
-                onButtonClicked: {
+                onClicked: {
                     /*textinputDialogCommonInput.visible = false;
                     dialogCommon.standardButtons = Dialog.Ok;
                     dialogCommon.fOnAccepted = ()=>{
@@ -392,15 +394,15 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 //Layout.preferredHeight: 50
                 Layout.fillHeight: true
 
-                text: "系统通用脚本"
-                onButtonClicked: {
+                text: "通用脚本"
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("GameCommonScript.qml");
                         //userMainProject.source = "GameCommonScript.qml";
@@ -412,7 +414,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -421,8 +423,8 @@ Rectangle {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "脚本编辑器"
-                onButtonClicked: {
+                text: "脚  本"
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("GameScriptEditor.qml");
                         //userMainProject.source = "GameScriptEditor.qml";
@@ -434,7 +436,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -444,7 +446,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "插件库"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainPlugins.qml");
                         //userMainProject.source = "GameScriptEditor.qml";
@@ -465,7 +467,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -474,7 +476,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "图片管理"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainImageEditor.qml");
                         //userMainProject.source = "mainImageEditor.qml";
@@ -486,7 +488,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -495,7 +497,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "音乐管理"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainMusicEditor.qml");
                         //userMainProject.source = "mainMusicEditor.qml";
@@ -507,7 +509,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -516,7 +518,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "视频管理"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainVideoEditor.qml");
                         //userMainProject.source = "mainVideoEditor.qml";
@@ -529,7 +531,7 @@ Rectangle {
             }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -538,7 +540,7 @@ Rectangle {
             Layout.fillHeight: true
 
             text: "开始游戏"
-            onButtonClicked: {
+            onClicked: {
                 if(Platform.compileType() === "debug") {
                     _private.loadModule("GameStart.qml");
                     //userMainProject.source = "GameStart.qml";
@@ -558,7 +560,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -567,7 +569,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "测试"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainGameTest.qml");
                         //userMainProject.source = "mainGameTest.qml";
@@ -579,7 +581,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -588,7 +590,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "打包项目"
-                onButtonClicked: {
+                onClicked: {
                     if(Qt.platform.os === "android") {
 
                         let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "MakerFrame" + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
@@ -705,7 +707,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -714,7 +716,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "平台分发"
-                onButtonClicked: {
+                onClicked: {
 
                     textinputDialogCommonInput.visible = false;
                     dialogCommon.standardButtons = Dialog.Ok;
@@ -749,7 +751,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -758,7 +760,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "导出工程"
-                onButtonClicked: {
+                onClicked: {
                     let ret = FrameManager.sl_qml_CompressDir(
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + ".zip",
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
@@ -781,7 +783,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -790,12 +792,12 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "导入工程"
-                onButtonClicked: {
+                onClicked: {
                     filedialogOpenProject.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -804,7 +806,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "示例工程"
-                onButtonClicked: {
+                onClicked: {
                     dialogCommon.show({
                         Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
                         Buttons: Dialog.Yes | Dialog.No,
@@ -899,7 +901,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -908,7 +910,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "教程"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainTutorial.qml");
                         //userMainProject.source = "mainTutorial.qml";
@@ -920,7 +922,7 @@ Rectangle {
                 }
             }
 
-            /*ColorButton {
+            /*Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -929,7 +931,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "关于"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainAbout.qml");
                         //userMainProject.source = "mainAbout.qml";
@@ -942,7 +944,7 @@ Rectangle {
             }
             */
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -951,7 +953,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "使用协议"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainAgreement.qml");
                         //userMainProject.source = "mainAgreement.qml";
@@ -963,7 +965,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -972,7 +974,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 text: "更新日志"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainUpdateLog.qml");
                         //userMainProject.source = "mainUpdateLog.qml";
@@ -994,7 +996,7 @@ Rectangle {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -1004,7 +1006,7 @@ Rectangle {
 
 
                 text: "简易画板"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("PaintView.qml");
                         //userMainProject.source = "mainMapEditor.qml";
@@ -1016,7 +1018,7 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
                 //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
@@ -1026,7 +1028,7 @@ Rectangle {
 
 
                 text: "简易画板2"
-                onButtonClicked: {
+                onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("NanoPaintView.qml");
                         //userMainProject.source = "mainMapEditor.qml";
@@ -1049,7 +1051,7 @@ Rectangle {
             Layout.minimumHeight: 20
             //Layout.fillHeight: true
 
-            Text {
+            Label {
                 //anchors.left: parent.left
                 //anchors.bottom: parent.bottom
                 //anchors.leftMargin: 20
@@ -1064,12 +1066,12 @@ Rectangle {
                 //width: parent.width
                 font.pointSize: 16
                 text: qsTr("Q群：654876441")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
 
             }
 
-            Text {
+            Label {
                 //anchors.right: parent.right
                 //anchors.bottom: parent.bottom
                 //anchors.rightMargin: 20
@@ -1084,15 +1086,15 @@ Rectangle {
 
                 font.pointSize: 16
                 text: qsTr("<a href='https://afdian.net/a/Leamus'>爱发电</a>")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
 
                 onLinkActivated: {
                     Qt.openUrlExternally(link);
                 }
             }
 
-            Text {
+            Label {
                 //anchors.right: parent.right
                 //anchors.bottom: parent.bottom
                 //anchors.rightMargin: 20
@@ -1107,8 +1109,8 @@ Rectangle {
 
                 font.pointSize: 16
                 text: qsTr("Ver：" + GameMakerGlobal.version)
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
 
                 MouseArea {
                     anchors.fill: parent
@@ -1144,7 +1146,12 @@ Rectangle {
     //工程目录
     L_List {
         id: l_listProjects
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
+
 
 
         onCanceled: {
@@ -1403,18 +1410,22 @@ Rectangle {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
-                    textArea.background: Rectangle {
-                        implicitWidth: 200
-                        implicitHeight: 40
-                        color: 'black'
-                        border.color: textHelpInfo.textArea.enabled ? "#21be2b" : "transparent"
-                    }
                     textArea.color: 'white'
                     textArea.readOnly: true
                     textArea.selectByMouse: false
 
                     textArea.text: ''
                     textArea.placeholderText: ""
+
+                    textArea.background: Rectangle {
+                        //implicitWidth: 200
+                        //implicitHeight: 40
+                        color: 'black'
+                        //color: 'transparent'
+                        //color: Global.style.backgroundColor
+                        border.color: textHelpInfo.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                        border.width: textHelpInfo.textArea.focus ? 2 : 1
+                    }
                 }
             }
 
@@ -1428,9 +1439,9 @@ Rectangle {
                 Layout.maximumHeight: 50
                 //Layout.fillHeight: true
 
-                ColorButton {
+                Button {
                     text: '关闭'
-                    onButtonClicked: {
+                    onClicked: {
                         rectHelpWindow.close();
                     }
                 }
@@ -1460,7 +1471,7 @@ Rectangle {
 
 
 
-        Text {
+        Label {
             id: textDebugButton
             anchors.fill: parent
             //anchors.horizontalCenter: parent.horizontalCenter
@@ -1472,8 +1483,8 @@ Rectangle {
             font.bold: true
             text: rectDebugButton.nCount === 0 ? '' : rectDebugButton.nCount
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
         }
 
         MouseArea {
@@ -1505,7 +1516,7 @@ Rectangle {
         height: parent.height * 0.9
         visible: false
 
-        color: "black"
+        color: Global.style.backgroundColor
 
         Keys.onEscapePressed: {
             close();
@@ -1518,6 +1529,12 @@ Rectangle {
 
             event.accepted = true;
             //Qt.quit();
+        }
+
+
+        Mask {
+            anchors.fill: parent
+            opacity: 0
         }
 
 
@@ -1549,32 +1566,54 @@ Rectangle {
 
                     nMaximumBlockCount: 0
 
-                    textArea.background: Rectangle {
-                        //implicitWidth: 200
-                        //implicitHeight: 40
-                        color: 'black'
-                        border.color: textDebugInfo.textArea.enabled ? "#21be2b" : "transparent"
-                    }
                     textArea.color: 'white'
                     //textArea.readOnly: true
                     //textArea.selectByKeyboard: true
                     //textArea.selectByMouse: true
 
-
                     textArea.text: ''
                     textArea.placeholderText: ""
+
+                    textArea.background: Rectangle {
+                        //implicitWidth: 200
+                        //implicitHeight: 40
+                        color: 'black'
+                        //color: 'transparent'
+                        //color: Global.style.backgroundColor
+                        border.color: textDebugInfo.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                        border.width: textDebugInfo.textArea.focus ? 2 : 1
+                    }
                 }
             }
 
             TextField {
+                id: textCommand
+
+                readonly property int nPadding: 6
+
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
+
+                leftPadding : nPadding
+                rightPadding : nPadding
+                topPadding : nPadding
+                bottomPadding: nPadding
 
                 placeholderText: '输入命令'
 
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextField.Wrap
+
+                background: Rectangle {
+                    //implicitWidth: 200
+                    //implicitHeight: 40
+                    //color: 'black'
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: textCommand.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: textCommand.focus ? 2 : 1
+                }
 
 
                 Keys.onEnterPressed: {
@@ -1600,23 +1639,23 @@ Rectangle {
                 Layout.maximumHeight: 50
                 //Layout.fillHeight: true
 
-                ColorButton {
+                Button {
                     text: '复制'
-                    onButtonClicked: {
+                    onClicked: {
                         FrameManager.sl_qml_SetClipboardText(FrameManager.toPlainText(textDebugInfo.textDocument));
                     }
                 }
 
-                ColorButton {
+                Button {
                     text: '清空'
-                    onButtonClicked: {
+                    onClicked: {
                         textDebugInfo.text = '';
                     }
                 }
 
-                ColorButton {
+                Button {
                     text: '关闭'
-                    onButtonClicked: {
+                    onClicked: {
                         rectDebugWindow.close();
                     }
                 }

@@ -73,6 +73,8 @@ game.goon();
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -100,9 +102,9 @@ game.goon();
                 horizontalAlignment: Label.AlignHCenter
             }
 
-            ColorButton {
+            Button {
                 text: 'v'
-                onButtonClicked: {
+                onClicked: {
                     loaderVisualScript.show();
                 }
             }
@@ -129,8 +131,17 @@ game.goon();
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                color: Global.style.backgroundColor
+
                 textArea.text: ''
                 textArea.placeholderText: ''
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: textGameStartScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: textGameStartScript.textArea.focus ? 2 : 1
+                }
             }
 
         }
@@ -146,8 +157,8 @@ game.goon();
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 20
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
 
                 font.pointSize: 15
                 text: '游戏刷新率：'
@@ -173,7 +184,7 @@ game.goon();
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            ColorButton {
+            Button {
                 id: buttonStartGame
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -184,15 +195,17 @@ game.goon();
 
                 text: '开始游戏'
 
-                onButtonClicked: {
+                onClicked: {
                     //enabled = false;
 
-                    loaderGameScene.source = './Core/GameScene.qml';
+                    showBusyIndicator(true, function() {
+                        loaderGameScene.source = './Core/GameScene.qml';
+                    });
 
                 }
             }
 
-            /*ColorButton {
+            /*Button {
                 id: buttonDeleteSave
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -200,7 +213,7 @@ game.goon();
                 Layout.bottomMargin: 10
 
                 text: '删除自动存档'
-                onButtonClicked: {
+                onClicked: {
                     FrameManager.sl_qml_DeleteFile(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + 'autosave.json');
                 }
             }*/
@@ -285,6 +298,9 @@ game.goon();
 
         Connections {
             target: loaderVisualScript.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
             function onS_close() {
                 //init();
 
@@ -340,14 +356,24 @@ game.goon();
             loaderGameScene.focus = true;
             loaderGameScene.item.focus = true;
 
-            loaderGameScene.item.init(true, true);
-
+            try {
+                loaderGameScene.item.init(true, true);
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
+            }
         }
 
 
 
         Connections {
             target: loaderGameScene.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
             function onS_close() {
 
                 loaderGameScene.visible = false;
@@ -432,55 +458,6 @@ function *$start() {
 
         break;
     }
-
-}
-
-
-//游戏初始化（游戏开始和载入存档时调用）
-function *$init() {
-
-    //每秒恢复
-    function resumeEventScript(combatant) {
-
-        if(combatant.$properties.HP[0] <= 0)
-            return;
-
-        game.addprops(combatant, {'HP': [2], 'MP': [2]});
-    }
-
-    //每秒恢复事件
-    game.addtimer("resume_event", 1000, -1, true);
-    game.gf["resume_event"] = function() {
-        for(let h in game.gd["$sys_fight_heros"]) {
-            resumeEventScript(game.gd["$sys_fight_heros"][h]);
-        }
-    }
-
-
-    //点击屏幕事件
-    game.gf['$map_click'] = function(bx, by, x, y) {
-        if(game.hero(0).nActionType !== -1) {
-            game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});
-        }
-    }
-
-
-    yield game.msg("合理安排时间");
-
-    game.goon();
-
-}
-
-
-//存档后调用
-function *$save() {
-
-}
-
-
-//读档后调用
-function *$load() {
-
 }
 
         `

@@ -30,6 +30,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -53,12 +55,8 @@ Rectangle {
             Layout.fillHeight: true
 
 
-            textArea.background: Rectangle {
-                implicitWidth: 200
-                implicitHeight: 40
-                color: "#80000000"
-                //border.color: debugMsg.textArea.enabled ? "#21be2b" : "transparent"
-            }
+            text: ''
+
             textArea.color: 'white'
             textArea.readOnly: true
 
@@ -68,17 +66,25 @@ Rectangle {
                 pointSize: 15
             }
 
-            text: ''
+            textArea.background: Rectangle {
+                //implicitWidth: 200
+                //implicitHeight: 40
+                color: "#80000000"
+                //color: 'transparent'
+                //color: Global.style.backgroundColor
+                border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                border.width: msgBox.textArea.focus ? 2 : 1
+            }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
             text: "返回"
-            onButtonClicked: {
+            onClicked: {
                 s_close();
             }
         }
@@ -124,10 +130,30 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+2023/11/07：发布 1.6.11.231107 版本
+1、调整适配全部UI，做了亮色和暗色两套主题；
+2、可自定义风格（默认Material）；
+3、修复报错系统；
+4、修复 乱 无效果问题；
+5、修复血量Bugs（判定将$properties.HP全部改为$$propertiesWithExtra.HP，需要改通用脚本）；
+6、优化代码；
+
+2023/11/05：发布 1.6.10.231105 版本
+1、增加耗时载入的忙碌提示；
+2、优化代码和脚本队列；
+
+2023/11/04：发布 1.6.9.231104 版本
+1、修复个小Bug（主角$targetX和$targetY写错）；
+2、增加主角和角色定向移动类型（$targetBlocks和$targetPositions为数组，$targetBlockAuto为自动寻路）；
+3、增加A*算法；
+4、移动start脚本里的init、save和load函数 到 通用脚本的gameInit、beforeSave、beforeLoad、afterSave、afterLoad函数；
+
 2023/11/02：发布 1.6.8.231102 版本
 1、修复读取存档黑屏Bug；
 2、增加选择步骤菜单类型；
-3、优化代码；
+3、所有编辑器加入退出提示；
+4、增加插件自动/非自动加载机制，增加game.plugin('作者', '插件名')来更安全的使用插件；
+5、优化代码；
 
 2023/11/01：发布 1.6.7.231101 版本
 1、增加自定义战斗人物顺序模式（可修改为按属性比较来获取多次机会）；

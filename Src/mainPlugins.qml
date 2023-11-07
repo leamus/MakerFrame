@@ -31,6 +31,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -144,12 +146,12 @@ Rectangle {
 
                     dialogCommon.show({
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
-                                          .arg(item)
-                                          .arg(menuJS.plugins[item]['version'])
-                                          .arg(menuJS.plugins[item]['update'])
-                                          .arg(menuJS.plugins[item]['author'])
-                                          .arg(menuJS.plugins[item]['size'])
-                                          .arg(menuJS.plugins[item]['description'])
+                                          .arg(menuJS.plugins[item]['Name'])
+                                          .arg(menuJS.plugins[item]['Version'])
+                                          .arg(menuJS.plugins[item]['Update'])
+                                          .arg(menuJS.plugins[item]['Author'])
+                                          .arg(menuJS.plugins[item]['Size'])
+                                          .arg(menuJS.plugins[item]['Description'])
                                           ,
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function(){

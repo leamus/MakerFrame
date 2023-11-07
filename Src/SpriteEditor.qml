@@ -127,6 +127,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -145,29 +147,33 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "特效图片"
-                onButtonClicked: {
+                text: "图片资源"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     dialogSpriteImageData.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "特效音乐"
-                onButtonClicked: {
+                text: "音效"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     dialogSpriteSoundData.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 visible: false
 
                 //Layout.fillWidth: true
@@ -175,42 +181,50 @@ Rectangle {
                 Layout.preferredHeight: 50
 
                 text: "刷新"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     _private.refreshSprite();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "保存"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
 
                     dialogSaveSprite.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "原图"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     if(textSpriteImageURL.text)
                         _private.showImage();
                 }
             }
 
-            ColorButton {
+            Button {
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "帮助"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
 
                     rootGameMaker.showMsg('
   特效大小：游戏中显示的大小；
@@ -226,14 +240,16 @@ Rectangle {
                 }
             }
 
-            ColorButton {
-                visible: false
+            Button {
+                visible: Platform.compileType() === "debug" ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
                 text: "Test"
-                onButtonClicked: {
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
                     /*sprite.sprite.running = true;
                     console.debug("[Sprite]test", sprite.sprite, sprite.sprite.state, sprite.sprite.currentSprite)
                     console.debug(sprite.sprite.sprites);
@@ -266,7 +282,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "50"
                 font.pointSize: _config.nTextFontSize
@@ -293,7 +309,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "50"
                 font.pointSize: _config.nTextFontSize
@@ -320,7 +336,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "1"
                 font.pointSize: _config.nTextFontSize
@@ -354,7 +370,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "1"
                 font.pointSize: _config.nTextFontSize
@@ -373,7 +389,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "1"
                 font.pointSize: _config.nTextFontSize
@@ -407,7 +423,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "37"
                 font.pointSize: _config.nTextFontSize
@@ -433,7 +449,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "58"
                 font.pointSize: _config.nTextFontSize
@@ -460,7 +476,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "3"
                 font.pointSize: _config.nTextFontSize
@@ -495,7 +511,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -513,7 +529,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -547,7 +563,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "100"
                 font.pointSize: _config.nTextFontSize
@@ -574,7 +590,7 @@ Rectangle {
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
+                //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
                 font.pointSize: _config.nTextFontSize
@@ -755,17 +771,17 @@ Rectangle {
                 Layout.preferredWidth: parent.width * 0.6
                 Layout.alignment: Qt.AlignHCenter
 
-                ColorButton {
+                Button {
                     text: "选择图片"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogSpriteImageData.nChoiceType = 1;
                         filedialogOpenSpriteImage.open();
                         //root.forceActiveFocus();
                     }
                 }
-                ColorButton {
+                Button {
                     text: "选择素材"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogSpriteImageData.nChoiceType = 2;
 
                         let path = GameMakerGlobal.spriteResourceURL();
@@ -910,7 +926,11 @@ Rectangle {
 
     L_List {
         id: l_listSpriteImageResource
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {
@@ -1100,17 +1120,17 @@ Rectangle {
                 Layout.preferredWidth: parent.width * 0.6
                 Layout.alignment: Qt.AlignHCenter
 
-                ColorButton {
+                Button {
                     text: "选择音效"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogSpriteSoundData.nChoiceType = 1;
                         filedialogOpenSpriteSound.open();
                         //root.forceActiveFocus();
                     }
                 }
-                ColorButton {
+                Button {
                     text: "选择素材"
-                    onButtonClicked: {
+                    onClicked: {
                         //dialogSpriteSoundDataData.nChoiceType = 2;
 
                         let path = GameMakerGlobal.soundResourceURL();
@@ -1123,10 +1143,10 @@ Rectangle {
                         dialogSpriteSoundData.visible = false;
                     }
                 }
-                ColorButton {
+                Button {
                     text: "不用音效"
                     //Layout.fillWidth: true
-                    onButtonClicked: {
+                    onClicked: {
                         textSpriteSoundURL.text = "";
                         textSpriteSoundResourceName.text = "";
 
@@ -1268,7 +1288,11 @@ Rectangle {
 
     L_List {
         id: l_listSpriteSoundResource
+
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {
@@ -1360,7 +1384,7 @@ Rectangle {
             width: parent.width
             RowLayout {
                 width: parent.width
-                Text {
+                Label {
                     text: qsTr("特效名：")
                 }
                 TextField {
@@ -1377,7 +1401,7 @@ Rectangle {
             }
             /*RowLayout {
                 width: parent.width
-                Text {
+                Label {
                     text: qsTr("地图缩放：")
                 }
                 TextField {
@@ -1449,8 +1473,8 @@ Rectangle {
             height: Math.min(implicitHeight, parent.height)
         }
 
-        Text {
-            color: 'white'
+        Label {
+            //color: 'white'
             text: image.implicitWidth + ' x ' + image.implicitHeight
             font.pointSize: 16
         }
@@ -1523,7 +1547,7 @@ Rectangle {
             if(spriteName.length === 0) {
                 Platform.showToast("特效名不能为空");
                 dialogSaveSprite.open();
-                return;
+                return false;
             }
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.json';
@@ -1563,10 +1587,32 @@ Rectangle {
             let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
-            console.debug("[SpriteEditor]exportSprite ret:", ret, filepath)
+            console.debug("[SpriteEditor]exportSprite ret:", ret, filepath);
+
+
+            return true;
         }
 
 
+
+        function close() {
+            dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function(){
+                    if(exportSprite())
+                        s_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    s_close();
+                },
+                OnDiscarded: ()=>{
+                    dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
+        }
     }
 
     //配置
@@ -1574,6 +1620,7 @@ Rectangle {
         id: _config
 
         property int nLabelFontSize: 10
+        property int nButtonFontSize: 12
         property int nTextFontSize: 10
     }
 
@@ -1583,12 +1630,12 @@ Rectangle {
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         console.debug("[SpriteEditor]Escape Key");
-        s_close();
+        _private.close();
         event.accepted = true;
     }
     Keys.onBackPressed: {
         console.debug("[SpriteEditor]Back Key");
-        s_close();
+        _private.close();
         event.accepted = true;
     }
     Keys.onPressed: {

@@ -116,6 +116,16 @@ Rectangle {
     }
 
 
+    anchors.fill: parent
+
+    focus: true
+
+    clip: true
+
+    color: Global.style.backgroundColor
+
+
+
     MouseArea {
         anchors.fill: parent
         onPressed: {
@@ -253,8 +263,12 @@ Rectangle {
 
                         background: Rectangle {
                             anchors.fill: parent
-                            color: _private.listSelectedCommands[index] === true ? "lightgreen" : "white"
+                            color: _private.listSelectedCommands[index] === true ? Global.style.accent : Global.style.backgroundColor
                             //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
+
+                            //border.color: textCode.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                            //border.width: textCode.activeFocus ? 2 : 1
+                            //radius: 6
                         }
 
                         text: index + 1 + '. '
@@ -290,8 +304,12 @@ Rectangle {
 
                             background: Rectangle {
                                 anchors.fill: parent
-                                color: listview.currentIndex === index ? "yellow" : "white"
+                                color: listview.currentIndex === index ? Global.style.accent : Global.style.backgroundColor
                                 //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
+
+                                //border.color: textCode.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                                //border.width: textCode.activeFocus ? 2 : 1
+                                //radius: 6
                             }
 
                             //textFormat: Label.PlainText
@@ -473,9 +491,9 @@ Rectangle {
             RowLayout {
                 anchors.fill: parent
 
-                ColorButton {
+                Button {
                     text: '编辑'
-                    onButtonClicked: {
+                    onClicked: {
                         if(_private.strCurrentCommand === '')
                             return;
 
@@ -524,13 +542,15 @@ Rectangle {
 
 
         RowLayout {
+            Layout.maximumWidth: parent.width
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "命令"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     rectParams.bEdit = false;
                     rectCommands.visible = true;
                     containerCommandButtons.nChoicedMenu = -1;
@@ -539,10 +559,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "追加"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let cmd = _private.createCommand(_private.strCurrentCommand, true);
                     if(!cmd)
                         return;
@@ -569,10 +590,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "插入"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let cmd = _private.createCommand(_private.strCurrentCommand, true);
                     if(!cmd)
                         return;
@@ -609,10 +631,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "修改"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let cmd = _private.createCommand(_private.strCurrentCommand, true);
                     if(!cmd)
                         return;
@@ -626,10 +649,11 @@ Rectangle {
                     //listview.refresh();
                 }
             }
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "删除"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex >= 0) {
                         _private.listModelData.splice(listview.currentIndex, 1);
                         _private.refreshCommandTabCount();
@@ -639,10 +663,11 @@ Rectangle {
                     //listview.refresh();
                 }
             }
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "向上"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex > 0) {
                         let a = _private.listModelData[listview.currentIndex];
                         _private.listModelData[listview.currentIndex] = _private.listModelData[listview.currentIndex - 1];
@@ -655,10 +680,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "向下"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex < listmodel.count - 1) {
                         let a = _private.listModelData[listview.currentIndex];
                         _private.listModelData[listview.currentIndex] = _private.listModelData[listview.currentIndex + 1];
@@ -671,10 +697,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: _private.bMultiple ? "多选" : "单选"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.bMultiple = !_private.bMultiple;
                     if(!_private.bMultiple)
                         _private.listSelectedCommands = [];
@@ -684,13 +711,15 @@ Rectangle {
 
 
         RowLayout {
+            Layout.maximumWidth: parent.width
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: '复制'
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     if(_private.listSelectedCommands.length > 0) {
                         let data = [];
 
@@ -724,10 +753,11 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: '粘贴'
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     //插入的地方
                     let insertIndex;
                     if(listview.currentIndex === -1) {
@@ -757,24 +787,27 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "保存"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     saveData();
                 }
             }
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "读取"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     loadData();
                 }
             }
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "编译"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let jsScript = _private.compile();
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
@@ -783,28 +816,31 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "测试"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     let jsScript = _private.compile();
                     console.debug(jsScript);
                     eval('let __tJSScript__ = function(){%1}'.arg(jsScript));
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "关闭"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     _private.close();
                 }
             }
 
-            ColorButton {
+            Button {
+                Layout.fillWidth: true
                 text: "帮助"
                 font.pointSize: 9
-                onButtonClicked: {
+                onClicked: {
                     rootGameMaker.showMsg('
 可视化脚本说明：
   1、先点击 命令，然后 填写参数 或者 长按编辑框（大部分可以长按）选择参数，再点击 追加（到最后）或 插入（到当前指令上面）来完成指令编写；
@@ -850,7 +886,10 @@ Rectangle {
         height: parent.height * 0.9
         visible: false
 
-        color: '#7F000000'
+        color: Global.style.theme === 0 ? '#7F7F7F7F' : '#7F7F7F7F'
+
+        border.width: 1
+        border.color: '#7F000000'
 
 
 
@@ -926,7 +965,7 @@ Rectangle {
                             return sysCommands[sysCommandsTree[containerCommandButtons.nChoicedMenu][2][index]].command[0];
                         }
                     }
-                    onButtonClicked: rectCommands.onCommandButtonClicked(index);
+                    onClicked: rectCommands.onCommandButtonClicked(index);
                 }
             }
         }
@@ -950,7 +989,10 @@ Rectangle {
         clip: true
 
 
-        color: '#7F000000'
+        color: Global.style.theme === 0 ? '#DFEFEFEF' : '#DF101010'
+
+        border.width: 1
+        border.color: '#7F000000'
 
 
 
@@ -1008,11 +1050,11 @@ Rectangle {
                 Layout.preferredWidth: parent.width
                 Layout.fillWidth: true
 
-                ColorButton {
+                Button {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                     text: '确  定'
-                    onButtonClicked: {
+                    onClicked: {
                         let t = _private.createCommandText();
                         if(!t) {
                             dialogCommon.show({
@@ -1052,11 +1094,11 @@ Rectangle {
                     }
                 }
 
-                ColorButton {
+                Button {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                     text: '检 查'
-                    onButtonClicked: {
+                    onClicked: {
                         let t = _private.createCommandText();
                         if(!t) {
                             dialogCommon.show({
@@ -1140,11 +1182,11 @@ Rectangle {
                     }
                 }
 
-                ColorButton {
+                Button {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                     text: '取  消'
-                    onButtonClicked: {
+                    onClicked: {
                         rectParams.visible = false;
                         rectParams.bEdit = false;
                     }
@@ -1163,6 +1205,10 @@ Rectangle {
         property var compParam
 
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
+
 
         onClicked: {
             //参数下标
@@ -1194,6 +1240,10 @@ Rectangle {
         id: l_listCommands
 
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
+
 
         onClicked: {
             l_listCommands.visible = false;

@@ -64,6 +64,11 @@ import "GameScene.js" as GameSceneJS
     game.gd["$sys_scale"]: 当前缩放大小
     game.gd["$sys_random_fight"]：随机战斗
 
+    _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
+    _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
+    _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
+    _private.objCommonScripts["after_save"] = tCommoncript.$afterSave;
+    _private.objCommonScripts["after_load"] = tCommoncript.$afterLoad;
     _private.objCommonScripts["combatant_class"] = tCommoncript.$Combatant;
     _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
     _private.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
@@ -77,7 +82,7 @@ import "GameScene.js" as GameSceneJS
     _private.objCommonScripts["fight_combatant_position_algorithm"]：//获取 某战斗角色 中心位置
     _private.objCommonScripts["fight_combatant_melee_position_algorithm"]：//战斗角色近战 坐标
     _private.objCommonScripts["fight_skill_melee_position_algorithm"]//特效在战斗角色的 坐标
-    _private.objCommonScripts["fight_combatant_choice"] //设置 战斗人物的 初始化 或 休息
+    _private.objCommonScripts["fight_combatant_set_choice"] //设置 战斗人物的 初始化 或 休息
     _private.objCommonScripts["fight_menu"]//战斗菜单
     //_private.objCommonScripts["resume_event_script"]
     //_private.objCommonScripts["get_goods_script"]
@@ -467,9 +472,18 @@ Rectangle {
 
         //创建主角；
         //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-        //  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
+        //  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto；
         //  $name为游戏显示名；
-        //成功返回 对象。
+        //  $action：
+        //    为0表示静止；为1表示随机移动；为-1表示禁止操作；
+        //    为2表示定向移动；此时（用其中一个即可）：
+        //      $targetBx、$targetBy为定向的地图块坐标
+        //      $targetX、$targetY为定向的像素坐标；
+        //      $targetBlocks：为定向的地图块坐标数组;
+        //      $targetPositions为定向的像素坐标数组;
+        //      $targetBlockAuto为定向的地图块自动寻路坐标数组；
+        //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
+        //成功返回 组件对象。
         readonly property var createhero: function(role={}) {
             if(GlobalLibraryJS.isString(role)) {
                 role = {RId: role, $id: role, $name: role};
@@ -581,13 +595,10 @@ Rectangle {
         }
 
         //返回 主角；
-        //hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
-        //props：需要修改的 单个主角属性（有$name、$showName、$speed、$scale、$avatar、$avatarSize，$direction、$x，$y、$bx、$by）；
-        //  $action：为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；为-1表示禁止操作；
-        //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
+        //hero可以是下标，或主角的$id，或主角对象，-1表示返回所有主角；
+        //props：非返回所有主角时，为修改的 单个主角属性，同 createhero 的第二个参数；
         //返回经过props修改的 主角 或 所有主角的列表；如果没有则返回null；
         readonly property var hero: function(hero=-1, props={}) {
-
             if(hero === -1)
                 return _private.arrMainRoles;
 
@@ -658,13 +669,41 @@ Rectangle {
                 if(props.$action !== undefined)
                     heroComp.nActionType = props.$action;
 
-                if(props.$targetBx !== undefined && props.$targetBy !== undefined) {
-                    [heroComp.targetPos.x, heroComp.targetPos.y] = getMapBlockPos(props.$targetBx, props.$targetBy);
+                //下面都是自动行走
+                if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
+                    let tPos = getMapBlockPos(props.$targetBx, props.$targetBy);
+                    if(props.$targetBx === undefined)
+                        tPos[0] = -1;
+                    if(props.$targetBy === undefined)
+                        tPos[1] = -1;
+                    heroComp.targetsPos = [Qt.point(tPos[0], tPos[1])];
                 }
-                if(props.$targetX !== undefined)   //修改x坐标
-                    heroComp.targetPos.x = props.$x;
-                if(props.$targetY !== undefined)   //修改y坐标
-                    heroComp.targetPos.y = props.$y;
+                if(props.$targetX !== undefined || props.$targetY !== undefined) {
+                    if(props.$targetX === undefined)
+                        props.$targetX = -1;
+                    if(props.$targetY === undefined)
+                        props.$targetY = -1;
+                    heroComp.targetsPos = [Qt.point(props.$targetX, props.$targetY)];
+                }
+                if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
+                    heroComp.targetsPos = [];
+                    for(let targetBlock of props.$targetBlocks) {
+                        let tPos = getMapBlockPos(targetBlock[0], targetBlock[1]);
+                        /*if(props.$targetBx === undefined)
+                            tPos[0] = -1;
+                        if(props.$targetBy === undefined)
+                            tPos[1] = -1;
+                            */
+                        heroComp.targetsPos.push(Qt.point(tPos[0], tPos[1]));
+                    }
+                }
+                if(GlobalLibraryJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
+                    heroComp.targetsPos = props.$targetPositions;
+                }
+                if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
+                    let rolePos = heroComp.pos();
+                    heroComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                }
 
                 if(props.$x !== undefined)   //修改x坐标
                     hero.$x = heroComp.x = props.$x;
@@ -810,12 +849,20 @@ Rectangle {
 
         //创建NPC；
         //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
-        //其他参数：$id、$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
-        //  $name为游戏名；
-        //  $action为0表示静止，为1表示随机移动；
+        //其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto、$start；
+        //  $name为游戏显示名；
+        //  $action：
+        //    为0表示静止；为1表示随机移动；为-1表示禁止操作；
+        //    为2表示定向移动；此时（用其中一个即可）：
+        //      $targetBx、$targetBy为定向的地图块坐标
+        //      $targetX、$targetY为定向的像素坐标；
+        //      $targetBlocks：为定向的地图块坐标数组;
+        //      $targetPositions为定向的像素坐标数组;
+        //      $targetBlockAuto为定向的地图块自动寻路坐标数组；
+        //    为-1表示禁止操作；
         //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
         //  $start表示角色是否自动动作（true或false)；
-        //成功返回true。
+        //成功返回 组件对象。
         readonly property var createrole: function(role={}) {
 
             if(GlobalLibraryJS.isString(role)) {
@@ -900,16 +947,15 @@ Rectangle {
         }
 
         //返回 角色；
-        //role可以是下标，或角色的$id，或角色对象，-1表示所有角色；
-        //props：需要修改的 单个角色属性（有 $name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by）；
-        //  $action：为0表示静止；为1表示随机移动；为2表示定向移动，此时$targetBx、$targetBy、$targetX、$targetY为定向的地图块坐标或像素坐标（用其中一对即可）；
+        //role可以是下标，或角色的$id，或角色对象，-1表示返回所有角色；
+        //props：非返回所有角色时，为修改的 单个角色属性，同 createhero 的第二个参数；
         //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
-        readonly property var role: function(role, props={}) {
-            let roleComp;
-
+        readonly property var role: function(role=-1, props={}) {
             if(role === -1/* || role === undefined || role === null*/)
                 return _private.objRoles;
 
+
+            let roleComp;
 
             if(GlobalLibraryJS.isString(role)) {
                 roleComp = _private.objRoles[role];
@@ -962,6 +1008,41 @@ Rectangle {
                 if(props.$action !== undefined)
                     roleComp.nActionType = props.$action;
 
+                if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
+                    let tPos = getMapBlockPos(props.$targetBx, props.$targetBy);
+                    if(props.$targetBx === undefined)
+                        tPos[0] = -1;
+                    if(props.$targetBy === undefined)
+                        tPos[1] = -1;
+                    roleComp.targetsPos = [Qt.point(tPos[0], tPos[1])];
+                }
+                if(props.$targetX !== undefined || props.$targetY !== undefined) {
+                    if(props.$targetX === undefined)
+                        props.$targetX = -1;
+                    if(props.$targetY === undefined)
+                        props.$targetY = -1;
+                    roleComp.targetsPos = [Qt.point(props.$targetX, props.$targetY)];
+                }
+                if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
+                    roleComp.targetsPos = [];
+                    for(let targetBlock of props.$targetBlocks) {
+                        let tPos = getMapBlockPos(targetBlock[0], targetBlock[1]);
+                        /*if(props.$targetBx === undefined)
+                            tPos[0] = -1;
+                        if(props.$targetBy === undefined)
+                            tPos[1] = -1;
+                            */
+                        roleComp.targetsPos.push(Qt.point(tPos[0], tPos[1]));
+                    }
+                }
+                if(GlobalLibraryJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
+                    roleComp.targetsPos = props.$targetPositions;
+                }
+                if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
+                    let rolePos = roleComp.pos();
+                    roleComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                }
+
                 if(props.$x !== undefined)   //修改x坐标
                     roleComp.x = props.$x;
                 if(props.$y !== undefined)   //修改y坐标
@@ -973,19 +1054,6 @@ Rectangle {
                     setRolePos(roleComp, props.$bx, props.$by);
                     //moverole(roleComp, bx, by);
 
-
-                if(props.$targetBx !== undefined && props.$targetBy !== undefined) {
-                    [roleComp.targetPos.x, roleComp.targetPos.y] = getMapBlockPos(props.$targetBx, props.$targetBy);
-                }
-                if(props.$targetX !== undefined)   //修改x坐标
-                    roleComp.targetPos.x = props.$targetX;
-                if(props.$targetY !== undefined)   //修改y坐标
-                    roleComp.targetPos.y = props.$targetY;
-
-                if(props.$start === true)
-                    roleComp.start();
-                else if(props.$start === false)
-                    roleComp.stop();
 
                 if(props.$direction !== undefined)
                     roleComp.changeDirection(props.$direction);
@@ -1002,6 +1070,13 @@ Rectangle {
                     roleComp.height1 = props.$realSize[1];
                     //console.debug('!!!', props.$realSize)
                 }
+
+
+                if(props.$start === true)
+                    roleComp.start();
+                else if(props.$start === false)
+                    roleComp.stop();
+
             }
 
 
@@ -3064,6 +3139,7 @@ Rectangle {
 
         //!!存档，showName为显示名。
         //game.gd 开头为 $$ 的键不会保存
+        //返回存档数据
         readonly property var save: function(fileName="autosave", showName='', type=1, compressionLevel=-1) {
             fileName = fileName.trim();
             if(!fileName)
@@ -3071,9 +3147,9 @@ Rectangle {
 
 
 
-            //载入save脚本
-            if(_private.objCommonScripts["game_save_script"])
-                game.run([_private.objCommonScripts["game_save_script"](), '$save'], -2);
+            //载入before_save脚本
+            if(_private.objCommonScripts["before_save"])
+                game.run([_private.objCommonScripts["before_save"](), 'before_save'], {Priority: -3, Type: 0, Running: 0});
 
 
 
@@ -3116,18 +3192,29 @@ Rectangle {
             //console.debug(itemContainer.arrCanvasMap[2].toDataURL())
 
 
+            //载入after_save脚本
+            if(_private.objCommonScripts["after_save"])
+                game.run([_private.objCommonScripts["after_save"](), 'after_save'], {Priority: -1, Type: 0, Running: 1});
+
+
             return ret;
 
         }
 
         //读档（读取数据到 game.gd），成功返回true，失败返回false。
         readonly property var load: function(fileName="autosave") {
+
+            //载入after_load脚本
+            if(_private.objCommonScripts["before_load"])
+                game.run([_private.objCommonScripts["before_load"](), 'before_load'], {Priority: -3, Type: 0, Running: 0});
+
+
+
             //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + ".json";
 
             fileName = fileName.trim();
             if(!fileName)
                 fileName = "autosave";
-
 
             let ret = checksave(fileName)
             if(ret === false)
@@ -3180,9 +3267,9 @@ Rectangle {
             }
 
 
-            //载入load脚本
-            if(_private.objCommonScripts["game_load_script"])
-                game.run([_private.objCommonScripts["game_load_script"](), '$load'], -2);
+            //载入after_load脚本
+            if(_private.objCommonScripts["after_load"])
+                game.run([_private.objCommonScripts["after_load"](), 'after_load'], {Priority: -1, Type: 0, Running: 1});
 
 
             return true;
@@ -3191,6 +3278,19 @@ Rectangle {
         //游戏结束（调用游戏结束脚本）；
         readonly property var gameover: function(params) {
             game.run(_private.objCommonScripts["game_over_script"](params), 0);
+        }
+
+
+        //返回插件
+        readonly property var plugin: function(...params) {
+            let plugin = _private.objPlugins[params[0]][params[1]];
+            if(plugin && plugin.$autoLoad === false) {
+                plugin.$autoLoad = true;
+                plugin.$load();
+                plugin.$init();
+            }
+
+            return plugin;
         }
 
 
@@ -3229,12 +3329,12 @@ Rectangle {
         //  vScript 为执行脚本（字符串、函数、生成器函数、生成器对象都可以），如果为null则表示强制执行队列，为true表示下次js事件循环再运行
         //    可以为数组（vScript是执行脚本时 为 第二个下标为tips，是null或true时为给_private.asyncScript.lastEscapeValue值）；
         //  scriptProps：
-        //    如果为数字，表示优先级，-2为立即执行（此时代码前必须有yield），-1为追加到队尾，0为挂到第一个，1以后类推；
+        //    如果为数字，表示优先级Priority；
         //      Type默认为0，Running默认为1，Value默认为无；
         //    如果为对象，则有以下参数：
-        //      Priority为优先级；
-        //      Type为运行类型（如果为0，则表示vScript为JS文件名，而scriptProps.Path为路径）；
-        //      Running为1或2，表示如果队列里如果为空则执行（区别为：1是下一个JS事件循环执行，2是立即执行）；
+        //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾；-2为立即执行（此时代码前必须有yield）；-3为将此代码执行完毕再返回（注意：1、代码里yield不能返回了；2、此时Running必须为0）；
+        //      Type为运行类型（如果为0，表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
+        //      Running为1或2，表示如果队列里如果为空则执行（区别为：1是下一个JS事件循环执行，2是立即执行）；为0时不执行；
         //      Value：传递给事件队列的值，无则默认上一次的；
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined) {
@@ -3416,7 +3516,7 @@ Rectangle {
         readonly property var $gameMakerGlobalJS: GameMakerGlobalJS
         readonly property var $config: GameMakerGlobal.config
 
-        //插件
+        //插件（直接访问，不推荐）
         readonly property var $plugins: _private.objPlugins
 
 
@@ -3617,14 +3717,14 @@ Rectangle {
                 _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             */
 
-            if(_private.objCommonScripts["game_start_script"])
-                game.run([_private.objCommonScripts["game_start_script"](), '$start']);
+            if(_private.objCommonScripts["game_start"])
+                game.run([_private.objCommonScripts["game_start"](), 'game_start']);
         }
         else if(startScript === false) {
 
         }
         else {  //是脚本
-            game.run([startScript, 'start']);
+            game.run([startScript, 'game_start']);
         }
 
 
@@ -3634,14 +3734,14 @@ Rectangle {
 
 
         //init脚本
-        if(_private.objCommonScripts["game_init_script"])
-            game.run([_private.objCommonScripts["game_init_script"](), '$init']);
+        if(_private.objCommonScripts["game_init"])
+            game.run([_private.objCommonScripts["game_init"](), 'game_init']);
 
 
         //所有插件初始化
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc])
-                if(_private.objPlugins[tc][tp].$init)
+                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
                     _private.objPlugins[tc][tp].$init();
 
 
@@ -3671,7 +3771,7 @@ Rectangle {
         //所有插件释放
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc])
-                if(_private.objPlugins[tc][tp].$release)
+                if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false)
                     _private.objPlugins[tc][tp].$release();
 
 
@@ -3857,6 +3957,12 @@ Rectangle {
             game.gd["$sys_map"].$$columns = itemContainer.mapInfo.MapSize[0];
             game.gd["$sys_map"].$$rows = itemContainer.mapInfo.MapSize[1];
             game.gd["$sys_map"].$$info = itemContainer.mapInfo;
+
+            game.gd["$sys_map"].$$obstacles = [];
+            for(let mb in itemContainer.mapInfo.MapBlockSpecialData) {
+                if(itemContainer.mapInfo.MapBlockSpecialData[mb] === -1)
+                    game.gd["$sys_map"].$$obstacles.push(mb.split(','));
+            }
         }
 
 
@@ -6258,7 +6364,7 @@ Rectangle {
                     }
                 },
                 OnRejected: ()=>{
-                    rootGameScene.forceActiveFocus();
+                    if(rootGameScene)rootGameScene.forceActiveFocus();
                 },
             });
         }
@@ -6633,7 +6739,7 @@ Rectangle {
             property int nActionType: 1
 
             //目标坐标
-            property point targetPos: Qt.point(-1,-1)
+            property var targetsPos: []
 
             //状态持续时间
             property int nActionStatusKeepTime: 0
@@ -6816,6 +6922,24 @@ Rectangle {
             //visible: true
         }
     }
+
+
+
+    /*  限制挺多：1、workerScript.sendMessage 只能一个参数，且只能传递一些数据，函数不能传递；
+    WorkerScript {
+        id: workerScriptWalk
+        source: 'computeWalkPath.mjs'
+
+        onMessage: {
+            console.warn('Worker')
+        }
+    }
+    mjs文件内容：
+    WorkerScript.onMessage = function(message) {
+        // ... long-running operations and calculations are done here
+        WorkerScript.sendMessage({ 'ret': 666});
+    }
+    */
 
 
 

@@ -37,6 +37,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -63,14 +65,14 @@ Rectangle {
 
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
             text: "选择地图"
-            onButtonClicked: {
+            onClicked: {
 
                 l_listChoice.visible = true;
                 l_listChoice.focus = true;
@@ -93,14 +95,14 @@ Rectangle {
 
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
             text: "选择角色"
-            onButtonClicked: {
+            onClicked: {
 
                 l_listChoice.visible = true;
                 l_listChoice.focus = true;
@@ -142,7 +144,7 @@ Rectangle {
             }
         }
 
-        ColorButton {
+        Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -150,7 +152,7 @@ Rectangle {
 
             text: "开始"
 
-            onButtonClicked: {
+            onClicked: {
                 if(textMapName.text === "" || textRoleName.text === "")
                     return;
 
@@ -269,6 +271,9 @@ Rectangle {
 
 
         visible: false
+
+        color: Global.style.backgroundColor
+        colorText: Global.style.primaryTextColor
 
 
         onClicked: {

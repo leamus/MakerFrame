@@ -38,6 +38,8 @@ Rectangle {
     clip: true
     focus: true
 
+    color: Global.style.backgroundColor
+
 
 
     MouseArea {
@@ -64,6 +66,8 @@ Rectangle {
             model: _private.arrImages
 
             delegate: L_ListItem {
+                height: 6.9 * Screen.pixelDensity
+                colorText: Global.style.primaryTextColor
                 text: modelData
                 bSelected: index === listview.currentIndex
                 //removeButtonVisible: modelData !== "main.qml"
@@ -131,24 +135,24 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            ColorButton {
+            Button {
                 id: buttonAddImage
 
                 Layout.preferredWidth: 60
 
                 text: "新增"
-                onButtonClicked: {
+                onClicked: {
                     filedialog.open();
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonModifyImage
 
                 Layout.preferredWidth: 60
 
                 text: "修改"
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 
@@ -185,13 +189,13 @@ Rectangle {
                 }
             }
 
-            ColorButton {
+            Button {
                 id: buttonPlayImage
 
                 Layout.preferredWidth: 60
 
                 text: "显示"
-                onButtonClicked: {
+                onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 

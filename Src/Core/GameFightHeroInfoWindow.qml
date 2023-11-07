@@ -246,6 +246,12 @@ Item {
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap
 
+            textArea.background: Rectangle {
+                color: 'transparent'
+                //color: Global.style.backgroundColor
+                //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                //border.width: debugMsg.textArea.focus ? 2 : 1
+            }
         }
 
         /*Rectangle {
@@ -344,6 +350,13 @@ Item {
             textArea.font.pointSize: 16
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap
+
+            textArea.background: Rectangle {
+                color: 'transparent'
+                //color: Global.style.backgroundColor
+                //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                //border.width: debugMsg.textArea.focus ? 2 : 1
+            }
         }
     }
 }
