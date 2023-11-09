@@ -26,7 +26,7 @@ function loadResources() {
         _private.objCommonScripts["game_over_script"] = tCommoncript.$gameOverScript;
         _private.objCommonScripts["common_run_away_algorithm"] = tCommoncript.$commonRunAwayAlgorithm;
         _private.objCommonScripts["fight_skill_algorithm"] = tCommoncript.$skillEffectAlgorithm;
-        _private.objCommonScripts["enemy_choice_skills_algorithm"] = tCommoncript.$enemyChoiceSkillsAlgorithm;
+        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = tCommoncript.$fightRoleChoiceSkillsOrGoodsAlgorithm;
         _private.objCommonScripts["fight_init_script"] = tCommoncript.$commonFightInitScript;
         _private.objCommonScripts["fight_start_script"] = tCommoncript.$commonFightStartScript;
         _private.objCommonScripts["fight_round_script"] = tCommoncript.$commonFightRoundScript;
@@ -35,7 +35,8 @@ function loadResources() {
         _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
         _private.objCommonScripts["fight_skill_melee_position_algorithm"] = tCommoncript.$fightSkillMeleePositionAlgorithmt;
         _private.objCommonScripts["fight_combatant_set_choice"] = tCommoncript.$fightCombatantSetChoice;
-        _private.objCommonScripts["fight_menu"] = tCommoncript.$fightMenu;
+        _private.objCommonScripts["fight_menus"] = tCommoncript.$fightMenus;
+        _private.objCommonScripts["fight_buttons"] = tCommoncript.$fightButtons;
         //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
         //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
         //_private.objCommonScripts["use_goods_script"] = tCommoncript.commonUseGoodsScript;
@@ -57,7 +58,7 @@ function loadResources() {
         _private.objCommonScripts["game_over_script"] = ret.$gameOverScript;
         _private.objCommonScripts["common_run_away_algorithm"] = ret.$commonRunAwayAlgorithm;
         _private.objCommonScripts["fight_skill_algorithm"] = ret.$skillEffectAlgorithm;
-        _private.objCommonScripts["enemy_choice_skills_algorithm"] = ret.$enemyChoiceSkillsAlgorithm;
+        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = ret.$fightRoleChoiceSkillsOrGoodsAlgorithm;
         _private.objCommonScripts["fight_start_script"] = ret.$commonFightStartScript;
         _private.objCommonScripts["fight_round_script"] = ret.$commonFightRoundScript;
         _private.objCommonScripts["fight_end_script"] = ret.$commonFightEndScript;
@@ -137,12 +138,12 @@ function loadResources() {
     else
         console.debug("[GameScene]载入战斗算法OK");  //, _private.objCommonScripts["fight_skill_algorithm"], data, eval("()=>{}"));
 
-    if(!_private.objCommonScripts["enemy_choice_skills_algorithm"]) {
-        _private.objCommonScripts["enemy_choice_skills_algorithm"] = GameMakerGlobalJS.$enemyChoiceSkillsAlgorithm;
-        console.debug("[!GameScene]载入敌人选择技能算法");
+    if(!_private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"]) {
+        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = GameMakerGlobalJS.$fightRoleChoiceSkillsOrGoodsAlgorithm;
+        console.debug("[!GameScene]载入战斗人物选择技能或物品算法");
     }
     else
-        console.debug("[GameScene]载入敌人选择技能OK");
+        console.debug("[GameScene]载入战斗人物选择技能或物品算法OK");
 
 
     if(!_private.objCommonScripts["fight_init_script"]) {
@@ -198,12 +199,19 @@ function loadResources() {
     else
         console.debug("[GameScene]载入设置 战斗人物的 初始化 或 休息OK");
 
-    if(!_private.objCommonScripts["fight_menu"]) {
-        _private.objCommonScripts["fight_menu"] = GameMakerGlobalJS.$fightMenu;
+    if(!_private.objCommonScripts["fight_menus"]) {
+        _private.objCommonScripts["fight_menus"] = GameMakerGlobalJS.$fightMenus;
         console.debug("[!GameScene]载入系统战斗菜单");
     }
     else
         console.debug("[GameScene]载入战斗菜单OK");
+
+    if(!_private.objCommonScripts["fight_buttons"]) {
+        _private.objCommonScripts["fight_buttons"] = GameMakerGlobalJS.$fightButtons;
+        console.debug("[!GameScene]载入系统战斗按钮");
+    }
+    else
+        console.debug("[GameScene]载入战斗按钮OK");
 
     /*if(!_private.objCommonScripts["resume_event_script"]) {
         _private.objCommonScripts["resume_event_script"] = GameMakerGlobalJS.$resumeEventScript;
@@ -747,6 +755,9 @@ function loadResources() {
     //console.debug("_private.objMusic", JSON.stringify(_private.objMusic))
 
 
+    loaderFightScene.load();
+
+
 
 //载入扩展 插件/组件
     let componentPath = game.$projectpath + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
@@ -804,6 +815,8 @@ function unloadResources() {
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false)
                 _private.objPlugins[tc][tp].$unload();
 
+
+    loaderFightScene.unload();
 
 
     if(Qt.platform.os === "android") {

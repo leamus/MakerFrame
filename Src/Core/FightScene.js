@@ -82,80 +82,10 @@ function combatantUseSkillOrGoods(combatant) {
     let skill;
 
 
-    //我方
-    if(combatant.$$fightData.$info.$teamsID[0] === 0) {
-        //检查技能
-
-        //所有普通技能作为备选
-        useSkillsOrGoods = FightSceneJS.getCombatantSkills(combatant, [0])[1];
-
-        //普通攻击或技能
-        if(combatant.$$fightData.$choice.$type === 3) {
-
-            //判断技能是否可用，不能用则 $choice.$type = -2 随机选择
-            do {
-                //是否有这个技能
-                let bFind = false;
-                let allSkills = FightSceneJS.getCombatantSkills(combatant)[1];
-                for(let ts of allSkills) {
-                    if(ts.$rid === combatant.$$fightData.$choice.$attack.$rid) {
-                        bFind = true;
-                        break;
-                    }
-                }
-                //如果没这个技能，则不能用
-                //if(!game.skill(combatant, combatant.$$fightData.$choice.$attack))
-                if(!bFind)
-                    break;
-
-                //如果技能可用
-                //不是 普通技能，放在最后（第一次进行使用判断）
-                if(combatant.$$fightData.$choice.$attack.$type !== 0)
-                    useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
-
-            }while(0);
-
-        }
-        //道具
-        else if(combatant.$$fightData.$choice.$type === 2) {
-
-            //判断道具是否可用，不能用则 $choice.$type = -2 随机选择
-            let goods = combatant.$$fightData.$choice.$attack;
-            //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
-            do {
-                //如果没这个道具，则不能用
-                if(!game.goods(goods))
-                    break;
-
-                //如果道具可用
-                //放在最后
-                useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
-
-            }while(0);
-        }
-        //其他类型（-1和-2）
-        else {
-            combatant.$$fightData.$choice.$type = -2;
-            //combatant.$$fightData.$choice.$attack = -1;
-            //console.warn('[!FightScene]', combatant.$$fightData.$choice.$type)
-        }
-
-    }
-
-    //敌人
-    else if(combatant.$$fightData.$info.$teamsID[0] === 1) {
-        //敌人 选择技能
-        //!!!!!这里需要加入：1、普通攻击概率；2、魔法值不足；3、最后还是普通攻击：OK
-
-        useSkillsOrGoods = game.$sys.resources.commonScripts["enemy_choice_skills_algorithm"](combatant);
-
-
-        //普通攻击或技能或道具（敌人被乱）
-        if(combatant.$$fightData.$choice.$type === 3 || combatant.$$fightData.$choice.$type === 2) {
-            useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
-        }
-    }
-
+    useSkillsOrGoods = game.$sys.resources.commonScripts["fight_role_choice_skills_or_goods_algorithm"](combatant);
+    //不做处理
+    if(useSkillsOrGoods === true)
+        return 1;
 
 
     //!循环测试所有技能，直到有可以用的
@@ -547,9 +477,9 @@ function skillChoiceCanUsing(params, combatant) {
 
             //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
             if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
-                    GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
-                    GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets[params.Step])
-                    ) {
+                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
+                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets[params.Step])
+                ) {
                 //selecting.push(...combatant.$$fightData.$lastChoice.$targets);
 
                 //循环每个选择的战斗人物，并根据条件来压入 上次选择的
@@ -576,10 +506,10 @@ function skillChoiceCanUsing(params, combatant) {
         selecting = [...new Array(params.Items.length).keys()];
 
         //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
-        if(combatant.$$fightData.$info.$teamsID[0] === 0
-                && GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets)
-                && GlobalLibraryJS.isValidNumber(combatant.$$fightData.$lastChoice.$targets[params.Step])
-                ) {
+        if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
+            GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
+            GlobalLibraryJS.isValidNumber(combatant.$$fightData.$lastChoice.$targets[params.Step])
+            ) {
             selecting.push(combatant.$$fightData.$lastChoice.$targets[params.Step]);
         }
     }
@@ -1459,6 +1389,34 @@ function resetRolesPosition() {
 }
 
 
+//战斗人物回合脚本
+function *runCombatantRoundScript(combatant, step) {
+    //执行 战斗人物回合 脚本
+    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, step);
+
+    if(combatantRoundScript === null) {
+        return null;
+    }
+    else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
+        for(let tCombatantActionSpriteData of combatantRoundScript) {
+            let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
+
+            if(SkillEffectResult === 1)
+                yield 0;
+            else if(SkillEffectResult === 0) {
+
+            }
+            else {
+
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+
 //一个回合
 //yield：0表示进行动画播放，需要等待；1：战斗人物回合之间需要等待；
 //return：undefined表示没有结束；否则（返回对象）战斗结束
@@ -1488,10 +1446,7 @@ function *fnRound() {
         else if(GlobalLibraryJS.isValidNumber(tValue)) {
 
             //暂停时间
-            GlobalLibraryJS.setTimeout(function() {
-                //开始运行
-                fight.continueFight();
-            },tValue,rootFightScene, 'fight.continueFight');
+            fight.$sys.continueFight(1, tValue);
 
             yield 1;
             continue;
@@ -1506,32 +1461,15 @@ function *fnRound() {
 
         do {
 
-
-            //执行 战斗人物回合 脚本
-            let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, 1);
-
-            if(combatantRoundScript === null) {
-                break;
-            }
-            else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
-                for(let tCombatantActionSpriteData of combatantRoundScript) {
-                    let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-
-                    if(SkillEffectResult === 1)
-                        yield 0;
-                    else if(SkillEffectResult === 0) {
-
-                    }
-                    else {
-
-                    }
-                }
-            }
-
+            //战斗人物回合脚本
+            let ret = yield *runCombatantRoundScript(combatant, 1);
 
 
             if(FightSceneJS.combatantUseSkillOrGoods(combatant) < 0)
                 break;
+
+
+            ret = yield *runCombatantRoundScript(combatant, 2);
 
 
 
@@ -1721,26 +1659,7 @@ function *fnRound() {
 
 
 
-        //执行 战斗人物回合 脚本
-        let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, 2);
-
-        if(combatantRoundScript === null) {
-            continue;
-        }
-        else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
-            for(let tCombatantActionSpriteData of combatantRoundScript) {
-                let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-
-                if(SkillEffectResult === 1)
-                    yield 0;
-                else if(SkillEffectResult === 0) {
-
-                }
-                else {
-
-                }
-            }
-        }
+        let ret = yield *runCombatantRoundScript(combatant, 3);
 
     }   //for
 
@@ -1769,26 +1688,8 @@ function *gfFighting() {
         //循环每个队伍，开始遍历运行 Buff
         for(let tcombatant of [..._private.myCombatants, ..._private.enemies]) {
 
-            let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](tcombatant, _private.nRound, 0);
-
-            if(combatantRoundScript === null) {
-
-            }
-            else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
-                for(let tCombatantActionSpriteData of combatantRoundScript) {
-                    let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, tcombatant);
-
-                    if(SkillEffectResult === 1)
-                        yield 0;
-                    else if(SkillEffectResult === 0) {
-
-                    }
-                    else {
-
-                    }
-                }
-            }
-
+            //战斗人物回合脚本
+            let ret = yield *runCombatantRoundScript(tcombatant, 0);
 
             //重新计算属性
             game.$sys.resources.commonScripts["refresh_combatant"](tcombatant);
@@ -1816,7 +1717,7 @@ function *gfFighting() {
         //console.debug("运行回合事件!!!", _private.nRound)
         fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round11'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
-        fight.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
+        fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
 
 
@@ -1861,7 +1762,7 @@ function *gfFighting() {
         //console.debug("运行回合事件!!!", _private.nRound)
         fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round12'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
-        fight.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
+        fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
 
 
@@ -1877,8 +1778,8 @@ function *gfFighting() {
                 //否则导致递归代码：在 asyncScript执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScript，导致递归运行!!!
                 GlobalLibraryJS.setTimeout(function() {
                     //开始运行
-                    fight.continueFight();
-                },0,rootFightScene, 'fight.continueFight');
+                    fight.$sys.continueFight();
+                },0,rootFightScene, 'fight.$sys.continueFight');
 
             }, 'continueFight']);
 

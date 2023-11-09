@@ -43,9 +43,12 @@ Item {
         readonly property alias myCombatants: _private.myCombatants
         readonly property alias enemies: _private.enemies
 
-        property alias nAutoAttack: _private.nAutoAttack
+
+        //!!兼容旧代码
         readonly property var saveLast: FightSceneJS.saveLast
         readonly property var loadLast: FightSceneJS.loadLast
+        readonly property var refreshCombatant: fight.$sys.refreshCombatant
+        property alias nAutoAttack: _private.nAutoAttack
 
 
 
@@ -69,6 +72,7 @@ Item {
 
         }
 
+        //同 game.msg
         readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}, callback=true) {
             //game.msg(msg, interval, pretext, keeptime, style);
 
@@ -204,7 +208,7 @@ Item {
             }
 
             //下次js循环运行
-            if(vScript === true) {
+            else if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
                         _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
@@ -214,6 +218,10 @@ Item {
                 _private.asyncScript.runNextEventLoop('fight.run1');
 
                 return 0;
+            }
+
+            else if(vScript === false) {
+                return false;
             }
 
 
@@ -276,31 +284,6 @@ Item {
         }
 
 
-        readonly property var continueFight: function(type=0) {
-            if(type === 1)
-                //将 continueFight 放在脚本队列最后
-                fight.run([function() {
-
-                    //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 asyncScript）
-                    //否则导致递归代码：在 asyncScript执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScript，导致递归运行!!!
-                    GlobalLibraryJS.setTimeout(function() {
-                        //开始运行
-                        _private.genFighting.run();
-                    },0,rootFightScene, 'fight.continueFight');
-
-                }, 'continueFight']);
-            else
-                _private.genFighting.run();
-
-        }
-
-        //刷新战斗人物（目前只是血量）
-        readonly property var refreshCombatant: function(combatant) {
-            if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$spriteEffect)
-                combatant.$$fightData.$info.$spriteEffect.propertyBar.refresh(combatant.$$propertiesWithExtra.HP);
-            //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
-        }
-
         property var d: ({})
 
 
@@ -315,6 +298,49 @@ Item {
 
             gfChoiceSingleCombatantSkill: FightSceneJS.gfChoiceSingleCombatantSkill,
             gfNoChoiceSkill: FightSceneJS.gfNoChoiceSkill,
+
+            saveLast: FightSceneJS.saveLast,
+            loadLast: FightSceneJS.loadLast,
+            resetFightScene: FightSceneJS.resetFightScene,
+
+            continueFight: function(type=0, delay=0) {
+                if(type === 1)
+                    //将 continueFight 放在脚本队列最后
+                    fight.run([function() {
+
+                        //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 asyncScript）
+                        //否则导致递归代码：在 asyncScript执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScript，导致递归运行!!!
+                        GlobalLibraryJS.setTimeout(function() {
+                            //开始运行
+                            _private.genFighting.run();
+                        }, delay, rootFightScene, 'fight.continueFight');
+
+                    }, 'continueFight']);
+                else
+                    _private.genFighting.run();
+
+            },
+
+            //刷新战斗人物（目前只是血量）
+            refreshCombatant: function(combatant) {
+                if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$spriteEffect)
+                    combatant.$$fightData.$info.$spriteEffect.propertyBar.refresh(combatant.$$propertiesWithExtra.HP);
+                //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+            },
+
+            runAway: FightSceneJS.runAway,
+
+            stage: function(value) {
+                if(value !== undefined)
+                    _private.nStage = value;
+                return _private.nStage;
+            },
+            autoAttack(value) {
+                if(value !== undefined)
+                    _private.nAutoAttack = value;
+                return _private.nAutoAttack;
+            },
+
 
             components: {
                 menuSkillsOrGoods: menuSkillsOrGoods,
@@ -423,59 +449,29 @@ Item {
 
     signal s_FightOver();
     onS_FightOver: {
-        //audioFightMusic.stop();
-
-        FightSceneJS.resetFightScene();
-
-        fight.d = {};
-
-        _private.asyncScript.clear(1);
-        _private.genFighting.clear();
-        ////numberanimationSpriteEffectX.stop();
-        ////numberanimationSpriteEffectY.stop();
-        timerRoleSprite.stop();
-
-        //_private.enemies = [];
-        //_private.arrTempLoopedAllFightHeros = [];
-        //_private.nRound = 0;
-        ////_private.nStep = 0;
-        _private.nStage = 0;
-
-        //repeaterEnemies.model = 0;
-        //repeaterMyCombatants.model = 0;
-
-        for(let tSpriteEffectIndex in _private.mapSpriteEffectsTemp) {
-            _private.mapSpriteEffectsTemp[tSpriteEffectIndex].destroy();
-        }
-        _private.mapSpriteEffectsTemp = {};
-
-
-        for(let i in _private.myCombatants) {
-            //_private.myCombatants[i].$$fightData.$buffs = {};
-
-            //必须清空lastTarget，否则有可能下次指向不存在的敌人
-            _private.myCombatants[i].$$fightData.$lastChoice.$targets = undefined;
-            _private.myCombatants[i].$$fightData.$choice.$targets = undefined;
-            delete _private.myCombatants[i].$$fightData.$info;
-        }
-
-
-
-        rootGameScene.focus = true;
-        rootFightScene.visible = false;
-
-        game.stage(0);
-        //_private.nStage = 0;
-        game.goon('$fight');
-
-        game.run(true);
-
-        //升级检测
-        //for(let h in game.gd["$sys_fight_heros"]) {
-        //    game.levelup(game.gd["$sys_fight_heros"][h]);
-        //}
+        release();
     }
 
+
+    function load() {
+        for(let tb of game.$sys.resources.commonScripts["fight_buttons"]) {
+            //let compButtons1 = Qt.createComponent('qrc:/QML/_Global/Button/ColorButton.qml');
+            //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
+            let button = compButtons.createObject(rowlayoutButtons);
+            button.text = tb.$text;
+            button.clicked.connect(function(){
+                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //    return;
+                fight.run(tb.$action(button));
+            });
+        }
+    }
+
+    function unload() {
+        for(let tb in rowlayoutButtons.children) {
+            rowlayoutButtons.children[tb].destroy();
+        }
+    }
 
 
     function *init(fightScriptData) {
@@ -672,28 +668,73 @@ Item {
 
         _private.genFighting.create(FightSceneJS.gfFighting(), 'gfFighting', -1);
 
-        //将 continueFight 放在脚本队列最后
-        fight.run([function() {
-
-            //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 asyncScript）
-            //否则导致递归代码：在 asyncScript执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScript，导致递归运行!!!
-            GlobalLibraryJS.setTimeout(function() {
-                //开始运行
-                let ret = _private.genFighting.run();
-            },0,rootFightScene,'fight init');
-
-        }, 'FightingStart']);
-
+        fight.$sys.continueFight(1);
     }
+
+    function release() {
+        //audioFightMusic.stop();
+
+        FightSceneJS.resetFightScene();
+
+        fight.d = {};
+
+        _private.asyncScript.clear(1);
+        _private.genFighting.clear();
+        ////numberanimationSpriteEffectX.stop();
+        ////numberanimationSpriteEffectY.stop();
+        timerRoleSprite.stop();
+
+        //_private.enemies = [];
+        //_private.arrTempLoopedAllFightHeros = [];
+        //_private.nRound = 0;
+        ////_private.nStep = 0;
+        _private.nStage = 0;
+
+        //repeaterEnemies.model = 0;
+        //repeaterMyCombatants.model = 0;
+
+        for(let tSpriteEffectIndex in _private.mapSpriteEffectsTemp) {
+            _private.mapSpriteEffectsTemp[tSpriteEffectIndex].destroy();
+        }
+        _private.mapSpriteEffectsTemp = {};
+
+
+        for(let i in _private.myCombatants) {
+            //_private.myCombatants[i].$$fightData.$buffs = {};
+
+            //必须清空lastTarget，否则有可能下次指向不存在的敌人
+            _private.myCombatants[i].$$fightData.$lastChoice.$targets = undefined;
+            _private.myCombatants[i].$$fightData.$choice.$targets = undefined;
+            delete _private.myCombatants[i].$$fightData.$info;
+        }
+
+
+
+        rootGameScene.focus = true;
+        rootFightScene.visible = false;
+
+        game.stage(0);
+        //_private.nStage = 0;
+        game.goon('$fight');
+
+        game.run(true);
+
+        //升级检测
+        //for(let h in game.gd["$sys_fight_heros"]) {
+        //    game.levelup(game.gd["$sys_fight_heros"][h]);
+        //}
+    }
+
+
 
     //刷新所有人物信息（目前只是血条）
     function refreshAllFightRoleInfo() {
         for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-            fight.refreshCombatant(_private.myCombatants[i]);
+            fight.$sys.refreshCombatant(_private.myCombatants[i]);
             //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
         }
         for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-            fight.refreshCombatant(_private.enemies[i]);
+            fight.$sys.refreshCombatant(_private.enemies[i]);
             //repeaterEnemies.itemAt(i).propertyBar.refresh(_private.enemies[i].$$propertiesWithExtra.HP);
         }
 
@@ -749,6 +790,15 @@ Item {
             }
         }
     }
+
+    Component {
+        id: compButtons
+
+        ColorButton {
+
+        }
+    }
+
 
 
     //背景
@@ -888,7 +938,7 @@ Item {
                             menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                             menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
                             //menuFightRoleChoice.show(_private.arrMenu);
-                            menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menu"].$menu);
+                            menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
                         }
                         else if(parent.bCanClick === true) {
                             FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
@@ -1012,6 +1062,62 @@ Item {
 
     }
 
+
+
+    //战场的消息框
+    Loader {
+        id: dialogFightMsg
+
+        visible: true
+        anchors.fill: parent
+        //z: 6
+
+        sourceComponent: compGameMsg
+        asynchronous: false
+
+        Connections {
+            target: dialogFightMsg.item
+
+            /*function onAccepted() {
+            }
+
+            function onRejected() {
+            }
+            */
+        }
+
+        onLoaded: {
+            //改变回调函数
+        }
+    }
+
+
+    //战场的菜单
+    Loader {
+        id: loaderFightMenu
+
+        visible: true
+        anchors.fill: parent
+        //z: 6
+
+        sourceComponent: compGameMenu
+        asynchronous: false
+
+        /*Connections {
+            target: loaderFightMenu.item
+
+            function onS_Choice(index) {
+            }
+        }
+        */
+
+        onLoaded: {
+            //改变回调函数
+        }
+    }
+
+
+
     //战斗人物的 选择主菜单
     GameMenu {
         id: menuFightRoleChoice
@@ -1025,7 +1131,7 @@ Item {
             //hide();
             menuFightRoleChoice.visible = false;
 
-            game.$sys.resources.commonScripts["fight_menu"].$actions[index](_private.nChoiceFightRoleIndex);
+            game.$sys.resources.commonScripts["fight_menus"].$actions[index](_private.nChoiceFightRoleIndex);
             return;
 
 
@@ -1106,6 +1212,22 @@ Item {
 
 
 
+    //游戏消息框，暂时不用
+    Message {
+        id: msgbox
+        //width: parent.width
+        Layout.preferredWidth: parent.width
+        Layout.preferredHeight: parent.height
+        Layout.fillHeight: true
+        //implicitHeight: parent.height / 2
+        //height: parent.height / 2
+        textArea.readOnly: true
+        //text: ""
+        visible: false
+    }
+
+
+
     //按钮
     ColumnLayout {
         id: flow
@@ -1121,7 +1243,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
 
 
-            ColorButton {
+            /*ColorButton {
                 text: "重复上次"
                 onButtonClicked: {
                     //rowlayoutButtons.enabled = false;
@@ -1149,7 +1271,7 @@ Item {
                         }
                     }
                 }
-            }*/
+            }* /
 
             ColorButton {
                 text: "逃跑"
@@ -1174,13 +1296,6 @@ Item {
                     }
                     else
                         _private.nAutoAttack = 0;
-                }
-            }
-
-            /*ColorButton {
-                text: "逃跑"
-                onButtonClicked: {
-                    rowlayoutButtons.enabled = false;
                 }
             }
             */
@@ -1254,21 +1369,6 @@ Item {
             }
         }*/
 
-
-
-        //游戏消息框，暂时不用
-        Message {
-            id: msgbox
-            //width: parent.width
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: parent.height
-            Layout.fillHeight: true
-            //implicitHeight: parent.height / 2
-            //height: parent.height / 2
-            textArea.readOnly: true
-            //text: ""
-            visible: false
-        }
     }
 
 
@@ -1327,61 +1427,6 @@ Item {
                     FightSceneJS.choicedSkillOrGoods(arrData[index], nType);
                 }
             }
-        }
-    }
-
-
-
-    //战场的菜单
-    Loader {
-        id: loaderFightMenu
-
-        visible: true
-        anchors.fill: parent
-        //z: 6
-
-        sourceComponent: compGameMenu
-        asynchronous: false
-
-        /*Connections {
-            target: loaderFightMenu.item
-
-            function onS_Choice(index) {
-            }
-        }
-        */
-
-        onLoaded: {
-            //改变回调函数
-        }
-    }
-
-
-
-    //战场的消息框
-    Loader {
-        id: dialogFightMsg
-
-        visible: true
-        anchors.fill: parent
-        //z: 6
-
-        sourceComponent: compGameMsg
-        asynchronous: false
-
-        Connections {
-            target: dialogFightMsg.item
-
-            /*function onAccepted() {
-            }
-
-            function onRejected() {
-            }
-            */
-        }
-
-        onLoaded: {
-            //改变回调函数
         }
     }
 

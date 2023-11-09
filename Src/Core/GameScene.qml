@@ -73,7 +73,7 @@ import "GameScene.js" as GameSceneJS
     _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
     _private.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
     _private.objCommonScripts["fight_skill_algorithm"]：战斗算法
-    _private.objCommonScripts["enemy_choice_skills_algorithm"]：敌人出技能算法
+    _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"]：战斗人物选择技能或物品算法
     _private.objCommonScripts["game_over_script"];   //游戏结束脚本
     _private.objCommonScripts["common_run_away_algorithm"]：逃跑算法
     _private.objCommonScripts["fight_start_script"]：战斗开始通用脚本
@@ -83,7 +83,7 @@ import "GameScene.js" as GameSceneJS
     _private.objCommonScripts["fight_combatant_melee_position_algorithm"]：//战斗角色近战 坐标
     _private.objCommonScripts["fight_skill_melee_position_algorithm"]//特效在战斗角色的 坐标
     _private.objCommonScripts["fight_combatant_set_choice"] //设置 战斗人物的 初始化 或 休息
-    _private.objCommonScripts["fight_menu"]//战斗菜单
+    _private.objCommonScripts["fight_menus"]//战斗菜单
     //_private.objCommonScripts["resume_event_script"]
     //_private.objCommonScripts["get_goods_script"]
     //_private.objCommonScripts["use_goods_script"]
@@ -154,7 +154,7 @@ Rectangle {
         //在屏幕中间显示提示信息。
         //interval为文字显示间隔，为0则不使用；
         //pretext为已显示的文字；
-        //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
+        //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
         //style为样式；
         //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
         //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
@@ -3370,7 +3370,7 @@ Rectangle {
             }
 
             //下次js循环运行
-            if(vScript === true) {
+            else if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
                         _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
@@ -3380,6 +3380,10 @@ Rectangle {
                 _private.asyncScript.runNextEventLoop('game.run1');
 
                 return 0;
+            }
+
+            else if(vScript === false) {
+                return false;
             }
 
 
@@ -3697,6 +3701,7 @@ Rectangle {
         game.gd["$sys_sound"] = 0b11;
         game.gd["$sys_music"] = '';
         game.gd["$sys_scale"] = 1;
+
 
         if(bLoadResources)
             GameSceneJS.loadResources();

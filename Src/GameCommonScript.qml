@@ -571,7 +571,7 @@ function $refreshCombatant(combatant) {
         //计算新属性
         computeCombatantPropertiesWithExtra(combatant);
         //刷新战斗时人物数据
-        fight.refreshCombatant(combatant);
+        fight.$sys.refreshCombatant(combatant);
     //}, 'refreshCombatant1'], 0);
 }
 
@@ -629,7 +629,7 @@ function levelUp(combatant, level=0, refresh=true) {
             //计算新属性
             computeCombatantPropertiesWithExtra(combatant);
             //刷新战斗时人物数据
-            fight.refreshCombatant(combatant);
+            fight.$sys.refreshCombatant(combatant);
         },'refreshCombatant2']);
 }
 
@@ -800,11 +800,116 @@ function $skillEffectAlgorithm(combatant, targetCombatant, Params) {
     return [{'HP': [harm, Math.floor(harm / 4)], Target: targetCombatant}];
 }
 
-//敌人选择技能算法
-function $enemyChoiceSkillsAlgorithm(combatant) {
-    //返回打乱后的所有技能
-    let useSkills = game.$globalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0, 1])[1]);
-    return useSkills;
+
+
+//战斗人物选择技能或道具算法
+//返回倒序使用的技能数组；
+//返回true表示不做 技能或道具的 使用和检查处理（比如乱）；
+function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
+    let useSkillsOrGoods = [];
+
+    let buffFlags = 0;
+    let buffs = combatant.$$fightData.$buffs;
+    for(let tbuffsIndex in buffs) {
+        let tbuff = buffs[tbuffsIndex];
+        //乱
+        if(tbuff.flags & 0b0100) {
+            buffFlags |= 0b0100;
+            return true;
+        }
+        //封
+        if(tbuff.flags & 0b0010) {
+            buffFlags |= 0b0010;
+        }
+    }
+
+
+
+    //我方
+    if(combatant.$$fightData.$info.$teamsID[0] === 0) {
+        //检查技能
+
+        //所有普通技能作为备选
+        useSkillsOrGoods = fight.$sys.getCombatantSkills(combatant, [0])[1];
+
+        //普通攻击或技能
+        if(combatant.$$fightData.$choice.$type === 3) {
+            //如果被封
+            if(buffFlags & 0b0010)
+                return useSkillsOrGoods;
+
+
+            //判断技能是否可用，不能用则 $choice.$type = -2 随机选择
+            do {
+                //是否有这个技能
+                let bFind = false;
+                let allSkills = fight.$sys.getCombatantSkills(combatant)[1];
+                for(let ts of allSkills) {
+                    if(ts.$rid === combatant.$$fightData.$choice.$attack.$rid) {
+                        bFind = true;
+                        break;
+                    }
+                }
+                //如果没这个技能，则不能用
+                //if(!game.skill(combatant, combatant.$$fightData.$choice.$attack))
+                if(!bFind)
+                    break;
+
+                //如果技能可用
+                //不是 普通技能，放在最后（第一次进行使用判断）
+                if(combatant.$$fightData.$choice.$attack.$type !== 0)
+                    useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
+
+            }while(0);
+
+        }
+        //道具
+        else if(combatant.$$fightData.$choice.$type === 2) {
+
+            //判断道具是否可用，不能用则 $choice.$type = -2 随机选择
+            let goods = combatant.$$fightData.$choice.$attack;
+            //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
+            do {
+                //如果没这个道具，则不能用
+                if(!game.goods(goods))
+                    break;
+
+                //如果道具可用
+                //放在最后
+                useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
+
+            }while(0);
+        }
+        //其他类型（-1和-2）
+        else {
+            combatant.$$fightData.$choice.$type = -2;
+            //combatant.$$fightData.$choice.$attack = -1;
+            //console.warn('[!FightScene]', combatant.$$fightData.$choice.$type)
+        }
+
+    }
+
+    //敌人
+    else if(combatant.$$fightData.$info.$teamsID[0] === 1) {
+        //敌人 选择技能
+        //!!!!!这里需要加入：1、普通攻击概率；2、魔法值不足；3、最后还是普通攻击：OK
+
+        //如果被封
+        if(buffFlags & 0b0010)
+            return game.$globalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0])[1]);
+
+
+        //返回打乱后的所有技能
+        useSkillsOrGoods = game.$globalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0, 1])[1]);
+
+
+        //普通攻击或技能或道具（敌人被乱）
+        if(combatant.$$fightData.$choice.$type === 3 || combatant.$$fightData.$choice.$type === 2) {
+            useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
+        }
+    }
+
+    return useSkillsOrGoods;
 }
 
 
@@ -817,7 +922,7 @@ function $enemyChoiceSkillsAlgorithm(combatant) {
 //    5属性：BuffName、Round、Properties、Flags；
 //        Properties：[属性名, 值, type]：Type为0表示相加，Type为1表示 与属性相乘；
 //      Flags：实质是决定什么时候运行脚本（见combatantRoundEffects），可表示 毒乱封眠属性 类型，也可以表示 buff类型；
-//          比如 毒 是回合开始前执行 buffAnimationEffect，乱封眠 是 combatant 行动前执行 buffAnimationEffect。
+//          比如 毒 是回合开始前执行 buffScript，乱封眠 是 combatant 行动前执行 buffScript。
 //  params：
 //      BuffName：存储的 Buff 名称，如果不同则插入，如果相同则会覆盖；
 //      Override表示是否覆盖（如果不覆盖，则 Buff名 后加时间戳来防止重复）
@@ -840,7 +945,7 @@ function getBuff(combatant, buffCode, params={}) {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
-            buffAnimationEffect: function*(combatant, objBuff) {
+            buffScript: function*(combatant, objBuff) {
                 //结算
                 let harm = 10;
                 //伤害类型：直接减
@@ -878,13 +983,13 @@ function getBuff(combatant, buffCode, params={}) {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
-            buffAnimationEffect: function*(combatant, objBuff) {
+            buffScript: function*(combatant, objBuff) {
                 //技能为普通攻击的第一个
                 let skills = fight.$sys.getCombatantSkills(combatant, [0], 0b1)[1];
                 combatant.$$fightData.$choice.$type = 3;
                 combatant.$$fightData.$choice.$attack = skills[0];
                 //目标为自己
-                combatant.$$fightData.$lastChoice.$targets = [[combatant]];
+                combatant.$$fightData.$choice.$targets = [[combatant]];
 
                 //显示
                 yield ({Type: 30, Interval: 0, Color: 'yellow', Text: params.BuffName, FontSize: 20, Combatant: combatant, Position: undefined});
@@ -908,11 +1013,11 @@ function getBuff(combatant, buffCode, params={}) {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
-            buffAnimationEffect: function*(combatant, objBuff) {
+            buffScript: function*(combatant, objBuff) {
                 //技能为 普通攻击 的最后一个
-                let skills = fight.$sys.getCombatantSkills(combatant, [0])[1];
-                combatant.$$fightData.$choice.$type = 3;
-                combatant.$$fightData.$choice.$attack = skills.pop();
+                //let skills = fight.$sys.getCombatantSkills(combatant, [0])[1];
+                //combatant.$$fightData.$choice.$type = 3;
+                //combatant.$$fightData.$choice.$attack = skills.pop();
                 //combatant.$$fightData.$choice.$targets = undefined;
 
                 //显示
@@ -937,7 +1042,7 @@ function getBuff(combatant, buffCode, params={}) {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
-            buffAnimationEffect: function*(combatant, objBuff) {
+            buffScript: function*(combatant, objBuff) {
                 $fightCombatantSetChoice(combatant, 1, false);
                 //combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
@@ -965,7 +1070,7 @@ function getBuff(combatant, buffCode, params={}) {
             //回合数
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
-            buffAnimationEffect: function*(combatant, objBuff) {
+            buffScript: function*(combatant, objBuff) {
 
                 //显示
                 yield ({Type: 30, Interval: 0, Color: 'yellow', Text: params.BuffName, FontSize: 20, Combatant: combatant, Position: undefined});
@@ -997,15 +1102,15 @@ function getBuff(combatant, buffCode, params={}) {
 
 //每个战斗人物（我方、敌方）的回合脚本；
 //round为回合数；
-//stage：0为回合开始前；1为战斗人物行动前；2为战斗人物行动后；
+//stage：0为回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
 //返回null表示跳过回合（stage为1时有效）
 function $combatantRoundScript(combatant, round, stage) {
     switch(stage) {
     case 0:
-        //下场 的或 没血的休息
+        //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             $fightCombatantSetChoice(combatant, 1, false);
-            //combatant.$$fightData.$choice.$type = 1;
+            combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
             return null;
@@ -1014,7 +1119,30 @@ function $combatantRoundScript(combatant, round, stage) {
     case 1:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            //console.debug('没血');
+            $fightCombatantSetChoice(combatant, 1, false);
+            combatant.$$fightData.$choice.$type = 1;
+
+            //去掉，则死亡后仍然有buff效果
+            return null;
+        }
+        break;
+    case 2:
+        //跳过下场 的或 没血的
+        if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
+            $fightCombatantSetChoice(combatant, 1, false);
+            combatant.$$fightData.$choice.$type = 1;
+
+            //去掉，则死亡后仍然有buff效果
+            return null;
+        }
+        break;
+    case 3:
+        //跳过下场 的或 没血的
+        if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
+            $fightCombatantSetChoice(combatant, 1, false);
+            combatant.$$fightData.$choice.$type = 1;
+
+            //去掉，则死亡后仍然有buff效果
             return null;
         }
         break;
@@ -1025,8 +1153,7 @@ function $combatantRoundScript(combatant, round, stage) {
 }
 
 //战斗人物回合脚本（主要是剧情和Buff），会在两个阶段分别执行一次；
-//round为回合数；
-//stage：0为回合开始前；1为战斗人物行动前；2为战斗人物行动后；
+//参数同 $combatantRoundScript；
 function *combatantRoundEffects(combatant, round, stage) {
 
     let buffs = combatant.$$fightData.$buffs;
@@ -1054,56 +1181,56 @@ function *combatantRoundEffects(combatant, round, stage) {
         //毒
         if(tbuff.flags & 0b1000) {
             if(stage === 0) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffScript) {
                     --tbuff.round;
 
                     //毒 的 方法和参数
-                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
+                    yield* tbuff.buffScript(combatant, tbuff);
                 }
             }
         }
         //乱
         if(tbuff.flags & 0b0100) {
-            if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
+            if(stage === 2) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffScript) {
                     //乱 的 方法和参数
-                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
+                    yield* tbuff.buffScript(combatant, tbuff);
                 }
             }
-            else if(stage === 2)
+            else if(stage === 3)
                 --tbuff.round;
         }
         //封
         if(tbuff.flags & 0b0010) {
-            if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
+            if(stage === 2) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffScript) {
                     //封 的 方法和参数
-                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
+                    yield* tbuff.buffScript(combatant, tbuff);
                 }
             }
-            else if(stage === 2)
+            else if(stage === 3)
                 --tbuff.round;
         }
         //眠
         if(tbuff.flags & 0b0001) {
             if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffScript) {
                     //眠 的 方法和参数
-                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
+                    yield* tbuff.buffScript(combatant, tbuff);
                 }
             }
-            else if(stage === 2)
+            else if(stage === 3)
                 --tbuff.round;
         }
         //其他
         if(tbuff.flags & 0b10000) {
-            if(stage === 1) {
-                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffAnimationEffect) {
+            if(stage === 2) {
+                if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0 && tbuff.buffScript) {
                     //其他 的 方法和参数
-                    yield* tbuff.buffAnimationEffect(combatant, tbuff);
+                    yield* tbuff.buffScript(combatant, tbuff);
                 }
             }
-            else if(stage === 2)
+            else if(stage === 3)
                 --tbuff.round;
         }
 
@@ -1353,7 +1480,7 @@ function *$commonFightInitScript(teams, fightData) {
 
 
 
-    yield fight.msg('通用战斗初始化事件', 0);
+    yield fight.msg('通用战斗初始化事件', 0, '', 500);
 
 
     let fightInitScript = fightData.$commons.$fightInitScript || fightData.$commons.FightInitScript;
@@ -1369,7 +1496,7 @@ function *$commonFightStartScript(teams, fightData) {
     //let game = this.game;
     //let fight = this.fight;
 
-    yield fight.msg('战斗开始通用脚本', 0);
+    yield fight.msg('战斗开始通用脚本', 0, '', 500);
 
 
 
@@ -1409,18 +1536,18 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
         //teams = [...teams[0], ...teams[1]];
 
         //!!这个是放置类的自动战斗功能代码
-        if(fight.nAutoAttack === 1) {
+        if(fight.$sys.autoAttack() === 1) {
             //自动重复上次类型，也可以根据需要改写
-            fight.loadLast();
+            fight.$sys.loadLast();
             /*game.$globalLibraryJS.setTimeout(function() {
-                    fight.continueFight();
+                    fight.$sys.continueFight();
                 },0,root
             );*/
         }
 
 
 
-        yield fight.msg('战斗回合通用脚本' + round, 0);
+        yield fight.msg('战斗回合通用脚本' + round, 0, '', 500);
         break;
     case 1:
         break;
@@ -1593,6 +1720,7 @@ function $fightCombatantSetChoice(combatant, type, bSaveLast) {
         combatant.$$fightData.$choice.$attack = undefined;
         combatant.$$fightData.$choice.$targets = undefined;
         if(bSaveLast) {
+            //fight.$sys.saveLast(combatant);
             combatant.$$fightData.$lastChoice.$type = -1;
             combatant.$$fightData.$lastChoice.$attack = undefined;
             combatant.$$fightData.$lastChoice.$targets = undefined;
@@ -1603,6 +1731,7 @@ function $fightCombatantSetChoice(combatant, type, bSaveLast) {
         combatant.$$fightData.$choice.$attack = undefined;
         combatant.$$fightData.$choice.$targets = undefined;
         if(bSaveLast) {
+            //fight.$sys.saveLast(combatant);
             combatant.$$fightData.$lastChoice.$type = 1;
             combatant.$$fightData.$lastChoice.$attack = undefined;
             combatant.$$fightData.$lastChoice.$targets = undefined;
@@ -1613,8 +1742,8 @@ function $fightCombatantSetChoice(combatant, type, bSaveLast) {
 
 
 //战斗菜单
-let $fightMenu = {
-    $menu: ['普通攻击', '技能', '物品', '信息', '休息'],
+let $fightMenus = {
+    $menus: ['普通攻击', '技能', '物品', '信息', '休息'],
     $actions: [
         function(combatantIndex) {
             fight.$sys.showSkillsOrGoods(0);
@@ -1645,6 +1774,55 @@ let $fightMenu = {
         },
     ],
 };
+
+//战斗按钮
+let $fightButtons = [
+    {
+        $text: '重复上次',
+        $action: function*(button) {
+            //rowlayoutButtons.enabled = false;
+
+            fight.$sys.resetFightScene();
+
+            if(fight.$sys.stage() === 1) {
+                fight.$sys.loadLast(true, 0);
+                fight.$sys.continueFight();
+            }
+            else if(fight.$sys.stage() === 2)
+                return;
+        },
+    },
+    {
+        $text: '逃跑',
+        $action: function*(button) {
+            fight.$sys.runAway();
+        },
+    },
+    {
+        $text: '手动攻击',
+        $action: function(button) {
+            if(fight.$sys.autoAttack() === 0) {
+                button.text = '自动攻击';
+
+                fight.$sys.autoAttack(1);
+
+
+                if(fight.$sys.stage() === 1) {
+                    fight.$sys.loadLast(true, 1);
+                    fight.$sys.continueFight();
+                }
+                else
+                    return false;
+            }
+            else {
+                button.text = '手动攻击';
+
+                fight.$sys.autoAttack(0);
+            }
+            return false;
+        },
+    },
+];
 
 
 

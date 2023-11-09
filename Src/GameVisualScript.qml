@@ -1419,7 +1419,7 @@ Rectangle {
                     strCreateMenu += "TextField {property int nIndex: %1; objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/  text: '%2'; placeholderText: '%3'; selectByMouse: true; onPressAndHold: {_private.showParamValues(this);} } ".arg(paramId).arg(defaultValue).arg(param[0]);
                     break;
                 case 'code':
-                    strCreateMenu += "Notepad {objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true;} ".arg(defaultValue).arg(param[0]);
+                    strCreateMenu += "Notepad {id: tNote; objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: tNote.textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: tNote.textArea.focus ? 2 : 1} ".arg(defaultValue).arg(param[0]);
                     break;
                 case 'label':
                     strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ color: 'white'; font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap} ".arg(param[0]);
@@ -1660,10 +1660,19 @@ Rectangle {
 
                     saveData();
 
+                    rectCommands.visible = false;
+                    rectParams.visible = false;
+                    l_listCommands.visible = false;
+                    l_listParam.visible = false;
+
                     s_close();
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
+                    rectCommands.visible = false;
+                    rectParams.visible = false;
+                    l_listCommands.visible = false;
+                    l_listParam.visible = false;
                     s_close();
                 },
                 OnDiscarded: ()=>{

@@ -20,7 +20,7 @@ QtObject {
     property string separator: Platform.separator(true)
 
     //引擎版本
-    property string version: "1.6.11.231107"
+    property string version: "1.6.12.231109"
 
 
     //配置
