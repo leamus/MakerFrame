@@ -2143,7 +2143,7 @@ function onTriggered() {
         let offsetMove = Math.round(mainRole.moveSpeed * realinterval);
 
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        if(_private.config.rJoystickSpeed > 0 && mainRole.nActionType === 10 && GlobalLibraryJS.objectIsEmpty(_private.keys)) {
+        if(_private.config.rJoystickSpeed > 0 && mainRole.nActionType === 10 && _private.arrPressedKeys.length === 0) {
             let tOffset;    //遥感百分比
             if(mainRole.moveDirection === Qt.Key_Left || mainRole.moveDirection === Qt.Key_Right) {
                 tOffset = Math.abs(joystick.pointInput.x);
@@ -2391,8 +2391,50 @@ function onTriggered() {
     }while(0);
 
 
-    //开始移动地图
-    setMapToRole(_private.sceneRole);
+    if(_private.sceneRole)
+        //开始移动地图
+        setSceneToRole(_private.sceneRole);
+    else {
+        //下面是移动代码
+
+        //计算真实移动偏移，初始为 角色速度 * 时间差
+        let offsetMoveX = 0;
+        let offsetMoveY = 0;
+
+        const dta = _private.rSceneMoveSpeed * realinterval;
+
+        //let arrKeys = Object.keys(_private.arrPressedKeys);
+        if(_private.arrPressedKeys.length > 0) {
+            if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0)
+                offsetMoveX = -Math.round(dta);
+            else if(_private.arrPressedKeys.indexOf(Qt.Key_Right) >= 0)
+                offsetMoveX = Math.round(dta);
+            if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0)
+                offsetMoveY = -Math.round(dta);
+            else if(_private.arrPressedKeys.indexOf(Qt.Key_Down) >= 0)
+                offsetMoveY = Math.round(dta);
+        }
+        //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
+        else if(_private.config.rJoystickSpeed > 0) {
+            offsetMoveX = Math.round(dta);
+            offsetMoveY = Math.round(dta);
+
+            let tOffset;    //遥感百分比
+            //if(Math.abs(joystick.pointInput.x) < _private.config.rJoystickSpeed) {
+                offsetMoveX = Math.round(offsetMoveX * joystick.pointInput.x);
+            //}
+            //if(Math.abs(joystick.pointInput.y) < _private.config.rJoystickSpeed) {
+                offsetMoveY = Math.round(offsetMoveY * joystick.pointInput.y);
+            //}
+        }
+
+        if(offsetMoveX || offsetMoveY) {
+            setScenePos(parseInt(-itemContainer.x + gameScene.width / 2 + offsetMoveX), parseInt(-itemContainer.y + gameScene.height / 2 + offsetMoveY));
+            //console.warn(-itemContainer.x, gameScene.width, itemContainer.width)
+            //itemContainer.x -= offsetMoveX;
+            //itemContainer.y -= offsetMoveY;
+        }
+    }
 
 
 

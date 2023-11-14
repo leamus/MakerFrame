@@ -34,7 +34,7 @@ import "FightScene.js" as FightSceneJS
 
 
 
-Item {
+Rectangle {
     id: rootFightScene
 
 
@@ -288,7 +288,9 @@ Item {
 
 
         readonly property var $sys: ({
-            container: itemRolesContainer,
+            screen: rootFightScene,    //固定屏幕上（所有，包含战斗场景）
+            scene: fightScene,      //战斗视窗
+            container: itemRolesContainer,  //容器（包含所有战斗人物）
 
             showSkillsOrGoods: FightSceneJS.showSkillsOrGoods,
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
@@ -742,8 +744,11 @@ Item {
 
 
 
-    focus: true
     anchors.fill: parent
+    clip: true
+    focus: true
+
+    color: 'black'
 
 
 
@@ -801,266 +806,283 @@ Item {
 
 
 
-    //背景
-    Rectangle {
-        anchors.fill: parent
-        color: 'black'
+    //战斗场景视窗
+    Item {
+        id: fightScene
 
-        Image {
-            id: imageBackground
+        width: parent.width
+        height: parent.height
+
+        clip: true
+
+
+
+        //背景
+        Rectangle {
             anchors.fill: parent
-            //source: "FightScene1.jpg"
-        }
+            color: 'black'
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                FightSceneJS.resetFightScene();
+            Image {
+                id: imageBackground
+                anchors.fill: parent
+                //source: "FightScene1.jpg"
+            }
 
-                //_private.nStep = 1;
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    FightSceneJS.resetFightScene();
 
-                mouse.accepted = true;
+                    //_private.nStep = 1;
+
+                    mouse.accepted = true;
+                }
             }
         }
-    }
 
 
-    //战斗人物容器
-    Item {
-        id: itemRolesContainer
-        width: rootFightScene.width
-        height: rootFightScene.height
+        //战斗人物容器
+        Item {
+            id: itemRolesContainer
 
-    //ColumnLayout {
-    //    width: parent.width / 2
-    //    height: parent.height / 2
+            width: parent.width
+            height: parent.height
 
-        //所有我方组件
-        Repeater {
-            id: repeaterMyCombatants
+        //ColumnLayout {
+        //    width: parent.width / 2
+        //    height: parent.height / 2
 
-            //!!废弃，兼容用
-            property int nCount: 0
+            //所有我方组件
+            Repeater {
+                id: repeaterMyCombatants
 
-
-            //model: 0
-            model: ListModel{}
-
-            SpriteEffect {
-                //id: tSpriteEffectMyCombatantBar
-
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                test: false
-
-                property var propertyBar: loaderMyCombatantPropertyBar.item
-                property alias strName: textMyCombatantsName.text
-
-                property bool bCanClick: false
+                //!!废弃，兼容用
+                property int nCount: 0
 
 
-                Text {
-                    id: textMyCombatantsName
+                //model: 0
+                model: ListModel{}
 
-                    anchors.bottom: loaderMyCombatantPropertyBar.bottom
-                    anchors.bottomMargin: 10
-                    width: parent.width
+                SpriteEffect {
+                    //id: tSpriteEffectMyCombatantBar
 
-                    color: "white"
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    test: false
 
-                    textFormat: Text.RichText
-                    font.pointSize: 10
-                    font.bold: true
-                    //wrapMode: Text.Wrap
-                }
+                    property var propertyBar: loaderMyCombatantPropertyBar.item
+                    property alias strName: textMyCombatantsName.text
 
-                Loader {
-                    id: loaderMyCombatantPropertyBar
-
-                    anchors.bottom: parent.top
-                    anchors.bottomMargin: 10
-                    width: parent.width
-                    height: _private.config.barHeight
-
-                    sourceComponent: compBar
-                    asynchronous: false
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        //if(!parent.animatedsprite.running)
-                        //    return;
-
-                        //弹出菜单
-                        if(_private.genFightChoice === null) {
-                        //if(_private.nStep === 1) {
-
-                            //没血的跳过
-                            if(_private.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
-                                return;
+                    property bool bCanClick: false
 
 
-                            //保存选择对象
-                            _private.nChoiceFightRoleIndex = modelData;
+                    Text {
+                        id: textMyCombatantsName
+
+                        anchors.bottom: loaderMyCombatantPropertyBar.bottom
+                        anchors.bottomMargin: 10
+                        width: parent.width
+
+                        color: "white"
+
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        textFormat: Text.RichText
+                        font.pointSize: 10
+                        font.bold: true
+                        //wrapMode: Text.Wrap
+                    }
+
+                    Loader {
+                        id: loaderMyCombatantPropertyBar
+
+                        anchors.bottom: parent.top
+                        anchors.bottomMargin: 10
+                        width: parent.width
+                        height: _private.config.barHeight
+
+                        sourceComponent: compBar
+                        asynchronous: false
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            //if(!parent.animatedsprite.running)
+                            //    return;
+
+                            //弹出菜单
+                            if(_private.genFightChoice === null) {
+                            //if(_private.nStep === 1) {
+
+                                //没血的跳过
+                                if(_private.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
+                                    return;
 
 
-                            //菜单位置
-                            /*跟随战士
-                            menuFightRoleChoice.parent = parent;
-                            menuFightRoleChoice.anchors.left = parent.right;
-                            menuFightRoleChoice.anchors.top = parent.top;
-                            */
+                                //保存选择对象
+                                _private.nChoiceFightRoleIndex = modelData;
 
-                            //菜单样式
-                            //let style = game.$sys.resources.commonScripts["$fight_menu"].$styles;
-                            let style = {};
-                            //样式
-                            if(!style)
-                                style = {};
-                            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$fight_menu') || {};
-                            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$fight_menu;
 
-                            //maskMenu.color = style.MaskColor || '#7FFFFFFF';
-                            menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-                            menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-                            menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
-                            menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-                            menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
-                            menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
-                            menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
-                            menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-                            menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-                            menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-                            menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-                            menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
-                            //menuFightRoleChoice.show(_private.arrMenu);
-                            menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
+                                //菜单位置
+                                /*跟随战士
+                                menuFightRoleChoice.parent = parent;
+                                menuFightRoleChoice.anchors.left = parent.right;
+                                menuFightRoleChoice.anchors.top = parent.top;
+                                */
+
+                                //菜单样式
+                                //let style = game.$sys.resources.commonScripts["$fight_menu"].$styles;
+                                let style = {};
+                                //样式
+                                if(!style)
+                                    style = {};
+                                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$fight_menu') || {};
+                                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$fight_menu;
+
+                                //maskMenu.color = style.MaskColor || '#7FFFFFFF';
+                                menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                                menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                                menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+                                menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+                                menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+                                menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+                                menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+                                menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+                                menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                                menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+                                menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+                                menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
+                                //menuFightRoleChoice.show(_private.arrMenu);
+                                menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
+                            }
+                            else if(parent.bCanClick === true) {
+                                FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
+                            }
+
+                            return;
                         }
-                        else if(parent.bCanClick === true) {
-                            FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
-                        }
+                    }
 
-                        return;
+                    onS_playEffect: {
+                        game.$sys.playSoundEffect(soundeffectSource);
                     }
                 }
-
-                onS_playEffect: {
-                    game.$sys.playSoundEffect(soundeffectSource);
-                }
             }
-        }
-    //}
+        //}
 
-    //ColumnLayout {
-    //    x: parent.width / 2
-    //    width: parent.width / 2
-    //    height: parent.height / 2
+        //ColumnLayout {
+        //    x: parent.width / 2
+        //    width: parent.width / 2
+        //    height: parent.height / 2
 
-        //所有敌方组件
-        Repeater {
-            id: repeaterEnemies
+            //所有敌方组件
+            Repeater {
+                id: repeaterEnemies
 
-            //!!废弃，兼容用
-            property int nCount: 0
-
-
-            //model: 0
-            model: ListModel{}
-
-            SpriteEffect {
-                //id: tSpriteEffectEnemy
-
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                test: false
-
-                property var propertyBar: loaderEnemyPropertyBar.item
-                property alias strName: textEnemyName.text
-
-                property bool bCanClick: false
+                //!!废弃，兼容用
+                property int nCount: 0
 
 
-                Text {
-                    id: textEnemyName
+                //model: 0
+                model: ListModel{}
 
-                    anchors.bottom: loaderEnemyPropertyBar.bottom
-                    anchors.bottomMargin: 10
-                    width: parent.width
+                SpriteEffect {
+                    //id: tSpriteEffectEnemy
 
-                    color: "white"
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    test: false
 
-                    textFormat: Text.RichText
-                    font.pointSize: 10
-                    font.bold: true
-                    //wrapMode: Text.Wrap
-                }
+                    property var propertyBar: loaderEnemyPropertyBar.item
+                    property alias strName: textEnemyName.text
+
+                    property bool bCanClick: false
 
 
-                Loader {
-                    id: loaderEnemyPropertyBar
+                    Text {
+                        id: textEnemyName
 
-                    anchors.bottom: parent.top
-                    anchors.bottomMargin: 10
-                    width: parent.width
-                    height: _private.config.barHeight
+                        anchors.bottom: loaderEnemyPropertyBar.bottom
+                        anchors.bottomMargin: 10
+                        width: parent.width
 
-                    sourceComponent: compBar
-                    asynchronous: false
-                }
+                        color: "white"
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        //不是选择敌方
-                        //if(_private.nStep !== 3)
-                        //    return;
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
 
-                        if(_private.genFightChoice !== null) {
-                            if(parent.bCanClick === true) {
-                                FightSceneJS.skillChoice(1, _private.enemies[modelData]);
+                        textFormat: Text.RichText
+                        font.pointSize: 10
+                        font.bold: true
+                        //wrapMode: Text.Wrap
+                    }
+
+
+                    Loader {
+                        id: loaderEnemyPropertyBar
+
+                        anchors.bottom: parent.top
+                        anchors.bottomMargin: 10
+                        width: parent.width
+                        height: _private.config.barHeight
+
+                        sourceComponent: compBar
+                        asynchronous: false
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            //不是选择敌方
+                            //if(_private.nStep !== 3)
+                            //    return;
+
+                            if(_private.genFightChoice !== null) {
+                                if(parent.bCanClick === true) {
+                                    FightSceneJS.skillChoice(1, _private.enemies[modelData]);
+                                }
                             }
                         }
                     }
-                }
 
-                onS_playEffect: {
-                    game.$sys.playSoundEffect(soundeffectSource);
-                }
+                    onS_playEffect: {
+                        game.$sys.playSoundEffect(soundeffectSource);
+                    }
 
-                Component.onCompleted: {
-                    //colorOverlayStart();
+                    Component.onCompleted: {
+                        //colorOverlayStart();
+                    }
                 }
             }
-        }
-    //}
+        //}
 
 
-        /*
-        NumberAnimation {
-            id: numberanimationSpriteEffectX
-            //target: handle.anchors
-            properties: "x"
-            //to: 0
-            //duration: 200
-            easing.type: Easing.OutSine
+            /*
+            NumberAnimation {
+                id: numberanimationSpriteEffectX
+                //target: handle.anchors
+                properties: "x"
+                //to: 0
+                //duration: 200
+                easing.type: Easing.OutSine
+            }
+            NumberAnimation {
+                id: numberanimationSpriteEffectY
+                //target: handle.anchors
+                properties: "y"
+                //to: 0
+                //duration: 200
+                easing.type: Easing.OutSine
+            }*/
+
         }
-        NumberAnimation {
-            id: numberanimationSpriteEffectY
-            //target: handle.anchors
-            properties: "y"
-            //to: 0
-            //duration: 200
-            easing.type: Easing.OutSine
-        }*/
 
     }
+
+
+
 
 
 

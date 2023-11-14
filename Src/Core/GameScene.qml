@@ -135,7 +135,7 @@ Rectangle {
 
             mainRole.$$collideRoles = {};
             mainRole.$$mapEventsTriggering = {};
-            _private.stopAction(1, -1);
+            _private.stopAction(0);
 
 
             let mapInfo = openMap(mapName, forceRepaint);
@@ -710,7 +710,7 @@ Rectangle {
                 if(props.$y !== undefined)   //修改y坐标
                     hero.$y = heroComp.y = props.$y;
                 if(props.$x !== undefined || props.$y !== undefined)
-                    if(heroComp === _private.sceneRole)setMapToRole(_private.sceneRole);
+                    if(heroComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
                 if(props.$bx || props.$by)
                     setMainRolePos(parseInt(props.$bx), parseInt(props.$by), hero.$index);
@@ -758,7 +758,7 @@ Rectangle {
                 mainRole.$props = {};
                 mainRole.refresh();
 
-                _private.stopAction(1, -1);
+                _private.stopAction(0);
             }
 
 
@@ -1048,7 +1048,7 @@ Rectangle {
                 if(props.$y !== undefined)   //修改y坐标
                     roleComp.y = props.$y;
                 if(props.$x !== undefined || props.$y !== undefined)
-                    if(roleComp === _private.sceneRole)setMapToRole(_private.sceneRole);
+                    if(roleComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
                 if(props.$bx !== undefined || props.$by !== undefined)
                     setRolePos(roleComp, props.$bx, props.$by);
@@ -2281,7 +2281,7 @@ Rectangle {
             if(properties.$videoOutput.$width === undefined && properties.$width === undefined)
                 videoOutput.width = Qt.binding(function(){return videoOutput.implicitWidth});
             else if(properties.$width === -1)
-                videoOutput.width = rootGameScene.width;
+                videoOutput.width = itemComponentsContainer.width;
             else if(GlobalLibraryJS.isValidNumber(properties.$width)) {
                 videoOutput.width = properties.$width * Screen.pixelDensity;
             }
@@ -2289,7 +2289,7 @@ Rectangle {
             if(properties.$videoOutput.$height === undefined && properties.$height === undefined)
                 videoOutput.height = Qt.binding(function(){return videoOutput.implicitHeight});
             else if(properties.$height === -1)
-                videoOutput.height = rootGameScene.height;
+                videoOutput.height = itemComponentsContainer.height;
             else if(GlobalLibraryJS.isValidNumber(properties.$height)) {
                 videoOutput.height = properties.$height * Screen.pixelDensity;
             }
@@ -2309,9 +2309,10 @@ Rectangle {
             itemVideo.visible = true;
 
             mediaPlayer.play();
-            gameScene.color='#CCFFFFFF';
-            console.debug(gameScene.color)
-            console.debug(gameScene.color==='#ccffffff');
+
+            //gameScene.color='#CCFFFFFF';
+            //console.debug(gameScene.color)
+            //console.debug(gameScene.color==='#ccffffff');
         }
         //结束播放
         readonly property var stopvideo: function() {
@@ -2961,20 +2962,34 @@ Rectangle {
         //将场景缩放n倍；可以是小数。
         readonly property var scale: function(n) {
             gameScene.scale = parseFloat(n);
-            setMapToRole(_private.sceneRole);
+            setSceneToRole(_private.sceneRole);
 
             game.gd["$sys_scale"] = n;
         }
 
         //场景跟随某个角色
-        readonly property var setscenerole: function(r) {
-            let role = game.hero(r);
-            if(!role)
-                role = game.role(r);
-            if(role) {
+        readonly property var setscenerole: function(r=0.2) {
+            let role;
+
+            if(GlobalLibraryJS.isString(r)) {
+                role = game.hero(r);
+                if(!role)
+                    role = game.role(r);
+                if(!role)
+                    return false;
+
                 _private.sceneRole = role;
-                setMapToRole(_private.sceneRole);
+                setSceneToRole(_private.sceneRole);
             }
+            else if(GlobalLibraryJS.isNumber(r)) {
+                _private.sceneRole = null;
+                _private.rSceneMoveSpeed = r;
+            }
+            else if(GlobalLibraryJS.isObject(r)) {
+                _private.sceneRole = r;
+            }
+            else
+                _private.sceneRole = null;
         }
 
         //暂停游戏。
@@ -2989,7 +3004,7 @@ Rectangle {
             //    return;
 
             timer.stop();
-            _private.stopAction(1, -1);
+            _private.stopAction(0);
 
             if(_private.config.objPauseNames[name] > 0) {
                 _private.config.objPauseNames[name] += times;
@@ -3247,7 +3262,7 @@ Rectangle {
             }
 
             //开始移动地图
-            //setMapToRole(_private.sceneRole);
+            //setSceneToRole(_private.sceneRole);
 
             //其他
             game.setinterval(game.gd["$sys_fps"]);
@@ -3529,9 +3544,10 @@ Rectangle {
             release: release,
             init: init,
 
-            screen: itemComponentsContainer,    //固定屏幕上（所有，包含战斗场景）
-            scene: gameScene,   //会改变大小
-            container: itemContainer,   //会改变大小和随地图移动
+            screen: rootGameScene,      //屏幕（组件位置和大小固定）
+            scene: itemComponentsContainer,    //游戏视窗，组件位置和大小固定（所有，包含战斗场景）
+            container: gameScene,   //组件容器（组件位置和大小固定，但会被scale影响）
+            map: itemContainer,   //地图（组件会改变大小和随地图移动）
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
@@ -3612,7 +3628,7 @@ Rectangle {
 
         //地图大小和视窗大小
         readonly property size $mapSize: Qt.size(itemContainer.width, itemContainer.height)
-        readonly property size $sceneSize: Qt.size(rootGameScene.width, rootGameScene.height)
+        readonly property size $sceneSize: Qt.size(itemComponentsContainer.width, itemComponentsContainer.height)
 
         //上次帧间隔时长
         property int $frameDuration: 0
@@ -3758,7 +3774,7 @@ Rectangle {
         //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
         //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
         //GlobalLibraryJS.setTimeout(function() {
-        //        setMapToRole(_private.sceneRole);
+        //        setSceneToRole(_private.sceneRole);
         //    },10,rootGameScene
         //);
     }
@@ -3909,12 +3925,12 @@ Rectangle {
 
             //如果地图小于等于场景，则将地图居中
             if(itemContainer.width < gameScene.width)
-                itemContainer.x = (rootGameScene.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale;
+                itemContainer.x = (itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale;
             if(itemContainer.height < gameScene.height)
-                itemContainer.y = (rootGameScene.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale;
+                itemContainer.y = (itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale;
 
-            //console.debug("!!!", itemContainer.width, gameScene.scale, rootGameScene.width, itemContainer.x);
-            //console.debug("!!!", itemContainer.height, gameScene.scale, rootGameScene.height, itemContainer.y);
+            //console.debug("!!!", itemContainer.width, gameScene.scale, itemComponentsContainer.width, itemContainer.x);
+            //console.debug("!!!", itemContainer.height, gameScene.scale, itemComponentsContainer.height, itemContainer.y);
 
 
             //卸载原地图块图片
@@ -4069,7 +4085,7 @@ Rectangle {
             role.y = targetY - role.y1 - role.height1 / 2;
         //role.y = by * sizeMapBlockSize.height - role.y1;
 
-        if(role === _private.sceneRole)setMapToRole(_private.sceneRole);
+        if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
     }
 
     //设置主角坐标（块坐标）
@@ -4077,14 +4093,15 @@ Rectangle {
         let mainRole = _private.arrMainRoles[index];
 
         setRolePos(mainRole, bx, by);
-        //setMapToRole(_private.sceneRole);
-        if(mainRole === _private.sceneRole)setMapToRole(_private.sceneRole);
+        //setSceneToRole(_private.sceneRole);
+        if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
         game.gd["$sys_main_roles"][index].$x = mainRole.x;
         game.gd["$sys_main_roles"][index].$y = mainRole.y;
     }
 
-    function setMapToRole(role) {
+    //
+    function setSceneToRole(role) {
         if(!role)
             return;
 
@@ -4104,24 +4121,38 @@ Rectangle {
 
         //开始移动地图
 
+        setScenePos(roleCenterX, roleCenterY);
+    }
+
+
+    //移动场景中心到地图的x、y
+    function setScenePos(x, y) {
+        //场景在地图左上角时的中央坐标
+        let mapLeftTopCenterX = parseInt(gameScene.nMaxMoveWidth / 2);
+        let mapLeftTopCenterY = parseInt(gameScene.nMaxMoveHeight / 2);
+
+        //场景在地图右下角时的中央坐标
+        let mapRightBottomCenterX = itemContainer.width - mapLeftTopCenterX;
+        let mapRightBottomCenterY = itemContainer.height - mapLeftTopCenterY;
+
         //如果场景小于地图
         if(gameScene.width < itemContainer.width) {
             //如果人物中心 X 小于 地图左上坐标的 X
-            if(roleCenterX <= mapLeftTopCenterX) {
+            if(x <= mapLeftTopCenterX) {
                 itemContainer.x = 0;
             }
             //如果人物中心 X 大于 地图右下坐标的 X
-            else if(roleCenterX >= mapRightBottomCenterX) {
+            else if(x >= mapRightBottomCenterX) {
                 itemContainer.x = gameScene.width - itemContainer.width;
             }
             //如果在区间，则随着主角移动
             else {
-                itemContainer.x = mapLeftTopCenterX - roleCenterX;
+                itemContainer.x = mapLeftTopCenterX - x;
             }
         }
         //如果地图小于等于场景，则将地图居中
         else {
-            itemContainer.x = (rootGameScene.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale;
+            itemContainer.x = parseInt((itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.x = 0;
         }
@@ -4130,27 +4161,25 @@ Rectangle {
         //如果场景小于地图
         if(gameScene.height < itemContainer.height) {
             //如果人物中心 Y 小于 地图左上坐标的 Y
-            if(roleCenterY <= mapLeftTopCenterY) {
+            if(y <= mapLeftTopCenterY) {
                 itemContainer.y = 0;
             }
             //如果人物中心 Y 大于 地图右下坐标的 Y
-            else if(roleCenterY >= mapRightBottomCenterY) {
+            else if(y >= mapRightBottomCenterY) {
                 itemContainer.y = gameScene.height - itemContainer.height;
             }
             //如果在区间，则随着主角移动
             else {
-                itemContainer.y = mapLeftTopCenterY - roleCenterY;
+                itemContainer.y = mapLeftTopCenterY - y;
             }
         }
         //如果地图小于等于场景则不动
         else {
-            itemContainer.y = (rootGameScene.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale;
+            itemContainer.y = parseInt((itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.y = 0;
         }
-
     }
-
 
 
     function test() {
@@ -4205,8 +4234,10 @@ Rectangle {
 
     //width: 400
     //height: 300
+    anchors.fill: parent
     clip: true
     focus: true
+
     color: "black"
 
 
@@ -4243,9 +4274,6 @@ Rectangle {
         if(!_private.config.bKeyboard)
             return;
 
-        if(mainRole.nActionType === -1)
-            return;
-
 
         switch(event.key) {
         case Qt.Key_Up:
@@ -4257,6 +4285,13 @@ Rectangle {
                 //mainRole.start();
                 return;
             }
+
+            //_private.arrPressedKeys[key] = true; //保存键盘按下
+            _private.arrPressedKeys.push(event.key);
+
+            if(mainRole.nActionType === -1)
+                return;
+
 
             if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
                 _private.doAction(1, event.key);
@@ -4272,6 +4307,9 @@ Rectangle {
                 event.accepted = true;
                 return;
             }
+
+            if(mainRole.nActionType === -1)
+                return;
 
 
             if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
@@ -4304,6 +4342,14 @@ Rectangle {
                 return;
             }
 
+            //delete arrPressedKeys[key]; //从键盘保存中删除
+            _private.arrPressedKeys.splice(_private.arrPressedKeys.indexOf(event.key), 1);
+
+
+            if(mainRole.nActionType === -1)
+                return;
+
+
             _private.stopAction(1, event.key);
 
             event.accepted = true;
@@ -4332,8 +4378,11 @@ Rectangle {
     //地图界面元素容器
     Item {
         id: itemComponentsContainer
-        anchors.fill: parent
 
+        //anchors.fill: parent
+        width: parent.width
+        height: parent.height
+        clip: true
 
 
         //游戏场景(可视区域）
@@ -4355,8 +4404,8 @@ Rectangle {
 
             //anchors.fill: parent
             //z: 0
-            width: rootGameScene.width / scale
-            height: rootGameScene.height / scale
+            width: itemComponentsContainer.width / scale
+            height: itemComponentsContainer.height / scale
 
             clip: true
             color: "black"
@@ -4365,7 +4414,8 @@ Rectangle {
 
 
 
-            Item {    //所有东西的容器
+            //所有东西的容器（大小为地图大小）
+            Item {
                 id: itemContainer
 
 
@@ -4719,30 +4769,6 @@ Rectangle {
                     }
                 }
             }
-
-
-
-            //游戏FPS
-            Timer {
-                property var nLastTime: 0
-
-                id: timer
-                repeat: true
-                interval: 16
-                triggeredOnStart: false
-                running: false
-                onRunningChanged: {
-                    if(running === true)
-                        nLastTime = game.date().getTime();
-                }
-
-                onTriggered: {
-                    GameSceneJS.onTriggered();
-                    //使用脚本队列的话，人物移动就不能在asyncScript.wait下使用了
-                    //game.run(GameSceneJS.onTriggered);
-                    //game.run(true);
-                }
-            }
         }
 
 
@@ -4788,614 +4814,654 @@ Rectangle {
                 //console.log("Cancel clicked");
             }
         }*/
+    }
 
 
 
-        //操控杆
-        Item {
-            id: itemGamePad
+    //游戏FPS
+    Timer {
+        property var nLastTime: 0
 
-            anchors.fill: parent
-            z: 1
+        id: timer
+        repeat: true
+        interval: 16
+        triggeredOnStart: false
+        running: false
+        onRunningChanged: {
+            if(running === true)
+                nLastTime = game.date().getTime();
+        }
+
+        onTriggered: {
+            GameSceneJS.onTriggered();
+            //使用脚本队列的话，人物移动就不能在asyncScript.wait下使用了
+            //game.run(GameSceneJS.onTriggered);
+            //game.run(true);
+        }
+    }
 
 
-            Joystick {
-                id: joystick
 
-                property real rJoystickIgnore: 0.1  //忽略的最大偏移比
+    //操控杆
+    Item {
+        id: itemGamePad
 
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
+        anchors.fill: parent
+        z: 1
 
-                width: 20 * Screen.pixelDensity
-                height: 20 * Screen.pixelDensity
 
-                //anchors.margins: 1 * Screen.pixelDensity
-                transformOrigin: Item.BottomLeft
-                anchors.leftMargin: 6 * Screen.pixelDensity
-                anchors.bottomMargin: 7 * Screen.pixelDensity
-                //anchors.verticalCenterOffset: -100
-                //anchors.horizontalCenterOffset: -100
+        Joystick {
+            id: joystick
 
-                opacity: 0.6
-                scale: 1
+            property real rJoystickIgnore: 0.1  //忽略的最大偏移比
 
-                onPressedChanged: {
-                    if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                        return;
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
 
-                    if(pressed === false) {
+            width: 20 * Screen.pixelDensity
+            height: 20 * Screen.pixelDensity
+
+            //anchors.margins: 1 * Screen.pixelDensity
+            transformOrigin: Item.BottomLeft
+            anchors.leftMargin: 6 * Screen.pixelDensity
+            anchors.bottomMargin: 7 * Screen.pixelDensity
+            //anchors.verticalCenterOffset: -100
+            //anchors.horizontalCenterOffset: -100
+
+            opacity: 0.6
+            scale: 1
+
+            onPressedChanged: {
+                if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    return;
+
+                if(pressed === false) {
+                    _private.stopAction(0);
+                }
+                //console.debug("[GameScene]Joystick onPressedChanged:", pressed)
+            }
+
+            onPointInputChanged: {
+                //if(pointInput === Qt.point(0,0))
+                //    return;
+
+                if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    return;
+
+                if(!pressed)    //如果没按下
+                    return;
+
+                if(mainRole.nActionType === -1)
+                    return;
+
+
+                if(Math.abs(pointInput.x) > Math.abs(pointInput.y)) {
+                    if(Math.abs(pointInput.x) < rJoystickIgnore) {    //忽略
                         _private.stopAction(0);
-                    }
-                    //console.debug("[GameScene]Joystick onPressedChanged:", pressed)
-                }
-
-                onPointInputChanged: {
-                    //if(pointInput === Qt.point(0,0))
-                    //    return;
-
-                    if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                         return;
-
-                    if(!pressed)    //如果没按下
-                        return;
-
-                    if(mainRole.nActionType === -1)
-                        return;
-
-
-                    if(Math.abs(pointInput.x) > Math.abs(pointInput.y)) {
-                        if(Math.abs(pointInput.x) < rJoystickIgnore) {    //忽略
-                            _private.stopAction(0);
-                            return;
-                        }
-
-                        if(pointInput.x > 0)
-                            _private.doAction(0, Qt.Key_Right);
-                        else
-                            _private.doAction(0, Qt.Key_Left);
                     }
-                    else {
-                        if(Math.abs(pointInput.y) < rJoystickIgnore) {    //忽略
-                            _private.stopAction(0);
-                            return;
-                        }
 
-                        if(pointInput.y > 0)
-                            _private.doAction(0, Qt.Key_Down);
-                        else
-                            _private.doAction(0, Qt.Key_Up);
+                    if(pointInput.x > 0)
+                        _private.doAction(0, Qt.Key_Right);
+                    else
+                        _private.doAction(0, Qt.Key_Left);
+                }
+                else {
+                    if(Math.abs(pointInput.y) < rJoystickIgnore) {    //忽略
+                        _private.stopAction(0);
+                        return;
                     }
-                    mainRole.nActionType = 10;
 
-                    //console.debug("[GameScene]onPointInputChanged", pointInput);
+                    if(pointInput.y > 0)
+                        _private.doAction(0, Qt.Key_Down);
+                    else
+                        _private.doAction(0, Qt.Key_Up);
                 }
-            }
+                mainRole.nActionType = 10;
 
-
-            /*/A键
-            GameButton {
-                id: buttonA
-
-
-                property var buttonClicked: null
-
-                property Image image: Image {
-                    parent: buttonA
-                    anchors.fill: parent
-                }
-
-
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                anchors.rightMargin: 10 * Screen.pixelDensity
-                anchors.bottomMargin: 16 * Screen.pixelDensity
-
-                //anchors.verticalCenterOffset: -100
-                //anchors.horizontalCenterOffset: -100
-
-                width: 6 * Screen.pixelDensity
-                height: 6 * Screen.pixelDensity
-
-
-                color: "red"
-
-                onS_pressed: {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                    //    return;
-                    game.run(buttonClicked);
-                }
-            }
-
-
-            //Menu键
-            GameButton {
-                id: buttonMenu
-
-
-                property var buttonClicked: null
-
-                property Image image: Image {
-                    parent: buttonMenu
-                    anchors.fill: parent
-                }
-
-
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                anchors.rightMargin: 16 * Screen.pixelDensity
-                anchors.bottomMargin: 8 * Screen.pixelDensity
-
-                //anchors.verticalCenterOffset: -100
-                //anchors.horizontalCenterOffset: -100
-
-                width: 6 * Screen.pixelDensity
-                height: 6 * Screen.pixelDensity
-
-
-                color: "blue"
-
-                onS_pressed: {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                    //    return;
-                    game.run(buttonClicked);
-                }
-            }
-            */
-
-            Item {
-                id: itemButtons
-                anchors.fill: parent
+                //console.debug("[GameScene]onPointInputChanged", pointInput);
             }
         }
 
 
+        /*/A键
+        GameButton {
+            id: buttonA
 
-        //战斗场景
-        /*/Loader {
-            id: loaderFightScene
 
-            source: "./FightScene.qml"
-            asynchronous: false
+            property var buttonClicked: null
 
-            Connections {
-                target: loaderFightScene.item
+            property Image image: Image {
+                parent: buttonA
+                anchors.fill: parent
+            }
 
-                //!鹰：Loader每次载入的时候都会重新Connection一次，所以没有的会出现警告
-                function onS_FightOver() {
 
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            anchors.rightMargin: 10 * Screen.pixelDensity
+            anchors.bottomMargin: 16 * Screen.pixelDensity
+
+            //anchors.verticalCenterOffset: -100
+            //anchors.horizontalCenterOffset: -100
+
+            width: 6 * Screen.pixelDensity
+            height: 6 * Screen.pixelDensity
+
+
+            color: "red"
+
+            onS_pressed: {
+                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //    return;
+                game.run(buttonClicked);
+            }
+        }
+
+
+        //Menu键
+        GameButton {
+            id: buttonMenu
+
+
+            property var buttonClicked: null
+
+            property Image image: Image {
+                parent: buttonMenu
+                anchors.fill: parent
+            }
+
+
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            anchors.rightMargin: 16 * Screen.pixelDensity
+            anchors.bottomMargin: 8 * Screen.pixelDensity
+
+            //anchors.verticalCenterOffset: -100
+            //anchors.horizontalCenterOffset: -100
+
+            width: 6 * Screen.pixelDensity
+            height: 6 * Screen.pixelDensity
+
+
+            color: "blue"
+
+            onS_pressed: {
+                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //    return;
+                game.run(buttonClicked);
+            }
+        }
         */
-        FightScene {
-            id: loaderFightScene
 
-            visible: false
-            anchors.fill: parent
-            z: 2
-
-            Component.onCompleted: {
-                //loaderFightScene.asyncScript = _private.asyncScript;
-            }
-        }
-
-
-
-        //菜单
-        GameMenuWindow {
-            id: gameMenuWindow
-
-            visible: false
-            anchors.fill: parent
-            z: 3
-
-            onS_close: {
-                gameMenuWindow.visible = false;
-
-                if(_private.config.objPauseNames['$menu_window'] !== undefined) {
-                    //如果没有使用yield来中断代码，可以不要game.run()
-                    game.goon('$menu_window');
-                    game.run(true);
-                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                }
-
-            }
-            onS_show: {
-                let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
-                if(show)
-                    show(newFlags, windowFlags);
-            }
-            onS_hide: {
-                let hide = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide');
-                if(hide)
-                    hide(newFlags, windowFlags);
-            }
-        }
-
-
-        //交易框
-        GameTradeWindow {
-            id: dialogTrade
-
-            visible: false
-            anchors.fill: parent
-            z: 4
-
-        }
-
-
-
-        //角色对话框
         Item {
-            id: itemRootRoleMsg
-
-
-            //显示完全后延时
-            property int nKeepTime: 0
-            //显示状态：-1：停止；0：显示完毕；1：正在显示
-            property int nShowStatus: -1
-
-            //回调函数
-            property var callback
-
-
-            //signal accepted();
-            //signal rejected();
-
-
-            function over(code) {
-                itemRootRoleMsg.nShowStatus = -1;
-
-                if(GlobalLibraryJS.isFunction(itemRootRoleMsg.callback))
-                    itemRootRoleMsg.callback(code, itemRootRoleMsg);
-                else {  // if(itemRootRoleMsg.callback === true) {   //默认回调函数
-                    //gameMap.focus = true;
-
-                    itemRootRoleMsg.visible = false;
-
-
-                    /*/*if(itemRootRoleMsg.bPauseGame && _private.config.bPauseGame) {
-                        game.goon();
-                        itemRootRoleMsg.bPauseGame = false;
-                    }* /*/
-
-                    /*if(_private.config.objPauseNames['$talk'] !== undefined) {
-                        game.goon('$talk');
-                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }*/
+            id: itemButtons
+            anchors.fill: parent
+        }
+    }
 
 
 
-                    //itemRootRoleMsg.destroy();
-                    ////FrameManager.goon();
-                }
+    //战斗场景
+    /*/Loader {
+        id: loaderFightScene
+
+        source: "./FightScene.qml"
+        asynchronous: false
+
+        Connections {
+            target: loaderFightScene.item
+
+            //!鹰：Loader每次载入的时候都会重新Connection一次，所以没有的会出现警告
+            function onS_FightOver() {
+
+    */
+    FightScene {
+        id: loaderFightScene
+
+        visible: false
+        anchors.fill: parent
+        z: 2
+
+        Component.onCompleted: {
+            //loaderFightScene.asyncScript = _private.asyncScript;
+        }
+    }
+
+
+
+    //菜单
+    GameMenuWindow {
+        id: gameMenuWindow
+
+        visible: false
+        anchors.fill: parent
+        z: 3
+
+        onS_close: {
+            gameMenuWindow.visible = false;
+
+            if(_private.config.objPauseNames['$menu_window'] !== undefined) {
+                //如果没有使用yield来中断代码，可以不要game.run()
+                game.goon('$menu_window');
+                game.run(true);
+                //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             }
 
-            function stop(type=0) {
-                messageRole.stop(type);
+        }
+        onS_show: {
+            let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
+            if(show)
+                show(newFlags, windowFlags);
+        }
+        onS_hide: {
+            let hide = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide');
+            if(hide)
+                hide(newFlags, windowFlags);
+        }
+    }
+
+
+    //交易框
+    GameTradeWindow {
+        id: dialogTrade
+
+        visible: false
+        anchors.fill: parent
+        z: 4
+
+    }
+
+
+
+    //角色对话框
+    Item {
+        id: itemRootRoleMsg
+
+
+        //显示完全后延时
+        property int nKeepTime: 0
+        //显示状态：-1：停止；0：显示完毕；1：正在显示
+        property int nShowStatus: -1
+
+        //回调函数
+        property var callback
+
+
+        //signal accepted();
+        //signal rejected();
+
+
+        function over(code) {
+            itemRootRoleMsg.nShowStatus = -1;
+
+            if(GlobalLibraryJS.isFunction(itemRootRoleMsg.callback))
+                itemRootRoleMsg.callback(code, itemRootRoleMsg);
+            else {  // if(itemRootRoleMsg.callback === true) {   //默认回调函数
+                //gameMap.focus = true;
+
+                itemRootRoleMsg.visible = false;
+
+
+                /*/*if(itemRootRoleMsg.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    itemRootRoleMsg.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$talk'] !== undefined) {
+                    game.goon('$talk');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }*/
+
+
+
+                //itemRootRoleMsg.destroy();
+                ////FrameManager.goon();
+            }
+        }
+
+        function stop(type=0) {
+            messageRole.stop(type);
+        }
+
+        function show(msg, pretext, interval, keeptime, style) {
+
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
+
+            messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+            //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
+
+            //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
+            itemRootRoleMsg.nKeepTime = keeptime || 0;
+
+            itemRootRoleMsg.nShowStatus = 1;
+
+
+
+            itemRootRoleMsg.visible = true;
+            //touchAreaRoleMsg.enabled = false;
+            messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
+            //FrameManager.wait(-1);
+        }
+
+        function clicked() {
+            //显示完毕，则关闭
+            if(itemRootRoleMsg.nShowStatus === 0)
+                itemRootRoleMsg.over(1);
+            //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
+            else if(itemRootRoleMsg.nShowStatus === 1 && itemRootRoleMsg.nKeepTime === -1) {
+                itemRootRoleMsg.nShowStatus = 0;
+                messageRole.stop(1);
+            }
+        }
+
+
+        visible: false
+        anchors.fill: parent
+        z: 5
+
+
+        Mask {
+            id: maskMessageRole
+
+            anchors.fill: parent
+
+            visible: color.a !== 0
+
+            color: "transparent"
+
+            mouseArea.onPressed: {
+                itemRootRoleMsg.clicked();
+            }
+        }
+
+
+        Message {
+            id: messageRole
+            width: parent.width
+            height: parent.height * 0.1
+            //height: 90
+            anchors.bottom: parent.bottom
+
+
+            nMaxWidth: parent.width
+            nMaxHeight: parent.height * 0.2
+            //nMaxHeight: 90
+
+
+            textArea.enabled: false
+
+            textArea.onReleased: {
+                itemRootRoleMsg.clicked();
+                //rootGameScene.forceActiveFocus();
             }
 
-            function show(msg, pretext, interval, keeptime, style) {
-
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
-                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
-
-                messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-                messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-                messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-                messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-                maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-                //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
-
-                //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
-                itemRootRoleMsg.nKeepTime = keeptime || 0;
-
-                itemRootRoleMsg.nShowStatus = 1;
-
-
-
-                itemRootRoleMsg.visible = true;
-                //touchAreaRoleMsg.enabled = false;
-                messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
-                //FrameManager.wait(-1);
-            }
-
-            function clicked() {
-                //显示完毕，则关闭
-                if(itemRootRoleMsg.nShowStatus === 0)
-                    itemRootRoleMsg.over(1);
-                //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
-                else if(itemRootRoleMsg.nShowStatus === 1 && itemRootRoleMsg.nKeepTime === -1) {
+            onS_over: {
+                //自动关闭
+                if(itemRootRoleMsg.nKeepTime > 0)
+                    itemRootRoleMsg.over(2);
+                else
                     itemRootRoleMsg.nShowStatus = 0;
-                    messageRole.stop(1);
-                }
-            }
-
-
-            visible: false
-            anchors.fill: parent
-            z: 5
-
-
-            Mask {
-                id: maskMessageRole
-
-                anchors.fill: parent
-
-                visible: color.a !== 0
-
-                color: "transparent"
-
-                mouseArea.onPressed: {
-                    itemRootRoleMsg.clicked();
-                }
-            }
-
-
-            Message {
-                id: messageRole
-                width: parent.width
-                height: parent.height * 0.1
-                //height: 90
-                anchors.bottom: parent.bottom
-
-
-                nMaxWidth: parent.width
-                nMaxHeight: parent.height * 0.2
-                //nMaxHeight: 90
-
-
-                textArea.enabled: false
-
-                textArea.onReleased: {
-                    itemRootRoleMsg.clicked();
-                    //rootGameScene.forceActiveFocus();
-                }
-
-                onS_over: {
-                    //自动关闭
-                    if(itemRootRoleMsg.nKeepTime > 0)
-                        itemRootRoleMsg.over(2);
-                    else
-                        itemRootRoleMsg.nShowStatus = 0;
-                }
-            }
-
-
-            /*MultiPointTouchArea {
-                id: touchAreaRoleMsg
-                anchors.fill: parent
-                enabled: false
-                //enabled: itemRootRoleMsg.standardButtons === Dialog.NoButton
-
-                //onPressed: {
-                onReleased: {
-                    //rootGameScene.forceActiveFocus();
-                    //console.debug("MultiPointTouchArea1")
-                    itemRootRoleMsg.over();
-                    //console.debug("MultiPointTouchArea2")
-                }
-            }*/
-
-        }
-
-
-        Loader {
-            id: loaderGameMsg
-
-            visible: true
-            anchors.fill: parent
-            z: 6
-
-            sourceComponent: compGameMsg
-            asynchronous: false
-
-            /*Connections {
-                target: loaderGameMsg.item
-
-                function onAccepted() {
-                }
-                function onRejected() {
-                }
-            }
-            */
-
-            onLoaded: {
             }
         }
 
 
-        //临时存放创建的Menus
-        Item {
-            id: itemGameMenus
-
-            //创建一个自增1
-            property int nIndex: 0
-
+        /*MultiPointTouchArea {
+            id: touchAreaRoleMsg
             anchors.fill: parent
-            z: 7
+            enabled: false
+            //enabled: itemRootRoleMsg.standardButtons === Dialog.NoButton
 
-        }
-
-        //游戏 输入框
-        Item {
-            id: itemRootGameInput
-
-
-            //回调函数
-            property var callback
-
-            visible: false
-            anchors.fill: parent
-            z: 8
-
-
-
-            Mask {
-                id: maskGameInput
-
-                anchors.fill: parent
-
-                visible: color.a !== 0
-
-                color: "#7FFFFFFF"
-
-                mouseArea.onPressed: {
-                    //itemRootGameInput.visible = false;
-                    //game.goon('$input');
-                    //_private.asyncScript.run(textGameInput.text);
-                }
+            //onPressed: {
+            onReleased: {
+                //rootGameScene.forceActiveFocus();
+                //console.debug("MultiPointTouchArea1")
+                itemRootRoleMsg.over();
+                //console.debug("MultiPointTouchArea2")
             }
+        }*/
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                width: parent.width * 0.6
-                //height: parent.height * 0.6
-
-                Rectangle {
-                    id: rectGameInputTitle
-
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: parent.width
-                    Layout.preferredHeight: 60
-                    //implicitHeight: 60
-
-                    //color: "darkred"
-                    color: "#EE00CC99"
-                    //radius: itemMenu.radius
-
-                    Text {
-                        id: textGameInputTitle
-
-                        anchors.fill: parent
-
-                        color: "white"
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        font.pointSize: 16
-                        font.bold: true
-
-                        wrapMode: Text.NoWrap
-                    }
-
-                }
+    }
 
 
-                Rectangle {
-                    id: rectGameInput
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width
-                    Layout.preferredHeight: textGameInput.implicitHeight
+    Loader {
+        id: loaderGameMsg
+
+        visible: true
+        anchors.fill: parent
+        z: 6
+
+        sourceComponent: compGameMsg
+        asynchronous: false
+
+        /*Connections {
+            target: loaderGameMsg.item
+
+            function onAccepted() {
+            }
+            function onRejected() {
+            }
+        }
+        */
+
+        onLoaded: {
+        }
+    }
 
 
-                    color: "#FFFFFF"
+    //临时存放创建的Menus
+    Item {
+        id: itemGameMenus
 
-                    border {
-                        color: '#60000000'
-                    }
+        //创建一个自增1
+        property int nIndex: 0
 
+        anchors.fill: parent
+        z: 7
 
-                    TextArea {
-                        id: textGameInput
+    }
 
-                        anchors.fill: parent
-
-
-                        color: "black"
-
-                        //horizontalAlignment: Text.AlignHCenter
-                        //verticalAlignment: Text.AlignVCenter
-
-                        font.pointSize: 16
-                        font.bold: true
-
-                        selectByKeyboard: true
-                        selectByMouse: true
-                        wrapMode: Text.Wrap
-                    }
-                }
-
-                ColorButton {
-
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-                    text: '确定'
-                    onButtonClicked: {
-                        if(GlobalLibraryJS.isFunction(itemRootGameInput.callback))
-                            itemRootGameInput.callback(itemRootGameInput);
-                        else {  // if(itemRootGameInput.callback === true) {   //默认回调函数
-                            //gameMap.focus = true;
-
-                            itemRootGameInput.visible = false;
+    //游戏 输入框
+    Item {
+        id: itemRootGameInput
 
 
-                            /*/*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
-                                game.goon();
-                                itemRootGameInput.bPauseGame = false;
-                            }* /*/
+        //回调函数
+        property var callback
 
-                            /*if(_private.config.objPauseNames['$input'] !== undefined) {
-                                game.goon('$input');
-                                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                            }*/
+        visible: false
+        anchors.fill: parent
+        z: 8
 
 
 
-                            //itemRootGameInput.destroy();
-                            ////FrameManager.goon();
-                        }
+        Mask {
+            id: maskGameInput
 
-                    }
-                }
+            anchors.fill: parent
+
+            visible: color.a !== 0
+
+            color: "#7FFFFFFF"
+
+            mouseArea.onPressed: {
+                //itemRootGameInput.visible = false;
+                //game.goon('$input');
+                //_private.asyncScript.run(textGameInput.text);
             }
         }
 
-        //视频播放
-        Item {
-            id: itemVideo
+        ColumnLayout {
+            anchors.centerIn: parent
+            width: parent.width * 0.8
+            //height: parent.height * 0.6
 
-            visible: false
-            anchors.fill: parent
-            z: 9
+            Rectangle {
+                id: rectGameInputTitle
 
-            MediaPlayer {
-                id: mediaPlayer
+                Layout.alignment: Qt.AlignCenter
+                Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 36
+                //implicitHeight: 60
 
-                source: ""
+                //color: "darkred"
+                color: "#EE00CC99"
+                //radius: itemMenu.radius
 
-                onStopped: {
-                    game.stopvideo();
+                Text {
+                    id: textGameInputTitle
+
+                    anchors.fill: parent
+
+                    color: "white"
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    font.pointSize: 16
+                    font.bold: true
+
+                    wrapMode: Text.NoWrap
+                }
+
+            }
+
+
+            Rectangle {
+                id: rectGameInput
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                Layout.preferredWidth: parent.width
+                Layout.preferredHeight: textGameInput.implicitHeight
+
+
+                color: "#FFFFFF"
+
+                border {
+                    color: '#60000000'
+                }
+
+
+                TextArea {
+                    id: textGameInput
+
+                    anchors.fill: parent
+
+
+                    color: 'white'
+
+                    //horizontalAlignment: Text.AlignHCenter
+                    //verticalAlignment: Text.AlignVCenter
+
+                    placeholderTextColor: '#7F7F7F7F'
+
+                    font.pointSize: 16
+                    font.bold: true
+
+                    selectByKeyboard: true
+                    selectByMouse: true
+                    wrapMode: Text.Wrap
+
+
+                    //padding : nPadding
+                    leftPadding : 6
+                    rightPadding : 6
+                    topPadding : 6
+                    bottomPadding: 6
+                    background: Rectangle {
+                        color: '#FF0035A8'
+                        implicitHeight: 0
+                        //color: Global.style.backgroundColor
+                        //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                        //border.width: debugMsg.textArea.focus ? 2 : 1
+                    }
                 }
             }
 
-            //渲染视频
-            VideoOutput{
-                id: videoOutput
+            Button {
 
-                anchors.centerIn: parent
-                source: mediaPlayer
-                //fillMode: VideoOutput.Stretch
-                //x: 0
-                //y: 0
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
-                //width: rootGameScene.width
-                //height: rootGameScene.height
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+                text: '确定'
                 onClicked: {
-                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                        mediaPlayer.pause();
-                    else
-                        mediaPlayer.play();
+                    if(GlobalLibraryJS.isFunction(itemRootGameInput.callback))
+                        itemRootGameInput.callback(itemRootGameInput);
+                    else {  // if(itemRootGameInput.callback === true) {   //默认回调函数
+                        //gameMap.focus = true;
+
+                        itemRootGameInput.visible = false;
+
+
+                        /*/*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
+                            game.goon();
+                            itemRootGameInput.bPauseGame = false;
+                        }* /*/
+
+                        /*if(_private.config.objPauseNames['$input'] !== undefined) {
+                            game.goon('$input');
+                            _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                        }*/
+
+
+
+                        //itemRootGameInput.destroy();
+                        ////FrameManager.goon();
+                    }
+
                 }
-                onDoubleClicked: {
-                    game.stopvideo();
-                }
+            }
+        }
+    }
+
+    //视频播放
+    Item {
+        id: itemVideo
+
+        visible: false
+        anchors.fill: parent
+        z: 9
+
+        MediaPlayer {
+            id: mediaPlayer
+
+            source: ""
+
+            onStopped: {
+                game.stopvideo();
+            }
+        }
+
+        //渲染视频
+        VideoOutput{
+            id: videoOutput
+
+            anchors.centerIn: parent
+            source: mediaPlayer
+            //fillMode: VideoOutput.Stretch
+            //x: 0
+            //y: 0
+
+            //width: rootGameScene.width
+            //height: rootGameScene.height
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+            onClicked: {
+                if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                    mediaPlayer.pause();
+                else
+                    mediaPlayer.play();
+            }
+            onDoubleClicked: {
+                game.stopvideo();
             }
         }
     }
@@ -5733,6 +5799,8 @@ Rectangle {
 
         //场景跟踪角色
         property var sceneRole: mainRole
+        //场景移动速度
+        property real rSceneMoveSpeed: 0.2
 
 
 
@@ -5749,9 +5817,9 @@ Rectangle {
 
 
         //键盘处理
-        property var keys: ({}) //保存按下的方向键
+        property var arrPressedKeys: ([]) //保存按下的方向键
 
-        //type为0表示按钮，type为1表示键盘（会保存key），2为自动行走
+        //type为0表示按钮，type为1表示键盘，2为自动行走
         function doAction(type, key) {
             switch(key) {
             case Qt.Key_Down:
@@ -5759,36 +5827,24 @@ Rectangle {
                 //mainRole.moveDirection = Qt.Key_Down; //移动方向
                 //mainRole.start();
                 //timer.start();  //开始移动
-                if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
                 break;
             case Qt.Key_Left:
                 _private.startSprite(mainRole, Qt.Key_Left);
                 //mainRole.moveDirection = Qt.Key_Left;
                 //mainRole.start();
                 //timer.start();
-                if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
                 break;
             case Qt.Key_Right:
                 _private.startSprite(mainRole, Qt.Key_Right);
                 //mainRole.moveDirection = Qt.Key_Right;
                 //mainRole.start();
                 //timer.start();
-                if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
                 break;
             case Qt.Key_Up:
                 _private.startSprite(mainRole, Qt.Key_Up);
                 //mainRole.moveDirection = Qt.Key_Up;
                 //mainRole.start();
                 //timer.start();
-                if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
                 break;
             default:
                 break;
@@ -5803,13 +5859,15 @@ Rectangle {
                 case Qt.Key_Right:
                 case Qt.Key_Left:
                 case Qt.Key_Down:
-                    delete keys[key]; //从键盘保存中删除
-
                     //获取下一个已经按下的键
-                    let l = Object.keys(keys);
+                    //let l = Object.keys(arrPressedKeys);
+                    let l = arrPressedKeys;
                     //console.debug(l);
-                    //keys.pop();
-                    if(l.length === 0) {    //如果没有键被按下
+
+
+
+                    //if(l.length === 0) {    //如果没有键被按下
+                    if(l.length === 0) {
                         //timer.stop();
                         _private.stopSprite(mainRole);
                         //mainRole.stop();
@@ -5824,7 +5882,8 @@ Rectangle {
                     break;
 
                 default:
-                    keys = {};
+                    arrPressedKeys = [];
+
                     _private.stopSprite(mainRole);
                     //mainRole.stop();
                     //console.debug("[GameScene]_private.stopAction stop1");
@@ -6953,7 +7012,7 @@ Rectangle {
         function onStateChanged() {
             switch(Qt.application.state){
             case Qt.ApplicationActive:   //每次窗口激活时触发
-                _private.keys = {};
+                _private.arrPressedKeys = [];
                 //mainRole.moveDirection = -1;
 
                 itemBackgroundMusic.resume('$sys_inactive');
@@ -6961,7 +7020,7 @@ Rectangle {
 
                 break;
             case Qt.ApplicationInactive:    //每次窗口非激活时触发
-                _private.keys = {};
+                _private.arrPressedKeys = [];
                 //mainRole.moveDirection = -1;
 
                 itemBackgroundMusic.pause('$sys_inactive');
@@ -6969,12 +7028,12 @@ Rectangle {
 
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
-                _private.keys = {};
+                _private.arrPressedKeys = [];
                 //mainRole.moveDirection = -1;
                 //itemBackgroundMusic.pause();
                 break;
             case Qt.ApplicationHidden:
-                _private.keys = {};
+                _private.arrPressedKeys = [];
                 //mainRole.moveDirection = -1;
                 //itemBackgroundMusic.pause();
                 break;

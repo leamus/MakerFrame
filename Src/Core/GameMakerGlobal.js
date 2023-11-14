@@ -244,7 +244,6 @@ function *$beforeSave() {
     return true;
 }
 
-
 //读档前调用
 function *$beforeLoad() {
     return true;
@@ -254,7 +253,6 @@ function *$beforeLoad() {
 function *$afterSave() {
     return true;
 }
-
 
 //读档后调用
 function *$afterLoad() {

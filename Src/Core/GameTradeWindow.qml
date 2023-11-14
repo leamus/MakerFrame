@@ -327,21 +327,28 @@ Item {
             width: parent.width
             height: implicitHeight
 
-            Text {
+            Label {
                 Layout.fillWidth: true
-                //Layout.preferredHeight: 60
-
-                color: "white"
+                Layout.preferredHeight: 36
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                font.pointSize: 16
-                font.bold: true
-
                 wrapMode: Text.NoWrap
 
                 text: '输入数量'
+                color: "white"
+
+                font.pointSize: 16
+                font.bold: true
+
+                background: Rectangle {
+                    color: "#EE00CC99"
+                    implicitHeight: 0
+                    //color: Global.style.backgroundColor
+                    //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    //border.width: debugMsg.textArea.focus ? 2 : 1
+                }
             }
 
             Slider {
@@ -349,7 +356,7 @@ Item {
 
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: 60
+                Layout.preferredHeight: 36
 
 
                 from: 1
@@ -368,7 +375,7 @@ Item {
 
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: 60
+                Layout.preferredHeight: 36
 
 
                 placeholderText: '输入数量'
@@ -376,6 +383,22 @@ Item {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
+
+                color: 'white'
+                placeholderTextColor: '#7F7F7F7F'
+
+                //padding : nPadding
+                leftPadding : 6
+                rightPadding : 6
+                topPadding : 6
+                bottomPadding: 6
+                background: Rectangle {
+                    color: '#FF0035A8'
+                    implicitHeight: 0
+                    //color: Global.style.backgroundColor
+                    //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    //border.width: debugMsg.textArea.focus ? 2 : 1
+                }
 
 
                 onTextChanged: {

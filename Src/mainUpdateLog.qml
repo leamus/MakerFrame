@@ -130,12 +130,17 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+2023/11/14：发布 1.6.13.231114 版本
+1、修复一个小问题；
+2、修改game.setscenerole指令，使之支持地图移动（非跟踪角色）；
+3、修改游戏整个布局设定：修改和新增 地图场景的 game.$sys.screen、game.$sys.scene、game.$sys.container、game.$sys.map 四个层次和 战斗场景的 fight.$sys.screen、fight.$sys.scene、fight.$sys.container 三个层次，可以修改场景大小来进行留白给插件使用；
+
 2023/11/09：发布 1.6.12.231109 版本
 1、继续将一部分战斗代码放入通用脚本，供自定义玩；
 2、修复乱封眠的错误；
 3、优化代码；
 
-2023/11/07：发布 1.6.11.231107 版本
+2023/11/07：发布 1.6.11.231107 版本（框架 1.3.19.231010 版本）
 1、调整适配全部UI，做了亮色和暗色两套主题；
 2、可自定义风格（默认Material）；
 3、修复报错系统；
