@@ -134,7 +134,8 @@ Item {
 
 
         textGoodsInfo.text = textGoodsInfo.strPreText;
-        textMoney.text = '金钱：￥ '  + game.gd["$sys_money"];
+        let moneyName = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$money'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$money'));
+        textMoney.text = moneyName + ':' + game.gd["$sys_money"];
 
 
         if(arrGoodsName.length > 0 && gameGoodsMenu.nChoiceIndex < 0)

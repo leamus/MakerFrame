@@ -87,7 +87,6 @@ import "GameScene.js" as GameSceneJS
     //_private.objCommonScripts["resume_event_script"]
     //_private.objCommonScripts["get_goods_script"]
     //_private.objCommonScripts["use_goods_script"]
-    _private.objCommonScripts["equip_reserved_slots"] //装备预留槽位
     _private.objCommonScripts["fight_roles_round"]   //一个大回合内 每次返回一个战斗人物的回合
     _private.objCommonScripts["combatant_info"]
     _private.objCommonScripts["show_goods_name"]
@@ -2281,7 +2280,7 @@ Rectangle {
             if(properties.$videoOutput.$width === undefined && properties.$width === undefined)
                 videoOutput.width = Qt.binding(function(){return videoOutput.implicitWidth});
             else if(properties.$width === -1)
-                videoOutput.width = itemComponentsContainer.width;
+                videoOutput.width = rootGameScene.width;
             else if(GlobalLibraryJS.isValidNumber(properties.$width)) {
                 videoOutput.width = properties.$width * Screen.pixelDensity;
             }
@@ -2289,7 +2288,7 @@ Rectangle {
             if(properties.$videoOutput.$height === undefined && properties.$height === undefined)
                 videoOutput.height = Qt.binding(function(){return videoOutput.implicitHeight});
             else if(properties.$height === -1)
-                videoOutput.height = itemComponentsContainer.height;
+                videoOutput.height = rootGameScene.height;
             else if(GlobalLibraryJS.isValidNumber(properties.$height)) {
                 videoOutput.height = properties.$height * Screen.pixelDensity;
             }
@@ -2337,10 +2336,10 @@ Rectangle {
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
         //      $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示全屏的百分比；为3表示居中后偏移多少像素，为4表示居中后偏移多少固定长度；
+        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度；
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示全屏的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在屏幕上（受scale影响）；2表示显示在地图上；字符串表示显示在某个角色上；
+        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
+        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在视窗上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
         readonly property var showimage: function(image, properties={}, id=undefined) {
             let filePath = GameMakerGlobal.imageResourceURL(image);
             //if(!FrameManager.sl_qml_FileExists(Global.toPath(filePath))) {
@@ -2400,11 +2399,14 @@ Rectangle {
             }
 
 
-            //会改变大小
+            //游戏视窗
             if(properties.$parent === 1)
+                properties.$parent = itemComponentsContainer;
+            //会改变大小
+            else if(properties.$parent === 2)
                 properties.$parent = gameScene;
             //会改变大小和随地图移动
-            else if(properties.$parent === 2) {
+            else if(properties.$parent === 3) {
                 properties.$parent = itemContainer;
                 _private.arrayMapComponents.push(tmp);
             }
@@ -2420,7 +2422,7 @@ Rectangle {
             }
             //固定屏幕上
             else
-                properties.$parent = itemComponentsContainer;
+                properties.$parent = rootGameScene;
 
             tmp.parent = properties.$parent;
 
@@ -2438,16 +2440,16 @@ Rectangle {
                 tmp.width = tmp.implicitWidth;
             //屏宽
             else if(properties.$width === -1)
-                tmp.width = Qt.binding(function(){return itemComponentsContainer.width});
+                tmp.width = Qt.binding(function(){return rootGameScene.width});
             else if(GlobalLibraryJS.isArray(properties.$width)) {
                 switch(properties.$width[1]) {
                 //如果是 固定宽度
                 case 1:
                     tmp.width = properties.$width[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    tmp.width = Qt.binding(function(){return properties.$width[0] * itemComponentsContainer.width});
+                    tmp.width = Qt.binding(function(){return properties.$width[0] * properties.$parent.width});
                     break;
                 //如果是 自身百分比
                 case 3:
@@ -2475,16 +2477,16 @@ Rectangle {
                 tmp.height = tmp.implicitHeight;
             //屏高
             else if(properties.$height === -1)
-                tmp.height = Qt.binding(function(){return itemComponentsContainer.height});
+                tmp.height = Qt.binding(function(){return rootGameScene.height});
             else if(GlobalLibraryJS.isArray(properties.$height)) {
                 switch(properties.$height[1]) {
                 //如果是 固定高度
                 case 1:
                     tmp.height = properties.$height[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    tmp.height = Qt.binding(function(){return properties.$height[0] * itemComponentsContainer.height});
+                    tmp.height = Qt.binding(function(){return properties.$height[0] * properties.$parent.height});
                     break;
                 //如果是 自身百分比
                 case 3:
@@ -2524,17 +2526,17 @@ Rectangle {
                 case 1:
                     tmp.x = properties.$x[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] * itemComponentsContainer.width});
+                    tmp.x = Qt.binding(function(){return properties.$x[0] * properties.$parent.width});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] + (itemComponentsContainer.width - tmp.width) / 2});
+                    tmp.x = Qt.binding(function(){return properties.$x[0] + (properties.$parent.width - tmp.width) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (itemComponentsContainer.width - tmp.width) / 2});
+                    tmp.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (properties.$parent.width - tmp.width) / 2});
                     break;
                 //跨平台x
                 case 5:
@@ -2559,17 +2561,17 @@ Rectangle {
                 case 1:
                     tmp.y = properties.$y[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] * itemComponentsContainer.height});
+                    tmp.y = Qt.binding(function(){return properties.$y[0] * properties.$parent.height});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] + (itemComponentsContainer.height - tmp.height) / 2});
+                    tmp.y = Qt.binding(function(){return properties.$y[0] + (properties.$parent.height - tmp.height) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (itemComponentsContainer.height - tmp.height) / 2});
+                    tmp.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (properties.$parent.height - tmp.height) / 2});
                     break;
                 //跨平台y
                 case 5:
@@ -2636,10 +2638,10 @@ Rectangle {
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
         //      $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示全屏的百分比；为3表示居中后偏移多少像素，为4表示居中后偏移多少固定长度；
+        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度；
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示全屏的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在屏幕上（受scale影响）；2表示显示在地图上；字符串表示显示在某个角色上；
+        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
+        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在屏幕上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
         readonly property var showsprite: function(spriteEffectRId, properties={}, id=undefined) {
             if(!GameSceneJS.getSpriteResource(spriteEffectRId))
                 return false;
@@ -2677,11 +2679,14 @@ Rectangle {
             sprite.id = id;
 
 
-            //会改变大小
+            //游戏视窗
             if(properties.$parent === 1)
+                properties.$parent = itemComponentsContainer;
+            //会改变大小
+            if(properties.$parent === 2)
                 properties.$parent = gameScene;
             //会改变大小和随地图移动
-            else if(properties.$parent === 2) {
+            else if(properties.$parent === 3) {
                 properties.$parent = itemContainer;
                 _private.arrayMapComponents.push(sprite);
             }
@@ -2702,7 +2707,7 @@ Rectangle {
             }
             //固定屏幕上
             else
-                properties.$parent = itemComponentsContainer;
+                properties.$parent = rootGameScene;
 
             sprite.parent = properties.$parent;
 
@@ -2720,16 +2725,16 @@ Rectangle {
                 sprite.width = sprite.implicitWidth;
             //屏宽
             else if(properties.$width === -1)
-                sprite.width = Qt.binding(function(){return itemComponentsContainer.width});
+                sprite.width = Qt.binding(function(){return rootGameScene.width});
             else if(GlobalLibraryJS.isArray(properties.$width)) {
                 switch(properties.$width[1]) {
                 //如果是 固定宽度
                 case 1:
                     sprite.width = properties.$width[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    sprite.width = Qt.binding(function(){return properties.$width[0] * itemComponentsContainer.width});
+                    sprite.width = Qt.binding(function(){return properties.$width[0] * properties.$parent.width});
                     break;
                 //如果是 自身百分比
                 case 3:
@@ -2757,16 +2762,16 @@ Rectangle {
                 sprite.height = sprite.implicitHeight;
             //全屏
             else if(properties.$height === -1)
-                sprite.height = Qt.binding(function(){return itemComponentsContainer.height});
+                sprite.height = Qt.binding(function(){return rootGameScene.height});
             else if(GlobalLibraryJS.isArray(properties.$height)) {
                 switch(properties.$height[1]) {
                 //如果是 固定高度
                 case 1:
                     sprite.height = properties.$height[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    sprite.height = Qt.binding(function(){return properties.$height[0] * itemComponentsContainer.height});
+                    sprite.height = Qt.binding(function(){return properties.$height[0] * properties.$parent.height});
                     break;
                 //如果是 自身百分比
                 case 3:
@@ -2806,17 +2811,17 @@ Rectangle {
                 case 1:
                     sprite.x = properties.$x[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] * itemComponentsContainer.width});
+                    sprite.x = Qt.binding(function(){return properties.$x[0] * properties.$parent.width});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] + (itemComponentsContainer.width - sprite.width) / 2});
+                    sprite.x = Qt.binding(function(){return properties.$x[0] + (properties.$parent.width - sprite.width) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (itemComponentsContainer.width - sprite.width) / 2});
+                    sprite.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (properties.$parent.width - sprite.width) / 2});
                     break;
                 //跨平台x
                 case 5:
@@ -2841,17 +2846,17 @@ Rectangle {
                 case 1:
                     sprite.y = properties.$y[0] * Screen.pixelDensity;
                     break;
-                //如果是 全屏百分比
+                //如果是 父组件百分比
                 case 2:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] * itemComponentsContainer.height});
+                    sprite.y = Qt.binding(function(){return properties.$y[0] * properties.$parent.height});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] + (itemComponentsContainer.height - sprite.height) / 2});
+                    sprite.y = Qt.binding(function(){return properties.$y[0] + (properties.$parent.height - sprite.height) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (itemComponentsContainer.height - sprite.height) / 2});
+                    sprite.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (properties.$parent.height - sprite.height) / 2});
                     break;
                 //跨平台y
                 case 5:
@@ -3544,8 +3549,8 @@ Rectangle {
             release: release,
             init: init,
 
-            screen: rootGameScene,      //屏幕（组件位置和大小固定）
-            scene: itemComponentsContainer,    //游戏视窗，组件位置和大小固定（所有，包含战斗场景）
+            screen: rootGameScene,      //屏幕（组件位置和大小固定）（所有，包含战斗场景）
+            scene: itemComponentsContainer,    //游戏视窗，组件位置和大小固定
             container: gameScene,   //组件容器（组件位置和大小固定，但会被scale影响）
             map: itemContainer,   //地图（组件会改变大小和随地图移动）
 
@@ -3925,9 +3930,9 @@ Rectangle {
 
             //如果地图小于等于场景，则将地图居中
             if(itemContainer.width < gameScene.width)
-                itemContainer.x = (itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale;
+                itemContainer.x = parseInt((itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
             if(itemContainer.height < gameScene.height)
-                itemContainer.y = (itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale;
+                itemContainer.y = parseInt((itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
             //console.debug("!!!", itemContainer.width, gameScene.scale, itemComponentsContainer.width, itemContainer.x);
             //console.debug("!!!", itemContainer.height, gameScene.scale, itemComponentsContainer.height, itemContainer.y);
@@ -4173,7 +4178,7 @@ Rectangle {
                 itemContainer.y = mapLeftTopCenterY - y;
             }
         }
-        //如果地图小于等于场景则不动
+        //如果地图小于等于场景，则将地图居中
         else {
             itemContainer.y = parseInt((itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 

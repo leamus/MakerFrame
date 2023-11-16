@@ -188,6 +188,19 @@ let $config = {
             $itemBorderColor: '#60FFFFFF',
         },
     },
+    //系统组件的一些名称
+    $names: {
+        $money: '金钱',
+        //装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
+        $equipReservedSlots: ['头戴', '身穿', '武器', '鞋子'],
+    },
+    //4个对象的根prototype对象，$objectType为对象类型
+    $protoTypeObject: {
+        $fightHero: {$objectType: 1},
+        $goods: {$objectType: 2},
+        $skill:{$objectType: 3},
+        $fightScript: {$objectType: 4},
+    },
     //安卓配置
     $android: {
         //屏幕旋转规则
@@ -225,7 +238,7 @@ function *$gameInit() {
             //简单走
             //game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});
             //A*算法走
-            game.hero(0, {$action: 2, $targetBlocks: game.$gameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
+            game.hero(0, {$action: 2, $targetBlocks: computePath([rolePos.bx, rolePos.by], [bx, by])});
         }
     }
 
@@ -439,6 +452,9 @@ function $Combatant(fightRoleRId, showName) {
         //lastDefenseSkill: '',
     };
 }
+$Combatant.prototype = $config.$protoTypeObject.$fightHero;
+
+
 
 function 属性(p, n=0) {
     let ret;
@@ -470,18 +486,8 @@ function 附加属性(p, n=0) {
     return ret;
 }
 
-//几种对象的根类
-
-$Combatant.prototype = {$objectType: 1};
-
 $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
-
-
-let $prototypeGoods = {$objectType: 2};
-let $prototypeSkill = {$objectType: 3};
-let $prototypeFightScript = {$objectType: 4};
-
 
 
 //系统显示 和 真实属性 对应
@@ -507,9 +513,7 @@ let mappingCombatantProperty = {
     '级别': 'level',
 };
 
-let mappingSystemName = {
-    'money': '金钱',
-}
+
 
 //显示战斗人物详细信息
 let $combatantInfo = function(combatant) {
@@ -1883,11 +1887,6 @@ function *commonUseGoodsScript(goodsName, type) {
 
 
 
-//装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
-let $equipReservedSlots = ['头戴', '身穿', '武器', '鞋子'];
-
-
-
 //读取存档信息，返回数组
 function $readSavesInfo(count=3) {
     let arrSave = [];
@@ -1911,19 +1910,27 @@ function $readSavesInfo(count=3) {
 //升级脚本
 function *commonLevelUpScript(combatant) {
 
-    let level = 0;  //当前经验可达到的级别
-    let nextExp = 10;   //下一级别的经验
+    //升级
+    while(1) {
+
+        //升级条件是否通过
+        let bConditions = true;
+        //下一级所需条件
+        let nextLevelConditions = commonLevelAlgorithm(combatant, combatant.$properties.level + 1);
+        //循环所有条件
+        for(let tc in nextLevelConditions) {
+            //如果有一条不符合
+            if(combatant.$properties[tc] < nextLevelConditions[tc]) {
+                bConditions = false;
+                break;
+            }
+        }
+
+        //不符合，则退出
+        if(!bConditions)
+            break;
 
 
-    //升级条件
-    while(nextExp <= combatant.$properties.EXP) {
-        nextExp = nextExp * 2;
-        ++level;
-    }
-
-
-    //升级结果
-    while(level > combatant.$properties.level) {
 
         ++combatant.$properties.level;
 
@@ -1952,7 +1959,7 @@ function *commonLevelUpScript(combatant) {
         }
     }
 
-    return level;
+    return combatant.$properties.level;
 }
 
 //targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）

@@ -73,7 +73,7 @@ Item {
 
         //装备
 
-        let equipReservedSlots = fighthero['$equip_reserved_slots'] || game.$sys.resources.commonScripts["equip_reserved_slots"];
+        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, fighthero['$equipReservedSlots'], GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'), []);
         root.arrEquipmentPositions = [];
         let arrEquipment = [];  //显示的
 
