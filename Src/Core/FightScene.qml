@@ -289,8 +289,8 @@ Rectangle {
 
         readonly property var $sys: ({
             screen: rootFightScene,    //固定屏幕上（所有，包含战斗场景）
-            scene: fightScene,      //战斗视窗
-            container: itemRolesContainer,  //容器（包含所有战斗人物）
+            viewport: fightScene,      //战斗视窗
+            scene: itemRolesContainer,  //容器（包含所有战斗人物）
 
             showSkillsOrGoods: FightSceneJS.showSkillsOrGoods,
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
@@ -388,7 +388,7 @@ Rectangle {
                     break;
                 }
 
-                //FightSceneJS.refreshFightRoleAction(fighthero, "Normal", AnimatedSprite.Infinite);
+                //FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
                 refreshAllFightRoleInfo();
                 FightSceneJS.resetRolesPosition();
 
@@ -406,7 +406,7 @@ Rectangle {
                     ret = _private.myCombatants.splice(index, 1);
                     repeaterMyCombatants.model.remove(index, 1);
                     ret[0].$$fightData.$info.$index = -1;
-                    ////_private.arrTempLoopedAllFightHeros.splice(_private.arrTempLoopedAllFightHeros.indexOf(ret[0]), 1);
+                    ////_private.arrTempLoopedAllFightRoles.splice(_private.arrTempLoopedAllFightRoles.indexOf(ret[0]), 1);
 
                     for(; index < _private.myCombatants.length; ++index)
                         _private.myCombatants[index].$$fightData.$info.$index = index;
@@ -421,7 +421,7 @@ Rectangle {
                     ret = _private.enemies.splice(index, 1);
                     repeaterEnemies.model.remove(index, 1);
                     ret[0].$$fightData.$info.$index = -1;
-                    ////_private.arrTempLoopedAllFightHeros.splice(_private.arrTempLoopedAllFightHeros.indexOf(ret[0]), 1);
+                    ////_private.arrTempLoopedAllFightRoles.splice(_private.arrTempLoopedAllFightRoles.indexOf(ret[0]), 1);
 
                     for(; index < _private.enemies.length; ++index)
                         _private.enemies[index].$$fightData.$info.$index = index;
@@ -431,7 +431,7 @@ Rectangle {
                     break;
                 }
 
-                //FightSceneJS.refreshFightRoleAction(fighthero, "Normal", AnimatedSprite.Infinite);
+                //FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
                 refreshAllFightRoleInfo();
                 FightSceneJS.resetRolesPosition();
 
@@ -487,7 +487,7 @@ Rectangle {
         timerRoleSprite.stop();
 
         _private.enemies = [];
-        ////_private.arrTempLoopedAllFightHeros = [];
+        ////_private.arrTempLoopedAllFightRoles = [];
         _private.nRound = 0;
         //_private.nStep = 0;
         _private.nStage = 0;
@@ -687,7 +687,7 @@ Rectangle {
         timerRoleSprite.stop();
 
         //_private.enemies = [];
-        //_private.arrTempLoopedAllFightHeros = [];
+        //_private.arrTempLoopedAllFightRoles = [];
         //_private.nRound = 0;
         ////_private.nStep = 0;
         _private.nStage = 0;
@@ -1592,7 +1592,7 @@ Rectangle {
         //所有特效临时存放（退出时清空）
         property var mapSpriteEffectsTemp: ({})
 
-        ////property var arrTempLoopedAllFightHeros: [] //每次战斗循环的所有临时战斗人物
+        ////property var arrTempLoopedAllFightRoles: [] //每次战斗循环的所有临时战斗人物
 
 
 

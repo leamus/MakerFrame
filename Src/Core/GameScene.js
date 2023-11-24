@@ -483,6 +483,12 @@ function loadResources() {
     */
 
 
+    game.$sys.protoObjects.fightRole = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightRole'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightRole'));
+    game.$sys.protoObjects.goods = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$goods'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$goods'));
+    game.$sys.protoObjects.skill = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$skill'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$skill'));
+    game.$sys.protoObjects.fightScript = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightScript'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightScript'));
+
+
 
     //起始脚本
     if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'start.js'))) {
@@ -875,7 +881,7 @@ function getGoodsResource(item, forceReload=false) {
     if(data) {
         _private.goodsResource[item] = ts.data;
         _private.goodsResource[item].$rid = item;
-        let _proto_ = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoTypeObject', '$goods'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoTypeObject', '$goods'));
+        let _proto_ = game.$sys.protoObjects.goods;
         if(_private.goodsResource[item].$commons) {
             _private.goodsResource[item].$commons.__proto__ = _proto_;
             _private.goodsResource[item].__proto__ = _private.goodsResource[item].$commons;
@@ -909,7 +915,7 @@ function getSkillResource(item, forceReload=false) {
     if(data) {
         _private.skillsResource[item] = ts.data;
         _private.skillsResource[item].$rid = item;
-        let _proto_ = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoTypeObject', '$skill'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoTypeObject', '$skill'));
+        let _proto_ = game.$sys.protoObjects.skill;
         if(_private.skillsResource[item].$commons) {
             _private.skillsResource[item].$commons.__proto__ = _proto_;
             _private.skillsResource[item].__proto__ = _private.skillsResource[item].$commons;
@@ -943,7 +949,7 @@ function getFightScriptResource(item, forceReload=false) {
     if(data) {
         _private.fightScriptsResource[item] = ts.data;
         _private.fightScriptsResource[item].$rid = item;
-        let _proto_ = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoTypeObject', '$fightScript'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoTypeObject', '$fightScript'));
+        let _proto_ = game.$sys.protoObjects.fightScript;
         if(_private.fightScriptsResource[item].$commons) {
             _private.fightScriptsResource[item].$commons.__proto__ = _proto_;
             _private.fightScriptsResource[item].__proto__ = _private.fightScriptsResource[item].$commons;

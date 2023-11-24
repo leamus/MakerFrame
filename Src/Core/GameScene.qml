@@ -1397,7 +1397,7 @@ Rectangle {
         readonly property var removeskill: function(fighthero, skill=-1, filters={}) {
             if(skill === undefined || skill === null)
                 skill = -1;
-            //if(skillIndex >= objFightHero.$skills.length || fightheroIndex < 0)
+            //if(skillIndex >= objFightRoles.$skills.length || fightheroIndex < 0)
             //    return false;
             //if(type === undefined || type === null)
             //    type = -1;
@@ -1476,7 +1476,7 @@ Rectangle {
                 skill = -1;
             //if(type === undefined || type === null)
             //    type = -1;
-            //if(skillIndex >= objFightHero.$skills.length || fightheroIndex < 0)
+            //if(skillIndex >= objFightRoles.$skills.length || fightheroIndex < 0)
             //    return null;
 
 
@@ -2401,7 +2401,7 @@ Rectangle {
 
             //游戏视窗
             if(properties.$parent === 1)
-                properties.$parent = itemComponentsContainer;
+                properties.$parent = itemViewPort;
             //会改变大小
             else if(properties.$parent === 2)
                 properties.$parent = gameScene;
@@ -2681,7 +2681,7 @@ Rectangle {
 
             //游戏视窗
             if(properties.$parent === 1)
-                properties.$parent = itemComponentsContainer;
+                properties.$parent = itemViewPort;
             //会改变大小
             if(properties.$parent === 2)
                 properties.$parent = gameScene;
@@ -3249,7 +3249,7 @@ Rectangle {
             //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
 
 
-            game.$sys.reloadFightHeros();
+            game.$sys.reloadFightRoles();
 
             //刷新战斗时人物数据
             //loaderFightScene.refreshAllFightRoleInfo();
@@ -3550,14 +3550,14 @@ Rectangle {
             init: init,
 
             screen: rootGameScene,      //屏幕（组件位置和大小固定）（所有，包含战斗场景）
-            scene: itemComponentsContainer,    //游戏视窗，组件位置和大小固定
-            container: gameScene,   //组件容器（组件位置和大小固定，但会被scale影响）
-            map: itemContainer,   //地图（组件会改变大小和随地图移动）
+            viewport: itemViewPort,     //游戏视窗，组件位置和大小固定
+            scene: gameScene,           //场景（组件位置和大小固定，但会被scale影响）
+            map: itemContainer,         //地图，组件的容器（组件会改变大小和随地图移动）
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
             //重新创建（修复继承链），并计算新属性
-            reloadFightHeros: function() {
+            reloadFightRoles: function() {
 
                 let tFightHeros = game.gd["$sys_fight_heros"];
                 game.gd["$sys_fight_heros"] = [];
@@ -3618,6 +3618,8 @@ Rectangle {
 
             loadSpriteEffect: GameSceneJS.loadSpriteEffect,
 
+            protoObjects: {},
+
             components: {
                 joystick: joystick,
                 buttons: itemButtons,
@@ -3633,7 +3635,7 @@ Rectangle {
 
         //地图大小和视窗大小
         readonly property size $mapSize: Qt.size(itemContainer.width, itemContainer.height)
-        readonly property size $sceneSize: Qt.size(itemComponentsContainer.width, itemComponentsContainer.height)
+        readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
 
         //上次帧间隔时长
         property int $frameDuration: 0
@@ -3930,12 +3932,12 @@ Rectangle {
 
             //如果地图小于等于场景，则将地图居中
             if(itemContainer.width < gameScene.width)
-                itemContainer.x = parseInt((itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
+                itemContainer.x = parseInt((itemViewPort.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
             if(itemContainer.height < gameScene.height)
-                itemContainer.y = parseInt((itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
+                itemContainer.y = parseInt((itemViewPort.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
-            //console.debug("!!!", itemContainer.width, gameScene.scale, itemComponentsContainer.width, itemContainer.x);
-            //console.debug("!!!", itemContainer.height, gameScene.scale, itemComponentsContainer.height, itemContainer.y);
+            //console.debug("!!!", itemContainer.width, gameScene.scale, itemViewPort.width, itemContainer.x);
+            //console.debug("!!!", itemContainer.height, gameScene.scale, itemViewPort.height, itemContainer.y);
 
 
             //卸载原地图块图片
@@ -4157,7 +4159,7 @@ Rectangle {
         }
         //如果地图小于等于场景，则将地图居中
         else {
-            itemContainer.x = parseInt((itemComponentsContainer.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
+            itemContainer.x = parseInt((itemViewPort.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.x = 0;
         }
@@ -4180,7 +4182,7 @@ Rectangle {
         }
         //如果地图小于等于场景，则将地图居中
         else {
-            itemContainer.y = parseInt((itemComponentsContainer.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
+            itemContainer.y = parseInt((itemViewPort.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.y = 0;
         }
@@ -4380,9 +4382,9 @@ Rectangle {
 
 
 
-    //地图界面元素容器
+    //游戏视窗，组件位置和大小固定
     Item {
-        id: itemComponentsContainer
+        id: itemViewPort
 
         //anchors.fill: parent
         width: parent.width
@@ -4409,8 +4411,8 @@ Rectangle {
 
             //anchors.fill: parent
             //z: 0
-            width: itemComponentsContainer.width / scale
-            height: itemComponentsContainer.height / scale
+            width: itemViewPort.width / scale
+            height: itemViewPort.height / scale
 
             clip: true
             color: "black"
@@ -5303,122 +5305,137 @@ Rectangle {
             }
         }
 
-        ColumnLayout {
+        Rectangle {
+            id: rectGameInputBack
+
             anchors.centerIn: parent
             width: parent.width * 0.8
-            //height: parent.height * 0.6
+            height: gameinput_columnlayout.implicitHeight
 
-            Rectangle {
-                id: rectGameInputTitle
-
-                Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: parent.width
-                Layout.preferredHeight: 36
-                //implicitHeight: 60
-
-                //color: "darkred"
-                color: "#EE00CC99"
-                //radius: itemMenu.radius
-
-                Text {
-                    id: textGameInputTitle
-
-                    anchors.fill: parent
-
-                    color: "white"
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    font.pointSize: 16
-                    font.bold: true
-
-                    wrapMode: Text.NoWrap
-                }
-
-            }
+            clip: true
 
 
-            Rectangle {
-                id: rectGameInput
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                Layout.preferredWidth: parent.width
-                Layout.preferredHeight: textGameInput.implicitHeight
+            radius: 6
+            color: '#303030'
 
 
-                color: "#FFFFFF"
+            ColumnLayout {
+                id: gameinput_columnlayout
+                anchors.fill: parent
+                //height: parent.height * 0.6
 
-                border {
-                    color: '#60000000'
-                }
+                Rectangle {
+                    id: rectGameInputTitle
 
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: parent.width
+                    Layout.preferredHeight: 36
+                    //implicitHeight: 60
 
-                TextArea {
-                    id: textGameInput
+                    color: "#FF0035A8"
+                    //color: "#EE00CC99"
+                    //radius: itemMenu.radius
 
-                    anchors.fill: parent
+                    Text {
+                        id: textGameInputTitle
 
+                        anchors.fill: parent
 
-                    color: 'white'
+                        color: "white"
 
-                    //horizontalAlignment: Text.AlignHCenter
-                    //verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
 
-                    placeholderTextColor: '#7F7F7F7F'
+                        font.pointSize: 16
+                        font.bold: true
 
-                    font.pointSize: 16
-                    font.bold: true
-
-                    selectByKeyboard: true
-                    selectByMouse: true
-                    wrapMode: Text.Wrap
-
-
-                    //padding : nPadding
-                    leftPadding : 6
-                    rightPadding : 6
-                    topPadding : 6
-                    bottomPadding: 6
-                    background: Rectangle {
-                        color: '#FF0035A8'
-                        implicitHeight: 0
-                        //color: Global.style.backgroundColor
-                        //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                        //border.width: debugMsg.textArea.focus ? 2 : 1
-                    }
-                }
-            }
-
-            Button {
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-                text: '确定'
-                onClicked: {
-                    if(GlobalLibraryJS.isFunction(itemRootGameInput.callback))
-                        itemRootGameInput.callback(itemRootGameInput);
-                    else {  // if(itemRootGameInput.callback === true) {   //默认回调函数
-                        //gameMap.focus = true;
-
-                        itemRootGameInput.visible = false;
-
-
-                        /*/*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
-                            game.goon();
-                            itemRootGameInput.bPauseGame = false;
-                        }* /*/
-
-                        /*if(_private.config.objPauseNames['$input'] !== undefined) {
-                            game.goon('$input');
-                            _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                        }*/
-
-
-
-                        //itemRootGameInput.destroy();
-                        ////FrameManager.goon();
+                        wrapMode: Text.NoWrap
                     }
 
+                }
+
+
+                Rectangle {
+                    id: rectGameInput
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width
+                    Layout.preferredHeight: textGameInput.implicitHeight
+
+
+                    color: "black"
+
+                    border {
+                        color: '#60000000'
+                    }
+
+
+                    TextArea {
+                        id: textGameInput
+
+                        anchors.fill: parent
+
+
+                        color: 'white'
+
+                        //horizontalAlignment: Text.AlignHCenter
+                        //verticalAlignment: Text.AlignVCenter
+
+                        placeholderTextColor: '#7F7F7F7F'
+
+                        font.pointSize: 16
+                        font.bold: true
+
+                        selectByKeyboard: true
+                        selectByMouse: true
+                        wrapMode: Text.Wrap
+
+
+                        //padding : nPadding
+                        leftPadding : 6
+                        rightPadding : 6
+                        topPadding : 6
+                        bottomPadding: 6
+                        background: Item {
+                            //color: 'transparent'
+                            implicitHeight: 0
+                            //color: Global.style.backgroundColor
+                            //border.color: textGameInput.focus ? Global.style.accent : Global.style.hintTextColor
+                            //border.width: textGameInput.focus ? 2 : 1
+                        }
+                    }
+                }
+
+                Button {
+
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+                    text: '确定'
+                    onClicked: {
+                        if(GlobalLibraryJS.isFunction(itemRootGameInput.callback))
+                            itemRootGameInput.callback(itemRootGameInput);
+                        else {  // if(itemRootGameInput.callback === true) {   //默认回调函数
+                            //gameMap.focus = true;
+
+                            itemRootGameInput.visible = false;
+
+
+                            /*/*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
+                                game.goon();
+                                itemRootGameInput.bPauseGame = false;
+                            }* /*/
+
+                            /*if(_private.config.objPauseNames['$input'] !== undefined) {
+                                game.goon('$input');
+                                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                            }*/
+
+
+
+                            //itemRootGameInput.destroy();
+                            ////FrameManager.goon();
+                        }
+
+                    }
                 }
             }
         }

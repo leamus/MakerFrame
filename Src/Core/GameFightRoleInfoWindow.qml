@@ -14,7 +14,7 @@ import _Global.Button 1.0
 Item {
     id: root
 
-    property int nFightHeroIndex: 0         //当前角色
+    property int nFightRoleIndex: 0         //当前角色
     property string strTeamName: '$sys_fight_heros'
     property var arrEquipmentPositions: []   //穿戴位置列表（用于索引用）
 
@@ -38,7 +38,7 @@ Item {
         }
         strTeamName = teamName;
 
-        nFightHeroIndex = n;
+        nFightRoleIndex = n;
         refresh();
         msgDetail.text = "双击道具可脱下";
 
@@ -52,52 +52,52 @@ Item {
 
 
     function refresh() {
-        let fighthero = game.gd[strTeamName][root.nFightHeroIndex];
-        let fightHeroPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-        textFightHeroName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](fighthero, {avatar: true, color: true}));
+        let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
+        let fightRolePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
+        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](conbatant, {avatar: true, color: true}));
 
 
-        /*textFightHeroInfo.text = "HP：" + fighthero.$$propertiesWithExtra.remainHP + "/" + fighthero.$$propertiesWithExtra.healthHP + "/" + fighthero.$$propertiesWithExtra.HP + ' ' +
-            "MP：" + fighthero.$$propertiesWithExtra.remainMP + "/" + fighthero.$$propertiesWithExtra.MP + ' ' +
-            "攻击：" + fighthero.$$propertiesWithExtra.attack + ' ' +
-            "防御：" + fighthero.$$propertiesWithExtra.defense + ' ' +
-            "灵力：" + fighthero.$$propertiesWithExtra.power + ' ' +
-            "幸运：" + fighthero.$$propertiesWithExtra.luck + ' ' +
-            "速度：" + fighthero.$$propertiesWithExtra.speed + ' ' +
-            "经验：" + fighthero.$properties.EXP + ' ' +
-            "级别：" + fighthero.$properties.level;
+        /*textFightRoleInfo.text = "HP：" + conbatant.$$propertiesWithExtra.remainHP + "/" + conbatant.$$propertiesWithExtra.healthHP + "/" + conbatant.$$propertiesWithExtra.HP + ' ' +
+            "MP：" + conbatant.$$propertiesWithExtra.remainMP + "/" + conbatant.$$propertiesWithExtra.MP + ' ' +
+            "攻击：" + conbatant.$$propertiesWithExtra.attack + ' ' +
+            "防御：" + conbatant.$$propertiesWithExtra.defense + ' ' +
+            "灵力：" + conbatant.$$propertiesWithExtra.power + ' ' +
+            "幸运：" + conbatant.$$propertiesWithExtra.luck + ' ' +
+            "速度：" + conbatant.$$propertiesWithExtra.speed + ' ' +
+            "经验：" + conbatant.$properties.EXP + ' ' +
+            "级别：" + conbatant.$properties.level;
         */
 
-        textFightHeroInfo.text = game.$sys.resources.commonScripts["combatant_info"](fighthero);
+        textFightRoleInfo.text = game.$sys.resources.commonScripts["combatant_info"](conbatant);
 
 
         //装备
 
-        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, fighthero['$equipReservedSlots'], GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'), []);
+        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, conbatant['$equipReservedSlots'], GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'), []);
         root.arrEquipmentPositions = [];
         let arrEquipment = [];  //显示的
 
         arrEquipment.length = equipReservedSlots.length;
         root.arrEquipmentPositions.length = equipReservedSlots.length;
 
-        for(let position in fighthero.$equipment) {
+        for(let position in conbatant.$equipment) {
             //跳过为空的
-            if(!fighthero.$equipment[position])
+            if(!conbatant.$equipment[position])
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](fighthero.$equipment[position], {image: true, color: true}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](conbatant.$equipment[position], {image: true, color: true}));
             if(tIndex > -1) {
-                //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(fighthero.$equipment[position].$rid).$properties.name);
+                //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
                 arrEquipment[tIndex] = '%1：%2'.arg(position).arg(tgoodsName);
                 root.arrEquipmentPositions[tIndex] = position;
             }
             else {
-                //arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.getGoodsResource(fighthero.$equipment[position].$rid).$properties.name) );
+                //arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name) );
                 arrEquipment.push('%1：%2'.arg(position).arg(tgoodsName) );
                 root.arrEquipmentPositions.push(position);
             }
-            //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.getGoodsResource(fighthero.$equipment[position].$rid).$properties.name + "\r\n";
+            //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name + "\r\n";
         }
         for(let ti = 0; ti < equipReservedSlots.length; ++ti)
             if(arrEquipment[ti] === undefined)
@@ -108,7 +108,7 @@ Item {
 
         //技能
         let arrSkill = [];
-        for(let skill of fighthero.$skills) {
+        for(let skill of conbatant.$skills) {
             arrSkill.push(skill.$name);
         }
 
@@ -155,7 +155,7 @@ Item {
                     anchors.fill: parent
 
                     Text {
-                        id: textFightHeroName
+                        id: textFightRoleName
 
                         Layout.fillWidth: true
                         //anchors.fill: parent
@@ -181,8 +181,8 @@ Item {
                         border.width: 1
 
                         onButtonClicked: {
-                            if(root.nFightHeroIndex > 0) {
-                                --root.nFightHeroIndex;
+                            if(root.nFightRoleIndex > 0) {
+                                --root.nFightRoleIndex;
                                 root.refresh();
                             }
                         }
@@ -197,8 +197,8 @@ Item {
                         border.width: 1
 
                         onButtonClicked: {
-                            if(game.gd[strTeamName].length - 1 > root.nFightHeroIndex) {
-                                ++root.nFightHeroIndex;
+                            if(game.gd[strTeamName].length - 1 > root.nFightRoleIndex) {
+                                ++root.nFightRoleIndex;
                                 root.refresh();
                             }
                         }
@@ -223,11 +223,11 @@ Item {
 
         //道具说明框（包括位置、颜色、文字等）
         Notepad {
-            id: textFightHeroInfo
+            id: textFightRoleInfo
 
             Layout.preferredWidth: parent.width
             Layout.maximumHeight: 100
-            Layout.preferredHeight: textFightHeroInfo.textArea.implicitHeight
+            Layout.preferredHeight: textFightRoleInfo.textArea.implicitHeight
 
 
             color: "darkblue"
@@ -257,11 +257,11 @@ Item {
         /*Rectangle {
             Layout.preferredWidth: parent.width
             Layout.maximumHeight: 100
-            Layout.preferredHeight: textFightHeroInfo.implicitHeight
+            Layout.preferredHeight: textFightRoleInfo.implicitHeight
             color: "darkred"
 
             Text {
-                id: textFightHeroInfo
+                id: textFightRoleInfo
                 anchors.fill: parent
 
                 color: "white"
@@ -290,7 +290,7 @@ Item {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
-                    let combatant = game.gd[strTeamName][root.nFightHeroIndex];
+                    let combatant = game.gd[strTeamName][root.nFightRoleIndex];
                     let position = root.arrEquipmentPositions[index];
                     //msgDetail.text = game.$sys.getGoodsResource(hero.$equipment[position].$rid).$properties.description;
 
@@ -305,7 +305,7 @@ Item {
                         return;
 
                     //let hero = game.gd[strTeamName][0];
-                    game.getgoods(game.unload(root.nFightHeroIndex, root.arrEquipmentPositions[index]));
+                    game.getgoods(game.unload(root.nFightRoleIndex, root.arrEquipmentPositions[index]));
 
                     root.refresh();
 
@@ -320,7 +320,7 @@ Item {
                 Layout.fillHeight: true
 
                 onS_Choice: {
-                    let combatant = game.gd[strTeamName][root.nFightHeroIndex];
+                    let combatant = game.gd[strTeamName][root.nFightRoleIndex];
                     //msgDetail.text = game.$sys.getSkillResource(combatant.$skills[index].$rid).$properties.description;
 
                     let description = combatant.$skills[index].$description;

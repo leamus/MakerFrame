@@ -16,7 +16,7 @@ Role 1.0 Role.qml
 GameMenuWindow 1.0 GameMenuWindow.qml
 GameSystemWindow 1.0 GameSystemWindow.qml
 GameBagWindow 1.0 GameBagWindow.qml
-GameFightHeroInfoWindow 1.0 GameFightHeroInfoWindow.qml
+GameFightRoleInfoWindow 1.0 GameFightRoleInfoWindow.qml
 GameTradeWindow 1.0 GameTradeWindow.qml
 
 GameScene 1.0 GameScene.qml

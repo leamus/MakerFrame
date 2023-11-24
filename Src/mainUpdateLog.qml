@@ -130,10 +130,16 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+
+2023/11/16：发布 1.6.14.231116 版本
+1、调整game.showsprite和game.showimage的$parent含义和$x、$y、$width、$height含义；
+2、调整通用脚本的配置（名称、prototype、预留槽）；
+3、优化升级脚本；
+
 2023/11/14：发布 1.6.13.231114 版本
 1、修复一个小问题；
 2、修改game.setscenerole指令，使之支持地图移动（非跟踪角色）；
-3、修改游戏整个布局设定：修改和新增 地图场景的 game.$sys.screen、game.$sys.scene、game.$sys.container、game.$sys.map 四个层次和 战斗场景的 fight.$sys.screen、fight.$sys.scene、fight.$sys.container 三个层次，可以修改场景大小来进行留白给插件使用；
+3、修改游戏整个布局设定：修改和新增 地图场景的 game.$sys.screen、game.$sys.viewport、game.$sys.scene、game.$sys.map 四个层次和 战斗场景的 fight.$sys.screen、fight.$sys.scene、fight.$sys.container 三个层次，可以修改场景大小来进行留白给插件使用；
 
 2023/11/09：发布 1.6.12.231109 版本
 1、继续将一部分战斗代码放入通用脚本，供自定义玩；

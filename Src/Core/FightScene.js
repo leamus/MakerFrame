@@ -98,9 +98,9 @@ function combatantUseSkillOrGoods(combatant) {
 
 
         combatant.$$fightData.$choice.$attack = choiceSkillOrGoods;
-        if(choiceSkillOrGoods.$objectType === 3)
+        if(choiceSkillOrGoods.$objectType === game.$sys.protoObjects.skill.$objectType)
             combatant.$$fightData.$choice.$type = 3;
-        else if(choiceSkillOrGoods.$objectType === 2)
+        else if(choiceSkillOrGoods.$objectType === game.$sys.protoObjects.goods.$objectType)
             combatant.$$fightData.$choice.$type = 2;
 
         //检测技能 或 道具是否可以使用
@@ -123,7 +123,7 @@ function combatantUseSkillOrGoods(combatant) {
 
 
         //普通攻击 或 技能
-        if(choiceSkillOrGoods.$objectType === 3) {
+        if(combatant.$$fightData.$choice.$type === 3) {
             skill = choiceSkillOrGoods;
             if(/*skill && */skill.$commons.$choiceScript)
                 genFightChoice = skill.$commons.$choiceScript(skill, combatant);
@@ -132,7 +132,7 @@ function combatantUseSkillOrGoods(combatant) {
             //}
         }
         //道具
-        else if(choiceSkillOrGoods.$objectType === 2) {
+        else if(combatant.$$fightData.$choice.$type === 2) {
             let goods = combatant.$$fightData.$choice.$attack;
             if(GlobalLibraryJS.isArray(goods.$fight))
                 skill = goods.$fight[0];
@@ -528,76 +528,76 @@ function skillChoiceCanUsing(params, combatant) {
 
 
 //重置刷新战斗人物（创建时调用）
-function resetFightRole(fighthero, fightheroSpriteEffect, index, teamID) {
+function resetFightRole(fightRole, fightRoleSpriteEffect, index, teamID) {
 
-    fightheroSpriteEffect.propertyBar.refresh(fighthero.$$propertiesWithExtra.HP);
-    fightheroSpriteEffect.strName = fighthero.$name;
+    fightRoleSpriteEffect.propertyBar.refresh(fightRole.$$propertiesWithExtra.HP);
+    fightRoleSpriteEffect.strName = fightRole.$name;
 
 
 
     //if(i >= repeaterMyCombatants.count)
     //    break;
-    //console.debug("!!!", _private.myCombatants, i, fighthero, JSON.stringify(fighthero));
-    if(!fighthero.$$fightData)
-        fighthero.$$fightData = {};
+    //console.debug("!!!", _private.myCombatants, i, fightRole, JSON.stringify(fightRole));
+    if(!fightRole.$$fightData)
+        fightRole.$$fightData = {};
 
-    //fighthero.$$fightData.$actionData = {};
-    //fighthero.$$fightData.$buffs = {};
+    //fightRole.$$fightData.$actionData = {};
+    //fightRole.$$fightData.$buffs = {};
     ////_private.myCombatants.$rid = fightScriptData.$enemiesData[tIndex].$rid;
 
-    fighthero.$$fightData.$info = {};
-    fighthero.$$fightData.$info.$index = parseInt(index);
+    fightRole.$$fightData.$info = {};
+    fightRole.$$fightData.$info.$index = parseInt(index);
     if(teamID === 0) {    //我方
-        fighthero.$$fightData.$info.$teamsID = [0, 1];
-        fighthero.$$fightData.$info.$teams = [_private.myCombatants, _private.enemies];
-        fighthero.$$fightData.$info.$teamsSpriteEffect = [repeaterMyCombatants, repeaterEnemies];
+        fightRole.$$fightData.$info.$teamsID = [0, 1];
+        fightRole.$$fightData.$info.$teams = [_private.myCombatants, _private.enemies];
+        fightRole.$$fightData.$info.$teamsSpriteEffect = [repeaterMyCombatants, repeaterEnemies];
 
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fighthero, -1, false);
+        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, false);
     }
     else if(teamID === 1) { //敌方
-        fighthero.$$fightData.$info.$teamsID = [1, 0];
-        fighthero.$$fightData.$info.$teams = [_private.enemies, _private.myCombatants];
-        fighthero.$$fightData.$info.$teamsSpriteEffect = [repeaterEnemies, repeaterMyCombatants];
+        fightRole.$$fightData.$info.$teamsID = [1, 0];
+        fightRole.$$fightData.$info.$teams = [_private.enemies, _private.myCombatants];
+        fightRole.$$fightData.$info.$teamsSpriteEffect = [repeaterEnemies, repeaterMyCombatants];
 
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fighthero, -1, true);
+        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, true);
         //_private.enemies[i].$rid = fightScriptData.$enemiesData[tIndex].$rid;
 
     }
 
-    fighthero.$$fightData.$info.$spriteEffect = fightheroSpriteEffect;
+    fightRole.$$fightData.$info.$spriteEffect = fightRoleSpriteEffect;
 
     //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
 
-    //fighthero.$$fightData.$choice.$type = -1;
-    ////fighthero.$$fightData.$lastChoice.$type = -1;
-    //fighthero.$$fightData.$choice.$attack = undefined;
-    ////fighthero.$$fightData.$lastChoice.$attack = undefined;
+    //fightRole.$$fightData.$choice.$type = -1;
+    ////fightRole.$$fightData.$lastChoice.$type = -1;
+    //fightRole.$$fightData.$choice.$attack = undefined;
+    ////fightRole.$$fightData.$lastChoice.$attack = undefined;
     //这两句必须，否则会指向不存在的对象（比如第一场结束前选第4个敌人，第二场直接重复上次就出错了）；
-    //fighthero.$$fightData.$choice.$targets = undefined;
-    //fighthero.$$fightData.$lastChoice.$targets = undefined;
+    //fightRole.$$fightData.$choice.$targets = undefined;
+    //fightRole.$$fightData.$lastChoice.$targets = undefined;
 
-    //fighthero.$$fightData.defenseSkill = undefined;
-    //fighthero.$$fightData.lastDefenseSkill = undefined;
+    //fightRole.$$fightData.defenseSkill = undefined;
+    //fightRole.$$fightData.lastDefenseSkill = undefined;
 
 
     /*/读取ActionData
-    let fightroleInfo = game.$sys.getFightRoleResource(fighthero.$rid);
+    let fightroleInfo = game.$sys.getFightRoleResource(fightRole.$rid);
     if(fightroleInfo) {
         for(let tn in fightroleInfo.ActionData) {
-            fighthero.$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
+            fightRole.$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
         }
     }
     else
-        console.warn("[!FightScene]载入战斗精灵失败：" + fighthero.$rid);
+        console.warn("[!FightScene]载入战斗精灵失败：" + fightRole.$rid);
     */
 
 
 
-    FightSceneJS.refreshFightRoleAction(fighthero, "Normal", AnimatedSprite.Infinite);
+    FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
 
     //刷新血条
-    //if(fighthero.$$propertiesWithExtra.HP[0] <= 0)
-    //    fighthero.$$propertiesWithExtra.HP[0] = 1;
+    //if(fightRole.$$propertiesWithExtra.HP[0] <= 0)
+    //    fightRole.$$propertiesWithExtra.HP[0] = 1;
 }
 
 
@@ -1435,9 +1435,9 @@ function *fnRound() {
     //!!!开始循环每一角色的攻击
     let genFightRolesRound = game.$sys.resources.commonScripts["fight_roles_round"](_private.nRound);
     for(let tValue of genFightRolesRound) {
-    ////for(let combatant of _private.arrTempLoopedAllFightHeros) {
-    ////for(let tc in _private.arrTempLoopedAllFightHeros) {
-        ////let combatant = _private.arrTempLoopedAllFightHeros[tc];
+    ////for(let combatant of _private.arrTempLoopedAllFightRoles) {
+    ////for(let tc in _private.arrTempLoopedAllFightRoles) {
+        ////let combatant = _private.arrTempLoopedAllFightRoles[tc];
 
         let combatant;
         if(GlobalLibraryJS.isArray(tValue)) {

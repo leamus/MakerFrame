@@ -657,8 +657,6 @@ NPC事件的四种写法（前两种支持同步调用）：
     function *$commonFightEndScript(r, exp, money) {
     //恢复算法
     function $resumeEventScript(combatant) {
-    //装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
-    let $equipReservedSlots = ['头戴', '身穿', '武器', '鞋子'];
   7、通用升级链算法（集成在了通用脚本里）：
     格式：function *commonLevelUpScript(combatant) {//升级脚本
         function commonLevelAlgorithm(combatant, targetLevel) {    //级别对应的 各项属性 算法（升级时会设置，可选；注意：只增不减）
@@ -833,7 +831,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
 5、其他：
   a、脚本的关键字、变量名都是区分大小写的，不注意大小写可能会出错，比如：
     iF	//应该是if
-    var choice;  //后面使用不能用 Chioce、cHoice等等
+    var choice;  //后面使用不能用 Choice、cHoice等等
 
   b、注释：
     注释就是给你的脚本做说明，本身不会执行。有两种：

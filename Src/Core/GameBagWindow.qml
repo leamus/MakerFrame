@@ -26,19 +26,19 @@ Item {
     function init() {
 
         //let fightheros = game.fighthero(-1, 1);
-        let fightHeroPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
+        let fightRolePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
         let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
             arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](tf, {avatar: true, color: true})));
         }
-        gameFightHeroMenu.show(arrFightHerosName);
+        gameFightRoleMenu.show(arrFightHerosName);
         if(arrFightHerosName.length > 0)
-            gameFightHeroMenu.choice(0);
+            gameFightRoleMenu.choice(0);
 
 
         //if(arrFightHerosName.length > 0)
-        //    gameFightHeroMenu.nChoiceIndex = 0;
+        //    gameFightRoleMenu.nChoiceIndex = 0;
 
         //gameGoodsMenu.nChoiceIndex = -1;
         showGoods(-1);
@@ -362,7 +362,7 @@ Item {
 
                 //战斗人物的列表
                 GameMenu {
-                    id: gameFightHeroMenu
+                    id: gameFightRoleMenu
 
                     //Layout.preferredWidth: parent.width * 0.5
                     Layout.fillWidth: true
@@ -479,7 +479,7 @@ Item {
                     //_private.close();
 
                     let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    game.usegoods(gameFightHeroMenu.nChoiceIndex, goods);
+                    game.usegoods(gameFightRoleMenu.nChoiceIndex, goods);
 
 
                     //脚本执行完毕后刷新背包
@@ -507,10 +507,10 @@ Item {
 
                     if(goodsInfo.$commons.$equipScript) {
                         let tfh;
-                        if(gameFightHeroMenu.nChoiceIndex < 0)
+                        if(gameFightRoleMenu.nChoiceIndex < 0)
                             tfh = null;
                         else
-                            tfh = game.fighthero(gameFightHeroMenu.nChoiceIndex);
+                            tfh = game.fighthero(gameFightRoleMenu.nChoiceIndex);
 
                         game.run(goodsInfo.$commons.$equipScript(goods, tfh));
                         //game.run(goodsInfo.$commons.$equipScript(goods.$rid));

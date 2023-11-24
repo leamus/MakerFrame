@@ -297,7 +297,7 @@ Item {
     }
 
 
-    GameFightHeroInfoWindow {
+    GameFightRoleInfoWindow {
         id: itemFightRoleInfo
 
         anchors.fill: parent

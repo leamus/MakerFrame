@@ -212,12 +212,12 @@ let $config = {
             $itemBorderColor: '#60FFFFFF',
         },
         $input: {
-            $backgroundColor: '#FFFFFF',
-            $borderColor: '#60000000',
+            $backgroundColor: 'black',
+            $borderColor: '#FFFFFF',
             $fontSize: 16,
             $fontColor: 'black',
-            $titleBackgroundColor: '#EE00CC99',
-            $titleBorderColor: 'white',
+            $titleBackgroundColor: '#FF0035A8',
+            $titleBorderColor: '#00000000',
             $titleFontSize: 16,
             $titleFontColor: 'white',
             $maskColor: '#7FFFFFFF',
@@ -236,6 +236,19 @@ let $config = {
             $titleFontColor: 'white',
             $itemBorderColor: '#60FFFFFF',
         },
+    },
+    //系统组件的一些名称
+    $names: {
+        $money: '金钱',
+        //装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
+        $equipReservedSlots: ['头戴', '身穿', '武器', '鞋子'],
+    },
+    //4个对象的根prototype对象，$objectType为对象类型
+    $protoObjects: {
+        $fightRole: {$objectType: 1},
+        $goods: {$objectType: 2},
+        $skill:{$objectType: 3},
+        $fightScript: {$objectType: 4},
     },
     //安卓配置
     $android: {
@@ -405,6 +418,9 @@ function $Combatant(fightRoleRId, showName) {
         //lastDefenseSkill: '',
     };
 }
+$Combatant.prototype = $config.$protoObjects.$fightRole;
+
+
 
 function 属性(p, n=0) {
     let ret;
@@ -436,18 +452,8 @@ function 附加属性(p, n=0) {
     return ret;
 }
 
-//几种对象的根类
-
-$Combatant.prototype = {$objectType: 1};
-
 $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
-
-
-let $prototypeGoods = {$objectType: 2};
-let $prototypeSkill = {$objectType: 3};
-let $prototypeFightScript = {$objectType: 4};
-
 
 
 //系统显示 和 真实属性 对应
@@ -473,9 +479,7 @@ let mappingCombatantProperty = {
     '级别': 'level',
 };
 
-let mappingSystemName = {
-    'money': '金钱',
-}
+
 
 //显示战斗人物详细信息
 let $combatantInfo = function(combatant) {
@@ -575,7 +579,7 @@ function $refreshCombatant(combatant) {
 
 
 //直接升level级；为0表示检测是否需要升级；
-//  fighthero为下标，或战斗角色的name，或战斗角色对象；
+//  combatant是战斗角色对象；
 function levelUp(combatant, level=0, refresh=true) {
 
     //优先载入战斗角色自己的升级链，如果没有则载入系统的
@@ -719,19 +723,19 @@ function $commonRunAwayAlgorithm(team, index) {
 //返回null表示大回合结束
 function *$fightRolesRound(round) {
     //所有的战斗人物
-    let arrTempLoopedAllFightHeros = fight.myCombatants.concat(fight.enemies);
+    let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
 
     //计算 攻击 顺序
-    arrTempLoopedAllFightHeros.sort(function(a, b) {
+    arrTempLoopedAllFightRoles.sort(function(a, b) {
         if(a.$$propertiesWithExtra.speed > b.$$propertiesWithExtra.speed)return -1;
         if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
         if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
     });
-    //console.debug('[FightScene]all', arrTempLoopedAllFightHeros.length, JSON.stringify(arrTempLoopedAllFightHeros));
+    //console.debug('[FightScene]all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
 
 
     //循环每个战斗人物
-    for(let c of arrTempLoopedAllFightHeros) {
+    for(let c of arrTempLoopedAllFightRoles) {
         //如果在场且HP[0] > 0，则进行战斗人物回合
         if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
             yield [c];
@@ -1821,11 +1825,6 @@ let $fightButtons = [
         },
     },
 ];
-
-
-
-//装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
-let $equipReservedSlots = ['头戴', '身穿', '武器', '鞋子'];
 
 
 
