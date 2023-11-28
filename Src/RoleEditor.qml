@@ -71,9 +71,9 @@ Rectangle {
         //cfg.RoleType;
         textRoleName.text = cfg.RoleName;
 
-        role.spriteSrc = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+        role.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
         //textRoleImageURL.text = cfg.Image;
-        textRoleImageURL.text = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+        textRoleImageURL.text = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
         //textRoleResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
         textRoleResourceName.text = cfg.Image;
         textRoleResourceName.enabled = false;
@@ -1260,7 +1260,7 @@ Rectangle {
                 //console.debug("ttt", textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
             }
             //textRoleImageURL.text = textRoleResourceName.text;
-            textRoleImageURL.text = Global.toURL(GameMakerGlobal.roleResourceURL(textRoleResourceName.text));
+            textRoleImageURL.text = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(textRoleResourceName.text));
 
 
             role.spriteSrc = textRoleImageURL.text;
@@ -1338,7 +1338,7 @@ Rectangle {
         onClicked: {
             let filepath = GameMakerGlobal.roleResourceURL(item);
 
-            textRoleImageURL.text = Global.toURL(filepath);
+            textRoleImageURL.text = GlobalJS.toURL(filepath);
             textRoleResourceName.text = item;
             console.debug("[RoleEditor]List Clicked:", textRoleImageURL.text)
 

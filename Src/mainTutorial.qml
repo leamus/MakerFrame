@@ -100,7 +100,7 @@ Rectangle {
 
             text: "官方教程"
             onClicked: {
-                Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame/blob/main/Tutorials/1/');
+                Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame/blob/main/Tutorials');
             }
         }
 

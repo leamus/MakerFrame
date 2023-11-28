@@ -261,7 +261,7 @@ Rectangle {
                 if(role.$data.$name && bShowName)
                     pretext = role.$data.$name + "：" + pretext;
                 if(role.$data.$avatar && bShowAvatar)
-                    pretext = GlobalLibraryJS.showRichTextImage(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
+                    pretext = GlobalLibraryJS.showRichTextImage(GlobalJS.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
             }
 
 
@@ -558,7 +558,7 @@ Rectangle {
 
 
 
-            mainRole.spriteSrc = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+            mainRole.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
             mainRole.sizeFrame = Qt.size(cfg.FrameSize[0], cfg.FrameSize[1]);
             mainRole.nFrameCount = cfg.FrameCount;
             mainRole.arrFrameDirectionIndex = cfg.FrameIndex;
@@ -894,7 +894,7 @@ Rectangle {
             let roleComp = compRole.createObject(itemRoleContainer);
 
 
-            roleComp.spriteSrc = Global.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+            roleComp.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
             roleComp.sizeFrame = Qt.size(cfg.FrameSize[0], cfg.FrameSize[1]);
             roleComp.nFrameCount = cfg.FrameCount;
             roleComp.arrFrameDirectionIndex = cfg.FrameIndex;
@@ -1557,8 +1557,9 @@ Rectangle {
         //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
         //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
         //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
+        //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties，1为propertiesWithExtra）；
         //  成功返回战斗角色对象；失败返回false；
-        readonly property var addprops: function(fighthero, props={}, type=1, refresh=true) {
+        readonly property var addprops: function(fighthero, props={}, type=[1,1], checkLevelUp=true) {
 
             if(fighthero < 0)
                 return false;
@@ -1569,7 +1570,24 @@ Rectangle {
                 return false;
 
 
-            GameMakerGlobalJS.addProps(fighthero.$properties, props, type, fighthero.$$propertiesWithExtra);
+            //if(refresh)
+                _private.objCommonScripts["refresh_combatant"](fighthero, false);
+
+            //参考属性（乘以比例时的参考属性）
+            let properties2;
+            if(GlobalLibraryJS.isNumber(type)) {
+                properties2 = fighthero.$$propertiesWithExtra;
+            }
+            else {
+                if(type[1] === 1)
+                    properties2 = fighthero.$$propertiesWithExtra;
+                else
+                    properties2 = fighthero.$properties;
+
+                type = type[0];
+            }
+
+            GameMakerGlobalJS.addProps(fighthero.$properties, props, type, properties2);
 
 
             /*if(fighthero.$properties.healthHP > fighthero.$$propertiesWithExtra.HP)
@@ -1586,8 +1604,8 @@ Rectangle {
                     fighthero.$properties.remainMP = fighthero.$$propertiesWithExtra.MP;
             */
 
-            if(refresh)
-                _private.objCommonScripts["refresh_combatant"](fighthero);
+            //if(refresh)
+                _private.objCommonScripts["refresh_combatant"](fighthero, checkLevelUp);
 
             return fighthero;
         }
@@ -1872,7 +1890,7 @@ Rectangle {
                 for(let tfh of game.gd["$sys_fight_heros"])
                     _private.objCommonScripts["refresh_combatant"](tfh);
                 //刷新战斗时人物数据
-                //loaderFightScene.refreshAllFightRoleInfo();
+                //fight.$sys.refreshCombatant(-1);
             }
             game.run(continueScript);
         }
@@ -1932,7 +1950,7 @@ Rectangle {
                 //计算新属性
                 _private.objCommonScripts["refresh_combatant"](fighthero);
                 //刷新战斗时人物数据
-                //loaderFightScene.refreshAllFightRoleInfo();
+                //fight.$sys.refreshCombatant(-1);
 
                 return newCount;
             }
@@ -1944,7 +1962,7 @@ Rectangle {
                 //计算新属性
                 _private.objCommonScripts["refresh_combatant"](fighthero);
                 //刷新战斗时人物数据
-                //loaderFightScene.refreshAllFightRoleInfo();
+                //fight.$sys.refreshCombatant(-1);
             }
             return goods.$count;
             //}
@@ -1982,7 +2000,7 @@ Rectangle {
             //计算新属性
             _private.objCommonScripts["refresh_combatant"](fighthero);
             //刷新战斗时人物数据
-            //loaderFightScene.refreshAllFightRoleInfo();
+            //fight.$sys.refreshCombatant(-1);
 
             return oldEquip;
         }
@@ -2040,6 +2058,7 @@ Rectangle {
 
 
             dialogTrade.init(goods, mygoodsinclude, callback);
+            dialogTrade.visible = true;
         }
 
         //获得金钱；返回金钱数目；
@@ -2171,13 +2190,13 @@ Rectangle {
             if(!params.$loops)
                 params.$loops = Audio.Infinite;
 
-            audioBackgroundMusic.source = Global.toURL(filePath);
+            audioBackgroundMusic.source = GlobalJS.toURL(filePath);
             audioBackgroundMusic.loops = params.$loops;
             itemBackgroundMusic.play();
 
             game.gd["$sys_music"] = music;
 
-            //console.debug("~~~playmusic:", _private.objMusic[musicRId], Global.toURL(GameMakerGlobal.musicResourceURL(_private.objMusic[musicRId])));
+            //console.debug("~~~playmusic:", _private.objMusic[musicRId], GlobalJS.toURL(GameMakerGlobal.musicResourceURL(_private.objMusic[musicRId])));
             //console.debug("~~~playmusic:", audioBackgroundMusic.source, audioBackgroundMusic.source.toString());
 
             return true;
@@ -2208,7 +2227,7 @@ Rectangle {
                 return;
             let m = itemBackgroundMusic.arrMusicStack.pop();
             game.gd["$sys_music"] = m[0];
-            audioBackgroundMusic.source = Global.toURL(GameMakerGlobal.musicResourceURL(game.gd["$sys_music"]));
+            audioBackgroundMusic.source = GlobalJS.toURL(GameMakerGlobal.musicResourceURL(game.gd["$sys_music"]));
             audioBackgroundMusic.seek(m[1]);
             //if(m[2])
                 itemBackgroundMusic.play();
@@ -2294,7 +2313,7 @@ Rectangle {
             }
 
 
-            mediaPlayer.source = Global.toURL(filePath);
+            mediaPlayer.source = GlobalJS.toURL(filePath);
 
             GlobalLibraryJS.copyPropertiesToObject(videoOutput, properties.$videoOutput, {onlyCopyExists: true});
             GlobalLibraryJS.copyPropertiesToObject(mediaPlayer, properties.$mediaPlayer, {onlyCopyExists: true});
@@ -2339,7 +2358,7 @@ Rectangle {
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度；
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在视窗上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
+        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
         readonly property var showimage: function(image, properties={}, id=undefined) {
             let filePath = GameMakerGlobal.imageResourceURL(image);
             //if(!FrameManager.sl_qml_FileExists(Global.toPath(filePath))) {
@@ -2353,7 +2372,7 @@ Rectangle {
             if(id === undefined || id === null)
                 id = image;
 
-            /*image.source = Global.toURL(GameMakerGlobal.imageResourceURL(imageRId));
+            /*image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(imageRId));
             image.x = x;
             image.y = y;
             if(w === -1)
@@ -2366,7 +2385,7 @@ Rectangle {
                 image.height = h;
             */
 
-            //properties.source = Global.toURL(filePath);
+            //properties.source = GlobalJS.toURL(filePath);
 
 
             let tmp = _private.objTmpImages[id];
@@ -2374,12 +2393,12 @@ Rectangle {
             if(!tmp) {
                 //let image = Qt.createQmlObject("import QtQuick 2.14; Image {}", rootGameScene);
 
-                tmp = compCacheImage.createObject(null, {source: Global.toURL(filePath)});
+                tmp = compCacheImage.createObject(null, {source: GlobalJS.toURL(filePath)});
                 //随场景缩放
-                //tmp = compCacheImage.createObject(gameScene, {source: Global.toURL(filePath)});
-                //tmp = compCacheImage.createObject(rootGameScene, {source: Global.toURL(filePath)});
+                //tmp = compCacheImage.createObject(gameScene, {source: GlobalJS.toURL(filePath)});
+                //tmp = compCacheImage.createObject(rootGameScene, {source: GlobalJS.toURL(filePath)});
                 //随地图移动
-                //tmp = compCacheImage.createObject(itemContainer, {source: Global.toURL(filePath)});
+                //tmp = compCacheImage.createObject(itemContainer, {source: GlobalJS.toURL(filePath)});
 
                 _private.objTmpImages[id] = tmp;
                 tmp.id = id;
@@ -2388,7 +2407,7 @@ Rectangle {
             //取出组件，循环赋值
             else {
                 tmp.visible = false;
-                tmp.source = Global.toURL(filePath);
+                tmp.source = GlobalJS.toURL(filePath);
                 //tmp.parent = properties.$parent;
                 /*
                 let tKeys = Object.keys(tmp);
@@ -2641,7 +2660,7 @@ Rectangle {
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度；
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在屏幕上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
+        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
         readonly property var showsprite: function(spriteEffectRId, properties={}, id=undefined) {
             if(!GameSceneJS.getSpriteResource(spriteEffectRId))
                 return false;
@@ -2649,7 +2668,7 @@ Rectangle {
             if(id === undefined || id === null)
                 id = spriteEffectRId;
 
-            /*image.source = Global.toURL(GameMakerGlobal.imageResourceURL(spriteEffectRId));
+            /*image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(spriteEffectRId));
             image.x = x;
             image.y = y;
             if(w === -1)
@@ -2663,7 +2682,7 @@ Rectangle {
             */
 
             //let data = _private.spritesResource[spriteEffectRId];
-            //properties.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
+            //properties.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
 
 
 
@@ -2972,7 +2991,8 @@ Rectangle {
             game.gd["$sys_scale"] = n;
         }
 
-        //场景跟随某个角色
+        //场景跟随某个角色 或 自由移动
+        //r为字符串表示跟随角色；为数字，则表示进入自由移动地图模式且设置为速度
         readonly property var setscenerole: function(r=0.2) {
             let role;
 
@@ -3252,7 +3272,7 @@ Rectangle {
             game.$sys.reloadFightRoles();
 
             //刷新战斗时人物数据
-            //loaderFightScene.refreshAllFightRoleInfo();
+            //fight.$sys.refreshCombatant(-1);
 
             game.$sys.reloadGoods();
 
@@ -3948,7 +3968,7 @@ Rectangle {
                 itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
             }
 
-            imageMapBlock.source = Global.toURL(GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]));
+            imageMapBlock.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]));
 
             //载入新地图块图片
             for(let tc in itemBackMapContainer.arrCanvas) {
@@ -4004,13 +4024,13 @@ Rectangle {
         //}
 
         //使用Component（太麻烦）
-        //let scriptComp = Qt.createComponent(Global.toURL(filePath + GameMakerGlobal.separator + "map.qml"));
-        //console.debug('!!!999', Global.toURL(filePath + GameMakerGlobal.separator + "map.qml"), scriptComp)
+        //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"));
+        //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"), scriptComp)
         //let script = scriptComp.createObject({}, rootGameScene);
 
-        //let script = Qt.createQmlObject('import QtQuick 2.14;import "map.js" as Script;Item {property var script: Script}', rootGameScene, Global.toURL(filePath + GameMakerGlobal.separator));
+        //let script = Qt.createQmlObject('import QtQuick 2.14;import "map.js" as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
         //script.destroy();
-        let ts = _private.jsEngine.load('map.js', Global.toURL(mapPath));
+        let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
         itemContainer.mapInfo.$$Script = ts;
         if(ts.$start)
             game.run([ts.$start(), 'map $start']);
@@ -4387,13 +4407,15 @@ Rectangle {
         id: itemViewPort
 
         //anchors.fill: parent
+        //anchors.centerIn: parent
         width: parent.width
         height: parent.height
+
         clip: true
 
 
         //游戏场景(可视区域）
-        Rectangle {
+        Item {
             id: gameScene
 
 
@@ -4410,14 +4432,19 @@ Rectangle {
 
 
             //anchors.fill: parent
+            // 除以scale的效果是：这个组件的实际大小其实是不变的，但它的子组件都会缩放，否则它自身也会缩放
+            // 缩放后，这个组件的坐标系也会缩放
+            width: parent.width / scale
+            height: parent.height / scale
             //z: 0
-            width: itemViewPort.width / scale
-            height: itemViewPort.height / scale
 
             clip: true
-            color: "black"
-
+            //缩放中心
             transformOrigin: Item.TopLeft
+            //transformOrigin: Item.Center
+
+
+            //color: "black"
 
 
 
@@ -5804,11 +5831,11 @@ Rectangle {
         property var objRoles: ({})
         property var arrMainRoles: []
 
-        property var objTmpImages: ({})      //临时图片组件（用户用）
-        property var objTmpSprites: ({})      //临时精灵组件（用户用）
+        property var objTmpImages: ({})      //临时图片组件（用户创建，退出游戏删除用）
+        property var objTmpSprites: ({})      //临时精灵组件（用户创建，退出游戏删除用）
 
         //地图缓存（目前没用到）
-        property var objCacheMaps: ({})
+        //property var objCacheMaps: ({})
 
         //依附在地图上的图片和特效，切换地图时删除
         property var arrayMapComponents: []
@@ -6900,9 +6927,9 @@ Rectangle {
                 //console.debug("[GameScene]Role Component.onCompleted");
             }
         }
-
     }
 
+    //音效
     Component {
         id: compCacheSoundEffect
         /*SoundEffect { //wav格式，实时性高
@@ -6918,6 +6945,8 @@ Rectangle {
             }
         }
     }
+
+    //地图图片
     Component {
         id: compCacheImage
         //Image {
@@ -6952,6 +6981,8 @@ Rectangle {
             }
         }
     }
+
+    //地图特效
     Component {
         id: compCacheSpriteEffect
         SpriteEffect {
@@ -7002,6 +7033,8 @@ Rectangle {
             }
         }
     }
+
+    //文字移动
     Component {
         id: compCacheWordMove
         WordMove {
@@ -7029,6 +7062,7 @@ Rectangle {
 
 
 
+    //应用程序信号
     Connections {
         target: Qt.application
         function onStateChanged() {

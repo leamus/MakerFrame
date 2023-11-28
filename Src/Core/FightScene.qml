@@ -168,8 +168,8 @@ Rectangle {
 
 
         readonly property var background: function(image='') {
-            //console.debug('!!!!image:::', image, Global.toURL(GameMakerGlobal.imageResourceURL(image)))
-            imageBackground.source = Global.toURL(GameMakerGlobal.imageResourceURL(image));
+            //console.debug('!!!!image:::', image, GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image)))
+            imageBackground.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image));
         }
 
 
@@ -289,8 +289,8 @@ Rectangle {
 
         readonly property var $sys: ({
             screen: rootFightScene,    //固定屏幕上（所有，包含战斗场景）
-            viewport: fightScene,      //战斗视窗
-            scene: itemRolesContainer,  //容器（包含所有战斗人物）
+            viewport: itemFightViewPort,      //战斗视窗
+            scene: fightScene,  //容器（包含所有战斗人物）
 
             showSkillsOrGoods: FightSceneJS.showSkillsOrGoods,
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
@@ -323,11 +323,32 @@ Rectangle {
 
             },
 
-            //刷新战斗人物（目前只是血量）
-            refreshCombatant: function(combatant) {
-                if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$spriteEffect)
-                    combatant.$$fightData.$info.$spriteEffect.propertyBar.refresh(combatant.$$propertiesWithExtra.HP);
-                //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+            //刷新战斗人物（目前只是血条）
+            //combatant可以为-1（全部）、0（我方）、1（敌方）、具体的某个战斗人物
+            refreshCombatant: function(combatant=-1) {
+                let refresh = function(combatant) {
+                    if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$comp) {
+                        game.$sys.resources.commonScripts["refresh_combatant"](combatant, false);
+                        combatant.$$fightData.$info.$comp.refresh(combatant);
+                        //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+                    }
+                }
+
+                if(GlobalLibraryJS.isNumber(combatant)) {
+                    if(combatant === -1 || combatant === 0)
+                        for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
+                            refresh(_private.myCombatants[i]);
+                            //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+                        }
+                    if(combatant === -1 || combatant === 1)
+                        for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
+                            refresh(_private.enemies[i]);
+                            //repeaterEnemies.itemAt(i).propertyBar.refresh(_private.enemies[i].$$propertiesWithExtra.HP);
+                        }
+                }
+                else {
+                    refresh(combatant);
+                }
             },
 
             runAway: FightSceneJS.runAway,
@@ -389,7 +410,7 @@ Rectangle {
                 }
 
                 //FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
-                refreshAllFightRoleInfo();
+                fight.$sys.refreshCombatant(-1);
                 FightSceneJS.resetRolesPosition();
 
                 return fightrole;
@@ -432,7 +453,7 @@ Rectangle {
                 }
 
                 //FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
-                refreshAllFightRoleInfo();
+                fight.$sys.refreshCombatant(-1);
                 FightSceneJS.resetRolesPosition();
 
                 return ret;
@@ -455,7 +476,12 @@ Rectangle {
     }
 
 
+    //第一次载入（其他资源都已经载入完毕）
     function load() {
+        _private.config.fightRoleBarConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$combatant_bars'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$fight', '$combatant_bars'));
+
+
+        //按钮
         for(let tb of game.$sys.resources.commonScripts["fight_buttons"]) {
             //let compButtons1 = Qt.createComponent('qrc:/QML/_Global/Button/ColorButton.qml');
             //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
@@ -467,9 +493,21 @@ Rectangle {
                 fight.run(tb.$action(button));
             });
         }
+
+
+        for(let i = 0; i < 10; ++i)
+            repeaterMyCombatants.model.append({modelData: i});
+        for(let i = 0; i < 10; ++i)
+            repeaterEnemies.model.append({modelData: i});
     }
 
+    //释放卸载
     function unload() {
+        repeaterMyCombatants.model.clear();
+        repeaterEnemies.model.clear();
+
+
+        //删除按钮
         for(let tb in rowlayoutButtons.children) {
             rowlayoutButtons.children[tb].destroy();
         }
@@ -596,7 +634,7 @@ Rectangle {
 
             //从 propertiesWithExtra 设置人物的 HP和MP
             //fight.run(function() {
-                game.addprops(_private.enemies[i], {HP: 2, MP: 1}, 0);
+                //game.addprops(_private.enemies[i], {HP: 2, MP: 1}, 0);
             //});
         }
 
@@ -620,6 +658,7 @@ Rectangle {
             if(repeaterMyCombatants.model.count <= i)
                 repeaterMyCombatants.model.append({modelData: i});
             repeaterMyCombatants.itemAt(i).visible = true;
+            repeaterMyCombatants.itemAt(i).opacity = 1;
 
 
             FightSceneJS.resetFightRole(_private.myCombatants[i], repeaterMyCombatants.itemAt(i), i, 0);
@@ -637,6 +676,7 @@ Rectangle {
             if(repeaterEnemies.model.count <= i)
                 repeaterEnemies.model.append({modelData: i});
             repeaterEnemies.itemAt(i).visible = true;
+            repeaterEnemies.itemAt(i).opacity = 1;
 
 
             FightSceneJS.resetFightRole(_private.enemies[i], repeaterEnemies.itemAt(i), i, 1);
@@ -650,7 +690,7 @@ Rectangle {
 
         FightSceneJS.resetFightScene();
 
-        refreshAllFightRoleInfo();
+        fight.$sys.refreshCombatant(-1);
         FightSceneJS.resetRolesPosition();
 
 
@@ -729,21 +769,6 @@ Rectangle {
 
 
 
-    //刷新所有人物信息（目前只是血条）
-    function refreshAllFightRoleInfo() {
-        for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-            fight.$sys.refreshCombatant(_private.myCombatants[i]);
-            //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
-        }
-        for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-            fight.$sys.refreshCombatant(_private.enemies[i]);
-            //repeaterEnemies.itemAt(i).propertyBar.refresh(_private.enemies[i].$$propertiesWithExtra.HP);
-        }
-
-    }
-
-
-
     anchors.fill: parent
     clip: true
     focus: true
@@ -758,7 +783,9 @@ Rectangle {
         Rectangle {
             id: trootBar
 
-            anchors.fill: parent
+            //anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.preferredWidth: parent.width
 
             color: "#800080"
             antialiasing: false
@@ -783,12 +810,12 @@ Rectangle {
             function refresh(data) {
                 let d0 = (data[0] > 0 ? data[0] : 0);
                 let d1 = (data[1] > 0 ? data[1] : 0);
-                let d2 = (data[2] > 0 ? data[2] : 0);
                 if(data.length === 2) {
                     bar1.width = width;
                     bar2.width = d0 / d1 * width;
                 }
                 else if(data.length === 3) {
+                    let d2 = (data[2] > 0 ? data[2] : 0);
                     bar1.width = d1 / d2 * width;
                     bar2.width = d0 / d2 * width;
                 }
@@ -804,12 +831,51 @@ Rectangle {
         }
     }
 
+    Component {
+        id: compText
+
+        Text {
+            //id: textMyCombatantName
+
+            //anchors.bottom: loaderMyCombatantPropertyBar.bottom
+            //anchors.bottomMargin: 10
+            //width: tSpriteEffectMyCombatant.width
+            //Layout.preferredWidth: tSpriteEffectMyCombatant.width
+            Layout.fillWidth: true
+            Layout.preferredWidth: parent.width
+
+            color: "white"
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            textFormat: Text.RichText
+            font.pointSize: 10
+            font.bold: true
+            //wrapMode: Text.Wrap
+        }
+    }
+
+    //战斗特效
+    Component {
+        id: compSpriteEffect
+        SpriteEffect {
+            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+
+            onS_playEffect: {
+                game.$sys.playSoundEffect(soundeffectSource);
+            }
+        }
+    }
+
 
 
     //战斗场景视窗
     Item {
-        id: fightScene
+        id: itemFightViewPort
 
+        //anchors.fill: parent
+        //anchors.centerIn: parent
         width: parent.width
         height: parent.height
 
@@ -818,18 +884,22 @@ Rectangle {
 
 
         //背景
-        Rectangle {
+        Item {
             anchors.fill: parent
-            color: 'black'
+
+            //color: 'black'
 
             Image {
                 id: imageBackground
+
                 anchors.fill: parent
+
                 //source: "FightScene1.jpg"
             }
 
             MouseArea {
                 anchors.fill: parent
+
                 onClicked: {
                     FightSceneJS.resetFightScene();
 
@@ -843,10 +913,23 @@ Rectangle {
 
         //战斗人物容器
         Item {
-            id: itemRolesContainer
+            id: fightScene
 
-            width: parent.width
-            height: parent.height
+
+            // 除以scale的效果是：这个组件的实际大小其实是不变的，但它的子组件都会缩放，否则它自身也会缩放
+            // 缩放后，这个组件的坐标系也会缩放
+            width: parent.width / scale
+            height: parent.height / scale
+
+            clip: true
+            //缩放中心
+            transformOrigin: Item.TopLeft
+            //transformOrigin: Item.Center
+
+
+            //color: "black"
+
+
 
         //ColumnLayout {
         //    width: parent.width / 2
@@ -856,118 +939,231 @@ Rectangle {
             Repeater {
                 id: repeaterMyCombatants
 
-                //!!废弃，兼容用
+                //!!兼容旧代码
                 property int nCount: 0
 
 
                 //model: 0
                 model: ListModel{}
 
-                SpriteEffect {
-                    //id: tSpriteEffectMyCombatantBar
 
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Item {
+                    id: tRootMyCombatantComp
 
-                    test: false
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    property var propertyBar: loaderMyCombatantPropertyBar.item
-                    property alias strName: textMyCombatantsName.text
+                    property alias spriteEffect: tSpriteEffectMyCombatant
+                    property alias numberanimationSpriteEffectX: numberanimationSpriteEffectMyCombatantX
+                    property alias numberanimationSpriteEffectY: numberanimationSpriteEffectMyCombatantY
+
+                    property var cacheComponents: []
 
                     property bool bCanClick: false
 
 
-                    Text {
-                        id: textMyCombatantsName
 
-                        anchors.bottom: loaderMyCombatantPropertyBar.bottom
-                        anchors.bottomMargin: 10
-                        width: parent.width
-
-                        color: "white"
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        textFormat: Text.RichText
-                        font.pointSize: 10
-                        font.bold: true
-                        //wrapMode: Text.Wrap
-                    }
-
-                    Loader {
-                        id: loaderMyCombatantPropertyBar
-
-                        anchors.bottom: parent.top
-                        anchors.bottomMargin: 10
-                        width: parent.width
-                        height: _private.config.barHeight
-
-                        sourceComponent: compBar
-                        asynchronous: false
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            //if(!parent.animatedsprite.running)
-                            //    return;
-
-                            //弹出菜单
-                            if(_private.genFightChoice === null) {
-                            //if(_private.nStep === 1) {
-
-                                //没血的跳过
-                                if(_private.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
-                                    return;
-
-
-                                //保存选择对象
-                                _private.nChoiceFightRoleIndex = modelData;
-
-
-                                //菜单位置
-                                /*跟随战士
-                                menuFightRoleChoice.parent = parent;
-                                menuFightRoleChoice.anchors.left = parent.right;
-                                menuFightRoleChoice.anchors.top = parent.top;
-                                */
-
-                                //菜单样式
-                                //let style = game.$sys.resources.commonScripts["$fight_menu"].$styles;
-                                let style = {};
-                                //样式
-                                if(!style)
-                                    style = {};
-                                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$fight_menu') || {};
-                                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$fight_menu;
-
-                                //maskMenu.color = style.MaskColor || '#7FFFFFFF';
-                                menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-                                menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-                                menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
-                                menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-                                menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
-                                menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
-                                menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
-                                menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-                                menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-                                menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-                                menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-                                menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
-                                //menuFightRoleChoice.show(_private.arrMenu);
-                                menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
+                    //第一次根据配置 初始化 组件
+                    function init() {
+                        for(let bar of _private.config.fightRoleBarConfig) {
+                            if(bar.$type === 1) {
+                                let obj = compText.createObject(tMyCombatantColumnLayout);
+                                //obj.
+                                cacheComponents.push(obj);
                             }
-                            else if(parent.bCanClick === true) {
-                                FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
+                            else if(bar.$type === 2) {
+                                let obj = compBar.createObject(tMyCombatantColumnLayout);
+                                obj.color = bar.$colors[2] || 'transparent';
+                                obj.bar1.color = bar.$colors[1] || 'white';
+                                obj.bar2.color = bar.$colors[0] || 'black';
+                                obj.height = bar.$height;
+                                cacheComponents.push(obj);
                             }
-
-                            return;
+                        }
+                    }
+                    //释放组件
+                    function release() {
+                        for(let bar of cacheComponents) {
+                            bar.destroy();
                         }
                     }
 
-                    onS_playEffect: {
-                        game.$sys.playSoundEffect(soundeffectSource);
+                    //根据 配置和数据 刷新组件
+                    function refresh(combatant) {
+                        for(let ti in _private.config.fightRoleBarConfig) {
+                            let bar = _private.config.fightRoleBarConfig[ti];
+                            if(bar.$type === 1) {
+                                cacheComponents[ti].text = GlobalLibraryJS.getObjectValue(combatant, ...bar.$property);
+                            }
+                            else if(bar.$type === 2) {
+                                cacheComponents[ti].refresh(GlobalLibraryJS.getObjectValue(combatant, ...bar.$property));
+                            }
+                        }
                     }
+
+                    //设置为可点或不可点
+                    function setEnable(enable=true) {
+                        if(enable) {
+                            tSpriteEffectMyCombatant.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            tRootMyCombatantComp.bCanClick = true;
+                        }
+                        else {
+                            tSpriteEffectMyCombatant.colorOverlayStop();
+                            tRootMyCombatantComp.bCanClick = false;
+                        }
+                    }
+
+
+                    width: tSpriteEffectMyCombatant.width * Math.abs(tSpriteEffectMyCombatant.rXScale)
+                    height: tSpriteEffectMyCombatant.height * Math.abs(tSpriteEffectMyCombatant.rYScale)
+                    implicitWidth: tSpriteEffectMyCombatant.implicitWidth * Math.abs(tSpriteEffectMyCombatant.rXScale)
+                    implicitHeight: tSpriteEffectMyCombatant.implicitHeight * Math.abs(tSpriteEffectMyCombatant.rYScale)
+
+
+
+                    NumberAnimation {
+                        id: numberanimationSpriteEffectMyCombatantX
+                        target: tRootMyCombatantComp
+                        properties: "x"
+                        //to: 0
+                        //duration: 200
+                        easing.type: Easing.OutSine
+                    }
+                    NumberAnimation {
+                        id: numberanimationSpriteEffectMyCombatantY
+                        target: tRootMyCombatantComp
+                        properties: "y"
+                        //to: 0
+                        //duration: 200
+                        easing.type: Easing.OutSine
+                    }
+
+
+                    SpriteEffect {
+                        id: tSpriteEffectMyCombatant
+
+                        anchors.centerIn: parent
+
+                        test: false
+
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                //if(!parent.animatedsprite.running)
+                                //    return;
+
+                                //弹出菜单
+                                if(_private.genFightChoice === null) {
+                                //if(_private.nStep === 1) {
+
+                                    //没血的跳过
+                                    if(_private.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
+                                        return;
+
+
+                                    //保存选择对象
+                                    _private.nChoiceFightRoleIndex = modelData;
+
+
+                                    //菜单位置
+                                    /*跟随战士
+                                    menuFightRoleChoice.parent = parent;
+                                    menuFightRoleChoice.anchors.left = parent.right;
+                                    menuFightRoleChoice.anchors.top = parent.top;
+                                    */
+
+                                    //菜单样式
+                                    let style = {};
+                                    //样式
+                                    if(!style)
+                                        style = {};
+                                    let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || {};
+                                    let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
+
+                                    //maskMenu.color = style.MaskColor || '#7FFFFFFF';
+                                    menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                                    menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                                    menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+                                    menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+                                    menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+                                    menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+                                    menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+                                    menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+                                    menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                                    menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+                                    menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+                                    menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
+                                    //menuFightRoleChoice.show(_private.arrMenu);
+                                    menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
+                                }
+                                else if(tRootMyCombatantComp.bCanClick === true) {
+                                    FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
+                                }
+
+                                return;
+                            }
+                        }
+
+                        onS_playEffect: {
+                            game.$sys.playSoundEffect(soundeffectSource);
+                        }
+                    }
+
+
+                    ColumnLayout {
+                        id: tMyCombatantColumnLayout
+
+                        //property alias spriteEffect: tSpriteEffectMyCombatant
+
+                        anchors.bottom: tRootMyCombatantComp.top
+                        //anchors.bottomMargin: 10
+                        width: tRootMyCombatantComp.width
+
+                        /*Text {
+                            id: textMyCombatantName
+
+                            //anchors.bottom: loaderMyCombatantPropertyBar.bottom
+                            //anchors.bottomMargin: 10
+                            //width: tSpriteEffectMyCombatant.width
+                            Layout.preferredWidth: tSpriteEffectMyCombatant.width
+
+                            color: "white"
+
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            textFormat: Text.RichText
+                            font.pointSize: 10
+                            font.bold: true
+                            //wrapMode: Text.Wrap
+                        }
+
+                        Loader {
+                            id: loaderMyCombatantPropertyBar
+
+                            //anchors.bottom: parent.top
+                            //anchors.bottomMargin: 10
+                            //width: tSpriteEffectMyCombatant.width
+                            Layout.preferredWidth: tSpriteEffectMyCombatant.width
+                            height: _private.config.barHeight
+
+                            sourceComponent: compBar
+                            asynchronous: false
+                        }
+                        */
+                    }
+
+                    Component.onCompleted: {
+                        //colorOverlayStart();
+                    }
+
+                    Component.onDestruction: {
+                        release();
+                    }
+                }
+
+                onItemAdded: {
+                    item.init();
                 }
             }
         //}
@@ -981,79 +1177,188 @@ Rectangle {
             Repeater {
                 id: repeaterEnemies
 
-                //!!废弃，兼容用
+                //!!兼容旧代码
                 property int nCount: 0
 
 
                 //model: 0
                 model: ListModel{}
 
-                SpriteEffect {
-                    //id: tSpriteEffectEnemy
 
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Item {
+                    id: tRootEnemyComp
 
-                    test: false
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    property var propertyBar: loaderEnemyPropertyBar.item
-                    property alias strName: textEnemyName.text
+                    property alias spriteEffect: tSpriteEffectEnemy
+                    property alias numberanimationSpriteEffectX: numberanimationSpriteEffectEnemyX
+                    property alias numberanimationSpriteEffectY: numberanimationSpriteEffectEnemyY
+
+                    property var cacheComponents: []
 
                     property bool bCanClick: false
 
 
-                    Text {
-                        id: textEnemyName
 
-                        anchors.bottom: loaderEnemyPropertyBar.bottom
-                        anchors.bottomMargin: 10
-                        width: parent.width
-
-                        color: "white"
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        textFormat: Text.RichText
-                        font.pointSize: 10
-                        font.bold: true
-                        //wrapMode: Text.Wrap
+                    //第一次根据配置 初始化 组件
+                    function init() {
+                        for(let bar of _private.config.fightRoleBarConfig) {
+                            if(bar.$type === 1) {
+                                let obj = compText.createObject(tEnemyColumnLayout);
+                                //obj.
+                                cacheComponents.push(obj);
+                            }
+                            else if(bar.$type === 2) {
+                                let obj = compBar.createObject(tEnemyColumnLayout);
+                                obj.color = bar.$colors[2] || 'transparent';
+                                obj.bar1.color = bar.$colors[1] || 'black';
+                                obj.bar2.color = bar.$colors[0] || 'white';
+                                obj.height = bar.$height;
+                                cacheComponents.push(obj);
+                            }
+                        }
+                    }
+                    //释放组件
+                    function release() {
+                        for(let bar of cacheComponents) {
+                            bar.destroy();
+                        }
                     }
 
-
-                    Loader {
-                        id: loaderEnemyPropertyBar
-
-                        anchors.bottom: parent.top
-                        anchors.bottomMargin: 10
-                        width: parent.width
-                        height: _private.config.barHeight
-
-                        sourceComponent: compBar
-                        asynchronous: false
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            //不是选择敌方
-                            //if(_private.nStep !== 3)
-                            //    return;
-
-                            if(_private.genFightChoice !== null) {
-                                if(parent.bCanClick === true) {
-                                    FightSceneJS.skillChoice(1, _private.enemies[modelData]);
-                                }
+                    //根据 配置和数据 刷新组件
+                    function refresh(combatant) {
+                        for(let ti in _private.config.fightRoleBarConfig) {
+                            let bar = _private.config.fightRoleBarConfig[ti];
+                            if(bar.$type === 1) {
+                                cacheComponents[ti].text = GlobalLibraryJS.getObjectValue(combatant, ...bar.$property);
+                            }
+                            else if(bar.$type === 2) {
+                                cacheComponents[ti].refresh(GlobalLibraryJS.getObjectValue(combatant, ...bar.$property));
                             }
                         }
                     }
 
-                    onS_playEffect: {
-                        game.$sys.playSoundEffect(soundeffectSource);
+                    //设置为可点或不可点
+                    function setEnable(enable=true) {
+                        if(enable) {
+                            tSpriteEffectEnemy.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            tRootEnemyComp.bCanClick = true;
+                        }
+                        else {
+                            tSpriteEffectEnemy.colorOverlayStop();
+                            tRootEnemyComp.bCanClick = false;
+                        }
+                    }
+
+
+                    width: tSpriteEffectEnemy.width * Math.abs(tSpriteEffectEnemy.rXScale)
+                    height: tSpriteEffectEnemy.height * Math.abs(tSpriteEffectEnemy.rYScale)
+                    implicitWidth: tSpriteEffectEnemy.implicitWidth * Math.abs(tSpriteEffectEnemy.rXScale)
+                    implicitHeight: tSpriteEffectEnemy.implicitHeight * Math.abs(tSpriteEffectEnemy.rYScale)
+
+
+
+                    NumberAnimation {
+                        id: numberanimationSpriteEffectEnemyX
+                        target: tRootEnemyComp
+                        properties: "x"
+                        //to: 0
+                        //duration: 200
+                        easing.type: Easing.OutSine
+                    }
+                    NumberAnimation {
+                        id: numberanimationSpriteEffectEnemyY
+                        target: tRootEnemyComp
+                        properties: "y"
+                        //to: 0
+                        //duration: 200
+                        easing.type: Easing.OutSine
+                    }
+
+
+                    SpriteEffect {
+                        id: tSpriteEffectEnemy
+
+                        anchors.centerIn: parent
+
+                        test: false
+
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                //不是选择敌方
+                                //if(_private.nStep !== 3)
+                                //    return;
+
+                                if(_private.genFightChoice !== null) {
+                                    if(tRootEnemyComp.bCanClick === true) {
+                                        FightSceneJS.skillChoice(1, _private.enemies[modelData]);
+                                    }
+                                }
+                            }
+                        }
+
+                        onS_playEffect: {
+                            game.$sys.playSoundEffect(soundeffectSource);
+                        }
+                    }
+
+
+                    ColumnLayout {
+                        id: tEnemyColumnLayout
+
+                        //property alias spriteEffect: tSpriteEffectEnemy
+
+                        anchors.bottom: tRootEnemyComp.top
+                        //anchors.bottomMargin: 10
+                        width: tRootEnemyComp.width
+
+                        /*Text {
+                            id: textEnemyName
+
+                            //anchors.bottom: loaderEnemyPropertyBar.bottom
+                            //anchors.bottomMargin: 10
+                            //width: tSpriteEffectEnemy.width
+                            Layout.preferredWidth: tSpriteEffectEnemy.width
+
+                            color: "white"
+
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            textFormat: Text.RichText
+                            font.pointSize: 10
+                            font.bold: true
+                            //wrapMode: Text.Wrap
+                        }
+
+                        Loader {
+                            id: loaderEnemyPropertyBar
+
+                            //anchors.bottom: parent.top
+                            //anchors.bottomMargin: 10
+                            //width: tSpriteEffectEnemy.width
+                            Layout.preferredWidth: tSpriteEffectEnemy.width
+                            height: _private.config.barHeight
+
+                            sourceComponent: compBar
+                            asynchronous: false
+                        }
+                        */
                     }
 
                     Component.onCompleted: {
                         //colorOverlayStart();
                     }
+
+                    Component.onDestruction: {
+                        release();
+                    }
+                }
+
+                onItemAdded: {
+                    item.init();
                 }
             }
         //}
@@ -1536,7 +1841,9 @@ Rectangle {
 
         //游戏配置/设置
         property var config: QtObject {
-            property int barHeight: 6
+            //property int barHeight: 6
+
+            property var fightRoleBarConfig
         }
 
 
@@ -1629,12 +1936,6 @@ Rectangle {
         */
 
 
-        for(let i = 0; i < 10; ++i)
-            repeaterMyCombatants.model.append({modelData: i});
-        for(let i = 0; i < 10; ++i)
-            repeaterEnemies.model.append({modelData: i});
-
-
 
         FrameManager.globalObject().fight = fight;
 
@@ -1643,12 +1944,9 @@ Rectangle {
 
     Component.onDestruction: {
 
-        repeaterMyCombatants.model.clear();
-        repeaterEnemies.model.clear();
-
         delete FrameManager.globalObject().fight;
 
-        //console.debug("[main]Component.onDestruction");
+        console.debug("[FightScene]Component.onDestruction");
 
     }
 

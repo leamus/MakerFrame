@@ -8,7 +8,8 @@ let data = (function() {
 
     //命令格式：
     //  key: {
-    //      command: [命令显示, 命令, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], 编译运行函数],
+    //      command: [命令显示, 命令模板, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], 编译运行函数],
+    //          编译运行函数的参数为：参数数组、tab个数、命令信息（包含command和params），如果为undefined或null则使用默认的处理方案（替换模板命令字符串的%n）；
     //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]}
     //          其中：
     //              类型：string、number、bool、string|number、name、json、unformatted、code、label

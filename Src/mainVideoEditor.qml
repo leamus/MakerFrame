@@ -200,13 +200,13 @@ Rectangle {
                     if(listview.currentIndex < 0)
                         return;
 
-                    mediaPlayer.source = Global.toURL(GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]));
+                    mediaPlayer.source = GlobalJS.toURL(GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]));
                     itemVideo.visible = true;
                     mediaPlayer.play();
 
                     //console.debug("video:", textVideoName.text, mediaPlayer.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourceURL(textVideoName.text)))
-                    //console.debug("file:", Global.toURL(GameMakerGlobal.videoResourceURL(textVideoName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.videoResourceURL(textVideoName.text)));
+                    //console.debug("file:", GlobalJS.toURL(GameMakerGlobal.videoResourceURL(textVideoName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.videoResourceURL(textVideoName.text)));
                 }
             }
 
@@ -219,7 +219,7 @@ Rectangle {
                 onClicked: {
                     mediaPlayer.stop();
                     itemVideo.visible = false;
-                    //mediaPlayer.source = Global.toURL(GameMakerGlobal.videoResourceURL(textVideoResourceName.text));
+                    //mediaPlayer.source = GlobalJS.toURL(GameMakerGlobal.videoResourceURL(textVideoResourceName.text));
                 }
             }
         }

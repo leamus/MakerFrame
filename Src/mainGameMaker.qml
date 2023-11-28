@@ -593,7 +593,7 @@ Rectangle {
                 onClicked: {
                     if(Qt.platform.os === "android") {
 
-                        let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "MakerFrame" + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
+                        let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
 
                         let jsFiles = FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0);
                         jsFiles.sort();

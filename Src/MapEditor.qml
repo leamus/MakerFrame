@@ -173,7 +173,7 @@ Rectangle {
         //导入图块文件（目前一张）
         //console.debug(cfg.MapBlockImage[0], typeof(cfg.MapBlockImage[0]) )
         root.arrMapBlockImageURL = cfg.MapBlockImage;
-        imageMapBlock1.source = Global.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+        imageMapBlock1.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
 
 
         canvasMapBlock1.loadImage(imageMapBlock1.source);
@@ -246,7 +246,7 @@ Rectangle {
         //导入图块文件（目前一张）
         root.arrMapBlockImageURL = cfg.MapBlockImage;
         //console.debug(cfg.MapBlockImage[0], typeof(cfg.MapBlockImage[0]) )
-        imageMapBlock1.source = Global.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+        imageMapBlock1.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
 
 
         canvasMapBlock1.loadImage(imageMapBlock1.source);
@@ -2530,7 +2530,7 @@ Rectangle {
             height: implicitHeight
 
             RowLayout {
-                Text {
+                Label {
                     text: qsTr("地图名：")
                 }
                 TextField {
@@ -2545,7 +2545,7 @@ Rectangle {
                 }
             }
             RowLayout {
-                Text {
+                Label {
                     text: qsTr("地图缩放：")
                 }
                 TextField {
@@ -2560,7 +2560,7 @@ Rectangle {
                 }
             }
             RowLayout {
-                Text {
+                Label {
                     text: qsTr("地板层：<")
                 }
                 TextField {
@@ -2786,7 +2786,7 @@ Rectangle {
          title: "保存文件"
          selectMultiple: false
          //folder: shortcuts.home
-         folder: Global._FixLocalPath_W("Map")
+         folder: GlobalJS._FixLocalPath_W("Map")
          selectFolder: true
          visible: false
          onAccepted: {

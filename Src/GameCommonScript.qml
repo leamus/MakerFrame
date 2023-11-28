@@ -222,20 +222,6 @@ let $config = {
             $titleFontColor: 'white',
             $maskColor: '#7FFFFFFF',
         },
-        $fight_menu: {
-            $borderColor: 'white',
-            $backgroundColor: '#CF6699FF',
-            $itemHeight: 60,
-            $titleHeight: 60,
-            $itemFontSize: 16,
-            $itemFontColor: 'white',
-            $itemBackgroundColor1: '#00FFFFFF',
-            $itemBackgroundColor2: '#66FFFFFF',
-            $titleFontSize: 16,
-            $titleBackgroundColor: '#EE00CC99',
-            $titleFontColor: 'white',
-            $itemBorderColor: '#60FFFFFF',
-        },
     },
     //系统组件的一些名称
     $names: {
@@ -243,17 +229,43 @@ let $config = {
         //装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
         $equipReservedSlots: ['头戴', '身穿', '武器', '鞋子'],
     },
+    //战斗场景
+    $fight: {
+        $styles: {
+            $menu: {
+                $borderColor: 'white',
+                $backgroundColor: '#CF6699FF',
+                $itemHeight: 60,
+                $titleHeight: 60,
+                $itemFontSize: 16,
+                $itemFontColor: 'white',
+                $itemBackgroundColor1: '#00FFFFFF',
+                $itemBackgroundColor2: '#66FFFFFF',
+                $titleFontSize: 16,
+                $titleBackgroundColor: '#EE00CC99',
+                $titleFontColor: 'white',
+                $itemBorderColor: '#60FFFFFF',
+            },
+        },
+
+        //战斗人物额外组件条
+        $combatant_bars: [
+            {$type: 1, $property: ['$name']}, //显示文字，属性为姓名
+            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
+            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
+        ],
+    },
+    //安卓配置
+    $android: {
+        //屏幕旋转规则
+        $orient: 4,
+    },
     //4个对象的根prototype对象，$objectType为对象类型
     $protoObjects: {
         $fightRole: {$objectType: 1},
         $goods: {$objectType: 2},
         $skill:{$objectType: 3},
         $fightScript: {$objectType: 4},
-    },
-    //安卓配置
-    $android: {
-        //屏幕旋转规则
-        $orient: 4,
     },
 };
 
@@ -392,7 +404,8 @@ function $Combatant(fightRoleRId, showName) {
             $index: -1,              //所在队伍下标
             $teamsID: [0, 1],         //0：我方；1：敌方；2：友军。下标：己方、对方、友方
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
-            $teamsSpriteEffect: [],
+            $teamsComp: [],
+            $comp: null,
             $spriteEffect: null,
 
         },
@@ -512,7 +525,7 @@ let $showGoodsName = function(goods, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
             //arg(goodsPath + goods.$rid + game.$gameMakerGlobal.separator + goods.$image).
-            arg(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(goods.$image))).
+            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(goods.$image))).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -544,7 +557,7 @@ let $showCombatantName = function(combatant, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
             //arg(fightRolePath + combatant.$rid + game.$gameMakerGlobal.separator + combatant.$avatar).
-            arg(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar))).
+            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar))).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -562,10 +575,10 @@ let $showCombatantName = function(combatant, flags=null) {
 
 
 //刷新战斗人物
-function $refreshCombatant(combatant) {
+function $refreshCombatant(combatant, checkLevel=true) {
 
     //只有我方战斗人物才可以升级
-    if(combatant.$index >= 0)
+    if(checkLevel && combatant.$index >= 0)
         levelUp(combatant, 0, false);
 
     //战斗时，由于是脚本系统运行，所以必须放在最前才能使血量实时更新
@@ -573,7 +586,7 @@ function $refreshCombatant(combatant) {
         //计算新属性
         computeCombatantPropertiesWithExtra(combatant);
         //刷新战斗时人物数据
-        fight.$sys.refreshCombatant(combatant);
+        //fight.$sys.refreshCombatant(combatant);
     //}, 'refreshCombatant1'], 0);
 }
 
@@ -631,7 +644,7 @@ function levelUp(combatant, level=0, refresh=true) {
             //计算新属性
             computeCombatantPropertiesWithExtra(combatant);
             //刷新战斗时人物数据
-            fight.$sys.refreshCombatant(combatant);
+            //fight.$sys.refreshCombatant(combatant);
         },'refreshCombatant2']);
 }
 
@@ -687,14 +700,16 @@ function computeCombatantPropertiesWithExtra(combatant) {
         }
     }
 
-    /*for(let tg of combatant.holdsScript) {
-        for(let te in tg.holdsScript) {
-            combatant.$$propertiesWithExtra[te] += tg.holdsScript[te];
-        }
-    }*/
+
+
+    //越界调整
+    (combatant.$$propertiesWithExtra.HP[1] > combatant.$$propertiesWithExtra.HP[2]) ? combatant.$$propertiesWithExtra.HP[1] = combatant.$$propertiesWithExtra.HP[2] : null;
+    (combatant.$$propertiesWithExtra.HP[0] > combatant.$$propertiesWithExtra.HP[1]) ? combatant.$$propertiesWithExtra.HP[0] = combatant.$$propertiesWithExtra.HP[1] : null;
+    (combatant.$$propertiesWithExtra.MP[0] > combatant.$$propertiesWithExtra.MP[1]) ? combatant.$$propertiesWithExtra.MP[0] = combatant.$$propertiesWithExtra.MP[1] : null;
+
+
 
     //console.debug('combatant.$$propertiesWithExtra', combatant, combatant.$$fightData, combatant.$$propertiesWithExtra);
-
 
     return combatant.$$propertiesWithExtra;
 }
@@ -1097,7 +1112,7 @@ function getBuff(combatant, buffCode, params={}) {
         break;
     }
 
-    $refreshCombatant(combatant);
+    fight.$sys.refreshCombatant(combatant);
 }
 
 
@@ -1348,7 +1363,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
 
 //检测是否战斗完毕，扫描所有战斗角色并将死亡角色隐藏；
 //返回：0为没有结束；1为胜利；-1为失败；
-function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTeamSpriteEffect) {
+function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesComp) {
 
     let nFlags = 0;
 
@@ -1358,7 +1373,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
             //break;
         }
         else {
-            myTeamSpriteEffect.itemAt(ti).opacity = 0.5;
+            myCombatantsComp.itemAt(ti).opacity = 0.5;
             //repeaterMyCombatants.itemAt(ti).visible = false;
         }
     }
@@ -1375,7 +1390,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
         }
         else {
             //隐藏
-            enemyTeamSpriteEffect.itemAt(ti).opacity = 0;
+            enemiesComp.itemAt(ti).opacity = 0;
             //repeaterEnemies.itemAt(ti).visible = false;
 
             //计算经验、金钱 和 道具
@@ -1676,39 +1691,40 @@ function $fightCombatantPositionAlgorithm(teamID, index) {
     if(index === -1) {    //全体时的位置
         let cols = 3;
         if(teamID === 0)    //我方
-            return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height / 2);
+            return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height / 2);
         else    //敌方
-            return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height / 2);
+            return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height / 2);
     }
 
     //单个人物位置
+    //默认：/我方所有x坐标 = 屏幕宽 / 4。我方a的y坐标 = 屏幕高 * (a+1) / (我方人数+1)。
     let cols = 4;
     if(teamID === 0) {    //我方
-        return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.components.spriteEffectMyCombatants.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.components.spriteEffectMyCombatants.nCount*/ + 1));
     }
     else {  //敌方
-        return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height * (index + 1) / (fight.enemies.length/*fight.$sys.components.spriteEffectEnemies.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height * (index + 1) / (fight.enemies.length/*fight.$sys.components.spriteEffectEnemies.nCount*/ + 1));
     }
 }
 
 //战斗角色近战 坐标
 function $fightCombatantMeleePositionAlgorithm(combatant, targetCombatant) {
-    let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
-    let targetCombatantSpriteEffect = targetCombatant.$$fightData.$info.$spriteEffect;
+    let combatantComp = combatant.$$fightData.$info.$comp;
+    let targetCombatantComp = targetCombatant.$$fightData.$info.$comp;
 
     //x偏移（targetCombatant的左或右边）
-    let tx = combatantSpriteEffect.x < targetCombatantSpriteEffect.x ? -combatantSpriteEffect.width : combatantSpriteEffect.width;
-    let position = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+    let tx = combatantComp.x < targetCombatantComp.x ? -combatantComp.width : combatantComp.width;
+    let position = combatantComp.mapFromItem(targetCombatantComp, tx, 0);
 
-    return Qt.point(position.x + combatantSpriteEffect.x, position.y + combatantSpriteEffect.y);
+    return Qt.point(position.x + combatantComp.x, position.y + combatantComp.y);
 }
 //特效在战斗角色的 坐标
 function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
-    let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
+    let combatantComp = combatant.$$fightData.$info.$comp;
 
     //x偏移（spriteEffect的左或右边）
-    let tx = spriteEffect.x < combatantSpriteEffect.x ? -spriteEffect.width : spriteEffect.width;
-    let position = spriteEffect.mapFromItem(combatantSpriteEffect, tx, 0);
+    let tx = spriteEffect.x < combatantComp.x ? -spriteEffect.width : spriteEffect.width;
+    let position = spriteEffect.mapFromItem(combatantComp, tx, 0);
 
     return Qt.point(position.x + spriteEffect.x, position.y + spriteEffect.y);
 }
@@ -1834,7 +1850,7 @@ function $readSavesInfo(count=3) {
     for(let i = 0; i < count; ++i) {
         let ts = game.checksave('存档' + i);
         if(ts) {
-            arrSave.push('存档%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
+            arrSave.push('%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
         }
         else
             arrSave.push('空');

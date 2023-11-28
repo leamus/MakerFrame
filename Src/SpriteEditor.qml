@@ -81,12 +81,12 @@ Rectangle {
         //cfg.SpriteType;
         textSpriteName.text = cfg.SpriteName;
 
-        sprite.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
+        sprite.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
         //textSpriteImageURL.text = cfg.Image;
         //textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf("/") + 1);
         textSpriteImageResourceName.text = cfg.Image;
         textSpriteImageResourceName.enabled = false;
-        textSpriteImageURL.text = Global.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
+        textSpriteImageURL.text = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
         textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
         textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
         textSpriteFrameCount.text = cfg.FrameCount.toString();
@@ -100,7 +100,7 @@ Rectangle {
         textSpriteHeight.text = cfg.SpriteSize[1].toString();
 
         if(cfg.Sound) {
-            textSpriteSoundURL.text = Global.toURL(GameMakerGlobal.soundResourceURL(cfg.Sound));
+            textSpriteSoundURL.text = GlobalJS.toURL(GameMakerGlobal.soundResourceURL(cfg.Sound));
             sprite.soundeffectName = cfg.Sound;
         }
         else {
@@ -858,7 +858,7 @@ Rectangle {
                 //console.debug("ttt", textSpriteImageURL.text, Qt.resolvedUrl(textSpriteImageURL.text))
             }
             //textSpriteImageURL.text = textSpriteImageResourceName.text;
-            textSpriteImageURL.text = Global.toURL(GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text));
+            textSpriteImageURL.text = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text));
 
 
             sprite.spriteSrc = textSpriteImageURL.text;
@@ -936,7 +936,7 @@ Rectangle {
         onClicked: {
             let filepath = GameMakerGlobal.spriteResourceURL(item);
 
-            textSpriteImageURL.text = Global.toURL(filepath);
+            textSpriteImageURL.text = GlobalJS.toURL(filepath);
             textSpriteImageResourceName.text = item;
             console.debug("[SpriteEditor]List Clicked:", textSpriteImageURL.text)
 
@@ -1224,7 +1224,7 @@ Rectangle {
             }
             //textSpriteSoundURL.text = textSpriteSoundResourceName.text;
 
-            textSpriteSoundURL.text = Global.toURL(GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text));
+            textSpriteSoundURL.text = GlobalJS.toURL(GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text));
             sprite.soundeffectName = textSpriteSoundResourceName.text;
 
             textSpriteSoundResourceName.enabled = true;
@@ -1298,7 +1298,7 @@ Rectangle {
         onClicked: {
             let filepath = GameMakerGlobal.soundResourceURL(item);
 
-            textSpriteSoundURL.text = Global.toURL(filepath);
+            textSpriteSoundURL.text = GlobalJS.toURL(filepath);
             textSpriteSoundResourceName.text = item;
             console.debug("[SpriteEditor]List Clicked:", textSpriteSoundURL.text)
 

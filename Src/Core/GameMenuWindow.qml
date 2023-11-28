@@ -216,6 +216,7 @@ Item {
 
     /*function showFightRoleInfo(nIndex) {
         itemFightRoleInfo.init(nIndex);
+        itemFightRoleInfo.visible = true;
     }*/
 
 
@@ -271,6 +272,7 @@ Item {
                     case 1:
                         root.showWindow(0b100);
                         //rectGoods.init();
+                        //rectGoods.visible = true;
                         break;
                     case 2:
                         root.showWindow(0b1000);
@@ -302,6 +304,12 @@ Item {
 
         anchors.fill: parent
         visible: false
+
+
+        onS_refreshBagWindow: {
+            rectGoods.init();
+            //rectGoods.visible = true;
+        }
     }
 
 

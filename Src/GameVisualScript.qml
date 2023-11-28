@@ -84,7 +84,8 @@ Rectangle {
                 _private.strCommandsName = '';
             }
         }
-        else {  //新增
+        //新增
+        else {
             _private.loadAllVisualScripts(null);
 
             _private.listModelData = [{"command":"函数/生成器{","params":["*start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
@@ -1532,7 +1533,6 @@ Rectangle {
 
                 if(cmd.status.enabled === false)
                     tstrCmd = '/*/\r\n';
-                tstrCmd += (Array(_private.arrCommandTabCount[i] + 1).join(' ') + sysCommands[cmdKey].command[1]);
 
                 //如果命令是字符串
                 if(GlobalLibraryJS.isString(tstrCmd)) {
@@ -1541,8 +1541,8 @@ Rectangle {
                 //是数字
                 else if(GlobalLibraryJS.isValidNumber(tstrCmd)) {
                 }
-                //console.debug('~~~tstrCmd', tstrCmd, _private.arrCommandTabCount[i])
 
+                //console.debug('~~~tstrCmd', tstrCmd, _private.arrCommandTabCount[i])
                 //console.debug('params:', cmd.command.length)
 
 
@@ -1553,11 +1553,12 @@ Rectangle {
                         let tParamValue = cmd.params[j];
                         params.push(tParamValue);
                     }
-                    tstrCmd = sysCommands[cmdKey].command[8](tstrCmd, params);
+                    tstrCmd += sysCommands[cmdKey].command[8](params, _private.arrCommandTabCount[i], sysCommands[cmdKey]);
                 }
                 //按默认处理
                 else {
 
+                    let templateCmd = sysCommands[cmdKey].command[1];
                     //循环参数
 
                     //输出的指令下标
@@ -1573,13 +1574,13 @@ Rectangle {
                         if(tParam === '') {
                             //如果这个参数不需要
                             if(sysCommands[cmdKey].params[j][2] === false)
-                                tstrCmd = tstrCmd.arg('');
+                                templateCmd = templateCmd.arg('');
                             else if(sysCommands[cmdKey].params[j][2] === undefined)
-                                tstrCmd = tstrCmd.arg('undefined');
+                                templateCmd = templateCmd.arg('undefined');
                             else if(sysCommands[cmdKey].params[j][2] === null)
-                                tstrCmd = tstrCmd.arg('null');
+                                templateCmd = templateCmd.arg('null');
                             else    //有默认值
-                                tstrCmd = tstrCmd.arg("%1".arg(sysCommands[cmdKey].params[j][2]));
+                                templateCmd = templateCmd.arg("%1".arg(sysCommands[cmdKey].params[j][2]));
 
                             continue;
                         }
@@ -1592,29 +1593,29 @@ Rectangle {
                         //判断参数类型
                         switch(sysCommands[cmdKey].params[j][1]) {
                         case 'number':
-                            tstrCmd = tstrCmd.arg(tParam);
+                            templateCmd = templateCmd.arg(tParam);
                             break;
                         case 'bool':
                             if(tParam === '0' || tParam.toLowerCase() === 'false')
-                                tstrCmd = tstrCmd.arg('false');
+                                templateCmd = templateCmd.arg('false');
                             else
-                                tstrCmd = tstrCmd.arg('true');
+                                templateCmd = templateCmd.arg('true');
                             break;
                         case 'string':
-                            tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
+                            templateCmd = templateCmd.arg("`%1`".arg(tParam));
                             break;
                         case 'string|number':
                             if(GlobalLibraryJS.isStringNumber(tParam))
-                                tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                                templateCmd = templateCmd.arg("%1".arg(tParam));
                             else
-                                tstrCmd = tstrCmd.arg("`%1`".arg(tParam));
+                                templateCmd = templateCmd.arg("`%1`".arg(tParam));
                             break;
                         case 'name':
                         case 'json':
                         case 'unformatted':
                         case 'code':
                         default:
-                            tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                            templateCmd = templateCmd.arg("%1".arg(tParam));
                         }
 
                         /*
@@ -1625,9 +1626,13 @@ Rectangle {
                         else if(sysCommands[cmdKey].params[j][1] === 'json')
                         else if(sysCommands[cmdKey].params[j][1] === 'code')
                         else
-                            tstrCmd = tstrCmd.arg("%1".arg(tParam));
+                            templateCmd = templateCmd.arg("%1".arg(tParam));
                         */
                     }
+
+                    //加入 缩进空格 和 替换后的命令字符串
+                    tstrCmd += Array(_private.arrCommandTabCount[i] + 1).join(' ') + templateCmd;
+
 
                     //如果命令是字符串
                     //if(GlobalLibraryJS.isString(tstrCmd))
@@ -1704,7 +1709,7 @@ Rectangle {
                 let ts;
 
                 try {
-                    ts = _private.jsEngine.load(tf, Global.toURL(path));
+                    ts = _private.jsEngine.load(tf, GlobalJS.toURL(path));
                 }
                 catch(e) {
                     console.error(e);
@@ -1732,6 +1737,7 @@ Rectangle {
 
 
         //载入所有的可视化脚本命令集
+        //参数：指令集；null为系统指令集
         function loadAllVisualScripts(name=null) {
             let pluginsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
             let virtualScriptPath = pluginsPath + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
@@ -1750,7 +1756,7 @@ Rectangle {
 
 
             //2.载入自定义指令（全局）
-            let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "MakerFrame" + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts';
+            let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts';
             //console.debug(path);
             //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
 
@@ -1783,6 +1789,7 @@ Rectangle {
             return 0;
         }
 
+        //卸载当前指令集
         function unloadAllVisualScripts() {
             root.sysCommands = {};
             root.sysCommandsTree = [];

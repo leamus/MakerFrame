@@ -9,7 +9,7 @@ function loadResources() {
     //读通用算法脚本
     let tCommoncript;
     if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'common_script.js')))
-        tCommoncript = _private.jsEngine.load('common_script.js', Global.toURL(projectpath));
+        tCommoncript = _private.jsEngine.load('common_script.js', GlobalJS.toURL(projectpath));
     if(tCommoncript) {
         _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
         _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
@@ -442,7 +442,7 @@ function loadResources() {
                 if(tConfig.$opacity !== undefined)
                     button.opacity = tConfig.$opacity;
                 if(tConfig.$image)
-                    button.image.source = Global.toURL(GameMakerGlobal.imageResourceURL(tConfig.$image));
+                    button.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(tConfig.$image));
                 button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.s_pressed.connect(function(){
@@ -466,7 +466,7 @@ function loadResources() {
     buttonA.color = buttonAConfig.$color;
     buttonA.opacity = buttonAConfig.$opacity;
     if(buttonAConfig.$image)
-        buttonA.image.source = Global.toURL(GameMakerGlobal.imageResourceURL(buttonAConfig.$image));
+        buttonA.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(buttonAConfig.$image));
     buttonA.anchors.rightMargin = buttonAConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonA.anchors.bottomMargin = buttonAConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonA.buttonClicked = buttonAConfig.$clicked;
@@ -476,7 +476,7 @@ function loadResources() {
     buttonMenu.color = buttonMenuConfig.$color;
     buttonMenu.opacity = buttonMenuConfig.$opacity;
     if(buttonMenuConfig.$image)
-        buttonMenu.image.source = Global.toURL(GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image));
+        buttonMenu.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image));
     buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonMenu.buttonClicked = buttonMenuConfig.$clicked;
@@ -493,7 +493,7 @@ function loadResources() {
     //起始脚本
     if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'start.js'))) {
         //载入初始脚本
-        let ts = _private.jsEngine.load('start.js', Global.toURL(projectpath));
+        let ts = _private.jsEngine.load('start.js', GlobalJS.toURL(projectpath));
         if(ts) {
             _private.objCommonScripts["game_start"] = ts.$start || ts.start;
             //_private.objCommonScripts["game_init"] = ts.$init || ts.init;
@@ -715,7 +715,7 @@ function loadResources() {
     filePath = game.$projectpath + GameMakerGlobal.separator;
     let tlevelChainScript;
     if(FrameManager.sl_qml_FileExists(Global.toPath(filePath + 'level_chain.js')))
-        tlevelChainScript = _private.jsEngine.load('level_chain.js', Global.toURL(filePath));
+        tlevelChainScript = _private.jsEngine.load('level_chain.js', GlobalJS.toURL(filePath));
     if(tlevelChainScript) {
         _private.objCommonScripts["levelup_script"] = tlevelChainScript.$commonLevelUpScript;
         _private.objCommonScripts["level_Algorithm"] = tlevelChainScript.$commonLevelAlgorithm;
@@ -769,7 +769,7 @@ function loadResources() {
                 continue;
 
             try {
-                let ts = _private.jsEngine.load('main.js', Global.toURL(jsPath));
+                let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
 
 
                 //放入 _private.objPlugins 中
@@ -874,7 +874,7 @@ function getGoodsResource(item, forceReload=false) {
     //读道具信息
     let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-    let ts = _private.jsEngine.load('goods.js', Global.toURL(path + GameMakerGlobal.separator + item));
+    let ts = _private.jsEngine.load('goods.js', GlobalJS.toURL(path + GameMakerGlobal.separator + item));
     let data = ts.data;
 
     //写入
@@ -908,7 +908,7 @@ function getSkillResource(item, forceReload=false) {
     //读技能信息
     let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-    let ts = _private.jsEngine.load('fight_skill.js', Global.toURL(path + GameMakerGlobal.separator + item));
+    let ts = _private.jsEngine.load('fight_skill.js', GlobalJS.toURL(path + GameMakerGlobal.separator + item));
     let data = ts.data;
 
     //写入
@@ -942,7 +942,7 @@ function getFightScriptResource(item, forceReload=false) {
     //读战斗脚本信息
     let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
 
-    let ts = _private.jsEngine.load('fight_script.js', Global.toURL(path + GameMakerGlobal.separator + item));
+    let ts = _private.jsEngine.load('fight_script.js', GlobalJS.toURL(path + GameMakerGlobal.separator + item));
     let data = ts.data;
 
     //写入
@@ -976,7 +976,7 @@ function getFightRoleResource(item, forceReload=false) {
     //读战斗角色信息
     let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
-    let ts = _private.jsEngine.load('fight_role.js', Global.toURL(path + GameMakerGlobal.separator + item));
+    let ts = _private.jsEngine.load('fight_role.js', GlobalJS.toURL(path + GameMakerGlobal.separator + item));
     let data = ts.data;
 
     //写入
@@ -1030,11 +1030,11 @@ function getSpriteResource(item, forceReload=false) {
             if(_private.objCacheSoundEffects[data.Sound])
                 cacheSoundEffect = _private.objCacheSoundEffects[data.Sound];
             else {
-                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: Global.toURL(GameMakerGlobal.soundResourceURL(data.Sound))});
+                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GlobalJS.toURL(GameMakerGlobal.soundResourceURL(data.Sound))});
                 _private.objCacheSoundEffects[data.Sound] = cacheSoundEffect;
             }
         }
-        let cacheImage = compCacheImage.createObject(rootGameScene, {source: Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image))});
+        let cacheImage = compCacheImage.createObject(rootGameScene, {source: GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image))});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
         return data;
@@ -1315,7 +1315,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
 
 
     //刷新
-    _private.objCommonScripts["refresh_combatant"](retFightRole);
+    _private.objCommonScripts["refresh_combatant"](retFightRole, false);
 
 
     return retFightRole;
@@ -1411,7 +1411,7 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemRol
             spriteEffect.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
 
-        spriteEffect.spriteSrc = Global.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
+        spriteEffect.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
         spriteEffect.sizeFrame = Qt.size(parseInt(data.FrameSize[0]), parseInt(data.FrameSize[1]));
         spriteEffect.nFrameCount = parseInt(data.FrameCount);
         spriteEffect.offsetIndex = Qt.point(parseInt(data.OffsetIndex[0]), parseInt(data.OffsetIndex[1]));
@@ -1464,19 +1464,19 @@ function buttonAClicked() {
     //人物方向
     switch(mainRole.moveDirection) {
     case Qt.Key_Up:
-        maxDistance = sizeMapBlockSize.height / 3;
+        maxDistance = Math.ceil(sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
         break;
     case Qt.Key_Right:
-        maxDistance = sizeMapBlockSize.width / 3;
+        maxDistance = Math.ceil(sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     case Qt.Key_Down:
-        maxDistance = sizeMapBlockSize.height / 3;
+        maxDistance = Math.ceil(sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
         break;
     case Qt.Key_Left:
-        maxDistance = sizeMapBlockSize.width / 3;
+        maxDistance = Math.ceil(sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     default:

@@ -14,6 +14,9 @@ import _Global.Button 1.0
 Item {
     id: root
 
+
+    signal s_refreshBagWindow();
+
     property int nFightRoleIndex: 0         //当前角色
     property string strTeamName: '$sys_fight_heros'
     property var arrEquipmentPositions: []   //穿戴位置列表（用于索引用）
@@ -42,7 +45,7 @@ Item {
         refresh();
         msgDetail.text = "双击道具可脱下";
 
-        root.visible = true;
+        //root.visible = true;
     }
 
     function hide() {
@@ -308,6 +311,7 @@ Item {
                     game.getgoods(game.unload(root.nFightRoleIndex, root.arrEquipmentPositions[index]));
 
                     root.refresh();
+                    s_refreshBagWindow();
 
                     //textGoodsInfo.text = textGoodsInfo.strPreText;
                     //rectGoods.showGoods(rectGoods.nlastShowType);

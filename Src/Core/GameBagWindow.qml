@@ -42,7 +42,7 @@ Item {
 
         //gameGoodsMenu.nChoiceIndex = -1;
         showGoods(-1);
-        visible = true;
+        //visible = true;
     }
 
     function hide() {

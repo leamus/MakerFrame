@@ -199,12 +199,12 @@ Rectangle {
                     if(listview.currentIndex < 0)
                         return;
 
-                    audio.source = Global.toURL(GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]));
+                    audio.source = GlobalJS.toURL(GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]));
                     audio.play();
 
                     //console.debug("audio:", textMusicName.text, audio.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourceURL(textMusicName.text)))
-                    //console.debug("file:", Global.toURL(GameMakerGlobal.musicResourceURL(textMusicName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourceURL(textMusicName.text)));
+                    //console.debug("file:", GlobalJS.toURL(GameMakerGlobal.musicResourceURL(textMusicName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourceURL(textMusicName.text)));
                 }
             }
 

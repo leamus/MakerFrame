@@ -341,8 +341,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
                 if(filter(_private.myCombatants[i], combatant)
                 ) {
                 //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                    repeaterMyCombatants.itemAt(i).colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
-                    repeaterMyCombatants.itemAt(i).bCanClick = true;
+                    repeaterMyCombatants.itemAt(i).setEnable(true);
                 }
             }
         }
@@ -353,8 +352,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
                 if(filter(_private.enemies[i], combatant)
                 ) {
                 //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                    repeaterEnemies.itemAt(i).colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
-                    repeaterEnemies.itemAt(i).bCanClick = true;
+                    repeaterEnemies.itemAt(i).setEnable(true);
                 }
             }
         }
@@ -365,8 +363,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
                 //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
-                    repeaterMyCombatants.itemAt(i).colorOverlayStop();
-                    repeaterMyCombatants.itemAt(i).bCanClick = false;
+                    repeaterMyCombatants.itemAt(i).setEnable(false);
                 }
             }
         }
@@ -375,8 +372,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
                 //if(repeaterEnemies.itemAt(i).opacity !== 0) {
                 if(_private.enemies[i].$$propertiesWithExtra.HP[0] > 0) {
-                    repeaterEnemies.itemAt(i).colorOverlayStop();
-                    repeaterEnemies.itemAt(i).bCanClick = false;
+                    repeaterEnemies.itemAt(i).setEnable(false);
                 }
             }
         }
@@ -528,10 +524,10 @@ function skillChoiceCanUsing(params, combatant) {
 
 
 //重置刷新战斗人物（创建时调用）
-function resetFightRole(fightRole, fightRoleSpriteEffect, index, teamID) {
+function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
-    fightRoleSpriteEffect.propertyBar.refresh(fightRole.$$propertiesWithExtra.HP);
-    fightRoleSpriteEffect.strName = fightRole.$name;
+    fightRoleComp.refresh(fightRole);
+    //fightRoleComp.strName = fightRole.$name;
 
 
 
@@ -550,21 +546,22 @@ function resetFightRole(fightRole, fightRoleSpriteEffect, index, teamID) {
     if(teamID === 0) {    //我方
         fightRole.$$fightData.$info.$teamsID = [0, 1];
         fightRole.$$fightData.$info.$teams = [_private.myCombatants, _private.enemies];
-        fightRole.$$fightData.$info.$teamsSpriteEffect = [repeaterMyCombatants, repeaterEnemies];
+        fightRole.$$fightData.$info.$teamsComp = [repeaterMyCombatants, repeaterEnemies];
 
         game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, false);
     }
     else if(teamID === 1) { //敌方
         fightRole.$$fightData.$info.$teamsID = [1, 0];
         fightRole.$$fightData.$info.$teams = [_private.enemies, _private.myCombatants];
-        fightRole.$$fightData.$info.$teamsSpriteEffect = [repeaterEnemies, repeaterMyCombatants];
+        fightRole.$$fightData.$info.$teamsComp = [repeaterEnemies, repeaterMyCombatants];
 
         game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, true);
         //_private.enemies[i].$rid = fightScriptData.$enemiesData[tIndex].$rid;
 
     }
 
-    fightRole.$$fightData.$info.$spriteEffect = fightRoleSpriteEffect;
+    fightRole.$$fightData.$info.$comp = fightRoleComp;
+    fightRole.$$fightData.$info.$spriteEffect = fightRoleComp.spriteEffect;
 
     //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
 
@@ -612,6 +609,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
     combatant = combatantActionSpriteData.Combatant || combatant;
     //目标战士或队伍
     let targetCombatantOrTeamIndex = combatantActionSpriteData.Target;
+    let combatantComp = combatant.$$fightData.$info.$comp;
     let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
 
 
@@ -621,10 +619,10 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
     //类型
     switch(combatantActionSpriteData.Type) {
     case 1: //刷新人物信息
-        //refreshAllFightRoleInfo();
+        //fight.$sys.refreshCombatant(-1);
 
         for(let tc of [..._private.myCombatants, ..._private.enemies]) {
-            game.$sys.resources.commonScripts["refresh_combatant"](tc);
+            fight.$sys.refreshCombatant(tc);
         }
 
         //if(tRoleSpriteEffect2.propertyBar)
@@ -710,8 +708,10 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             case 0:
                 //位置
                 position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
-                combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
-                combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
+                combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
+                combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
+                //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
+                //combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
                 break;
 
             case 1:
@@ -723,8 +723,11 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
                 position = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
                 */
-                combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x + offset[0];
-                combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y + offset[1];
+
+                combatantComp.numberanimationSpriteEffectX.to = position.x + offset[0];
+                combatantComp.numberanimationSpriteEffectY.to = position.y + offset[1];
+                //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x + offset[0];
+                //combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y + offset[1];
 
                 //combatantSpriteEffect.x = position.x + combatantSpriteEffect.x;
                 //combatantSpriteEffect.y = position.y + combatantSpriteEffect.y;
@@ -735,18 +738,24 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             case 2:
                 position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
-                combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
-                combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
+                combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
+                combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
+                //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
+                //combatantSpriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
                 break;
 
             }
 
-            //combatantSpriteEffect.numberanimationSpriteEffectX.target = combatantSpriteEffect;
-            combatantSpriteEffect.numberanimationSpriteEffectX.duration = combatantActionSpriteData.Duration;
-            combatantSpriteEffect.numberanimationSpriteEffectX.start();
-            //combatantSpriteEffect.numberanimationSpriteEffectY.target = combatantSpriteEffect;
-            combatantSpriteEffect.numberanimationSpriteEffectY.duration = combatantActionSpriteData.Duration;
-            combatantSpriteEffect.numberanimationSpriteEffectY.start();
+            ////combatantSpriteEffect.numberanimationSpriteEffectX.target = combatantSpriteEffect;
+            combatantComp.numberanimationSpriteEffectX.duration = combatantActionSpriteData.Duration;
+            combatantComp.numberanimationSpriteEffectX.start();
+            //combatantSpriteEffect.numberanimationSpriteEffectX.duration = combatantActionSpriteData.Duration;
+            //combatantSpriteEffect.numberanimationSpriteEffectX.start();
+            ////combatantSpriteEffect.numberanimationSpriteEffectY.target = combatantSpriteEffect;
+            combatantComp.numberanimationSpriteEffectY.duration = combatantActionSpriteData.Duration;
+            combatantComp.numberanimationSpriteEffectY.start();
+            //combatantSpriteEffect.numberanimationSpriteEffectY.duration = combatantActionSpriteData.Duration;
+            //combatantSpriteEffect.numberanimationSpriteEffectY.start();
         }
 
         //多特效
@@ -764,7 +773,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         break;
 
     case 20: {   //Sprite
-            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, undefined, combatantActionSpriteData.Loops, itemRolesContainer);
+            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, compSpriteEffect.createObject(fightScene), combatantActionSpriteData.Loops);
 
             if(spriteEffect === null)
                 break;
@@ -888,8 +897,8 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
                 case 2:
                     position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
-                    spriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
-                    spriteEffect.numberanimationSpriteEffectY.to = position.y - combatantSpriteEffect.height / 2 + offset[1];
+                    spriteEffect.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
+                    spriteEffect.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                     break;
 
                 }
@@ -919,7 +928,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
     case 30: //显示动态文字
 
-        let spriteEffect = compCacheWordMove.createObject(itemRolesContainer);
+        let spriteEffect = compCacheWordMove.createObject(fightScene);
         spriteEffect.parallelAnimation.finished.connect(function(){
             if(spriteEffect)
                 spriteEffect.destroy();
@@ -1412,6 +1421,11 @@ function *runCombatantRoundScript(combatant, step) {
         }
     }
 
+
+    //重新计算属性
+    fight.$sys.refreshCombatant(combatant);
+
+
     return 0;
 }
 
@@ -1691,8 +1705,6 @@ function *gfFighting() {
             //战斗人物回合脚本
             let ret = yield *runCombatantRoundScript(tcombatant, 0);
 
-            //重新计算属性
-            game.$sys.resources.commonScripts["refresh_combatant"](tcombatant);
         }
 
 
@@ -1880,6 +1892,7 @@ function runAway() {
     let continueScript = function *() {
         yield fight.msg("逃跑失败");
 
+        //全部设置为 休息
         for(let i = 0; i < _private.myCombatants.length; ++i) {
             if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
@@ -2098,10 +2111,10 @@ function getCombatantPosition(teamID, index, cols=4) {
     //let index = combatant.$$fightData.$info.$index;
 
     if(teamID === 0) {    //我方
-        return Qt.point(itemRolesContainer.width / cols, itemRolesContainer.height * (index + 1) / (repeaterMyCombatants.nCount + 1));
+        return Qt.point(fightScene.width / cols, fightScene.height * (index + 1) / (repeaterMyCombatants.nCount + 1));
     }
     else {  //敌方
-        return Qt.point(itemRolesContainer.width * (cols-1) / cols, itemRolesContainer.height * (index + 1) / (repeaterEnemies.nCount + 1));
+        return Qt.point(fightScene.width * (cols-1) / cols, fightScene.height * (index + 1) / (repeaterEnemies.nCount + 1));
     }
 }
 */

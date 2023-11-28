@@ -93,7 +93,7 @@ Rectangle {
             textMapHeight.text = cfg.MapSize[1];
             textBlockWidth.text = cfg.MapBlockSize[0];
             textBlockHeight.text = cfg.MapBlockSize[1];
-            textMapBlockImageURL.text = Global.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
             textMapBlockResourceName.text = cfg.MapBlockImage[0];
             //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
             textMapBlockResourceName.enabled = false;
@@ -360,7 +360,7 @@ Rectangle {
                     return;
                 }
 
-                //textMapBlockImageURL.text = Global.toURL(filepath);
+                //textMapBlockImageURL.text = GlobalJS.toURL(filepath);
             }
             else {  //资源图库
                 //console.debug("ttt2:", filepath);
@@ -369,7 +369,7 @@ Rectangle {
 
                 //console.debug("ttt", textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
             }
-            textMapBlockImageURL.text = Global.toURL(GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text));
+            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text));
 
 
             //创建地图工作
@@ -520,7 +520,7 @@ Rectangle {
         onClicked: {
             //let filepath = GameMakerGlobal.config.strProjectRootPath + "/" + GameMakerGlobal.config.strCurrentProjectName + "/" + GameMakerGlobal.config.strMapResourceDirName + "/" + item;
 
-            textMapBlockImageURL.text = Global.toURL(GameMakerGlobal.mapResourceURL(item));
+            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(item));
             textMapBlockResourceName.text = item;
             //console.debug("[mainMapEditor]List Clicked::", textMapBlockImageURL.text)
 
@@ -697,7 +697,7 @@ Rectangle {
         title: "选择地图文件"
         selectMultiple: false
         //folder: shortcuts.home
-        folder: Global._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
+        folder: GlobalJS._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
         nameFilters: [ "Json files (*.json *.map *.jsn)", "All files (*)" ]
         selectExisting: true
         selectFolder: false
@@ -771,7 +771,7 @@ Rectangle {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = Global._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
+            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
             //console.debug("filedialogOpenMap.folder:", filedialogOpenMap.folder)
@@ -787,9 +787,9 @@ Rectangle {
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug("path:", Global._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug("path:", GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
             //console.debug("path:", Qt.resolvedUrl(Platform.getExternalDataPath()));
-            //console.debug("path:", Qt.resolvedUrl(Global._FixLocalPath_W(Platform.getExternalDataPath())));
+            //console.debug("path:", Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.getExternalDataPath())));
         }
     }
 

@@ -199,12 +199,12 @@ Rectangle {
                     if(listview.currentIndex < 0)
                         return;
 
-                    imageReview.source = Global.toURL(GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]));
+                    imageReview.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]));
                     imageReview.visible = true;
 
                     //console.debug("image:", textImageName.text, imageReview.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourceURL(textImageName.text)))
-                    //console.debug("file:", Global.toURL(GameMakerGlobal.imageResourceURL(textImageName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.imageResourceURL(textImageName.text)));
+                    //console.debug("file:", GlobalJS.toURL(GameMakerGlobal.imageResourceURL(textImageName.text)), FrameManager.sl_qml_FileExists(GameMakerGlobal.imageResourceURL(textImageName.text)));
                 }
             }
 

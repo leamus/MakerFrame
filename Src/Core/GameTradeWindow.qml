@@ -41,7 +41,7 @@ Item {
         fCallback = callback;
         goodsDetail.text = '双击进行买卖';
 
-        root.visible = true;
+        //root.visible = true;
         refresh();
     }
 

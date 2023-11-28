@@ -338,7 +338,7 @@ Item {
 
         onTriggered: {
             if(nType === 1) {
-                soundeffect.source =  Global.toURL(GameMakerGlobal.soundResourceURL(root.soundeffectName));
+                soundeffect.source =  GlobalJS.toURL(GameMakerGlobal.soundResourceURL(root.soundeffectName));
                 soundeffect.play();
             }
             else

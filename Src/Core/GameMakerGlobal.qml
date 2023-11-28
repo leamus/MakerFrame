@@ -20,7 +20,7 @@ QtObject {
     property string separator: Platform.separator(true)
 
     //引擎版本
-    property string version: "1.6.14.231116"
+    property string version: "1.6.18.231128"
 
 
     //配置
@@ -39,7 +39,7 @@ QtObject {
         property string strProjectRootPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "Projects";
+                return Platform.getExternalDataPath() + separator + "RPGMaker" + separator + "Projects";
                 //return "assets:";   //"."  //'qrc:'
             case 'windows':
             default:
@@ -52,7 +52,7 @@ QtObject {
         property string strSaveDataPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return Platform.getExternalDataPath() + separator + "MakerFrame" + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
+                return Platform.getExternalDataPath() + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
                 //return Platform.getExternalDataPath() + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
             case 'windows':
             default:

@@ -173,20 +173,6 @@ let $config = {
             $titleFontColor: 'white',
             $maskColor: '#7FFFFFFF',
         },
-        $fight_menu: {
-            $borderColor: 'white',
-            $backgroundColor: '#CF6699FF',
-            $itemHeight: 60,
-            $titleHeight: 60,
-            $itemFontSize: 16,
-            $itemFontColor: 'white',
-            $itemBackgroundColor1: '#00FFFFFF',
-            $itemBackgroundColor2: '#66FFFFFF',
-            $titleFontSize: 16,
-            $titleBackgroundColor: '#EE00CC99',
-            $titleFontColor: 'white',
-            $itemBorderColor: '#60FFFFFF',
-        },
     },
     //系统组件的一些名称
     $names: {
@@ -194,17 +180,43 @@ let $config = {
         //装备预留槽位（会显示这些槽位，且按顺序排，不在里面的会追加在后面）；
         $equipReservedSlots: ['头戴', '身穿', '武器', '鞋子'],
     },
+    //战斗场景
+    $fight: {
+        $styles: {
+            $menu: {
+                $borderColor: 'white',
+                $backgroundColor: '#CF6699FF',
+                $itemHeight: 60,
+                $titleHeight: 60,
+                $itemFontSize: 16,
+                $itemFontColor: 'white',
+                $itemBackgroundColor1: '#00FFFFFF',
+                $itemBackgroundColor2: '#66FFFFFF',
+                $titleFontSize: 16,
+                $titleBackgroundColor: '#EE00CC99',
+                $titleFontColor: 'white',
+                $itemBorderColor: '#60FFFFFF',
+            },
+        },
+
+        //战斗人物额外组件条
+        $combatant_bars: [
+            {$type: 1, $property: ['$name']}, //显示文字，属性为姓名
+            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
+            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
+        ],
+    },
+    //安卓配置
+    $android: {
+        //屏幕旋转规则
+        $orient: 4,
+    },
     //4个对象的根prototype对象，$objectType为对象类型
     $protoObjects: {
         $fightRole: {$objectType: 1},
         $goods: {$objectType: 2},
         $skill:{$objectType: 3},
         $fightScript: {$objectType: 4},
-    },
-    //安卓配置
-    $android: {
-        //屏幕旋转规则
-        $orient: 4,
     },
 };
 
@@ -426,7 +438,8 @@ function $Combatant(fightRoleRId, showName) {
             $index: -1,              //所在队伍下标
             $teamsID: [0, 1],         //0：我方；1：敌方；2：友军。下标：己方、对方、友方
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
-            $teamsSpriteEffect: [],
+            $teamsComp: [],
+            $comp: null,
             $spriteEffect: null,
 
         },
@@ -546,7 +559,7 @@ let $showGoodsName = function(goods, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(goodsPath + goods.$rid + game.$gameMakerGlobal.separator + goods.$image).
-            arg(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(goods.$image))).
+            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(goods.$image))).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -578,7 +591,7 @@ let $showCombatantName = function(combatant, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(fightRolePath + combatant.$rid + game.$gameMakerGlobal.separator + combatant.$avatar).
-            arg(game.$global.toURL(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar))).
+            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar))).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -596,10 +609,10 @@ let $showCombatantName = function(combatant, flags=null) {
 
 
 //刷新战斗人物
-function $refreshCombatant(combatant) {
+function $refreshCombatant(combatant, checkLevel=true) {
 
     //只有我方战斗人物才可以升级
-    if(combatant.$index >= 0)
+    if(checkLevel && combatant.$index >= 0)
         levelUp(combatant, 0, false);
 
     //战斗时，由于是脚本系统运行，所以必须放在最前才能使血量实时更新
@@ -607,7 +620,7 @@ function $refreshCombatant(combatant) {
         //计算新属性
         computeCombatantPropertiesWithExtra(combatant);
         //刷新战斗时人物数据
-        fight.$sys.refreshCombatant(combatant);
+        //fight.$sys.refreshCombatant(combatant);
     //}, 'refreshCombatant1'], 0);
 }
 
@@ -665,7 +678,7 @@ function levelUp(combatant, level=0, refresh=true) {
             //计算新属性
             computeCombatantPropertiesWithExtra(combatant);
             //刷新战斗时人物数据
-            fight.$sys.refreshCombatant(combatant);
+            //fight.$sys.refreshCombatant(combatant);
         },'refreshCombatant2']);
 }
 
@@ -721,14 +734,16 @@ function computeCombatantPropertiesWithExtra(combatant) {
         }
     }
 
-    /*for(let tg of combatant.holdsScript) {
-        for(let te in tg.holdsScript) {
-            combatant.$$propertiesWithExtra[te] += tg.holdsScript[te];
-        }
-    }*/
+
+
+    //越界调整
+    (combatant.$$propertiesWithExtra.HP[1] > combatant.$$propertiesWithExtra.HP[2]) ? combatant.$$propertiesWithExtra.HP[1] = combatant.$$propertiesWithExtra.HP[2] : null;
+    (combatant.$$propertiesWithExtra.HP[0] > combatant.$$propertiesWithExtra.HP[1]) ? combatant.$$propertiesWithExtra.HP[0] = combatant.$$propertiesWithExtra.HP[1] : null;
+    (combatant.$$propertiesWithExtra.MP[0] > combatant.$$propertiesWithExtra.MP[1]) ? combatant.$$propertiesWithExtra.MP[0] = combatant.$$propertiesWithExtra.MP[1] : null;
+
+
 
     //console.debug('combatant.$$propertiesWithExtra', combatant, combatant.$$fightData, combatant.$$propertiesWithExtra);
-
 
     return combatant.$$propertiesWithExtra;
 }
@@ -1131,7 +1146,7 @@ function getBuff(combatant, buffCode, params={}) {
         break;
     }
 
-    $refreshCombatant(combatant);
+    fight.$sys.refreshCombatant(combatant);
 }
 
 
@@ -1382,7 +1397,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
 
 //检测是否战斗完毕，扫描所有战斗角色并将死亡角色隐藏；
 //返回：0为没有结束；1为胜利；-1为失败；
-function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTeamSpriteEffect) {
+function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesComp) {
 
     let nFlags = 0;
 
@@ -1392,7 +1407,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
             //break;
         }
         else {
-            myTeamSpriteEffect.itemAt(ti).opacity = 0.5;
+            myCombatantsComp.itemAt(ti).opacity = 0.5;
             //repeaterMyCombatants.itemAt(ti).visible = false;
         }
     }
@@ -1409,7 +1424,7 @@ function $checkAllCombatants(myCombatants, myTeamSpriteEffect, enemies, enemyTea
         }
         else {
             //隐藏
-            enemyTeamSpriteEffect.itemAt(ti).opacity = 0;
+            enemiesComp.itemAt(ti).opacity = 0;
             //repeaterEnemies.itemAt(ti).visible = false;
 
             //计算经验、金钱 和 道具
@@ -1710,39 +1725,40 @@ function $fightCombatantPositionAlgorithm(teamID, index) {
     if(index === -1) {    //全体时的位置
         let cols = 3;
         if(teamID === 0)    //我方
-            return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height / 2);
+            return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height / 2);
         else    //敌方
-            return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height / 2);
+            return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height / 2);
     }
 
     //单个人物位置
+    //默认：/我方所有x坐标 = 屏幕宽 / 4。我方a的y坐标 = 屏幕高 * (a+1) / (我方人数+1)。
     let cols = 4;
     if(teamID === 0) {    //我方
-        return Qt.point(fight.$sys.container.width / cols, fight.$sys.container.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.components.spriteEffectMyCombatants.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.components.spriteEffectMyCombatants.nCount*/ + 1));
     }
     else {  //敌方
-        return Qt.point(fight.$sys.container.width * (cols-1) / cols, fight.$sys.container.height * (index + 1) / (fight.enemies.length/*fight.$sys.components.spriteEffectEnemies.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height * (index + 1) / (fight.enemies.length/*fight.$sys.components.spriteEffectEnemies.nCount*/ + 1));
     }
 }
 
 //战斗角色近战 坐标
 function $fightCombatantMeleePositionAlgorithm(combatant, targetCombatant) {
-    let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
-    let targetCombatantSpriteEffect = targetCombatant.$$fightData.$info.$spriteEffect;
+    let combatantComp = combatant.$$fightData.$info.$comp;
+    let targetCombatantComp = targetCombatant.$$fightData.$info.$comp;
 
     //x偏移（targetCombatant的左或右边）
-    let tx = combatantSpriteEffect.x < targetCombatantSpriteEffect.x ? -combatantSpriteEffect.width : combatantSpriteEffect.width;
-    let position = combatantSpriteEffect.mapFromItem(targetCombatantSpriteEffect, tx, 0);
+    let tx = combatantComp.x < targetCombatantComp.x ? -combatantComp.width : combatantComp.width;
+    let position = combatantComp.mapFromItem(targetCombatantComp, tx, 0);
 
-    return Qt.point(position.x + combatantSpriteEffect.x, position.y + combatantSpriteEffect.y);
+    return Qt.point(position.x + combatantComp.x, position.y + combatantComp.y);
 }
 //特效在战斗角色的 坐标
 function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
-    let combatantSpriteEffect = combatant.$$fightData.$info.$spriteEffect;
+    let combatantComp = combatant.$$fightData.$info.$comp;
 
     //x偏移（spriteEffect的左或右边）
-    let tx = spriteEffect.x < combatantSpriteEffect.x ? -spriteEffect.width : spriteEffect.width;
-    let position = spriteEffect.mapFromItem(combatantSpriteEffect, tx, 0);
+    let tx = spriteEffect.x < combatantComp.x ? -spriteEffect.width : spriteEffect.width;
+    let position = spriteEffect.mapFromItem(combatantComp, tx, 0);
 
     return Qt.point(position.x + spriteEffect.x, position.y + spriteEffect.y);
 }
@@ -1893,7 +1909,7 @@ function $readSavesInfo(count=3) {
     for(let i = 0; i < count; ++i) {
         let ts = game.checksave('存档' + i);
         if(ts) {
-            arrSave.push('存档%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
+            arrSave.push('%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
         }
         else
             arrSave.push('空');
@@ -1995,9 +2011,11 @@ function commonLevelAlgorithm(combatant, targetLevel) {
 //          当type为2倍率时，value可以为数组，第1、2表示哪一个属性；
 //          当type为0时，value为填满的段值个数；
 //  type:1为加减；2为倍率；3为直接赋值；0为将值填满（只限n段值的 0~n-2 段值），且incrementProps的value为填满的段值个数；
+//  注意：只有 {HP: [a,b,c]} 这种形式的才会调整是否越界（n段属性），且只检查给定的段的个数，比如 {HP: [0]} 只检查HP0的越界，{HP: [0, 0]} 可以检查HP0和HP1的越界；
 function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) {
     if(!propertiesWithExtra)
         propertiesWithExtra = props;
+
 
     let tKeys = Object.keys(props);
     //循环属性
@@ -2015,7 +2033,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                 if(game.$globalLibraryJS.isArray(props[tp])) {
                     //循环数组
                     for(let tti = props[tp].length; tti > 0; --tti) {
-                        //如果增加的属性值是 数字，则每段都加
+                        //如果增加的属性值是 数字，则每段都加（这个分支不会产生值越界）
                         if(game.$globalLibraryJS.isValidNumber(tincrementValue)) {
                             //根据type来赋值
                             if(type === 1)
@@ -2026,36 +2044,80 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                                 props[tp][tti - 1] = parseInt(tincrementValue);
                             //直接赋值，且 不是最后一项， 且 恢复的个数 >= 当前下标!!!
                             else if(type === 0 && tti < props[tp].length && tincrementValue >= tti) {
-                                props[tp][tti - 1] = props[tp][tti];
+                                //下面是回复最低血量的功能（不符合现实）
+                                //props[tp][tti - 1] = propertiesWithExtra[tp][tti] - (propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1]);
                                 //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
+
+                                props[tp][tti - 1] = propertiesWithExtra[tp][tti - 1];
+                                propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
                             }
                         }
-                        //如果增加的属性值是 数组，且此下标值是数字
+                        //如果增加的属性值是 数组，且此下标值是数字（有可能产生值越界）
                         else if(game.$globalLibraryJS.isValidNumber(tincrementValue[tti - 1])) {
+                            //差值（这里保存差值是因为 下面会进行 越界调整使用，得调整propertiesWithExtra为正确值）
+                            let dlta = propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1];
+
+
                             //根据type来赋值
-                            if(type === 1)
+                            if(type === 1) {
                                 props[tp][tti - 1] = parseInt(props[tp][tti - 1] + tincrementValue[tti - 1]);
-                            else if(type === 2)
+                                propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
+                            }
+                            else if(type === 2) {
                                 props[tp][tti - 1] = parseInt(propertiesWithExtra[tp][tti - 1] * tincrementValue[tti - 1]);
-                            else if(type === 3)
+                                propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
+                            }
+                            else if(type === 3) {
                                 props[tp][tti - 1] = parseInt(tincrementValue[tti - 1]);
+                                propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
+                            }
                             else if(type === 0 && tti < props[tp].length) {
-                                props[tp][tti - 1] = props[tp][tti];
+                                //下面是回复最低血量的功能（不符合现实）
+                                //props[tp][tti - 1] = propertiesWithExtra[tp][tti] - (propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1]);
                                 //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
+
+                                props[tp][tti - 1] = propertiesWithExtra[tp][tti - 1];
+                                //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
+                                propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
                             }
 
+
                             //如果前面的大于后面的，则调整
-                            if(game.$globalLibraryJS.isValidNumber(props[tp][tti])) {
-                                if(props[tp][tti - 1] > props[tp][tti]) {
-                                    props[tp][tti - 1] = props[tp][tti];
+                            if(tti < props[tp].length) {
+                            //if(game.$globalLibraryJS.isValidNumber(props[tp][tti])) {
+                                if(propertiesWithExtra[tp][tti - 1] > propertiesWithExtra[tp][tti]) {
+                                    let v1 = propertiesWithExtra[tp][tti] - dlta;
+                                    if(v1 >= props[tp][tti]) {
+                                        props[tp][tti - 1] = v1;
+                                        //propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta; //这句也可以
+                                    }
+                                    else {
+                                        props[tp][tti - 1] = props[tp][tti];
+                                        //propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
+                                    }
+                                    propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];
                                 }
+
+                                //if(props[tp][tti - 1] > props[tp][tti]) {
+                                //    props[tp][tti - 1] = props[tp][tti];
+                                //}
                                 //if(propertiesWithExtra[tp][tti - 1] > propertiesWithExtra[tp][tti]) {
                                 //    propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];
                                 //}
+
+                                //下面是回复最低血量的功能（不符合现实）
+                                //if(propertiesWithExtra[tp][tti - 1] > propertiesWithExtra[tp][tti]) {
+                                //    props[tp][tti - 1] = propertiesWithExtra[tp][tti] - (propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1]);
+                                //}
+
                             }
                         }
+                        else
+                            continue;
+
                     }
                 }
+                //属性非多段
                 //如果属性是数字（{HP: 。。。}，且增加的属性也是数字
                 else if(game.$globalLibraryJS.isValidNumber(tincrementValue)) {
 
@@ -2074,12 +2136,19 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
         //如果是 {'HP, xxx': 。。。} 类型
         else if(tp.length === 2) {
             tp[0] = tp[0].trim();
-            tp[1] = tp[1].trim();
+            tp[1] = parseInt(tp[1].trim());
+
+
+            //差值（这里保存差值是因为 下面会进行 越界调整使用，得调整propertiesWithExtra为正确值）
+            let dlta = propertiesWithExtra[tp[0]][tp[1]] - props[tp[0]][tp[1]];
+
 
             //根据type来赋值
             //加
-            if(type === 1)
+            if(type === 1) {
                 props[tp[0]][tp[1]] = parseInt(props[tp[0]][tp[1]] + tincrementValue);
+                propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta;
+            }
             //倍率（两种方式）
             else if(type === 2) {
                 //形式1：key为数组，前2个表示要修改的属性和段，后2个表示基属性和段（段可省略）
@@ -2120,16 +2189,52 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                 //直接乘
                 else if(game.$globalLibraryJS.isValidNumber(tincrementValue))
                     props[tp[0]][tp[1]] = parseInt(propertiesWithExtra[tp[0]][tp[1]] * tincrementValue);
+
+                propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta;
             }
             //赋值
-            else if(type === 3)
+            else if(type === 3) {
                 props[tp[0]][tp[1]] = parseInt(tincrementValue);
+                propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta;
+            }
             //else if(type === 0 && tti < props[tp[0]][tp[1]].length)
             //    props[tp[0]][tp[1]] += tincrementValue;
+
+
+            //如果前面的大于后面的，则调整
+            if(tp[1] < props[tp[0]].length - 1) {
+            //if(game.$globalLibraryJS.isValidNumber(props[tp[0]][tp[1] + 1])) {
+                if(propertiesWithExtra[tp[0]][tp[1]] > propertiesWithExtra[tp[0]][tp[1] + 1]) {
+                    let v1 = propertiesWithExtra[tp[0]][tp[1] + 1] - dlta;
+                    if(v1 >= props[tp[0]][tp[1] + 1]) {
+                        props[tp[0]][tp[1]] = v1;
+                        //propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta; //这句也可以
+                    }
+                    else {
+                        props[tp[0]][tp[1]] = props[tp[0]][tp[1] + 1];
+                        //propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta;
+                    }
+                    propertiesWithExtra[tp[0]][tp[1]] = propertiesWithExtra[tp[0]][tp[1] + 1];
+                }
+
+                //if(props[tp[0]][tp[1]] > props[tp[0]][tp[1] + 1]) {
+                //    props[tp[0]][tp[1]] = props[tp[0]][tp[1] + 1];
+                //}
+                //if(propertiesWithExtra[tp[0]][tp[1]] > propertiesWithExtra[tp[0]][tp[1] + 1]) {
+                //    propertiesWithExtra[tp[0]][tp[1]] = propertiesWithExtra[tp[0]][tp[1] + 1];
+                //}
+
+                //下面是回复最低血量的功能（不符合现实）
+                //if(propertiesWithExtra[tp[0]][tp[1]] > propertiesWithExtra[tp[0]][tp[1] + 1]) {
+                //    props[tp[0]][tp[1]] = propertiesWithExtra[tp[0]][tp[1] + 1] - (propertiesWithExtra[tp[0]][tp[1]] - props[tp[0]][tp[1]]);
+                //}
+
+            }
         }
     }
-
 }
+
+
 
 //计算行走路径
 function computePath(blockPos, targetBlockPos) {
