@@ -142,6 +142,8 @@ game.goon();
                     border.color: textGameStartScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
                     border.width: textGameStartScript.textArea.focus ? 2 : 1
                 }
+
+                bCode: true
             }
 
         }

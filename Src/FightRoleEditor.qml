@@ -172,6 +172,8 @@ let data = (function() {
                 border.color: notepadFightRoleProperty.textArea.focus ? Global.style.accent : Global.style.hintTextColor
                 border.width: notepadFightRoleProperty.textArea.focus ? 2 : 1
             }
+
+            bCode: true
         }
 
 

@@ -1934,6 +1934,8 @@ function $readSavesInfo(count=3) {
                     border.color: notepadGameFightScriptScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
                     border.width: notepadGameFightScriptScript.textArea.focus ? 2 : 1
                 }
+
+                bCode: true
             }
 
         }

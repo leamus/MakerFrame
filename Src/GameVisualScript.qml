@@ -1417,13 +1417,13 @@ Rectangle {
                 case 'unformatted':
                     //nIndex是长按时给相关函数传递的本控件下标
                     //strCreateMenu += "TextField {property int nIndex: %1; placeholderText: '%2'; selectByMouse: true; Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter; Layout.fillWidth: true; MouseArea {anchors.fill: parent; onPressed: {parent.focus = true;} onDoubleClicked: {_private.showParamValues(parent); mouse.accepted = false;}} } ".arg(paramId).arg(param[0]);
-                    strCreateMenu += "TextField {property int nIndex: %1; objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/  text: '%2'; placeholderText: '%3'; selectByMouse: true; onPressAndHold: {_private.showParamValues(this);} } ".arg(paramId).arg(defaultValue).arg(param[0]);
+                    strCreateMenu += "TextField {property int nIndex: %1; objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/  text: '%2'; placeholderText: '%3'; selectByMouse: true; onPressAndHold: {_private.showParamValues(this);}; } ".arg(paramId).arg(defaultValue).arg(param[0]);
                     break;
                 case 'code':
-                    strCreateMenu += "Notepad {id: tNote; objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: tNote.textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: tNote.textArea.focus ? 2 : 1} ".arg(defaultValue).arg(param[0]);
+                    strCreateMenu += "Notepad {id: tNote; objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: tNote.textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: tNote.textArea.focus ? 2 : 1; bCode: true;} ".arg(defaultValue).arg(param[0]);
                     break;
                 case 'label':
-                    strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ color: 'white'; font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap} ".arg(param[0]);
+                    strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ color: 'white'; font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap;} ".arg(param[0]);
                     break;
                 default:
                     strCreateMenu += "TextField {objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ text: '%1'; placeholderText: '%2'; selectByMouse: true;} ".arg(defaultValue).arg(param[0]);

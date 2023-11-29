@@ -120,6 +120,8 @@ Rectangle {
                     border.color: notepadScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
                     border.width: notepadScript.textArea.focus ? 2 : 1
                 }
+
+                bCode: true
             }
 
         }

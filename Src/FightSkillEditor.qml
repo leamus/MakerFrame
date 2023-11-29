@@ -266,6 +266,8 @@ let data = (function() {
                     border.color: notepadGameFightSkillScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
                     border.width: notepadGameFightSkillScript.textArea.focus ? 2 : 1
                 }
+
+                bCode: true
             }
 
         }
