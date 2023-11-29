@@ -20,7 +20,7 @@ QtObject {
     property string separator: Platform.separator(true)
 
     //引擎版本
-    property string version: "1.6.18.231128"
+    property string version: "1.6.19.231129"
 
 
     //配置
@@ -54,6 +54,7 @@ QtObject {
             case 'android':
                 return Platform.getExternalDataPath() + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
                 //return Platform.getExternalDataPath() + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
+                //return Platform.getSdcardPath() + separator + "Leamus" + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
             case 'windows':
             default:
                 return "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;

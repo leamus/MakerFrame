@@ -788,7 +788,7 @@ Rectangle {
             Layout.preferredWidth: parent.width
 
             color: "#800080"
-            antialiasing: false
+            //antialiasing: false
             radius: height / 3
             clip: true
 
@@ -796,14 +796,14 @@ Rectangle {
                 parent: trootBar
                 height: parent.height
                 color: "red"
-                antialiasing: false
+                //antialiasing: false
                 radius: height / 3
             }
             property Rectangle bar2: Rectangle {
                 parent: trootBar
                 height: parent.height
                 color: "yellow"
-                antialiasing: false
+                //antialiasing: false
                 radius: height / 3
             }
 
@@ -1013,10 +1013,10 @@ Rectangle {
                     }
 
 
-                    width: tSpriteEffectMyCombatant.width * Math.abs(tSpriteEffectMyCombatant.rXScale)
-                    height: tSpriteEffectMyCombatant.height * Math.abs(tSpriteEffectMyCombatant.rYScale)
-                    implicitWidth: tSpriteEffectMyCombatant.implicitWidth * Math.abs(tSpriteEffectMyCombatant.rXScale)
-                    implicitHeight: tSpriteEffectMyCombatant.implicitHeight * Math.abs(tSpriteEffectMyCombatant.rYScale)
+                    width: tSpriteEffectMyCombatant.width// * Math.abs(tSpriteEffectMyCombatant.rXScale)
+                    height: tSpriteEffectMyCombatant.height// * Math.abs(tSpriteEffectMyCombatant.rYScale)
+                    implicitWidth: tSpriteEffectMyCombatant.implicitWidth// * Math.abs(tSpriteEffectMyCombatant.rXScale)
+                    implicitHeight: tSpriteEffectMyCombatant.implicitHeight// * Math.abs(tSpriteEffectMyCombatant.rYScale)
 
 
 
@@ -1251,10 +1251,10 @@ Rectangle {
                     }
 
 
-                    width: tSpriteEffectEnemy.width * Math.abs(tSpriteEffectEnemy.rXScale)
-                    height: tSpriteEffectEnemy.height * Math.abs(tSpriteEffectEnemy.rYScale)
-                    implicitWidth: tSpriteEffectEnemy.implicitWidth * Math.abs(tSpriteEffectEnemy.rXScale)
-                    implicitHeight: tSpriteEffectEnemy.implicitHeight * Math.abs(tSpriteEffectEnemy.rYScale)
+                    width: tSpriteEffectEnemy.width// * Math.abs(tSpriteEffectEnemy.rXScale)
+                    height: tSpriteEffectEnemy.height// * Math.abs(tSpriteEffectEnemy.rYScale)
+                    implicitWidth: tSpriteEffectEnemy.implicitWidth// * Math.abs(tSpriteEffectEnemy.rXScale)
+                    implicitHeight: tSpriteEffectEnemy.implicitHeight// * Math.abs(tSpriteEffectEnemy.rYScale)
 
 
 
