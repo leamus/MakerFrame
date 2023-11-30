@@ -2048,8 +2048,9 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                                 //props[tp][tti - 1] = propertiesWithExtra[tp][tti] - (propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1]);
                                 //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
 
-                                props[tp][tti - 1] = propertiesWithExtra[tp][tti - 1];
+                                props[tp][tti - 1] = propertiesWithExtra[tp][tti];
                                 propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
+                                //propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
                             }
                         }
                         //如果增加的属性值是 数组，且此下标值是数字（有可能产生值越界）
@@ -2076,9 +2077,9 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                                 //props[tp][tti - 1] = propertiesWithExtra[tp][tti] - (propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1]);
                                 //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
 
-                                props[tp][tti - 1] = propertiesWithExtra[tp][tti - 1];
-                                //propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
-                                propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
+                                props[tp][tti - 1] = propertiesWithExtra[tp][tti];
+                                propertiesWithExtra[tp][tti - 1] = propertiesWithExtra[tp][tti];    //给下一个props做准备赋值
+                                //propertiesWithExtra[tp][tti - 1] = props[tp][tti - 1] + dlta;
                             }
 
 
