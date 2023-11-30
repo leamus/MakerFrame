@@ -41,7 +41,7 @@ Rectangle {
             if(data) {
                 //console.debug('data', data);
                 _private.strSavedName = textFightSkillName.text = fightSkillName;
-                FrameManager.setPlainText(notepadGameFightSkillScript.textDocument, data);
+                notepadGameFightSkillScript.setPlainText(data);
                 notepadGameFightSkillScript.toBegin();
 
                 return;
@@ -49,7 +49,7 @@ Rectangle {
         }
 
         _private.strSavedName = textFightSkillName.text = '';
-        FrameManager.setPlainText(notepadGameFightSkillScript.textDocument, "
+        notepadGameFightSkillScript.setPlainText("
 
 //闭包写法
 let data = (function() {
@@ -257,6 +257,7 @@ let data = (function() {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: '请输入算法脚本'
 
@@ -351,7 +352,7 @@ let data = (function() {
             }
 
             function onS_Compile(code) {
-                FrameManager.setPlainText(notepadGameFightSkillScript.textArea.textDocument, code);
+                notepadGameFightSkillScript.setPlainText(code);
                 notepadGameFightSkillScript.toBegin();
             }
         }

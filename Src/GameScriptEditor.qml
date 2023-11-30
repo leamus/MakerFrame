@@ -39,11 +39,11 @@ Rectangle {
 
         if(data) {
             //data = JSON.parse(data)['LevelChainScript'];
-            FrameManager.setPlainText(notepadScript.textDocument, data);
+            notepadScript.setPlainText(data);
             notepadScript.toBegin();
         }
         else {
-            FrameManager.setPlainText(notepadScript.textDocument, "
+            notepadScript.setPlainText("
 "
             );
             notepadScript.toBegin();
@@ -111,6 +111,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: '请输入算法脚本'
 
@@ -262,7 +263,7 @@ Rectangle {
             function onS_Compile(code) {
                 //console.debug(code)
 
-                FrameManager.setPlainText(notepadScript.textDocument, code);
+                notepadScript.setPlainText(code);
                 notepadScript.toBegin();
             }
         }
@@ -347,7 +348,7 @@ Rectangle {
             let data = FrameManager.sl_qml_ReadFile(path);
 
             if(data !== "") {
-                FrameManager.setPlainText(notepadScript.textDocument, data);
+                notepadScript.setPlainText(data);
                 notepadScript.toBegin();
             }
 

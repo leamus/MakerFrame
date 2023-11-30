@@ -42,7 +42,7 @@ Rectangle {
                 //data = JSON.parse(data);
                 //console.debug('data', data);
                 _private.strSavedName = textGoodsName.text = goodsName;
-                FrameManager.setPlainText(notepadGoodsScript.textDocument, data);
+                notepadGoodsScript.setPlainText(data);
                 notepadGoodsScript.toBegin();
 
                 return;
@@ -51,7 +51,7 @@ Rectangle {
 
         _private.strSavedName = textGoodsName.text = '';
 
-        FrameManager.setPlainText(notepadGoodsScript.textDocument, "
+        notepadGoodsScript.setPlainText("
 
 
 //闭包写法
@@ -251,6 +251,7 @@ let data = (function() {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: '请输入道具脚本'
 
@@ -345,7 +346,7 @@ let data = (function() {
             }
 
             function onS_Compile(code) {
-                FrameManager.setPlainText(notepadGoodsScript.textArea.textDocument, code);
+                notepadGoodsScript.setPlainText(code);
                 notepadGoodsScript.toBegin();
             }
         }

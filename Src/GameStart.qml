@@ -39,14 +39,14 @@ Rectangle {
             //loaderGameScene.item.init(data);
 
             //textGameStartScript.text = data.GameStartScript;
-            FrameManager.setPlainText(textGameStartScript.textDocument, data);
+            textGameStartScript.setPlainText(data);
             textGameStartScript.toBegin();
             //textGameFPS.text = data.GameFPS;
 
             return true;
         }
         else {
-            FrameManager.setPlainText(textGameStartScript.textDocument,
+            textGameStartScript.setPlainText(
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
 game.setinterval(16);
@@ -133,6 +133,7 @@ game.goon();
 
                 color: Global.style.backgroundColor
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: ''
 
@@ -317,7 +318,7 @@ game.goon();
                 if(code.indexOf('function *$start() {') < 0 && code.indexOf('function *start() {') < 0) {
                     code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
                 }
-                FrameManager.setPlainText(textGameStartScript.textDocument, code);
+                textGameStartScript.setPlainText(code);
                 textGameStartScript.toBegin();
             }
         }

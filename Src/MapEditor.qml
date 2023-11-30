@@ -198,7 +198,7 @@ Rectangle {
         _private.strMapName = '';
 
 
-        FrameManager.setPlainText(textCode.textDocument, 'function *$start(){ //地图载入事件 \r\n}');
+        textCode.setPlainText('function *$start(){ //地图载入事件 \r\n}');
         textCode.toBegin();
         //textCode.text = ;
 
@@ -892,7 +892,7 @@ Rectangle {
                 onClicked: {
                     //textEventName.text = "$1";
                     //textCode.text = objSystemEventsData["$1"] || "";
-                    //FrameManager.setPlainText(textCode.textDocument, objSystemEventsData["$1"] || "");
+                    //textCode.setPlainText(objSystemEventsData["$1"] || "");
 
                     if(!_private.strMapName) {
                         dialogCommon.show({
@@ -1032,7 +1032,7 @@ Rectangle {
                             textEventName.text = listmodelEventsData.get(index)["EventName"];
                             ////textCode.text = listmodelEventsData.get(index)["EventCode"];
                             //textCode.text = objEventsData[textEventName.text];
-                            //FrameManager.setPlainText(textCode.textDocument, objEventsData[textEventName.text]);
+                            //textCode.setPlainText(objEventsData[textEventName.text]);
 
                             dialogEvent.open();
                             //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
@@ -2641,7 +2641,7 @@ Rectangle {
                 //_private.createEvent(textEventName.text, textCode.text);
                 _private.createEvent(textEventName.text);
                 //textCode.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
-                FrameManager.setPlainText(textCode.textDocument, FrameManager.toPlainText(textCode.textDocument) + '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                textCode.setPlainText(FrameManager.toPlainText(textCode.textDocument) + '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 textCode.toBegin();
             }
             //else if(nEventIndex === -2) {  //新建系统事件
@@ -2751,6 +2751,7 @@ Rectangle {
 
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
 
@@ -2939,7 +2940,7 @@ Rectangle {
             }
 
             function onS_Compile(code) {
-                FrameManager.setPlainText(textCode.textDocument, code);
+                textCode.setPlainText(code);
                 textCode.toBegin();
             }
         }
@@ -3018,7 +3019,7 @@ Rectangle {
             let data = FrameManager.sl_qml_ReadFile(filePath);
             console.debug("[MapEditor]filePath：", filePath);
             if(data) {
-                FrameManager.setPlainText(textCode.textDocument, data);
+                textCode.setPlainText(data);
                 textCode.toBegin();
             }
             else

@@ -39,10 +39,10 @@ Rectangle {
         //data = JSON.parse(data)["FightAlgorithm"];
 
         if(data) {
-            FrameManager.setPlainText(notepadGameFightScriptScript.textDocument, data);
+            notepadGameFightScriptScript.setPlainText(data);
         }
         else {
-            FrameManager.setPlainText(notepadGameFightScriptScript.textDocument, "
+            notepadGameFightScriptScript.setPlainText("
 
 //注意：game.$globalLibraryJS
 
@@ -1925,6 +1925,7 @@ function $readSavesInfo(count=3) {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
 

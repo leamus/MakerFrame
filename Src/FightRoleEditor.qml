@@ -39,7 +39,7 @@ Rectangle {
 
             if(data) {
                 _private.strSavedName = textFightRoleName.text = fightRoleName;
-                FrameManager.setPlainText(notepadFightRoleProperty.textDocument, data);
+                notepadFightRoleProperty.setPlainText(data);
                 notepadFightRoleProperty.toBegin();
 
                 return;
@@ -47,7 +47,7 @@ Rectangle {
         }
 
         _private.strSavedName = textFightRoleName.text = '';
-        FrameManager.setPlainText(notepadFightRoleProperty.textDocument, "
+        notepadFightRoleProperty.setPlainText("
 
 //闭包写法
 let data = (function() {
@@ -163,6 +163,7 @@ let data = (function() {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+            textArea.textFormat: TextArea.PlainText
             textArea.text: ''
             textArea.placeholderText: '输入脚本'
 
@@ -256,7 +257,7 @@ let data = (function() {
             }
 
             function onS_Compile(code) {
-                FrameManager.setPlainText(notepadFightRoleProperty.textArea.textDocument, code);
+                notepadFightRoleProperty.setPlainText(code);
                 notepadFightRoleProperty.toBegin();
             }
         }
