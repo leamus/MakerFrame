@@ -252,6 +252,7 @@ Rectangle {
                         color: _private.getColor(_private.arrCommandTabCount[index]) || '';
                     }
 
+                    //序号
                     Label {
                         //Layout.minimumWidth: _private.listModelData.length.toString().length * 12
                         Layout.minimumWidth: 36
@@ -264,7 +265,8 @@ Rectangle {
 
                         background: Rectangle {
                             anchors.fill: parent
-                            color: _private.listSelectedCommands[index] === true ? Global.style.accent : Global.style.backgroundColor
+                            color: _private.listSelectedCommands[index] === true ? Global.style.accent : 'transparent'
+                            //color: _private.listSelectedCommands[index] === true ? Global.style.accent : Global.style.backgroundColor
                             //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
 
                             //border.color: textCode.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -290,7 +292,7 @@ Rectangle {
                         contentWidth: tLabel.implicitWidth
                         contentHeight: parent.height
 
-                        //显示
+                        //命令
                         Label {
                             id: tLabel
                             //anchors.fill: parent
@@ -305,7 +307,8 @@ Rectangle {
 
                             background: Rectangle {
                                 anchors.fill: parent
-                                color: listview.currentIndex === index ? Global.style.accent : Global.style.backgroundColor
+                                color: 'transparent'
+                                //color: listview.currentIndex === index ? Global.style.accent : Global.style.backgroundColor
                                 //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
 
                                 //border.color: textCode.activeFocus ? Global.style.accent : Global.style.hintTextColor
