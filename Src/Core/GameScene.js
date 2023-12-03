@@ -299,7 +299,7 @@ function loadResources() {
     _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'), 0);
 
     //地图遮挡透明度
-    _private.config.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
+    itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
 
 
     //安卓配置
@@ -1395,7 +1395,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 //载入特效，返回特效对象
 //如果 spriteEffect 为null，则 创建1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
-function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemRoleContainer) {
+function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemViewPort.itemRoleContainer) {
     //console.debug("[FightScene]loadSpriteEffect0");
 
     /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectRId + GameMakerGlobal.separator + "sprite.json";
@@ -1464,19 +1464,19 @@ function buttonAClicked() {
     //人物方向
     switch(mainRole.moveDirection) {
     case Qt.Key_Up:
-        maxDistance = Math.ceil(sizeMapBlockSize.height / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
         break;
     case Qt.Key_Right:
-        maxDistance = Math.ceil(sizeMapBlockSize.width / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     case Qt.Key_Down:
-        maxDistance = Math.ceil(sizeMapBlockSize.height / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
         break;
     case Qt.Key_Left:
-        maxDistance = Math.ceil(sizeMapBlockSize.width / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     default:
@@ -1484,25 +1484,25 @@ function buttonAClicked() {
     }
 
     //计算人物所占的地图块
-    let usedMapBlocks = _private.fComputeUseBlocks(usePos.x, usePos.y, usePos.x + usePos.width, usePos.y + usePos.height);
+    let usedMapBlocks = itemViewPort.fComputeUseBlocks(usePos.x, usePos.y, usePos.x + usePos.width, usePos.y + usePos.height);
 
 
     let mainRoleUseBlocks = [];
 
     for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
         for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-            mainRoleUseBlocks.push(xb + yb * itemContainer.mapInfo.MapSize[0]);
+            mainRoleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
         }
     }
 
     //console.debug("人物占用图块：", usedMapBlocks,mainRoleUseBlocks)
 
     //循环地图事件（优先）
-    for(let event in itemContainer.mapEventBlocks) {
+    for(let event in itemViewPort.itemContainer.mapEventBlocks) {
         //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
         if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {  //如果事件触发
-            //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEvent(itemContainer.mapEventBlocks[event], mainRole);   //触发事件
+            //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], mainRole);   //触发事件
 
             //放在这里运行事件，因为 loadmap 的地图事件会改掉所有原来的事件；
             //如果异步脚本 初始为空，且现在不为空
@@ -1511,7 +1511,7 @@ function buttonAClicked() {
 
             return; //!!只执行一次事件
         }
-        //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+        //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
     }
 
     //循环NPC
@@ -1524,7 +1524,7 @@ function buttonAClicked() {
             console.debug("[GameScene]触发NPC事件：", _private.objRoles[r].$data.$id);
 
             //获得脚本（地图脚本优先级 > game.f定义的）
-            let tScript = itemContainer.mapInfo.$$Script[_private.objRoles[r].$data.$id];
+            let tScript = itemViewPort.mapScript[_private.objRoles[r].$data.$id];
             if(!tScript)
                 tScript = game.f[_private.objRoles[r].$data.$id];
             if(tScript) {
@@ -1545,11 +1545,11 @@ function mapEvent(eventName, role) {
 
     //主角和NPC的事件名不同
     if(role.$type === 1)
-        tScript = itemContainer.mapInfo.$$Script['$' + eventName];
+        tScript = itemViewPort.mapScript['$' + eventName];
     else
-        tScript = itemContainer.mapInfo.$$Script['$' + role.$data.$id + '_' + eventName + '_map'];
+        tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map'];
     if(!tScript && role.$type === 1)    //!!兼容旧的
-        tScript = itemContainer.mapInfo.$$Script[eventName];
+        tScript = itemViewPort.mapScript[eventName];
     if(!tScript)
         if(role.$type === 1)
             tScript = game.f['$' + eventName];
@@ -1564,7 +1564,7 @@ function mapEvent(eventName, role) {
 
 
     //调用一个总的
-    tScript = itemContainer.mapInfo.$$Script['$map_' + eventName];
+    tScript = itemViewPort.mapScript['$map_' + eventName];
     if(tScript)
         GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件:map_' + eventName], role);
 
@@ -1579,11 +1579,11 @@ function mapEventCanceled(eventName, role) {
 
     //主角和NPC的事件名不同
     if(role.$type === 1)
-        tScript = itemContainer.mapInfo.$$Script['$' + eventName + '_map_leave'];
+        tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'];
     else
-        tScript = itemContainer.mapInfo.$$Script['$' + role.$data.$id + '_' + eventName + '_map_leave'];
+        tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'];
     //if(!tScript)    //!!兼容旧的
-    //    tScript = itemContainer.mapInfo.$$Script[eventName + '_map_leave'];
+    //    tScript = itemViewPort.mapScript[eventName + '_map_leave'];
     if(!tScript)
         if(role.$type === 1)
             tScript = game.f['$' + eventName + '_map_leave'];
@@ -1599,7 +1599,7 @@ function mapEventCanceled(eventName, role) {
 
 
     //调用一个总的
-    tScript = itemContainer.mapInfo.$$Script['$_map_leave_' + eventName];
+    tScript = itemViewPort.mapScript['$_map_leave_' + eventName];
     if(tScript)
         GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图离开事件:map_leave_' + eventName], role);
 
@@ -1613,16 +1613,16 @@ function mapEventCanceled(eventName, role) {
 function mapClickEvent(x, y) {
 
     let eventName = '$map_click';
-    let tScript = itemContainer.mapInfo.$$Script[eventName];
+    let tScript = itemViewPort.mapScript[eventName];
     if(!tScript)
         tScript = game.f[eventName];
     if(!tScript)
         tScript = game.gf[eventName];
     if(tScript)
-        game.run([tScript, eventName], -1, Math.floor(x / sizeMapBlockSize.width), Math.floor(y / sizeMapBlockSize.height), x, y);
+        game.run([tScript, eventName], -1, Math.floor(x / itemViewPort.sizeMapBlockSize.width), Math.floor(y / itemViewPort.sizeMapBlockSize.height), x, y);
 
     //console.debug(mouse.x, mouse.y,
-    //              Math.floor(mouse.x / sizeMapBlockSize.width), Math.floor(mouse.y / sizeMapBlockSize.height))
+    //              Math.floor(mouse.x / itemViewPort.sizeMapBlockSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockSize.height))
 
 }
 
@@ -1632,7 +1632,7 @@ function roleClickEvent(role, dx, dy) {
 
     let eventName = `$${role.$data.$id}_click`;
     //获得脚本（地图脚本优先级 > game.f定义的）
-    let tScript = itemContainer.mapInfo.$$Script[eventName];
+    let tScript = itemViewPort.mapScript[eventName];
     if(!tScript)
         tScript = game.f[eventName];
     if(!tScript)
@@ -1655,14 +1655,14 @@ function onTriggered() {
 
     //如果是0，则重新赋值
     if(timer.nLastTime <= 0) {
-        timer.nLastTime = game.date().getTime();
+        timer.nLastTime = new Date().getTime();
         return;
     }
 
     let bAsyncScriptIsEmpty = _private.asyncScript.isEmpty();
 
     //获取精确时间差
-    let realinterval = game.date().getTime() - timer.nLastTime;
+    let realinterval = new Date().getTime() - timer.nLastTime;
     timer.nLastTime = timer.nLastTime + realinterval;
 
     game.$frameDuration = realinterval;
@@ -1724,7 +1724,7 @@ function onTriggered() {
             else
                 _private.objTimers[tt][2] = _private.objTimers[tt][0];
 
-            let tScript = itemContainer.mapInfo.$$Script[tt];
+            let tScript = itemViewPort.mapScript[tt];
             if(!tScript)
                 tScript = game.f[tt];
 
@@ -1778,7 +1778,7 @@ function onTriggered() {
 
 
                         let eventName = `$${role.$data.$id}_arrive`;
-                        let tScript = itemContainer.mapInfo.$$Script[eventName];
+                        let tScript = itemViewPort.mapScript[eventName];
                         if(!tScript)
                             tScript = game.f[eventName];
                         if(!tScript)
@@ -1955,7 +1955,7 @@ function onTriggered() {
                 )
             ) {
                 let eventName = `$${role.$data.$id}_collide`;
-                let tScript = itemContainer.mapInfo.$$Script[eventName];
+                let tScript = itemViewPort.mapScript[eventName];
                 if(!tScript)
                     tScript = game.f[eventName];
                 if(!tScript)
@@ -1991,7 +1991,7 @@ function onTriggered() {
                 )
             ) {
                 let eventName = `$${role.$data.$id}_collide`;
-                let tScript = itemContainer.mapInfo.$$Script[eventName];
+                let tScript = itemViewPort.mapScript[eventName];
                 if(!tScript)
                     tScript = game.f[eventName];
                 if(!tScript)
@@ -2021,44 +2021,44 @@ function onTriggered() {
         //计算人物所占的地图块
 
         //返回 地图块坐标（左上和右下）
-        let usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x1, role.y + role.y1, role.x + role.x2, role.y + role.y2);
+        let usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1, role.x + role.x2, role.y + role.y2);
 
         //转换为 每个地图块ID
         for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                roleUseBlocks.push(xb + yb * itemContainer.mapInfo.MapSize[0]);
+                roleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
             }
         }
 
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
-        for(let event in itemContainer.mapEventBlocks) {
+        for(let event in itemViewPort.itemContainer.mapEventBlocks) {
             //console.debug("[GameScene]检测事件：", event, roleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(roleUseBlocks.indexOf(parseInt(event)) > -1) {
-                let isTriggered = role.$$mapEventsTriggering[itemContainer.mapEventBlocks[event]] ||
-                    tEvents[itemContainer.mapEventBlocks[event]];
+                let isTriggered = role.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]] ||
+                    tEvents[itemViewPort.itemContainer.mapEventBlocks[event]];
 
-                tEvents[itemContainer.mapEventBlocks[event]] = event;  //加入
+                tEvents[itemViewPort.itemContainer.mapEventBlocks[event]] = event;  //加入
 
                 //如果已经被触发过
                 if(isTriggered) {
 
                     ////将触发的事件删除（role.$$mapEventsTriggering剩下的就是 下面要取消触发的事件 了）
-                    delete role.$$mapEventsTriggering[itemContainer.mapEventBlocks[event]];
+                    delete role.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, roleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-                GameSceneJS.mapEvent(itemContainer.mapEventBlocks[event], role);   //触发事件
+                //console.debug("[GameScene]mapEvent触发:", event, roleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
+                GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], role);   //触发事件
             }
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in role.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, roleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemContainer.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug("[GameScene]mapEventCanceled触发:", event, roleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEventCanceled(itemViewPort.itemContainer.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
+            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         role.$$mapEventsTriggering = tEvents;
@@ -2105,7 +2105,7 @@ function onTriggered() {
 
 
                         let eventName = `$${mainRole.$data.$id}_arrive`;
-                        let tScript = itemContainer.mapInfo.$$Script[eventName];
+                        let tScript = itemViewPort.mapScript[eventName];
                         if(!tScript)
                             tScript = game.f[eventName];
                         if(!tScript)
@@ -2156,12 +2156,12 @@ function onTriggered() {
         offsetMove = _private.fComputeRoleMoveToObstacleOffset(mainRole, mainRole.moveDirection, offsetMove);
         if(offsetMove === 0) {  //如果碰墙
 
-            if(!_private.fChangeMainRoleDirection())
+            if(!fChangeMainRoleDirection())
                 break;
         }
 
         //计算与其他角色距离
-        offsetMove = _private.fComputeRoleMoveToRolesOffset(mainRole, mainRole.moveDirection, offsetMove);
+        offsetMove = fComputeRoleMoveToRolesOffset(mainRole, mainRole.moveDirection, offsetMove);
 
         if(offsetMove !== undefined && offsetMove !== 0) {
             //console.debug("offsetMove:", offsetMove);
@@ -2259,28 +2259,28 @@ function onTriggered() {
         //转换事件的地图块的坐标为地图块的ID
         for(let i in roleUseBlocks) {
             //计算出 行列
-            let px = roleUseBlocks[i] % itemContainer.mapInfo.MapSize[0];
-            let py = parseInt(roleUseBlocks[i] / itemContainer.mapInfo.MapSize[0]);
+            let px = roleUseBlocks[i] % itemViewPort.itemContainer.mapInfo.MapSize[0];
+            let py = parseInt(roleUseBlocks[i] / itemViewPort.itemContainer.mapInfo.MapSize[0]);
             let strP = [px, py].toString();
 
-            console.debug("检测障碍：", strP, itemContainer.mapInfo.MapBlockSpecialData)
+            console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
             //存在障碍
-            if(itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                switch(itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+            if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
                     //!!!这里需要修改
                 case -1:
                     if(mainRole.moveDirection === Qt.Key_Left) {
 
-                        let v = (px + 1) * sizeMapBlockSize.width - (mainRole.x + mainRole.x1);
+                        let v = (px + 1) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x1);
                         let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, v);
                         roleNewX = rolePos[0];
                         checkover = true;
 
-                        console.debug("碰到左边墙壁", px, (px + 1) * sizeMapBlockSize.width, (mainRole.x + mainRole.x1), v);
+                        console.debug("碰到左边墙壁", px, (px + 1) * itemViewPort.sizeMapBlockSize.width, (mainRole.x + mainRole.x1), v);
                     }
                     if(mainRole.moveDirection === Qt.Key_Right) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * sizeMapBlockSize.width - (mainRole.x + mainRole.x2));
+                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x2));
                         roleNewX = rolePos[0];
                         checkover = true;
 
@@ -2288,7 +2288,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Up) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * sizeMapBlockSize.height - (mainRole.y + mainRole.y1));
+                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y1));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2296,7 +2296,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Down) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * sizeMapBlockSize.height - (mainRole.y + mainRole.y2));
+                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y2));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2325,44 +2325,44 @@ function onTriggered() {
         //计算人物所占的地图块
 
         //返回 地图块坐标（左上和右下）
-        let usedMapBlocks = _private.fComputeUseBlocks(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1, mainRole.x + mainRole.x2, mainRole.y + mainRole.y2);
+        let usedMapBlocks = itemViewPort.fComputeUseBlocks(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1, mainRole.x + mainRole.x2, mainRole.y + mainRole.y2);
 
         //转换为 每个地图块ID
         for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                mainRoleUseBlocks.push(xb + yb * itemContainer.mapInfo.MapSize[0]);
+                mainRoleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
             }
         }
 
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
-        for(let event in itemContainer.mapEventBlocks) {
+        for(let event in itemViewPort.itemContainer.mapEventBlocks) {
             //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {
-                let isTriggered = mainRole.$$mapEventsTriggering[itemContainer.mapEventBlocks[event]] ||
-                    tEvents[itemContainer.mapEventBlocks[event]];
+                let isTriggered = mainRole.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]] ||
+                    tEvents[itemViewPort.itemContainer.mapEventBlocks[event]];
 
-                tEvents[itemContainer.mapEventBlocks[event]] = event;  //加入
+                tEvents[itemViewPort.itemContainer.mapEventBlocks[event]] = event;  //加入
 
                 //如果已经被触发过
                 if(isTriggered) {
 
                     ////将触发的事件删除（mainRole.$$mapEventsTriggering剩下的就是 下面要取消触发的事件 了）
-                    delete mainRole.$$mapEventsTriggering[itemContainer.mapEventBlocks[event]];
+                    delete mainRole.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-                GameSceneJS.mapEvent(itemContainer.mapEventBlocks[event], mainRole);   //触发事件
+                //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
+                GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], mainRole);   //触发事件
             }
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in mainRole.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, mainRoleUseBlocks, itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemContainer.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug("[GameScene]mapEventCanceled触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEventCanceled(itemViewPort.itemContainer.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
+            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         mainRole.$$mapEventsTriggering = tEvents;
@@ -2370,8 +2370,8 @@ function onTriggered() {
 
 
         textPos.text = " 【%1】".
-            arg([Math.floor(centerX / sizeMapBlockSize.width), Math.floor(centerY / sizeMapBlockSize.height)])
-            //.arg(itemContainer.mapInfo.data.length)
+            arg([Math.floor(centerX / itemViewPort.sizeMapBlockSize.width), Math.floor(centerY / itemViewPort.sizeMapBlockSize.height)])
+            //.arg(itemViewPort.itemContainer.mapInfo.data.length)
         ;
 
         textPos1.text = "[%1](%2),(%3),(%4),(%5)".
@@ -2423,10 +2423,10 @@ function onTriggered() {
         }
 
         if(offsetMoveX || offsetMoveY) {
-            setScenePos(parseInt(-itemContainer.x + gameScene.width / 2 + offsetMoveX), parseInt(-itemContainer.y + gameScene.height / 2 + offsetMoveY));
-            //console.warn(-itemContainer.x, gameScene.width, itemContainer.width)
-            //itemContainer.x -= offsetMoveX;
-            //itemContainer.y -= offsetMoveY;
+            itemViewPort.setScenePos(parseInt(-itemViewPort.itemContainer.x + itemViewPort.gameScene.width / 2 + offsetMoveX), parseInt(-itemViewPort.itemContainer.y + itemViewPort.gameScene.height / 2 + offsetMoveY));
+            //console.warn(-itemViewPort.itemContainer.x, itemViewPort.gameScene.width, itemViewPort.itemContainer.width)
+            //itemViewPort.itemContainer.x -= offsetMoveX;
+            //itemViewPort.itemContainer.y -= offsetMoveY;
         }
     }
 
@@ -2446,7 +2446,7 @@ function onTriggered() {
                 _private.objPlugins[tc][tp].$timerTriggered(realinterval);
 
     /*/精确控制下一帧（有问题）
-    let runinterval = game.date().getTime() - timer.nLastTime;
+    let runinterval = new Date().getTime() - timer.nLastTime;
     if(runinterval >= _private.config.nInterval) {
         timer.interval = 1;
     }
@@ -2461,4 +2461,266 @@ function onTriggered() {
 
     //timer.start();
 
+}
+
+
+//计算 role 在 direction 方向 在 offsetMove 距离中碰到其他roles的距离
+function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
+
+    let objRoles = _private.objRoles;
+    let arrMainRoles = _private.arrMainRoles;
+
+    if(offsetMove <= 0)
+        return 0;
+
+    switch(direction) {
+    case Qt.Key_Left:
+
+        //与其他角色碰撞
+        for(let r in objRoles) {
+            //跳过自身
+            if(role === objRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
+                    Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
+            ))
+                offsetMove = (role.x + role.x1) - (objRoles[r].x + objRoles[r].x2) - 1;
+        }
+        //与主角碰撞
+        for(let r in arrMainRoles) {
+            //跳过自身
+            if(role === arrMainRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
+                    Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
+            ))
+                offsetMove = (role.x + role.x1) - (arrMainRoles[r].x + arrMainRoles[r].x2) - 1;
+        }
+
+        return offsetMove;
+
+        break;
+
+    case Qt.Key_Right:
+
+        for(let r in objRoles) {
+            //跳过自身
+            if(role === objRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
+                    Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
+            ))
+                offsetMove = (objRoles[r].x + objRoles[r].x1) - (role.x + role.x2) - 1;
+        }
+        for(let r in arrMainRoles) {
+            //跳过自身
+            if(role === arrMainRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
+                    Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
+            ))
+                offsetMove = (arrMainRoles[r].x + arrMainRoles[r].x1) - (role.x + role.x2) - 1;
+        }
+
+        return offsetMove;
+
+        break;
+
+    case Qt.Key_Up: //同Left
+
+        for(let r in objRoles) {
+            //跳过自身
+            if(role === objRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
+                    Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
+            ))
+                offsetMove = (role.y + role.y1) - (objRoles[r].y + objRoles[r].y2) - 1;
+        }
+        for(let r in arrMainRoles) {
+            //跳过自身
+            if(role === arrMainRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
+                    Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
+            ))
+                offsetMove = (role.y + role.y1) - (arrMainRoles[r].y + arrMainRoles[r].y2) - 1;
+        }
+
+        return offsetMove;
+
+        break;
+
+    case Qt.Key_Down:   //同Right
+
+        for(let r in objRoles) {
+            //跳过自身
+            if(role === objRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
+                    Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
+            ))
+                offsetMove = (objRoles[r].y + objRoles[r].y1) - (role.y + role.y2) - 1;
+        }
+        for(let r in arrMainRoles) {
+            //跳过自身
+            if(role === arrMainRoles[r])
+                continue;
+            //跳过没有大小的
+            //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
+            //    continue;
+
+            if(
+                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                GlobalLibraryJS.checkRectangleClashed(
+                    Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
+                    Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
+            ))
+                offsetMove = (arrMainRoles[r].y + arrMainRoles[r].y1) - (role.y + role.y2) - 1;
+        }
+
+        return offsetMove;
+
+        break;
+
+    default:
+        //console.warn("[GameScene]fComputeRoleMoveOffset:", direction);
+        return;
+    }
+
+}
+
+
+
+
+
+//转换方向（碰墙后）
+function fChangeMainRoleDirection() {
+    return;
+
+    console.debug("！！碰墙返回", mainRole.moveDirection);
+    if(mainRole.$props.$tmpDirection !== undefined) {
+        _private.startSprite(mainRole, mainRole.$props.$tmpDirection);
+        delete mainRole.$props.$tmpDirection;
+        return;
+    }
+
+    //人物的占位最中央 所在地图的坐标
+    let bx = Math.floor((mainRole.x + mainRole.x1 + mainRole.width1 / 2) / itemViewPort.sizeMapBlockSize.width);
+    let by = Math.floor((mainRole.y + mainRole.y1 + mainRole.height1 / 2) / itemViewPort.sizeMapBlockSize.height);
+
+    switch(mainRole.moveDirection) {
+    case Qt.Key_Left:
+        if(mainRole.x + mainRole.x1 === 0) {
+            return;
+        }
+
+        break;
+
+    case Qt.Key_Right:
+        if(mainRole.x + mainRole.x2 === itemViewPort.itemContainer.width - 1) {
+            return;
+        }
+
+        break;
+
+    case Qt.Key_Up:
+        if(mainRole.y + mainRole.y1 === 0) {
+            console.debug("！！碰边界返回2")
+            return;
+        }
+
+        //左边距离和右边距离
+        let toffset1 = (mainRole.x + mainRole.x2) % itemViewPort.sizeMapBlockSize.width + 1;
+        let toffset2 = itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x1) % itemViewPort.sizeMapBlockSize.width;
+        if(toffset1 > itemViewPort.sizeMapBlockSize.width / 3 && toffset2 > itemViewPort.sizeMapBlockSize.width / 3 ) {
+            //_private.startSprite(mainRole, Qt.Key_Up);
+            console.debug("！！不能转方向返回")
+            return;
+        }
+        if(toffset1 < toffset2) {
+            if(toffset1 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Left, toffset1)) {
+                console.debug("！！左有障碍返回")
+                return;
+            }
+
+            console.debug("！！转方向Left", mainRole.moveDirection, Qt.Key_Left)
+            mainRole.$props.$tmpDirection = mainRole.moveDirection;
+            _private.startSprite(mainRole, Qt.Key_Left);
+            if(offsetMove > toffset1)
+                offsetMove = toffset1;
+        }
+        else {
+            if(toffset2 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Right, toffset2)) {
+                console.debug("！！右有障碍返回")
+                return;
+            }
+
+            console.debug("！！转方向Right", mainRole.moveDirection, Qt.Key_Right)
+            mainRole.$props.$tmpDirection = mainRole.moveDirection;
+            _private.startSprite(mainRole, Qt.Key_Right);
+            if(offsetMove > toffset2)
+                offsetMove = toffset2;
+        }
+
+        break;
+
+    case Qt.Key_Down:
+        if(mainRole.y + mainRole.y2 === itemViewPort.itemContainer.height - 1)
+            return offsetMove;
+
+        break;
+
+    }
+
+    return offsetMove;
 }

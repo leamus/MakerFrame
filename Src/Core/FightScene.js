@@ -1,7 +1,7 @@
 ﻿
 /*
 技能选择系统：
-  1、目前只有两种选择：战斗人物和菜单（Type分别为1和2）；
+  1、目前选择的每个步骤只有两种选择类型：战斗人物和菜单（Type分别为1和2）；
   2、如果要新增类型，则：
     a、Type为3及以上
     b、在选择后调用 skillChoice(n, 值);，表示进行下一个选择步骤
@@ -103,7 +103,7 @@ function combatantUseSkillOrGoods(combatant) {
         else if(choiceSkillOrGoods.$objectType === game.$sys.protoObjects.goods.$objectType)
             combatant.$$fightData.$choice.$type = 2;
 
-        //检测技能 或 道具是否可以使用
+        //检测技能 或 道具是否可以使用（我方和敌方人物刚选择技能时判断）
         let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 10);
         if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
             //fight.msg(checkSkill || "不能使用", 50);
@@ -191,7 +191,7 @@ function combatantUseSkillOrGoods(combatant) {
                 //    return;
 
 
-                //检测技能 或 道具是否可以使用
+                //检测技能 或 道具是否可以使用（我方和敌方人物选择技能的步骤完毕时判断）
                 let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 11);
                 if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
                     //fight.msg(checkSkill || "不能使用", 50);
@@ -421,7 +421,12 @@ function skillSetUsing(params, combatant) {
     }
     //选择菜单
     else if(params.Type === 2) {
-        fight.choicemenu(params.Title, params.Items, params.Style);
+        fight.menu(params.Title, params.Items, params.Style, function(index, itemMenu) {
+            itemMenu.visible = false;
+            FightSceneJS.skillChoice(2, index);
+
+            itemMenu.destroy();
+        });
 
         return false;
     }
@@ -1168,7 +1173,7 @@ function choicedSkillOrGoods(used, type) {
 
     //console.debug('!!!1', JSON.stringify(used))
 
-    //检测技能 或 道具是否可以使用
+    //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
     if(type === 3 || type === 2) {
         let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](used, combatant, 0);
         if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
@@ -1288,7 +1293,7 @@ function skillChoice(type, value) {
             //if(_private.nChoiceFightRoleIndex < 0 || _private.nChoiceFightRoleIndex >= _private.myCombatants.length)
             //    return;
 
-            //检测技能 或 道具是否可以使用
+            //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
             let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skillOrGoods, combatant, 1);
             if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
                 fight.msg(checkSkill || "不能使用", 50);

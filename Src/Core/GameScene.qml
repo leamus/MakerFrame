@@ -35,8 +35,8 @@ import "GameScene.js" as GameSceneJS
     2、event.isAutoRepeat
         第一次按返回false，长按会一直返回true
     3、防止Canvas闪烁，openMap时隐藏，绘制完成后显示：
-        itemBackMapContainer.visible = false;
-        itemFrontMapContainer.visible = false;
+        itemViewPort.itemBackMapContainer.visible = false;
+        itemViewPort.itemFrontMapContainer.visible = false;
         角色增删也必须设置为这样（要加入map和role全部初始化完毕）
 
     4、缩放：将地图块大小更改即可；
@@ -158,9 +158,29 @@ Rectangle {
         //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
         //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
-        //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
+        //pauseGame为是否暂停游戏（建议用yield关键字且返回true），如果为false，尽量不要用yield关键字；
         //buttonNum为按钮数量（0-2，目前没用）。
         readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, buttonNum=0, callback=true) {
+            //默认回调函数
+            if(callback === true) {
+                callback = function(code, itemMsg) {
+                    itemMsg.visible = false;
+
+                    if(_private.config.objPauseNames['$msg'] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run()
+                        game.goon('$msg');
+                        game.run(true);
+                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }
+
+
+                    itemMsg.destroy();
+                }
+            }
+
+
+            let itemGameMsg = compGameMsg.createObject(itemGameMsgs, {nIndex: itemGameMsgs.nIndex, callback: callback});
+
 
             //样式
             if(style === undefined || style === null)
@@ -182,9 +202,11 @@ Rectangle {
 
 
             //是否暂停游戏
-            if(pauseGame) {
+            if(pauseGame === true)
+                pauseGame = '$msg';
+            if(GlobalLibraryJS.isString(pauseGame)) {
                 //loaderGameMsg.bPauseGame = true;
-                game.pause('$msg');
+                game.pause(pauseGame);
 
                 //loaderGameMsg.focus = true;
             }
@@ -193,23 +215,10 @@ Rectangle {
             }
 
 
-            //回调函数
-            if(callback === true) {
-                callback = function(code, itemMsg) {
-                    itemMsg.visible = false;
-
-                    if(_private.config.objPauseNames['$msg'] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run()
-                        game.goon('$msg');
-                        game.run(true);
-                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }
-                }
-            }
-            loaderGameMsg.item.callback = callback;
-
-
-            loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
+            ++itemGameMsgs.nIndex;
+            itemGameMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
+            //loaderGameMsg.item.callback = callback;
+            //loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
             return true;
@@ -222,7 +231,7 @@ Rectangle {
         //style为样式；
         //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
-        //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
+        //pauseGame为是否暂停游戏（建议用yield关键字且返回true），如果为false，尽量不要用yield关键字；
         readonly property var talk: function(role, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true) {
             //console.debug("say1")
 
@@ -246,8 +255,11 @@ Rectangle {
 
 
             //是否暂停游戏
-            if(pauseGame) {
-                game.pause('$talk');
+            if(pauseGame === true)
+                pauseGame = '$talk';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
 
                 //loaderGameMsg.focus = true;
             }
@@ -294,7 +306,6 @@ Rectangle {
         //style为样式；
         //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor）；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
-        //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
         readonly property var say: function(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
             if(!role)
                 return false;
@@ -322,7 +333,7 @@ Rectangle {
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
             role.message.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            role.message.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            role.message.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             //role.message.visible = true;
             role.message.show(GlobalLibraryJS.convertToHTML(msg.toString()), GlobalLibraryJS.convertToHTML(pretext.toString()), interval, keeptime, 0b11);
@@ -339,8 +350,8 @@ Rectangle {
         //返回值为选择的下标（0开始）；
         //注意：该脚本必须用yield才能暂停并接受返回值。
         readonly property var menu: function(title, items, style={}, pauseGame=true, callback=true) {
-
-            if(callback === true) {   //默认回调函数
+            //默认回调函数
+            if(callback === true) {
                 callback = function(index, itemMenu) {
                     //gameMap.focus = true;
 
@@ -353,7 +364,6 @@ Rectangle {
                         game.run(true, {Value: index});
                         //_private.asyncScript.run(index);
                     }
-
 
 
                     itemMenu.destroy();
@@ -391,8 +401,11 @@ Rectangle {
 
 
             //是否暂停游戏
-            if(pauseGame) {
-                game.pause('$menu' + itemGameMenus.nIndex);
+            if(pauseGame === true)
+                pauseGame = '$menu';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame + itemGameMenus.nIndex);
             }
             else {
             }
@@ -423,8 +436,11 @@ Rectangle {
 
 
             //是否暂停游戏
-            if(pauseGame) {
-                game.pause('$input');
+            if(pauseGame === true)
+                pauseGame = '$input';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
             }
             else {
             }
@@ -434,12 +450,12 @@ Rectangle {
             rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
             textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            textGameInput.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            textGameInput.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
             rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
             textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-            textGameInputTitle.font.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+            textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
 
             maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
@@ -523,7 +539,7 @@ Rectangle {
             cfg = JSON.parse(cfg);
 
 
-            //let role = compRole.createObject(itemRoleContainer);
+            //let role = compRole.createObject(itemViewPort.itemRoleContainer);
             let index = 0;
             _private.arrMainRoles[index] = mainRole;
             _private.arrMainRoles[index].visible = true;
@@ -670,7 +686,7 @@ Rectangle {
 
                 //下面都是自动行走
                 if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
-                    let tPos = getMapBlockPos(props.$targetBx, props.$targetBy);
+                    let tPos = itemViewPort.getMapBlockPos(props.$targetBx, props.$targetBy);
                     if(props.$targetBx === undefined)
                         tPos[0] = -1;
                     if(props.$targetBy === undefined)
@@ -687,7 +703,7 @@ Rectangle {
                 if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
                     heroComp.targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
-                        let tPos = getMapBlockPos(targetBlock[0], targetBlock[1]);
+                        let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
                         /*if(props.$targetBx === undefined)
                             tPos[0] = -1;
                         if(props.$targetBy === undefined)
@@ -891,7 +907,7 @@ Rectangle {
             cfg = JSON.parse(cfg);
 
 
-            let roleComp = compRole.createObject(itemRoleContainer);
+            let roleComp = compRole.createObject(itemViewPort.itemRoleContainer);
 
 
             roleComp.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
@@ -1008,7 +1024,7 @@ Rectangle {
                     roleComp.nActionType = props.$action;
 
                 if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
-                    let tPos = getMapBlockPos(props.$targetBx, props.$targetBy);
+                    let tPos = itemViewPort.getMapBlockPos(props.$targetBx, props.$targetBy);
                     if(props.$targetBx === undefined)
                         tPos[0] = -1;
                     if(props.$targetBy === undefined)
@@ -1025,7 +1041,7 @@ Rectangle {
                 if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
                     roleComp.targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
-                        let tPos = getMapBlockPos(targetBlock[0], targetBlock[1]);
+                        let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
                         /*if(props.$targetBx === undefined)
                             tPos[0] = -1;
                         if(props.$targetBy === undefined)
@@ -1100,29 +1116,29 @@ Rectangle {
 
                 if(bx < 0)
                     bx = 0;
-                else if(bx >= itemContainer.mapInfo.MapSize[0])
-                    bx = itemContainer.mapInfo.MapSize[0] - 1;
+                else if(bx >= itemViewPort.itemContainer.mapInfo.MapSize[0])
+                    bx = itemViewPort.itemContainer.mapInfo.MapSize[0] - 1;
 
                 if(by < 0)
                     by = 0;
-                else if(by >= itemContainer.mapInfo.MapSize[1])
-                    by = itemContainer.mapInfo.MapSize[1] - 1;
+                else if(by >= itemViewPort.itemContainer.mapInfo.MapSize[1])
+                    by = itemViewPort.itemContainer.mapInfo.MapSize[1] - 1;
 
 
                 //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-                //if(bx === itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > sizeMapBlockSize.width)
-                //    role.x = itemContainer.width - role.x2 - 1;
+                //if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
+                //    role.x = itemViewPort.itemContainer.width - role.x2 - 1;
                 //else
                 //    role.x = roleCenterX - role.x1 - role.width1 / 2;
-                role.x = bx * sizeMapBlockSize.width - role.x1;
+                role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
 
 
                 //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-                //if(by === itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > sizeMapBlockSize.height)
-                //    role.y = itemContainer.height - role.y2 - 1;
+                //if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
+                //    role.y = itemViewPort.itemContainer.height - role.y2 - 1;
                 //else
                 //    role.y = roleCenterY - role.y1 - role.height1 / 2;
-                role.y = by * sizeMapBlockSize.height - role.y1;
+                role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
 
             }
             */
@@ -1200,13 +1216,13 @@ Rectangle {
             let centerY = role.y + role.y1 + parseInt(role.height1 / 2);
 
             if(pos) {
-                if(pos[0] === Math.floor(centerX / sizeMapBlockSize.width) && pos[1] === Math.floor(centerY / sizeMapBlockSize.height))
+                if(pos[0] === Math.floor(centerX / itemViewPort.sizeMapBlockSize.width) && pos[1] === Math.floor(centerY / itemViewPort.sizeMapBlockSize.height))
                     return true;
                 return false;
             }
             else
-                return {bx: Math.floor(centerX / sizeMapBlockSize.width),
-                    by: Math.floor(centerY / sizeMapBlockSize.height),
+                return {bx: Math.floor(centerX / itemViewPort.sizeMapBlockSize.width),
+                    by: Math.floor(centerY / itemViewPort.sizeMapBlockSize.height),
                     x: role.x,
                     y: role.y,
                     cx: centerX,
@@ -1226,11 +1242,11 @@ Rectangle {
             let mainRoleUseBlocks = [];
 
             //计算人物所占的地图块
-            let usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x1, role.y + role.y1, role.x + role.x2, role.y + role.y2);
+            let usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1, role.x + role.x2, role.y + role.y2);
 
             for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                 for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                    mainRoleUseBlocks.push(xb + yb * itemContainer.mapInfo.MapSize[0]);
+                    mainRoleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
                 }
             }
             */
@@ -2044,11 +2060,14 @@ Rectangle {
         //goods为买的物品rid列表；
         //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
         //callback为交易结束后的脚本。
-        readonly property var trade: function(goods=[], mygoodsinclude=true, callback=null, pauseGame=true) {
+        readonly property var trade: function(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
             //是否暂停游戏
-            if(pauseGame) {
-                game.pause('$trade');
+            if(pauseGame === true)
+                pauseGame = '$trade';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
 
                 //loaderGameMsg.focus = true;
             }
@@ -2270,8 +2289,11 @@ Rectangle {
         readonly property var playvideo: function(video, properties={}, pauseGame=true) {
 
             //是否暂停游戏
-            if(pauseGame) {
-                game.pause('$video');
+            if(pauseGame === true)
+                pauseGame = '$video';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
 
                 //loaderGameMsg.focus = true;
             }
@@ -2328,9 +2350,9 @@ Rectangle {
 
             mediaPlayer.play();
 
-            //gameScene.color='#CCFFFFFF';
-            //console.debug(gameScene.color)
-            //console.debug(gameScene.color==='#ccffffff');
+            //itemViewPort.gameScene.color='#CCFFFFFF';
+            //console.debug(itemViewPort.gameScene.color)
+            //console.debug(itemViewPort.gameScene.color==='#ccffffff');
         }
         //结束播放
         readonly property var stopvideo: function() {
@@ -2395,10 +2417,10 @@ Rectangle {
 
                 tmp = compCacheImage.createObject(null, {source: GlobalJS.toURL(filePath)});
                 //随场景缩放
-                //tmp = compCacheImage.createObject(gameScene, {source: GlobalJS.toURL(filePath)});
+                //tmp = compCacheImage.createObject(itemViewPort.gameScene, {source: GlobalJS.toURL(filePath)});
                 //tmp = compCacheImage.createObject(rootGameScene, {source: GlobalJS.toURL(filePath)});
                 //随地图移动
-                //tmp = compCacheImage.createObject(itemContainer, {source: GlobalJS.toURL(filePath)});
+                //tmp = compCacheImage.createObject(itemViewPort.itemContainer, {source: GlobalJS.toURL(filePath)});
 
                 _private.objTmpImages[id] = tmp;
                 tmp.id = id;
@@ -2423,10 +2445,10 @@ Rectangle {
                 properties.$parent = itemViewPort;
             //会改变大小
             else if(properties.$parent === 2)
-                properties.$parent = gameScene;
+                properties.$parent = itemViewPort.gameScene;
             //会改变大小和随地图移动
             else if(properties.$parent === 3) {
-                properties.$parent = itemContainer;
+                properties.$parent = itemViewPort.itemContainer;
                 _private.arrayMapComponents.push(tmp);
             }
             //某角色上
@@ -2703,10 +2725,10 @@ Rectangle {
                 properties.$parent = itemViewPort;
             //会改变大小
             if(properties.$parent === 2)
-                properties.$parent = gameScene;
+                properties.$parent = itemViewPort.gameScene;
             //会改变大小和随地图移动
             else if(properties.$parent === 3) {
-                properties.$parent = itemContainer;
+                properties.$parent = itemViewPort.itemContainer;
                 _private.arrayMapComponents.push(sprite);
             }
             //某角色上
@@ -2985,7 +3007,7 @@ Rectangle {
 
         //将场景缩放n倍；可以是小数。
         readonly property var scale: function(n) {
-            gameScene.scale = parseFloat(n);
+            itemViewPort.gameScene.scale = parseFloat(n);
             setSceneToRole(_private.sceneRole);
 
             game.gd["$sys_scale"] = n;
@@ -3120,8 +3142,13 @@ Rectangle {
 
             if(params.$visible !== false) {
 
-                if(pauseGame)
-                    game.pause('$menu_window');
+                //是否暂停游戏
+                if(pauseGame === true)
+                    pauseGame = '$menu_window';
+                if(GlobalLibraryJS.isString(pauseGame)) {
+                    //loaderGameMsg.bPauseGame = true;
+                    game.pause(pauseGame);
+                }
 
                 /*switch(params.$id) {
                 case 1:
@@ -3229,7 +3256,7 @@ Rectangle {
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
             let ret = FrameManager.sl_qml_WriteFile(fileData, Global.toPath(filePath), 0);
-            //console.debug(itemContainer.arrCanvasMap[2].toDataURL())
+            //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
 
 
             //载入after_save脚本
@@ -3322,6 +3349,7 @@ Rectangle {
 
 
         //返回插件
+        //参数0是组织/开发者名，参数1是插件名
         readonly property var plugin: function(...params) {
             let plugin = _private.objPlugins[params[0]][params[1]];
             if(plugin && plugin.$autoLoad === false) {
@@ -3376,6 +3404,7 @@ Rectangle {
         //      Type为运行类型（如果为0，表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
         //      Running为1或2，表示如果队列里如果为空则执行（区别为：1是下一个JS事件循环执行，2是立即执行）；为0时不执行；
         //      Value：传递给事件队列的值，无则默认上一次的；
+        //      AsyncScript：脚本队列，无则本脚本队列
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined) {
                 console.warn('[!GameScene]运行脚本未定义!!!');
@@ -3384,18 +3413,20 @@ Rectangle {
 
 
             //参数
-            let priority, runType = 0, running = 1, value;
+            let priority, runType = 0, running = 1, value, asyncScript;
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
+                asyncScript = scriptProps.AsyncScript || _private.asyncScript;
                 priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
                 runType = GlobalLibraryJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : 0;
                 running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : 1;
-                value = Object.keys(scriptProps).indexOf('Value') < 0 ? _private.asyncScript.lastEscapeValue : scriptProps.Value;
+                value = Object.keys(scriptProps).indexOf('Value') < 0 ? asyncScript.lastEscapeValue : scriptProps.Value;
             }
             else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
+                asyncScript = _private.asyncScript;
                 priority = scriptProps;
                 runType = 0;
                 running = 1;
-                value = _private.asyncScript.lastEscapeValue;
+                value = asyncScript.lastEscapeValue;
             }
             else {
                 console.warn('[!GameScene]运行脚本属性错误!!!');
@@ -3405,7 +3436,7 @@ Rectangle {
 
             //直接运行
             if(vScript === null) {
-                _private.asyncScript.run(value);
+                asyncScript.run(value);
                 return 1;
             }
 
@@ -3413,11 +3444,11 @@ Rectangle {
             else if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
-                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                        asyncScript.run(asyncScript.lastEscapeValue);
                     }, 'game.run1');
                 */
-                _private.asyncScript.lastEscapeValue = value;
-                _private.asyncScript.runNextEventLoop('game.run1');
+                asyncScript.lastEscapeValue = value;
+                asyncScript.runNextEventLoop('game.run1');
 
                 return 0;
             }
@@ -3450,7 +3481,7 @@ Rectangle {
             }
 
             //可以立刻执行
-            if(GlobalJS.createScript(_private.asyncScript, runType, priority, vScript, ...params) === 0) {
+            if(GlobalJS.createScript(asyncScript, runType, priority, vScript, ...params) === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(null)，导致执行两次
                 //game.pause('$event');
 
@@ -3458,14 +3489,14 @@ Rectangle {
                     //GlobalLibraryJS.setTimeout(function() {
                     /*GlobalLibraryJS.runNextEventLoop(function() {
                         //game.goon('$event');
-                            _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                            asyncScript.run(asyncScript.lastEscapeValue);
                         }, 'game.run');
                     */
-                    _private.asyncScript.lastEscapeValue = value;
-                    _private.asyncScript.runNextEventLoop('game.run');
+                    asyncScript.lastEscapeValue = value;
+                    asyncScript.runNextEventLoop('game.run');
                 }
                 else if(running === 2)
-                    _private.asyncScript.run(value);
+                    asyncScript.run(value);
 
                 return 0;
             }
@@ -3530,12 +3561,6 @@ Rectangle {
         }
 
 
-        readonly property var date: ()=>{return new Date();}
-
-        readonly property var math: Math
-
-        readonly property var http: new XMLHttpRequest
-
         //局部/全局 数据/方法
         property var d: ({})
         property var f: ({})
@@ -3560,7 +3585,7 @@ Rectangle {
         readonly property var $gameMakerGlobalJS: GameMakerGlobalJS
         readonly property var $config: GameMakerGlobal.config
 
-        //插件（直接访问，不推荐）
+        //!!兼容旧代码；插件（直接访问，不推荐）
         readonly property var $plugins: _private.objPlugins
 
 
@@ -3571,8 +3596,8 @@ Rectangle {
 
             screen: rootGameScene,      //屏幕（组件位置和大小固定）（所有，包含战斗场景）
             viewport: itemViewPort,     //游戏视窗，组件位置和大小固定
-            scene: gameScene,           //场景（组件位置和大小固定，但会被scale影响）
-            map: itemContainer,         //地图，组件的容器（组件会改变大小和随地图移动）
+            scene: itemViewPort.gameScene,           //场景（组件位置和大小固定，但会被scale影响）
+            map: itemViewPort.itemContainer,         //地图，组件的容器（组件会改变大小和随地图移动）
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
@@ -3644,7 +3669,7 @@ Rectangle {
                 joystick: joystick,
                 buttons: itemButtons,
                 fps: itemFPS,
-                map: [canvasBackMap, canvasFrontMap],
+                map: [itemViewPort.canvasBackMap, itemViewPort.canvasFrontMap],
             },
 
             //资源
@@ -3654,26 +3679,13 @@ Rectangle {
 
 
         //地图大小和视窗大小
-        readonly property size $mapSize: Qt.size(itemContainer.width, itemContainer.height)
+        readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
         readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
 
         //上次帧间隔时长
         property int $frameDuration: 0
 
         //property real fAspectRatio: Screen.width / Screen.height
-
-
-
-        //资源（!!!鹰：过时：兼容旧代码）
-        readonly property alias objGoods: _private.goodsResource
-        readonly property alias objFightRoles: _private.fightRolesResource
-        readonly property alias objSkills: _private.skillsResource
-        readonly property alias objFightScripts: _private.fightScriptsResource
-        readonly property alias objSprites: _private.spritesResource
-
-        readonly property alias objCommonScripts: _private.objCommonScripts
-
-        readonly property alias objCacheSoundEffects: _private.objCacheSoundEffects
 
 
 
@@ -3703,6 +3715,24 @@ Rectangle {
 
         }
 
+
+        //资源（!!!鹰：过时：兼容旧代码）
+        readonly property alias objGoods: _private.goodsResource
+        readonly property alias objFightRoles: _private.fightRolesResource
+        readonly property alias objSkills: _private.skillsResource
+        readonly property alias objFightScripts: _private.fightScriptsResource
+        readonly property alias objSprites: _private.spritesResource
+
+        readonly property alias objCommonScripts: _private.objCommonScripts
+
+        readonly property alias objCacheSoundEffects: _private.objCacheSoundEffects
+
+
+
+        readonly property var date: ()=>{return new Date();}
+        readonly property var math: Math
+        readonly property var http: XMLHttpRequest
+
     }
 
     property Item mainRole
@@ -3720,9 +3750,6 @@ Rectangle {
 
 
     //property alias mainRole: mainRole
-
-    //地图块大小（用于缩放地图块）
-    property size sizeMapBlockSize
 
 
 
@@ -3828,7 +3855,7 @@ Rectangle {
         _private.asyncScript.clear(1);
         //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
 
-        loaderGameMsg.item.stop();
+        //loaderGameMsg.item.stop();
         messageRole.stop();
 
         game.delrole(-1);
@@ -3847,7 +3874,13 @@ Rectangle {
         gameMenuWindow.closeWindow(-1);
         //gameMenuWindow.visible = false;
         dialogTrade.visible = false;
-        loaderGameMsg.item.visible = false;
+
+        //loaderGameMsg.item.visible = false;
+        itemGameMsgs.nIndex = 0;
+        for(let tim in itemGameMsgs.children) {
+            itemGameMsgs.children[tim].destroy();
+        }
+
         itemRootRoleMsg.visible = false;
         itemRootGameInput.visible = false;
 
@@ -3896,22 +3929,7 @@ Rectangle {
         loaderFightScene.visible = false;
 
 
-        itemContainer.mapInfo = null;
-
-        for(let tc in itemBackMapContainer.arrCanvas) {
-            itemBackMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
-            _private.clearCanvas(itemBackMapContainer.arrCanvas[tc]);
-            itemBackMapContainer.arrCanvas[tc].requestPaint();
-        }
-        for(let tc in itemFrontMapContainer.arrCanvas) {
-            itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
-            _private.clearCanvas(itemFrontMapContainer.arrCanvas[tc]);
-            itemFrontMapContainer.arrCanvas[tc].requestPaint();
-        }
-
-        //canvasBackMap.unloadImage(imageMapBlock.source);
-        //canvasFrontMap.unloadImage(imageMapBlock.source);
-        imageMapBlock.source = "";
+        itemViewPort.release();
 
 
         if(bUnloadResources)
@@ -3923,92 +3941,29 @@ Rectangle {
     function openMap(mapName, forceRepaint=false) {
         let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
 
-        if(forceRepaint || game.gd["$sys_map"].$name !== mapName || !itemContainer.mapInfo) {
+        //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
+        if(forceRepaint || game.gd["$sys_map"].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
 
-            itemBackMapContainer.visible = false;
-            itemFrontMapContainer.visible = false;
+            if(!itemViewPort.openMap(mapPath)) {
+                game.gd["$sys_map"].$name = null;
+                game.gd["$sys_map"].$$columns = 0;
+                game.gd["$sys_map"].$$rows = 0;
+                game.gd["$sys_map"].$$info = {};
+                game.gd["$sys_map"].$$obstacles = [];
 
-            //let cfg = File.read(mapPath);
-            let mapInfo = FrameManager.sl_qml_ReadFile(Global.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
-            //console.debug("cfg", cfg, mapPath);
-
-            if(mapInfo === "")
+                console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
                 return false;
-            mapInfo = JSON.parse(mapInfo);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor_1.qml", {});
-
-
-            //地图数据
-            //itemContainer.mapInfo = JSON.parse(File.read(mapFilePath));
-            itemContainer.mapInfo = mapInfo;
-
-            let nMapBlockScale = parseFloat(itemContainer.mapInfo.MapScale) || 1;
-            sizeMapBlockSize.width = Math.round(itemContainer.mapInfo.MapBlockSize[0] * nMapBlockScale);
-            sizeMapBlockSize.height = Math.round(itemContainer.mapInfo.MapBlockSize[1] * nMapBlockScale);
-
-            itemContainer.width = itemContainer.mapInfo.MapSize[0] * sizeMapBlockSize.width;
-            itemContainer.height = itemContainer.mapInfo.MapSize[1] * sizeMapBlockSize.height;
-
-            //如果地图小于等于场景，则将地图居中
-            if(itemContainer.width < gameScene.width)
-                itemContainer.x = parseInt((itemViewPort.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
-            if(itemContainer.height < gameScene.height)
-                itemContainer.y = parseInt((itemViewPort.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
-
-            //console.debug("!!!", itemContainer.width, gameScene.scale, itemViewPort.width, itemContainer.x);
-            //console.debug("!!!", itemContainer.height, gameScene.scale, itemViewPort.height, itemContainer.y);
-
-
-            //卸载原地图块图片
-            for(let tc in itemBackMapContainer.arrCanvas) {
-                itemBackMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
-            }
-            for(let tc in itemFrontMapContainer.arrCanvas) {
-                itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
             }
 
-            imageMapBlock.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]));
-
-            //载入新地图块图片
-            for(let tc in itemBackMapContainer.arrCanvas) {
-                itemBackMapContainer.arrCanvas[tc].loadImage(imageMapBlock.source);
-                if(itemBackMapContainer.arrCanvas[tc].isImageLoaded(imageMapBlock.source)) {
-                    //console.debug("[GameScene]Canvas.loadImage载入OK，requestPaint");
-                    itemBackMapContainer.arrCanvas[tc].requestPaint();
-                }
-                //else
-                    //console.debug("[GameScene]Canvas.loadImage载入NO，等待回调。。。");
-            }
-            for(let tc in itemFrontMapContainer.arrCanvas) {
-                itemFrontMapContainer.arrCanvas[tc].loadImage(imageMapBlock.source);
-                if(itemFrontMapContainer.arrCanvas[tc].isImageLoaded(imageMapBlock.source)) {
-                    //console.debug("[GameScene]canvasBackMap.loadImage载入OK，requestPaint");
-                    itemFrontMapContainer.arrCanvas[tc].requestPaint();
-                }
-                //else
-                    //console.debug("[GameScene]Canvas.loadImage载入NO，等待回调。。。");
-            }
-
-
-            itemContainer.mapEventBlocks = {};
-            //转换事件的地图块的坐标为地图块的ID
-            for(let i in itemContainer.mapInfo.MapEventData) {
-                let p = i.split(',');
-                itemContainer.mapEventBlocks[parseInt(p[0]) + parseInt(p[1]) * itemContainer.mapInfo.MapSize[0]] = itemContainer.mapInfo.MapEventData[i];
-            }
-
-            //console.debug("itemContainer.mapEventBlocks", JSON.stringify(itemContainer.mapEventBlocks))
-
-            //game.$sys_map.$name = itemContainer.mapInfo.MapName;
-            game.gd["$sys_map"].$name = itemContainer.mapInfo.MapName;
-            game.gd["$sys_map"].$$columns = itemContainer.mapInfo.MapSize[0];
-            game.gd["$sys_map"].$$rows = itemContainer.mapInfo.MapSize[1];
-            game.gd["$sys_map"].$$info = itemContainer.mapInfo;
+            //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
+            game.gd["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
+            game.gd["$sys_map"].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+            game.gd["$sys_map"].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+            game.gd["$sys_map"].$$info = itemViewPort.itemContainer.mapInfo;
 
             game.gd["$sys_map"].$$obstacles = [];
-            for(let mb in itemContainer.mapInfo.MapBlockSpecialData) {
-                if(itemContainer.mapInfo.MapBlockSpecialData[mb] === -1)
+            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] === -1)
                     game.gd["$sys_map"].$$obstacles.push(mb.split(','));
             }
         }
@@ -4018,8 +3973,8 @@ Rectangle {
         //执行载入地图脚本
 
         //之前的
-        //if(itemContainer.mapInfo.SystemEventData !== undefined && itemContainer.mapInfo.SystemEventData["$1"] !== undefined) {
-        //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemContainer.mapInfo.SystemEventData["$1"]) === 0)
+        //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData["$1"] !== undefined) {
+        //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData["$1"]) === 0)
         //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
         //}
 
@@ -4031,7 +3986,7 @@ Rectangle {
         //let script = Qt.createQmlObject('import QtQuick 2.14;import "map.js" as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
         //script.destroy();
         let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
-        itemContainer.mapInfo.$$Script = ts;
+        itemViewPort.mapScript = ts;
         if(ts.$start)
             game.run([ts.$start(), 'map $start']);
         else if(ts.start)
@@ -4039,11 +3994,11 @@ Rectangle {
 
 
 
-        console.debug("[GameScene]openMap", itemContainer.width, itemContainer.height)
+        console.debug("[GameScene]openMap", itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
 
         //test();
 
-        return itemContainer.mapInfo;
+        return itemViewPort.itemContainer.mapInfo;
     }
 
     function updateAllRolesPos() {
@@ -4051,66 +4006,29 @@ Rectangle {
     }
 
 
-    //块坐标对应的真实坐标
-    //bx、by为块坐标；dx、dy为偏移坐标（为小数则偏移多少个块，为整数则偏移多少坐标）
-    function getMapBlockPos(bx, by, dx=0.5, dy=0.5) {
-
-        //边界检测
-
-        if(bx < 0)
-            bx = 0;
-        else if(bx >= itemContainer.mapInfo.MapSize[0])
-            bx = itemContainer.mapInfo.MapSize[0] - 1;
-
-        if(by < 0)
-            by = 0;
-        else if(by >= itemContainer.mapInfo.MapSize[1])
-            by = itemContainer.mapInfo.MapSize[1] - 1;
-
-
-        //在目标图块最中央的 地图的坐标
-        let targetX;
-        let targetY;
-        if(dx.toString().indexOf('.') < 0)
-            targetX = parseInt((bx) * sizeMapBlockSize.width);
-        else {
-            targetX = parseInt((bx + dx) * sizeMapBlockSize.width);
-            dx = 0;
-        }
-        if(dy.toString().indexOf('.') < 0)
-            targetY = parseInt((by) * sizeMapBlockSize.height);
-        else {
-            targetY = parseInt((by + dy) * sizeMapBlockSize.height);
-            dy = 0;
-        }
-        //let targetX = role.x + role.x1 + parseInt(role.width1 / 2);
-        //let targetY = role.y + role.y1 + parseInt(role.height1 / 2);
-
-        return [targetX + dx, targetY + dy];
-    }
 
     //设置角色坐标（块坐标）
     function setRolePos(role, bx, by) {
 
         let targetX;
         let targetY;
-        [targetX, targetY] = getMapBlockPos(bx, by);
+        [targetX, targetY] = itemViewPort.getMapBlockPos(bx, by);
 
         //设置角色坐标
 
         //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-        if(bx === itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > sizeMapBlockSize.width)
-            role.x = itemContainer.width - role.x2 - 1;
+        if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
+            role.x = itemViewPort.itemContainer.width - role.x2 - 1;
         else
             role.x = targetX - role.x1 - role.width1 / 2;
-        //role.x = bx * sizeMapBlockSize.width - role.x1;
+        //role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
 
         //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-        if(by === itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > sizeMapBlockSize.height)
-            role.y = itemContainer.height - role.y2 - 1;
+        if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
+            role.y = itemViewPort.itemContainer.height - role.y2 - 1;
         else
             role.y = targetY - role.y1 - role.height1 / 2;
-        //role.y = by * sizeMapBlockSize.height - role.y1;
+        //role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
 
         if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
     }
@@ -4127,7 +4045,7 @@ Rectangle {
         game.gd["$sys_main_roles"][index].$y = mainRole.y;
     }
 
-    //
+    //场景移动到某角色
     function setSceneToRole(role) {
         if(!role)
             return;
@@ -4135,12 +4053,12 @@ Rectangle {
         //计算角色移动时，地图移动的 左上角和右下角 的坐标
 
         //场景在地图左上角时的中央坐标
-        let mapLeftTopCenterX = parseInt(gameScene.nMaxMoveWidth / 2);
-        let mapLeftTopCenterY = parseInt(gameScene.nMaxMoveHeight / 2);
+        let mapLeftTopCenterX = parseInt(itemViewPort.gameScene.nMaxMoveWidth / 2);
+        let mapLeftTopCenterY = parseInt(itemViewPort.gameScene.nMaxMoveHeight / 2);
 
         //场景在地图右下角时的中央坐标
-        let mapRightBottomCenterX = itemContainer.width - mapLeftTopCenterX;
-        let mapRightBottomCenterY = itemContainer.height - mapLeftTopCenterY;
+        let mapRightBottomCenterX = itemViewPort.itemContainer.width - mapLeftTopCenterX;
+        let mapRightBottomCenterY = itemViewPort.itemContainer.height - mapLeftTopCenterY;
 
         //角色最中央坐标
         let roleCenterX = role.x + role.x1 + parseInt(role.width1 / 2);
@@ -4148,70 +4066,14 @@ Rectangle {
 
         //开始移动地图
 
-        setScenePos(roleCenterX, roleCenterY);
+        itemViewPort.setScenePos(roleCenterX, roleCenterY);
     }
 
-
-    //移动场景中心到地图的x、y
-    function setScenePos(x, y) {
-        //场景在地图左上角时的中央坐标
-        let mapLeftTopCenterX = parseInt(gameScene.nMaxMoveWidth / 2);
-        let mapLeftTopCenterY = parseInt(gameScene.nMaxMoveHeight / 2);
-
-        //场景在地图右下角时的中央坐标
-        let mapRightBottomCenterX = itemContainer.width - mapLeftTopCenterX;
-        let mapRightBottomCenterY = itemContainer.height - mapLeftTopCenterY;
-
-        //如果场景小于地图
-        if(gameScene.width < itemContainer.width) {
-            //如果人物中心 X 小于 地图左上坐标的 X
-            if(x <= mapLeftTopCenterX) {
-                itemContainer.x = 0;
-            }
-            //如果人物中心 X 大于 地图右下坐标的 X
-            else if(x >= mapRightBottomCenterX) {
-                itemContainer.x = gameScene.width - itemContainer.width;
-            }
-            //如果在区间，则随着主角移动
-            else {
-                itemContainer.x = mapLeftTopCenterX - x;
-            }
-        }
-        //如果地图小于等于场景，则将地图居中
-        else {
-            itemContainer.x = parseInt((itemViewPort.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
-
-            //itemContainer.x = 0;
-        }
-
-
-        //如果场景小于地图
-        if(gameScene.height < itemContainer.height) {
-            //如果人物中心 Y 小于 地图左上坐标的 Y
-            if(y <= mapLeftTopCenterY) {
-                itemContainer.y = 0;
-            }
-            //如果人物中心 Y 大于 地图右下坐标的 Y
-            else if(y >= mapRightBottomCenterY) {
-                itemContainer.y = gameScene.height - itemContainer.height;
-            }
-            //如果在区间，则随着主角移动
-            else {
-                itemContainer.y = mapLeftTopCenterY - y;
-            }
-        }
-        //如果地图小于等于场景，则将地图居中
-        else {
-            itemContainer.y = parseInt((itemViewPort.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
-
-            //itemContainer.y = 0;
-        }
-    }
 
 
     function test() {
 
-        /*itemContainer.mapInfo = {
+        /*itemViewPort.itemContainer.mapInfo = {
             //mapWidth: 800,
             //mapHeight: 600,
             //blockWidth: 50,
@@ -4247,13 +4109,13 @@ Rectangle {
         };*/
 
 
-        //itemContainer.mapInfo.events = [1, 40];
+        //itemViewPort.itemContainer.mapInfo.events = [1, 40];
 
         //mainRole.x1 = 0;
-        //mainRole.y1 = mainRole.height - sizeMapBlockSize.height;
+        //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockSize.height;
         //mainRole.width1 = 50;
         //mainRole.width1 = mainRole.width;
-        //mainRole.height1 = sizeMapBlockSize.height;
+        //mainRole.height1 = itemViewPort.sizeMapBlockSize.height;
         //mainRole.height1 = mainRole.height;
     }
 
@@ -4269,7 +4131,7 @@ Rectangle {
 
 
 
-    //Keys.forwardTo: [itemContainer]
+    //Keys.forwardTo: [itemViewPort.itemContainer]
 
     Keys.onEscapePressed: {
         _private.exitGame();
@@ -4401,10 +4263,12 @@ Rectangle {
     }
 
 
-
-    //游戏视窗，组件位置和大小固定
-    Item {
+    //地图视窗
+    GameMapView {
         id: itemViewPort
+
+        //地图脚本（map.js）
+        property var mapScript: null
 
         //anchors.fill: parent
         //anchors.centerIn: parent
@@ -4414,442 +4278,9 @@ Rectangle {
         clip: true
 
 
-        //游戏场景(可视区域）
-        Item {
-            id: gameScene
-
-
-            //场景的 人物的最大X、Y坐标（返回场景 / 地图 的较小值）；这个可以固定
-            //如果地图小于场景时，人物不会到达场景边缘
-            readonly property int nMaxMoveWidth: gameScene.width < itemContainer.width ? gameScene.width : itemContainer.width;
-            readonly property int nMaxMoveHeight: gameScene.height < itemContainer.height ? gameScene.height : itemContainer.height;
-
-            //地图场景的 最中央坐标（左上角的）；
-            //人物绘制在场景最中间（返回地图最中间 - 人物的一半）
-            readonly property int nRoleCenterInScenePosX: parseInt((gameScene.width - mainRole.width1) / 2);
-            readonly property int nRoleCenterInScenePosY: parseInt((gameScene.height - mainRole.height1) / 2);
-
-
-
-            //anchors.fill: parent
-            // 除以scale的效果是：这个组件的实际大小其实是不变的，但它的子组件都会缩放，否则它自身也会缩放
-            // 缩放后，这个组件的坐标系也会缩放
-            width: parent.width / scale
-            height: parent.height / scale
-            //z: 0
-
-            clip: true
-            //缩放中心
-            transformOrigin: Item.TopLeft
-            //transformOrigin: Item.Center
-
-
-            //color: "black"
-
-
-
-            //所有东西的容器（大小为地图大小）
-            Item {
-                id: itemContainer
-
-
-                property var mapInfo: null          //地图数据（map.json 和 map.js（$$Script） 的数据）
-                property var mapEventBlocks: ({})   //有事件的地图块ID（换算后的）
-
-                //property var image1: "1.jpg"
-                //property var image2: "2.png"
-
-
-                //width: 800
-                //height: 600
-
-                //scale: 2
-
-
-
-                //地图点击
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
-                    onClicked: {
-                        GameSceneJS.mapClickEvent(mouse.x, mouse.y);
-                    }
-                }
-
-
-
-                Image { //预先载入图片
-                    id: imageMapBlock
-                    //source: "file:./1.png"
-                    visible: false
-
-                    onStatusChanged: {
-                        /*if(status === Image.Ready) {
-                            for(let tc in itemBackMapContainer.arrCanvas) {
-                                itemBackMapContainer.arrCanvas[tc].requestPaint();
-                            }
-                            for(let tc in itemFrontMapContainer.arrCanvas) {
-                                itemFrontMapContainer.arrCanvas[tc].requestPaint();
-                            }
-
-                            console.debug("[GameScene]Image.Ready");
-                        }
-                        */
-                    }
-                    Component.onCompleted: {
-                        console.debug("[GameScene]Image Component.onCompleted");
-                    }
-                }
-
-
-                //背景地图容器
-                Item {
-                    id: itemBackMapContainer
-                    anchors.fill: parent
-                    property var arrCanvas: [canvasBackMap]
-
-                    Canvas {
-                        id: canvasBackMap
-
-                        anchors.fill: parent
-
-                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
-
-
-                        onPaint: {  //绘制地图
-
-                            //地图块没有准备好
-                            /*if(imageMapBlock.status !== Image.Ready) {
-                                console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
-                                return;
-                            }*/
-
-                            if(!available) {
-                                console.debug("[GameScene]canvasBackMap：地图块没有准备好：");
-                                return;
-                            }
-                            if(!isImageLoaded(imageMapBlock.source)) {
-                                console.debug("[GameScene]canvasBackMap：地图块图片没有载入：");
-                                //loadImage(imageMapBlock.source);
-                                return;
-                            }
-
-
-                            let ctx = getContext("2d");
-
-                            //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
-                            //ctx.fillRect(0, 0, width, height);
-                            ctx.clearRect(0, 0, width, height);
-
-                            //循环绘制地图块
-                            /* 之前的
-                            for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
-                            {
-                                //x1、y1为源，x2、y2为目标
-                                let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                                let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                                let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                                let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
-
-                                ctx.drawImage(imageMapBlock.source,
-                                              x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                              itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                              x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                              sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
-
-                                if(y2 > itemContainer.mapInfo.MapSize[1]) {
-                                    console.warn("WARNING!!!too many rows");
-                                    break;
-                                }
-                            }
-                            */
-
-                            //绘制每一层
-                            for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
-                                //console.debug("k:", k);
-
-                                //如果前景色需要半透明，则背景的每一层都必须绘制，如果没有半透明，则不需要绘制不属于地板层的
-                                if(_private.config.rMapOpacity >= 1)
-                                    //跳过不属于地板层的
-                                    if(k >= itemContainer.mapInfo.MapOfRole)
-                                        continue;
-
-                                for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
-                                //	console.debug("j:", j);
-                                    //循环绘制地图块
-                                    for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
-                                //		console.debug("i:", i);
-
-                                        ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                        //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                        if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
-                                            continue;
-
-                                        let _block = itemContainer.mapInfo.MapData[k][j][i];
-                                        //x1、y1为源，x2、y2为目标
-                                        let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                        let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                        let x2 = i * sizeMapBlockSize.width;
-                                        let y2 = j * sizeMapBlockSize.height;
-
-                                        //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                        //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
-
-                                        ctx.drawImage(imageMapBlock.source,
-                                                      x1, y1,
-                                                      itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                                      x2, y2,
-                                                      sizeMapBlockSize.width, sizeMapBlockSize.height
-                                        );
-                                    }
-                                }
-                            }
-
-                            itemBackMapContainer.visible = true;
-
-                            console.debug("[GameScene]canvasMapBack onPaint");
-                        }
-
-                        onImageLoaded: {    //载入图片完成
-                            requestPaint(); //重新绘图
-
-                            console.debug("[GameScene]canvasMapBack onImageLoaded");
-                        }
-
-
-                        Component.onCompleted: {
-                            //loadImage(image1);  //载入图片
-                            //loadImage(image2);
-                            console.debug("[GameScene]canvasMapBack Component.onCompleted");
-                        }
-                    }
-                }
-
-
-                //精灵容器
-                Item {
-                    id: itemRoleContainer
-                    anchors.fill: parent
-
-
-                    /*Role {
-                        id: mainRole
-
-                        property Message message: Message {
-                            parent: mainRole
-                            visible: false
-                            width: parent.width
-                            height: parent.height * 0.2
-                            anchors.bottom: parent.top
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            nMaxHeight: 32
-
-                            onS_over: {
-                                visible = false;
-                            }
-                        }
-
-                        property string $name: ""
-
-                        //在场景中的坐标
-                        readonly property int sceneX: x + itemContainer.x
-                        readonly property int sceneY: y + itemContainer.y
-
-                        //其他属性（用户自定义）
-                        property var props: ({})
-
-
-
-                        z: y + y1
-
-
-
-                        Component.onCompleted: {
-                            //console.debug("[GameScene]Role Component.onCompleted");
-                        }
-                    }
-                    */
-
-                }
-
-
-                //前景地图容器
-                Item {
-                    id: itemFrontMapContainer
-                    anchors.fill: parent
-                    property var arrCanvas: [canvasFrontMap]
-
-                    Canvas {
-                        id: canvasFrontMap
-
-                        anchors.fill: parent
-
-                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
-
-                        opacity: _private.config.rMapOpacity
-
-
-                        onPaint: {  //绘制地图
-
-                            //地图块没有准备好
-                            /*if(imageMapBlock.status !== Image.Ready) {
-                                console.debug("[GameScene]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
-                                return;
-                            }*/
-
-                            if(!available) {
-                                console.debug("[GameScene]canvasFrontMap：地图块没有准备好：");
-                                return;
-                            }
-                            if(!isImageLoaded(imageMapBlock.source)) {
-                                console.debug("[GameScene]canvasFrontMap：地图块图片没有载入：");
-                                //loadImage(imageMapBlock.source);
-                                return;
-                            }
-
-
-                            let ctx = getContext("2d");
-
-                            //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
-                            //ctx.fillRect(0, 0, width, height);
-                            ctx.clearRect(0, 0, width, height);
-
-                            //循环绘制地图块
-                            /* 之前的
-                            for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
-                            {
-                                //x1、y1为源，x2、y2为目标
-                                let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                                let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                                let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                                let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
-
-                                ctx.drawImage(imageMapBlock.source,
-                                              x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                              itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                              x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                              sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
-
-                                if(y2 > itemContainer.mapInfo.MapSize[1]) {
-                                    console.warn("WARNING!!!too many rows");
-                                    break;
-                                }
-                            }
-                            */
-
-                            //绘制每一层
-                            for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
-                                //console.debug("k:", k);
-
-                                //跳过地板层
-                                if(k < itemContainer.mapInfo.MapOfRole)
-                                    continue;
-
-                                for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
-                                //	console.debug("j:", j);
-                                    //循环绘制地图块
-                                    for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
-                                //		console.debug("i:", i);
-
-                                        ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                        //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
-
-                                        if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
-                                            continue;
-
-                                        let _block = itemContainer.mapInfo.MapData[k][j][i];
-                                        //x1、y1为源，x2、y2为目标
-                                        let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                        let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                        let x2 = i * sizeMapBlockSize.width;
-                                        let y2 = j * sizeMapBlockSize.height;
-
-                                        //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                        //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
-
-                                        ctx.drawImage(imageMapBlock.source,
-                                                      x1, y1,
-                                                      itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                                      x2, y2,
-                                                      sizeMapBlockSize.width, sizeMapBlockSize.height
-                                        );
-                                    }
-                                }
-                            }
-
-                            itemFrontMapContainer.visible = true;
-
-                            console.debug("[GameScene]canvasFrontMap onPaint");
-                        }
-
-                        onImageLoaded: {    //载入图片完成
-                            requestPaint(); //重新绘图
-
-                            console.debug("[GameScene]canvasFrontMap onImageLoaded");
-                        }
-
-
-                        Component.onCompleted: {
-                            //loadImage(image1);  //载入图片
-                            //loadImage(image2);
-                            console.debug("[GameScene]canvasFrontMap Component.onCompleted");
-                        }
-                    }
-                }
-            }
-        }
-
-
-        /*/游戏对话框
-        Dialog {
-            id: loaderGameMsg
-
-            property alias textGameMsg: textGameMsg.text
-
-            title: ""
-            width: 300
-            height: 200
-            standardButtons: Dialog.Ok | Dialog.Cancel
-            modal: true
-
-            anchors.centerIn: parent
-
-            Text {
-                id: textGameMsg
-                text: qsTr("")
-            }
-
-
-            MultiPointTouchArea {
-                anchors.fill: parent
-                enabled: loaderGameMsg.standardButtons === Dialog.NoButton
-                onPressed: {
-                    //rootGameScene.forceActiveFocus();
-                    loaderGameMsg.reject();
-                }
-            }
-
-
-            onAccepted: {
-                //gameMap.focus = true;
-                if(_private.config.bPauseGame)
-                    game.goon();
-            }
-            onRejected: {
-                //gameMap.focus = true;
-                if(_private.config.bPauseGame)
-                    game.goon();
-                //console.log("Cancel clicked");
-            }
-        }*/
+        mouseArea.onClicked:
+            GameSceneJS.mapClickEvent(mouse.x, mouse.y);
     }
-
 
 
     //游戏FPS
@@ -4863,7 +4294,7 @@ Rectangle {
         running: false
         onRunningChanged: {
             if(running === true)
-                nLastTime = game.date().getTime();
+                nLastTime = new Date().getTime();
         }
 
         onTriggered: {
@@ -5168,7 +4599,7 @@ Rectangle {
             messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
             messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            messageRole.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
             maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
             //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
 
@@ -5265,7 +4696,7 @@ Rectangle {
     }
 
 
-    Loader {
+    /*Loader {
         id: loaderGameMsg
 
         visible: true
@@ -5283,10 +4714,22 @@ Rectangle {
             function onRejected() {
             }
         }
-        */
+        * /
 
         onLoaded: {
         }
+    }
+    */
+    //临时存放创建的Menus
+    Item {
+        id: itemGameMsgs
+
+        //创建一个自增1
+        property int nIndex: 0
+
+        anchors.fill: parent
+        z: 6
+
     }
 
 
@@ -5785,15 +5228,12 @@ Rectangle {
         property var config: QtObject {
             property int nInterval: 16
 
-            property var objPauseNames: ({})     //暂停游戏
+            property var objPauseNames: ({})     //暂停游戏（只停止游戏timer主循环，不会停止事件队列）
 
             property real rJoystickSpeed: 0.2   //开启摇杆加速功能（最低速度比例）
 
             //键盘是否可以操作
             property bool bKeyboard: true
-
-            //前景地图遮挡人物透明度
-            property real rMapOpacity: 1
 
             //是否游戏提前载入所有资源
             property int nLoadAllResources: 0
@@ -5981,30 +5421,6 @@ Rectangle {
 
 
 
-        //计算 占用的图块
-        function fComputeUseBlocks(x1, y1, x2, y2) {
-
-            //let blocks = [];    //人物所占用地图块 列表
-
-            //人物所占 起始和终止 的地图块ID，然后按序统计出来地图块
-            ////+1、-1 是因为 小于等于图块 时，只占用1个图块
-            let xBlock1 = Math.floor((x1) / sizeMapBlockSize.width);
-            let xBlock2 = Math.floor((x2) / sizeMapBlockSize.width);
-            let yBlock1 = Math.floor((y1) / sizeMapBlockSize.height);
-            let yBlock2 = Math.floor((y2) / sizeMapBlockSize.height);
-
-            /*/计算 所占的 地图块
-            for(; yBlock1 <= yBlock2; ++yBlock1) {
-                for(let xb = xBlock1; xb <= xBlock2; xb ++) {
-                    blocks.push(xb + yBlock1 * itemContainer.mapInfo.MapSize[0])
-                }
-            }
-            return blocks;*/
-
-            return [xBlock1, yBlock1, xBlock2, yBlock2];
-        }
-
-
         //计算 role 在 moveDirection 方向 在 offsetMove 距离中碰到障碍的距离
         //  障碍算法：从direction方向依次循环每个地图块，如果遇到障碍就返回距离（肯定是最近）
         function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
@@ -6025,7 +5441,7 @@ Rectangle {
                 if(role.x + role.x1 - offsetMove < 0)
                     offsetMove = role.x + role.x1;
 
-                usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
+                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
 
                 //console.debug("usedMapBlocks:", usedMapBlocks);
 
@@ -6034,15 +5450,15 @@ Rectangle {
                     for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                         let strP = [xb, yb].toString();
 
-                        //console.debug("检测障碍：", strP, itemContainer.mapInfo.MapBlockSpecialData)
+                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
                         //存在特殊图块
-                        if(itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
                             //!!!这里需要修改
                             //障碍
                             case -1:
                                 //计算离障碍距离
-                                offsetMove = (role.x + role.x1) - (xb + 1) * sizeMapBlockSize.width;    //计算人物与障碍距离
+                                offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
                                 computeOver = true;
                                 break;
                             default:
@@ -6060,10 +5476,10 @@ Rectangle {
             case Qt.Key_Right:
 
                 //如果超过地图右，则返回到右边的距离
-                if(role.x + role.x2 + offsetMove >= itemContainer.width)
-                    offsetMove = itemContainer.width - (role.x + role.x2) - 1;
+                if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width)
+                    offsetMove = itemViewPort.itemContainer.width - (role.x + role.x2) - 1;
 
-                usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
+                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
 
                 //console.debug("usedMapBlocks:", usedMapBlocks);
                 //从上到下，从左到右
@@ -6071,13 +5487,13 @@ Rectangle {
                     for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                         let strP = [xb, yb].toString();
 
-                        //console.debug("检测障碍：", strP, itemContainer.mapInfo.MapBlockSpecialData)
+                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
                         //存在障碍
-                        if(itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
                                 //!!!这里需要修改
                             case -1:
-                                offsetMove = (xb) * sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
+                                offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
                                 computeOver = true;
                                 break;
                             default:
@@ -6098,7 +5514,7 @@ Rectangle {
                 if(role.y + role.y1 - offsetMove < 0)
                     offsetMove = role.y + role.y1;
 
-                usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
+                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
 
                 //console.debug("usedMapBlocks:", usedMapBlocks);
                 //从左到右，从下到上
@@ -6106,13 +5522,13 @@ Rectangle {
                     for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                         let strP = [xb, yb].toString();
 
-                        //console.debug("检测障碍：", strP, itemContainer.mapInfo.MapBlockSpecialData)
+                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
                         //存在障碍
-                        if(itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
                                 //!!!这里需要修改
                             case -1:
-                                offsetMove = (role.y + role.y1) - (yb + 1) * sizeMapBlockSize.height;    //计算人物与障碍距离
+                                offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
                                 computeOver = true;
                                 break;
                             default:
@@ -6130,10 +5546,10 @@ Rectangle {
             case Qt.Key_Down:   //同Right
 
                 //如果超过地图下，则返回到下边的距离
-                if(role.y + role.y2 + offsetMove >= itemContainer.height)
-                    offsetMove = itemContainer.height - (role.y + role.y2) - 1;
+                if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height)
+                    offsetMove = itemViewPort.itemContainer.height - (role.y + role.y2) - 1;
 
-                usedMapBlocks = _private.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
+                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
 
                 //console.debug("usedMapBlocks:", usedMapBlocks);
                 //从左到右，从上到下
@@ -6141,13 +5557,13 @@ Rectangle {
                     for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                         let strP = [xb, yb].toString();
 
-                        //console.debug("检测障碍：", strP, itemContainer.mapInfo.MapBlockSpecialData)
+                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
                         //存在障碍
-                        if(itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
                                 //!!!这里需要修改
                             case -1:
-                                offsetMove = (yb) * sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
+                                offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
                                 computeOver = true;
                                 break;
                             default:
@@ -6169,177 +5585,6 @@ Rectangle {
             return offsetMove;
         }
 
-        //计算 role 在 direction 方向 在 offsetMove 距离中碰到其他roles的距离
-        function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
-
-            if(offsetMove <= 0)
-                return 0;
-
-            switch(direction) {
-            case Qt.Key_Left:
-
-                //与其他角色碰撞
-                for(let r in objRoles) {
-                    //跳过自身
-                    if(role === objRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
-                            Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
-                    ))
-                        offsetMove = (role.x + role.x1) - (objRoles[r].x + objRoles[r].x2) - 1;
-                }
-                //与主角碰撞
-                for(let r in arrMainRoles) {
-                    //跳过自身
-                    if(role === arrMainRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
-                            Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
-                    ))
-                        offsetMove = (role.x + role.x1) - (arrMainRoles[r].x + arrMainRoles[r].x2) - 1;
-                }
-
-                return offsetMove;
-
-                break;
-
-            case Qt.Key_Right:
-
-                for(let r in objRoles) {
-                    //跳过自身
-                    if(role === objRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
-                            Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
-                    ))
-                        offsetMove = (objRoles[r].x + objRoles[r].x1) - (role.x + role.x2) - 1;
-                }
-                for(let r in arrMainRoles) {
-                    //跳过自身
-                    if(role === arrMainRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
-                            Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
-                    ))
-                        offsetMove = (arrMainRoles[r].x + arrMainRoles[r].x1) - (role.x + role.x2) - 1;
-                }
-
-                return offsetMove;
-
-                break;
-
-            case Qt.Key_Up: //同Left
-
-                for(let r in objRoles) {
-                    //跳过自身
-                    if(role === objRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
-                            Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
-                    ))
-                        offsetMove = (role.y + role.y1) - (objRoles[r].y + objRoles[r].y2) - 1;
-                }
-                for(let r in arrMainRoles) {
-                    //跳过自身
-                    if(role === arrMainRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
-                            Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
-                    ))
-                        offsetMove = (role.y + role.y1) - (arrMainRoles[r].y + arrMainRoles[r].y2) - 1;
-                }
-
-                return offsetMove;
-
-                break;
-
-            case Qt.Key_Down:   //同Right
-
-                for(let r in objRoles) {
-                    //跳过自身
-                    if(role === objRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(objRoles[r].width1 === 0 || objRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
-                            Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
-                    ))
-                        offsetMove = (objRoles[r].y + objRoles[r].y1) - (role.y + role.y2) - 1;
-                }
-                for(let r in arrMainRoles) {
-                    //跳过自身
-                    if(role === arrMainRoles[r])
-                        continue;
-                    //跳过没有大小的
-                    //if(arrMainRoles[r].width1 === 0 || arrMainRoles[r].height1 === 0)
-                    //    continue;
-
-                    if(
-                        (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
-                        GlobalLibraryJS.checkRectangleClashed(
-                            Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
-                            Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
-                    ))
-                        offsetMove = (arrMainRoles[r].y + arrMainRoles[r].y1) - (role.y + role.y2) - 1;
-                }
-
-                return offsetMove;
-
-                break;
-
-            default:
-                //console.warn("[GameScene]fComputeRoleMoveOffset:", direction);
-                return;
-            }
-
-        }
 
         //计算 role 在 derect方向 在 offsetMove 距离中最多能移动的距离
         //  Role向direction方向移动offsetMove，如果遇到障碍或其他role，则返回离最近障碍的距离
@@ -6356,97 +5601,16 @@ Rectangle {
             if(offsetMove <= 0)
                 return 0;
 
-            offsetMove = _private.fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
+            offsetMove = GameSceneJS.fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
 
             return offsetMove;
         }
 
 
 
-        //???
-        function fChangeMainRoleDirection() {
-            return;
-
-            console.debug("！！碰墙返回", mainRole.moveDirection);
-            if(mainRole.$props.$tmpDirection !== undefined) {
-                _private.startSprite(mainRole, mainRole.$props.$tmpDirection);
-                delete mainRole.$props.$tmpDirection;
-                return;
-            }
-
-            //人物的占位最中央 所在地图的坐标
-            let bx = Math.floor((mainRole.x + mainRole.x1 + mainRole.width1 / 2) / sizeMapBlockSize.width);
-            let by = Math.floor((mainRole.y + mainRole.y1 + mainRole.height1 / 2) / sizeMapBlockSize.height);
-
-            switch(mainRole.moveDirection) {
-            case Qt.Key_Left:
-                if(mainRole.x + mainRole.x1 === 0) {
-                    return;
-                }
-
-                break;
-
-            case Qt.Key_Right:
-                if(mainRole.x + mainRole.x2 === itemContainer.width - 1) {
-                    return;
-                }
-
-                break;
-
-            case Qt.Key_Up:
-                if(mainRole.y + mainRole.y1 === 0) {
-                    console.debug("！！碰边界返回2")
-                    return;
-                }
-
-                //左边距离和右边距离
-                let toffset1 = (mainRole.x + mainRole.x2) % sizeMapBlockSize.width + 1;
-                let toffset2 = sizeMapBlockSize.width - (mainRole.x + mainRole.x1) % sizeMapBlockSize.width;
-                if(toffset1 > sizeMapBlockSize.width / 3 && toffset2 > sizeMapBlockSize.width / 3 ) {
-                    //_private.startSprite(mainRole, Qt.Key_Up);
-                    console.debug("！！不能转方向返回")
-                    return;
-                }
-                if(toffset1 < toffset2) {
-                    if(toffset1 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Left, toffset1)) {
-                        console.debug("！！左有障碍返回")
-                        return;
-                    }
-
-                    console.debug("！！转方向Left", mainRole.moveDirection, Qt.Key_Left)
-                    mainRole.$props.$tmpDirection = mainRole.moveDirection;
-                    _private.startSprite(mainRole, Qt.Key_Left);
-                    if(offsetMove > toffset1)
-                        offsetMove = toffset1;
-                }
-                else {
-                    if(toffset2 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Right, toffset2)) {
-                        console.debug("！！右有障碍返回")
-                        return;
-                    }
-
-                    console.debug("！！转方向Right", mainRole.moveDirection, Qt.Key_Right)
-                    mainRole.$props.$tmpDirection = mainRole.moveDirection;
-                    _private.startSprite(mainRole, Qt.Key_Right);
-                    if(offsetMove > toffset2)
-                        offsetMove = toffset2;
-                }
-
-                break;
-
-            case Qt.Key_Down:
-                if(mainRole.y + mainRole.y2 === itemContainer.height - 1)
-                    return offsetMove;
-
-                break;
-
-            }
-
-            return offsetMove;
-        }
 
 
-
+        //退出游戏
         function exitGame() {
 
             dialogCommon.show({
@@ -6480,14 +5644,6 @@ Rectangle {
                     if(rootGameScene)rootGameScene.forceActiveFocus();
                 },
             });
-        }
-
-
-
-        //清空canvas
-        function clearCanvas(canvas) {
-            let ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
     }
@@ -6560,7 +5716,7 @@ Rectangle {
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
                 messageGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
                 messageGame.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-                messageGame.textArea.font.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+                messageGame.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
                 let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
 
@@ -6843,8 +5999,8 @@ Rectangle {
 
 
             //在场景中的坐标
-            readonly property int sceneX: x + itemContainer.x
-            readonly property int sceneY: y + itemContainer.y
+            readonly property int sceneX: x + itemViewPort.itemContainer.x
+            readonly property int sceneY: y + itemViewPort.itemContainer.y
 
 
             //行动类别；
@@ -6889,7 +6045,7 @@ Rectangle {
 
             //x、y是 图片 在 地图 中的坐标；
             //占位坐标：x + x1；y + y1
-            //在 场景 中的 占位坐标：x + x1 + itemContainer.x
+            //在 场景 中的 占位坐标：x + x1 + itemViewPort.itemContainer.x
             //x: 180
             //y: 100
             //width: 50
@@ -7099,7 +6255,7 @@ Rectangle {
 
 
     Component.onCompleted: {
-        mainRole = compRole.createObject(itemRoleContainer);
+        mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
         mainRole.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         mainRole.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
 

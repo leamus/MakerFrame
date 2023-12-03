@@ -4,6 +4,10 @@ import QtQuick 2.14
 import Qt.labs.settings 1.1
 
 
+import "GameMakerGlobal.js" as GameMakerGlobalJS
+
+
+
 QtObject {
 
     //可存储配置
@@ -19,8 +23,11 @@ QtObject {
 
     property string separator: Platform.separator(true)
 
+    property url urlRPGCorePath: Qt.resolvedUrl(".")
+
+
     //引擎版本
-    property string version: "1.6.20.231130"
+    property string version: "1.6.21.231203"
 
 
     //配置
@@ -251,4 +258,29 @@ QtObject {
         return ret;
     }
 
+    Component.onCompleted: {
+        //提交访问信息
+        let xhr = new XMLHttpRequest;
+        xhr.open("POST", FrameManager.configValue('InfoJsonURL'), true);  //建立间接，要求异步响应
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
+        xhr.onreadystatechange = function () {  //绑定响应状态事件监听函数
+            if (xhr.readyState == 4) {  //监听readyState状态
+                if (xhr.status == 200) {  //监听HTTP状态码
+                    //console.log('~~~XMLHttpRequest:', xhr.responseText);  //接收数据
+                    //infoCallback(JSON.parse(xhr.responseText));
+                }
+                else
+                    console.warn('Request ERROR:', xhr.status, xhr.responseXML, xhr.statusText, FrameManager.configValue('InfoJsonURL'))
+            }
+            //else
+            //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
+        }
+        xhr.send("client=%1_%2(%3)&product=RPGGame_%4&timestamp=%5".arg(Qt.platform.os).arg(Platform.sysInfo.buildCpuArchitecture).arg(Platform.compileType()).arg(settings.category).arg(Number(new Date())));  //发送请求
+        //xhr.send();
+
+        console.debug("[GameMakerGlobal]Component.onCompleted:", GameMakerGlobalJS);
+    }
+    Component.onDestruction: {
+        console.debug("[GameMakerGlobal]Component.onDestruction");
+    }
 }

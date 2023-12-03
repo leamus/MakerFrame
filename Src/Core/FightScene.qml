@@ -73,49 +73,45 @@ Rectangle {
         }
 
         //同 game.msg
-        readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}, callback=true) {
-            //game.msg(msg, interval, pretext, keeptime, style);
+        readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}, buttonNum=0, callback=true) {
+            /*/是否暂停游戏
+            if(pauseGame === true)
+                pauseGame = '$fight_msg';
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
 
-            //样式
-            if(style === undefined || style === null)
-                style = {};
-            else if(GlobalLibraryJS.isValidNumber(style))
-                style = {Type: style};
-
-
-            dialogFightMsg.item.callback = function(code, itemMsg) {
-                itemMsg.visible = false;
-                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                //loaderGameMsg.focus = true;
             }
-
+            else {
+                //loaderGameMsg.bPauseGame = false;
+            }
+            */
 
             //回调函数
             if(callback === true) {
                 callback = function(code, itemMsg) {
                     itemMsg.visible = false;
-                    fight.run(true);
-                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+
+                    //if(_private.config.objPauseNames['$fight_msg'] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run()
+                        //game.goon('$fight_msg');
+                        run(true);
+                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    //}
+
+                    itemMsg.destroy();
                 }
             }
-            dialogFightMsg.item.callback = callback;
 
 
-            dialogFightMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
-
-
-            return true;
+            return game.msg(msg, interval, pretext, keeptime, style, false, 0, callback);
         }
 
-        //显示一个菜单；
-        //title为显示文字；
-        //items为选项数组；
-        //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
-        //pauseGame是否暂停游戏；
-        //返回值为选择的下标（0开始）；
-        //注意：该脚本必须用yield才能暂停并接受返回值。
+        //同 game.menu
         readonly property var menu: function(title, items, style={}, callback=true) {
 
-            let itemMenu = loaderFightMenu.item;
+            /*let itemMenu = loaderFightMenu.item;
             let maskMenu = loaderFightMenu.item.maskMenu;
             let menuGame = loaderFightMenu.item.menuGame;
 
@@ -154,19 +150,31 @@ Rectangle {
             }
             loaderFightMenu.item.callback = callback;
 
-
             menuGame.show(items);
+            */
+
+
+            if(callback === true) {   //默认回调函数
+                callback = function(index, itemMenu) {
+                    itemMenu.visible = false;
+                    run(true, {Value: index});
+                    //_private.asyncScript.run(index);
+
+                    itemMenu.destroy();
+                }
+            }
+
+
+            return game.menu(title, items, style, false, callback);
         }
 
+        //技能选择菜单
         readonly property var choicemenu: function(title, items, style={}) {
-            menu(title, items, style, function(index, itemMenu) {
-                itemMenu.visible = false;
-
-                FightSceneJS.skillChoice(2, index);
-            });
+            menu(title, items, style, );
         }
 
 
+        //换背景图
         readonly property var background: function(image='') {
             //console.debug('!!!!image:::', image, GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image)))
             imageBackground.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image));
@@ -175,113 +183,15 @@ Rectangle {
 
         //参数同 game.run
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
-            if(vScript === undefined) {
-                console.warn('[!FightScene]运行脚本未定义!!!');
-                return false;
-            }
-
-
-            //参数
-            let priority, runType = 0, running = 1, value;
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
-                priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
-                runType = GlobalLibraryJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : 0;
-                running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : 1;
-                value = Object.keys(scriptProps).indexOf('Value') < 0 ? _private.asyncScript.lastEscapeValue : scriptProps.Value;
+                scriptProps.AsyncScript = _private.asyncScript;
             }
             else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
-                priority = scriptProps;
-                runType = 0;
-                running = 1;
-                value = _private.asyncScript.lastEscapeValue;
+                scriptProps = {AsyncScript: _private.asyncScript, Priority: scriptProps};
             }
-            else {
-                console.warn('[!FightScene]运行脚本属性错误!!!');
-                return false;
-            }
-
-
-            //直接运行
-            if(vScript === null) {
-                _private.asyncScript.run(value);
-                return 1;
-            }
-
-            //下次js循环运行
-            else if(vScript === true) {
-                /*GlobalLibraryJS.runNextEventLoop(function() {
-                    //game.goon('$event');
-                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }, 'fight.run1');
-                */
-                _private.asyncScript.lastEscapeValue = value;
-                _private.asyncScript.runNextEventLoop('fight.run1');
-
-                return 0;
-            }
-
-            else if(vScript === false) {
-                return false;
-            }
-
-
-            if(runType === 0) { //vScript是代码
-
-            }
-            else {  //vScript是文件名
-                let tScript;
-                if(GlobalLibraryJS.isArray(vScript)) {
-                    tScript = vScript[0];
-                }
-                else {
-                    tScript = vScript;
-                }
-
-                tScript = tScript.trim();
-                if(!scriptProps.Path)
-                    scriptProps.Path = game.$projectpath;
-
-                if(GlobalLibraryJS.isArray(vScript))
-                    vScript[0] = scriptProps.Path + GameMakerGlobal.separator + tScript;
-                else
-                    vScript = scriptProps.Path + GameMakerGlobal.separator + tScript;
-            }
-
-            //可以立刻执行
-            if(GlobalJS.createScript(_private.asyncScript, runType, priority, vScript, ...params) === 0) {
-                //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(null)，导致执行两次
-                //game.pause('$event');
-
-                if(running === 1) {
-                    //GlobalLibraryJS.setTimeout(function() {
-                    /*GlobalLibraryJS.runNextEventLoop(function() {
-                        //game.goon('$event');
-                            _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                        }, 'fight.run');
-                    */
-                    _private.asyncScript.lastEscapeValue = value;
-                    _private.asyncScript.runNextEventLoop('fight.run');
-                }
-                else if(running === 2)
-                    _private.asyncScript.run(value);
-
-                return 0;
-            }
+            return game.run(vScript, scriptProps, ...params);
         }
 
-        //!!!鹰：NO
-        //将脚本放入 系统脚本引擎（asyncScript）中 等候执行；一般用在编辑器中载入外部脚本文件
-        //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
-        readonly property var script: function(fileName, priority, filePath) {
-            fileName = fileName.trim();
-            if(!filePath)
-                filePath = game.$projectpath + GameMakerGlobal.separator + fileName;
-            else
-                filePath = filePath + GameMakerGlobal.separator + fileName;
-
-            if(GlobalJS.createScript(_private.asyncScript, 1, priority, filePath) === 0)
-                return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-        }
 
 
         property var d: ({})
@@ -789,7 +699,7 @@ Rectangle {
 
             color: "#800080"
             //antialiasing: false
-            radius: height / 3
+            radius: 6
             clip: true
 
             property Rectangle bar1: Rectangle {
@@ -797,14 +707,14 @@ Rectangle {
                 height: parent.height
                 color: "red"
                 //antialiasing: false
-                radius: height / 3
+                radius: 6
             }
             property Rectangle bar2: Rectangle {
                 parent: trootBar
                 height: parent.height
                 color: "yellow"
                 //antialiasing: false
-                radius: height / 3
+                radius: 6
             }
 
             function refresh(data) {

@@ -163,22 +163,22 @@ let data = (function() {
         },
 
 
-        //检查技能（有4个阶段会调用：选择技能时、技能选择完毕后、攻击时、敌人和我方遍历时）；
+        //检查技能（有4个阶段会调用：见stage）；
         //返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
-        //stage为0表示选择技能时，为1表示选择技能完毕，为10表示战斗中（在阶段10减去MP的作用：道具的技能可以跳过减MP）；
+        //stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（在阶段11减去MP的作用：道具的技能可以跳过减MP）；
         $check: function(skill, combatant, stage) {
             //使用的技能对象（可以用技能的数据）
             //let skill = combatant.$$fightData.$choice.$attack;
             //目标战斗人物
             //let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
-            //使用的技能或道具
+            //使用类型：技能或道具
             let choiceType = combatant.$$fightData.$choice.$type;
 
             //if(combatant.$properties.MP[0] < 50)
             //    return '技能点不足';
 
-            //阶段10时减去MP
-            //if(stage === 10 && choiceType !== 2)
+            //阶段11时减去MP，道具跳过
+            //if(stage === 11 && choiceType !== 2)
             //    game.addprops(combatant, {'MP': [-50]});
 
             return true;
