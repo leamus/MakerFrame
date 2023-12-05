@@ -1067,11 +1067,11 @@ function getSkillObject(skill, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(skill)) {
         let resSkill;
-        //如果已是 技能对象，直接返回
+        //如果已是 技能对象
         if(skill.$rid && (resSkill = GameSceneJS.getSkillResource(skill.$rid))) {
-            if(forceNew === false) {
-                skill.__proto__ = resSkill;
+            if(forceNew === false && skill.__proto__ === resSkill) {    //直接返回
                 retSkill = skill;
+                //skill.__proto__ = resSkill;
                 //return skill;
             }
             else {
@@ -1138,9 +1138,9 @@ function getGoodsObject(goods, forceNew=true) {
         let resGoods;
         //如果已是 道具对象
         if(goods.$rid && (resGoods = GameSceneJS.getGoodsResource(goods.$rid))) {
-            if(forceNew === false) {
-                goods.__proto__ = resGoods;
+            if(forceNew === false && goods.__proto__ === resGoods) {    //直接返回
                 retGoods = goods;
+                //goods.__proto__ = resGoods;
                 //return goods;
             }
             else {
@@ -1213,6 +1213,7 @@ function getGoodsObject(goods, forceNew=true) {
 
 //创建FightRole对象
 //forceNew：当FightRole为战斗人物对象时，forceNew为true或对象（会复制它的属性）则表示再新建一个相同的战斗人物对象返回；FightRole为其他类型，则会复制forceNew的属性；
+//!!!注意：战斗人物的比较特殊，因为有 $Combatant 作为构造函数，会构造 $$开头的属性（比如$$fightData），所以判断 fightrole已经是战斗人物时 有可能不是构建好的战斗人物，所以最好参数是true，或者false时自己判断是否已经创建好
 function getFightRoleObject(fightrole, forceNew=true) {
     let retFightRole = null;
     if(GlobalLibraryJS.isString(fightrole)) {
@@ -1233,11 +1234,11 @@ function getFightRoleObject(fightrole, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(fightrole)) {
         let resFightRole;
-        //如果已是 战斗人物对象，直接返回
+        //如果已是 战斗人物对象!!注意这里有可能判断错误
         if(fightrole.$rid && (resFightRole = GameSceneJS.getFightRoleResource(fightrole.$rid))) {
-            if(forceNew === false) {
-                fightrole.__proto__ = resFightRole;
+            if(forceNew === false && fightrole.__proto__ === resFightRole) {    //直接返回
                 retFightRole = fightrole;
+                //fightrole.__proto__ = resFightRole;
                 //return fightrole;
             }
             else {
@@ -1340,11 +1341,11 @@ function getFightScriptObject(fightscript, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(fightscript)) {
         let resFightScript;
-        //如果已是 战斗脚本对象，直接返回
+        //如果已是 战斗脚本对象
         if(fightscript.$rid && (resFightScript = GameSceneJS.getFightScriptResource(fightscript.$rid))) {
-            if(forceNew === false) {
-                fightscript.__proto__ = resFightScript;
+            if(forceNew === false && fightscript.__proto__ === resFightScript) {    //直接返回
                 retFightScript = fightscript;
+                //fightscript.__proto__ = resFightScript;
                 //return fightscript;
             }
             else {

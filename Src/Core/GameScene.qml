@@ -3133,13 +3133,15 @@ Rectangle {
         //  $value：战斗人物信息时为下标；
         //  $visible：为false表示关闭窗口；
         //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
-        readonly property var window: function(params=null, style={}, pauseGame=true) {
+        readonly property var window: function(params=null, style={}, pauseGame=true, callback=true) {
             if(GlobalLibraryJS.isValidNumber(params))
                 params = {$id: params, $visible: true};
             else if(!params) {
                 params = {$id: 0b1111, $visible: true};
             }
 
+
+            //显示
             if(params.$visible !== false) {
 
                 //是否暂停游戏
@@ -3149,6 +3151,24 @@ Rectangle {
                     //loaderGameMsg.bPauseGame = true;
                     game.pause(pauseGame);
                 }
+
+
+                //回调函数
+                if(callback === true) {
+                    callback = function(itemWindow) {
+
+                        itemWindow.visible = false;
+
+                        if(_private.config.objPauseNames['$menu_window'] !== undefined) {
+                            //如果没有使用yield来中断代码，可以不要game.run()
+                            game.goon('$menu_window');
+                            game.run(true);
+                            //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                        }
+                    }
+                }
+                gameMenuWindow.fCallback = callback;
+
 
                 /*switch(params.$id) {
                 case 1:
@@ -3573,7 +3593,7 @@ Rectangle {
         property string $projectpath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
 
 
-        //用户脚本（用户 common_scripts.js，如果没有则指向 GameMakerGlobalJS）
+        //用户脚本（用户 common_script.js，如果没有则指向 GameMakerGlobalJS）
         property var $userscripts: null
 
 
@@ -4271,7 +4291,7 @@ Rectangle {
         property var mapScript: null
 
         //anchors.fill: parent
-        //anchors.centerIn: parent
+        anchors.centerIn: parent
         width: parent.width
         height: parent.height
 
@@ -4501,20 +4521,15 @@ Rectangle {
     GameMenuWindow {
         id: gameMenuWindow
 
+        property var fCallback: null
+
         visible: false
         anchors.fill: parent
         z: 3
 
         onS_close: {
-            gameMenuWindow.visible = false;
-
-            if(_private.config.objPauseNames['$menu_window'] !== undefined) {
-                //如果没有使用yield来中断代码，可以不要game.run()
-                game.goon('$menu_window');
-                game.run(true);
-                //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-            }
-
+            if(fCallback)
+                fCallback(gameMenuWindow);
         }
         onS_show: {
             let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');

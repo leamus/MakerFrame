@@ -283,7 +283,8 @@ Rectangle {
                 spriteEffectEnemies: repeaterEnemies,
             },
 
-            insertFightRole: function(index, fightrole, teamID) {   //上场
+            //上场
+            insertFightRole: function(index, fightrole, teamID) {
                 fightrole = game.$sys.getFightRoleObject(fightrole, false);
                 if(!fightrole)
                     return null;
@@ -424,6 +425,7 @@ Rectangle {
     }
 
 
+    //初始化
     function *init(fightScriptData) {
         console.debug("[FightScene]init", fightScriptData);
 
@@ -623,6 +625,7 @@ Rectangle {
         fight.$sys.continueFight(1);
     }
 
+    //释放
     function release() {
         //audioFightMusic.stop();
 
@@ -785,7 +788,7 @@ Rectangle {
         id: itemFightViewPort
 
         //anchors.fill: parent
-        //anchors.centerIn: parent
+        anchors.centerIn: parent
         width: parent.width
         height: parent.height
 
