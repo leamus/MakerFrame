@@ -260,17 +260,19 @@ QtObject {
 
     Component.onCompleted: {
         //提交访问信息
+        let url = 'http://MakerFrame.Leamus.cn/api/v1/clientUsage';
         let xhr = new XMLHttpRequest;
-        xhr.open("POST", 'http://MakerFrame.Leamus.cn/api/v1/clientUsage', true);  //建立间接，要求异步响应
+        xhr.open("POST", url, true);  //建立间接，要求异步响应
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
-        xhr.onreadystatechange = function () {  //绑定响应状态事件监听函数
+        xhr.onreadystatechange = function() {  //绑定响应状态事件监听函数
             if (xhr.readyState == 4) {  //监听readyState状态
                 if (xhr.status == 200) {  //监听HTTP状态码
-                    //console.log('~~~XMLHttpRequest:', xhr.responseText);  //接收数据
+                    //console.log('XMLHttpRequest:', xhr.responseText);  //接收数据
                     //infoCallback(JSON.parse(xhr.responseText));
                 }
                 else
-                    console.warn('Request ERROR:', xhr.status, xhr.responseXML, xhr.statusText, FrameManager.configValue('InfoJsonURL'))
+                    //0, '', '网页内容', object, null, '',
+                    console.warn('Request ERROR:', xhr.status, xhr.statusText/*, xhr.responseText*/, xhr, xhr.responseXML, xhr.responseType, url);
             }
             //else
             //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
