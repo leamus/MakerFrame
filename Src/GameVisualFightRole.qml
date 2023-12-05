@@ -4,10 +4,23 @@ import QtQuick.Layouts 1.14
 import QtGraphicalEffects 1.14
 
 
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
-import "qrc:/QML"
+
+//import RPGComponents 1.0
+
+
+import 'qrc:/QML'
+
+
+//import './Core'
+
+
+//import 'File.js' as File
 
 
 

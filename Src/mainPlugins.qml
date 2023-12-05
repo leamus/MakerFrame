@@ -5,15 +5,23 @@ import QtQuick.Dialogs 1.2 as Dialog1
 import QtQuick.Layouts 1.14
 
 
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+//import RPGComponents 1.0
 
 
+import 'qrc:/QML'
 
-//import "File.js" as File
+
+//import './Core'
+
+
+//import 'File.js' as File
 
 
 
@@ -157,10 +165,10 @@ Rectangle {
                         OnAccepted: function(){
 
                             let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            let zipPath = projectUrl + "Plugins/%1".arg(menuJS.plugins[item]['file']);
+                            let zipPath = projectUrl + "Plugins/%1".arg(menuJS.plugins[item]['File']);
 
                             //let nr = FrameManager.sl_qml_DownloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
-                            let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['file']), zipPath);
+                            let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
                             nr.finished.connect(function() {
                                 //FrameManager.sl_qml_Property("属性", nr);  //TimeStamp、Data、SaveType、Code
                                 console.debug("下载完毕", nr, FrameManager.sl_qml_Property("Data", nr), FrameManager.sl_qml_Property("Code", nr));

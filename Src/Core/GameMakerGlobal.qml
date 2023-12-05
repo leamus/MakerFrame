@@ -261,7 +261,7 @@ QtObject {
     Component.onCompleted: {
         //提交访问信息
         let xhr = new XMLHttpRequest;
-        xhr.open("POST", FrameManager.configValue('InfoJsonURL'), true);  //建立间接，要求异步响应
+        xhr.open("POST", 'http://MakerFrame.Leamus.cn/api/v1/clientUsage', true);  //建立间接，要求异步响应
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
         xhr.onreadystatechange = function () {  //绑定响应状态事件监听函数
             if (xhr.readyState == 4) {  //监听readyState状态
@@ -275,8 +275,12 @@ QtObject {
             //else
             //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
         }
-        xhr.send("client=%1_%2(%3)&product=RPGGame_%4&timestamp=%5".arg(Qt.platform.os).arg(Platform.sysInfo.buildCpuArchitecture).arg(Platform.compileType()).arg(settings.category).arg(Number(new Date())));  //发送请求
+        xhr.send(`client=${Qt.platform.os}_${Platform.sysInfo.buildCpuArchitecture}(${Platform.compileType()})&product=${settings.category}&timestamp=${Number(new Date())}`);  //发送请求
         //xhr.send();
+
+
+        FrameManager.addImportPath(urlRPGCorePath);
+
 
         console.debug("[GameMakerGlobal]Component.onCompleted:", GameMakerGlobalJS);
     }

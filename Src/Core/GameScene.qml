@@ -15,7 +15,8 @@ import cn.Leamus.MakerFrame 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-//import LGlobal 1.0
+
+import RPGComponents 1.0
 
 
 import "qrc:/QML"
@@ -681,10 +682,8 @@ Rectangle {
                     hero.$avatarSize[1]/* = heroComp.$avatarSize.height*/ = props.$avatarSize[1];
                 }
 
-                if(props.$action !== undefined)
-                    heroComp.nActionType = props.$action;
-
-                //下面都是自动行走
+                
+                //下面都是定向移动
                 if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
                     let tPos = itemViewPort.getMapBlockPos(props.$targetBx, props.$targetBy);
                     if(props.$targetBx === undefined)
@@ -700,7 +699,7 @@ Rectangle {
                         props.$targetY = -1;
                     heroComp.targetsPos = [Qt.point(props.$targetX, props.$targetY)];
                 }
-                if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
+                if(GlobalLibraryJS.isArray(props.$targetBlocks)) {
                     heroComp.targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
                         let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
@@ -719,6 +718,14 @@ Rectangle {
                     let rolePos = heroComp.pos();
                     heroComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
+
+                if(props.$action !== undefined)
+                    heroComp.nActionType = props.$action;
+
+                //如果没有定向目标，则停止
+                //if(heroComp.targetsPos.length === 0 && props.$action === 2)
+                //    props.$action = 0;
+
 
                 if(props.$x !== undefined)   //修改x坐标
                     hero.$x = heroComp.x = props.$x;
@@ -1020,9 +1027,8 @@ Rectangle {
                     role.$avatarSize = props.$avatarSize;
                 }
 
-                if(props.$action !== undefined)
-                    roleComp.nActionType = props.$action;
 
+                //下面都是定向移动
                 if(props.$targetBx !== undefined || props.$targetBy !== undefined) {
                     let tPos = itemViewPort.getMapBlockPos(props.$targetBx, props.$targetBy);
                     if(props.$targetBx === undefined)
@@ -1050,13 +1056,21 @@ Rectangle {
                         roleComp.targetsPos.push(Qt.point(tPos[0], tPos[1]));
                     }
                 }
-                if(GlobalLibraryJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
+                if(GlobalLibraryJS.isArray(props.$targetPositions)) {
                     roleComp.targetsPos = props.$targetPositions;
                 }
                 if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
                     let rolePos = roleComp.pos();
                     roleComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
+
+                if(props.$action !== undefined)
+                    roleComp.nActionType = props.$action;
+
+                //如果没有定向目标，则停止
+                //if(roleComp.targetsPos.length === 0 && props.$action === 2)
+                //    props.$action = 0;
+
 
                 if(props.$x !== undefined)   //修改x坐标
                     roleComp.x = props.$x;

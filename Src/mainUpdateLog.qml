@@ -5,15 +5,23 @@ import QtQuick.Dialogs 1.2 as Dialog1
 import QtQuick.Layouts 1.14
 
 
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+//import RPGComponents 1.0
 
 
+import 'qrc:/QML'
 
-//import "File.js" as File
+
+//import './Core'
+
+
+//import 'File.js' as File
 
 
 
@@ -130,6 +138,12 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+2023/12/5：发布 1.6.22.231205 版本（框架 1.3.23.231205 版本）
+1、修复getFightRoleObject的隐形Bug；
+2、调整引擎目录结构，将通用组件放在RPGComponents；
+3、修复点击障碍物会乱跑Bug；
+4、修复插件下载错误Bug；
+
 2023/12/3：发布 1.6.21.231203 版本
 1、优化代码：分离出地图组件（GameMapView），合并run，调整其他命令兼容run；
 2、修复一些字体颜色不起作用的问题；

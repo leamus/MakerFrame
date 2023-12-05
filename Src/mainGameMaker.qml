@@ -5,7 +5,6 @@ import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
-//引入Qt定义的类
 import cn.Leamus.MakerFrame 1.0
 
 
@@ -13,11 +12,16 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+//import RPGComponents 1.0
 
 
-import "Core"
-//import "File.js" as File
+import 'qrc:/QML'
+
+
+import './Core'
+
+
+//import 'File.js' as File
 
 
 

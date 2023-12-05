@@ -5,11 +5,20 @@ import QtQuick.Dialogs 1.2 as Dialog1
 import QtQuick.Layouts 1.14
 
 
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
+//import RPGComponents 1.0
+
+
 import 'qrc:/QML'
+
+
+//import './Core'
 
 
 //import 'File.js' as File

@@ -21,7 +21,7 @@ import _Global.Button 1.0
 import "qrc:/QML"
 
 
-import "GameMakerGlobal.js" as GameMakerGlobalJS
+//import "GameMakerGlobal.js" as GameMakerGlobalJS
 
 //import "GameScene.js" as GameSceneJS
 //import "File.js" as File

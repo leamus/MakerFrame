@@ -15,7 +15,8 @@ import cn.Leamus.MakerFrame 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-//import LGlobal 1.0
+
+import RPGComponents 1.0
 
 
 import "qrc:/QML"
