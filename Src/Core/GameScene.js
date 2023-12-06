@@ -1411,6 +1411,8 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
             spriteEffect = compCacheSpriteEffect.createObject(parent);
             spriteEffect.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
+        else if(spriteEffect.running === true)
+            spriteEffect.stop();
 
         spriteEffect.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
         spriteEffect.sizeFrame = Qt.size(parseInt(data.FrameSize[0]), parseInt(data.FrameSize[1]));

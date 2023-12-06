@@ -390,6 +390,7 @@ Rectangle {
 
     //第一次载入（其他资源都已经载入完毕）
     function load() {
+        //读取配置
         _private.config.fightRoleBarConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$combatant_bars'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$fight', '$combatant_bars'));
 
 
@@ -407,10 +408,35 @@ Rectangle {
         }
 
 
+        //预留10个我方和敌方人物组件
         for(let i = 0; i < 10; ++i)
             repeaterMyCombatants.model.append({modelData: i});
         for(let i = 0; i < 10; ++i)
             repeaterEnemies.model.append({modelData: i});
+
+
+        //初始化样式
+        //菜单样式
+        let style = {};
+        //样式
+        //if(!style)
+        //    style = {};
+        let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || {};
+        let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
+
+        //maskMenu.color = style.MaskColor || '#7FFFFFFF';
+        menuSkillsOrGoods.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+        menuSkillsOrGoods.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+        menuSkillsOrGoods.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+        menuSkillsOrGoods.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+        menuSkillsOrGoods.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+        menuSkillsOrGoods.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+        menuSkillsOrGoods.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+        menuSkillsOrGoods.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+        menuSkillsOrGoods.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+        menuSkillsOrGoods.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+        menuSkillsOrGoods.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+        menuSkillsOrGoods.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
     }
 
     //释放卸载
@@ -572,13 +598,16 @@ Rectangle {
                 repeaterMyCombatants.model.append({modelData: i});
             repeaterMyCombatants.itemAt(i).visible = true;
             repeaterMyCombatants.itemAt(i).opacity = 1;
+            repeaterMyCombatants.itemAt(i).spriteEffect.stop();
 
 
             FightSceneJS.resetFightRole(_private.myCombatants[i], repeaterMyCombatants.itemAt(i), i, 0);
 
         }
-        for(; i < repeaterMyCombatants.model.count; ++i)
+        for(; i < repeaterMyCombatants.model.count; ++i) {
             repeaterMyCombatants.itemAt(i).visible = false;
+            repeaterMyCombatants.itemAt(i).spriteEffect.stop();
+        }
 
 
 
@@ -590,14 +619,17 @@ Rectangle {
                 repeaterEnemies.model.append({modelData: i});
             repeaterEnemies.itemAt(i).visible = true;
             repeaterEnemies.itemAt(i).opacity = 1;
+            repeaterEnemies.itemAt(i).spriteEffect.stop();
 
 
             FightSceneJS.resetFightRole(_private.enemies[i], repeaterEnemies.itemAt(i), i, 1);
 
         }
         //隐藏剩下的
-        for(; i < repeaterEnemies.model.count; ++i)
+        for(; i < repeaterEnemies.model.count; ++i) {
             repeaterEnemies.itemAt(i).visible = false;
+            repeaterEnemies.itemAt(i).spriteEffect.stop();
+        }
 
 
 
@@ -989,8 +1021,8 @@ Rectangle {
                                     //菜单样式
                                     let style = {};
                                     //样式
-                                    if(!style)
-                                        style = {};
+                                    //if(!style)
+                                    //    style = {};
                                     let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || {};
                                     let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
 
@@ -1631,7 +1663,7 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        Item {
             //width: parent.width * 0.5
             width: Screen.width > Screen.height ? parent.width * 0.6 : parent.width * 0.9
             //height: parent.height * 0.5
@@ -1639,9 +1671,9 @@ Rectangle {
             anchors.centerIn: parent
 
             clip: true
-            color: "#00000000"
-            border.color: "white"
-            radius: height / 20
+            //color: "#00000000"
+            //border.color: "white"
+            //radius: height / 20
 
 
             //技能或道具 选择菜单
