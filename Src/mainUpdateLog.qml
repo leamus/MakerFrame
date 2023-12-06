@@ -138,6 +138,10 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+2023/12/6：发布 1.6.23.231206 版本
+1、修复选择技能/道具框风格无效问题；
+2、修复自动攻击时第一次无动作bug；
+
 2023/12/5：发布 1.6.22.231205 版本（框架 1.3.23.231205 版本）
 1、修复getFightRoleObject的隐形Bug；
 2、调整引擎目录结构，将通用组件放在RPGComponents；
