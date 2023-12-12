@@ -908,14 +908,16 @@ Rectangle {
 
 
 
-                    //第一次根据配置 初始化 组件
+                    //第一次根据配置 创建 组件
                     function init() {
                         for(let bar of _private.config.fightRoleBarConfig) {
+                            //文本
                             if(bar.$type === 1) {
                                 let obj = compText.createObject(tMyCombatantColumnLayout);
                                 //obj.
                                 cacheComponents.push(obj);
                             }
+                            //状态条
                             else if(bar.$type === 2) {
                                 let obj = compBar.createObject(tMyCombatantColumnLayout);
                                 obj.color = bar.$colors[2] || 'transparent';
@@ -1149,11 +1151,13 @@ Rectangle {
                     //第一次根据配置 初始化 组件
                     function init() {
                         for(let bar of _private.config.fightRoleBarConfig) {
+                            //文本
                             if(bar.$type === 1) {
                                 let obj = compText.createObject(tEnemyColumnLayout);
                                 //obj.
                                 cacheComponents.push(obj);
                             }
+                            //状态条
                             else if(bar.$type === 2) {
                                 let obj = compBar.createObject(tEnemyColumnLayout);
                                 obj.color = bar.$colors[2] || 'transparent';

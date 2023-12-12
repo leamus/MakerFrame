@@ -57,7 +57,7 @@ import "GameScene.js" as GameSceneJS
     //game.gd["$sys_hidden_fight_heros"]：我方所有隐藏了的战斗人员列表
     game.gd["$sys_money"]: 金钱
     game.gd["$sys_goods"]: 道具道具 列表（存的是{$rid: goodsRId, $count: count}）
-    game.gd["$sys_map"]: 当前地图信息
+    game.gd["$sys_map"]、game.d["$sys_map"]: 当前地图信息
     game.gd["$sys_fps"]: 当前FPS
     game.gd["$sys_main_roles"]: 当前主角列表，保存了主角属性（{$rid、$id、$name、$index、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y 等}）
     game.gd["$sys_music"]: 当前播放的音乐名
@@ -118,7 +118,14 @@ Rectangle {
 
         //载入地图并执行地图载入事件；成功返回true。
         readonly property var loadmap: function(mapName, forceRepaint=false) {
+            //载入beforeLoadmap脚本
+            let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
+            if(beforeLoadmap)
+                game.run([beforeLoadmap(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 0});
+
+
             timer.running = false;
+
 
             game.d = {};
             game.f = {};
@@ -140,9 +147,17 @@ Rectangle {
 
             let mapInfo = openMap(mapName, forceRepaint);
 
+
             //载入地图会卡顿，重新开始计时会顺滑一点
             timer.running = true;
             timer.nLastTime = 0;
+
+
+            //载入after_loadmap脚本
+            let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
+            if(afterLoadmap)
+                game.run([afterLoadmap(mapName), 'afterLoadmap'], {Priority: -1, Type: 0, Running: 1});
+
 
             return true;
         }
@@ -3344,6 +3359,7 @@ Rectangle {
             //读取主角
             for(let th of game.gd["$sys_main_roles"]) {
                 let mainRole = game.createhero(th.$rid);
+                mainRole.nActionType = 0;
                 //game.hero(mainRole, th);
             }
 
@@ -3973,6 +3989,8 @@ Rectangle {
 
     //打开地图
     function openMap(mapName, forceRepaint=false) {
+        game.d["$sys_map"] = {};
+
         let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
 
         //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
@@ -3980,6 +3998,14 @@ Rectangle {
 
             if(!itemViewPort.openMap(mapPath)) {
                 game.gd["$sys_map"].$name = null;
+
+                game.d["$sys_map"].$name = null;
+                game.d["$sys_map"].$columns = 0;
+                game.d["$sys_map"].$rows = 0;
+                game.d["$sys_map"].$info = {};
+                game.d["$sys_map"].$obstacles = [];
+
+                //!!!兼容旧代码
                 game.gd["$sys_map"].$$columns = 0;
                 game.gd["$sys_map"].$$rows = 0;
                 game.gd["$sys_map"].$$info = {};
@@ -3991,15 +4017,23 @@ Rectangle {
 
             //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
             game.gd["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
+
+            game.d["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
+            game.d["$sys_map"].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+            game.d["$sys_map"].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+            game.d["$sys_map"].$info = itemViewPort.itemContainer.mapInfo;
+
+            game.d["$sys_map"].$obstacles = [];
+            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] === -1) {
+                    game.d["$sys_map"].$obstacles.push(mb.split(','));
+                }
+            }
+            //!!!兼容旧代码
             game.gd["$sys_map"].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
             game.gd["$sys_map"].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
             game.gd["$sys_map"].$$info = itemViewPort.itemContainer.mapInfo;
-
-            game.gd["$sys_map"].$$obstacles = [];
-            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] === -1)
-                    game.gd["$sys_map"].$$obstacles.push(mb.split(','));
-            }
+            game.gd["$sys_map"].$$obstacles = game.d["$sys_map"].$obstacles;
         }
 
 

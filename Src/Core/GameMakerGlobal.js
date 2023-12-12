@@ -285,6 +285,23 @@ function *$afterLoad() {
 }
 
 
+//打开地图前调用
+function *$beforeLoadmap(mapName) {
+    if(game.$globalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
+        for(let ts of game.gd['$sys_before_loadmap'])
+            game.run([ts(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 0});
+    }
+}
+
+//读档后调用
+function *$afterLoadmap(mapName) {
+    if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
+        for(let ts of game.gd['$sys_after_loadmap'])
+            game.run([ts(mapName), 'afterLoadmap'], {Priority: -1, Type: 0, Running: 0});
+    }
+}
+
+
 
 /*/创建战斗角色
 function $createCombatant(fightRoleRId, showName) {
@@ -767,9 +784,9 @@ function $commonRunAwayAlgorithm(team, index) {
 }
 
 
-//一个大回合内，返回每次回合的战斗人物数组
+//一个战斗回合内，返回每次回合的战斗人物数组
 //返回数字表示延迟多久ms再继续
-//返回null表示大回合结束
+//返回null表示战斗回合结束
 function *$fightRolesRound(round) {
     //所有的战斗人物
     let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
@@ -790,7 +807,7 @@ function *$fightRolesRound(round) {
             yield [c];
     }
 
-    //大回合结束
+    //战斗回合结束
     return null;
 }
 
@@ -853,7 +870,7 @@ function $skillEffectAlgorithm(combatant, targetCombatant, Params) {
 
 
 
-//战斗人物选择技能或道具算法
+//战斗人物选择技能或道具算法（战斗人物回合开始时调用，对我方使用的技能进行检测，对敌方使用的技能进行算法使用）；
 //返回倒序使用的技能数组；
 //返回true表示不做 技能或道具的 使用和检查处理（比如乱）；
 function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
@@ -2241,8 +2258,8 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 function computePath(blockPos, targetBlockPos) {
 
     var aPlus = game.$globalLibraryJS.APlus.create({
-        screenSize: [game.gd["$sys_map"].$$columns, game.gd["$sys_map"].$$rows],
-        obstacles: game.gd["$sys_map"].$$obstacles,
+        screenSize: [game.d["$sys_map"].$columns, game.d["$sys_map"].$rows],
+        obstacles: game.d["$sys_map"].$obstacles,
         // true使用穷举法。默认为false贪心算法不一定是最优解。
         // isExhaustive: true,
         // starSearch: true,

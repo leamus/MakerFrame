@@ -1,13 +1,42 @@
 ﻿
 /*
 技能选择系统：
-  1、目前选择的每个步骤只有两种选择类型：战斗人物和菜单（Type分别为1和2）；
-  2、如果要新增类型，则：
-    a、Type为3及以上
-    b、在选择后调用 skillChoice(n, 值);，表示进行下一个选择步骤
-    c、skillSetUsing 函数里加上Type判断，且进行选择步骤的初始化，返回false表示等待，返回true表示不等待；
-    d、skillChoiceCanUsing 函数里加上Type判断，且将进行选择步骤的所有可能性返回（供自动调用使用，比如敌方）；返回false表示没有选择对象；返回true表示此次选择步骤不需要选择；
-      如果是我方，则会将 已经选择过的步骤值 压栈作为 第一次选择 来判断（如果不符合则会依次判断栈内容）
+  原理：
+  步骤：
+    1、进入战斗，先init（做初始化，创建战斗人物、调用start脚本、创建genFighting，进入gfFighting循环）；
+    2、gfFighting中：
+      a、运行 runCombatantRoundScript 战斗人物回合脚本（处理buff等）；
+      b、检查战斗是否结束；
+      c、调用 round 回合脚本；
+      d、我方开始战斗选择和步骤；
+      e、调用 round 回合脚本；
+      f、运行战斗人物回合 fnRound；
+    3、我方开始战斗选择和步骤：
+      a、如果 _private.genFightChoice 为null，则弹出 选择菜单；
+      b、点击 选择菜单后，根据通用脚本的$fightMenus，分别调用 fight.$sys.showSkillsOrGoods（0、1、2分别是普通攻击、技能、物品）、休息；
+      c、选择 技能或道具后，调用 FightSceneJS.choicedSkillOrGoods，进行判断是否可用，并赋值_private.genFightChoice，进入skillChoice；
+      d、skillChoice：技能步骤选择完后进行的处理（_private.genFightChoice），选择完毕后再次判断是否可用，并检测是否可以战斗；
+      e、点人物：如果 _private.genFightChoice 已经有值 且 人物可点，则调用FightSceneJS.skillChoice；
+    4、我方选择完毕后，进行战斗回合：yield *fnRound();
+      a、调用 通用脚本的fight_roles_round脚本，对每一次返回的战斗人物进行一次战斗人物回合；
+      b、调用一次 runCombatantRoundScript；
+      c、调用 FightSceneJS.combatantUseSkillOrGoods(combatant)；
+      d、调用一次 runCombatantRoundScript；
+      e、进行 技能的动画播放、道具收尾 和数据处理；
+      f、检测是否结束战斗；
+    5、combatantUseSkillOrGoods：
+      a、调用 通用脚本 fight_role_choice_skills_or_goods_algorithm 的算法，返回我方（将已选的放在最优先）或敌方能使用技能的数组，返回1不做处理（比如乱）；
+      b、将返回的技能数组遍历，检查是否可用，并将技能步骤检查一次（比如有可能已选的对方已下场，则重新自动选择），每个步骤都会返回所有可选可能性数组，已选的最优先；
+      c、复现完毕后再检查一次是否可用；返回0表示技能和步骤可用；返回-1表示不可用；
+
+  新增技能步骤：
+    1、目前选择的每个步骤只有两种选择类型：战斗人物和菜单（Type分别为1和2）；
+    2、如果要新增类型，则：
+      a、Type为3及以上
+      b、在选择后调用 skillChoice(n, 值);，表示进行下一个选择步骤
+      c、skillSetUsing 函数里加上Type判断，且进行选择步骤的初始化，返回false表示等待，返回true表示不等待；
+      d、skillChoiceCanUsing 函数里加上Type判断，且将进行选择步骤的所有可能性返回（供自动调用使用，比如敌方）；返回false表示没有选择对象；返回true表示此次选择步骤不需要选择；
+        如果是我方，则会将 已经选择过的步骤值 压栈作为 第一次选择 来判断（如果不符合则会依次判断栈内容）
 */
 
 
@@ -93,8 +122,10 @@ function combatantUseSkillOrGoods(combatant) {
     useNextSkill:
     while(1) {
         choiceSkillOrGoods = useSkillsOrGoods.pop();    //从最后开始
-        if(!choiceSkillOrGoods) //没有技能了
+        if(!choiceSkillOrGoods) {   //没有技能了
+            combatant.$$fightData.$choice.$type = -1;
             return -1;
+        }
 
 
         combatant.$$fightData.$choice.$attack = choiceSkillOrGoods;
@@ -1404,9 +1435,10 @@ function resetRolesPosition() {
 
 
 //战斗人物回合脚本
-function *runCombatantRoundScript(combatant, step) {
+//stage：0为回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
+function *runCombatantRoundScript(combatant, stage) {
     //执行 战斗人物回合 脚本
-    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, step);
+    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, stage);
 
     if(combatantRoundScript === null) {
         return null;
@@ -1453,6 +1485,7 @@ function *fnRound() {
 
     //!!!开始循环每一角色的攻击
     let genFightRolesRound = game.$sys.resources.commonScripts["fight_roles_round"](_private.nRound);
+    //返回战斗人物数组，或 暂停时间（数字）
     for(let tValue of genFightRolesRound) {
     ////for(let combatant of _private.arrTempLoopedAllFightRoles) {
     ////for(let tc in _private.arrTempLoopedAllFightRoles) {
@@ -1478,17 +1511,19 @@ function *fnRound() {
         }))*/
 
 
+        let ret;
         do {
-
             //战斗人物回合脚本
-            let ret = yield *runCombatantRoundScript(combatant, 1);
+            yield *runCombatantRoundScript(combatant, 1);
 
+            ret = FightSceneJS.combatantUseSkillOrGoods(combatant);
 
-            if(FightSceneJS.combatantUseSkillOrGoods(combatant) < 0)
+            yield *runCombatantRoundScript(combatant, 2);
+
+            if(ret < 0)
                 break;
 
 
-            ret = yield *runCombatantRoundScript(combatant, 2);
 
 
 
@@ -1678,7 +1713,7 @@ function *fnRound() {
 
 
 
-        let ret = yield *runCombatantRoundScript(combatant, 3);
+        yield *runCombatantRoundScript(combatant, 3);
 
     }   //for
 
@@ -1686,8 +1721,8 @@ function *fnRound() {
 }
 
 
-//回合生成器，主程序逻辑
-//yield：<0同fnRound；10、11：等待选择或等待下一个事件循环
+//战斗主逻辑，战斗回合循环
+//yield：<0同fnRound；10、11：等待选择 或 等待下一个事件循环
 //return：战斗结果
 function *gfFighting() {
     console.debug("[FightScene]gfFighting");
@@ -1866,6 +1901,7 @@ function *gfFighting() {
     }
 }
 
+//逃跑处理
 function runAway() {
 
     //rowlayoutButtons.enabled = false;

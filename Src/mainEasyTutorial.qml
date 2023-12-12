@@ -472,8 +472,11 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
     支持用 let、var、const定义局部变量。
   game.math 或 Math：JS 的 Math对象。
 
-  game.gd["$sys_map"]：当前地图信息
-    .name：当前地图名
+  game.d["$sys_map"]：当前地图信息
+    .$name：当前地图名
+    .$columns：列数
+    .$rows：行数
+    .$info：地图信息
 
 
   game.$projectpath：项目根目录。

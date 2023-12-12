@@ -260,7 +260,7 @@ QtObject {
 
     Component.onCompleted: {
         //提交访问信息
-        let url = 'http://MakerFrame.Leamus.cn/api/v1/clientUsage';
+        let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
         let xhr = new XMLHttpRequest;
         xhr.open("POST", url, true);  //建立间接，要求异步响应
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
