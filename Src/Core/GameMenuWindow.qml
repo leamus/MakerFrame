@@ -205,13 +205,12 @@ Item {
         //rectEquipInfo.visible = false;
 
 
+        s_hide(newFlags, nShowWindowFlags);
+
+
         if(nShowWindowFlags === 0) {
-            visible = false;
             s_close();
         }
-
-
-        s_hide(newFlags, nShowWindowFlags);
     }
 
 

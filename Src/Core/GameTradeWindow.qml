@@ -16,18 +16,12 @@ import RPGComponents 1.0
 Item {
     id: root
 
-    property var fCallback
-
-    //商店所列 道具名
-    property var arrSaleGoods: []
-    //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
-    property var mygoodsinclude
 
     //初始化交易道具；
     //goods：可以买的；
     //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
     //callback：交易完成后的脚本
-    function init(goods=[], mygoodsinclude=true, callback=null) {
+    function init(goods=[], mygoodsinclude=true) {
         arrSaleGoods = [];
 
         for(let g of goods) {
@@ -39,22 +33,10 @@ Item {
         }
 
         root.mygoodsinclude = mygoodsinclude;
-        fCallback = callback;
         goodsDetail.text = '双击进行买卖';
 
         //root.visible = true;
         refresh();
-    }
-
-    function hide() {
-        root.visible = false;
-
-        game.run(root.fCallback);
-
-        if(game.pause(true)['$trade'] !== undefined) {
-            game.goon('$trade');
-            //_private.asyncScript.run();
-        }
     }
 
 
@@ -86,6 +68,15 @@ Item {
         }
         gamemenuMyGoods.show(arrShowMyGoods, arrMyGoods);
     }
+
+
+    signal s_close();
+
+
+    //商店所列 道具名
+    property var arrSaleGoods: []
+    //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
+    property var mygoodsinclude
 
 
     anchors.fill: parent
@@ -157,7 +148,7 @@ Item {
                     border.width: 1
 
                     onButtonClicked: {
-                        root.hide();
+                        s_close();
                     }
                 }
             }
@@ -198,8 +189,10 @@ Item {
                     sliderCount.from = 1;
                     sliderCount.to = arrData[index].$count > 0 ? arrData[index].$count : 99;
 
+
                     itemCountBox.visible = true;
-                    return;
+                    sliderCount.forceActiveFocus();
+
 
                     ////let goodsInfo = _private.goodsResource[arrData[index]];
 
@@ -252,7 +245,9 @@ Item {
                         sliderCount.from = 1;
                         sliderCount.to = arrData[index].$count;
 
+
                         itemCountBox.visible = true;
+                        sliderCount.forceActiveFocus();
                     }
                     else
                         game.run(function*(){yield game.msg('此物品不能卖');});
@@ -303,6 +298,7 @@ Item {
             }
         }
     }
+
 
     Rectangle {
         id: itemCountBox
@@ -489,6 +485,8 @@ Item {
 
                         }
 
+
+                        root.forceActiveFocus();
                     }
                 }
                 ColorButton {
@@ -505,6 +503,9 @@ Item {
 
                     onButtonClicked: {
                         itemCountBox.visible = false;
+
+
+                        root.forceActiveFocus();
                     }
                 }
             }

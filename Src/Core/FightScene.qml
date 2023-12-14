@@ -102,6 +102,9 @@ Rectangle {
                     //}
 
                     itemMsg.destroy();
+
+                    //不再执行默认的回调函数
+                    return true;
                 }
             }
 
@@ -162,6 +165,9 @@ Rectangle {
                     //_private.asyncScript.run(index);
 
                     itemMenu.destroy();
+
+                    //不再执行默认的回调函数
+                    return true;
                 }
             }
 

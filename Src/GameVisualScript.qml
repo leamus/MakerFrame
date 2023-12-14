@@ -76,7 +76,7 @@ Rectangle {
 
                     _private.loadAllVisualScripts(null);
 
-                    _private.listModelData = [{"command":"函数/生成器{","params":["*start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
+                    _private.listModelData = [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
                     _private.strCommandsName = '';
                 }
                 else {
@@ -95,7 +95,7 @@ Rectangle {
         else {
             _private.loadAllVisualScripts(null);
 
-            _private.listModelData = [{"command":"函数/生成器{","params":["*start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
+            _private.listModelData = [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}];
             _private.strCommandsName = '';
         }
 

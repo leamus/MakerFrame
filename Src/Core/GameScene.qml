@@ -65,6 +65,7 @@ import "GameScene.js" as GameSceneJS
     game.gd["$sys_scale"]: 当前缩放大小
     game.gd["$sys_random_fight"]：随机战斗
 
+    _private.objCommonScripts["game_start"] = *$start;
     _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
     _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
     _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
@@ -177,32 +178,8 @@ Rectangle {
         //pauseGame为是否暂停游戏（建议用yield关键字且返回true），如果为false，尽量不要用yield关键字；
         //buttonNum为按钮数量（0-2，目前没用）。
         readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, buttonNum=0, callback=true) {
-            //默认回调函数
-            if(callback === true) {
-                callback = function(code, itemMsg) {
-                    itemMsg.visible = false;
 
-                    if(_private.config.objPauseNames['$msg'] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run()
-                        game.goon('$msg');
-                        game.run(true);
-                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }
-
-
-                    itemMsg.destroy();
-                }
-            }
-
-
-            let itemGameMsg = compGameMsg.createObject(itemGameMsgs, {nIndex: itemGameMsgs.nIndex, callback: callback});
-
-
-            //样式
-            if(style === undefined || style === null)
-                style = {};
-            else if(GlobalLibraryJS.isValidNumber(style))
-                style = {Type: style};
+            let itemGameMsg = compGameMsg.createObject(itemGameMsgs, {nIndex: itemGameMsgs.nIndex, pauseGame: pauseGame, fCallback: callback});
 
 
             //按钮数
@@ -217,23 +194,10 @@ Rectangle {
             */
 
 
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$msg';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-
-                //loaderGameMsg.focus = true;
-            }
-            else {
-                //loaderGameMsg.bPauseGame = false;
-            }
-
-
             ++itemGameMsgs.nIndex;
+
             itemGameMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
-            //loaderGameMsg.item.callback = callback;
+            //loaderGameMsg.item.fCallback = callback;
             //loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
@@ -249,67 +213,12 @@ Rectangle {
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
         //pauseGame为是否暂停游戏（建议用yield关键字且返回true），如果为false，尽量不要用yield关键字；
         readonly property var talk: function(role, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true) {
-            //console.debug("say1")
 
-            if(GlobalLibraryJS.isString(role)) {
-                do {
-                    let roleName = role;
-                    role = game.hero(roleName);
-                    if(role !== null)
-                        break;
-                    role = game.role(roleName);
-                    //if(role !== null)
-                    //    break;
-                    //role = null;
-                }while(0);
-
-            }
-
-            //样式
-            if(!style)
-                style = {};
+            itemRootRoleMsg.pauseGame = pauseGame;
+            itemRootRoleMsg.fCallback = callback;
 
 
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$talk';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-
-                //loaderGameMsg.focus = true;
-            }
-            else {
-            }
-
-
-            let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
-            let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
-            if(role !== null) {
-                if(role.$data.$name && bShowName)
-                    pretext = role.$data.$name + "：" + pretext;
-                if(role.$data.$avatar && bShowAvatar)
-                    pretext = GlobalLibraryJS.showRichTextImage(GlobalJS.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
-            }
-
-
-            //回调函数
-            if(callback === true) {
-                callback = function(code, itemMsg) {
-                    itemMsg.visible = false;
-
-                    if(_private.config.objPauseNames['$talk'] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run()
-                        game.goon('$talk');
-                        game.run(true);
-                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }
-                }
-            }
-            itemRootRoleMsg.callback = callback;
-
-
-            itemRootRoleMsg.show(msg.toString(), pretext.toString(), interval, keeptime, style);
+            itemRootRoleMsg.show(role, msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
             return true;
@@ -366,72 +275,18 @@ Rectangle {
         //返回值为选择的下标（0开始）；
         //注意：该脚本必须用yield才能暂停并接受返回值。
         readonly property var menu: function(title, items, style={}, pauseGame=true, callback=true) {
-            //默认回调函数
-            if(callback === true) {
-                callback = function(index, itemMenu) {
-                    //gameMap.focus = true;
 
-                    itemMenu.visible = false;
-                    //menuGame.hide();
-
-                    if(_private.config.objPauseNames['$menu' + itemMenu.nIndex] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run()
-                        game.goon('$menu' + itemMenu.nIndex);
-                        game.run(true, {Value: index});
-                        //_private.asyncScript.run(index);
-                    }
-
-
-                    itemMenu.destroy();
-                    //FrameManager.goon();
-                    //console.debug("!!!asyncScript.run", index);
-                }
-            }
-
-            let itemMenu = compGameMenu.createObject(itemGameMenus, {nIndex: itemGameMenus.nIndex, callback: callback});
-            let maskMenu = itemMenu.maskMenu;
-            let menuGame = itemMenu.menuGame;
+            let itemMenu = compGameMenu.createObject(itemGameMenus, {nIndex: itemGameMenus.nIndex, pauseGame: pauseGame, fCallback: callback});
+            //let maskMenu = itemMenu.maskMenu;
+            //let menuGame = itemMenu.menuGame;
 
             /*itemMenu.s_Choice.connect(function(index) {
             });*/
 
-            //样式
-            if(!style)
-                style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
-
-            maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-            menuGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            menuGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            menuGame.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
-            menuGame.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-            menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
-            menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
-            menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
-            menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-            menuGame.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-            menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-            menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-            menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
-
-
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$menu';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame + itemGameMenus.nIndex);
-            }
-            else {
-            }
-
-
 
             ++itemGameMenus.nIndex;
-            itemMenu.visible = true;
-            menuGame.strTitle = title;
-            menuGame.show(items);
+
+            itemMenu.show(title, items, style);
 
         }
 
@@ -444,60 +299,11 @@ Rectangle {
         //注意：该脚本必须用yield才能暂停并接受返回值。
         readonly property var input: function(title='', pretext='', style={}, pauseGame=true, callback=true) {
 
-            //样式
-            if(style === undefined || style === null)
-                style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
+            itemRootGameInput.pauseGame = pauseGame;
+            itemRootGameInput.fCallback = callback;
 
 
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$input';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-            }
-            else {
-            }
-
-
-
-            rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            textGameInput.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-
-            rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-            rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
-            textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-            textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-
-            maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-
-
-            textGameInputTitle.text = title;
-            textGameInput.text = pretext;
-
-
-            //回调函数
-            if(callback === true) {
-                callback = function(itemInput) {
-                    itemInput.visible = false;
-
-                    if(_private.config.objPauseNames['$input'] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run()
-                        game.goon('$input');
-                        game.run(true, {Value: textGameInput.text});
-                        //_private.asyncScript.run(textGameInput.text);
-                    }
-                }
-            }
-            itemRootGameInput.callback = callback;
-
-
-            itemRootGameInput.visible = true;
-
+            itemRootGameInput.show(title, pretext, style);
         }
 
 
@@ -2091,22 +1897,11 @@ Rectangle {
         //callback为交易结束后的脚本。
         readonly property var trade: function(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$trade';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-
-                //loaderGameMsg.focus = true;
-            }
-            else {
-            }
+            dialogTrade.pauseGame = pauseGame;
+            dialogTrade.fCallback = callback;
 
 
-
-            dialogTrade.init(goods, mygoodsinclude, callback);
-            dialogTrade.visible = true;
+            dialogTrade.show(goods, mygoodsinclude);
         }
 
         //获得金钱；返回金钱数目；
@@ -2317,19 +2112,6 @@ Rectangle {
         //  也可以 $x、$y、$width、$height。
         readonly property var playvideo: function(video, properties={}, pauseGame=true) {
 
-            //是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$video';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-
-                //loaderGameMsg.focus = true;
-            }
-            else {
-            }
-
-
             let filePath = GameMakerGlobal.videoResourceURL(video);
             //if(!FrameManager.sl_qml_FileExists(Global.toPath(filePath))) {
             //    console.warn('[!GameScene]video no exist：', video, filePath)
@@ -2375,9 +2157,8 @@ Rectangle {
                     videoOutput[tp] = properties[tp];
             */
 
-            itemVideo.visible = true;
-
-            mediaPlayer.play();
+            itemVideo.pauseGame = pauseGame;
+            itemVideo.play();
 
             //itemViewPort.gameScene.color='#CCFFFFFF';
             //console.debug(itemViewPort.gameScene.color)
@@ -2385,18 +2166,7 @@ Rectangle {
         }
         //结束播放
         readonly property var stopvideo: function() {
-            itemVideo.visible = false;
-            mediaPlayer.stop();
-            mediaPlayer.source = '';
-
-
-            if(_private.config.objPauseNames['$video'] !== undefined) {
-                //如果没有使用yield来中断代码，可以不要game.run()
-                game.goon('$video');
-                game.run(true);
-                //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-            }
-
+            itemVideo.stop();
         }
 
         //显示图片；
@@ -3172,40 +2942,11 @@ Rectangle {
 
             //显示
             if(params.$visible !== false) {
-
-                //是否暂停游戏
-                if(pauseGame === true)
-                    pauseGame = '$menu_window';
-                if(GlobalLibraryJS.isString(pauseGame)) {
-                    //loaderGameMsg.bPauseGame = true;
-                    game.pause(pauseGame);
-                }
-
-
-                //回调函数
-                if(callback === true) {
-                    callback = function(itemWindow) {
-
-                        itemWindow.visible = false;
-
-                        if(_private.config.objPauseNames['$menu_window'] !== undefined) {
-                            //如果没有使用yield来中断代码，可以不要game.run()
-                            game.goon('$menu_window');
-                            game.run(true);
-                            //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                        }
-                    }
-                }
+                gameMenuWindow.pauseGame = pauseGame;
                 gameMenuWindow.fCallback = callback;
 
 
-                /*switch(params.$id) {
-                case 1:
-                    break;
-                case 2:
-                    break;
-                }*/
-                gameMenuWindow.showWindow(params.$id, params.$value, style);
+                gameMenuWindow.show(params.$id, params.$value, style);
             }
             else
                 gameMenuWindow.closeWindow(params.$id);
@@ -3727,11 +3468,6 @@ Rectangle {
         })
 
 
-
-        //地图大小和视窗大小
-        readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
-        readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
-
         //上次帧间隔时长
         property int $frameDuration: 0
 
@@ -3751,8 +3487,8 @@ Rectangle {
             readonly property alias cacheSoundEffects: _private.objCacheSoundEffects
 
 
-            //readonly property alias objTmpImages: _private.objTmpImages
-            //readonly property alias objTmpSprites: _private.objTmpSprites
+            readonly property alias tmpImages: _private.objTmpImages
+            readonly property alias tmpSprites: _private.objTmpSprites
 
             //readonly property alias objImages: _private.objImages
             //readonly property alias objMusic: _private.objMusic
@@ -3766,6 +3502,18 @@ Rectangle {
         }
 
 
+        //地图大小和视窗大小
+        readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
+        readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
+
+
+
+        readonly property var date: ()=>{return new Date();}
+        readonly property var math: Math
+        readonly property var http: XMLHttpRequest
+
+
+
         //资源（!!!鹰：过时：兼容旧代码）
         readonly property alias objGoods: _private.goodsResource
         readonly property alias objFightRoles: _private.fightRolesResource
@@ -3776,13 +3524,6 @@ Rectangle {
         readonly property alias objCommonScripts: _private.objCommonScripts
 
         readonly property alias objCacheSoundEffects: _private.objCacheSoundEffects
-
-
-
-        readonly property var date: ()=>{return new Date();}
-        readonly property var math: Math
-        readonly property var http: XMLHttpRequest
-
     }
 
     property Item mainRole
@@ -4307,7 +4048,9 @@ Rectangle {
                 return;
 
 
-            _private.stopAction(1, event.key);
+            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+                _private.stopAction(1, event.key);
+            }
 
             event.accepted = true;
 
@@ -4569,15 +4312,80 @@ Rectangle {
     GameMenuWindow {
         id: gameMenuWindow
 
+
+        function show() {
+
+            if(pauseGame === true)
+                pauseGame = '$menu_window';
+            //是否暂停游戏
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
+            }
+
+
+            /*switch(params.$id) {
+            case 1:
+                break;
+            case 2:
+                break;
+            }*/
+            gameMenuWindow.showWindow(params.$id, params.$value, style);
+        }
+
+
+        property var pauseGame
         property var fCallback: null
+
 
         visible: false
         anchors.fill: parent
         z: 3
 
+
         onS_close: {
-            if(fCallback)
-                fCallback(gameMenuWindow);
+
+            //默认回调函数
+            let callback = function(itemWindow) {
+
+                itemWindow.visible = false;
+
+                //game.pause(true)[pauseGame]
+                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    //如果没有使用yield来中断代码，可以不要game.run(true)
+                    game.goon(pauseGame);
+                    game.run(true);
+                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+            }
+            if(gameMenuWindow.fCallback === true) {    //默认回调函数
+                callback(gameMenuWindow);
+            }
+            else if(GlobalLibraryJS.isFunction(gameMenuWindow.fCallback)) {  //用户自定义回调函数
+                if(gameMenuWindow.fCallback(gameMenuWindow) !== true)   //如果返回 非true，则继续调用默认回调函数
+                    callback(gameMenuWindow);
+            }
+            else {   //不使用 回调函数
+                //gameMap.focus = true;
+
+                gameMenuWindow.visible = false;
+
+
+                /* /*if(gameMenuWindow.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    gameMenuWindow.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                    game.goon('$msg');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }*/
+
+
+
+                //gameMenuWindow.destroy();
+                ////FrameManager.goon();
+            }
         }
         onS_show: {
             let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
@@ -4596,10 +4404,87 @@ Rectangle {
     GameTradeWindow {
         id: dialogTrade
 
+
+        function show(goods, mygoodsinclude) {
+
+            if(pauseGame === true)
+                pauseGame = '$trade';
+
+            //是否暂停游戏
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
+
+                //loaderGameMsg.focus = true;
+            }
+            else {
+            }
+
+
+            init(goods, mygoodsinclude);
+            visible = true;
+        }
+
+
+        property var pauseGame
+        property var fCallback
+
+
         visible: false
         anchors.fill: parent
         z: 4
 
+
+        onS_close: {
+
+            //默认回调函数
+            let callback = function(itemTrade) {
+
+                itemTrade.visible = false;
+
+                //game.pause(true)[pauseGame]
+                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    //如果没有使用yield来中断代码，可以不要game.run(true)
+                    game.goon(pauseGame);
+                    game.run(true);
+                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+
+
+                //itemTrade.destroy();
+            };
+            if(dialogTrade.fCallback === true) {    //默认回调函数
+                callback(dialogTrade);
+            }
+            else if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {  //用户自定义回调函数
+                if(dialogTrade.fCallback(dialogTrade) !== true)   //如果返回 非true，则继续调用默认回调函数
+                    callback(dialogTrade);
+            }
+            else {   //不使用 回调函数
+                //gameMap.focus = true;
+
+                dialogTrade.visible = false;
+
+
+                /* /*if(dialogTrade.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    dialogTrade.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                    game.goon('$msg');
+                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }*/
+
+
+
+                //dialogTrade.destroy();
+                ////FrameManager.goon();
+            }
+
+
+            rootGameScene.forceActiveFocus();
+        }
     }
 
 
@@ -4614,8 +4499,10 @@ Rectangle {
         //显示状态：-1：停止；0：显示完毕；1：正在显示
         property int nShowStatus: -1
 
+        //是否暂停
+        property var pauseGame: true
         //回调函数
-        property var callback
+        property var fCallback
 
 
         //signal accepted();
@@ -4625,18 +4512,40 @@ Rectangle {
         function over(code) {
             itemRootRoleMsg.nShowStatus = -1;
 
-            if(GlobalLibraryJS.isFunction(itemRootRoleMsg.callback))
-                itemRootRoleMsg.callback(code, itemRootRoleMsg);
-            else {  // if(itemRootRoleMsg.callback === true) {   //默认回调函数
+
+            //默认回调函数
+            let callback = function(code, itemMsg) {
+
+                itemMsg.visible = false;
+
+                //game.pause(true)[pauseGame]
+                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    //如果没有使用yield来中断代码，可以不要game.run(true)
+                    game.goon(pauseGame);
+                    game.run(true);
+                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                }
+
+
+                //itemMsg.destroy();
+            };
+            if(itemRootRoleMsg.fCallback === true) {    //默认回调函数
+                callback(code, itemRootRoleMsg);
+            }
+            else if(GlobalLibraryJS.isFunction(itemRootRoleMsg.fCallback)) {    //用户自定义回调函数
+                if(itemRootRoleMsg.fCallback(code, itemRootRoleMsg) !== true)   //如果返回 非true，则继续调用默认回调函数
+                    callback(code, itemRootRoleMsg);
+            }
+            else {   //不使用 回调函数
                 //gameMap.focus = true;
 
                 itemRootRoleMsg.visible = false;
 
 
-                /*/*if(itemRootRoleMsg.bPauseGame && _private.config.bPauseGame) {
+                /* /*if(itemRootRoleMsg.bPauseGame && _private.config.bPauseGame) {
                     game.goon();
                     itemRootRoleMsg.bPauseGame = false;
-                }* /*/
+                }* / */
 
                 /*if(_private.config.objPauseNames['$talk'] !== undefined) {
                     game.goon('$talk');
@@ -4654,10 +4563,55 @@ Rectangle {
             messageRole.stop(type);
         }
 
-        function show(msg, pretext, interval, keeptime, style) {
+        function show(role, msg, pretext, interval, keeptime, style) {
 
+            if(GlobalLibraryJS.isString(role)) {
+                do {
+                    let roleName = role;
+                    role = game.hero(roleName);
+                    if(role !== null)
+                        break;
+                    role = game.role(roleName);
+                    //if(role !== null)
+                    //    break;
+                    //role = null;
+                }while(0);
+
+            }
+
+
+            if(pauseGame === true)
+                pauseGame = '$talk';
+            //是否暂停游戏
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
+
+                //loaderGameMsg.focus = true;
+            }
+            else {
+            }
+
+
+
+            //样式
+            if(!style)
+                style = {};
             let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
             let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
+
+
+            let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
+            let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
+            //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
+            //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
+            if(role !== null) {
+                if(role.$data.$name && bShowName)
+                    pretext = role.$data.$name + "：" + pretext;
+                if(role.$data.$avatar && bShowAvatar)
+                    pretext = GlobalLibraryJS.showRichTextImage(GlobalJS.toURL(game.$gameMakerGlobal.imageResourceURL(role.$data.$avatar)), role.$data.$avatarSize[0], role.$data.$avatarSize[1]) + pretext;
+            }
+
 
             messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -4813,8 +4767,50 @@ Rectangle {
         id: itemRootGameInput
 
 
+        function show(title, pretext, style) {
+
+            if(pauseGame === true)
+                pauseGame = '$input';
+            //是否暂停游戏
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
+            }
+            else {
+            }
+
+
+
+            //样式
+            if(style === undefined || style === null)
+                style = {};
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
+            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
+
+            rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+            rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+            textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            textGameInput.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+
+            rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+            rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
+            textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+            textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+
+            maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+
+
+            textGameInputTitle.text = title;
+            textGameInput.text = pretext;
+
+
+            visible = true;
+        }
+
+
+        property var pauseGame
         //回调函数
-        property var callback
+        property var fCallback
 
         visible: false
         anchors.fill: parent
@@ -4902,21 +4898,21 @@ Rectangle {
                     }
 
 
-                    TextArea {
+                    Notepad {
                         id: textGameInput
 
                         anchors.fill: parent
 
 
-                        color: 'white'
+                        //color: 'white'
 
                         //horizontalAlignment: Text.AlignHCenter
                         //verticalAlignment: Text.AlignVCenter
 
-                        placeholderTextColor: '#7F7F7F7F'
-
                         font.pointSize: 16
                         font.bold: true
+
+                        /*placeholderTextColor: '#7F7F7F7F'
 
                         selectByKeyboard: true
                         selectByMouse: true
@@ -4935,6 +4931,7 @@ Rectangle {
                             //border.color: textGameInput.focus ? Global.style.accent : Global.style.hintTextColor
                             //border.width: textGameInput.focus ? 2 : 1
                         }
+                        */
                     }
                 }
 
@@ -4944,15 +4941,35 @@ Rectangle {
 
                     text: '确定'
                     onClicked: {
-                        if(GlobalLibraryJS.isFunction(itemRootGameInput.callback))
-                            itemRootGameInput.callback(itemRootGameInput);
-                        else {  // if(itemRootGameInput.callback === true) {   //默认回调函数
+
+                        //默认回调函数
+                        let callback = function(itemInput) {
+
+                            itemInput.visible = false;
+
+                            //game.pause(true)[pauseGame]
+                            if(GlobalLibraryJS.isString(itemInput.pauseGame) && _private.config.objPauseNames[itemInput.pauseGame] !== undefined) {
+                                //如果没有使用yield来中断代码，可以不要game.run(true)
+                                game.goon(itemInput.pauseGame);
+                                game.run(true, {Value: textGameInput.text});
+                                //_private.asyncScript.run(textGameInput.text);
+                            }
+                        }
+                        //默认回调函数
+                        if(itemRootGameInput.fCallback === true) {
+                            callback(itemRootGameInput);
+                        }
+                        else if(GlobalLibraryJS.isFunction(itemRootGameInput.fCallback)) {  //用户自定义回调函数
+                            if(itemRootGameInput.fCallback(itemRootGameInput) !== true)
+                                callback(itemRootGameInput);
+                        }
+                        else {   //不使用 回调函数
                             //gameMap.focus = true;
 
                             itemRootGameInput.visible = false;
 
 
-                            /*/*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
+                            /* /*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
                                 game.goon();
                                 itemRootGameInput.bPauseGame = false;
                             }* /*/
@@ -4967,7 +4984,6 @@ Rectangle {
                             //itemRootGameInput.destroy();
                             ////FrameManager.goon();
                         }
-
                     }
                 }
             }
@@ -4978,9 +4994,52 @@ Rectangle {
     Item {
         id: itemVideo
 
+
+        function play() {
+            if(pauseGame === true)
+                pauseGame = '$video';
+
+            //是否暂停游戏
+            if(GlobalLibraryJS.isString(pauseGame)) {
+                //loaderGameMsg.bPauseGame = true;
+                game.pause(pauseGame);
+
+                //loaderGameMsg.focus = true;
+            }
+            else {
+            }
+
+
+            visible = true;
+
+            mediaPlayer.play();
+        }
+
+        function stop() {
+            visible = false;
+            mediaPlayer.stop();
+            mediaPlayer.source = '';
+
+
+            //game.pause(true)[pauseGame]
+            if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                //如果没有使用yield来中断代码，可以不要game.run(true)
+                game.goon(pauseGame);
+                game.run(true);
+                //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            }
+        }
+
+
+        property var pauseGame
+        //property var fCallback
+
+
         visible: false
         anchors.fill: parent
         z: 9
+
+
 
         MediaPlayer {
             id: mediaPlayer
@@ -5731,8 +5790,10 @@ Rectangle {
             //property alias textGameMsg: textGameMsg.text
             //property int standardButtons: Dialog.Ok | Dialog.Cancel
 
+            //是否暂停
+            property var pauseGame: true
             //回调函数
-            property var callback
+            property var fCallback
 
 
             //signal accepted();
@@ -5742,15 +5803,37 @@ Rectangle {
             function over(code) {
                 rootGameMsgDialog.nShowStatus = -1;
 
-                if(GlobalLibraryJS.isFunction(rootGameMsgDialog.callback))
-                    rootGameMsgDialog.callback(code, rootGameMsgDialog);
-                else {  // if(rootGameMsgDialog.callback === true) {   //默认回调函数
+
+                //默认回调函数
+                let callback = function(code, itemMsg) {
+
+                    itemMsg.visible = false;
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        game.run(true);
+                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    }
+
+
+                    itemMsg.destroy();
+                };
+                if(rootGameMsgDialog.fCallback === true) {    //默认回调函数
+                    callback(code, rootGameMsgDialog);
+                }
+                else if(GlobalLibraryJS.isFunction(rootGameMsgDialog.fCallback)) {  //用户自定义回调函数
+                    if(rootGameMsgDialog.fCallback(code, rootGameMsgDialog) !== true)   //如果返回 非true，则继续调用默认回调函数
+                        callback(code, rootGameMsgDialog);
+                }
+                else {   //不使用 回调函数
                     //gameMap.focus = true;
 
                     rootGameMsgDialog.visible = false;
 
 
-                    /*/*if(rootGameMsgDialog.bPauseGame && _private.config.bPauseGame) {
+                    /* /*if(rootGameMsgDialog.bPauseGame && _private.config.bPauseGame) {
                         game.goon();
                         rootGameMsgDialog.bPauseGame = false;
                     }* /*/
@@ -5772,6 +5855,26 @@ Rectangle {
             }
 
             function show(msg, pretext, interval, keeptime, style) {
+                if(pauseGame === true)
+                    pauseGame = '$msg_' + itemGameMsgs.nIndex;
+                //是否暂停游戏
+                if(GlobalLibraryJS.isString(pauseGame)) {
+                    //loaderGameMsg.bPauseGame = true;
+                    game.pause(pauseGame);
+
+                    //loaderGameMsg.focus = true;
+                }
+                else {
+                    //loaderGameMsg.bPauseGame = false;
+                }
+
+
+                //样式
+                if(style === undefined || style === null)
+                    style = {};
+                else if(GlobalLibraryJS.isValidNumber(style))
+                    style = {Type: style};
+
 
                 let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$msg') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$msg;
@@ -5891,19 +5994,62 @@ Rectangle {
             id: rootGameMenu
 
 
-            //第几个Menu
-            property int nIndex
-            property var callback   //点击后的回调函数，true为缺省
+            function show(title, items, style) {
+                if(pauseGame === true)
+                    pauseGame = '$menu_' + itemGameMenus.nIndex;
+                //是否暂停游戏
+                if(GlobalLibraryJS.isString(pauseGame)) {
+                    //loaderGameMsg.bPauseGame = true;
+                    game.pause(pauseGame);
+                }
+                else {
+                }
 
-            property alias maskMenu: maskMenu
-            property alias menuGame: menuGame
+
+                //样式
+                if(!style)
+                    style = {};
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
+
+                maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+                menuGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                menuGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                menuGame.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
+                menuGame.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
+                menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+                menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
+                menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
+                menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
+                menuGame.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+                menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+                menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
+
+
+                visible = true;
+                menuGame.strTitle = title;
+                menuGame.show(items);
+            }
 
 
             //signal s_Choice(int index)
 
 
+            //第几个Menu
+            property int nIndex
+
+            property var pauseGame: true
+            property var fCallback   //点击后的回调函数，true为缺省
+
+            property alias maskMenu: maskMenu
+            property alias menuGame: menuGame
+
+
             anchors.fill: parent
             visible: false
+
+
 
             Mask {
                 id: maskMenu
@@ -5944,9 +6090,35 @@ Rectangle {
 
                     onS_Choice: {
 
-                        if(GlobalLibraryJS.isFunction(rootGameMenu.callback))
-                            rootGameMenu.callback(index, rootGameMenu);
-                        else if(rootGameMenu.callback === true) {   //默认回调函数
+                        //默认回调函数
+                        let callback = function(index, itemMenu) {
+                            //gameMap.focus = true;
+
+                            itemMenu.visible = false;
+                            //menuGame.hide();
+
+                            //game.pause(true)[pauseGame]
+                            if(GlobalLibraryJS.isString(rootGameMenu.pauseGame) && _private.config.objPauseNames[rootGameMenu.pauseGame] !== undefined) {
+                                //如果没有使用yield来中断代码，可以不要game.run(true)
+                                game.goon(rootGameMenu.pauseGame);
+                                game.run(true, {Value: index});
+                                //_private.asyncScript.run(index);
+                            }
+
+
+                            itemMenu.destroy();
+                            //FrameManager.goon();
+                            //console.debug("!!!asyncScript.run", index);
+                        }
+                        //默认回调函数
+                        if(rootGameMenu.fCallback === true) {
+                            callback(index, rootGameMenu);
+                        }
+                        else if(GlobalLibraryJS.isFunction(rootGameMenu.fCallback)) {   //用户自定义回调函数
+                            if(rootGameMenu.fCallback(index, rootGameMenu) !== true)
+                                callback(index, rootGameMenu);
+                        }
+                        else {  //不使用 回调函数
                             //gameMap.focus = true;
 
                             rootGameMenu.visible = false;

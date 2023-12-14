@@ -27,7 +27,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: "1.6.23.231206"
+    property string version: "1.6.24.231213"
 
 
     //配置
