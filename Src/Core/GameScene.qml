@@ -3746,11 +3746,13 @@ Rectangle {
                 game.d["$sys_map"].$info = {};
                 game.d["$sys_map"].$obstacles = [];
 
+
                 //!!!兼容旧代码
                 game.gd["$sys_map"].$$columns = 0;
                 game.gd["$sys_map"].$$rows = 0;
                 game.gd["$sys_map"].$$info = {};
                 game.gd["$sys_map"].$$obstacles = [];
+
 
                 console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
                 return false;
@@ -3770,6 +3772,8 @@ Rectangle {
                     game.d["$sys_map"].$obstacles.push(mb.split(','));
                 }
             }
+
+
             //!!!兼容旧代码
             game.gd["$sys_map"].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
             game.gd["$sys_map"].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
@@ -4313,7 +4317,7 @@ Rectangle {
         id: gameMenuWindow
 
 
-        function show() {
+        function show(id, value, style) {
 
             if(pauseGame === true)
                 pauseGame = '$menu_window';
@@ -4330,7 +4334,7 @@ Rectangle {
             case 2:
                 break;
             }*/
-            gameMenuWindow.showWindow(params.$id, params.$value, style);
+            gameMenuWindow.showWindow(id, value, style);
         }
 
 

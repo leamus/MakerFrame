@@ -75,21 +75,8 @@ Rectangle {
 
         //同 game.msg
         readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}, buttonNum=0, callback=true) {
-            /*/是否暂停游戏
-            if(pauseGame === true)
-                pauseGame = '$fight_msg';
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
 
-                //loaderGameMsg.focus = true;
-            }
-            else {
-                //loaderGameMsg.bPauseGame = false;
-            }
-            */
-
-            //回调函数
+            //默认回调函数
             if(callback === true) {
                 callback = function(code, itemMsg) {
                     itemMsg.visible = false;
@@ -115,50 +102,8 @@ Rectangle {
         //同 game.menu
         readonly property var menu: function(title, items, style={}, callback=true) {
 
-            /*let itemMenu = loaderFightMenu.item;
-            let maskMenu = loaderFightMenu.item.maskMenu;
-            let menuGame = loaderFightMenu.item.menuGame;
-
-
-            //样式
-            if(!style)
-                style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
-
-            maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-            menuGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            menuGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            menuGame.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
-            menuGame.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-            menuGame.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
-            menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
-            menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
-            menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-            menuGame.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-            menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-            menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-            menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
-
-
-            menuGame.strTitle = title;
-            itemMenu.visible = true;
-
-
-            if(callback === true) {   //默认回调函数
-                callback = function(index, itemMenu) {
-                    itemMenu.visible = false;
-                    fight.run(true, {Value: index});
-                    //_private.asyncScript.run(index);
-                }
-            }
-            loaderFightMenu.item.callback = callback;
-
-            menuGame.show(items);
-            */
-
-
-            if(callback === true) {   //默认回调函数
+            //默认回调函数
+            if(callback === true) {
                 callback = function(index, itemMenu) {
                     itemMenu.visible = false;
                     run(true, {Value: index});
@@ -177,7 +122,7 @@ Rectangle {
 
         //技能选择菜单
         readonly property var choicemenu: function(title, items, style={}) {
-            menu(title, items, style, );
+            return menu(title, items, style, );
         }
 
 

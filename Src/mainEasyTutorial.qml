@@ -540,10 +540,12 @@ NPC事件的四种写法（前两种支持同步调用）：
     game.input
     game.trade
     game.window
+    注意，上面的指令如果用yield，pauseGame最好设置为true（暂停游戏），不用yield的话就将pauseGame设置为false（最好这样用，否则可能会出现意料之外的结果）。
+  战斗：
     fight.msg
     fight.menu
-  但是注意，一般用yield的指令，pauseGame最好设置为true（暂停游戏），不用yield的话就将pauseGame设置为false（最好这样用，否则可能会出现意料之外的结果）。
-  战斗时的技能脚本 也支持yield，它是yield一个固定的对象，用来完成不同的效果和功能。
+    注意，这两个指令没有pauseGame，直接使用yield；
+    技能脚本 也支持yield，它是yield一个固定的对象，用来完成不同的效果和功能。
 
 
 
