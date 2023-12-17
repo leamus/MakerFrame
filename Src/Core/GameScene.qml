@@ -366,28 +366,32 @@ Rectangle {
             _private.arrMainRoles[index] = mainRole;
             _private.arrMainRoles[index].visible = true;
 
+            let trole = {$index: index, $x: mainRole.x, $y: mainRole.y};
+
+            trole.$speed = parseFloat(cfg.MoveSpeed);
+            trole.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
+            trole.$avatar = cfg.Avatar || '';
+            trole.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
+            trole.$showName = isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName);
+            trole.$penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
+
+            GlobalLibraryJS.copyPropertiesToObject(trole, role, {objectRecursion: 0});
+
             if(game.gd["$sys_main_roles"][index] === undefined) {
                 //mainRole.$name = role.$name;
-
-                game.gd["$sys_main_roles"][index] = {$rid: role.RId, $id: role.$id, $name: role.$name, $index: index, $showName: true, $speed: 0, $scale: [1,1], $avatar: '', $avatarSize: [0, 0], $x: mainRole.x, $y: mainRole.y};
-
-                role = game.gd["$sys_main_roles"][index];
-
-                role.$avatar = cfg.Avatar || '';
-                role.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
-                role.$speed = parseFloat(cfg.MoveSpeed);
-                role.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
 
             }
             //有数据，说明从存档已读取
             else {
-                if(!game.gd["$sys_main_roles"][index].$scale)
+                /*if(!game.gd["$sys_main_roles"][index].$scale)
                     game.gd["$sys_main_roles"][index].$scale = [];
                 if(!game.gd["$sys_main_roles"][index].$avatarSize)
                     game.gd["$sys_main_roles"][index].$avatarSize = [];
+                */
 
-                role = game.gd["$sys_main_roles"][index];
+                GlobalLibraryJS.copyPropertiesToObject(trole, game.gd["$sys_main_roles"][index], {objectRecursion: 0});
             }
+            game.gd["$sys_main_roles"][index] = role = trole;
 
             //_private.arrMainRoles[index].$id = role.$id;
             //_private.arrMainRoles[index].$index = index;
@@ -409,24 +413,27 @@ Rectangle {
             mainRole.y1 = cfg.RealOffset[1];
             mainRole.width1 = cfg.RealSize[0];
             mainRole.height1 = cfg.RealSize[1];
-            //mainRole.moveSpeed = parseFloat(cfg.MoveSpeed);
             mainRole.rectShadow.opacity = isNaN(parseFloat(cfg.ShadowOpacity)) ? 0.3 : parseFloat(cfg.ShadowOpacity);
-            mainRole.penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
-
-            mainRole.$type = 1;
 
             mainRole.refresh();
 
 
+
+
+            mainRole.$$type = 1;
 
             mainRole.$data = role;
 
             //if(role.$direction === undefined)
             //    role.$direction = 2;
 
+
+
             game.hero(index, role);
 
+
             //console.debug("[GameScene]createhero：mainRole：", JSON.stringify(cfg));
+
 
             return mainRole;
         }
@@ -483,13 +490,15 @@ Rectangle {
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
                     hero.$name = heroComp.textName.text = props.$name;
-                if(props.$showName === true)   //修改名字
+                if(props.$showName === true)   //显示名字
                     hero.$showName = heroComp.textName.visible = true;
                 else if(props.$showName === false)
                     hero.$showName = heroComp.textName.visible = false;
+                if(props.$penetrate !== undefined)   //可穿透
+                    hero.$penetrate = /*heroComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
-                    hero.$speed = heroComp.moveSpeed = parseFloat(props.$speed);
-                if(props.$scale && props.$scale[0] !== undefined) {
+                    hero.$speed = /*heroComp.moveSpeed = */parseFloat(props.$speed);
+                if(props.$scale && props.$scale[0] !== undefined) { //缩放
                     hero.$scale[0] = heroComp.rXScale = props.$scale[0];
                 }
                 if(props.$scale && props.$scale[1] !== undefined) {
@@ -511,17 +520,17 @@ Rectangle {
                         tPos[0] = -1;
                     if(props.$targetBy === undefined)
                         tPos[1] = -1;
-                    heroComp.targetsPos = [Qt.point(tPos[0], tPos[1])];
+                    heroComp.$$targetsPos = [Qt.point(tPos[0], tPos[1])];
                 }
                 if(props.$targetX !== undefined || props.$targetY !== undefined) {
                     if(props.$targetX === undefined)
                         props.$targetX = -1;
                     if(props.$targetY === undefined)
                         props.$targetY = -1;
-                    heroComp.targetsPos = [Qt.point(props.$targetX, props.$targetY)];
+                    heroComp.$$targetsPos = [Qt.point(props.$targetX, props.$targetY)];
                 }
                 if(GlobalLibraryJS.isArray(props.$targetBlocks)) {
-                    heroComp.targetsPos = [];
+                    heroComp.$$targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
                         let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
                         /*if(props.$targetBx === undefined)
@@ -529,22 +538,22 @@ Rectangle {
                         if(props.$targetBy === undefined)
                             tPos[1] = -1;
                             */
-                        heroComp.targetsPos.push(Qt.point(tPos[0], tPos[1]));
+                        heroComp.$$targetsPos.push(Qt.point(tPos[0], tPos[1]));
                     }
                 }
                 if(GlobalLibraryJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
-                    heroComp.targetsPos = props.$targetPositions;
+                    heroComp.$$targetsPos = props.$targetPositions;
                 }
                 if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
                     let rolePos = heroComp.pos();
-                    heroComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    heroComp.$$targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
 
                 if(props.$action !== undefined)
-                    heroComp.nActionType = props.$action;
+                    heroComp.$$nActionType = props.$action;
 
                 //如果没有定向目标，则停止
-                //if(heroComp.targetsPos.length === 0 && props.$action === 2)
+                //if(heroComp.$$targetsPos.length === 0 && props.$action === 2)
                 //    props.$action = 0;
 
 
@@ -568,6 +577,20 @@ Rectangle {
                         },20,rootGameScene
                     );*/
 
+                if(props.$realSize !== undefined) {
+                    heroComp.width1 = props.$realSize[0];
+                    heroComp.height1 = props.$realSize[1];
+                    //console.debug('!!!', props.$realSize)
+                }
+
+
+                //其他属性直接赋值
+                let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                for(let tp in props) {
+                    if(usedProps.indexOf(tp) >= 0)
+                        continue;
+                    hero[tp] = props[tp];
+                }
             }
 
             return heroComp;
@@ -588,7 +611,8 @@ Rectangle {
                 mainRole.height1 = 0;
                 mainRole.rXScale = 1;
                 mainRole.rYScale = 1;
-                mainRole.moveSpeed = 0.1;
+                //mainRole.moveSpeed = 0.1;
+                //mainRole.$penetrate = 0;
                 //mainRole.textName.text = '';
                 mainRole.$data = null;
                 //mainRole.$id = '';
@@ -610,11 +634,11 @@ Rectangle {
                     //tr.destroy();
                     tr.visible = false;
 
-                    for(let c of tr.$components) {
+                    for(let c of tr.$tmpComponents) {
                         if(GlobalLibraryJS.isComponent(c))
                             c.destroy();
                     }
-                    tr.$components = [];
+                    tr.$tmpComponents = [];
                 }
                 _private.arrMainRoles = [];
                 game.gd["$sys_main_roles"] = [];
@@ -652,11 +676,11 @@ Rectangle {
 
 
             _private.arrMainRoles[index].visible = false;
-            for(let c of _private.arrMainRoles[index].$components) {
+            for(let c of _private.arrMainRoles[index].$tmpComponents) {
                 if(GlobalLibraryJS.isComponent(c))
                     c.destroy();
             }
-            _private.arrMainRoles[index].$components = [];
+            _private.arrMainRoles[index].$tmpComponents = [];
 
             //_private.arrMainRoles[index].destroy();
             delete _private.arrMainRoles[index];
@@ -737,6 +761,8 @@ Rectangle {
 
             let roleComp = compRole.createObject(itemViewPort.itemRoleContainer);
 
+            _private.objRoles[role.$id] = roleComp;
+
 
             roleComp.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
             roleComp.sizeFrame = Qt.size(cfg.FrameSize[0], cfg.FrameSize[1]);
@@ -752,7 +778,6 @@ Rectangle {
             roleComp.width1 = cfg.RealSize[0];
             roleComp.height1 = cfg.RealSize[1];
             roleComp.rectShadow.opacity = isNaN(parseFloat(cfg.ShadowOpacity)) ? 0.3 : parseFloat(cfg.ShadowOpacity);
-            roleComp.penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
 
             //roleComp.test = true;
 
@@ -760,27 +785,31 @@ Rectangle {
             roleComp.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
 
 
-
-            _private.objRoles[role.$id] = roleComp;
-
-            roleComp.$type = 2;
-
-
             roleComp.refresh();
 
+
+
+            roleComp.$$type = 2;
 
             //roleComp.$id = role.$id;
             roleComp.$data = role;
 
+
+
             //roleComp.$name = role.$name;
             role.$speed = parseFloat(cfg.MoveSpeed);
             role.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
-
             role.$avatar = cfg.Avatar || '';
             role.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
+            role.$showName = isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName);
+            role.$penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
+
+            role.__proto__ = cfg;
 
             //if(role.$direction === undefined)
             //    role.$direction = 2;
+
+
 
             game.role(roleComp, role);
 
@@ -830,13 +859,15 @@ Rectangle {
                     role.$showName = roleComp.textName.visible = true;
                 else if(props.$showName === false)
                     role.$showName = roleComp.textName.visible = false;
+                if(props.$penetrate !== undefined)   //可穿透
+                    role.$penetrate = /*roleComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
-                    roleComp.moveSpeed = parseFloat(props.$speed);
+                    role.$speed = /*roleComp.moveSpeed = */parseFloat(props.$speed);
                 if(props.$scale && props.$scale[0] !== undefined) {
-                    roleComp.rXScale = props.$scale[0];
+                    role.$scale[0] = roleComp.rXScale = props.$scale[0];
                 }
                 if(props.$scale && props.$scale[1] !== undefined) {
-                    roleComp.rYScale = props.$scale[1];
+                    role.$scale[1] = roleComp.rYScale = props.$scale[1];
                 }
 
                 //!!!这里要加入名字是否重复
@@ -856,17 +887,17 @@ Rectangle {
                         tPos[0] = -1;
                     if(props.$targetBy === undefined)
                         tPos[1] = -1;
-                    roleComp.targetsPos = [Qt.point(tPos[0], tPos[1])];
+                    roleComp.$$targetsPos = [Qt.point(tPos[0], tPos[1])];
                 }
                 if(props.$targetX !== undefined || props.$targetY !== undefined) {
                     if(props.$targetX === undefined)
                         props.$targetX = -1;
                     if(props.$targetY === undefined)
                         props.$targetY = -1;
-                    roleComp.targetsPos = [Qt.point(props.$targetX, props.$targetY)];
+                    roleComp.$$targetsPos = [Qt.point(props.$targetX, props.$targetY)];
                 }
                 if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
-                    roleComp.targetsPos = [];
+                    roleComp.$$targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
                         let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
                         /*if(props.$targetBx === undefined)
@@ -874,22 +905,22 @@ Rectangle {
                         if(props.$targetBy === undefined)
                             tPos[1] = -1;
                             */
-                        roleComp.targetsPos.push(Qt.point(tPos[0], tPos[1]));
+                        roleComp.$$targetsPos.push(Qt.point(tPos[0], tPos[1]));
                     }
                 }
                 if(GlobalLibraryJS.isArray(props.$targetPositions)) {
-                    roleComp.targetsPos = props.$targetPositions;
+                    roleComp.$$targetsPos = props.$targetPositions;
                 }
                 if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
                     let rolePos = roleComp.pos();
-                    roleComp.targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    roleComp.$$targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
 
                 if(props.$action !== undefined)
-                    roleComp.nActionType = props.$action;
+                    roleComp.$$nActionType = props.$action;
 
                 //如果没有定向目标，则停止
-                //if(roleComp.targetsPos.length === 0 && props.$action === 2)
+                //if(roleComp.$$targetsPos.length === 0 && props.$action === 2)
                 //    props.$action = 0;
 
 
@@ -927,6 +958,14 @@ Rectangle {
                 else if(props.$start === false)
                     roleComp.stop();
 
+
+                //其他属性直接赋值
+                let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                for(let tp in props) {
+                    if(usedProps.indexOf(tp) >= 0)
+                        continue;
+                    role[tp] = props[tp];
+                }
             }
 
 
@@ -989,7 +1028,7 @@ Rectangle {
         readonly property var delrole: function(role=-1) {
             if(role === -1) {
                 for(let r in _private.objRoles) {
-                    for(let c of _private.objRoles[r].$components) {
+                    for(let c of _private.objRoles[r].$tmpComponents) {
                         if(GlobalLibraryJS.isComponent(c))
                             c.destroy();
                     }
@@ -1012,7 +1051,7 @@ Rectangle {
 
             delete _private.objRoles[role.$data.$id];
 
-            for(let c of role.$components) {
+            for(let c of role.$tmpComponents) {
                 if(GlobalLibraryJS.isComponent(c))
                     c.destroy();
             }
@@ -1028,8 +1067,8 @@ Rectangle {
         //角色的影子中心所在的各种坐标；
         //role为角色组件（可用heros和roles命令返回的组件）；
         //  如果为数字或空，则是主角；如果是字符串，则在主角和NPC中查找；
-        //pos为[x,y]，如果为空则表示返回角色中心所在各种坐标；
-        readonly property var rolepos: function(role, pos) {
+        //pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
+        readonly property var rolepos: function(role, pos=null) {
             if(GlobalLibraryJS.isValidNumber(role)) {
                 role = mainRole;
             }
@@ -1050,20 +1089,36 @@ Rectangle {
             let centerX = role.x + role.x1 + parseInt(role.width1 / 2);
             let centerY = role.y + role.y1 + parseInt(role.height1 / 2);
 
+            //如果是地图块坐标
             if(pos) {
-                if(pos[0] === Math.floor(centerX / itemViewPort.sizeMapBlockSize.width) && pos[1] === Math.floor(centerY / itemViewPort.sizeMapBlockSize.height))
+                //返回 地图块坐标（左上和右下）
+                let usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1, role.x + role.x2, role.y + role.y2);
+
+                //在占用块内
+                if(pos[0] >= usedMapBlocks[0] && pos[0] <= usedMapBlocks[2] && pos[1] >= usedMapBlocks[1] && pos[1] <= usedMapBlocks[3])
                     return true;
                 return false;
             }
             else
-                return {bx: Math.floor(centerX / itemViewPort.sizeMapBlockSize.width),
+                return {
+                    //地图块坐标
+                    bx: Math.floor(centerX / itemViewPort.sizeMapBlockSize.width),
                     by: Math.floor(centerY / itemViewPort.sizeMapBlockSize.height),
+                    //实际坐标
                     x: role.x,
                     y: role.y,
+                    //中心坐标
                     cx: centerX,
                     cy: centerY,
-                    rx: role.x1,
-                    ry: role.y1,
+                    //影子左上角坐标
+                    rx1: role.x + role.x1,
+                    ry1: role.y + role.y1,
+                    //影子右下角坐标
+                    rx2: role.x + role.x2,
+                    ry2: role.y + role.y2,
+                    //在 视窗 中的坐标
+                    sx: role.x + itemViewPort.itemContainer.x,
+                    sy: role.y + itemViewPort.itemContainer.y,
                 };
 
 
@@ -2257,7 +2312,7 @@ Rectangle {
                     role = game.role(properties.$parent);
                 if(role) {
                     properties.$parent = role;
-                    role.$components.push(tmp);
+                    role.$tmpComponents.push(tmp);
                 }
             }
             //固定屏幕上
@@ -2537,7 +2592,7 @@ Rectangle {
                     role = game.role(properties.$parent);
                 if(role) {
                     properties.$parent = role;
-                    role.$components.push(sprite);
+                    role.$tmpComponents.push(sprite);
                 }
                 else {
                     console.warn('找不到：', properties.$parent);
@@ -3100,7 +3155,7 @@ Rectangle {
             //读取主角
             for(let th of game.gd["$sys_main_roles"]) {
                 let mainRole = game.createhero(th.$rid);
-                mainRole.nActionType = 0;
+                mainRole.$$nActionType = 0;
                 //game.hero(mainRole, th);
             }
 
@@ -3991,13 +4046,13 @@ Rectangle {
             //_private.arrPressedKeys[key] = true; //保存键盘按下
             _private.arrPressedKeys.push(event.key);
 
-            if(mainRole.nActionType === -1)
+            if(mainRole.$$nActionType === -1)
                 return;
 
 
             if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
                 _private.doAction(1, event.key);
-                mainRole.nActionType = 1;
+                mainRole.$$nActionType = 1;
             }
 
             event.accepted = true;
@@ -4010,7 +4065,7 @@ Rectangle {
                 return;
             }
 
-            if(mainRole.nActionType === -1)
+            if(mainRole.$$nActionType === -1)
                 return;
 
 
@@ -4048,7 +4103,7 @@ Rectangle {
             _private.arrPressedKeys.splice(_private.arrPressedKeys.indexOf(event.key), 1);
 
 
-            if(mainRole.nActionType === -1)
+            if(mainRole.$$nActionType === -1)
                 return;
 
 
@@ -4171,7 +4226,7 @@ Rectangle {
                 if(!pressed)    //如果没按下
                     return;
 
-                if(mainRole.nActionType === -1)
+                if(mainRole.$$nActionType === -1)
                     return;
 
 
@@ -4197,7 +4252,7 @@ Rectangle {
                     else
                         _private.doAction(0, Qt.Key_Up);
                 }
-                mainRole.nActionType = 10;
+                mainRole.$$nActionType = 10;
 
                 //console.debug("[GameScene]onPointInputChanged", pointInput);
             }
@@ -5511,10 +5566,10 @@ Rectangle {
             }
 
 
-            if(mainRole.nActionType === -1)
+            if(mainRole.$$nActionType === -1)
                 return;
 
-            mainRole.nActionType = 0;
+            mainRole.$$nActionType = 0;
         }
 
 
@@ -6182,6 +6237,42 @@ Rectangle {
         Role {
             id: rootRole
 
+
+            //返回各种坐标
+            function pos(tPos) {
+                return game.rolepos(rootRole, tPos);
+            }
+
+            //返回方向
+            //0、1、2、3分别表示上右下左；
+            function direction() {
+                switch(moveDirection) {
+                case Qt.Key_Up:
+                    return 0;
+                case Qt.Key_Right:
+                    return 1;
+                case Qt.Key_Down:
+                    return 2;
+                case Qt.Key_Left:
+                    return 3;
+                }
+                return -1;
+            }
+
+
+            function action(tsprite) {
+                GameSceneJS.loadSpriteEffect(tsprite.RId, rootRole.actionSprite, tsprite.$loops);
+                if(GlobalLibraryJS.isValidNumber(tsprite.width))
+                    rootRole.actionSprite.width = tsprite.width;
+                if(GlobalLibraryJS.isValidNumber(tsprite.height))
+                    rootRole.actionSprite.height = tsprite.height;
+                rootRole.actionSprite.x = tsprite.x || 0;
+                rootRole.actionSprite.y = tsprite.y || 0;
+                rootRole.actionSprite.playAction();
+            }
+
+
+
             //头顶消息
             property Message message: Message {
                 parent: rootRole
@@ -6219,65 +6310,47 @@ Rectangle {
                 wrapMode: Text.NoWrap
             }
 
+
+            //依附在角色上的图片和特效
+            property var $tmpComponents: []
+
             //属性
             //property int $index: -1
             //property string $id: ''
 
+
             //自定义属性（系统包含一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
+            //主角的会被保存，NPC不会
             property var $data: null
             //property string $name: ''
             //property string $avatar: ''
             //property size $avatarSize: Qt.size(0, 0)
-            property int $type: -1  //角色类型（1为主角，2为NPC）
+
 
             //其他属性（用户自定义）
+            //目前没用到
             property var $props: ({})
 
-            //依附在角色上的图片和特效
-            property var $components: []
 
+            property int $$type: -1  //不要修改（只读）；角色类型（1为主角，2为NPC）
 
-            //在场景中的坐标
-            readonly property int sceneX: x + itemViewPort.itemContainer.x
-            readonly property int sceneY: y + itemViewPort.itemContainer.y
-
+            //property int $penetrate: 0  //可穿透
+            //property real moveSpeed: 0.3 //移动像素
 
             //行动类别；
             //0为停止；1为正常行走；2为动向移动；10为摇杆行走；-1为禁止操作
-            property int nActionType: 1
+            property int $$nActionType: 1
 
             //目标坐标
-            property var targetsPos: []
+            property var $$targetsPos: []
 
             //状态持续时间
-            property int nActionStatusKeepTime: 0
+            property int $$nActionStatusKeepTime: 0
 
             //保存上个Interval碰撞的角色名（包含主角）
             property var $$collideRoles: ({})
 
             property var $$mapEventsTriggering: ({})    //保存正在触发的地图事件
-
-
-            //返回各种坐标
-            function pos(tPos) {
-                return game.rolepos(rootRole, tPos);
-            }
-
-            //返回方向
-            //0、1、2、3分别表示上右下左；
-            function direction() {
-                switch(moveDirection) {
-                case Qt.Key_Up:
-                    return 0;
-                case Qt.Key_Right:
-                    return 1;
-                case Qt.Key_Down:
-                    return 2;
-                case Qt.Key_Left:
-                    return 3;
-                }
-                return -1;
-            }
 
 
             z: y + y1
@@ -6291,6 +6364,7 @@ Rectangle {
             //height: 100
 
 
+            //缩放效果是否平滑过度
             sprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
             actionSprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
 
@@ -6299,18 +6373,6 @@ Rectangle {
             //sizeFrame: Qt.size(32, 48)
             //nFrameCount: 4
             //arrFrameDirectionIndex: [[0,3],[0,2],[0,0],[0,1]]
-
-
-            function action(tsprite) {
-                GameSceneJS.loadSpriteEffect(tsprite.RId, rootRole.actionSprite, tsprite.$loops);
-                if(GlobalLibraryJS.isValidNumber(tsprite.width))
-                    rootRole.actionSprite.width = tsprite.width;
-                if(GlobalLibraryJS.isValidNumber(tsprite.height))
-                    rootRole.actionSprite.height = tsprite.height;
-                rootRole.actionSprite.x = tsprite.x || 0;
-                rootRole.actionSprite.y = tsprite.y || 0;
-                rootRole.actionSprite.playAction();
-            }
 
 
             mouseArea.onClicked: {

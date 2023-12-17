@@ -1547,18 +1547,18 @@ function mapEvent(eventName, role) {
 
 
     //主角和NPC的事件名不同
-    if(role.$type === 1)
+    if(role.$$type === 1)
         tScript = itemViewPort.mapScript['$' + eventName];
     else
         tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map'];
-    if(!tScript && role.$type === 1)    //!!兼容旧的
+    if(!tScript && role.$$type === 1)    //!!兼容旧的
         tScript = itemViewPort.mapScript[eventName];
     if(!tScript)
-        if(role.$type === 1)
+        if(role.$$type === 1)
             tScript = game.f['$' + eventName];
         else
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'];
-    if(!tScript && role.$type === 1)    //!!兼容旧的
+    if(!tScript && role.$$type === 1)    //!!兼容旧的
         tScript = game.f[eventName];
 
     if(tScript)
@@ -1581,14 +1581,14 @@ function mapEventCanceled(eventName, role) {
 
 
     //主角和NPC的事件名不同
-    if(role.$type === 1)
+    if(role.$$type === 1)
         tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'];
     else
         tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'];
     //if(!tScript)    //!!兼容旧的
     //    tScript = itemViewPort.mapScript[eventName + '_map_leave'];
     if(!tScript)
-        if(role.$type === 1)
+        if(role.$$type === 1)
             tScript = game.f['$' + eventName + '_map_leave'];
         else
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
@@ -1745,7 +1745,7 @@ function onTriggered() {
         let role = _private.objRoles[r];
 
         //停止状态
-        //if(role.nActionType === 0)
+        //if(role.$$nActionType === 0)
         //    continue;
 
 
@@ -1753,30 +1753,30 @@ function onTriggered() {
         let centerY = role.y + role.y1 + parseInt(role.height1 / 2);
 
         //定向移动
-        if(role.nActionType === 2) {
+        if(role.$$nActionType === 2) {
 
             do {
-                if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x < centerX) {
+                if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x < centerX) {
                     role.moveDirection = Qt.Key_Left;
                     _private.startSprite(role, role.moveDirection);
                 }
-                else if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x > centerX) {
+                else if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x > centerX) {
                     role.moveDirection = Qt.Key_Right;
                     _private.startSprite(role, role.moveDirection);
                 }
-                else if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y < centerY) {
+                else if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y < centerY) {
                     role.moveDirection = Qt.Key_Up;
                     _private.startSprite(role, role.moveDirection);
                 }
-                else if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y > centerY) {
+                else if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y > centerY) {
                     role.moveDirection = Qt.Key_Down;
                     _private.startSprite(role, role.moveDirection);
                 }
                 else {
-                    role.targetsPos.shift();
-                    if(role.targetsPos.length === 0) {
+                    role.$$targetsPos.shift();
+                    if(role.$$targetsPos.length === 0) {
                         //role.moveDirection = -1;
-                        role.nActionType = 0;
+                        role.$$nActionType = 0;
                         _private.stopSprite(role);
 
 
@@ -1801,17 +1801,17 @@ function onTriggered() {
 
 
         //增加状态时间
-        role.nActionStatusKeepTime += realinterval;
+        role.$$nActionStatusKeepTime += realinterval;
 
         //走路状态
         if(role.sprite.running) {
             //console.debug("walk status")
 
             //随机走
-            if(role.nActionType === 1) {
+            if(role.$$nActionType === 1) {
                 //如果到达切换状态阈值
-                if(role.nActionStatusKeepTime > 500) {
-                    role.nActionStatusKeepTime = 0;
+                if(role.$$nActionStatusKeepTime > 500) {
+                    role.$$nActionStatusKeepTime = 0;
 
                     //概率停止
                     if(GlobalLibraryJS.randTarget(5, 6) !== 0) {
@@ -1826,10 +1826,10 @@ function onTriggered() {
             }
 
             //计算走路
-            let offsetMove = Math.round(role.moveSpeed * realinterval);
+            let offsetMove = Math.round(role.$data.$speed * realinterval);
             offsetMove = _private.fComputeRoleMoveOffset(role, role.moveDirection, offsetMove);
 
-            if(role.nActionType === 1) {
+            if(role.$$nActionType === 1) {
                 if(offsetMove === 0) {
                     _private.stopSprite(role);
                     //role.moveDirection = -1;
@@ -1863,35 +1863,35 @@ function onTriggered() {
             }
 
             //定向走
-            else if(role.nActionType === 2) {
+            else if(role.$$nActionType === 2) {
 
                 //console.debug("Start...", role.moveDirection, offsetMove);
                 //人物移动计算（值为按键值）
                 switch(role.moveDirection) {
                 case Qt.Key_Left:
-                    if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x < centerX && role.targetsPos[0].x > centerX - offsetMove)
-                        role.x = role.targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
+                    if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x < centerX && role.$$targetsPos[0].x > centerX - offsetMove)
+                        role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
                     else
                         role.x -= offsetMove;
                     break;
 
                 case Qt.Key_Right:
-                    if(role.targetsPos[0] && role.targetsPos[0].x >= 0 && role.targetsPos[0].x > centerX && role.targetsPos[0].x < centerX + offsetMove)
-                        role.x = role.targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
+                    if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x > centerX && role.$$targetsPos[0].x < centerX + offsetMove)
+                        role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
                     else
                         role.x += offsetMove;
                     break;
 
                 case Qt.Key_Up: //同Left
-                    if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y < centerY && role.targetsPos[0].y > centerY - offsetMove)
-                        role.y = role.targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
+                    if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y < centerY && role.$$targetsPos[0].y > centerY - offsetMove)
+                        role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
                     else
                         role.y -= offsetMove;
                     break;
 
                 case Qt.Key_Down:   //同Right
-                    if(role.targetsPos[0] && role.targetsPos[0].y >= 0 && role.targetsPos[0].y > centerY && role.targetsPos[0].y < centerY + offsetMove)
-                        role.y = role.targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
+                    if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y > centerY && role.$$targetsPos[0].y < centerY + offsetMove)
+                        role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
                     else
                         role.y += offsetMove;
                     break;
@@ -1904,10 +1904,10 @@ function onTriggered() {
         //站立状态
         else {
             //随机走
-            if(role.nActionType === 1) {
+            if(role.$$nActionType === 1) {
                 //如果到达切换状态阈值
-                if(role.nActionStatusKeepTime > 500) {
-                    role.nActionStatusKeepTime = 0;
+                if(role.$$nActionStatusKeepTime > 500) {
+                    role.$$nActionStatusKeepTime = 0;
 
                     //移动（概率）
                     //console.debug("stop status")
@@ -1951,7 +1951,7 @@ function onTriggered() {
             //    continue;
 
             if(
-                //(role.penetrate === 0 && _private.objRoles[r].penetrate === 0) &&
+                //(role.$data.$penetrate === 0 && _private.objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1 - 1, role.y + role.y1 - 1, role.width1 + 2, role.height1 + 2),
                     Qt.rect(_private.objRoles[r].x + _private.objRoles[r].x1, _private.objRoles[r].y + _private.objRoles[r].y1, _private.objRoles[r].width1, _private.objRoles[r].height1),
@@ -1987,7 +1987,7 @@ function onTriggered() {
             //    continue;
 
             if(
-                //(role.penetrate === 0 && _private.arrMainRoles[r].penetrate === 0) &&
+                //(role.$data.$penetrate === 0 && _private.arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1 - 1, role.y + role.y1 - 1, role.width1 + 2, role.height1 + 2),
                     Qt.rect(_private.arrMainRoles[r].x + _private.arrMainRoles[r].x1, _private.arrMainRoles[r].y + _private.arrMainRoles[r].y1, _private.arrMainRoles[r].width1, _private.arrMainRoles[r].height1),
@@ -2085,25 +2085,25 @@ function onTriggered() {
 
 
         //定向移动
-        if(mainRole.nActionType === 2) {
+        if(mainRole.$$nActionType === 2) {
 
             do {
-                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x < centerX) {
+                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x < centerX) {
                     _private.doAction(2, Qt.Key_Left);
                 }
-                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x > centerX) {
+                else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x > centerX) {
                     _private.doAction(2, Qt.Key_Right);
                 }
-                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y < centerY) {
+                else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y < centerY) {
                     _private.doAction(2, Qt.Key_Up);
                 }
-                else if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y > centerY) {
+                else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y > centerY) {
                     _private.doAction(2, Qt.Key_Down);
                 }
                 else {
-                    mainRole.targetsPos.shift();
-                    if(mainRole.targetsPos.length === 0) {
-                        mainRole.nActionType = 0;
+                    mainRole.$$targetsPos.shift();
+                    if(mainRole.$$targetsPos.length === 0) {
+                        mainRole.$$nActionType = 0;
                         _private.stopAction(1, -1);
 
 
@@ -2137,10 +2137,10 @@ function onTriggered() {
         //下面是移动代码
 
         //计算真实移动偏移，初始为 角色速度 * 时间差
-        let offsetMove = Math.round(mainRole.moveSpeed * realinterval);
+        let offsetMove = Math.round(mainRole.$data.$speed * realinterval);
 
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        if(_private.config.rJoystickSpeed > 0 && mainRole.nActionType === 10 && _private.arrPressedKeys.length === 0) {
+        if(_private.config.rJoystickSpeed > 0 && mainRole.$$nActionType === 10 && _private.arrPressedKeys.length === 0) {
             let tOffset;    //遥感百分比
             if(mainRole.moveDirection === Qt.Key_Left || mainRole.moveDirection === Qt.Key_Right) {
                 tOffset = Math.abs(joystick.pointInput.x);
@@ -2177,37 +2177,37 @@ function onTriggered() {
         //let roleNewX = mainRole.x, roleNewY = mainRole.y;
 
         //定向走
-        if(mainRole.nActionType === 2) {
+        if(mainRole.$$nActionType === 2) {
 
             //console.debug("Start...", mainRole.moveDirection, offsetMove);
             //人物移动计算（值为按键值）
             switch(mainRole.moveDirection) {
             case Qt.Key_Left:
-                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x < centerX && mainRole.targetsPos[0].x > centerX - offsetMove) {
-                    mainRole.x = mainRole.targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
+                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x < centerX && mainRole.$$targetsPos[0].x > centerX - offsetMove) {
+                    mainRole.x = mainRole.$$targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
                 }
                 else
                     mainRole.x -= offsetMove;
                 break;
 
             case Qt.Key_Right:
-                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].x >= 0 && mainRole.targetsPos[0].x > centerX && mainRole.targetsPos[0].x < centerX + offsetMove) {
-                    mainRole.x = mainRole.targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
+                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x > centerX && mainRole.$$targetsPos[0].x < centerX + offsetMove) {
+                    mainRole.x = mainRole.$$targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
                 }
                 else
                     mainRole.x += offsetMove;
                 break;
 
             case Qt.Key_Up: //同Left
-                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y < centerY && mainRole.targetsPos[0].y > centerY - offsetMove)
-                    mainRole.y = mainRole.targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
+                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y < centerY && mainRole.$$targetsPos[0].y > centerY - offsetMove)
+                    mainRole.y = mainRole.$$targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
                 else
                     mainRole.y -= offsetMove;
                 break;
 
             case Qt.Key_Down:   //同Right
-                if(mainRole.targetsPos[0] && mainRole.targetsPos[0].y >= 0 && mainRole.targetsPos[0].y > centerY && mainRole.targetsPos[0].y < centerY + offsetMove)
-                    mainRole.y = mainRole.targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
+                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y > centerY && mainRole.$$targetsPos[0].y < centerY + offsetMove)
+                    mainRole.y = mainRole.$$targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
                 else
                     mainRole.y += offsetMove;
                 break;
@@ -2327,7 +2327,7 @@ function onTriggered() {
 
         //计算人物所占的地图块
 
-        //返回 地图块坐标（左上和右下）
+        //返回 地图块坐标（4个元素的数组，左上和右下）
         let usedMapBlocks = itemViewPort.fComputeUseBlocks(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1, mainRole.x + mainRole.x2, mainRole.y + mainRole.y2);
 
         //转换为 每个地图块ID
@@ -2489,7 +2489,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
                     Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
@@ -2506,7 +2506,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1 - offsetMove, role.y + role.y1, offsetMove, role.height1),
                     Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
@@ -2529,7 +2529,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
                     Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
@@ -2545,7 +2545,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x2 + 1, role.y + role.y1, offsetMove, role.height1),
                     Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
@@ -2568,7 +2568,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
                     Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
@@ -2584,7 +2584,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1, role.y + role.y1 - offsetMove, role.width1, offsetMove),
                     Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),
@@ -2607,7 +2607,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && objRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
                     Qt.rect(objRoles[r].x + objRoles[r].x1, objRoles[r].y + objRoles[r].y1, objRoles[r].width1, objRoles[r].height1),
@@ -2623,7 +2623,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
             //    continue;
 
             if(
-                (role.penetrate === 0 && arrMainRoles[r].penetrate === 0) &&
+                (role.$data.$penetrate === 0 && arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
                     Qt.rect(role.x + role.x1, role.y + role.y2 + 1, role.width1, offsetMove),
                     Qt.rect(arrMainRoles[r].x + arrMainRoles[r].x1, arrMainRoles[r].y + arrMainRoles[r].y1, arrMainRoles[r].width1, arrMainRoles[r].height1),

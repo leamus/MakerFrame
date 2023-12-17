@@ -113,6 +113,7 @@ Rectangle {
         textRoleSpeed.text = cfg.MoveSpeed !== undefined ? cfg.MoveSpeed.toString() : '0.1';
         textRoleShadowOpacity.text = cfg.ShadowOpacity !== undefined ? cfg.ShadowOpacity.toString() : '0.3';
         textPenetrate.text = cfg.Penetrate !== undefined ? cfg.Penetrate.toString() : '0';
+        textShowName.text = cfg.ShowName !== undefined ? cfg.ShowName.toString() : '1';
         textAvatar.text = cfg.Avatar !== undefined ? cfg.Avatar.toString() : '';
         textAvatarWidth.text = (cfg.AvatarSize && cfg.AvatarSize[0] !== undefined ? cfg.AvatarSize[0].toString() : '60');
         textAvatarHeight.text = (cfg.AvatarSize && cfg.AvatarSize[1] !== undefined ? cfg.AvatarSize[1].toString() : '60');
@@ -473,7 +474,71 @@ Rectangle {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 //Layout.preferredHeight: 10
 
-                text: "每帧的宽高"
+                text: "影子透明度"
+                font.pointSize: _config.nLabelFontSize
+            }
+
+            TextField {
+                id: textRoleShadowOpacity
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "0.5"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshRole();
+                }
+            }
+
+
+            Label {
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 10
+
+                text: "帧切换速度（ms）"
+                font.pointSize: _config.nLabelFontSize
+            }
+
+            TextField {
+                id: textRoleFrameInterval
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "100"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshRole();
+                }
+            }
+
+        }
+
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
+
+            Label {
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 10
+
+                text: "帧宽高"
                 font.pointSize: _config.nLabelFontSize
             }
 
@@ -758,34 +823,6 @@ Rectangle {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 //Layout.preferredHeight: 10
 
-                text: "帧切换速度（ms）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleFrameInterval
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "100"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
                 text: "移动速度"
                 font.pointSize: _config.nLabelFontSize
             }
@@ -804,43 +841,6 @@ Rectangle {
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
             }
-        }
-
-
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "影子透明度"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleShadowOpacity
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0.5"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
 
             Label {
                 //Layout.preferredWidth: 80
@@ -859,6 +859,34 @@ Rectangle {
                 //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    //_private.refreshRole();
+                }
+            }
+
+            Label {
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 10
+
+                text: "显示名字"
+                font.pointSize: _config.nLabelFontSize
+            }
+
+            TextField {
+                id: textShowName
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "1"
                 font.pointSize: _config.nTextFontSize
 
                 //selectByKeyboard: true
@@ -1575,7 +1603,7 @@ Rectangle {
 
             role.rectShadow.opacity = parseFloat(textRoleShadowOpacity.text);
 
-            role.moveSpeed = parseFloat(textRoleSpeed.text);
+            //role.moveSpeed = parseFloat(textRoleSpeed.text);
 
 
             rectRole.Layout.preferredWidth = rectRole.width = parseInt(textRoleWidth.text);
@@ -1656,6 +1684,7 @@ Rectangle {
             outputData.MoveSpeed = parseFloat(textRoleSpeed.text);
             outputData.ShadowOpacity = parseFloat(textRoleShadowOpacity.text);
             outputData.Penetrate = parseInt(textPenetrate.text);
+            outputData.ShowName = parseInt(textShowName.text);
 
             outputData.Image = textRoleResourceName.text;
             outputData.Avatar = textAvatar.text;

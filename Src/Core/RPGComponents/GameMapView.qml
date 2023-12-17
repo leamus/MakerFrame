@@ -523,10 +523,6 @@ Item {
 
                     property string $name: ""
 
-                    //在场景中的坐标
-                    readonly property int sceneX: x + itemContainer.x
-                    readonly property int sceneY: y + itemContainer.y
-
                     //其他属性（用户自定义）
                     property var props: ({})
 

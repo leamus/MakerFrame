@@ -27,8 +27,6 @@ Item {
     property alias rXScale: walkSprite.rXScale
     property alias rYScale: walkSprite.rYScale
 
-    property int penetrate: 0  //可穿透
-
 
     //x1、y1为 场景中 人物的 有效占位（占地图） 起始点 偏移（相对于x，y），x2、y2为 有效占位 终止点 偏移，width1、height1为有效占位宽高
     property alias x1: rectShadow.x
@@ -43,7 +41,6 @@ Item {
 
     property int moveDirection: Qt.Key_Up   //移动方向（键值）
     //property int stopDirection: moveDirection === -1 ? stopDirection : moveDirection    //停止方向
-    property real moveSpeed: 0.3 //移动像素
 
 
     property alias sprite: walkSprite

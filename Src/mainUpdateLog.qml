@@ -138,8 +138,10 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
-    2、修复一些小bugs；
-    3、调整和优化代码细节，调整部分指令；
+2023/12/17：发布 1.6.25.231217 版本
+1、修复一些小bugs；
+2、调整和优化代码细节，调整部分指令（game.createhero、game.hero、game.createrole、game.role、game.rolepos）；
+3、角色编辑器增加是否显示名字；
 
 2023/12/13：发布 1.6.24.231213 版本
 1、增加载入地图前后自定义运行脚本；
