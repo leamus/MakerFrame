@@ -1316,9 +1316,10 @@ function *combatantRoundEffects(combatant, round, stage) {
 
 
 
-//检测 技能/攻击 是否可用（有4个阶段会调用：选择时、攻击时、敌人和我方遍历时）；
-//返回：true表示可以使用；字符串表示不能使用并提示的信息（只有选择时）；
-//stage为0表示选择技能时，为1表示技能步骤选择完毕，为10表示战斗时再判断一次；
+//检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
+//返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
+//stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
+//会检测技能、道具的相关函数并调用返回；
 function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
     let choiceType = combatant.$$fightData.$choice.$type;//choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
     //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
@@ -1734,11 +1735,12 @@ function *$commonFightEndScript(r, teams, fightData) {
 
 
 //获取 某战斗角色 中心位置
-//teamID、index是战斗角色的；cols表示有几列（战场分布）；
+//teamID、index是战斗角色的；
 function $fightCombatantPositionAlgorithm(teamID, index) {
     //let teamID = combatant.$$fightData.$info.$teamID[0];
     //let index = combatant.$$fightData.$info.$index;
 
+    //cols表示有几列（战场分布）；
     if(index === -1) {    //全体时的位置
         let cols = 3;
         if(teamID === 0)    //我方

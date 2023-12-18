@@ -238,7 +238,7 @@ Rectangle {
   特效大小：游戏中显示的大小；
   X/Y轴缩放：可以在x、y方向进行缩放，且可以为负数（x、y轴的镜像）；
   透明度：0-1之间的小数；
-  每帧的宽高：将图片切割为每一帧的大小（如果图片显示有问题，则可能这里不正确）；
+  帧宽高：将图片切割为每一帧的大小（如果图片显示有问题，则可能这里不正确）；
   帧数：连续播放的帧数；
   帧偏移：从第几列、第几行开始（然后连续的n张）；
   帧切换速度：你懂的；
@@ -336,40 +336,6 @@ Rectangle {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "透明度"
-            }
-
-            TextField {
-                id: textSpriteOpacity
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
                 text: "X/Y轴缩放"
             }
 
@@ -423,7 +389,7 @@ Rectangle {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "每帧的宽高"
+                text: "帧宽高"
             }
 
             TextField {
@@ -540,6 +506,33 @@ Rectangle {
                 //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshSprite();
+                }
+            }
+
+            Label {
+                font.pointSize: _config.nLabelFontSize
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 10
+                text: "透明度"
+            }
+
+            TextField {
+                id: textSpriteOpacity
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "1"
                 font.pointSize: _config.nTextFontSize
 
                 //selectByKeyboard: true
