@@ -1527,8 +1527,12 @@ function buttonAClicked() {
             console.debug("[GameScene]触发NPC事件：", _private.objRoles[r].$data.$id);
 
             //获得脚本（地图脚本优先级 > game.f定义的）
-            let tScript = itemViewPort.mapScript[_private.objRoles[r].$data.$id];
+            let tScript = itemViewPort.mapScript['$' + _private.objRoles[r].$data.$id];
+            if(!tScript)    //!!!兼容旧的
+                tScript = itemViewPort.mapScript[_private.objRoles[r].$data.$id];
             if(!tScript)
+                tScript = game.f['$' + _private.objRoles[r].$data.$id];
+            if(!tScript)    //!!!兼容旧的
                 tScript = game.f[_private.objRoles[r].$data.$id];
             if(tScript) {
                 game.run([tScript, _private.objRoles[r].$data.$id], _private.objRoles[r]);
