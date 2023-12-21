@@ -27,7 +27,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: "1.6.24.231213"
+    property string version: "1.6.26.231221"
 
 
     //配置
@@ -42,17 +42,22 @@ QtObject {
         //当前项目名称
         property alias strCurrentProjectName: settings.strCurrentProjectName    //"Project"
 
-        //项目根目录
-        property string strProjectRootPath: {
+        //引擎工作目录
+        property string strWorkPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return Platform.getExternalDataPath() + separator + "RPGMaker" + separator + "Projects";
+                return Platform.getExternalDataPath() + separator + "RPGMaker";
                 //return "assets:";   //"."  //'qrc:'
             case 'windows':
             default:
-                return "RPGMaker" + separator + "Projects";
+                return "RPGMaker";
                 //return '.';
             }
+        }
+
+        //项目根目录
+        property string strProjectRootPath: {
+            return strWorkPath + separator + "Projects";
         }
 
         //存档目录
