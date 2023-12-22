@@ -7,6 +7,7 @@ let $config = {
     //游戏
     $game: {
         $loadAllResources: 0,   //提前载入所有资源
+        $walkAllDirections: true,   //主角可多方向行走（否则4方向）
     },
     //地图
     $map: {
@@ -23,10 +24,11 @@ let $config = {
     },
     //摇杆
     $joystick: {
-        //位置
+        //位置和大小
         $left: 6,
         $bottom: 7,
         $size: 20,
+        $joystickMinimumProportion: 0.2,    //使能最低的比例
     },
     //按钮（数组，前两个是系统的必有）
     $buttons: [
@@ -225,6 +227,12 @@ let $config = {
 //游戏初始化（游戏开始和载入存档时调用）
 function *$gameInit() {
 
+    try {
+        let initJS = _private.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator));
+        Object.assign(game.gf, initJS);
+    }catch(e){}
+
+
     //每秒恢复
     function resumeEventScript(combatant) {
 
@@ -245,7 +253,7 @@ function *$gameInit() {
 
     //点击屏幕事件
     game.gf['$map_click'] = function(bx, by, x, y) {
-        if(game.hero(0).nActionType !== -1) {
+        if(game.hero(0).$$nActionType !== -1) {
             let rolePos = game.hero(0).pos();
             //简单走
             //game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});

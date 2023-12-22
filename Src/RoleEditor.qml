@@ -1715,7 +1715,8 @@ Rectangle {
         function doAction(type, key) {
             switch(key) {
             case Qt.Key_Down:
-                _private.startSprite(role, Qt.Key_Down);
+                role.start(Qt.Key_Down);
+                //_private.startSprite(role, Qt.Key_Down);
                 //role.moveDirection = Qt.Key_Down; //移动方向
                 //role.start();
                 //timer.start();  //开始移动
@@ -1724,7 +1725,8 @@ Rectangle {
                 //keys.push(key);
                 break;
             case Qt.Key_Left:
-                _private.startSprite(role, Qt.Key_Left);
+                role.start(Qt.Key_Left);
+                //_private.startSprite(role, Qt.Key_Left);
                 //role.moveDirection = Qt.Key_Left;
                 //role.start();
                 //timer.start();
@@ -1733,7 +1735,8 @@ Rectangle {
                 //keys.push(key);
                 break;
             case Qt.Key_Right:
-                _private.startSprite(role, Qt.Key_Right);
+                role.start(Qt.Key_Right);
+                //_private.startSprite(role, Qt.Key_Right);
                 //role.moveDirection = Qt.Key_Right;
                 //role.start();
                 //timer.start();
@@ -1742,7 +1745,8 @@ Rectangle {
                 //keys.push(key);
                 break;
             case Qt.Key_Up:
-                _private.startSprite(role, Qt.Key_Up);
+                role.start(Qt.Key_Up);
+                //_private.startSprite(role, Qt.Key_Up);
                 //role.moveDirection = Qt.Key_Up;
                 //role.start();
                 //timer.start();
@@ -1771,12 +1775,13 @@ Rectangle {
                     //keys.pop();
                     if(l.length === 0) {    //如果没有键被按下
                         //timer.stop();
-                        _private.stopSprite(role);
+                        role.stop();
                         //role.stop();
                         console.debug("[RoleEditor]_private.stopAction stop");
                     }
                     else {
-                        _private.startSprite(role, l[0]);
+                        role.start(l[0]);
+                        //_private.startSprite(role, l[0]);
                         //role.moveDirection = l[0];    //弹出第一个按键
                         //role.start();
                         console.debug("[RoleEditor]_private.stopAction nextKey");
@@ -1785,28 +1790,19 @@ Rectangle {
 
                 default:
                     keys = {};
-                    _private.stopSprite(role);
+                    role.stop();
                     //role.stop();
                     console.debug("[RoleEditor]_private.stopAction stop1");
                 }
             }
             else {
-                _private.stopSprite(role);
+                role.stop();
                 //role.stop();
                 console.debug("[RoleEditor]_private.stopAction stop2");
             }
         }
 
-        function startSprite(role, key) {
-            role.moveDirection = key; //移动方向
-            role.start();
-        }
-        function stopSprite(role) {
-            role.moveDirection = -1;
-            role.stop();
-        }
-
-
+        
 
         function close() {
             dialogCommon.show({

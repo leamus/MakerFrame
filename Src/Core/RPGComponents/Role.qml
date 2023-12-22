@@ -7,7 +7,7 @@
     问题：1、无法初始化时直接显示某个Sprite，只能是第一个Srite；
       2、无法显示某个Sprite的某一帧；
       3、running为false时jumpTo无效，只能在后面调用一次 start和stop；
-      4、refresh（也就是重新创建组件）后立刻调用changeDirection（也就是 jumpTo）无效，只能延时1ms后调用才有效。
+      4、refresh（也就是重新创建组件）后立刻调用start（也就是 jumpTo）无效，只能延时1ms后调用才有效。
 */
 
 Item {
@@ -39,12 +39,13 @@ Item {
     property alias rectShadow: rectShadow   //真实占用大小（影子）
     property alias mouseArea: mouseArea
 
-    property int moveDirection: Qt.Key_Up   //移动方向（键值）
-    //property int stopDirection: moveDirection === -1 ? stopDirection : moveDirection    //停止方向
-
 
     property alias sprite: walkSprite
     property alias actionSprite: actionSprite
+
+    //目前行走特效的方向
+    property alias nDirection: walkSprite.nDirection
+
 
     property var test: false
 
@@ -52,7 +53,7 @@ Item {
 
     //刷新重建
     function refresh() {
-        changeDirection(2);
+        start(2, null);
         walkSprite.animatedsprite.currentFrame = 0;
     }
 
@@ -65,29 +66,55 @@ Item {
     }
 
     //开始播放动画（和方向有关）
-    function start(tdirect) {
+    function start(tdirect, running=true) {
         //if(walkSprite === undefined)
         //    return;
+        //walkSprite.jumpTo(d);
 
-        if(tdirect)
-            root.moveDirection = tdirect; //移动方向
-
-        switch(root.moveDirection) {
+        switch(tdirect) {
         case Qt.Key_Up:
+        case 0:
             walkSprite.jumpTo("Up");
+            //walkSprite.jumpTo("Up");
+            //walkSprite.goalSprite = "Up";
+            //walkSprite.currentSprite = "Up";
             break;
         case Qt.Key_Right:
+        case 1:
             walkSprite.jumpTo("Right");
+            //walkSprite.jumpTo("Right");
+            //walkSprite.goalSprite = "Right";
+            //walkSprite.currentSprite = "Right";
             break;
-        case Qt.Key_Left:
-            walkSprite.jumpTo("Left");
-            break;
+        case 2:
         case Qt.Key_Down:
             walkSprite.jumpTo("Down");
+            //walkSprite.jumpTo("Down");
+            //walkSprite.goalSprite = "Down";
+            //walkSprite.currentSprite = "Down";
+            break;
+        case Qt.Key_Left:
+        case 3:
+            walkSprite.jumpTo("Left");
+            //walkSprite.jumpTo("Left");
+            //walkSprite.goalSprite = "Left";
+            //walkSprite.currentSprite = "Left";
             break;
         }
-        walkSprite.running = true;
-        //console.debug("[Role]start", walkSprite, walkSprite.state, walkSprite.currentSprite, moveDirection)
+
+        if(running === true || running === false)
+            walkSprite.running = running;
+
+
+        //静态换方向
+        /*if(walkSprite.running === false) {
+            start();
+            stop();
+        }
+        else
+            start();*/
+
+        //console.debug("[Role]start", walkSprite, walkSprite.state, walkSprite.currentSprite)
     }
 
     //停止动画
@@ -95,54 +122,26 @@ Item {
         //if(walkSprite === undefined)
         //    return;
         walkSprite.running = false;
-        //root.moveDirection = -1;
     }
 
-    //静态换方向
-    function changeDirection(d) {
-        if(d !== undefined) {
-            //walkSprite.jumpTo(d);
-            ////root.moveDirection = d;
-
-            switch(d) {
+    //行走方向
+    function direction(type=0) {
+        if(type === 0)
+            return walkSprite.nDirection;
+        else {
+            switch(walkSprite.nDirection) {
             case 0:
-                //walkSprite.jumpTo("Up");
-                root.moveDirection = Qt.Key_Up;
-                //walkSprite.goalSprite = "Up";
-                //walkSprite.currentSprite = "Up";
-                walkSprite.jumpTo("Up");
-                break;
+                return Qt.Key_Up;
             case 1:
-                //walkSprite.jumpTo("Right");
-                root.moveDirection = Qt.Key_Right;
-                //walkSprite.goalSprite = "Right";
-                //walkSprite.currentSprite = "Right";
-                walkSprite.jumpTo("Right");
-                break;
+                return Qt.Key_Right;
             case 2:
-                //walkSprite.jumpTo("Down");
-                root.moveDirection = Qt.Key_Down;
-                //walkSprite.goalSprite = "Down";
-                //walkSprite.currentSprite = "Down";
-                walkSprite.jumpTo("Down");
-                break;
+                return Qt.Key_Down;
             case 3:
-                //walkSprite.jumpTo("Left");
-                root.moveDirection = Qt.Key_Left;
-                //walkSprite.goalSprite = "Left";
-                //walkSprite.currentSprite = "Left";
-                walkSprite.jumpTo("Left");
-                break;
+                return Qt.Key_Left;
             }
-
-            /*if(walkSprite.running === false) {
-                start();
-                stop();
-            }
-            else
-                start();*/
         }
     }
+
 
 
     width: 0
@@ -174,6 +173,8 @@ Item {
                 //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
                 walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
                 walkSprite.animatedsprite.currentFrame = 0;
+
+                nDirection = 0;
             }
             else if(action === 'Right') {
                 width = root.width;
@@ -187,6 +188,8 @@ Item {
                 //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
                 walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
                 walkSprite.animatedsprite.currentFrame = 0;
+
+                nDirection = 1;
             }
             else if(action === 'Down') {
                 width = root.width;
@@ -200,6 +203,8 @@ Item {
                 //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
                 walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
                 walkSprite.animatedsprite.currentFrame = 0;
+
+                nDirection = 2;
             }
             else if(action === 'Left') {
                 width = root.width;
@@ -213,9 +218,13 @@ Item {
                 //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
                 walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
                 walkSprite.animatedsprite.currentFrame = 0;
+
+                nDirection = 3;
             }
         }
 
+
+        property int nDirection: -1
 
         //width: root.width; height: root.height     //一个帧的大小，会缩放
         anchors.horizontalCenter: parent.horizontalCenter

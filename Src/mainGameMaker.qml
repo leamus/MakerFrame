@@ -63,7 +63,7 @@ Rectangle {
         Label {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: 20
+            //Layout.preferredHeight: 20
 
             //anchors.horizontalCenter: parent.horizontalCenter
             //anchors.verticalCenter: parent.verticalCenter
@@ -82,7 +82,7 @@ Rectangle {
         Label {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: 20
+            //Layout.preferredHeight: 20
 
             //anchors.horizontalCenter: parent.horizontalCenter
             //anchors.verticalCenter: parent.verticalCenter
@@ -992,67 +992,14 @@ Rectangle {
 
         }
 
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-
-                text: "简易画板"
-                onClicked: {
-                    if(Platform.compileType() === "debug") {
-                        _private.loadModule("PaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
-                    }
-                    else {
-                        _private.loadModule("PaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-
-                text: "简易画板2"
-                onClicked: {
-                    if(Platform.compileType() === "debug") {
-                        _private.loadModule("NanoPaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
-                    }
-                    else {
-                        _private.loadModule("NanoPaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
-                    }
-                }
-            }
-        }
-
 
 
         RowLayout {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
+            //Layout.preferredHeight: 30
+            //Layout.minimumHeight: 20
             //Layout.fillHeight: true
 
             Label {
@@ -1068,7 +1015,7 @@ Rectangle {
                 //Layout.preferredWidth: 1
 
                 //width: parent.width
-                font.pointSize: 16
+                font.pointSize: 12
                 text: qsTr("Q群：654876441")
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
@@ -1088,7 +1035,7 @@ Rectangle {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
 
-                font.pointSize: 16
+                font.pointSize: 12
                 text: qsTr("<a href='https://afdian.net/a/Leamus'>爱发电</a>")
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
@@ -1111,8 +1058,8 @@ Rectangle {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
 
-                font.pointSize: 16
-                text: qsTr("Ver：" + GameMakerGlobal.version)
+                font.pointSize: 12
+                text: qsTr("RPG引擎 Ver：" + GameMakerGlobal.version)
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
 

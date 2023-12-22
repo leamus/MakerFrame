@@ -297,6 +297,8 @@ function loadResources() {
 
     //是否提前载入所有资源
     _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'), 0);
+    _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'), true);
+    _private.config.rJoystickMinimumProportion = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick', '$joystickMinimumProportion'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick', '$joystickMinimumProportion'), true);
 
     //地图遮挡透明度
     itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
@@ -1465,20 +1467,20 @@ function buttonAClicked() {
     let maxDistance;
 
     //人物方向
-    switch(mainRole.moveDirection) {
-    case Qt.Key_Up:
+    switch(mainRole.direction()) {
+    case 0:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
         break;
-    case Qt.Key_Right:
+    case 1:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
-    case Qt.Key_Down:
+    case 2:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
         break;
-    case Qt.Key_Left:
+    case 3:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
@@ -1659,6 +1661,7 @@ function roleClickEvent(role, dx, dy) {
 
 //游戏主定时器
 function onTriggered() {
+    //console.time('all')
 
     //如果是0，则重新赋值
     if(timer.nLastTime <= 0) {
@@ -1761,27 +1764,29 @@ function onTriggered() {
 
             do {
                 if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x < centerX) {
-                    role.moveDirection = Qt.Key_Left;
-                    _private.startSprite(role, role.moveDirection);
+                    role.$$arrMoveDirection = [-1, 0];
+                    role.start(Qt.Key_Left);
+                    //_private.startSprite(role, Qt.Key_Left);
                 }
                 else if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x > centerX) {
-                    role.moveDirection = Qt.Key_Right;
-                    _private.startSprite(role, role.moveDirection);
+                    role.$$arrMoveDirection = [1, 0];
+                    role.start(Qt.Key_Right);
+                    //_private.startSprite(role, Qt.Key_Right);
                 }
                 else if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y < centerY) {
-                    role.moveDirection = Qt.Key_Up;
-                    _private.startSprite(role, role.moveDirection);
+                    role.$$arrMoveDirection = [0, -1];
+                    role.start(Qt.Key_Up);
+                    //_private.startSprite(role, Qt.Key_Up);
                 }
                 else if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y > centerY) {
-                    role.moveDirection = Qt.Key_Down;
-                    _private.startSprite(role, role.moveDirection);
+                    role.$$arrMoveDirection = [0, 1];
+                    role.start(Qt.Key_Down);
+                    //_private.startSprite(role, Qt.Key_Down);
                 }
                 else {
                     role.$$targetsPos.shift();
                     if(role.$$targetsPos.length === 0) {
-                        //role.moveDirection = -1;
-                        role.$$nActionType = 0;
-                        _private.stopSprite(role);
+                        role.stopMoving();
 
 
                         let eventName = `$${role.$data.$id}_arrive`;
@@ -1808,134 +1813,88 @@ function onTriggered() {
         role.$$nActionStatusKeepTime += realinterval;
 
         //走路状态
-        if(role.sprite.running) {
+        if(role.$$nActionType === 1 || role.$$nActionType === 2) {
             //console.debug("walk status")
 
             //随机走
             if(role.$$nActionType === 1) {
                 //如果到达切换状态阈值
-                if(role.$$nActionStatusKeepTime > 500) {
+                if(role.$$nActionStatusKeepTime > _private.config.nRoleChangeActionDuration) {
                     role.$$nActionStatusKeepTime = 0;
 
                     //概率停止
-                    if(GlobalLibraryJS.randTarget(5, 6) !== 0) {
-                        _private.stopSprite(role);
-                        //role.moveDirection = -1;
-                        //role.stop();
-                        //console.debug("Stop");
+                    if(GlobalLibraryJS.randTarget(_private.config.arrRoleChangeStopProbability, 100) !== 0) {
+                        role.stopMoving();
                         continue;
                     }
 
                 }
             }
 
+
             //计算走路
-            let offsetMove = Math.round(role.$data.$speed * realinterval);
-            offsetMove = _private.fComputeRoleMoveOffset(role, role.moveDirection, offsetMove);
+            //x、y轴上移动的距离（乘以比率）
+            let offsetMoveX = Math.round(role.$data.$speed * realinterval);
+            let offsetMoveY = Math.round(role.$data.$speed * realinterval);
+            offsetMoveX = Math.round(offsetMoveX * Math.abs(role.$$arrMoveDirection[0]));
+            offsetMoveY = Math.round(offsetMoveY * Math.abs(role.$$arrMoveDirection[1]));
+            //如果有移动，至少移动1
+            offsetMoveX = role.$$arrMoveDirection[0] !== 0 ? (offsetMoveX || 1) : 0;
+            offsetMoveY = role.$$arrMoveDirection[1] !== 0 ? (offsetMoveY || 1) : 0;
+
+            //x、y轴上移动的方向
+            let directionX = offsetMoveX === 0 ? -1 : role.$$arrMoveDirection[0] > 0 ? 1 : 3;
+            let directionY = offsetMoveY === 0 ? -1 : role.$$arrMoveDirection[1] > 0 ? 2 : 0;
+
+            let ret = fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY);
 
             if(role.$$nActionType === 1) {
-                if(offsetMove === 0) {
-                    _private.stopSprite(role);
-                    //role.moveDirection = -1;
-                    //role.stop();
-                    //console.debug("Stop2...");
+                if(ret === false) {
+                    role.stopMoving();
                     continue;
-                }
-
-                //console.debug("Start...", role.moveDirection, offsetMove);
-                //人物移动计算（值为按键值）
-                switch(role.moveDirection) {
-                case Qt.Key_Left:
-                    role.x -= offsetMove;
-                    break;
-
-                case Qt.Key_Right:
-                    role.x += offsetMove;
-                    break;
-
-                case Qt.Key_Up: //同Left
-                    role.y -= offsetMove;
-                    break;
-
-                case Qt.Key_Down:   //同Right
-                    role.y += offsetMove;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-
-            //定向走
-            else if(role.$$nActionType === 2) {
-
-                //console.debug("Start...", role.moveDirection, offsetMove);
-                //人物移动计算（值为按键值）
-                switch(role.moveDirection) {
-                case Qt.Key_Left:
-                    if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x < centerX && role.$$targetsPos[0].x > centerX - offsetMove)
-                        role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
-                    else
-                        role.x -= offsetMove;
-                    break;
-
-                case Qt.Key_Right:
-                    if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x > centerX && role.$$targetsPos[0].x < centerX + offsetMove)
-                        role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
-                    else
-                        role.x += offsetMove;
-                    break;
-
-                case Qt.Key_Up: //同Left
-                    if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y < centerY && role.$$targetsPos[0].y > centerY - offsetMove)
-                        role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
-                    else
-                        role.y -= offsetMove;
-                    break;
-
-                case Qt.Key_Down:   //同Right
-                    if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y > centerY && role.$$targetsPos[0].y < centerY + offsetMove)
-                        role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
-                    else
-                        role.y += offsetMove;
-                    break;
-
-                default:
-                    break;
                 }
             }
         }
         //站立状态
-        else {
-            //随机走
-            if(role.$$nActionType === 1) {
-                //如果到达切换状态阈值
-                if(role.$$nActionStatusKeepTime > 500) {
-                    role.$$nActionStatusKeepTime = 0;
+        else if(role.$$nActionType === 0) {
+            //如果到达切换状态阈值
+            if(role.$$nActionStatusKeepTime > _private.config.nRoleChangeActionDuration) {
+                role.$$nActionStatusKeepTime = 0;
 
-                    //移动（概率）
-                    //console.debug("stop status")
-                    let tn = GlobalLibraryJS.random(1, 10)
-                    if(tn === 1) {
-                        _private.startSprite(role, Qt.Key_Up);
-                        //role.moveDirection = Qt.Key_Up;
-                        //role.start();
-                    }
-                    else if(tn === 2) {
-                        _private.startSprite(role, Qt.Key_Down);
-                        //role.moveDirection = Qt.Key_Down;
-                        //role.start();
-                    }
-                    else if(tn === 3) {
-                        _private.startSprite(role, Qt.Key_Left);
-                        //role.moveDirection = Qt.Key_Left;
-                        //role.start();
-                    }
-                    else if(tn === 4) {
-                        _private.startSprite(role, Qt.Key_Right);
-                        //role.moveDirection = Qt.Key_Right;
-                        //role.start();
-                    }
+                //移动（概率）
+                //console.debug("stop status")
+                let tn = GlobalLibraryJS.random(0, 100)
+                if(tn < _private.config.arrRoleChangeActionProbability[0]) {
+                    role.$$nActionType = 1;
+                    role.$$arrMoveDirection = [0, -1];
+                    role.start(Qt.Key_Up);
+                    //_private.startSprite(role, Qt.Key_Up);
+                    //role.moveDirection = Qt.Key_Up;
+                    //role.start();
+                }
+                else if(tn < _private.config.arrRoleChangeActionProbability[1]) {
+                    role.$$nActionType = 1;
+                    role.$$arrMoveDirection = [1, 0];
+                    role.start(Qt.Key_Right);
+                    //_private.startSprite(role, Qt.Key_Right);
+                    //role.moveDirection = Qt.Key_Right;
+                    //role.start();
+                }
+                else if(tn < _private.config.arrRoleChangeActionProbability[2]) {
+                    role.$$nActionType = 1;
+                    role.$$arrMoveDirection = [0, 1];
+                    role.start(Qt.Key_Down);
+                    //_private.startSprite(role, Qt.Key_Down);
+                    //role.moveDirection = Qt.Key_Down;
+                    //role.start();
+                }
+                else if(tn < _private.config.arrRoleChangeActionProbability[3]) {
+                    role.$$nActionType = 1;
+                    role.$$arrMoveDirection = [-1, 0];
+                    role.start(Qt.Key_Left);
+                    //_private.startSprite(role, Qt.Key_Left);
+                    //role.moveDirection = Qt.Key_Left;
+                    //role.start();
                 }
             }
             //console.debug("status:", role.moveDirection)
@@ -2127,123 +2086,67 @@ function onTriggered() {
                     //console.debug('!!!ok, getup')
                 }
                 break;
-            } while(1);
+            }while(1);
         }
 
         //console.debug('moveDirection:', mainRole.moveDirection)
 
 
         //如果主角不移动，则跳出移动部分
-        if(!mainRole.sprite.running)
+        if(mainRole.$$nActionType === 0 || mainRole.$$nActionType === -1)
             break;
 
 
         //下面是移动代码
 
-        //计算真实移动偏移，初始为 角色速度 * 时间差
-        let offsetMove = Math.round(mainRole.$data.$speed * realinterval);
+        //计算 真实移动偏移，初始为 角色速度 * 时间差
+        let offsetMoveX = Math.round(mainRole.$data.$speed * realinterval);
+        let offsetMoveY = Math.round(mainRole.$data.$speed * realinterval);
 
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        if(_private.config.rJoystickSpeed > 0 && mainRole.$$nActionType === 10 && _private.arrPressedKeys.length === 0) {
-            let tOffset;    //遥感百分比
-            if(mainRole.moveDirection === Qt.Key_Left || mainRole.moveDirection === Qt.Key_Right) {
+        //鹰：摇杆、键盘统一 放在 doMove 中处理
+        if(_private.config.rJoystickMinimumProportion > 0 && mainRole.$$nActionType === 10 && _private.arrPressedKeys.length === 0) {
+            /*let tOffset;    //遥感百分比
+            if(mainRole.direction() === 3 || mainRole.direction() === 1) {
                 tOffset = Math.abs(joystick.pointInput.x);
             }
             else {
                 tOffset = Math.abs(joystick.pointInput.y);
             }
             //小于最小值
-            if(tOffset < _private.config.rJoystickSpeed)
-                tOffset = _private.config.rJoystickSpeed;
+            if(tOffset < _private.config.rJoystickMinimumProportion)
+                tOffset = _private.config.rJoystickMinimumProportion;
             offsetMove = Math.round(offsetMove * tOffset);
+            */
+
+            /*let tOffsetX = Math.abs(joystick.pointInput.x), tOffsetY = Math.abs(joystick.pointInput.y);
+            //小于最小值
+            if(tOffsetX < _private.config.rJoystickMinimumProportion)
+                tOffsetX = 0;
+            if(tOffsetY < _private.config.rJoystickMinimumProportion)
+                tOffsetY = 0;
+            offsetMoveX = Math.round(offsetMoveX * tOffsetX);
+            offsetMoveY = Math.round(offsetMoveY * tOffsetY);
+            */
         }
 
+        //x、y轴上移动的距离（乘以比率）
+        offsetMoveX = Math.round(offsetMoveX * Math.abs(mainRole.$$arrMoveDirection[0]));
+        offsetMoveY = Math.round(offsetMoveY * Math.abs(mainRole.$$arrMoveDirection[1]));
+        //x、y轴上移动的方向
+        let directionX = offsetMoveX === 0 ? -1 : mainRole.$$arrMoveDirection[0] > 0 ? 1 : 3;
+        let directionY = offsetMoveY === 0 ? -1 : mainRole.$$arrMoveDirection[1] > 0 ? 2 : 0;
 
-        //计算障碍距离
-        offsetMove = _private.fComputeRoleMoveToObstacleOffset(mainRole, mainRole.moveDirection, offsetMove);
-        if(offsetMove === 0) {  //如果碰墙
+        //console.warn(mainRole.$$arrMoveDirection, directionX, directionY);
 
-            if(!fChangeMainRoleDirection())
-                break;
-        }
-
-        //计算与其他角色距离
-        offsetMove = fComputeRoleMoveToRolesOffset(mainRole, mainRole.moveDirection, offsetMove);
-
-        if(offsetMove !== undefined && offsetMove !== 0) {
-            //console.debug("offsetMove:", offsetMove);
-        }
-        else
-            break;
+        //计算最终移动的x、y距离
+        fComputeRoleMultiMoveOffset(mainRole, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY);
+        ///if(offsetMoveX === 0 && offsetMoveY === 0)
+        ///    break;
 
 
         //存主角的新坐标
         //let roleNewX = mainRole.x, roleNewY = mainRole.y;
-
-        //定向走
-        if(mainRole.$$nActionType === 2) {
-
-            //console.debug("Start...", mainRole.moveDirection, offsetMove);
-            //人物移动计算（值为按键值）
-            switch(mainRole.moveDirection) {
-            case Qt.Key_Left:
-                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x < centerX && mainRole.$$targetsPos[0].x > centerX - offsetMove) {
-                    mainRole.x = mainRole.$$targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
-                }
-                else
-                    mainRole.x -= offsetMove;
-                break;
-
-            case Qt.Key_Right:
-                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x > centerX && mainRole.$$targetsPos[0].x < centerX + offsetMove) {
-                    mainRole.x = mainRole.$$targetsPos[0].x - mainRole.x1 - parseInt(mainRole.width1 / 2);
-                }
-                else
-                    mainRole.x += offsetMove;
-                break;
-
-            case Qt.Key_Up: //同Left
-                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y < centerY && mainRole.$$targetsPos[0].y > centerY - offsetMove)
-                    mainRole.y = mainRole.$$targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
-                else
-                    mainRole.y -= offsetMove;
-                break;
-
-            case Qt.Key_Down:   //同Right
-                if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y > centerY && mainRole.$$targetsPos[0].y < centerY + offsetMove)
-                    mainRole.y = mainRole.$$targetsPos[0].y - mainRole.y1 - parseInt(mainRole.height1 / 2);
-                else
-                    mainRole.y += offsetMove;
-                break;
-
-            default:
-                break;
-            }
-        }
-        else {
-            //人物移动计算（值为按键值）
-            switch(mainRole.moveDirection) {
-            case Qt.Key_Left:
-                mainRole.x -= offsetMove;
-                break;
-
-            case Qt.Key_Right:
-                mainRole.x += offsetMove;
-                break;
-
-            case Qt.Key_Up: //同Left
-                mainRole.y -= offsetMove;
-                break;
-
-            case Qt.Key_Down:   //同Right
-                mainRole.y += offsetMove;
-                break;
-
-            default:
-                break;
-            }
-        }
-
 
 
         //mainRole.x = roleNewX;
@@ -2279,7 +2182,7 @@ function onTriggered() {
                     if(mainRole.moveDirection === Qt.Key_Left) {
 
                         let v = (px + 1) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x1);
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, v);
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, v);
                         roleNewX = rolePos[0];
                         checkover = true;
 
@@ -2287,7 +2190,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Right) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x2));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x2));
                         roleNewX = rolePos[0];
                         checkover = true;
 
@@ -2295,7 +2198,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Up) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y1));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y1));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2303,7 +2206,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Down) {
 
-                        let rolePos = _private.fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y2));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y2));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2391,10 +2294,14 @@ function onTriggered() {
 
     }while(0);
 
+    //console.timeEnd('all')
 
+
+    //如果有跟随目标
     if(_private.sceneRole)
         //开始移动地图
         setSceneToRole(_private.sceneRole);
+    //移动地图
     else {
         //下面是移动代码
 
@@ -2416,15 +2323,15 @@ function onTriggered() {
                 offsetMoveY = Math.round(dta);
         }
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        else if(_private.config.rJoystickSpeed > 0) {
+        else if(_private.config.rJoystickMinimumProportion > 0) {
             offsetMoveX = Math.round(dta);
             offsetMoveY = Math.round(dta);
 
             let tOffset;    //遥感百分比
-            //if(Math.abs(joystick.pointInput.x) < _private.config.rJoystickSpeed) {
+            //if(Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion) {
                 offsetMoveX = Math.round(offsetMoveX * joystick.pointInput.x);
             //}
-            //if(Math.abs(joystick.pointInput.y) < _private.config.rJoystickSpeed) {
+            //if(Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion) {
                 offsetMoveY = Math.round(offsetMoveY * joystick.pointInput.y);
             //}
         }
@@ -2471,6 +2378,176 @@ function onTriggered() {
 }
 
 
+
+//计算角色多方向行动时的偏移
+//注意：当 单向移动时，返回可以移动的偏移（因为定向移动还需要判断一次）；
+function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY) {
+    if(directionX === -1 || directionY === -1) {
+        if(directionX !== -1)   //如果只是y方向移动
+            offsetMoveX = fComputeRoleMoveOffset(role, directionX, offsetMoveX);
+        else
+            offsetMoveX = 0;
+        if(directionY !== -1)   //如果只是y方向移动
+            offsetMoveY = fComputeRoleMoveOffset(role, directionY, offsetMoveY);
+        else
+            offsetMoveY = 0;
+
+        if(offsetMoveX === 0 && offsetMoveY === 0)
+            return false;
+
+
+        //定向走，需要检查处理是否越过
+        if(role.$$nActionType === 2) {
+
+            //console.debug("Start...", role.moveDirection, offsetMove);
+            //人物移动计算（值为按键值）
+            switch(role.direction()) {
+            case 3:
+                //如果$$targetsPos有x值，且大于等于0、小于角色中心坐标，角色移动后会超过；
+                if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x < centerX && role.$$targetsPos[0].x > centerX - offsetMoveX) {
+                    //直接设置
+                    role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
+                }
+                else
+                    role.x -= offsetMoveX;
+                break;
+
+            case 1:
+                //含义同上
+                if(role.$$targetsPos[0] && role.$$targetsPos[0].x >= 0 && role.$$targetsPos[0].x > centerX && role.$$targetsPos[0].x < centerX + offsetMoveX) {
+                    role.x = role.$$targetsPos[0].x - role.x1 - parseInt(role.width1 / 2);
+                }
+                else
+                    role.x += offsetMoveX;
+                break;
+
+            case 0:
+                //含义同上
+                if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y < centerY && role.$$targetsPos[0].y > centerY - offsetMoveY)
+                    role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
+                else
+                    role.y -= offsetMoveY;
+                break;
+
+            case 2:
+                //含义同上
+                if(role.$$targetsPos[0] && role.$$targetsPos[0].y >= 0 && role.$$targetsPos[0].y > centerY && role.$$targetsPos[0].y < centerY + offsetMoveY)
+                    role.y = role.$$targetsPos[0].y - role.y1 - parseInt(role.height1 / 2);
+                else
+                    role.y += offsetMoveY;
+                break;
+
+            default:
+                break;
+            }
+        }
+        //直接处理
+        else {
+            /*/人物移动计算（值为按键值）
+            switch(role.direction()) {
+            case 3:
+                role.x -= offsetMove;
+                break;
+
+            case 1:
+                role.x += offsetMove;
+                break;
+
+            case 0: //同Left
+                role.y -= offsetMove;
+                break;
+
+            case 2:   //同Right
+                role.y += offsetMove;
+                break;
+
+            default:
+                break;
+            }
+            */
+
+            if(role.$$arrMoveDirection[0] > 0)
+                role.x += offsetMoveX;
+            else
+                role.x -= offsetMoveX;
+            if(role.$$arrMoveDirection[1] > 0)
+                role.y += offsetMoveY;
+            else
+                role.y -= offsetMoveY;
+        }
+
+        return true;
+    }
+    //如果x方向移动的多，则以y为步进，循环计算y和x方向的可移动偏移
+    if(offsetMoveX > offsetMoveY) {
+        let proportion = offsetMoveX / offsetMoveY; //倍数；y步进时，每次x都会乘以这个数
+        let ox = 0; //上次的x偏差（因为计算dx时会四舍五入，下次计算时要去掉这个偏差再计算）
+        //y步进循环
+        for(let oy = 1; oy <= offsetMoveY; ++oy) {
+            let dy = fComputeRoleMoveOffset(role, directionY, 1);   //y方向偏移
+            let dx = fComputeRoleMoveOffset(role, directionX, Math.round(proportion + ox)); //x方向偏移
+
+
+            if(directionX === 1)
+                role.x += dx;
+            else
+                role.x -= dx;
+            if(directionY === 2)
+                role.y += dy;
+            else
+                role.y -= dy;
+
+
+            //计算x偏差
+            ox = proportion - Math.round(proportion + ox);
+        }
+    }
+    else {
+        //同上
+        let proportion = offsetMoveY / offsetMoveX;
+        let oy = 0;
+        for(let ox = 1; ox <= offsetMoveX; ++ox) {
+            let dx = fComputeRoleMoveOffset(role, directionX, 1);
+            let dy = fComputeRoleMoveOffset(role, directionY, Math.round(proportion + oy));
+
+
+            if(directionX === 1)
+                role.x += dx;
+            else
+                role.x -= dx;
+            if(directionY === 2)
+                role.y += dy;
+            else
+                role.y -= dy;
+
+
+            oy = proportion - Math.round(proportion + oy);
+        }
+    }
+
+    return true;
+}
+
+//计算 role 在 derect方向 在 offsetMove 距离中最多能移动的距离
+//  Role向direction方向移动offsetMove，如果遇到障碍或其他role，则返回离最近障碍的距离
+function fComputeRoleMoveOffset(role, direction, offsetMove) {
+
+    if(offsetMove <= 0)
+        return 0;
+
+    if(role.width1 <= 0 || role.height1 <= 0)
+        return offsetMove;
+
+    offsetMove = fComputeRoleMoveToObstacleOffset(role, direction, offsetMove);
+
+    if(offsetMove <= 0)
+        return 0;
+
+    offsetMove = fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
+
+    return offsetMove;
+}
+
 //计算 role 在 direction 方向 在 offsetMove 距离中碰到其他roles的距离
 function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
 
@@ -2481,7 +2558,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
         return 0;
 
     switch(direction) {
-    case Qt.Key_Left:
+    case 3:
 
         //与其他角色碰撞
         for(let r in objRoles) {
@@ -2522,7 +2599,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
 
         break;
 
-    case Qt.Key_Right:
+    case 1:
 
         for(let r in objRoles) {
             //跳过自身
@@ -2561,7 +2638,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
 
         break;
 
-    case Qt.Key_Up: //同Left
+    case 0: //同Left
 
         for(let r in objRoles) {
             //跳过自身
@@ -2600,7 +2677,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
 
         break;
 
-    case Qt.Key_Down:   //同Right
+    case 2:   //同Right
 
         for(let r in objRoles) {
             //跳过自身
@@ -2644,6 +2721,171 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
         return;
     }
 
+}
+
+
+//计算 role 在 moveDirection 方向 在 offsetMove 距离中碰到障碍的距离
+//  障碍算法：从direction方向依次循环每个地图块，如果遇到障碍就返回距离（肯定是最近）
+function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
+
+    if(offsetMove <= 0)
+        return 0;
+
+    let computeOver = false;//是否计算完毕（遇到图块就停止）
+    //计算移动后占用图块
+    let usedMapBlocks;
+
+
+    //计算障碍距离（值为按键值）
+    switch(direction) {
+    case 3:
+
+        //如果超过地图左，则返回到左边的距离
+        if(role.x + role.x1 - offsetMove < 0)
+            offsetMove = role.x + role.x1;
+
+        usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
+
+        //console.debug("usedMapBlocks:", usedMapBlocks);
+
+        //从上到下，从右到左（由近到远） 检测障碍
+        for(let xb = usedMapBlocks[2]; usedMapBlocks[0] <= xb; --xb) {
+            for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
+                let strP = [xb, yb].toString();
+
+                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //存在特殊图块
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                    //!!!这里需要修改
+                    //障碍
+                    case -1:
+                        //计算离障碍距离
+                        offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
+                        computeOver = true;
+                        break;
+                    default:
+                        continue;
+                    }
+                    if(computeOver)
+                        break;
+                }
+            }
+            if(computeOver)
+                break;
+        }
+        break;
+
+    case 1:
+
+        //如果超过地图右，则返回到右边的距离
+        if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width)
+            offsetMove = itemViewPort.itemContainer.width - (role.x + role.x2) - 1;
+
+        usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
+
+        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //从上到下，从左到右
+        for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
+            for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
+                let strP = [xb, yb].toString();
+
+                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //存在障碍
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        //!!!这里需要修改
+                    case -1:
+                        offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
+                        computeOver = true;
+                        break;
+                    default:
+                        continue;
+                    }
+                    if(computeOver)
+                        break;
+                }
+            }
+            if(computeOver)
+                break;
+        }
+        break;
+
+    case 0: //同Left
+
+        //如果超过地图上，则返回到上边的距离
+        if(role.y + role.y1 - offsetMove < 0)
+            offsetMove = role.y + role.y1;
+
+        usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
+
+        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //从左到右，从下到上
+        for(let yb = usedMapBlocks[3]; yb >= usedMapBlocks[1]; --yb) {
+            for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
+                let strP = [xb, yb].toString();
+
+                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //存在障碍
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        //!!!这里需要修改
+                    case -1:
+                        offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
+                        computeOver = true;
+                        break;
+                    default:
+                        continue;
+                    }
+                    if(computeOver)
+                        break;
+                }
+            }
+            if(computeOver)
+                break;
+        }
+        break;
+
+    case 2:   //同Right
+
+        //如果超过地图下，则返回到下边的距离
+        if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height)
+            offsetMove = itemViewPort.itemContainer.height - (role.y + role.y2) - 1;
+
+        usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
+
+        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //从左到右，从上到下
+        for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
+            for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
+                let strP = [xb, yb].toString();
+
+                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //存在障碍
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+                        //!!!这里需要修改
+                    case -1:
+                        offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
+                        computeOver = true;
+                        break;
+                    default:
+                        continue;
+                    }
+                    if(computeOver)
+                        break;
+                }
+            }
+            if(computeOver)
+                break;
+        }
+        break;
+
+    default:
+        return;
+    }
+
+    return offsetMove;
 }
 
 
@@ -2695,7 +2937,7 @@ function fChangeMainRoleDirection() {
             return;
         }
         if(toffset1 < toffset2) {
-            if(toffset1 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Left, toffset1)) {
+            if(toffset1 < fComputeRoleMoveOffset(mainRole, Qt.Key_Left, toffset1)) {
                 console.debug("！！左有障碍返回")
                 return;
             }
@@ -2707,7 +2949,7 @@ function fChangeMainRoleDirection() {
                 offsetMove = toffset1;
         }
         else {
-            if(toffset2 < _private.fComputeRoleMoveOffset(mainRole, Qt.Key_Right, toffset2)) {
+            if(toffset2 < fComputeRoleMoveOffset(mainRole, Qt.Key_Right, toffset2)) {
                 console.debug("！！右有障碍返回")
                 return;
             }

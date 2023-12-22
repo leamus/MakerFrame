@@ -334,6 +334,7 @@ Rectangle {
             if(!role.$name) {
                 role.$name = role.RId;
             }
+            role.$rid = role.RId;
 
 
             for(let th of _private.arrMainRoles) {
@@ -355,7 +356,7 @@ Rectangle {
             console.debug('[GameScene]createhero：filePath：', filePath);
 
             if(cfg === '') {
-                console.warn('[!GameScene]角色读取失败：', cfg);
+                console.warn('[!GameScene]角色读取失败：', role.RId);
                 return false;
             }
             cfg = JSON.parse(cfg);
@@ -368,12 +369,12 @@ Rectangle {
 
             let trole = {$index: index, $x: mainRole.x, $y: mainRole.y};
 
-            trole.$speed = parseFloat(cfg.MoveSpeed);
-            trole.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
-            trole.$avatar = cfg.Avatar || '';
-            trole.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
-            trole.$showName = isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName);
-            trole.$penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
+            trole.$speed = trole.$speed ?? parseFloat(cfg.MoveSpeed);
+            trole.$scale = trole.$scale ?? [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
+            trole.$avatar = trole.$avatar || cfg.Avatar || '';
+            trole.$avatarSize = trole.$avatarSize || [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
+            trole.$showName = trole.$showName ?? (isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName));
+            trole.$penetrate = trole.$penetrate ?? (isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate));
 
             GlobalLibraryJS.copyPropertiesToObject(trole, role, {objectRecursion: 0});
 
@@ -490,8 +491,8 @@ Rectangle {
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
                     hero.$name = heroComp.textName.text = props.$name;
-                if(props.$showName === true)   //显示名字
-                    hero.$showName = heroComp.textName.visible = true;
+                if(props.$showName !== undefined)   //修改名字
+                    hero.$showName = heroComp.textName.visible = props.$showName;
                 else if(props.$showName === false)
                     hero.$showName = heroComp.textName.visible = false;
                 if(props.$penetrate !== undefined)   //可穿透
@@ -569,11 +570,11 @@ Rectangle {
 
 
                 if(props.$direction !== undefined)
-                    heroComp.changeDirection(props.$direction);
+                    heroComp.start(props.$direction, null);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
                     GlobalLibraryJS.setTimeout(function() {
                             if(heroComp)
-                                heroComp.changeDirection(props.$direction);
+                                heroComp.start(props.$direction, null);
                         },20,rootGameScene
                     );*/
 
@@ -744,6 +745,8 @@ Rectangle {
             if(!role.$name) {
                 role.$name = role.RId;
             }
+            role.$rid = role.RId;
+
 
             if(_private.objRoles[role.$id] !== undefined)
                 return false;
@@ -797,12 +800,12 @@ Rectangle {
 
 
             //roleComp.$name = role.$name;
-            role.$speed = parseFloat(cfg.MoveSpeed);
-            role.$scale = [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
-            role.$avatar = cfg.Avatar || '';
-            role.$avatarSize = [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
-            role.$showName = isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName);
-            role.$penetrate = isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate);
+            role.$speed = role.$speed ?? parseFloat(cfg.MoveSpeed);
+            role.$scale = role.$scale ?? [((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0] : 1), ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1] : 1)];
+            role.$avatar = role.$avatar || cfg.Avatar || '';
+            role.$avatarSize = role.$avatarSize || [((cfg.AvatarSize && cfg.AvatarSize[0] !== undefined) ? cfg.AvatarSize[0] : 0), ((cfg.AvatarSize && cfg.AvatarSize[1] !== undefined) ? cfg.AvatarSize[1] : 0)];
+            role.$showName = role.$showName ?? (isNaN(parseInt(cfg.ShowName)) ? 1 : parseInt(cfg.ShowName));
+            role.$penetrate = role.$penetrate ?? (isNaN(parseInt(cfg.Penetrate)) ? 0 : parseInt(cfg.Penetrate));
 
             role.__proto__ = cfg;
 
@@ -855,10 +858,8 @@ Rectangle {
 
                 if(props.$name !== undefined)   //修改名字
                     role.$name = roleComp.textName.text = props.$name;
-                if(props.$showName === true)   //修改名字
-                    role.$showName = roleComp.textName.visible = true;
-                else if(props.$showName === false)
-                    role.$showName = roleComp.textName.visible = false;
+                if(props.$showName !== undefined)   //修改名字
+                    role.$showName = roleComp.textName.visible = props.$showName;
                 if(props.$penetrate !== undefined)   //可穿透
                     role.$penetrate = /*roleComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
@@ -937,11 +938,11 @@ Rectangle {
 
 
                 if(props.$direction !== undefined)
-                    roleComp.changeDirection(props.$direction);
+                    roleComp.start(props.$direction, null);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
                     GlobalLibraryJS.setTimeout(function() {
                             if(roleComp)
-                                roleComp.changeDirection(props.$direction);
+                                roleComp.start(props.$direction, null);
                         },20,rootGameScene
                     );
                     */
@@ -2016,7 +2017,7 @@ Rectangle {
                 //判断行动或静止状态
 
                 //行动中
-                if(_private.getSpritePlay(mainRole)) {
+                if(mainRole.isMoving()) {
                     if((0b1 & flag) === 0)
                         return;
                 }
@@ -3156,6 +3157,7 @@ Rectangle {
             for(let th of game.gd["$sys_main_roles"]) {
                 let mainRole = game.createhero(th.$rid);
                 mainRole.$$nActionType = 0;
+                mainRole.$$arrMoveDirection = [];
                 //game.hero(mainRole, th);
             }
 
@@ -3520,6 +3522,7 @@ Rectangle {
 
             //资源
             resources: $resources,
+            jsEngine: _private.jsEngine,
         })
 
 
@@ -3999,131 +4002,6 @@ Rectangle {
 
 
 
-    //Keys.forwardTo: [itemViewPort.itemContainer]
-
-    Keys.onEscapePressed: {
-        _private.exitGame();
-        event.accepted = true;
-
-        console.debug("[GameScene]Escape Key");
-    }
-    Keys.onBackPressed: {
-        _private.exitGame();
-        event.accepted = true;
-
-        console.debug("[GameScene]Back Key");
-    }
-    Keys.onTabPressed: {
-        rootGameScene.forceActiveFocus();
-
-        event.accepted = true;
-        console.debug("[GameScene]Tab Key");
-    }
-    Keys.onSpacePressed: {
-        event.accepted = true;
-    }
-
-
-
-    Keys.onPressed: {   //键盘按下
-        //console.debug("[GameScene]Keys.onPressed:", event.key, event.isAutoRepeat);
-
-        if(!_private.config.bKeyboard)
-            return;
-
-
-        switch(event.key) {
-        case Qt.Key_Up:
-        case Qt.Key_Right:
-        case Qt.Key_Down:
-        case Qt.Key_Left:
-            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
-                event.accepted = true;
-                //mainRole.start();
-                return;
-            }
-
-            //_private.arrPressedKeys[key] = true; //保存键盘按下
-            _private.arrPressedKeys.push(event.key);
-
-            if(mainRole.$$nActionType === -1)
-                return;
-
-
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
-                _private.doAction(1, event.key);
-                mainRole.$$nActionType = 1;
-            }
-
-            event.accepted = true;
-
-            break;
-
-        case Qt.Key_Return:
-            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
-                event.accepted = true;
-                return;
-            }
-
-            if(mainRole.$$nActionType === -1)
-                return;
-
-
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                GameSceneJS.buttonAClicked();
-
-
-            event.accepted = true;
-
-            break;
-
-        default:
-            event.accepted = true;
-        }
-    }
-
-    Keys.onReleased: {
-        //console.debug("[GameScene]Keys.onReleased", event.isAutoRepeat);
-
-        if(!_private.config.bKeyboard)
-            return;
-
-
-        switch(event.key) {
-        case Qt.Key_Up:
-        case Qt.Key_Right:
-        case Qt.Key_Down:
-        case Qt.Key_Left:
-            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
-                event.accepted = true;
-                return;
-            }
-
-            //delete arrPressedKeys[key]; //从键盘保存中删除
-            _private.arrPressedKeys.splice(_private.arrPressedKeys.indexOf(event.key), 1);
-
-
-            if(mainRole.$$nActionType === -1)
-                return;
-
-
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
-                _private.stopAction(1, event.key);
-            }
-
-            event.accepted = true;
-
-            break;
-
-        default:
-            event.accepted = true;
-        }
-
-
-        //console.debug("[GameScene]timer", timer.running);
-    }
-
-
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
@@ -4217,6 +4095,7 @@ Rectangle {
             }
 
             onPointInputChanged: {
+                //console.debug("[GameScene]onPointInputChanged", pointInput);
                 //if(pointInput === Qt.point(0,0))
                 //    return;
 
@@ -4230,11 +4109,12 @@ Rectangle {
                     return;
 
 
+                if(Math.abs(pointInput.x) < rJoystickIgnore && Math.abs(pointInput.y) < rJoystickIgnore) {    //忽略
+                    _private.stopAction(0);
+                    return;
+                }
+
                 if(Math.abs(pointInput.x) > Math.abs(pointInput.y)) {
-                    if(Math.abs(pointInput.x) < rJoystickIgnore) {    //忽略
-                        _private.stopAction(0);
-                        return;
-                    }
 
                     if(pointInput.x > 0)
                         _private.doAction(0, Qt.Key_Right);
@@ -4242,19 +4122,13 @@ Rectangle {
                         _private.doAction(0, Qt.Key_Left);
                 }
                 else {
-                    if(Math.abs(pointInput.y) < rJoystickIgnore) {    //忽略
-                        _private.stopAction(0);
-                        return;
-                    }
-
                     if(pointInput.y > 0)
                         _private.doAction(0, Qt.Key_Down);
                     else
                         _private.doAction(0, Qt.Key_Up);
                 }
-                mainRole.$$nActionType = 10;
 
-                //console.debug("[GameScene]onPointInputChanged", pointInput);
+                mainRole.$$nActionType = 10;
             }
         }
 
@@ -5407,17 +5281,28 @@ Rectangle {
 
         //游戏配置/设置
         property var config: QtObject {
+            //下面是游戏中可以修改的
             property int nInterval: 16
 
             property var objPauseNames: ({})     //暂停游戏（只停止游戏timer主循环，不会停止事件队列）
 
-            property real rJoystickSpeed: 0.2   //开启摇杆加速功能（最低速度比例）
-
             //键盘是否可以操作
             property bool bKeyboard: true
 
+
+            //下面是从配置中读取的：
             //是否游戏提前载入所有资源
             property int nLoadAllResources: 0
+            property bool bWalkAllDirections: true
+            property real rJoystickMinimumProportion: 0.2   //开启摇杆加速功能（最低速度比例）
+
+
+            //角色切换状态时长（毫秒）
+            property int nRoleChangeActionDuration: 500
+            //切换上右下左的概率（叠加概率，非概率值）（剩下是继续停止状态概率）
+            property var arrRoleChangeActionProbability: [10, 20, 30, 40]
+            //从行动 切换 停止状态概率
+            property int arrRoleChangeStopProbability: 60
 
         }
 
@@ -5489,30 +5374,143 @@ Rectangle {
         //键盘处理
         property var arrPressedKeys: ([]) //保存按下的方向键
 
-        //type为0表示按钮，type为1表示键盘，2为自动行走
+        //处理主角移动时的横纵方向的速率
+        function doMove(type, key) {
+            mainRole.$$arrMoveDirection = [0, 0];
+
+            //摇杆
+            if(type === 0) {
+                //四向
+                if(!_private.config.bWalkAllDirections) {
+                    //判断x、y的偏移哪个大
+                    if(Math.abs(joystick.pointInput.x) > Math.abs(joystick.pointInput.y)) {
+                        mainRole.$$arrMoveDirection[0] = Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.x;
+                    }
+                    else {
+                        mainRole.$$arrMoveDirection[1] = Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.y;
+                    }
+                }
+                //多向
+                else {
+                    mainRole.$$arrMoveDirection[0] = Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.x;
+                    mainRole.$$arrMoveDirection[1] = Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.y;
+                }
+            }
+            //键盘
+            else if(type === 1) {
+                //四向
+                if(!_private.config.bWalkAllDirections) {
+                    switch(_private.arrPressedKeys[_private.arrPressedKeys.length - 1]) {
+                    case Qt.Key_Down:
+                        mainRole.$$arrMoveDirection[1] = 1;
+                        break;
+                    case Qt.Key_Left:
+                        mainRole.$$arrMoveDirection[0] = -1;
+                        break;
+                    case Qt.Key_Right:
+                        mainRole.$$arrMoveDirection[0] = 1;
+                        break;
+                    case Qt.Key_Up:
+                        mainRole.$$arrMoveDirection[1] = -1;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                //多向
+                else {
+                    if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0 && _private.arrPressedKeys.indexOf(Qt.Key_Right) >= 0) {
+                        mainRole.$$arrMoveDirection[0] = 0;
+                    }
+                    else if(_private.arrPressedKeys.indexOf(Qt.Key_Left) < 0 && _private.arrPressedKeys.indexOf(Qt.Key_Right) < 0) {
+                        mainRole.$$arrMoveDirection[0] = 0;
+                    }
+                    else {
+                        if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0)
+                            mainRole.$$arrMoveDirection[0] = -1;
+                        else
+                            mainRole.$$arrMoveDirection[0] = 1;
+                    }
+
+                    if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0 && _private.arrPressedKeys.indexOf(Qt.Key_Down) >= 0) {
+                        mainRole.$$arrMoveDirection[1] = 0;
+                    }
+                    else if(_private.arrPressedKeys.indexOf(Qt.Key_Up) < 0 && _private.arrPressedKeys.indexOf(Qt.Key_Down) < 0) {
+                        mainRole.$$arrMoveDirection[1] = 0;
+                    }
+                    else {
+                        if(mainRole.$$arrMoveDirection[0] !== 0) {
+                            mainRole.$$arrMoveDirection[0] = mainRole.$$arrMoveDirection[0] === -1 ? -0.71 : 0.71;
+                        }
+
+                        if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0) {
+                            if(mainRole.$$arrMoveDirection[0] !== 0) {
+                                mainRole.$$arrMoveDirection[1] = -0.71;
+                            }
+                            else
+                                mainRole.$$arrMoveDirection[1] = -1;
+                        }
+                        else {
+                            if(mainRole.$$arrMoveDirection[0] !== 0) {
+                                mainRole.$$arrMoveDirection[1] = 0.71;
+                            }
+                            else
+                                mainRole.$$arrMoveDirection[1] = 1;
+                        }
+                    }
+                }
+            }
+            //定向移动
+            else if(type === 2) {
+                switch(key) {
+                case Qt.Key_Down:
+                    mainRole.$$arrMoveDirection[1] = 1;
+                    break;
+                case Qt.Key_Left:
+                    mainRole.$$arrMoveDirection[0] = -1;
+                    break;
+                case Qt.Key_Right:
+                    mainRole.$$arrMoveDirection[0] = 1;
+                    break;
+                case Qt.Key_Up:
+                    mainRole.$$arrMoveDirection[1] = -1;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        //type为0表示摇杆，type为1表示键盘，2为自动行走
         function doAction(type, key) {
+            doMove(type, key);
+
             switch(key) {
             case Qt.Key_Down:
-                _private.startSprite(mainRole, Qt.Key_Down);
-                //mainRole.moveDirection = Qt.Key_Down; //移动方向
+                mainRole.start(Qt.Key_Down);
+                //_private.startSprite(mainRole, Qt.Key_Down);
+                //mainRole.$$nMoveDirectionFlag = Qt.Key_Down; //移动方向
                 //mainRole.start();
                 //timer.start();  //开始移动
                 break;
             case Qt.Key_Left:
-                _private.startSprite(mainRole, Qt.Key_Left);
-                //mainRole.moveDirection = Qt.Key_Left;
+                mainRole.start(Qt.Key_Left);
+                //_private.startSprite(mainRole, Qt.Key_Left);
+                //mainRole.$$nMoveDirectionFlag = Qt.Key_Left;
                 //mainRole.start();
                 //timer.start();
                 break;
             case Qt.Key_Right:
-                _private.startSprite(mainRole, Qt.Key_Right);
-                //mainRole.moveDirection = Qt.Key_Right;
+                mainRole.start(Qt.Key_Right);
+                //_private.startSprite(mainRole, Qt.Key_Right);
+                //mainRole.$$nMoveDirectionFlag = Qt.Key_Right;
                 //mainRole.start();
                 //timer.start();
                 break;
             case Qt.Key_Up:
-                _private.startSprite(mainRole, Qt.Key_Up);
-                //mainRole.moveDirection = Qt.Key_Up;
+                mainRole.start(Qt.Key_Up);
+                //_private.startSprite(mainRole, Qt.Key_Up);
+                //mainRole.$$nMoveDirectionFlag = Qt.Key_Up;
                 //mainRole.start();
                 //timer.start();
                 break;
@@ -5539,37 +5537,36 @@ Rectangle {
                     //if(l.length === 0) {    //如果没有键被按下
                     if(l.length === 0) {
                         //timer.stop();
-                        _private.stopSprite(mainRole);
+                        mainRole.stopMoving();
                         //mainRole.stop();
                         //console.debug("[GameScene]_private.stopAction stop");
                     }
                     else {
-                        _private.startSprite(mainRole, l[0]);
-                        //mainRole.moveDirection = l[0];    //弹出第一个按键
+                        doMove(type);
+
+                        mainRole.$$nActionType = mainRole.$$nActionType === -1 ? -1 : 1;
+                        mainRole.start(l[0]);
+                        //_private.startSprite(mainRole, l[0]);
+                        //mainRole.$$nMoveDirectionFlag = l[0];    //弹出第一个按键
                         //mainRole.start();
                         //console.debug("[GameScene]_private.stopAction nextKey");
                     }
                     break;
 
-                default:
+                default:    //-1
                     arrPressedKeys = [];
 
-                    _private.stopSprite(mainRole);
+                    mainRole.stopMoving();
+
                     //mainRole.stop();
                     //console.debug("[GameScene]_private.stopAction stop1");
                 }
             }
             else {
-                _private.stopSprite(mainRole);
+                mainRole.stopMoving();
                 //mainRole.stop();
                 //console.debug("[GameScene]_private.stopAction stop2");
             }
-
-
-            if(mainRole.$$nActionType === -1)
-                return;
-
-            mainRole.$$nActionType = 0;
         }
 
 
@@ -5580,214 +5577,6 @@ Rectangle {
             game.window(1);
 
         }*/
-
-
-
-        //开始播放某个方向的精灵
-        function startSprite(role, key) {
-            role.moveDirection = key; //移动方向
-            role.start();
-        }
-        //停止播放
-        function stopSprite(role) {
-            //role.moveDirection = -1;
-            role.stop();
-        }
-
-        //某角色是否在移动
-        function getSpritePlay(role) {
-            return role.sprite.running;
-            //或者 role.moveDirection === -1;  //
-        }
-
-
-
-        //计算 role 在 moveDirection 方向 在 offsetMove 距离中碰到障碍的距离
-        //  障碍算法：从direction方向依次循环每个地图块，如果遇到障碍就返回距离（肯定是最近）
-        function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
-
-            if(offsetMove <= 0)
-                return 0;
-
-            let computeOver = false;//是否计算完毕（遇到图块就停止）
-            //计算移动后占用图块
-            let usedMapBlocks;
-
-
-            //计算障碍距离（值为按键值）
-            switch(direction) {
-            case Qt.Key_Left:
-
-                //如果超过地图左，则返回到左边的距离
-                if(role.x + role.x1 - offsetMove < 0)
-                    offsetMove = role.x + role.x1;
-
-                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
-
-                //console.debug("usedMapBlocks:", usedMapBlocks);
-
-                //从上到下，从右到左（由近到远） 检测障碍
-                for(let xb = usedMapBlocks[2]; usedMapBlocks[0] <= xb; --xb) {
-                    for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
-                        let strP = [xb, yb].toString();
-
-                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                        //存在特殊图块
-                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                            //!!!这里需要修改
-                            //障碍
-                            case -1:
-                                //计算离障碍距离
-                                offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
-                                computeOver = true;
-                                break;
-                            default:
-                                continue;
-                            }
-                            if(computeOver)
-                                break;
-                        }
-                    }
-                    if(computeOver)
-                        break;
-                }
-                break;
-
-            case Qt.Key_Right:
-
-                //如果超过地图右，则返回到右边的距离
-                if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width)
-                    offsetMove = itemViewPort.itemContainer.width - (role.x + role.x2) - 1;
-
-                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
-
-                //console.debug("usedMapBlocks:", usedMapBlocks);
-                //从上到下，从左到右
-                for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                    for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
-                        let strP = [xb, yb].toString();
-
-                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                        //存在障碍
-                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                                //!!!这里需要修改
-                            case -1:
-                                offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
-                                computeOver = true;
-                                break;
-                            default:
-                                continue;
-                            }
-                            if(computeOver)
-                                break;
-                        }
-                    }
-                    if(computeOver)
-                        break;
-                }
-                break;
-
-            case Qt.Key_Up: //同Left
-
-                //如果超过地图上，则返回到上边的距离
-                if(role.y + role.y1 - offsetMove < 0)
-                    offsetMove = role.y + role.y1;
-
-                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
-
-                //console.debug("usedMapBlocks:", usedMapBlocks);
-                //从左到右，从下到上
-                for(let yb = usedMapBlocks[3]; yb >= usedMapBlocks[1]; --yb) {
-                    for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                        let strP = [xb, yb].toString();
-
-                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                        //存在障碍
-                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                                //!!!这里需要修改
-                            case -1:
-                                offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
-                                computeOver = true;
-                                break;
-                            default:
-                                continue;
-                            }
-                            if(computeOver)
-                                break;
-                        }
-                    }
-                    if(computeOver)
-                        break;
-                }
-                break;
-
-            case Qt.Key_Down:   //同Right
-
-                //如果超过地图下，则返回到下边的距离
-                if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height)
-                    offsetMove = itemViewPort.itemContainer.height - (role.y + role.y2) - 1;
-
-                usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
-
-                //console.debug("usedMapBlocks:", usedMapBlocks);
-                //从左到右，从上到下
-                for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
-                    for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                        let strP = [xb, yb].toString();
-
-                        //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                        //存在障碍
-                        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                            switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                                //!!!这里需要修改
-                            case -1:
-                                offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
-                                computeOver = true;
-                                break;
-                            default:
-                                continue;
-                            }
-                            if(computeOver)
-                                break;
-                        }
-                    }
-                    if(computeOver)
-                        break;
-                }
-                break;
-
-            default:
-                return;
-            }
-
-            return offsetMove;
-        }
-
-
-        //计算 role 在 derect方向 在 offsetMove 距离中最多能移动的距离
-        //  Role向direction方向移动offsetMove，如果遇到障碍或其他role，则返回离最近障碍的距离
-        function fComputeRoleMoveOffset(role, direction, offsetMove) {
-
-            if(offsetMove <= 0)
-                return 0;
-
-            if(role.width1 <= 0 || role.height1 <= 0)
-                return offsetMove;
-
-            offsetMove = _private.fComputeRoleMoveToObstacleOffset(role, direction, offsetMove);
-
-            if(offsetMove <= 0)
-                return 0;
-
-            offsetMove = GameSceneJS.fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
-
-            return offsetMove;
-        }
-
-
 
 
 
@@ -6243,23 +6032,23 @@ Rectangle {
                 return game.rolepos(rootRole, tPos);
             }
 
-            //返回方向
-            //0、1、2、3分别表示上右下左；
-            function direction() {
-                switch(moveDirection) {
-                case Qt.Key_Up:
-                    return 0;
-                case Qt.Key_Right:
-                    return 1;
-                case Qt.Key_Down:
-                    return 2;
-                case Qt.Key_Left:
-                    return 3;
-                }
-                return -1;
+
+            //某角色是否在移动
+            function isMoving() {
+                //return role.sprite.running;
+                return (rootRole.$$nActionType !== 0 && rootRole.$$nActionType !== -1);
+            }
+
+            //停止播放
+            function stopMoving() {
+                //role.$$nMoveDirectionFlag = 0;
+                rootRole.$$arrMoveDirection = [0, 0];
+                rootRole.$$nActionType = rootRole.$$nActionType === -1 ? -1 : 0;
+                rootRole.stop();
             }
 
 
+            //播放一个动作
             function action(tsprite) {
                 GameSceneJS.loadSpriteEffect(tsprite.RId, rootRole.actionSprite, tsprite.$loops);
                 if(GlobalLibraryJS.isValidNumber(tsprite.width))
@@ -6339,7 +6128,10 @@ Rectangle {
 
             //行动类别；
             //0为停止；1为正常行走；2为动向移动；10为摇杆行走；-1为禁止操作
-            property int $$nActionType: 1
+            property int $$nActionType: 0
+
+            property var $$arrMoveDirection: []   //移动方向的速率（横方向竖方向，-1~1）
+            //property int stopDirection: moveDirection === -1 ? stopDirection : moveDirection    //停止方向
 
             //目标坐标
             property var $$targetsPos: []
@@ -6526,7 +6318,7 @@ Rectangle {
             switch(Qt.application.state){
             case Qt.ApplicationActive:   //每次窗口激活时触发
                 _private.arrPressedKeys = [];
-                //mainRole.moveDirection = -1;
+                //mainRole.$$nMoveDirectionFlag = 0;
 
                 itemBackgroundMusic.resume('$sys_inactive');
                 rootSoundEffect.resume('$sys_inactive');
@@ -6534,7 +6326,7 @@ Rectangle {
                 break;
             case Qt.ApplicationInactive:    //每次窗口非激活时触发
                 _private.arrPressedKeys = [];
-                //mainRole.moveDirection = -1;
+                //mainRole.$$nMoveDirectionFlag = 0;
 
                 itemBackgroundMusic.pause('$sys_inactive');
                 rootSoundEffect.pause('$sys_inactive');
@@ -6542,17 +6334,156 @@ Rectangle {
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
                 _private.arrPressedKeys = [];
-                //mainRole.moveDirection = -1;
+                //mainRole.$$nMoveDirectionFlag = 0;
                 //itemBackgroundMusic.pause();
                 break;
             case Qt.ApplicationHidden:
                 _private.arrPressedKeys = [];
-                //mainRole.moveDirection = -1;
+                //mainRole.$$nMoveDirectionFlag = 0;
                 //itemBackgroundMusic.pause();
                 break;
             }
         }
     }
+
+
+
+    /*onFocusChanged: {
+        if(focus === false) {
+            _private.arrPressedKeys = [];
+            _private.stopAction(1, -1);
+        }
+        console.warn(focus)
+    }
+    */
+
+
+    //Keys.forwardTo: [itemViewPort.itemContainer]
+
+    Keys.onEscapePressed: {
+        _private.exitGame();
+        event.accepted = true;
+
+        console.debug("[GameScene]Escape Key");
+    }
+    Keys.onBackPressed: {
+        _private.exitGame();
+        event.accepted = true;
+
+        console.debug("[GameScene]Back Key");
+    }
+    Keys.onTabPressed: {
+        rootGameScene.forceActiveFocus();
+
+        event.accepted = true;
+        console.debug("[GameScene]Tab Key");
+    }
+    Keys.onSpacePressed: {
+        event.accepted = true;
+    }
+
+
+
+    Keys.onPressed: {   //键盘按下
+        //console.debug("[GameScene]Keys.onPressed:", event.key, event.isAutoRepeat);
+
+        if(!_private.config.bKeyboard)
+            return;
+
+
+        switch(event.key) {
+        case Qt.Key_Up:
+        case Qt.Key_Right:
+        case Qt.Key_Down:
+        case Qt.Key_Left:
+            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
+                event.accepted = true;
+                //mainRole.start();
+                return;
+            }
+
+            //_private.arrPressedKeys[key] = true; //保存键盘按下
+            if(_private.arrPressedKeys.indexOf(event.key) === -1)
+                _private.arrPressedKeys.push(event.key);
+
+            if(mainRole.$$nActionType === -1)
+                return;
+
+
+            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+                mainRole.$$nActionType = 1;
+
+                _private.doAction(1, event.key);
+            }
+
+            event.accepted = true;
+
+            break;
+
+        case Qt.Key_Return:
+            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
+                event.accepted = true;
+                return;
+            }
+
+            if(mainRole.$$nActionType === -1)
+                return;
+
+
+            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                GameSceneJS.buttonAClicked();
+
+
+            event.accepted = true;
+
+            break;
+
+        default:
+            event.accepted = true;
+        }
+    }
+
+    Keys.onReleased: {
+        //console.debug("[GameScene]Keys.onReleased", event.isAutoRepeat);
+
+        if(!_private.config.bKeyboard)
+            return;
+
+
+        switch(event.key) {
+        case Qt.Key_Up:
+        case Qt.Key_Right:
+        case Qt.Key_Down:
+        case Qt.Key_Left:
+            if(event.isAutoRepeat === true) { //如果是按住不放的事件，则返回（只记录第一次按）
+                event.accepted = true;
+                return;
+            }
+
+            //delete arrPressedKeys[key]; //从键盘保存中删除
+            _private.arrPressedKeys.splice(_private.arrPressedKeys.indexOf(event.key), 1);
+
+
+            if(mainRole.$$nActionType === -1)
+                return;
+
+
+            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+                _private.stopAction(1, event.key);
+            }
+
+            event.accepted = true;
+
+            break;
+
+        default:
+            event.accepted = true;
+        }
+
+
+        //console.debug("[GameScene]timer", timer.running);
+    }
+
 
 
     Component.onCompleted: {

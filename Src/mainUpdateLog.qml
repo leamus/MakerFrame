@@ -138,6 +138,13 @@ Rectangle {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+
+2023/12/22：发布 1.7.1.231222 版本
+1、增加键盘和摇杆多方向移动！
+2、调整、优化代码和界面；
+3、修复一些Bugs（包括NPC移动一点点的上古Bug）；
+4、NPC禁止移动从0改为-1；
+
 2023/12/17：发布 1.6.25.231217 版本
 1、修复一些小bugs；
 2、调整和优化代码细节，调整部分指令（game.createhero、game.hero、game.createrole、game.role、game.rolepos）；

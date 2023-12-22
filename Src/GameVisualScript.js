@@ -8,9 +8,9 @@ let data = (function() {
 
     //命令格式：
     //  key: {
-    //      command: [命令显示, 命令模板, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], 编译运行函数],
+    //      command: [命令显示, 命令模板, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], [编译运行函数]],
     //          编译运行函数的参数为：参数数组、tab个数、命令信息（包含command和params），如果为undefined或null则使用默认的处理方案（替换模板命令字符串的%n）；
-    //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]}
+    //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]]
     //          其中：
     //              类型：string、number、bool、string|number、name、json、unformatted、code、label
     //                  string、number、bool、string|number、name、json、unformatted 可以长按选择；
@@ -109,13 +109,13 @@ let data = (function() {
                                     ],
                                 },
                                 '创建NPC': {
-                                    command: ['创建NPC', 'game.createrole({RId: %1, $name: %2, $bx: %3, $by: %4, $action: %5});', '', 0, true, 'red', 'white'],
+                                    command: ['创建NPC', 'game.createrole({RId: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5});', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                                         ['NPC名', 'string', undefined, 0, '', 'darkgreen'],
                                         ['*地图块x', 'number', true, 0, '', 'blue'],
                                         ['*地图块y', 'number', true, 0, '', 'blue'],
-                                        ['@动作（1为移动）', 'number', '1', 2, [['移动', '禁止'], ['1', '0']], 'green'],
+                                        ['@动作', 'number', '1', 2, [['移动', '禁止'], ['1', '0']], 'green'],
                                     ],
                                 },
                                 '移动NPC': {
@@ -404,14 +404,14 @@ let data = (function() {
                                     command: ['进入战斗', 'game.fighting({RId: %1, %2});', '进入战斗', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@战斗脚本', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
-                                        ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 函数名']], 'green'],
+                                        ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                                     ],
                                 },
                                 '开启随机战斗': {
                                     command: ['开启随机战斗', 'game.fighton({RId: %1, %2},%3,%4);', '开启随机战斗', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@战斗脚本', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
-                                        ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 函数名']], 'green'],
+                                        ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                                         ['几率(百分之)', 'number', '5', 0, '5', 'darkgreen'],
                                         ['@方式', 'number', '3', 2, [['全部开启', '主角静止时遇敌', '主角行动时遇敌'], ['3', '2', '1'], '3'], 'darkgreen'],
                                     ],
@@ -544,7 +544,7 @@ let data = (function() {
                                 '函数/生成器{': {
                                     command: ['函数/生成器{', 'function %1(%2) {', '定义函数或生成器名', 4, true, 'red', 'white', ['块结束}']],
                                     params: [
-                                        ['*@函数名', 'name', true, 2, [['开始事件', '事件1', '事件2', '事件3', '事件4', '事件5', '事件6'], ['*$start', '*事件1', '*事件2', '*事件3', '*事件4', '*事件5', '*事件6']], 'green'],
+                                        ['*@名称', 'name', true, 2, [['开始事件', '事件1', '事件2', '事件3', '事件4', '事件5', '事件6'], ['*$start', '*事件1', '*事件2', '*事件3', '*事件4', '*事件5', '*事件6']], 'green'],
                                         ['参数(,号分隔)', 'name', '', 0, '', 'blue'],
                                     ],
                                 },
@@ -553,7 +553,7 @@ let data = (function() {
                                 '调用函数/生成器': {
                                     command: ['调用函数/生成器', 'game.run(%1,%2);', '调用函数/生成器', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*@函数名', 'name', true, 0, '函数名', 'green'],
+                                        ['*@名称', 'name', true, 0, '名称', 'green'],
                                         ['优先级', 'number', '-1', 0, '-1', 'blue'],
                                     ],
                                 },

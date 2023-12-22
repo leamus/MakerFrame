@@ -82,8 +82,7 @@ Rectangle {
 
             text: "关于"
             onClicked: {
-                loader.source = 'mainAbout.qml';
-                loader.visible = true;
+                _private.loadModule('mainAbout.qml');
             }
         }
 
@@ -95,8 +94,7 @@ Rectangle {
 
             text: "简易教程"
             onClicked: {
-                loader.source = 'mainEasyTutorial.qml';
-                loader.visible = true;
+                _private.loadModule('mainEasyTutorial.qml');
             }
         }
 
@@ -123,7 +121,82 @@ Rectangle {
                 Qt.openUrlExternally('https://www.taptap.cn/app/261814');
             }
         }
+
+
+
+        Label {
+            Layout.preferredWidth: parent.width
+            Layout.alignment: Qt.AlignHCenter
+            //Layout.preferredHeight: 20
+
+            //anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.verticalCenter: parent.verticalCenter
+            //width: parent.width
+
+
+            font.pointSize: 12
+            font.bold: true
+            text: qsTr("实验性功能")
+
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
+        }
+
+        RowLayout {
+            //Layout.fillWidth: true
+            //Layout.preferredWidth: parent.width * 0.4
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.preferredHeight: 50
+            Layout.minimumHeight: 20
+            //Layout.fillHeight: true
+
+            Button {
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                //Layout.preferredHeight: 50
+                //Layout.minimumHeight: 20
+                //Layout.fillHeight: true
+
+
+                text: "简易画板"
+                onClicked: {
+                    if(Platform.compileType() === "debug") {
+                        _private.loadModule("PaintView.qml");
+                        //userMainProject.source = "mainMapEditor.qml";
+                    }
+                    else {
+                        _private.loadModule("PaintView.qml");
+                        //userMainProject.source = "mainMapEditor.qml";
+                    }
+                }
+            }
+
+            Button {
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                //Layout.preferredHeight: 50
+                //Layout.minimumHeight: 20
+                //Layout.fillHeight: true
+
+
+                text: "简易画板2"
+                onClicked: {
+                    if(Platform.compileType() === "debug") {
+                        _private.loadModule("NanoPaintView.qml");
+                        //userMainProject.source = "mainMapEditor.qml";
+                    }
+                    else {
+                        _private.loadModule("NanoPaintView.qml");
+                        //userMainProject.source = "mainMapEditor.qml";
+                    }
+                }
+            }
+        }
+
     }
+
 
 
     Loader {
@@ -174,6 +247,11 @@ Rectangle {
     QtObject {
         id: _private
 
+        function loadModule(url) {
+            loader.source = url;
+            loader.visible = true;
+            loader.forceActiveFocus();
+        }
     }
 
     //配置

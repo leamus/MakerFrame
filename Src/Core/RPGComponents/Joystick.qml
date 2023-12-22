@@ -8,6 +8,8 @@ Item {
     property point pointInput
     //property double inputX
     //property double inputY
+    property int nFixPrecision: 5  //偏移度的精度(先乘取整再除）
+
     property bool pressed: false   //是否按下
     property alias fingerOutOfBounds: multiPointTouchArea.fingerOutOfBounds
 
@@ -32,10 +34,17 @@ Item {
         height: 6 * Screen.pixelDensity
 
         anchors.centerIn: joystick
-        anchors.onHorizontalCenterOffsetChanged:
-            joystick.pointInput.x = anchors.horizontalCenterOffset / (joystick.width / 2 - handle.width / 2)
-        anchors.onVerticalCenterOffsetChanged:
-            joystick.pointInput.y = anchors.verticalCenterOffset / (joystick.height / 2 - handle.height / 2)
+
+        /*anchors.onHorizontalCenterOffsetChanged: {
+            let dx = anchors.horizontalCenterOffset / (joystick.width / 2 - handle.width / 2);
+            //if(joystick.pointInput.x !== Math.round(dx * nFixPrecision) / nFixPrecision)
+                joystick.pointInput.x = Math.round(dx * nFixPrecision) / nFixPrecision;
+        }
+        anchors.onVerticalCenterOffsetChanged: {
+            let dy = anchors.verticalCenterOffset / (joystick.height / 2 - handle.height / 2);
+            //if(joystick.pointInput.y !== Math.round(dy * nFixPrecision) / nFixPrecision)
+                joystick.pointInput.y = Math.round(dy * nFixPrecision) / nFixPrecision;
+        }*/
 
         radius: width / 2
         color: "#1e1b18"
@@ -65,27 +74,26 @@ Item {
 
         onPressed: {
             //保存按下的坐标
-            pointStart.x = mouseArea.startX
-            pointStart.y = mouseArea.startY
+            pointStart.x = mouseArea.x
+            pointStart.y = mouseArea.y
 
-            //???
-            //joystick.anchors.horizontalCenterOffset = mouseArea.x - width / 2
-            //joystick.anchors.verticalCenterOffset = mouseArea.y - height / 2
-            handle.anchors.horizontalCenterOffset = mouseArea.x - width / 2
-            handle.anchors.verticalCenterOffset = mouseArea.y - height / 2
+            //里圆位置
+            //handle.anchors.horizontalCenterOffset = mouseArea.x - width / 2
+            //handle.anchors.verticalCenterOffset = mouseArea.y - height / 2
 
             joystick.pressed = true;
         }
 
         onUpdated: {
+            //超出圈外
             if (fingerOutOfBounds) {
-                handle.anchors.horizontalCenterOffset = mouseArea.x - pointStart.x
-                handle.anchors.verticalCenterOffset = mouseArea.y - pointStart.y
+                _private.updateHandlePosition(mouseArea.x - pointStart.x, mouseArea.y - pointStart.y);
             }
             else {
                 var angle = Math.atan2(mouseArea.y - pointStart.y, mouseArea.x - pointStart.x)
-                handle.anchors.horizontalCenterOffset = Math.cos(angle) * (joystick.width / 2 - handle.width / 2)
-                handle.anchors.verticalCenterOffset = Math.sin(angle) * (joystick.width / 2 - handle.width / 2)
+
+                _private.updateHandlePosition(Math.cos(angle) * (joystick.width / 2 - handle.width / 2), Math.sin(angle) * (joystick.width / 2 - handle.width / 2));
+
             }
         }
 
@@ -93,6 +101,24 @@ Item {
             returnAnimation.start()
 
             joystick.pressed = false;
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        function updateHandlePosition(xOffset, yOffset) {
+            let dx = (xOffset) / (joystick.width / 2 - handle.width / 2);
+            //if(joystick.pointInput.x !== Math.round(dx * nFixPrecision) / nFixPrecision)
+                joystick.pointInput.x = Math.round(dx * nFixPrecision) / nFixPrecision;
+
+            let dy = (yOffset) / (joystick.height / 2 - handle.height / 2);
+            //if(joystick.pointInput.y !== Math.round(dy * nFixPrecision) / nFixPrecision)
+                joystick.pointInput.y = Math.round(dy * nFixPrecision) / nFixPrecision;
+
+
+            handle.anchors.horizontalCenterOffset = xOffset;
+            handle.anchors.verticalCenterOffset = yOffset;
         }
     }
 }
