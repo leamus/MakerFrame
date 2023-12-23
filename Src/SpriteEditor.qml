@@ -25,7 +25,7 @@ import './Core'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -132,15 +132,17 @@ Rectangle {
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
 
 
@@ -1627,7 +1629,6 @@ Rectangle {
 
 
 
-
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         console.debug("[SpriteEditor]Escape Key");
@@ -1649,7 +1650,6 @@ Rectangle {
 
         console.debug("[SpriteEditor]key:", event, event.key, event.text)
     }
-
     Keys.onReleased: {
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
@@ -1659,7 +1659,6 @@ Rectangle {
         //console.debug(sprite.arrFrameDirectionIndex);
         //console.debug(textSpriteFangXiangIndex.text.split(','));
     }
-
 
 
     Component.onCompleted: {

@@ -45,10 +45,6 @@ Item {
     signal s_hide(int newFlags, int windowFlags);
 
 
-    //打开了哪些窗口
-    property int nShowWindowFlags: 0
-
-
     function showWindow(flags=1, value=0, style={}) {
         //closeWindow();
         let newFlags = 0;
@@ -218,6 +214,11 @@ Item {
         itemFightRoleInfo.init(nIndex);
         itemFightRoleInfo.visible = true;
     }*/
+
+
+
+    //打开了哪些窗口
+    property int nShowWindowFlags: 0
 
 
 
@@ -601,8 +602,6 @@ Item {
 
 
 
-
-
     QtObject {  //私有数据,函数,对象等
         id: _private
 
@@ -675,6 +674,8 @@ Item {
         */
 
     }
+
+
 
     Component.onCompleted: {
         gameMenu.show(["状态", "背包", "系统", "关闭菜单"]);

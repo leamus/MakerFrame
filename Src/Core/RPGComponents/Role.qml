@@ -17,39 +17,6 @@ Item {
     signal s_clicked();
 
 
-    property alias spriteSrc: walkSprite.spriteSrc   //精灵图片
-    property alias sizeFrame: walkSprite.sizeFrame     //一帧的宽高
-    property alias nFrameCount: walkSprite.nFrameCount //一个方向有几张图片
-    property var arrFrameDirectionIndex: [[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
-    property alias interval: walkSprite.interval  //帧切换速度
-
-    //缩放
-    property alias rXScale: walkSprite.rXScale
-    property alias rYScale: walkSprite.rYScale
-
-
-    //x1、y1为 场景中 人物的 有效占位（占地图） 起始点 偏移（相对于x，y），x2、y2为 有效占位 终止点 偏移，width1、height1为有效占位宽高
-    property alias x1: rectShadow.x
-    property alias y1: rectShadow.y
-    readonly property int x2: x1 + width1 - 1
-    readonly property int y2: y1 + height1 - 1
-    property alias width1: rectShadow.width
-    property alias height1: rectShadow.height
-
-    property alias rectShadow: rectShadow   //真实占用大小（影子）
-    property alias mouseArea: mouseArea
-
-
-    property alias sprite: walkSprite
-    property alias actionSprite: actionSprite
-
-    //目前行走特效的方向
-    property alias nDirection: walkSprite.nDirection
-
-
-    property var test: false
-
-
 
     //刷新重建
     function refresh() {
@@ -142,6 +109,39 @@ Item {
         }
     }
 
+
+
+    property alias spriteSrc: walkSprite.spriteSrc   //精灵图片
+    property alias sizeFrame: walkSprite.sizeFrame     //一帧的宽高
+    property alias nFrameCount: walkSprite.nFrameCount //一个方向有几张图片
+    property var arrFrameDirectionIndex: [[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
+    property alias interval: walkSprite.interval  //帧切换速度
+
+    //缩放
+    property alias rXScale: walkSprite.rXScale
+    property alias rYScale: walkSprite.rYScale
+
+
+    //x1、y1为 场景中 人物的 有效占位（占地图） 起始点 偏移（相对于x，y），x2、y2为 有效占位 终止点 偏移，width1、height1为有效占位宽高
+    property alias x1: rectShadow.x
+    property alias y1: rectShadow.y
+    readonly property int x2: x1 + width1 - 1
+    readonly property int y2: y1 + height1 - 1
+    property alias width1: rectShadow.width
+    property alias height1: rectShadow.height
+
+    property alias rectShadow: rectShadow   //真实占用大小（影子）
+    property alias mouseArea: mouseArea
+
+
+    property alias sprite: walkSprite
+    property alias actionSprite: actionSprite
+
+    //目前行走特效的方向
+    property alias nDirection: walkSprite.nDirection
+
+
+    property var test: false
 
 
     width: 0
@@ -325,6 +325,7 @@ Item {
     }
 
 
+
     Keys.onPressed: {
         switch(event.key) {
         case Qt.Key_Up:
@@ -364,6 +365,7 @@ Item {
         }
 
     }
+
 
     Component.onCompleted: {
 

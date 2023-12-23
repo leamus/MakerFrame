@@ -9,18 +9,8 @@ import _Global 1.0
 
 
  
-Rectangle {
+Notepad {
     id: root
-
-
-    property alias notepad: notepad
-    property alias textArea: notepad.textArea
-    property alias flickable: notepad.flickable
-    property alias timer: timer
-
-
-    property int nMaxWidth: Screen.desktopAvailableWidth * 0.9
-    property int nMaxHeight: Screen.desktopAvailableHeight * 0.9
 
 
 
@@ -116,13 +106,61 @@ Rectangle {
 
 
 
- 
-    color: "#BF6699FF"
-    border.color: "white"
-    radius: height / 20
+    //property alias notepad: root
+    //property alias textArea: notepad.textArea
+    //property alias flickable: notepad.flickable
+    property alias timer: timer
+
+
+    property int nMaxWidth: Screen.desktopAvailableWidth * 0.9
+    property int nMaxHeight: Screen.desktopAvailableHeight * 0.9
+
+
+    width: parent.width
+    height: parent.height
     //width: 250
     //height: 50
- 
+
+    //color: 'transparent'
+    color: "#BF6699FF"
+    border {
+        width: 1
+        color: "white"
+    }
+    radius: height / 20
+
+
+    font.pointSize: 16
+
+
+    textArea.readOnly: true
+    textArea.color: 'white'
+    textArea.selectByKeyboard: false
+    textArea.selectByMouse: false
+    textArea.wrapMode: TextArea.WrapAnywhere
+
+
+    /*
+    textArea.implicitHeight: textArea.contentHeight + 12
+    //textArea.padding : 6
+    textArea.leftPadding : 6
+    textArea.rightPadding : 6
+    textArea.topPadding : 6
+    textArea.bottomPadding: 6
+    */
+
+    textArea.background: Rectangle {
+        color: 'transparent'
+        //color: Global.style.backgroundColor
+        //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+        //border.width: debugMsg.textArea.focus ? 2 : 1
+    }
+
+    /*textArea.onReleased: {
+        root.s_mouseReleased();
+    }*/
+
+
 
     /*Item {
         id: waitItem
@@ -172,50 +210,6 @@ Rectangle {
 
 
 
-    Notepad {
-        id: notepad
-
-        width: parent.width
-        height: parent.height
-
-        color: 'transparent'
-
-        font.pointSize: 16
-
-        border {
-            width: 0
-            //color: 'lightgray'
-        }
-
-        textArea.readOnly: true
-        textArea.color: 'white'
-        textArea.selectByKeyboard: false
-        textArea.selectByMouse: false
-        textArea.wrapMode: TextArea.WrapAnywhere
-
-
-        /*
-        textArea.implicitHeight: textArea.contentHeight + 12
-        //textArea.padding : 6
-        textArea.leftPadding : 6
-        textArea.rightPadding : 6
-        textArea.topPadding : 6
-        textArea.bottomPadding: 6
-        */
-
-        textArea.background: Rectangle {
-            color: 'transparent'
-            //color: Global.style.backgroundColor
-            //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-            //border.width: debugMsg.textArea.focus ? 2 : 1
-        }
-
-        /*textArea.onReleased: {
-            root.s_mouseReleased();
-        }*/
-
-    }
-
     Timer {
         id: timer
 
@@ -246,7 +240,7 @@ Rectangle {
 
 
                 textArea.text = _private.pretext + _private.textVar.substr(0, _private.textIndex);
-                notepad.toEnd();
+                toEnd();
                 //textArea.insert(textArea.length, _private.textVar[_private.textIndex]);
 
 
@@ -273,6 +267,7 @@ Rectangle {
         }
  
     }
+
 
 
     QtObject {

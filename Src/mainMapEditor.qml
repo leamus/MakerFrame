@@ -25,28 +25,30 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
     signal s_close();
 
 
+
     //width: 600
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     L_List {
@@ -517,6 +519,7 @@ Rectangle {
         }
     }
 
+
     L_List {
         id: l_listMapBlockResource
 
@@ -582,6 +585,8 @@ Rectangle {
             });
         }
     }
+
+
 
     /*Dialog1.Dialog {
         id: fileDialogSave
@@ -699,8 +704,6 @@ Rectangle {
 
 
 
-
-
     /*Dialog1.FileDialog {
         id: filedialogOpenMap
         title: "选择地图文件"
@@ -771,9 +774,6 @@ Rectangle {
 
 
 
-
-
-
     QtObject {
         id: _private
 
@@ -802,6 +802,7 @@ Rectangle {
         }
     }
 
+
     //配置
     QtObject {
         id: config
@@ -827,7 +828,6 @@ Rectangle {
     Keys.onPressed: {
         console.debug("[mainMapEditor]key:", event, event.key, event.text)
     }
-
 
 
     Component.onCompleted: {

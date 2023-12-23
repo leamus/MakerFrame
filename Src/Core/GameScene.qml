@@ -105,13 +105,348 @@ import "GameScene.js" as GameSceneJS
 
 
 
-Rectangle {
-
+Item {
     id: rootGameScene
 
 
     //关闭退出
     signal s_close();
+
+
+
+    //游戏开始脚本
+    //startScript为true，则载入start.js；为字符串，则直接运行startScript
+    function init(startScript=true, bLoadResources=true, gameData=null) {
+        game.gd["$sys_fight_heros"] = [];
+        //game.gd["$sys_hidden_fight_heros"] = [];
+        game.gd["$sys_money"] = 0;
+        game.gd["$sys_goods"] = [];
+        game.gd["$sys_map"] = {};
+        game.gd["$sys_fps"] = 16;
+        game.gd["$sys_main_roles"] = [];
+        game.gd["$sys_sound"] = 0b11;
+        game.gd["$sys_music"] = '';
+        game.gd["$sys_scale"] = 1;
+
+
+        if(bLoadResources)
+            GameSceneJS.loadResources();
+
+
+        //game.gf["$sys"] = _private.objCommonScripts;
+
+
+        //读取 start.js 脚本
+        if(startScript === true) {
+            /*
+            let filePath = game.$projectpath + GameMakerGlobal.separator + "start.js";
+            //let cfg = File.read(filePath);
+            let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+            //if(data === "")
+            //    return false;
+            if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
+                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            */
+
+            if(_private.objCommonScripts["game_start"])
+                game.run([_private.objCommonScripts["game_start"](), 'game_start']);
+        }
+        else if(startScript === false) {
+
+        }
+        else {  //是脚本
+            game.run([startScript, 'game_start']);
+        }
+
+
+        //恢复游戏数据
+        if(gameData)
+            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+
+
+        //init脚本
+        if(_private.objCommonScripts["game_init"])
+            game.run([_private.objCommonScripts["game_init"](), 'game_init']);
+
+
+        //所有插件初始化
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
+                    _private.objPlugins[tc][tp].$init();
+
+
+        game.pause();
+        game.goon('$release');
+
+        //game.run([function(){game.goon(true);}, 'goon']);
+
+        //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
+        //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
+        //GlobalLibraryJS.setTimeout(function() {
+        //        setSceneToRole(_private.sceneRole);
+        //    },10,rootGameScene
+        //);
+    }
+
+
+
+    //释放所有资源
+    function release(bUnloadResources=true) {
+
+        //timer.stop();
+        _private.config.objPauseNames = {};
+        game.pause('$release');
+
+
+        //所有插件释放
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false)
+                    _private.objPlugins[tc][tp].$release();
+
+
+        game.scale(1);
+
+        _private.asyncScript.clear(1);
+        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+
+        //loaderGameMsg.item.stop();
+        messageRole.stop();
+
+        game.delrole(-1);
+        game.delimage();
+        game.delsprite();
+        game.delhero(-1);
+        game.stopvideo();
+        itemBackgroundMusic.stop();
+        itemBackgroundMusic.arrMusicStack = [];
+        itemBackgroundMusic.objMusicPause = {};
+
+
+        //FrameManager.goon();
+
+
+        gameMenuWindow.closeWindow(-1);
+        //gameMenuWindow.visible = false;
+        dialogTrade.visible = false;
+
+        //loaderGameMsg.item.visible = false;
+        itemGameMsgs.nIndex = 0;
+        for(let tim in itemGameMsgs.children) {
+            itemGameMsgs.children[tim].destroy();
+        }
+
+        itemRootRoleMsg.visible = false;
+        itemRootGameInput.visible = false;
+
+        itemGameMenus.nIndex = 0;
+        for(let tim in itemGameMenus.children) {
+            itemGameMenus.children[tim].destroy();
+        }
+
+        //itemMenu.visible = false;
+        //menuGame.hide();
+
+        /*/
+        for(let i in _private.objTmpSprites) {
+            _private.objTmpSprites[i].destroy();
+        }
+        _private.objTmpSprites = {};
+        */
+
+
+        game.d = {};
+        game.f = {};
+        game.gd = {};
+        game.gf = {};
+
+
+
+
+        _private.objRoles = {};
+        _private.arrMainRoles = [];
+        _private.objTmpImages = {};
+        _private.objTmpSprites = {};
+
+
+        _private.objTimers = {};
+        _private.objGlobalTimers = {};
+
+
+        _private.sceneRole = mainRole;
+        mainRole.$$collideRoles = {};
+        mainRole.$$mapEventsTriggering = {};
+
+
+        _private.nStage = 0;
+
+
+        loaderFightScene.visible = false;
+
+
+        itemViewPort.release();
+
+
+        if(bUnloadResources)
+            GameSceneJS.unloadResources();
+    }
+
+
+    //打开地图
+    function openMap(mapName, forceRepaint=false) {
+        game.d["$sys_map"] = {};
+
+        let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
+
+        //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
+        if(forceRepaint || game.gd["$sys_map"].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
+
+            if(!itemViewPort.openMap(mapPath)) {
+                game.gd["$sys_map"].$name = null;
+
+                game.d["$sys_map"].$name = null;
+                game.d["$sys_map"].$columns = 0;
+                game.d["$sys_map"].$rows = 0;
+                game.d["$sys_map"].$info = {};
+                game.d["$sys_map"].$obstacles = [];
+
+
+                //!!!兼容旧代码
+                game.gd["$sys_map"].$$columns = 0;
+                game.gd["$sys_map"].$$rows = 0;
+                game.gd["$sys_map"].$$info = {};
+                game.gd["$sys_map"].$$obstacles = [];
+
+
+                console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
+                return false;
+            }
+
+            //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
+            game.gd["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
+
+            game.d["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
+            game.d["$sys_map"].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+            game.d["$sys_map"].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+            game.d["$sys_map"].$info = itemViewPort.itemContainer.mapInfo;
+
+            game.d["$sys_map"].$obstacles = [];
+            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
+                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] === -1) {
+                    game.d["$sys_map"].$obstacles.push(mb.split(','));
+                }
+            }
+
+
+            //!!!兼容旧代码
+            game.gd["$sys_map"].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+            game.gd["$sys_map"].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+            game.gd["$sys_map"].$$info = itemViewPort.itemContainer.mapInfo;
+            game.gd["$sys_map"].$$obstacles = game.d["$sys_map"].$obstacles;
+        }
+
+
+
+        //执行载入地图脚本
+
+        //之前的
+        //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData["$1"] !== undefined) {
+        //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData["$1"]) === 0)
+        //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+        //}
+
+        //使用Component（太麻烦）
+        //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"));
+        //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"), scriptComp)
+        //let script = scriptComp.createObject({}, rootGameScene);
+
+        //let script = Qt.createQmlObject('import QtQuick 2.14;import "map.js" as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
+        //script.destroy();
+        let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
+        itemViewPort.mapScript = ts;
+        if(ts.$start)
+            game.run([ts.$start(), 'map $start']);
+        else if(ts.start)
+            game.run([ts.start(), 'map start']);
+
+
+
+        console.debug("[GameScene]openMap", itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
+
+        //test();
+
+        return itemViewPort.itemContainer.mapInfo;
+    }
+
+    function updateAllRolesPos() {
+
+    }
+
+
+
+    //设置角色坐标（块坐标）
+    function setRolePos(role, bx, by) {
+
+        let targetX;
+        let targetY;
+        [targetX, targetY] = itemViewPort.getMapBlockPos(bx, by);
+
+        //设置角色坐标
+
+        //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
+        if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
+            role.x = itemViewPort.itemContainer.width - role.x2 - 1;
+        else
+            role.x = targetX - role.x1 - role.width1 / 2;
+        //role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
+
+        //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
+        if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
+            role.y = itemViewPort.itemContainer.height - role.y2 - 1;
+        else
+            role.y = targetY - role.y1 - role.height1 / 2;
+        //role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
+
+        if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
+    }
+
+    //设置主角坐标（块坐标）
+    function setMainRolePos(bx, by, index=0) {
+        let mainRole = _private.arrMainRoles[index];
+
+        setRolePos(mainRole, bx, by);
+        //setSceneToRole(_private.sceneRole);
+        if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
+
+        game.gd["$sys_main_roles"][index].$x = mainRole.x;
+        game.gd["$sys_main_roles"][index].$y = mainRole.y;
+    }
+
+    //场景移动到某角色
+    function setSceneToRole(role) {
+        if(!role)
+            return;
+
+        //计算角色移动时，地图移动的 左上角和右下角 的坐标
+
+        //场景在地图左上角时的中央坐标
+        let mapLeftTopCenterX = parseInt(itemViewPort.gameScene.nMaxMoveWidth / 2);
+        let mapLeftTopCenterY = parseInt(itemViewPort.gameScene.nMaxMoveHeight / 2);
+
+        //场景在地图右下角时的中央坐标
+        let mapRightBottomCenterX = itemViewPort.itemContainer.width - mapLeftTopCenterX;
+        let mapRightBottomCenterY = itemViewPort.itemContainer.height - mapLeftTopCenterY;
+
+        //角色最中央坐标
+        let roleCenterX = role.x + role.x1 + parseInt(role.width1 / 2);
+        let roleCenterY = role.y + role.y1 + parseInt(role.height1 / 2);
+
+        //开始移动地图
+
+        itemViewPort.setScenePos(roleCenterX, roleCenterY);
+    }
+
 
 
     //property alias g: rootGameScene.game
@@ -3597,417 +3932,28 @@ Rectangle {
     property alias asyncScript: _private.asyncScript
 
 
-
     //property alias mainRole: mainRole
-
 
 
     //是否是测试模式（不会存档）
     property bool bTest: false
 
 
-
-    //游戏开始脚本
-    //startScript为true，则载入start.js；为字符串，则直接运行startScript
-    function init(startScript=true, bLoadResources=true, gameData=null) {
-        game.gd["$sys_fight_heros"] = [];
-        //game.gd["$sys_hidden_fight_heros"] = [];
-        game.gd["$sys_money"] = 0;
-        game.gd["$sys_goods"] = [];
-        game.gd["$sys_map"] = {};
-        game.gd["$sys_fps"] = 16;
-        game.gd["$sys_main_roles"] = [];
-        game.gd["$sys_sound"] = 0b11;
-        game.gd["$sys_music"] = '';
-        game.gd["$sys_scale"] = 1;
-
-
-        if(bLoadResources)
-            GameSceneJS.loadResources();
-
-
-        //game.gf["$sys"] = _private.objCommonScripts;
-
-
-        //读取 start.js 脚本
-        if(startScript === true) {
-            /*
-            let filePath = game.$projectpath + GameMakerGlobal.separator + "start.js";
-            //let cfg = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
-            //if(data === "")
-            //    return false;
-            if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
-                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-            */
-
-            if(_private.objCommonScripts["game_start"])
-                game.run([_private.objCommonScripts["game_start"](), 'game_start']);
-        }
-        else if(startScript === false) {
-
-        }
-        else {  //是脚本
-            game.run([startScript, 'game_start']);
-        }
-
-
-        //恢复游戏数据
-        if(gameData)
-            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
-
-
-        //init脚本
-        if(_private.objCommonScripts["game_init"])
-            game.run([_private.objCommonScripts["game_init"](), 'game_init']);
-
-
-        //所有插件初始化
-        for(let tc in _private.objPlugins)
-            for(let tp in _private.objPlugins[tc])
-                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
-                    _private.objPlugins[tc][tp].$init();
-
-
-        game.pause();
-        game.goon('$release');
-
-        //game.run([function(){game.goon(true);}, 'goon']);
-
-        //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
-        //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
-        //GlobalLibraryJS.setTimeout(function() {
-        //        setSceneToRole(_private.sceneRole);
-        //    },10,rootGameScene
-        //);
-    }
-
-
-
-    //释放所有资源
-    function release(bUnloadResources=true) {
-
-        //timer.stop();
-        _private.config.objPauseNames = {};
-        game.pause('$release');
-
-
-        //所有插件释放
-        for(let tc in _private.objPlugins)
-            for(let tp in _private.objPlugins[tc])
-                if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false)
-                    _private.objPlugins[tc][tp].$release();
-
-
-        game.scale(1);
-
-        _private.asyncScript.clear(1);
-        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-
-        //loaderGameMsg.item.stop();
-        messageRole.stop();
-
-        game.delrole(-1);
-        game.delimage();
-        game.delsprite();
-        game.delhero(-1);
-        game.stopvideo();
-        itemBackgroundMusic.stop();
-        itemBackgroundMusic.arrMusicStack = [];
-        itemBackgroundMusic.objMusicPause = {};
-
-
-        //FrameManager.goon();
-
-
-        gameMenuWindow.closeWindow(-1);
-        //gameMenuWindow.visible = false;
-        dialogTrade.visible = false;
-
-        //loaderGameMsg.item.visible = false;
-        itemGameMsgs.nIndex = 0;
-        for(let tim in itemGameMsgs.children) {
-            itemGameMsgs.children[tim].destroy();
-        }
-
-        itemRootRoleMsg.visible = false;
-        itemRootGameInput.visible = false;
-
-        itemGameMenus.nIndex = 0;
-        for(let tim in itemGameMenus.children) {
-            itemGameMenus.children[tim].destroy();
-        }
-
-        //itemMenu.visible = false;
-        //menuGame.hide();
-
-        /*/
-        for(let i in _private.objTmpSprites) {
-            _private.objTmpSprites[i].destroy();
-        }
-        _private.objTmpSprites = {};
-        */
-
-
-        game.d = {};
-        game.f = {};
-        game.gd = {};
-        game.gf = {};
-
-
-
-
-        _private.objRoles = {};
-        _private.arrMainRoles = [];
-        _private.objTmpImages = {};
-        _private.objTmpSprites = {};
-
-
-        _private.objTimers = {};
-        _private.objGlobalTimers = {};
-
-
-        _private.sceneRole = mainRole;
-        mainRole.$$collideRoles = {};
-        mainRole.$$mapEventsTriggering = {};
-
-
-        _private.nStage = 0;
-
-
-        loaderFightScene.visible = false;
-
-
-        itemViewPort.release();
-
-
-        if(bUnloadResources)
-            GameSceneJS.unloadResources();
-    }
-
-
-    //打开地图
-    function openMap(mapName, forceRepaint=false) {
-        game.d["$sys_map"] = {};
-
-        let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
-
-        //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
-        if(forceRepaint || game.gd["$sys_map"].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
-
-            if(!itemViewPort.openMap(mapPath)) {
-                game.gd["$sys_map"].$name = null;
-
-                game.d["$sys_map"].$name = null;
-                game.d["$sys_map"].$columns = 0;
-                game.d["$sys_map"].$rows = 0;
-                game.d["$sys_map"].$info = {};
-                game.d["$sys_map"].$obstacles = [];
-
-
-                //!!!兼容旧代码
-                game.gd["$sys_map"].$$columns = 0;
-                game.gd["$sys_map"].$$rows = 0;
-                game.gd["$sys_map"].$$info = {};
-                game.gd["$sys_map"].$$obstacles = [];
-
-
-                console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
-                return false;
-            }
-
-            //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
-            game.gd["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
-
-            game.d["$sys_map"].$name = itemViewPort.itemContainer.mapInfo.MapName;
-            game.d["$sys_map"].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-            game.d["$sys_map"].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-            game.d["$sys_map"].$info = itemViewPort.itemContainer.mapInfo;
-
-            game.d["$sys_map"].$obstacles = [];
-            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] === -1) {
-                    game.d["$sys_map"].$obstacles.push(mb.split(','));
-                }
-            }
-
-
-            //!!!兼容旧代码
-            game.gd["$sys_map"].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-            game.gd["$sys_map"].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-            game.gd["$sys_map"].$$info = itemViewPort.itemContainer.mapInfo;
-            game.gd["$sys_map"].$$obstacles = game.d["$sys_map"].$obstacles;
-        }
-
-
-
-        //执行载入地图脚本
-
-        //之前的
-        //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData["$1"] !== undefined) {
-        //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData["$1"]) === 0)
-        //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-        //}
-
-        //使用Component（太麻烦）
-        //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"));
-        //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + "map.qml"), scriptComp)
-        //let script = scriptComp.createObject({}, rootGameScene);
-
-        //let script = Qt.createQmlObject('import QtQuick 2.14;import "map.js" as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
-        //script.destroy();
-        let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
-        itemViewPort.mapScript = ts;
-        if(ts.$start)
-            game.run([ts.$start(), 'map $start']);
-        else if(ts.start)
-            game.run([ts.start(), 'map start']);
-
-
-
-        console.debug("[GameScene]openMap", itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
-
-        //test();
-
-        return itemViewPort.itemContainer.mapInfo;
-    }
-
-    function updateAllRolesPos() {
-
-    }
-
-
-
-    //设置角色坐标（块坐标）
-    function setRolePos(role, bx, by) {
-
-        let targetX;
-        let targetY;
-        [targetX, targetY] = itemViewPort.getMapBlockPos(bx, by);
-
-        //设置角色坐标
-
-        //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-        if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
-            role.x = itemViewPort.itemContainer.width - role.x2 - 1;
-        else
-            role.x = targetX - role.x1 - role.width1 / 2;
-        //role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
-
-        //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-        if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
-            role.y = itemViewPort.itemContainer.height - role.y2 - 1;
-        else
-            role.y = targetY - role.y1 - role.height1 / 2;
-        //role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
-
-        if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
-    }
-
-    //设置主角坐标（块坐标）
-    function setMainRolePos(bx, by, index=0) {
-        let mainRole = _private.arrMainRoles[index];
-
-        setRolePos(mainRole, bx, by);
-        //setSceneToRole(_private.sceneRole);
-        if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
-
-        game.gd["$sys_main_roles"][index].$x = mainRole.x;
-        game.gd["$sys_main_roles"][index].$y = mainRole.y;
-    }
-
-    //场景移动到某角色
-    function setSceneToRole(role) {
-        if(!role)
-            return;
-
-        //计算角色移动时，地图移动的 左上角和右下角 的坐标
-
-        //场景在地图左上角时的中央坐标
-        let mapLeftTopCenterX = parseInt(itemViewPort.gameScene.nMaxMoveWidth / 2);
-        let mapLeftTopCenterY = parseInt(itemViewPort.gameScene.nMaxMoveHeight / 2);
-
-        //场景在地图右下角时的中央坐标
-        let mapRightBottomCenterX = itemViewPort.itemContainer.width - mapLeftTopCenterX;
-        let mapRightBottomCenterY = itemViewPort.itemContainer.height - mapLeftTopCenterY;
-
-        //角色最中央坐标
-        let roleCenterX = role.x + role.x1 + parseInt(role.width1 / 2);
-        let roleCenterY = role.y + role.y1 + parseInt(role.height1 / 2);
-
-        //开始移动地图
-
-        itemViewPort.setScenePos(roleCenterX, roleCenterY);
-    }
-
-
-
-    function test() {
-
-        /*itemViewPort.itemContainer.mapInfo = {
-            //mapWidth: 800,
-            //mapHeight: 600,
-            //blockWidth: 50,
-            //blockHeight: 50,
-            //rowCount: 12,
-            //colCount: 16,
-            data: [1,2,3,4,5,6,7,8,
-                9,1,1,1,1,1,1,1,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                20,1,1,1,1,3,2,4,
-                6,5,7,8,9,20,1,20],
-
-            events: [1, 40]
-        };*/
-
-
-        //itemViewPort.itemContainer.mapInfo.events = [1, 40];
-
-        //mainRole.x1 = 0;
-        //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockSize.height;
-        //mainRole.width1 = 50;
-        //mainRole.width1 = mainRole.width;
-        //mainRole.height1 = itemViewPort.sizeMapBlockSize.height;
-        //mainRole.height1 = mainRole.height;
-    }
-
-
-
     //width: 400
     //height: 300
     anchors.fill: parent
-    clip: true
+
     focus: true
+    clip: true
 
-    color: "black"
+    //color: "black"
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
-        acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
-        onPressed: {
-            mouse.accepted = true;
-        }
+        color: "black"
+        //opacity: 0
     }
 
 
@@ -4026,8 +3972,9 @@ Rectangle {
         clip: true
 
 
-        mouseArea.onClicked:
+        mouseArea.onClicked: {
             GameSceneJS.mapClickEvent(mouse.x, mouse.y);
+        }
     }
 
 
@@ -5001,6 +4948,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+
             onClicked: {
                 if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                     mediaPlayer.pause();
@@ -5224,6 +5172,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+
             onDoubleClicked: {
                 dialogScript.open();
             }
@@ -5440,19 +5389,19 @@ Rectangle {
                     }
                     else {
                         if(mainRole.$$arrMoveDirection[0] !== 0) {
-                            mainRole.$$arrMoveDirection[0] = mainRole.$$arrMoveDirection[0] === -1 ? -0.71 : 0.71;
+                            mainRole.$$arrMoveDirection[0] = mainRole.$$arrMoveDirection[0] === -1 ? -0.7 : 0.7;
                         }
 
                         if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0) {
                             if(mainRole.$$arrMoveDirection[0] !== 0) {
-                                mainRole.$$arrMoveDirection[1] = -0.71;
+                                mainRole.$$arrMoveDirection[1] = -0.7;
                             }
                             else
                                 mainRole.$$arrMoveDirection[1] = -1;
                         }
                         else {
                             if(mainRole.$$arrMoveDirection[0] !== 0) {
-                                mainRole.$$arrMoveDirection[1] = 0.71;
+                                mainRole.$$arrMoveDirection[1] = 0.7;
                             }
                             else
                                 mainRole.$$arrMoveDirection[1] = 1;
@@ -6214,8 +6163,8 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: true;
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+
                 onClicked: {
                     //console.debug('clicked: parent.id', parent.id)
                     if(parent.clicked)
@@ -6254,8 +6203,8 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: true;
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+
                 onClicked: {
                     //console.debug('clicked: parent.id', parent.id)
                     if(parent.clicked)

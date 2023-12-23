@@ -1,7 +1,6 @@
 import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
 import QtQuick.Layouts 1.14
 import QtGraphicalEffects 1.0
 import QtMultimedia 5.14
@@ -279,7 +278,16 @@ Item {
     width: parent.width
     height: parent.height
 
+    focus: true
     clip: true
+
+
+
+    Mask {
+        anchors.fill: parent
+        color: '#00000000'
+        opacity: 0
+    }
 
 
     //游戏场景(可视区域）

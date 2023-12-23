@@ -89,6 +89,7 @@ Item {
         color: "#7FFFFFFF"
     }
 
+
     ColumnLayout {
 
         width: parent.width * 0.96

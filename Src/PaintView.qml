@@ -38,7 +38,7 @@ Rectangle {
 
 
     Rectangle {
-        id: options;
+        id: options
 
         anchors.fill: row
 

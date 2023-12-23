@@ -25,28 +25,30 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
     signal s_close();
 
 
+
     //width: 600
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     //打开工程 对话框
@@ -251,6 +253,7 @@ Rectangle {
         }
     }
 
+
     //配置
     QtObject {
         id: config
@@ -278,7 +281,6 @@ Rectangle {
     Keys.onPressed: {
         console.debug("[mainRoleEditor]key:", event, event.key, event.text)
     }
-
 
 
     Component.onCompleted: {

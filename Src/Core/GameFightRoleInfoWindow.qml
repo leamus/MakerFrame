@@ -18,12 +18,6 @@ Item {
 
     signal s_refreshBagWindow();
 
-    property int nFightRoleIndex: 0         //当前角色
-    property string strTeamName: '$sys_fight_heros'
-    property var arrEquipmentPositions: []   //穿戴位置列表（用于索引用）
-
-    property alias maskFightRoleInfo: maskFightRoleInfo
-
 
 
     function init(params) {
@@ -119,8 +113,18 @@ Item {
         gamemenuSkills.show(arrSkill);
     }
 
+
+
+    property int nFightRoleIndex: 0         //当前角色
+    property string strTeamName: '$sys_fight_heros'
+    property var arrEquipmentPositions: []   //穿戴位置列表（用于索引用）
+
+    property alias maskFightRoleInfo: maskFightRoleInfo
+
+
     anchors.fill: parent
     visible: false
+
 
 
     Mask {
@@ -133,6 +137,7 @@ Item {
             root.hide();
         }
     }
+
 
     ColumnLayout {
 

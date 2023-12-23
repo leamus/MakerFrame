@@ -24,7 +24,7 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -48,10 +48,9 @@ Rectangle {
     anchors.fill: parent
 
     focus: true
-
     clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
@@ -152,13 +151,11 @@ Rectangle {
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
-        onPressed: {
-            mouse.accepted = true;
-        }
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {

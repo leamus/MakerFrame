@@ -20,10 +20,13 @@ import QtQuick 2.14
 import QtQuick.Layouts 1.14
 import QtQuick.Window 2.14
 
+
 Rectangle {
     id: root
 
+
     signal s_pressed();
+
 
     width: 6 * Screen.pixelDensity
     height: 6 * Screen.pixelDensity
@@ -32,6 +35,8 @@ Rectangle {
     radius: width / 2
     color: "white"
     border.color: "black"
+
+
 
     MultiPointTouchArea {
         anchors.fill: parent

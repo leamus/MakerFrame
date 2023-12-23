@@ -2973,3 +2973,53 @@ function fChangeMainRoleDirection() {
 
     return offsetMove;
 }
+
+
+
+function test() {
+
+    /*itemViewPort.itemContainer.mapInfo = {
+        //mapWidth: 800,
+        //mapHeight: 600,
+        //blockWidth: 50,
+        //blockHeight: 50,
+        //rowCount: 12,
+        //colCount: 16,
+        data: [1,2,3,4,5,6,7,8,
+            9,1,1,1,1,1,1,1,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            20,1,1,1,1,3,2,4,
+            6,5,7,8,9,20,1,20],
+
+        events: [1, 40]
+    };*/
+
+
+    //itemViewPort.itemContainer.mapInfo.events = [1, 40];
+
+    //mainRole.x1 = 0;
+    //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockSize.height;
+    //mainRole.width1 = 50;
+    //mainRole.width1 = mainRole.width;
+    //mainRole.height1 = itemViewPort.sizeMapBlockSize.height;
+    //mainRole.height1 = mainRole.height;
+}

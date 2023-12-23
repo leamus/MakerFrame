@@ -16,13 +16,6 @@ Item {
     id: root
 
 
-    //上次保存的类型 和 选择的道具下标
-    property int nlastShowType: 0
-    property int nLastChoicedIndex: 0
-
-    property alias maskGoods: maskGoods
-
-
     //初始化，主要是显示 战斗人物 和 所有的道具
     function init() {
 
@@ -50,7 +43,6 @@ Item {
         //closeWindow(0b100);
         game.window({$id: 0b100, $visible: false});
     }
-
 
 
     //按类型 显示道具
@@ -151,13 +143,19 @@ Item {
     }
 
 
-    //铺满整个屏幕
+
+    //上次保存的类型 和 选择的道具下标
+    property int nlastShowType: 0
+    property int nLastChoicedIndex: 0
+
+    property alias maskGoods: maskGoods
+
+
     anchors.fill: parent
     visible: false
 
 
 
-    //遮罩层
     Mask {
         id: maskGoods
 

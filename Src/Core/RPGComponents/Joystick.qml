@@ -4,6 +4,7 @@ import QtQuick.Window 2.2
 Item {
     id: joystick
 
+
     //手柄偏移度（横向纵向都是-1~+1）
     property point pointInput
     //property double inputX
@@ -16,6 +17,7 @@ Item {
 
     implicitWidth: 20 * Screen.pixelDensity
     implicitHeight: 20 * Screen.pixelDensity
+
 
 
     //外圆
@@ -104,21 +106,30 @@ Item {
         }
     }
 
+
+
     QtObject {
         id: _private
 
         function updateHandlePosition(xOffset, yOffset) {
             let dx = (xOffset) / (joystick.width / 2 - handle.width / 2);
             //if(joystick.pointInput.x !== Math.round(dx * nFixPrecision) / nFixPrecision)
-                joystick.pointInput.x = Math.round(dx * nFixPrecision) / nFixPrecision;
+                //joystick.pointInput.x = Math.round(dx * nFixPrecision) / nFixPrecision;
 
             let dy = (yOffset) / (joystick.height / 2 - handle.height / 2);
             //if(joystick.pointInput.y !== Math.round(dy * nFixPrecision) / nFixPrecision)
-                joystick.pointInput.y = Math.round(dy * nFixPrecision) / nFixPrecision;
+                //joystick.pointInput.y = Math.round(dy * nFixPrecision) / nFixPrecision;
+
+            let pointInput = Qt.point(Math.round(dx * nFixPrecision) / nFixPrecision, Math.round(dy * nFixPrecision) / nFixPrecision);
+            //if(joystick.pointInput !== pointInput)
+                joystick.pointInput = pointInput;
 
 
             handle.anchors.horizontalCenterOffset = xOffset;
             handle.anchors.verticalCenterOffset = yOffset;
+
+
+            //console.debug(dx, dy);
         }
     }
 }

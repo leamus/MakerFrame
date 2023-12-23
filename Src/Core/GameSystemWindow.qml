@@ -16,10 +16,6 @@ Item {
     id: root
 
 
-    property alias gamemenuSystemMenu: gamemenuSystemMenu
-    property alias maskSystemMenu: maskSystemMenu
-
-
     function showSystemMenu() {
         visible = true;
         gamemenuSystemMenu.show(['写入存档', '读取存档', '设置', '返回']);
@@ -31,8 +27,13 @@ Item {
     }
 
 
+    property alias gamemenuSystemMenu: gamemenuSystemMenu
+    property alias maskSystemMenu: maskSystemMenu
+
+
     anchors.fill: parent
     visible: false
+
 
 
     Mask {
@@ -45,7 +46,6 @@ Item {
             root.hide();
         }
     }
-
 
 
     GameMenu {

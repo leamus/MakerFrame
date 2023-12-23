@@ -25,7 +25,7 @@ import './Core'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -206,17 +206,17 @@ let data = (function() {
     anchors.fill: parent
 
     focus: true
-
     clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {

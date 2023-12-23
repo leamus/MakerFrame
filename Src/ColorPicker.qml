@@ -7,17 +7,19 @@ Rectangle {
     id: colorPicker
 
 
+    signal colorPicked(color clr)
+
+
     property alias text: label.text
     property alias textColor: label.color
     property alias font: label.font
     property alias selectedColor: currentColor.color
     //property var colorDialog: null
 
-    signal colorPicked(color clr)
-
 
     //width: 64
     //height: 60
+
 
 
     Rectangle {

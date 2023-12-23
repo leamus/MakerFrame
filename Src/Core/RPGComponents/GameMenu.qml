@@ -11,51 +11,11 @@ import Qt.labs.settings 1.1
 Rectangle {
     id: root
 
+
+
     //选择事件
     signal s_Choice(int index);
     signal s_DoubleChoice(int index);
-
-
-
-    //一个选项的最大最小高度（宽度自适应）
-    //property int nItemMaxHeight: 60
-    //property int nItemMinHeight: 20
-    property int nItemHeight: 60    //选项高度
-    property int nItemFontSize: 16  //选项字体大小
-    property color colorItemFontColor: "white"  //选项字体颜色
-    property color colorItemColor1: "#00FFFFFF" //选项静止颜色
-    property color colorItemColor2: "#66FFFFFF" //选项被选颜色
-    property color colorItemBorderColor: "#60FFFFFF"    //选项边框颜色
-    property int nTitleFontSize: 16     //标题字体大小
-    property int nTitleHeight: 60
-    property color colorTitleColor: "#EE00CC99" //标题颜色
-    property color colorTitleFontColor: "white" //标题文字颜色
-
-    property var itemAlignment: Text.AlignHCenter //每个项目对齐方式
-
-
-    //property var arrChoiceList  //要显示的列表
-    property var arrList: []    //所有列表
-    property var arrData    //对应的数据
-
-    property int nPageIndex: 0
-    property int nMaxPage: -1
-    property int nPageItemsCount: -1
-
-
-
-    property int nChoiceIndex: -1
-    property int nChoiceListIndex: -1
-
-    property string strTitle: ''
-
-
-    property alias rectMenuTitle: rectMenuTitle
-    property alias textMenuTitle: textMenuTitle
-
-
-    property alias column1: columnRoot
-    property alias column2: columnChoices
 
 
 
@@ -187,6 +147,46 @@ Rectangle {
         //console.debug(arguments, arguments.length);
     }
 
+
+
+    //一个选项的最大最小高度（宽度自适应）
+    //property int nItemMaxHeight: 60
+    //property int nItemMinHeight: 20
+    property int nItemHeight: 60    //选项高度
+    property int nItemFontSize: 16  //选项字体大小
+    property color colorItemFontColor: "white"  //选项字体颜色
+    property color colorItemColor1: "#00FFFFFF" //选项静止颜色
+    property color colorItemColor2: "#66FFFFFF" //选项被选颜色
+    property color colorItemBorderColor: "#60FFFFFF"    //选项边框颜色
+    property int nTitleFontSize: 16     //标题字体大小
+    property int nTitleHeight: 60
+    property color colorTitleColor: "#EE00CC99" //标题颜色
+    property color colorTitleFontColor: "white" //标题文字颜色
+
+    property var itemAlignment: Text.AlignHCenter //每个项目对齐方式
+
+
+    //property var arrChoiceList  //要显示的列表
+    property var arrList: []    //所有列表
+    property var arrData    //对应的数据
+
+    property int nPageIndex: 0
+    property int nMaxPage: -1
+    property int nPageItemsCount: -1
+
+
+    property int nChoiceIndex: -1
+    property int nChoiceListIndex: -1
+
+    property string strTitle: ''
+
+
+    property alias rectMenuTitle: rectMenuTitle
+    property alias textMenuTitle: textMenuTitle
+
+
+    property alias column1: columnRoot
+    property alias column2: columnChoices
 
 
     color: "#CF6699FF"
@@ -452,6 +452,7 @@ Rectangle {
     }
 
 
+
     QtObject {
         id: _private
 
@@ -462,6 +463,8 @@ Rectangle {
         //property int nShowItemCount: 0  //只读，个数
 
     }
+
+
 
     Component.onCompleted: {
         //_private.arrItems.push(compItem.createObject(columnChoices, {nIndex: 0}));

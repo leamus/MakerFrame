@@ -25,7 +25,7 @@ import './Core'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -195,22 +195,23 @@ let data = (function() {
     }
 
 
+
     //width: 600
     //height: 800
     anchors.fill: parent
 
     focus: true
-
     clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {
@@ -412,6 +413,7 @@ let data = (function() {
         }
     }
 
+
     //配置
     QtObject {
         id: _config
@@ -440,7 +442,6 @@ let data = (function() {
     Keys.onReleased: {
         console.debug('[GoodsEditor]Keys.onReleased:', event.key);
     }
-
 
 
     Component.onCompleted: {

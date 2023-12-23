@@ -25,16 +25,13 @@ import 'GameVisualScript.js' as GameVisualScriptJS
 
 
 
-Rectangle {
+Item {
     id: root
 
 
     signal s_close();
     signal s_Compile(string code);
 
-
-    property var sysCommands: ({})
-    property var sysCommandsTree: []
 
 
     function clearData() {
@@ -124,21 +121,24 @@ Rectangle {
     }
 
 
+
+    property var sysCommands: ({})
+    property var sysCommandsTree: []
+
+
     anchors.fill: parent
 
     focus: true
-
     clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
-        onPressed: {
-            mouse.accepted = true;
-        }
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
 
 

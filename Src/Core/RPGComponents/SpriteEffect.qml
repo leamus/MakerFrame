@@ -31,36 +31,6 @@ import "qrc:/QML"
 Item {
     id: root
 
-    property string spriteSrc: ""   //精灵图片
-    property size sizeFrame: Qt.size(0,0)     //一帧的宽高
-    property int nFrameCount: 3 //一个方向有几张图片
-    property int interval: 100  //帧切换速度
-    property point offsetIndex: Qt.point(0, 0)  //行、列 偏移
-    property real rXScale: 1        //1为原图，-1为X轴镜像，其他值为X轴缩放
-    property real rYScale: 1        //1为原图，-1为Y轴镜像，其他值为Y轴缩放
-
-    property alias animatedsprite: animatedsprite
-    property alias running: animatedsprite.running
-    property alias numberanimationSpriteEffectX: numberanimationSpriteEffectX
-    property alias numberanimationSpriteEffectY: numberanimationSpriteEffectY
-
-    property int nType: 0   //0表示不播放音效，只是触发 播放信号；1表示本组件播放音频（win下如果太多，会卡顿）
-    property string soundeffectName
-    property alias soundeffectDelay: timerSound.interval
-
-
-    property alias arrColorOverlayColors: colorOverlay.arrColors
-    property alias nColorOverlayStep: colorOverlay.nStep
-    property alias nColorOverlayInterval: colorOverlay.nInterval
-
-
-    //测试，可以点击和显示调试信息
-    property alias test: mouseArea.enabled
-
-
-    //是否准备开始（不适用系统的running是因为系统先调用current
-    property bool bStartToRunning: false
-
 
     //被点击
     signal s_clicked();
@@ -126,6 +96,38 @@ Item {
     function colorOverlayStop() {
         colorOverlay.stop();
     }
+
+
+
+    property string spriteSrc: ""   //精灵图片
+    property size sizeFrame: Qt.size(0,0)     //一帧的宽高
+    property int nFrameCount: 3 //一个方向有几张图片
+    property int interval: 100  //帧切换速度
+    property point offsetIndex: Qt.point(0, 0)  //行、列 偏移
+    property real rXScale: 1        //1为原图，-1为X轴镜像，其他值为X轴缩放
+    property real rYScale: 1        //1为原图，-1为Y轴镜像，其他值为Y轴缩放
+
+    property alias animatedsprite: animatedsprite
+    property alias running: animatedsprite.running
+    property alias numberanimationSpriteEffectX: numberanimationSpriteEffectX
+    property alias numberanimationSpriteEffectY: numberanimationSpriteEffectY
+
+    property int nType: 0   //0表示不播放音效，只是触发 播放信号；1表示本组件播放音频（win下如果太多，会卡顿）
+    property string soundeffectName
+    property alias soundeffectDelay: timerSound.interval
+
+
+    property alias arrColorOverlayColors: colorOverlay.arrColors
+    property alias nColorOverlayStep: colorOverlay.nStep
+    property alias nColorOverlayInterval: colorOverlay.nInterval
+
+
+    //测试，可以点击和显示调试信息
+    property alias test: mouseArea.enabled
+
+
+    //是否准备开始（不适用系统的running是因为系统先调用current
+    property bool bStartToRunning: false
 
 
     //width: 0

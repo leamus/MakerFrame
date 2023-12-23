@@ -25,7 +25,7 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -79,17 +79,18 @@ game.goon();
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {
@@ -474,6 +475,7 @@ function *$start() {
 
         `
     }
+
 
     //配置
     QtObject {

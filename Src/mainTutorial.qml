@@ -25,27 +25,30 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
+
     signal s_close();
+
 
 
     //width: 600
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {
@@ -223,6 +226,23 @@ Rectangle {
 
 
 
+    QtObject {
+        id: _private
+
+        function loadModule(url) {
+            loader.source = url;
+            loader.visible = true;
+            loader.forceActiveFocus();
+        }
+    }
+
+    //配置
+    QtObject {
+        id: config
+    }
+
+
+
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         s_close();
@@ -241,25 +261,6 @@ Rectangle {
     Keys.onPressed: {
         console.debug("[mainTutorial]key:", event, event.key, event.text)
     }
-
-
-
-    QtObject {
-        id: _private
-
-        function loadModule(url) {
-            loader.source = url;
-            loader.visible = true;
-            loader.forceActiveFocus();
-        }
-    }
-
-    //配置
-    QtObject {
-        id: config
-    }
-
-
 
 
 

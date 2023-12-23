@@ -25,27 +25,30 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
+
     signal s_close();
+
 
 
     //width: 600
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {
@@ -100,6 +103,18 @@ Rectangle {
 
 
 
+    QtObject {
+        id: _private
+
+    }
+
+    //配置
+    QtObject {
+        id: config
+    }
+
+
+
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         s_close();
@@ -120,24 +135,13 @@ Rectangle {
     }
 
 
-
-    QtObject {
-        id: _private
-
-    }
-
-    //配置
-    QtObject {
-        id: config
-    }
-
-
-
-
-
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+
+2023/12/23：发布 1.7.2.231223 版本
+1、修复QML的一个Bug（MouseArea和TextArea组件，如果双指操作会有穿透的问题）；
+2、大幅整理优化代码；
 
 2023/12/22：发布 1.7.1.231222 版本
 1、增加键盘和摇杆多方向移动！

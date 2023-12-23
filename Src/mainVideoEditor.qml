@@ -26,7 +26,7 @@ import 'qrc:/QML'
 
 
 
-Rectangle {
+Item {
     id: root
 
 
@@ -35,6 +35,7 @@ Rectangle {
         mediaPlayer.stop();
         itemVideo.visible = false;
     }
+
 
 
     function init() {
@@ -48,17 +49,18 @@ Rectangle {
     //height: 800
     anchors.fill: parent
 
-    clip: true
     focus: true
+    clip: true
 
-    color: Global.style.backgroundColor
+    //color: Global.style.backgroundColor
 
 
 
-    MouseArea {
+    Mask {
         anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
     }
-
 
 
     ColumnLayout {
@@ -407,7 +409,6 @@ Rectangle {
     Keys.onPressed: {
         console.debug("[mainVideoEditor]key:", event, event.key, event.text);
     }
-
 
 
     Component.onCompleted: {

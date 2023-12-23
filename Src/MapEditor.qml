@@ -54,8 +54,8 @@ import './Core'
         outputData.MapName = ""; //地图名
         outputData.MapType = 1; //地图类型
         outputData.MapScale = ""; //地图缩放
-        outputData.MapSize = [config.sizeMapSize.width, config.sizeMapSize.height]; //地图大小（行列）
-        outputData.MapBlockSize = [config.sizeMapBlockSize.width, config.sizeMapBlockSize.height];  //地图块大小（像素）
+        outputData.MapSize = [_config.sizeMapSize.width, _config.sizeMapSize.height]; //地图大小（行列）
+        outputData.MapBlockSize = [_config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height];  //地图块大小（像素）
         outputData.MapCount = canvasMapContainer.arrCanvasMap.length;  //地图层数
         outputData.MapData = [];    //arrMapData。地图数据（从0开始）
         outputData.MapBlockImageCount = 1;  //地图块图片数
@@ -89,68 +89,15 @@ import './Core'
 */
 
 
-Rectangle {
+Item {
     id: root
+
 
 
     signal s_close()
     onS_close: {
         cleanMap();
     }
-
-
-
-    //width: 600
-    //height: 800
-    anchors.fill: parent
-
-    clip: true
-    focus: true
-
-    color: Global.style.backgroundColor
-
-
-    //Keys.forwardTo: [canvasMapContainer]
-    Keys.onEscapePressed: {
-        _private.close();
-
-        //focus = false;
-        //loader.visible = false;
-        //loader.focus = false;
-        //menuEsc.hide();
-
-        event.accepted = true;
-
-        console.debug("[MapEditor]Escape Key");
-    }
-    Keys.onBackPressed: {
-        _private.close();
-
-        //focus = false;
-        //loader.visible = false;
-        //loader.focus = false;
-        //menuEsc.hide();
-        event.accepted = true;
-
-        console.debug("[MapEditor]Back Key");
-    }
-    Keys.onPressed: {
-        console.debug("[MapEditor]key:", event, event.key, event.text)
-    }
-
-
-
-    //地图 数据
-    property var arrMapData: [] //地图数据
-    property var arrMapBlockImageURL: []    //地图块图片URL
-
-    property var objMapBlockSpecialData: ({})   //地图特殊图块数据（{坐标: 数据代码}）
-    property var objMapEventsData: ({}) //地图事件数据（{坐标: 事件名}）
-    //property var objEventsData: ({}) //事件数据（{事件名: 事件代码}）
-    //property var objSystemEventsData: ({}) //系统事件数据（{事件名: 事件代码}）
-
-
-    readonly property int rMapBlockSpecialType_Obstacle: -1
 
 
 
@@ -161,18 +108,18 @@ Rectangle {
         //console.debug("init:", cfg.MapBlockSize, cfg.MapSize)
 
         //得到Size
-        config.sizeMapSize = Qt.size(cfg.MapSize[0], cfg.MapSize[1]);
-        config.sizeMapBlockSize = Qt.size(cfg.MapBlockSize[0], cfg.MapBlockSize[1]);
+        _config.sizeMapSize = Qt.size(cfg.MapSize[0], cfg.MapSize[1]);
+        _config.sizeMapBlockSize = Qt.size(cfg.MapBlockSize[0], cfg.MapBlockSize[1]);
 
 
         //计算地图宽高
-        canvasMapContainer.width = config.sizeMapSize.width * config.sizeMapBlockSize.width;
-        canvasMapContainer.height = config.sizeMapSize.height * config.sizeMapBlockSize.height;
+        canvasMapContainer.width = _config.sizeMapSize.width * _config.sizeMapBlockSize.width;
+        canvasMapContainer.height = _config.sizeMapSize.height * _config.sizeMapBlockSize.height;
 
         canvasOutput.width = canvasMapContainer.width;
         canvasOutput.height = canvasMapContainer.height;
 
-        flickableMapBlock.implicitHeight = config.sizeMapBlockSize.height * 3;
+        flickableMapBlock.implicitHeight = _config.sizeMapBlockSize.height * 3;
 
 
 
@@ -221,18 +168,18 @@ Rectangle {
         textMapName.text = _private.strMapName;
 
         //得到size
-        config.sizeMapSize = Qt.size(cfg.MapSize[0], cfg.MapSize[1]);
-        config.sizeMapBlockSize = Qt.size(cfg.MapBlockSize[0], cfg.MapBlockSize[1]);
+        _config.sizeMapSize = Qt.size(cfg.MapSize[0], cfg.MapSize[1]);
+        _config.sizeMapBlockSize = Qt.size(cfg.MapBlockSize[0], cfg.MapBlockSize[1]);
 
 
         //计算地图宽高
-        canvasMapContainer.width = config.sizeMapSize.width * config.sizeMapBlockSize.width;
-        canvasMapContainer.height = config.sizeMapSize.height * config.sizeMapBlockSize.height;
+        canvasMapContainer.width = _config.sizeMapSize.width * _config.sizeMapBlockSize.width;
+        canvasMapContainer.height = _config.sizeMapSize.height * _config.sizeMapBlockSize.height;
 
         canvasOutput.width = canvasMapContainer.width;
         canvasOutput.height = canvasMapContainer.height;
 
-        flickableMapBlock.implicitHeight = config.sizeMapBlockSize.height * 3;
+        flickableMapBlock.implicitHeight = _config.sizeMapBlockSize.height * 3;
 
 
         //导入地图数据
@@ -307,8 +254,8 @@ Rectangle {
             //设置cfg.MapData[k]等同于设置arrMapData[k]!!
 
             //实际高
-            cfg.MapData[k].length = config.sizeMapSize.height;
-            //arrMapData[k].length = config.sizeMapSize.height;
+            cfg.MapData[k].length = _config.sizeMapSize.height;
+            //arrMapData[k].length = _config.sizeMapSize.height;
 
             //循环每一行
             for(let j in cfg.MapData[k]) {
@@ -317,8 +264,8 @@ Rectangle {
                     cfg.MapData[k][j] = [];
 
                 //实际宽
-                cfg.MapData[k][j].length = config.sizeMapSize.width;
-                //arrMapData[k][j].length = config.sizeMapSize.width;
+                cfg.MapData[k][j].length = _config.sizeMapSize.width;
+                //arrMapData[k][j].length = _config.sizeMapSize.width;
 
                 //循环每一列
                 for(let i in cfg.MapData[k][j]) {
@@ -337,15 +284,15 @@ Rectangle {
                     //canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
 
 
-                    /*ctx.clearRect(i * config.sizeMapBlockSize.width, j * config.sizeMapBlockSize.height,
-                                  config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                    /*ctx.clearRect(i * _config.sizeMapBlockSize.width, j * _config.sizeMapBlockSize.height,
+                                  _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                     ctx.drawImage(imageMapBlock1.source,
-                                  cfg.MapData[k][j][i][0] * config.sizeMapBlockSize.width,
-                                  cfg.MapData[k][j][i][1] * config.sizeMapBlockSize.height,
-                                  config.sizeMapBlockSize.width, config.sizeMapBlockSize.height,
-                                  i * config.sizeMapBlockSize.width, j * config.sizeMapBlockSize.height,
-                                  config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                  cfg.MapData[k][j][i][0] * _config.sizeMapBlockSize.width,
+                                  cfg.MapData[k][j][i][1] * _config.sizeMapBlockSize.height,
+                                  _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height,
+                                  i * _config.sizeMapBlockSize.width, j * _config.sizeMapBlockSize.height,
+                                  _config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
                     */
                 }
             }
@@ -497,8 +444,8 @@ Rectangle {
         outputData.MapName = newName;
         outputData.MapType = 1; //地图类型
         outputData.MapScale = parseFloat(textMapScale.text) > 0 ? parseFloat(textMapScale.text) : 1;
-        outputData.MapSize = [config.sizeMapSize.width, config.sizeMapSize.height];
-        outputData.MapBlockSize = [config.sizeMapBlockSize.width, config.sizeMapBlockSize.height];
+        outputData.MapSize = [_config.sizeMapSize.width, _config.sizeMapSize.height];
+        outputData.MapBlockSize = [_config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height];
         outputData.MapCount = canvasMapContainer.arrCanvasMap.length;
         outputData.MapData = [];
         outputData.MapBlockImageCount = 1;
@@ -558,10 +505,35 @@ Rectangle {
 
 
 
-    MouseArea {
-        anchors.fill: parent
-    }
+    //地图 数据
+    property var arrMapData: [] //地图数据
+    property var arrMapBlockImageURL: []    //地图块图片URL
 
+    property var objMapBlockSpecialData: ({})   //地图特殊图块数据（{坐标: 数据代码}）
+    property var objMapEventsData: ({}) //地图事件数据（{坐标: 事件名}）
+    //property var objEventsData: ({}) //事件数据（{事件名: 事件代码}）
+    //property var objSystemEventsData: ({}) //系统事件数据（{事件名: 事件代码}）
+
+
+    readonly property int rMapBlockSpecialType_Obstacle: -1
+
+
+    //width: 600
+    //height: 800
+    anchors.fill: parent
+
+    focus: true
+    clip: true
+
+    //color: Global.style.backgroundColor
+
+
+
+    Mask {
+        anchors.fill: parent
+        color: Global.style.backgroundColor
+        //opacity: 0
+    }
 
 
     ColumnLayout {
@@ -587,15 +559,15 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: {
-                        if(config.bMapMove)
+                        if(_config.bMapMove)
                             return "移动";
-                        else if(config.bMapDraw)
+                        else if(_config.bMapDraw)
                             return "绘制";
-                        //else if(config.bMapClean)
+                        //else if(_config.bMapClean)
                         //    return "清除";
-                        else if(config.bMapEvent)
+                        else if(_config.bMapEvent)
                             return "事件";
-                        else if(config.bMapBlockSpecial)
+                        else if(_config.bMapBlockSpecial)
                             return "障碍";
                         else
                             return "ERROR";
@@ -605,18 +577,18 @@ Rectangle {
                     anchors.fill: parent
                     onClicked: {
                         //切换模式
-                        if(config.bMapMove)
-                            config.nDrawMapType = 1;
-                        else if(config.bMapDraw)
-                            config.nDrawMapType = 2;
-                        //else if(config.bMapClean)
-                        //    config.nDrawMapType = 0;
-                        else if(config.bMapBlockSpecial)
-                            config.nDrawMapType = 3;
-                        else if(config.bMapEvent)
-                            config.nDrawMapType = 0;
+                        if(_config.bMapMove)
+                            _config.nDrawMapType = 1;
+                        else if(_config.bMapDraw)
+                            _config.nDrawMapType = 2;
+                        //else if(_config.bMapClean)
+                        //    _config.nDrawMapType = 0;
+                        else if(_config.bMapBlockSpecial)
+                            _config.nDrawMapType = 3;
+                        else if(_config.bMapEvent)
+                            _config.nDrawMapType = 0;
                         else
-                            config.nDrawMapType = 0;
+                            _config.nDrawMapType = 0;
                     }
                 }
             }
@@ -716,7 +688,7 @@ Rectangle {
                             /*switch(index) {
                             case 0:
                             case 1:
-                                //config.nDrawMapType = 3;
+                                //_config.nDrawMapType = 3;
                                 listviewCanvasMap.currentIndex = index;
                                 canvasMapContainer.nCurrentCanvasMap = index;
                                 break;
@@ -765,10 +737,10 @@ Rectangle {
                 font.pointSize: _config.nFontPointSize
                 text: "铺图"
                 onClicked: {
-                    let nBlockImageCols = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width);
-                    let nBlockImageRows = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.height / config.sizeMapBlockSize.height);
+                    let nBlockImageCols = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
+                    let nBlockImageRows = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.height / _config.sizeMapBlockSize.height);
 
-                    for(let by = 0; by < config.sizeMapSize.height; ++by) {
+                    for(let by = 0; by < _config.sizeMapSize.height; ++by) {
                         //超出地图块
                         if(by >= nBlockImageRows)
                             break;
@@ -777,7 +749,7 @@ Rectangle {
                         if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
                             arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
 
-                        for(let bx = 0; bx < config.sizeMapSize.width; ++bx) {
+                        for(let bx = 0; bx < _config.sizeMapSize.width; ++bx) {
                             //超出地图块
                             if(bx >= nBlockImageCols)
                                 break;
@@ -789,7 +761,7 @@ Rectangle {
 
                             arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [bx, by, itemMapBlockContainer.currentMapBlock.nIndex];
 
-                            //console.debug("!!!2", bx, by, nBlockImageCols, nBlockImageRows, config.sizeMapSize.width, config.sizeMapSize.height);
+                            //console.debug("!!!2", bx, by, nBlockImageCols, nBlockImageRows, _config.sizeMapSize.width, _config.sizeMapSize.height);
                         }
                     }
 
@@ -821,20 +793,20 @@ Rectangle {
                     let x1 = rectCopy.x + rectCopy.width - 1;
                     let y1 = rectCopy.y + rectCopy.height - 1;
 
-                    //let bx = parseInt(rectPaste.x / config.sizeMapBlockSize.width);
-                    let by = parseInt(rectPaste.y / config.sizeMapBlockSize.height);
+                    //let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
+                    let by = parseInt(rectPaste.y / _config.sizeMapBlockSize.height);
 
-                    //let bx0 = parseInt(rectCopy.x / config.sizeMapBlockSize.width);
-                    let by0 = parseInt(rectCopy.y / config.sizeMapBlockSize.height);
-                    let bx1 = parseInt(x1 / config.sizeMapBlockSize.width);
-                    let by1 = parseInt(y1 / config.sizeMapBlockSize.height);
+                    //let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
+                    let by0 = parseInt(rectCopy.y / _config.sizeMapBlockSize.height);
+                    let bx1 = parseInt(x1 / _config.sizeMapBlockSize.width);
+                    let by1 = parseInt(y1 / _config.sizeMapBlockSize.height);
 
-                    //console.debug("!!!1", parseInt(rectCopy.x / config.sizeMapBlockSize.width), by0, bx1, by1)
+                    //console.debug("!!!1", parseInt(rectCopy.x / _config.sizeMapBlockSize.width), by0, bx1, by1)
 
                     for(; by0 <= by1; ++by0, ++by) {
                         //超出地图
-                        if(by >= config.sizeMapSize.height) {
-                            //console.debug("!1", by, config.sizeMapSize.height)
+                        if(by >= _config.sizeMapSize.height) {
+                            //console.debug("!1", by, _config.sizeMapSize.height)
                             break;
                         }
 
@@ -842,12 +814,12 @@ Rectangle {
                         if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0]))
                             arrMapData[canvasMapContainer.nCurrentCanvasMap][by0] = [];
 
-                        let bx = parseInt(rectPaste.x / config.sizeMapBlockSize.width);
-                        let bx0 = parseInt(rectCopy.x / config.sizeMapBlockSize.width);
+                        let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
+                        let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
                         for(; bx0 <= bx1; ++bx0, ++bx) {
                             //超出地图
-                            if(bx >= config.sizeMapSize.width) {
-                                //console.debug("!2", bx, config.sizeMapSize.width)
+                            if(bx >= _config.sizeMapSize.width) {
+                                //console.debug("!2", bx, _config.sizeMapSize.width)
                                 break;
                             }
 
@@ -1010,7 +982,7 @@ Rectangle {
                             /*switch(index) {
                             case 0:
                             case 1:
-                                //config.nDrawMapType = 3;
+                                //_config.nDrawMapType = 3;
                                 listviewEvents.currentIndex = index;
                                 canvasMapContainer.nCurrentCanvasMap = index;
                                 break;
@@ -1256,8 +1228,8 @@ Rectangle {
 
 
                 //anchors.centerIn: parent
-                //width: nCols * config.sizeMapBlockSize.width
-                //height: () * config.sizeMapBlockSize.height
+                //width: nCols * _config.sizeMapBlockSize.width
+                //height: () * _config.sizeMapBlockSize.height
 
 
 
@@ -1292,16 +1264,16 @@ Rectangle {
                         onStatusChanged: {
                             if (status === Image.Ready) {
                                 //计算地图块图片所占行列数
-                                parent.sizeBlockCount.width = parseInt(sourceSize.width / config.sizeMapBlockSize.width);
-                                parent.sizeBlockCount.height = parseInt(sourceSize.height / config.sizeMapBlockSize.height);
+                                parent.sizeBlockCount.width = parseInt(sourceSize.width / _config.sizeMapBlockSize.width);
+                                parent.sizeBlockCount.height = parseInt(sourceSize.height / _config.sizeMapBlockSize.height);
 
                                 itemMapBlockContainer.nCols = parent.sizeBlockCount.width; //设置为和地图块列数相同
 
                                 //计算地图块canvas大小
-                                let nBlockImageCols = parseInt(parent.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width);
-                                let nBlockImageRows = parseInt(parent.imageMapBlock.sourceSize.height / config.sizeMapBlockSize.height);
-                                itemMapBlockContainer.width = itemMapBlockContainer.nCols * config.sizeMapBlockSize.width;//nCols * config.sizeMapBlockSize.width;
-                                itemMapBlockContainer.height = Math.ceil((nBlockImageCols * nBlockImageRows) / itemMapBlockContainer.nCols) * config.sizeMapBlockSize.height;// * config.sizeMapBlockSize.height;
+                                let nBlockImageCols = parseInt(parent.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
+                                let nBlockImageRows = parseInt(parent.imageMapBlock.sourceSize.height / _config.sizeMapBlockSize.height);
+                                itemMapBlockContainer.width = itemMapBlockContainer.nCols * _config.sizeMapBlockSize.width;//nCols * _config.sizeMapBlockSize.width;
+                                itemMapBlockContainer.height = Math.ceil((nBlockImageCols * nBlockImageRows) / itemMapBlockContainer.nCols) * _config.sizeMapBlockSize.height;// * _config.sizeMapBlockSize.height;
 
 
 
@@ -1369,8 +1341,8 @@ Rectangle {
                                     console.debug("[MapEditor]", mouse.x, mouse.y);
 
                                     //计算出鼠标点击的 块坐标 和 id号
-                                    let x = parseInt(mouse.x / config.sizeMapBlockSize.width);
-                                    let y = parseInt(mouse.y / config.sizeMapBlockSize.height);
+                                    let x = parseInt(mouse.x / _config.sizeMapBlockSize.width);
+                                    let y = parseInt(mouse.y / _config.sizeMapBlockSize.height);
                                     let id = x + y * itemMapBlockContainer.nCols;   //id为从左到右 从上到下的图块数
                                     //console.debug(x, itemMapBlockContainer.nCols, id , itemMapBlock1.sizeBlockCount.width * itemMapBlock1.sizeBlockCount.height)
 
@@ -1386,13 +1358,13 @@ Rectangle {
                                     }
 
 
-                                    rectSelect.x = x * config.sizeMapBlockSize.width;
-                                    rectSelect.y = y * config.sizeMapBlockSize.height;
+                                    rectSelect.x = x * _config.sizeMapBlockSize.width;
+                                    rectSelect.y = y * _config.sizeMapBlockSize.height;
 
 
                                     //计算点击的块 在原图中的位置
-                                    let col = id % parseInt(itemMapBlock1.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width);
-                                    let row = parseInt(id / parseInt(itemMapBlock1.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width));
+                                    let col = id % parseInt(itemMapBlock1.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
+                                    let row = parseInt(id / parseInt(itemMapBlock1.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width));
 
                                     itemMapBlock1.pointSelectedMapBlock = Qt.point(col, row);
 
@@ -1406,8 +1378,8 @@ Rectangle {
                         //选择框
                         Rectangle {
                             id: rectSelect
-                            width: config.sizeMapBlockSize.width
-                            height: config.sizeMapBlockSize.height
+                            width: _config.sizeMapBlockSize.width
+                            height: _config.sizeMapBlockSize.height
                             x: 0
                             y: 0
                             color: "transparent"
@@ -1440,8 +1412,8 @@ Rectangle {
 
 
                             //计算宽、高
-                            let nBlockImageCols = parseInt(parent.imageMapBlock.sourceSize.width / config.sizeMapBlockSize.width);
-                            let nBlockImageRows = parseInt(parent.imageMapBlock.sourceSize.height / config.sizeMapBlockSize.height);
+                            let nBlockImageCols = parseInt(parent.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
+                            let nBlockImageRows = parseInt(parent.imageMapBlock.sourceSize.height / _config.sizeMapBlockSize.height);
 
                             //console.debug(nBlockImageCols,nBlockImageRows)
 
@@ -1457,10 +1429,10 @@ Rectangle {
                                 //console.debug(i, x1,y1,x2,y2);
 
                                 ctx.drawImage(parent.imageMapBlock.source,
-                                              x1 * config.sizeMapBlockSize.width, y1 * config.sizeMapBlockSize.height,
-                                              config.sizeMapBlockSize.width, config.sizeMapBlockSize.height,
-                                              x2 * config.sizeMapBlockSize.width, y2 * config.sizeMapBlockSize.height,
-                                              config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                              x1 * _config.sizeMapBlockSize.width, y1 * _config.sizeMapBlockSize.height,
+                                              _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height,
+                                              x2 * _config.sizeMapBlockSize.width, y2 * _config.sizeMapBlockSize.height,
+                                              _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                             }
 
                             console.debug("[MapEditor]canvasMapBlock onPaint", nBlockImageCols, nBlockImageRows,
@@ -1550,7 +1522,7 @@ Rectangle {
 
                 //synchronousDrag: true
 
-                //mouseEnabled: config.bMapMove
+                //mouseEnabled: _config.bMapMove
 
 
                 //地图层 Canvas 容器
@@ -1620,20 +1592,20 @@ Rectangle {
                                         //删除块
                                         if(arrMapData[y][x].x === -2 && arrMapData[y][x].y === -2) {
                                             ctx.fillStyle = "white";
-                                            ctx.fillRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                            ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                                             arrMapData[y][x] = Qt.point(-1,-1);
                                         }
 
-                                        //console.debug(arrMapData[y][x].x * config.sizeMapBlockSize.width, arrMapData[y][x].y * config.sizeMapBlockSize.height,
-                                        //              x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height)
+                                        //console.debug(arrMapData[y][x].x * _config.sizeMapBlockSize.width, arrMapData[y][x].y * _config.sizeMapBlockSize.height,
+                                        //              x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height)
 
                                         //绘制图块
                                         else {
                                             ctx.drawImage(itemMapBlockContainer.currentMapBlock.imageMapBlock.source,
-                                                arrMapData[y][x].x * config.sizeMapBlockSize.width, arrMapData[y][x].y * config.sizeMapBlockSize.height,
-                                                config.sizeMapBlockSize.width, config.sizeMapBlockSize.height,
-                                                x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height,
-                                                config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                                arrMapData[y][x].x * _config.sizeMapBlockSize.width, arrMapData[y][x].y * _config.sizeMapBlockSize.height,
+                                                _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height,
+                                                x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height,
+                                                _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                                         }
                                     }
 
@@ -1651,31 +1623,31 @@ Rectangle {
 
 
                                     //清除块
-                                    if(config.bMapClean/* && arrMapData[canvasMapContainer.nCurrentCanvasMap][mapRepaintPoint.y][mapRepaintPoint.x] === Qt.point(-1, -1)*/) {
-                                        ctx.clearRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                    if(_config.bMapClean/* && arrMapData[canvasMapContainer.nCurrentCanvasMap][mapRepaintPoint.y][mapRepaintPoint.x] === Qt.point(-1, -1)*/) {
+                                        ctx.clearRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         //console.debug("删除", y, x, arrMapData[y][x])
                                     }
                                     /*/障碍物
-                                    else if(config.bMapDraw && canvasMapContainer.nCurrentCanvasMap === 0/* && arrMapData[0][y][x] !== Qt.point(0, 0)* /) {
-                                        ctx.clearRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                    else if(_config.bMapDraw && canvasMapContainer.nCurrentCanvasMap === 0/* && arrMapData[0][y][x] !== Qt.point(0, 0)* /) {
+                                        ctx.clearRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         ctx.fillStyle = Qt.rgba(255,0,0,0.4);
-                                        ctx.fillRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                        ctx.fillRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         //console.debug("设置障碍2", y, x, arrMapData[0][y][x]);
                                     }
                                     //事件
-                                    else if(config.bMapDraw && canvasMapContainer.nCurrentCanvasMap === 1/* && arrMapData[1][y][x] !== Qt.point(0, 0)* /) {
-                                        ctx.clearRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                    else if(_config.bMapDraw && canvasMapContainer.nCurrentCanvasMap === 1/* && arrMapData[1][y][x] !== Qt.point(0, 0)* /) {
+                                        ctx.clearRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         ctx.fillStyle = Qt.rgba(0,255,0,0.4);
-                                        ctx.fillRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                        ctx.fillRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                                     }*/
                                     //绘制地图
                                     else {
@@ -1685,17 +1657,17 @@ Rectangle {
                                                       index, mapRepaintPoint,
                                                       arrMapData[index][mapRepaintPoint.y][mapRepaintPoint.x])*/
 
-                                        ctx.clearRect(mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                        ctx.clearRect(mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         ctx.drawImage(itemMapBlockContainer.currentMapBlock.imageMapBlock.source,
-                                                      arrMapData[index][mapRepaintPoint.y][mapRepaintPoint.x][0] * config.sizeMapBlockSize.width,
-                                                      arrMapData[index][mapRepaintPoint.y][mapRepaintPoint.x][1] * config.sizeMapBlockSize.height,
-                                                      //itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.x * config.sizeMapBlockSize.width,
-                                                      //itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height,
-                                                      mapRepaintPoint.x * config.sizeMapBlockSize.width, mapRepaintPoint.y * config.sizeMapBlockSize.height,
-                                                      config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                                      arrMapData[index][mapRepaintPoint.y][mapRepaintPoint.x][0] * _config.sizeMapBlockSize.width,
+                                                      arrMapData[index][mapRepaintPoint.y][mapRepaintPoint.x][1] * _config.sizeMapBlockSize.height,
+                                                      //itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.x * _config.sizeMapBlockSize.width,
+                                                      //itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height,
+                                                      mapRepaintPoint.x * _config.sizeMapBlockSize.width, mapRepaintPoint.y * _config.sizeMapBlockSize.height,
+                                                      _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                         //console.debug("画", y, x, arrMapData[y][x])
                                     }
@@ -1746,13 +1718,13 @@ Rectangle {
                                 let y = parseInt(p[1]);
 
                                 //超出范围
-                                if(x >= config.sizeMapSize.width || y >= config.sizeMapSize.height) {
+                                if(x >= _config.sizeMapSize.width || y >= _config.sizeMapSize.height) {
                                     delete objMapBlockSpecialData[i];
                                     continue;
                                 }
 
                                 //绘制方块
-                                ctx.fillRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                             }
 
                             requestPaint();
@@ -1785,14 +1757,14 @@ Rectangle {
                                 let y = parseInt(p[1]);
 
                                 //超出范围
-                                if(x >= config.sizeMapSize.width || y >= config.sizeMapSize.height) {
+                                if(x >= _config.sizeMapSize.width || y >= _config.sizeMapSize.height) {
                                     delete objMapEventsData[i];
                                     continue;
                                 }
 
 
                                 //绘制方块
-                                ctx.fillRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                                ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                                 //绘制文字
                                 let eventID = listviewEvents.currentIndex1;
@@ -1800,11 +1772,11 @@ Rectangle {
                                 //ctx.textBaseLine="middle";
                                 ctx.strokeStyle = "blue";
                                 ctx.lineWidth = 1;
-                                ctx.font = "bold %1px 微软雅黑".arg(config.sizeMapBlockSize.height / 2);
+                                ctx.font = "bold %1px 微软雅黑".arg(_config.sizeMapBlockSize.height / 2);
                                 //console.debug("tmpEventIndex", tmpEventIndex, objMapEventsData[i], tmpEventIndex.indexOf(objMapEventsData[i]), tmpEventIndex.indexOf(objMapEventsData[i]).toString())
-                                ctx.strokeText(tmpEventIndex.indexOf(objMapEventsData[i]).toString(), (x + 0.4) * config.sizeMapBlockSize.width, (y + 0.2) * config.sizeMapBlockSize.height + config.sizeMapBlockSize.height / 2, config.sizeMapBlockSize.width);
+                                ctx.strokeText(tmpEventIndex.indexOf(objMapEventsData[i]).toString(), (x + 0.4) * _config.sizeMapBlockSize.width, (y + 0.2) * _config.sizeMapBlockSize.height + _config.sizeMapBlockSize.height / 2, _config.sizeMapBlockSize.width);
 
-                                //console.debug("绘制方块", x, y, (x + 0.4), (y + 0.2), (x + 0.4) * config.sizeMapBlockSize.width)
+                                //console.debug("绘制方块", x, y, (x + 0.4), (y + 0.2), (x + 0.4) * _config.sizeMapBlockSize.width)
                             }
 
                             requestPaint();
@@ -1840,7 +1812,7 @@ Rectangle {
                         z: 998
 
                         Text {
-                            text: `(${parent.x / config.sizeMapBlockSize.width}, ${parent.y / config.sizeMapBlockSize.height})`
+                            text: `(${parent.x / _config.sizeMapBlockSize.width}, ${parent.y / _config.sizeMapBlockSize.height})`
                         }
                     }
 
@@ -1980,13 +1952,13 @@ Rectangle {
                         //height: flickable.height
                         onPressed: {
                             //console.debug("flickable onPressed", pinch.width, pinch.height, pinch.scale, flickable.width, flickable.height, flickable.scale)
-                            let bx = parseInt((mouse.x) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                            let by = parseInt((mouse.y) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                            let bx = parseInt((mouse.x) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                            let by = parseInt((mouse.y) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
-                            rectPaste.x = bx * config.sizeMapBlockSize.width;
-                            rectPaste.y = by * config.sizeMapBlockSize.height;
-                            rectPaste.width = config.sizeMapBlockSize.width;
-                            rectPaste.height = config.sizeMapBlockSize.height;
+                            rectPaste.x = bx * _config.sizeMapBlockSize.width;
+                            rectPaste.y = by * _config.sizeMapBlockSize.height;
+                            rectPaste.width = _config.sizeMapBlockSize.width;
+                            rectPaste.height = _config.sizeMapBlockSize.height;
                             rectPaste.visible = true;
 
                             //Platform.showToast("%1,%2".arg(bx).arg(by));
@@ -2085,7 +2057,7 @@ Rectangle {
                 width: flickable.width
                 height: flickable.height
 
-                enabled: !config.bMapMove
+                enabled: !_config.bMapMove
 
                 //propagateComposedEvents: true   //鼠标事件即可通过该MouseArea传递到其下层（Mousea之间的关系不一定非要是parent关系），mouse.accepted=true 可以让事件不传递
                 acceptedButtons: Qt.AllButtons  //Qt.LeftButton | Qt.RightButton
@@ -2100,17 +2072,17 @@ Rectangle {
 
                     //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
                     //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                     //如果越界
-                    if(x < 0 || y < 0 || y >= config.sizeMapSize.height || x >= config.sizeMapSize.width)
+                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
                         return;
 
                     //console.time("drawMap");
 
                     //如果是清除模式
-                    if(config.bMapClean) {
+                    if(_config.bMapClean) {
                         /*/如果是障碍层
                         if(canvasMapContainer.nCurrentCanvasMap === 0) {
                             if(arrMapData[0][y][x] !== -1) {
@@ -2191,7 +2163,7 @@ Rectangle {
                         //console.debug(x,y)
                     }
                     //else
-                        //console.debug("err:", config.bMapBlockSpecial, arrMapData[0][y][x])
+                        //console.debug("err:", _config.bMapBlockSpecial, arrMapData[0][y][x])
                     //mouse.accept = true;  //无用
 
                     //console.timeEnd("drawMap");
@@ -2209,11 +2181,11 @@ Rectangle {
 
                     //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
                     //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                     //如果越界
-                    if(x < 0 || y < 0 || y >= config.sizeMapSize.height || x >= config.sizeMapSize.width)
+                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
                         return;
 
                     let strIndex = [x, y].toString();
@@ -2230,15 +2202,15 @@ Rectangle {
 
 
                     //如果是清除模式
-                    if(config.bMapClean) {
+                    if(_config.bMapClean) {
                         if(objMapEventsData[strIndex] === undefined)
                             return;
 
                         delete objMapEventsData[strIndex];
 
                         let ctx = canvasEvent.getContext("2d");
-                        ctx.clearRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
-                        canvasEvent.markDirty(Qt.rect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width / 2, config.sizeMapBlockSize.height / 2));
+                        ctx.clearRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasEvent.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
 
                     }
                     else {
@@ -2254,18 +2226,18 @@ Rectangle {
                         let ctx = canvasEvent.getContext("2d");
                         //绘制方块
                         ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
-                        ctx.fillRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                        ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                         //绘制文字
                         //ctx.textAlign="left";
                         //ctx.textBaseLine="middle";
                         ctx.strokeStyle = "blue";
                         ctx.lineWidth = 1;
-                        ctx.font = "bold %1px 微软雅黑".arg(config.sizeMapBlockSize.height / 2);
-                        ctx.strokeText(listviewEvents.currentIndex.toString(), (x + 0.4) * config.sizeMapBlockSize.width, (y + 0.2) * config.sizeMapBlockSize.height + config.sizeMapBlockSize.height / 2, config.sizeMapBlockSize.width);
+                        ctx.font = "bold %1px 微软雅黑".arg(_config.sizeMapBlockSize.height / 2);
+                        ctx.strokeText(listviewEvents.currentIndex.toString(), (x + 0.4) * _config.sizeMapBlockSize.width, (y + 0.2) * _config.sizeMapBlockSize.height + _config.sizeMapBlockSize.height / 2, _config.sizeMapBlockSize.width);
 
 
-                        canvasEvent.markDirty(Qt.rect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width / 2, config.sizeMapBlockSize.height / 2));
+                        canvasEvent.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
 
                     }
 
@@ -2283,11 +2255,11 @@ Rectangle {
 
                     //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
                     //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                     //如果越界
-                    if(x < 0 || y < 0 || y >= config.sizeMapSize.height || x >= config.sizeMapSize.width)
+                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
                         return;
 
                     let strIndex = [x, y].toString();
@@ -2297,15 +2269,15 @@ Rectangle {
                     */
 
                     //如果是清除模式
-                    if(config.bMapClean) {
+                    if(_config.bMapClean) {
                         if(objMapBlockSpecialData[strIndex] === undefined)
                             return;
 
                         delete objMapBlockSpecialData[strIndex];
 
                         let ctx = canvasBlockSpecial.getContext("2d");
-                        ctx.clearRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
-                        canvasBlockSpecial.markDirty(Qt.rect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width / 2, config.sizeMapBlockSize.height / 2));
+                        ctx.clearRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasBlockSpecial.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
 
                     }
                     else {
@@ -2319,15 +2291,15 @@ Rectangle {
 
                         let ctx = canvasBlockSpecial.getContext("2d");
                         ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
-                        ctx.fillRect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
+                        ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
 
                         /*ctx.strokeStyle = "blue";
                         ctx.lineWidth = 1;
                         ctx.font = "bold 30px 微软雅黑";
-                        ctx.strokeText(listviewEvents.currentIndex.toString(), x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height);
+                        ctx.strokeText(listviewEvents.currentIndex.toString(), x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height);
                         */
 
-                        canvasBlockSpecial.markDirty(Qt.rect(x * config.sizeMapBlockSize.width, y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width / 2, config.sizeMapBlockSize.height / 2));
+                        canvasBlockSpecial.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
 
                     }
 
@@ -2346,7 +2318,7 @@ Rectangle {
                     //flickable.enabled = false;
                     pointMousePressBegin = Qt.point(mouse.x, mouse.y);
 
-                    config.bMapClean = false;
+                    _config.bMapClean = false;
 
                     mouse.accepted = true;
                 }
@@ -2370,48 +2342,48 @@ Rectangle {
                         break;
                     }*/
                     if(nMousePressType === 1 || nMousePressType === 2) {
-                        if(config.bMapDraw) {
+                        if(_config.bMapDraw) {
                             drawMap(mouse);
                         }
-                        else if(config.bMapEvent) {
+                        else if(_config.bMapEvent) {
                             drawEvent(mouse);
                         }
-                        else if(config.bMapBlockSpecial) {
+                        else if(_config.bMapBlockSpecial) {
                             drawBlockSpecial(mouse);
                         }
                     }
                     //复制选区
                     else if(nMousePressType === 3) {
-                        let bx = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                        let by = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                        let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                        let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                         if(bx === rectCopy.pointStart.x) {
-                            rectCopy.x = bx * config.sizeMapBlockSize.width;
-                            rectCopy.width = config.sizeMapBlockSize.width;
+                            rectCopy.x = bx * _config.sizeMapBlockSize.width;
+                            rectCopy.width = _config.sizeMapBlockSize.width;
                         }
                         else if(bx < rectCopy.pointStart.x) {
-                            rectCopy.x = bx * config.sizeMapBlockSize.width;
-                            rectCopy.width = (rectCopy.pointStart.x - bx + 1) * config.sizeMapBlockSize.width;
+                            rectCopy.x = bx * _config.sizeMapBlockSize.width;
+                            rectCopy.width = (rectCopy.pointStart.x - bx + 1) * _config.sizeMapBlockSize.width;
                         }
                         else {
                             ++bx;
 
-                            rectCopy.x = rectCopy.pointStart.x * config.sizeMapBlockSize.width;
-                            rectCopy.width = (bx - rectCopy.pointStart.x) * config.sizeMapBlockSize.width;
+                            rectCopy.x = rectCopy.pointStart.x * _config.sizeMapBlockSize.width;
+                            rectCopy.width = (bx - rectCopy.pointStart.x) * _config.sizeMapBlockSize.width;
                         }
                         if(by === rectCopy.pointStart.y) {
-                            rectCopy.y = by * config.sizeMapBlockSize.height;
-                            rectCopy.height = config.sizeMapBlockSize.height;
+                            rectCopy.y = by * _config.sizeMapBlockSize.height;
+                            rectCopy.height = _config.sizeMapBlockSize.height;
                         }
                         else if(by < rectCopy.pointStart.y) {
-                            rectCopy.y = by * config.sizeMapBlockSize.height;
-                            rectCopy.height = (rectCopy.pointStart.y - by + 1) * config.sizeMapBlockSize.height;
+                            rectCopy.y = by * _config.sizeMapBlockSize.height;
+                            rectCopy.height = (rectCopy.pointStart.y - by + 1) * _config.sizeMapBlockSize.height;
                         }
                         else {
                             ++by;
 
-                            rectCopy.y = rectCopy.pointStart.y * config.sizeMapBlockSize.height;
-                            rectCopy.height = (by - rectCopy.pointStart.y) * config.sizeMapBlockSize.height;
+                            rectCopy.y = rectCopy.pointStart.y * _config.sizeMapBlockSize.height;
+                            rectCopy.height = (by - rectCopy.pointStart.y) * _config.sizeMapBlockSize.height;
                         }
 
                         //console.debug("!!!", bx, by, rectCopy.x, rectCopy.y, pointMousePressBegin.x, pointMousePressBegin.y)
@@ -2434,25 +2406,25 @@ Rectangle {
                     //    drawMap(mouse);
 
                     if(nMousePressType === 0) {
-                        if(config.bMapDraw) {
+                        if(_config.bMapDraw) {
                             drawMap(mouse);
                         }
-                        else if(config.bMapEvent) {
+                        else if(_config.bMapEvent) {
                             drawEvent(mouse);
                         }
-                        else if(config.bMapBlockSpecial) {
+                        else if(_config.bMapBlockSpecial) {
                             drawBlockSpecial(mouse);
                         }
                     }
 
 
-                    let bx = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let by = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
-                    rectPaste.x = bx * config.sizeMapBlockSize.width;
-                    rectPaste.y = by * config.sizeMapBlockSize.height;
-                    rectPaste.width = config.sizeMapBlockSize.width;
-                    rectPaste.height = config.sizeMapBlockSize.height;
+                    rectPaste.x = bx * _config.sizeMapBlockSize.width;
+                    rectPaste.y = by * _config.sizeMapBlockSize.height;
+                    rectPaste.width = _config.sizeMapBlockSize.width;
+                    rectPaste.height = _config.sizeMapBlockSize.height;
                     rectPaste.visible = true;
 
                     //Platform.showToast("%1,%2".arg(bx).arg(by));
@@ -2462,15 +2434,15 @@ Rectangle {
                     //nOpType = 2;
                     nMousePressType = 2;
                     //drawEvent(mouse);
-                    config.bMapClean = true;
+                    _config.bMapClean = true;
 
-                    if(config.bMapDraw) {
+                    if(_config.bMapDraw) {
                         drawMap(mouse);
                     }
-                    else if(config.bMapEvent) {
+                    else if(_config.bMapEvent) {
                         drawEvent(mouse);
                     }
-                    else if(config.bMapBlockSpecial) {
+                    else if(_config.bMapBlockSpecial) {
                         drawBlockSpecial(mouse);
                     }
                 }
@@ -2482,13 +2454,13 @@ Rectangle {
                         //drawBlockSpecial(mouse);
 
 
-                        let bx = parseInt((mouse.x + flickable.contentX) / config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                        let by = parseInt((mouse.y + flickable.contentY) / config.sizeMapBlockSize.height / canvasMapContainer.scale);
+                        let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                        let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
-                        rectCopy.x = bx * config.sizeMapBlockSize.width;
-                        rectCopy.y = by * config.sizeMapBlockSize.height;
-                        rectCopy.width = config.sizeMapBlockSize.width;
-                        rectCopy.height = config.sizeMapBlockSize.height;
+                        rectCopy.x = bx * _config.sizeMapBlockSize.width;
+                        rectCopy.y = by * _config.sizeMapBlockSize.height;
+                        rectCopy.width = _config.sizeMapBlockSize.width;
+                        rectCopy.height = _config.sizeMapBlockSize.height;
                         rectCopy.pointStart.x = bx;
                         rectCopy.pointStart.y = by;
                         rectCopy.nCopyCanvasID = canvasMapContainer.nCurrentCanvasMap;
@@ -2671,11 +2643,11 @@ Rectangle {
                     }
             }
 
-            /*config.events[config.strEventID] = [, textCode.text];
+            /*_config.events[_config.strEventID] = [, textCode.text];
             let ctx = canvasEvent.getContext("2d");
             ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
-            ctx.fillRect(canvasEvent.pointPaint.x * config.sizeMapBlockSize.width, canvasEvent.pointPaint.y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width, config.sizeMapBlockSize.height);
-            canvasEvent.markDirty(Qt.rect(canvasEvent.pointPaint.x * config.sizeMapBlockSize.width, canvasEvent.pointPaint.y * config.sizeMapBlockSize.height, config.sizeMapBlockSize.width / 2, config.sizeMapBlockSize.height / 2));
+            ctx.fillRect(canvasEvent.pointPaint.x * _config.sizeMapBlockSize.width, canvasEvent.pointPaint.y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+            canvasEvent.markDirty(Qt.rect(canvasEvent.pointPaint.x * _config.sizeMapBlockSize.width, canvasEvent.pointPaint.y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
             */
 
             //!!!这里需要绘制
@@ -2987,29 +2959,6 @@ Rectangle {
 
 
 
-    //配置
-    QtObject {
-        id: config
-        //property QtObject mapOperatorModel: QtObject {
-        property int nDrawMapType: 1
-        property bool bMapMove: nDrawMapType === 0      //移动模式
-        property bool bMapDraw: nDrawMapType === 1      //绘制模式
-        //property bool bMapClean: nDrawMapType === -1    //删除模式
-        property bool bMapBlockSpecial: nDrawMapType === 2     //障碍
-        property bool bMapEvent: nDrawMapType === 3     //事件
-
-        property bool bMapClean: false    //删除模式
-
-
-        //地图块大小(像素）
-        property size sizeMapBlockSize//: Qt.size(30, 30);
-
-        //地图大小（块）
-        property size sizeMapSize//: Qt.size(20, 20);
-    }
-
-
-
     QtObject {
         id: _private
 
@@ -3042,12 +2991,12 @@ Rectangle {
 
         //初始化一层地图的数据
         //使用initData进行填充（只填充undefined的元素）
-        //_mapData为二维数组，大小会改为为 config.sizeMapSize.width * config.sizeMapSize.height；
+        //_mapData为二维数组，大小会改为为 _config.sizeMapSize.width * _config.sizeMapSize.height；
         function initMapData(_mapData, initData) {
 
             //计算、设置地图所需数据大小
-            //let mapCols = parseInt(canvasMapContainer.width / config.sizeMapBlockSize.width);
-            //let mapRows = parseInt(canvasMapContainer.height / config.sizeMapBlockSize.height);
+            //let mapCols = parseInt(canvasMapContainer.width / _config.sizeMapBlockSize.width);
+            //let mapRows = parseInt(canvasMapContainer.height / _config.sizeMapBlockSize.height);
 
             /*/初始化
             for(let y = 0; y < mapRows; y++) {
@@ -3058,15 +3007,15 @@ Rectangle {
             }*/
 
             //初始化（会保存原数据，只填充undefined的元素）
-            _mapData.length = config.sizeMapSize.height;
-            for(let y = 0; y < config.sizeMapSize.height; ++y) {
+            _mapData.length = _config.sizeMapSize.height;
+            for(let y = 0; y < _config.sizeMapSize.height; ++y) {
                 if(!(_mapData[y] instanceof(Array))) //如果不是数组，则赋值为数组
                     _mapData[y] = [];
 
                 //console.debug(_mapData[y])
 
-                _mapData[y].length = config.sizeMapSize.width;
-                for(let x = 0; x < config.sizeMapSize.width; ++x) {
+                _mapData[y].length = _config.sizeMapSize.width;
+                for(let x = 0; x < _config.sizeMapSize.width; ++x) {
                     if(_mapData[y][x] === undefined) {  //只填充undefined的元素
                         _mapData[y][x] = initData;
                         //console.debug(typeof(_mapData[y][x]), _mapData[y][x])
@@ -3185,14 +3134,63 @@ Rectangle {
     }
 
 
+    //配置
     QtObject {
         id: _config
 
+
+        //property QtObject mapOperatorModel: QtObject {
+        property int nDrawMapType: 1
+        property bool bMapMove: nDrawMapType === 0      //移动模式
+        property bool bMapDraw: nDrawMapType === 1      //绘制模式
+        //property bool bMapClean: nDrawMapType === -1    //删除模式
+        property bool bMapBlockSpecial: nDrawMapType === 2     //障碍
+        property bool bMapEvent: nDrawMapType === 3     //事件
+
+        property bool bMapClean: false    //删除模式
+
+
+        //地图块大小(像素）
+        property size sizeMapBlockSize//: Qt.size(30, 30);
+
+        //地图大小（块）
+        property size sizeMapSize//: Qt.size(20, 20);
 
         //地图名 和 地图缩放倍数（暂存）
         property int nFontPointSize: 9
 
     }
+
+
+
+    //Keys.forwardTo: [canvasMapContainer]
+    Keys.onEscapePressed: {
+        _private.close();
+
+        //focus = false;
+        //loader.visible = false;
+        //loader.focus = false;
+        //menuEsc.hide();
+
+        event.accepted = true;
+
+        console.debug("[MapEditor]Escape Key");
+    }
+    Keys.onBackPressed: {
+        _private.close();
+
+        //focus = false;
+        //loader.visible = false;
+        //loader.focus = false;
+        //menuEsc.hide();
+        event.accepted = true;
+
+        console.debug("[MapEditor]Back Key");
+    }
+    Keys.onPressed: {
+        console.debug("[MapEditor]key:", event, event.key, event.text)
+    }
+
 
     Component.onCompleted: {
         //console.debug(Qt.point(1,1) === Qt.point(1,1), Qt.point(0,1) === Qt.point(1,1));    //true false
