@@ -104,7 +104,7 @@ Item {
             textMapHeight.text = cfg.MapSize[1];
             textBlockWidth.text = cfg.MapBlockSize[0];
             textBlockHeight.text = cfg.MapBlockSize[1];
-            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
             textMapBlockResourceName.text = cfg.MapBlockImage[0];
             //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
             textMapBlockResourceName.enabled = false;
@@ -303,7 +303,7 @@ Item {
                     onClicked: {
                         //dialogMapData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.mapResourceURL();
+                        let path = GameMakerGlobal.mapResourcePath();
 
                         l_listMapBlockResource.show(path, "*", 0x002, 0x00);
                         l_listMapBlockResource.visible = true;
@@ -346,10 +346,10 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(Global.toPath(textMapBlockImageURL.text))) {
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textMapBlockImageURL.text))) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "图块路径错误或文件不存在:" + Global.toPath(textMapBlockImageURL.text);
+                labelDialogTips.text = "图块路径错误或文件不存在:" + GlobalJS.toPath(textMapBlockImageURL.text);
                 Platform.showToast("图块路径错误或文件不存在");
                 return;
             }
@@ -360,7 +360,7 @@ Item {
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
                 //filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapResourceDirName + GameMakerGlobal.separator + textMapBlockResourceName.text;
-                let ret = FrameManager.sl_qml_CopyFile(Global.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text), false);
+                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = "拷贝到资源目录失败";
@@ -380,7 +380,7 @@ Item {
 
                 //console.debug("ttt", textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
             }
-            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text));
+            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
 
 
             //创建地图工作
@@ -532,7 +532,7 @@ Item {
         onClicked: {
             //let filepath = GameMakerGlobal.config.strProjectRootPath + "/" + GameMakerGlobal.config.strCurrentProjectName + "/" + GameMakerGlobal.config.strMapResourceDirName + "/" + item;
 
-            textMapBlockImageURL.text = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(item));
+            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(item);
             textMapBlockResourceName.text = item;
             //console.debug("[mainMapEditor]List Clicked::", textMapBlockImageURL.text)
 
@@ -792,6 +792,7 @@ Item {
             //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, "*", 0x001 | 0x2000, 0x00);
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建地图】');
+            l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.showList(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;

@@ -231,7 +231,7 @@ let data = (function() {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.fillWidth: true
-                text: '技能算法脚本'
+                text: '战斗技能脚本'
                 font.pointSize: 16
                 wrapMode: Label.WordWrap
                 verticalAlignment: Label.AlignVCenter

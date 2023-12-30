@@ -93,7 +93,7 @@ Item {
 
                 Label {
                     //id: tlable
-                    text: '*@特效名'
+                    text: '@特效名'
                 }
 
                 TextField {
@@ -105,7 +105,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*@特效名'
+                    placeholderText: '@特效名'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -414,7 +414,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.imageResourceURL();
+                                let path = GameMakerGlobal.imageResourcePath();
 
                                 l_list.open({
                                     Data: path,
@@ -489,7 +489,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: ''
-                            placeholderText: '@拥有技能'
+                            placeholderText: '*@拥有技能'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -681,7 +681,7 @@ Item {
                             }
                             Label {
                                 //id: tlable
-                                text: '*@特效名'
+                                text: '@特效名'
                             }
 
                             TextField {
@@ -691,7 +691,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: ''
-                                placeholderText: '*@特效名'
+                                placeholderText: '@特效名'
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -755,6 +755,9 @@ Item {
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
@@ -902,6 +905,47 @@ Item {
 
         //编译（结果为字符串）
         function compile() {
+            let bCheck = true;
+            do {
+                let actionTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'actionName');
+                let spriteTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'spriteName');
+
+                //console.debug(actionTextFields);
+                for(let tt in actionTextFields) {
+                    let actionTextField = actionTextFields[tt];
+                    let spriteTextField = spriteTextFields[tt];
+                    //console.debug(tt.text.trim());
+
+                    if(!actionTextField.text.trim()/* || !spriteTextField.text.trim()*/) {
+                        bCheck = false;
+                        break;
+                    }
+                }
+                if(!bCheck)
+                    break;
+                if(!textSkills.text.trim()) {
+                    bCheck = false;
+                    break;
+                }
+            }while(0);
+            if(!bCheck) {
+                dialogCommon.show({
+                    Msg: '有必填项没有完成',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function(){
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                    OnDiscarded: ()=>{
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                });
+                return false;
+            }
+
+
+
             let strActions = '';
             let actionTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'actionName');
             let spriteTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'spriteName');
@@ -943,6 +987,9 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function(){
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 

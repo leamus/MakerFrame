@@ -114,14 +114,14 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*效果值'
+                    placeholderText: '*@效果值'
 
                     //selectByKeyboard: true
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['固定值：20','倍率：2.0'],
+                        let data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
                         l_list.open({
@@ -488,7 +488,7 @@ Item {
 
                             onPressAndHold: {
                                 l_list.open({
-                                    Data: GameMakerGlobal.imageResourceURL(),
+                                    Data: GameMakerGlobal.imageResourcePath(),
                                     OnClicked: (index, item)=>{
                                         text = item;
 
@@ -557,7 +557,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: ''
-                            placeholderText: '*@战斗技能'
+                            placeholderText: '@战斗技能'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -607,7 +607,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gd[""]']];
+                                let data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gf[""]']];
                                 l_list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
@@ -760,6 +760,9 @@ Item {
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
@@ -916,6 +919,39 @@ Item {
 
         //编译（结果为字符串）
         function compile() {
+            let bCheck = true;
+            do {
+                for(let effectComp of _private.arrCacheComponent) {
+                    let propertyTextFields = FrameManager.sl_qml_FindChild(effectComp, 'property');
+                    let effectTextFields = FrameManager.sl_qml_FindChild(effectComp, 'effect');
+                    if(!propertyTextFields.text.trim() || !effectTextFields.text.trim()) {
+                        bCheck = false;
+                        break;
+                    }
+                }
+                if(!bCheck)
+                    break;
+                if(comboType.currentIndex === 0 && !textPosition.text.trim()) {
+                    bCheck = false;
+                    break;
+                }
+            }while(0);
+            if(!bCheck) {
+                dialogCommon.show({
+                    Msg: '有必填项没有完成',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function(){
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                    OnDiscarded: ()=>{
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                });
+                return false;
+            }
+
 
 
             //战斗技能
@@ -1055,6 +1091,9 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function(){
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 

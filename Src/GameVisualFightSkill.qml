@@ -67,8 +67,10 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
+
             RowLayout {
                 anchors.fill: parent
+
 
                 Label {
                     //id: tlable
@@ -175,7 +177,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[Buff效果]', '固定值：20','倍率：2.0'],
+                        let data = [['[Buff效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                     ['', '20','2.0']];
 
                         l_list.open({
@@ -349,14 +351,14 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: '0'
-                    placeholderText: '*效果'
+                    placeholderText: '*@效果'
 
                     //selectByKeyboard: true
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[效果]', '固定值：20','倍率：2.0'],
+                        let data = [['[效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                     ['', '20','2.0']];
 
                         l_list.open({
@@ -620,17 +622,17 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '*@播放特效'
+                            text: '@播放特效'
                         }
 
                         TextField {
-                            id: textSkillEffects
+                            id: textSkillEffect
 
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '60'
-                            placeholderText: '*@播放特效'
+                            placeholderText: '@播放特效'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1120,6 +1122,9 @@ Item {
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
@@ -1213,7 +1218,7 @@ Item {
             data.SkillType = comboType.currentIndex;
             data.Name = textName.text.trim();
             data.Description = textDescription.text.trim();
-            data.Animations = textSkillEffects.text.trim();
+            data.Animations = textSkillEffect.text.trim();
             data.Target = textTarget.text.trim();
             data.Count = textCount.text.trim();
             data.RequiredMP = textRequiredMP.text.trim();
@@ -1298,7 +1303,7 @@ Item {
 
             textName.text = data.Name || '';
             textDescription.text = data.Description || '';
-            textSkillEffects.text = data.Animations || '';
+            textSkillEffect.text = data.Animations || '';
             textTarget.text = data.Target || '';
             textCount.text = data.Count || '';
             textRequiredMP.text = data.RequiredMP || '';
@@ -1308,6 +1313,76 @@ Item {
 
         //编译（结果为字符串）
         function compile() {
+            let bCheck = true;
+            do {
+                let typeTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'type');
+                let effectTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'effect');
+                let roundTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'round');
+                let probabilityTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'probability');
+
+                //console.debug(actionTextFields);
+                for(let tt in typeTextFields) {
+                    let typeTextField = typeTextFields[tt];
+                    let effectTextField = effectTextFields[tt];
+                    let roundTextField = roundTextFields[tt];
+                    let probabilityTextField = probabilityTextFields[tt];
+                    //console.debug(tt.text.trim());
+
+                    if(!typeTextField.text.trim() || !effectTextField.text.trim() || !roundTextField.text.trim() || !probabilityTextField.text.trim()) {
+                        bCheck = false;
+                        break;
+                    }
+                }
+                if(!bCheck)
+                    break;
+                if(!textTarget.text.trim() || !textCount.text.trim()) {
+                    bCheck = false;
+                    break;
+                }
+                if(comboType.currentIndex === 1) {
+                    if(!textRequiredMP.text.trim()) {
+                        bCheck = false;
+                        break;
+                    }
+
+                    //技能效果
+                    let typeTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'type');
+                    let effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'effect');
+                    let combatantTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'combatant');
+                    let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'property');
+
+                    for(let tt in typeTextFields) {
+                        let typeTextField = typeTextFields[tt];
+                        let effectTextField = effectTextFields[tt];
+                        let combatantTextField = combatantTextFields[tt];
+                        let propertyTextField = propertyTextFields[tt];
+                        //console.debug(tt.text.trim());
+
+                        if(!typeTextField.text.trim() || !effectTextField.text.trim() || !combatantTextField.text.trim() || !propertyTextField.text.trim()) {
+                            bCheck = false;
+                            break;
+                        }
+                    }
+                }
+            }while(0);
+            if(!bCheck) {
+                dialogCommon.show({
+                    Msg: '有必填项没有完成',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function(){
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                    OnDiscarded: ()=>{
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                });
+                return false;
+            }
+
+
+
             let type;
             let check;
             let playScript;
@@ -1315,7 +1390,6 @@ Item {
             let targetCount = textCount.text.trim();
             let requiredMP = textRequiredMP.text.trim();
             let effects = '';
-
 
 
 
@@ -1335,7 +1409,7 @@ Item {
                 else {
                     playScript = strTemplate1playScript;
                 }
-                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffects.text.trim());
+                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
 
                 break;
 
@@ -1359,9 +1433,9 @@ Item {
                 else {
                     playScript = strTemplate3playScript;
                 }
-                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffects.text.trim());
-                //playScript = playScript.replace(/\$\$property\$\$/g, textSkillEffects.text.trim());
-                //playScript = playScript.replace(/\$\$effect\$\$/g, textSkillEffects.text.trim());
+                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
+                //playScript = playScript.replace(/\$\$property\$\$/g, textSkillEffect.text.trim());
+                //playScript = playScript.replace(/\$\$effect\$\$/g, textSkillEffect.text.trim());
 
 
                 //技能效果
@@ -1558,6 +1632,9 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function(){
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 

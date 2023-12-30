@@ -72,7 +72,7 @@ Item {
 
                 Label {
                     //id: tlable
-                    text: '@敌人：'
+                    text: '*@敌人：'
                 }
 
                 TextField {
@@ -84,7 +84,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '@敌人'
+                    placeholderText: '*@敌人'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -236,7 +236,7 @@ Item {
                                 */
 
                                 l_list.open({
-                                    Data: GameMakerGlobal.imageResourceURL(),
+                                    Data: GameMakerGlobal.imageResourcePath(),
                                     OnClicked: (index, item)=>{
                                         text = item;
 
@@ -284,7 +284,7 @@ Item {
                                 */
 
                                 l_list.open({
-                                    Data: GameMakerGlobal.musicResourceURL(),
+                                    Data: GameMakerGlobal.musicResourcePath(),
                                     OnClicked: (index, item)=>{
                                         textMusic.text = item;
 
@@ -399,7 +399,7 @@ Item {
                             Layout.preferredHeight: 30
 
                             Label {
-                                text: '@敌人：'
+                                text: '*@敌人：'
                             }
 
                             TextField {
@@ -410,7 +410,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: ''
-                                placeholderText: '@敌人'
+                                placeholderText: '*@敌人'
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -492,6 +492,9 @@ Item {
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
@@ -612,6 +615,46 @@ Item {
 
         //编译（结果为字符串）
         function compile() {
+            let bCheck = true;
+            do {
+                let enemyTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemy');
+                let enemyParamsTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemyParams');
+
+                //console.debug(actionTextFields);
+                for(let tt in enemyTextFields) {
+                    let enemyTextField = enemyTextFields[tt];
+                    //let enemyParamsTextField = enemyParamsTextFields[tt];
+                    //console.debug(tt.text.trim());
+
+                    if(!enemyTextField.text.trim()/* || !enemyParamsTextField.text.trim()*/) {
+                        bCheck = false;
+                        break;
+                    }
+                }
+                if(!bCheck)
+                    break;
+                if(!textRunAway.text.trim() || !textEnemyCount.text.trim()) {
+                    bCheck = false;
+                    break;
+                }
+            }while(0);
+            if(!bCheck) {
+                dialogCommon.show({
+                    Msg: '有必填项没有完成',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function(){
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                    OnDiscarded: ()=>{
+                        //dialogCommon.close();
+                        root.forceActiveFocus();
+                    },
+                });
+                return false;
+            }
+
+
 
             let strEnemies = '';
             let enemyTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemy');
@@ -667,6 +710,9 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function(){
                     let jsScript = _private.compile();
+                    if(jsScript === false)
+                        return;
+
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 

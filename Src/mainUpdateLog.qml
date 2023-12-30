@@ -80,7 +80,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
@@ -94,7 +94,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返回"
+            text: '返回'
             onClicked: {
                 s_close();
             }
@@ -119,25 +119,38 @@ Item {
     Keys.onEscapePressed: {
         s_close();
 
-        console.debug("[mainUpdateLog]Escape Key");
+        console.debug('[mainUpdateLog]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         s_close();
 
-        console.debug("[mainUpdateLog]Back Key");
+        console.debug('[mainUpdateLog]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainUpdateLog]key:", event, event.key, event.text)
+        console.debug('[mainUpdateLog]key:', event, event.key, event.text);
     }
 
 
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
+1、修复Win版不能重命名工程的问题；
+2、修复优化系统底层函数；
+3、增加地图遮罩层，可以绘制任何颜色格子，为战旗引擎打基础；
+4、完善各编辑器细节（包括错误提示、界面、删除资源等）；
+5、修改Global各资源函数名字；
+
+2023/12/27：发布 1.7.3.231227 版本
+1、增强game.gf功能；
+2、增加game.cd变量（跨存档通用变量，会保存），并添加到了视图编程命令中；
+3、优化 地图编辑器界面、增加状态栏；
+4、优化 地图编辑器代码，提高绘制速率；
+5、增加 特殊图块 的值设置（1为障碍），为战旗引擎打基础；
+6、增加 游戏退出 脚本函数；
 
 2023/12/23：发布 1.7.2.231223 版本
 1、修复QML的一个Bug（MouseArea和TextArea组件，如果双指操作会有穿透的问题）；

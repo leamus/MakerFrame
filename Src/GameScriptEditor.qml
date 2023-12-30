@@ -380,10 +380,10 @@ Item {
                         removeItem(index);
                     }
 
-                    root.forceActiveFocus();
+                    l_listExplorer.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    l_listExplorer.forceActiveFocus();
                 },
             });
         }
@@ -420,7 +420,7 @@ Item {
             list.unshift('【新建文件】', '..');
             l_listExplorer.showList(list);
             //console.warn(l_listExplorer.listview.itemAtIndex(0)); //null，还没创建
-            //l_listExplorer.listview.itemAtIndex(0).bRemoveButtonVisible = false;
+            l_listExplorer.removeButtonVisible = {0: false, 1: false, '-1': true};
             l_listExplorer.visible = true;
             l_listExplorer.forceActiveFocus();
         }

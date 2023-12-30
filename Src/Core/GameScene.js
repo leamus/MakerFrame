@@ -1,6 +1,11 @@
 ﻿
 //载入资源
 function loadResources() {
+    //读取通用变量
+    game.cd = GameMakerGlobal.settings.value("$RPG/" + GameMakerGlobal.config.strCurrentProjectName);
+    if(!game.cd)
+        game.cd = {};
+
 
     let projectpath = game.$projectpath + GameMakerGlobal.separator;
 
@@ -8,10 +13,11 @@ function loadResources() {
 
     //读通用算法脚本
     let tCommoncript;
-    if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'common_script.js')))
+    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(projectpath + 'common_script.js')))
         tCommoncript = _private.jsEngine.load('common_script.js', GlobalJS.toURL(projectpath));
     if(tCommoncript) {
         _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
+        _private.objCommonScripts['game_exit'] = tCommoncript.$gameExit;
         _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
         _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
         _private.objCommonScripts["after_save"] = tCommoncript.$afterSave;
@@ -25,7 +31,7 @@ function loadResources() {
         _private.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
         _private.objCommonScripts["game_over_script"] = tCommoncript.$gameOverScript;
         _private.objCommonScripts["common_run_away_algorithm"] = tCommoncript.$commonRunAwayAlgorithm;
-        _private.objCommonScripts["fight_skill_algorithm"] = tCommoncript.$skillEffectAlgorithm;
+        _private.objCommonScripts["fight_skill_algorithm"] = tCommoncript.$fightSkillAlgorithm || tCommoncript.$skillEffectAlgorithm;
         _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = tCommoncript.$fightRoleChoiceSkillsOrGoodsAlgorithm;
         _private.objCommonScripts["fight_init_script"] = tCommoncript.$commonFightInitScript;
         _private.objCommonScripts["fight_start_script"] = tCommoncript.$commonFightStartScript;
@@ -56,7 +62,7 @@ function loadResources() {
         let ret = GlobalJS._eval(data["FightAlgorithm"]);
         _private.objCommonScripts["game_over_script"] = ret.$gameOverScript;
         _private.objCommonScripts["common_run_away_algorithm"] = ret.$commonRunAwayAlgorithm;
-        _private.objCommonScripts["fight_skill_algorithm"] = ret.$skillEffectAlgorithm;
+        _private.objCommonScripts["fight_skill_algorithm"] = ret.$fightSkillAlgorithm;
         _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = ret.$fightRoleChoiceSkillsOrGoodsAlgorithm;
         _private.objCommonScripts["fight_start_script"] = ret.$commonFightStartScript;
         _private.objCommonScripts["fight_round_script"] = ret.$commonFightRoundScript;
@@ -71,6 +77,13 @@ function loadResources() {
     }
     else
         console.debug("[GameScene]载入游戏初始化脚本OK");
+
+    if(!_private.objCommonScripts["game_exit"]) {
+        _private.objCommonScripts["game_exit"] = GameMakerGlobalJS.$gameExit;
+        console.debug("[!GameScene]载入系统游戏结束脚本");
+    }
+    else
+        console.debug("[GameScene]载入游戏结束脚本OK");
 
     if(!_private.objCommonScripts["before_save"]) {
         _private.objCommonScripts["before_save"] = GameMakerGlobalJS.$beforeSave;
@@ -130,7 +143,7 @@ function loadResources() {
         console.debug("[GameScene]载入游戏结束脚本OK");
 
     if(!_private.objCommonScripts["fight_skill_algorithm"]) {
-        _private.objCommonScripts["fight_skill_algorithm"] = GameMakerGlobalJS.$skillEffectAlgorithm;
+        _private.objCommonScripts["fight_skill_algorithm"] = GameMakerGlobalJS.$fightSkillAlgorithm;
         console.debug("[!GameScene]载入系统战斗算法");
     }
     else
@@ -444,7 +457,7 @@ function loadResources() {
                 if(tConfig.$opacity !== undefined)
                     button.opacity = tConfig.$opacity;
                 if(tConfig.$image)
-                    button.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(tConfig.$image));
+                    button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
                 button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.s_pressed.connect(function(){
@@ -468,7 +481,7 @@ function loadResources() {
     buttonA.color = buttonAConfig.$color;
     buttonA.opacity = buttonAConfig.$opacity;
     if(buttonAConfig.$image)
-        buttonA.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(buttonAConfig.$image));
+        buttonA.image.source = GameMakerGlobal.imageResourceURL(buttonAConfig.$image);
     buttonA.anchors.rightMargin = buttonAConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonA.anchors.bottomMargin = buttonAConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonA.buttonClicked = buttonAConfig.$clicked;
@@ -478,7 +491,7 @@ function loadResources() {
     buttonMenu.color = buttonMenuConfig.$color;
     buttonMenu.opacity = buttonMenuConfig.$opacity;
     if(buttonMenuConfig.$image)
-        buttonMenu.image.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image));
+        buttonMenu.image.source = GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image);
     buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonMenu.buttonClicked = buttonMenuConfig.$clicked;
@@ -493,7 +506,7 @@ function loadResources() {
 
 
     //起始脚本
-    if(FrameManager.sl_qml_FileExists(Global.toPath(projectpath + 'start.js'))) {
+    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(projectpath + 'start.js'))) {
         //载入初始脚本
         let ts = _private.jsEngine.load('start.js', GlobalJS.toURL(projectpath));
         if(ts) {
@@ -515,7 +528,7 @@ function loadResources() {
     if(_private.config.nLoadAllResources) {
         //读道具信息
         path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
-        items = FrameManager.sl_qml_listDir(Global.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let data = getGoodsResource(item, true);
@@ -528,7 +541,7 @@ function loadResources() {
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "goods.json";
             //console.debug(path, items, item, filePath)
-            let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
             if(data !== "") {
                 data = JSON.parse(data);
@@ -549,7 +562,7 @@ function loadResources() {
     if(_private.config.nLoadAllResources) {
         //读技能信息
         path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
-        items = FrameManager.sl_qml_listDir(Global.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let data = getSkillResource(item, true);
@@ -562,7 +575,7 @@ function loadResources() {
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_skill.json";
             //console.debug(path, items, item, filePath)
-            let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
             if(data !== "") {
                 data = JSON.parse(data);
@@ -583,7 +596,7 @@ function loadResources() {
     if(_private.config.nLoadAllResources) {
         //读战斗脚本信息
         path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
-        items = FrameManager.sl_qml_listDir(Global.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let data = getFightScriptResource(item, true);
@@ -602,7 +615,7 @@ function loadResources() {
     if(_private.config.nLoadAllResources) {
         //读战斗角色信息
         path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
-        items = FrameManager.sl_qml_listDir(Global.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let data = getFightRoleResource(item, true);
@@ -615,7 +628,7 @@ function loadResources() {
 
 
             //let data = File.read(filePath);
-            /*let data = FrameManager.sl_qml_ReadFile(Global.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json"));
+            /*let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json"));
 
             if(data) {
                 data = JSON.parse(data);
@@ -638,7 +651,7 @@ function loadResources() {
     if(_private.config.nLoadAllResources) {
         //读特效信息
         path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-        items = FrameManager.sl_qml_listDir(Global.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             //console.debug(path, items, item)
@@ -657,7 +670,7 @@ function loadResources() {
     /*/读图片信息
     filePath = game.$projectpath + GameMakerGlobal.separator +  "images.json";
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+    data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
@@ -672,7 +685,7 @@ function loadResources() {
     //读音乐信息
     filePath = game.$projectpath + GameMakerGlobal.separator +  "music.json";
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+    data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
@@ -687,7 +700,7 @@ function loadResources() {
     //读视频信息
     filePath = game.$projectpath + GameMakerGlobal.separator +  "videos.json";
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+    data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
@@ -716,7 +729,7 @@ function loadResources() {
     /*/读升级链
     filePath = game.$projectpath + GameMakerGlobal.separator;
     let tlevelChainScript;
-    if(FrameManager.sl_qml_FileExists(Global.toPath(filePath + 'level_chain.js')))
+    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(filePath + 'level_chain.js')))
         tlevelChainScript = _private.jsEngine.load('level_chain.js', GlobalJS.toURL(filePath));
     if(tlevelChainScript) {
         _private.objCommonScripts["levelup_script"] = tlevelChainScript.$commonLevelUpScript;
@@ -759,15 +772,15 @@ function loadResources() {
     let componentPath = game.$projectpath + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
 
     //循环三方根目录
-    for(let tc0 of FrameManager.sl_qml_listDir(Global.toPath(componentPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+    for(let tc0 of FrameManager.sl_qml_listDir(GlobalJS.toPath(componentPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
         //if(tc0 === '$Leamus')
         //    continue;
 
         //循环三方插件目录
-        for(let tc1 of FrameManager.sl_qml_listDir(Global.toPath(componentPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+        for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(componentPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
 
             let jsPath = componentPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Components' + GameMakerGlobal.separator;
-            if(!FrameManager.sl_qml_FileExists(Global.toPath(jsPath + 'main.js')))
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + 'main.js')))
                 continue;
 
             try {
@@ -828,14 +841,14 @@ function unloadResources() {
     }
     _private.spritesResource = {};
 
+    rootSoundEffect.objCacheSoundEffects = {};
+
     _private.goodsResource = {};
     _private.fightRolesResource = {};
     _private.skillsResource = {};
     _private.fightScriptsResource = {};
 
     _private.objCommonScripts = {};
-
-    _private.objCacheSoundEffects = {};
 
     //_private.objImages = {};
     //_private.objMusic = {};
@@ -846,6 +859,9 @@ function unloadResources() {
     _private.objPlugins = {};
 
     _private.jsEngine.clear();
+
+    GameMakerGlobal.settings.setValue("$RPG/" + GameMakerGlobal.config.strCurrentProjectName, game.cd);
+    game.cd = {};
 
 
 
@@ -1016,7 +1032,7 @@ function getSpriteResource(item, forceReload=false) {
     //读特效信息
     let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-    let data = FrameManager.sl_qml_ReadFile(Global.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json"));
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json"));
     if(data)
         data = JSON.parse(data);
 
@@ -1029,14 +1045,14 @@ function getSpriteResource(item, forceReload=false) {
         //let cacheImage = Qt.createQmlObject("import QtQuick 2.14;import QtMultimedia 5.14; Audio {}", parent);
         let cacheSoundEffect;
         if(data.Sound) {
-            if(_private.objCacheSoundEffects[data.Sound])
-                cacheSoundEffect = _private.objCacheSoundEffects[data.Sound];
+            if(rootSoundEffect.objCacheSoundEffects[data.Sound])
+                cacheSoundEffect = rootSoundEffect.objCacheSoundEffects[data.Sound];
             else {
-                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GlobalJS.toURL(GameMakerGlobal.soundResourceURL(data.Sound))});
-                _private.objCacheSoundEffects[data.Sound] = cacheSoundEffect;
+                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(data.Sound)});
+                rootSoundEffect.objCacheSoundEffects[data.Sound] = cacheSoundEffect;
             }
         }
-        let cacheImage = compCacheImage.createObject(rootGameScene, {source: GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image))});
+        let cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
         return data;
@@ -1403,7 +1419,7 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
 
     /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectRId + GameMakerGlobal.separator + "sprite.json";
     //console.debug("[FightScene]filePath2：", filePath);
-    let data = FrameManager.sl_qml_ReadFile(Global.toPath(filePath));
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     */
 
     let data = GameSceneJS.getSpriteResource(spriteEffectRId);
@@ -1416,7 +1432,7 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
         else if(spriteEffect.running === true)
             spriteEffect.stop();
 
-        spriteEffect.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(data.Image));
+        spriteEffect.spriteSrc = GameMakerGlobal.spriteResourceURL(data.Image);
         spriteEffect.sizeFrame = Qt.size(parseInt(data.FrameSize[0]), parseInt(data.FrameSize[1]));
         spriteEffect.nFrameCount = parseInt(data.FrameCount);
         spriteEffect.offsetIndex = Qt.point(parseInt(data.OffsetIndex[0]), parseInt(data.OffsetIndex[1]));
@@ -1536,6 +1552,10 @@ function buttonAClicked() {
                 tScript = game.f['$' + _private.objRoles[r].$data.$id];
             if(!tScript)    //!!!兼容旧的
                 tScript = game.f[_private.objRoles[r].$data.$id];
+            if(!tScript)
+                tScript = game.gf['$' + _private.objRoles[r].$data.$id];
+            if(!tScript)    //!!!兼容旧的
+                tScript = game.gf[_private.objRoles[r].$data.$id];
             if(tScript) {
                 game.run([tScript, _private.objRoles[r].$data.$id], _private.objRoles[r]);
                 //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$data.$id));
@@ -1566,6 +1586,13 @@ function mapEvent(eventName, role) {
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'];
     if(!tScript && role.$$type === 1)    //!!兼容旧的
         tScript = game.f[eventName];
+    if(!tScript)
+        if(role.$$type === 1)
+            tScript = game.gf['$' + eventName];
+        else
+            tScript = game.gf['$' + role.$data.$id + '_' + eventName + '_map'];
+    if(!tScript && role.$$type === 1)    //!!兼容旧的
+        tScript = game.gf[eventName];
 
     if(tScript)
         GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件:' + role.$data.$id + '_' + eventName + '_map'], role);
@@ -1591,15 +1618,16 @@ function mapEventCanceled(eventName, role) {
         tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'];
     else
         tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-    //if(!tScript)    //!!兼容旧的
-    //    tScript = itemViewPort.mapScript[eventName + '_map_leave'];
     if(!tScript)
         if(role.$$type === 1)
             tScript = game.f['$' + eventName + '_map_leave'];
         else
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-    //if(!tScript)    //!!兼容旧的
-    //    tScript = game.f[eventName + '_map_leave'];
+    if(!tScript)
+        if(role.$$type === 1)
+            tScript = game.gf['$' + eventName + '_map_leave'];
+        else
+            tScript = game.gf['$' + role.$data.$id + '_' + eventName + '_map_leave'];
 
 
     if(tScript)
@@ -1734,9 +1762,13 @@ function onTriggered() {
             else
                 _private.objTimers[tt][2] = _private.objTimers[tt][0];
 
-            let tScript = itemViewPort.mapScript[tt];
+            let tScript;
+            if(itemViewPort.mapScript)
+                tScript = itemViewPort.mapScript[tt];
             if(!tScript)
                 tScript = game.f[tt];
+            if(!tScript)
+                tScript = game.gf[tt];
 
             GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '定时器事件:' + tt], tt);
             //game.run([tScript, tt]);
@@ -2756,16 +2788,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                    //!!!这里需要修改
                     //障碍
-                    case -1:
+                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         //计算离障碍距离
                         offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
                         computeOver = true;
-                        break;
-                    default:
-                        continue;
                     }
                     if(computeOver)
                         break;
@@ -2791,16 +2818,12 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 let strP = [xb, yb].toString();
 
                 //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                //存在障碍
+                //存在特殊图块
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                        //!!!这里需要修改
-                    case -1:
+                    //障碍
+                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
                         computeOver = true;
-                        break;
-                    default:
-                        continue;
                     }
                     if(computeOver)
                         break;
@@ -2826,16 +2849,12 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 let strP = [xb, yb].toString();
 
                 //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                //存在障碍
+                //存在特殊图块
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                        //!!!这里需要修改
-                    case -1:
+                    //障碍
+                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
                         computeOver = true;
-                        break;
-                    default:
-                        continue;
                     }
                     if(computeOver)
                         break;
@@ -2861,16 +2880,12 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 let strP = [xb, yb].toString();
 
                 //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
-                //存在障碍
+                //存在特殊图块
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                    switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
-                        //!!!这里需要修改
-                    case -1:
+                    //障碍
+                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
                         computeOver = true;
-                        break;
-                    default:
-                        continue;
                     }
                     if(computeOver)
                         break;

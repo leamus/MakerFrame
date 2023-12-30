@@ -79,7 +79,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        game.save('存档' + c, game.gd["$sys_map"].$name, 1);
+                        game.save('存档' + c, game.gd['$sys_map'].$name, 1);
                         yield game.msg('存档成功');
                         break;
                     default:
@@ -121,8 +121,8 @@ Item {
                     let musicInfo = '音乐状态：' + ((game.gd["$sys_sound"] & 0b1) ? '开' : '关');
                     let soundInfo = '音效状态：' + ((game.gd["$sys_sound"] & 0b10) ? '开' : '关');
                     //全局音乐
-                    //let musicInfo = '音乐状态：' + (GameMakerGlobal.settings.value('$PauseMusic') ? '开' : '关');
-                    //let soundInfo = '音效状态：' + (GameMakerGlobal.settings.value('$PauseSound') ? '开' : '关');
+                    //let musicInfo = '音乐状态：' + (/*GameMakerGlobal.settings.value('$PauseMusic')*/game.cd['$PauseMusic'] ? '开' : '关');
+                    //let soundInfo = '音效状态：' + (/*GameMakerGlobal.settings.value('$PauseSound')*/game.cd['$PauseSound'] ? '开' : '关');
 
                     let c = yield game.menu('设 置', [musicInfo, soundInfo, '关闭']);
                     switch(c) {
@@ -138,7 +138,8 @@ Item {
                         }
                         /*
                         //全局音乐
-                        if(GameMakerGlobal.settings.value('$PauseMusic')) {
+                        //if(GameMakerGlobal.settings.value('$PauseMusic')) {
+                        if(game.cd['$PauseMusic']) {
                             itemBackgroundMusic.resume(true);
                             yield game.msg("打开音乐");
                         }
@@ -160,7 +161,8 @@ Item {
                         }
                         /*
                         //全局音效
-                        if(GameMakerGlobal.settings.value('$PauseSound')) {
+                        //if(GameMakerGlobal.settings.value('$PauseSound')) {
+                        if(game.cd['$PauseSound']) {
                             rootSoundEffect.resume(true);
                             yield game.msg("打开音效");
                         }

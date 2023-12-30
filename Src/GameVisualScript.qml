@@ -1807,12 +1807,12 @@ Item {
             //（工程）
 
             //3.循环三方插件根目录（开发组名）
-            for(let tc0 of FrameManager.sl_qml_listDir(Global.toPath(pluginsPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+            for(let tc0 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginsPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
                 if(tc0 === '$Leamus')
                     continue;
 
                 //循环三方插件目录（插件名）
-                for(let tc1 of FrameManager.sl_qml_listDir(Global.toPath(pluginsPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+                for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginsPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
 
                     path = pluginsPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'VisualScripts';
 

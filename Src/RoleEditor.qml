@@ -79,9 +79,9 @@ Item {
         //cfg.RoleType;
         textRoleName.text = cfg.RoleName;
 
-        role.spriteSrc = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+        role.spriteSrc = GameMakerGlobal.roleResourceURL(cfg.Image);
         //textRoleImageURL.text = cfg.Image;
-        textRoleImageURL.text = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(cfg.Image));
+        textRoleImageURL.text = GameMakerGlobal.roleResourceURL(cfg.Image);
         //textRoleResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
         textRoleResourceName.text = cfg.Image;
         textRoleResourceName.enabled = false;
@@ -934,7 +934,7 @@ Item {
                 //wrapMode: TextEdit.Wrap
 
                 onPressAndHold: {
-                    let path = GameMakerGlobal.imageResourceURL();
+                    let path = GameMakerGlobal.imageResourcePath();
 
                     l_list.open({
                         Data: path,
@@ -1225,7 +1225,7 @@ Item {
                     onClicked: {
                         //dialogRoleData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.roleResourceURL();
+                        let path = GameMakerGlobal.roleResourcePath();
 
                         l_listRoleResource.show(path, "*", 0x002, 0x00);
                         l_listRoleResource.visible = true;
@@ -1267,10 +1267,10 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(Global.toPath(textRoleImageURL.text))) {
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textRoleImageURL.text))) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "路径错误或文件不存在:" + Global.toPath(textRoleImageURL.text);
+                labelDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textRoleImageURL.text);
                 Platform.showToast("路径错误或文件不存在");
                 return;
             }
@@ -1280,7 +1280,7 @@ Item {
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = FrameManager.sl_qml_CopyFile(Global.toPath(textRoleImageURL.text), GameMakerGlobal.roleResourceURL(textRoleResourceName.text), false);
+                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.roleResourcePath(textRoleResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = "拷贝资源失败，是否重名或目录不可写？";
@@ -1299,7 +1299,7 @@ Item {
                 //console.debug("ttt", textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
             }
             //textRoleImageURL.text = textRoleResourceName.text;
-            textRoleImageURL.text = GlobalJS.toURL(GameMakerGlobal.roleResourceURL(textRoleResourceName.text));
+            textRoleImageURL.text = GameMakerGlobal.roleResourceURL(textRoleResourceName.text);
 
 
             role.spriteSrc = textRoleImageURL.text;
@@ -1373,11 +1373,11 @@ Item {
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
 
+        //removeButtonVisible: false
+
 
         onClicked: {
-            let filepath = GameMakerGlobal.roleResourceURL(item);
-
-            textRoleImageURL.text = GlobalJS.toURL(filepath);
+            textRoleImageURL.text = GameMakerGlobal.roleResourceURL(item);
             textRoleResourceName.text = item;
             console.debug("[RoleEditor]List Clicked:", textRoleImageURL.text)
 
@@ -1399,7 +1399,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[RoleEditor]filepath", filepath);
+            console.debug("[RoleEditor]filepath", textRoleImageURL.text);
         }
 
         onCanceled: {
@@ -1413,17 +1413,21 @@ Item {
         }
 
         onRemoveClicked: {
-            /*let dirUrl = Platform.getExternalDataPath() + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
+            let filepath = GameMakerGlobal.roleResourcePath(item);
 
-            dialogCommon.text = "确认删除?";
-            dialogCommon.fOnAccepted = ()=>{
-                console.debug("[RoleEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
-                removeItem(index);
-            };
-            dialogCommon.fOnRejected = ()=>{
-            };
-            dialogCommon.open();
-            */
+            dialogCommon.show({
+                Msg: '确认删除？',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function(){
+                    console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
+                    removeItem(index);
+
+                    l_listRoleResource.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    l_listRoleResource.forceActiveFocus();
+                },
+            });
         }
     }
 
@@ -1644,9 +1648,8 @@ Item {
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
 
-            /*if(FrameManager.sl_qml_DirExists(path))
-                ;
-            FrameManager.sl_qml_CreateFolder(path);
+            /*//if(!FrameManager.sl_qml_DirExists(path))
+                FrameManager.sl_qml_CreateFolder(path);
             */
 
 

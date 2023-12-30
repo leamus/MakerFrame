@@ -126,7 +126,7 @@ Item {
         //导入图块文件（目前一张）
         //console.debug(cfg.MapBlockImage[0], typeof(cfg.MapBlockImage[0]) )
         root.arrMapBlockImageURL = cfg.MapBlockImage;
-        imageMapBlock1.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+        imageMapBlock1.source = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
 
 
         canvasMapBlock1.loadImage(imageMapBlock1.source);
@@ -199,7 +199,7 @@ Item {
         //导入图块文件（目前一张）
         root.arrMapBlockImageURL = cfg.MapBlockImage;
         //console.debug(cfg.MapBlockImage[0], typeof(cfg.MapBlockImage[0]) )
-        imageMapBlock1.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]));
+        imageMapBlock1.source = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
 
 
         canvasMapBlock1.loadImage(imageMapBlock1.source);
@@ -419,9 +419,8 @@ Item {
 
         let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + newName;
 
-        if(FrameManager.sl_qml_DirExists(newPath))
-            ;
-        FrameManager.sl_qml_CreateFolder(newPath);
+        //if(!FrameManager.sl_qml_DirExists(newPath))
+            FrameManager.sl_qml_CreateFolder(newPath);
 
 
         //绘制所有 0层及以上 canvas
@@ -515,7 +514,7 @@ Item {
     //property var objSystemEventsData: ({}) //系统事件数据（{事件名: 事件代码}）
 
 
-    readonly property int rMapBlockSpecialType_Obstacle: -1
+    //readonly property int rMapBlockSpecialType_Obstacle: -1
 
 
     //width: 600
@@ -542,325 +541,127 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             Layout.maximumWidth: parent.width
-            Layout.preferredHeight: 30
+            Layout.preferredHeight: 42
             Layout.minimumHeight: 0
-            Layout.maximumHeight: 30
+            Layout.maximumHeight: 42
 
-
-            Rectangle {
-                Layout.minimumWidth: 50
-                Layout.maximumWidth: 50
-                Layout.fillWidth: true
-                //Layout.preferredWidth: 100
-                Layout.fillHeight: true
-                //width: 100
-                //height: 50
-                color: "red"
-                Text {
-                    anchors.centerIn: parent
-                    text: {
-                        if(_config.bMapMove)
-                            return "移动";
-                        else if(_config.bMapDraw)
-                            return "绘制";
-                        //else if(_config.bMapClean)
-                        //    return "清除";
-                        else if(_config.bMapEvent)
-                            return "事件";
-                        else if(_config.bMapBlockSpecial)
-                            return "障碍";
-                        else
-                            return "ERROR";
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        //切换模式
-                        if(_config.bMapMove)
-                            _config.nDrawMapType = 1;
-                        else if(_config.bMapDraw)
-                            _config.nDrawMapType = 2;
-                        //else if(_config.bMapClean)
-                        //    _config.nDrawMapType = 0;
-                        else if(_config.bMapBlockSpecial)
-                            _config.nDrawMapType = 3;
-                        else if(_config.bMapEvent)
-                            _config.nDrawMapType = 0;
-                        else
-                            _config.nDrawMapType = 0;
-                    }
-                }
-            }
 
             Button {
-                //Layout.minimumWidth: 45
-                Layout.maximumWidth: 45
-                Layout.fillWidth: true
-                //Layout.preferredWidth: 100
-                Layout.fillHeight: true
-
-                //x: 520
-                font.pointSize: _config.nFontPointSize
-                text: "层+"
-                onClicked: {
-                    _private.createCanvasMap(_private.initMapData([], [-1,-1,-1]));
-                }
-            }
-            Button {
-                //Layout.minimumWidth: 45
-                Layout.maximumWidth: 45
-                Layout.fillWidth: true
-                //Layout.preferredWidth: 100
-                Layout.fillHeight: true
-
-                //x: 520
-                //y: 30
-                font.pointSize: _config.nFontPointSize
-                text: "层-"
-                onClicked: {
-
-                    if(listmodelCanvasMap.count < 1)
-                        return;
-
-                    _private.removeCanvasMap();
-                }
-            }
-
-            //图层列表
-            ListView {
-                id: listviewCanvasMap
-
-                Layout.minimumWidth: 100
-                //Layout.maximumWidth: 100
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                //x: 300
-                //anchors.fill: parent
-                //width: 200
-                //height: 200
-
-
-                clip: true
-
-                //snapMode: ListView.SnapOneItem
-                orientation:ListView.Horizontal
-
-                model: ListModel {
-                    id: listmodelCanvasMap
-                    //ListElement { key: "全部"; value: "-1" }
-                }
-
-                delegate: ItemDelegate {
-                    width: 30
-                    height: listviewCanvasMap.height
-                    //color: index % 2 ? "lightgreen" : "lightblue"
-                    //color: "lightblue"
-                    highlighted: listviewCanvasMap.currentIndex === index
-                    Rectangle {
-                        anchors.fill: parent
-                        color: listviewCanvasMap.currentIndex === index ? "lightgreen" : "lightblue"
-                        //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
-                    }
-
-                    Label {
-                        anchors.centerIn: parent
-
-                        font.pointSize: 10
-                        //需要判断 canvasMapContainer.arrCanvasMap[index] 是否存在，因为在删除地图层时对象会在最后删除，会导致有绑定错误
-                        font.strikeout: canvasMapContainer.arrCanvasMap[index] ? (canvasMapContainer.arrCanvasMap[index].opacity === 0 ? true : false) : false
-                        font.underline: canvasMapContainer.arrCanvasMap[index] ? (canvasMapContainer.arrCanvasMap[index].opacity === 0.5 ? true : false) : false
-
-                        text: {
-                            switch(index) {
-                            //case 0:
-                                //return "设置障碍";
-                            //case 1:
-                                //return "设置事件";
-                            default:
-                                return index;
-                            }
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            /*switch(index) {
-                            case 0:
-                            case 1:
-                                //_config.nDrawMapType = 3;
-                                listviewCanvasMap.currentIndex = index;
-                                canvasMapContainer.nCurrentCanvasMap = index;
-                                break;
-                            default:
-                                listviewCanvasMap.currentIndex = index;
-                                canvasMapContainer.nCurrentCanvasMap = index;
-                                break;
-                            }*/
-
-                            //选择图层
-                            listviewCanvasMap.currentIndex = index;
-                            canvasMapContainer.nCurrentCanvasMap = index;
-
-                            console.debug("[MapEditor]", index, listviewCanvasMap.currentIndex);
-                            //console.debug(key,value);
-
-                            //let obj = compListItem.createObject(null, {key: 999, value: 666});
-                            //listmodelCanvasMap.append({key: "666", value: "999"});
-                        }
-                        onDoubleClicked: {
-                            //!!!隐藏图层，这里加隐藏标志
-                            //bVisible = !bVisible;
-                            //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
-                            if(fOpacity === 0)
-                                fOpacity = 1;
-                            else if(fOpacity === 1)
-                                fOpacity = 0.5;
-                            else if(fOpacity === 0.5)
-                                fOpacity = 0;
-                            canvasMapContainer.arrCanvasMap[index].opacity = fOpacity;
-                        }
-                    }
-                }
-            }
-
-            Button {
-                //Layout.minimumWidth: 55
-                Layout.maximumWidth: 55
+                Layout.minimumWidth: 42
+                Layout.maximumWidth: implicitWidth + 16
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                //Layout.preferredWidth: 100
+                //Layout.preferredWidth: implicitWidth
 
                 //x: 130
                 //width: 100
                 //height: 30
                 font.pointSize: _config.nFontPointSize
-                text: "铺图"
+
+                text: {
+                    if(_config.bMapMove)
+                        return "移动";
+                    else if(_config.bMapDraw)
+                        return "绘制";
+                    //else if(_config.bMapClean)
+                    //    return "清除";
+                    else if(_config.bMapEvent)
+                        return "事件";
+                    else if(_config.bMapBlockSpecial)
+                        return "特殊";
+                    else
+                        return "ERROR";
+                }
+                background: Rectangle {
+                    anchors.fill: parent
+                    anchors.topMargin: 6
+                    anchors.bottomMargin: 6
+                    //anchors.leftMargin: 6
+                    //anchors.rightMargin: 6
+                    color: "red"
+                }
+
                 onClicked: {
-                    let nBlockImageCols = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
-                    let nBlockImageRows = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.height / _config.sizeMapBlockSize.height);
-
-                    for(let by = 0; by < _config.sizeMapSize.height; ++by) {
-                        //超出地图块
-                        if(by >= nBlockImageRows)
-                            break;
-
-                        //检测arrMapData是否正常
-                        if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
-
-                        for(let bx = 0; bx < _config.sizeMapSize.width; ++bx) {
-                            //超出地图块
-                            if(bx >= nBlockImageCols)
-                                break;
-
-                            //检测arrMapData是否正常
-                            //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
-                            //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
-
-
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [bx, by, itemMapBlockContainer.currentMapBlock.nIndex];
-
-                            //console.debug("!!!2", bx, by, nBlockImageCols, nBlockImageRows, _config.sizeMapSize.width, _config.sizeMapSize.height);
-                        }
-                    }
-
-                    let ctx = canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].getContext("2d");
-                    ctx.drawImage(itemMapBlockContainer.currentMapBlock.imageMapBlock.source,
-                                  0, 0);
-                    canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint();
-
+                    //切换模式
+                    if(_config.bMapMove)
+                        _config.nDrawMapType = 1;
+                    else if(_config.bMapDraw)
+                        _config.nDrawMapType = 2;
+                    //else if(_config.bMapClean)
+                    //    _config.nDrawMapType = 0;
+                    else if(_config.bMapBlockSpecial)
+                        _config.nDrawMapType = 3;
+                    else if(_config.bMapEvent)
+                        _config.nDrawMapType = 0;
+                    else
+                        _config.nDrawMapType = 0;
                 }
             }
 
             Button {
                 //Layout.minimumWidth: 60
-                Layout.maximumWidth: 60
-                //Layout.preferredWidth: 100
+                Layout.maximumWidth: implicitWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                //Layout.preferredWidth: implicitWidth
 
-                //x: 520
+                //x: 130
+                //width: 100
+                //height: 30
                 font.pointSize: _config.nFontPointSize
-                text: "粘贴"
+                text: "层>"
                 onClicked: {
-                    //flickableMapBlock.visible = !flickableMapBlock.visible;
-                    if(rectCopy.nCopyCanvasID >= canvasMapContainer.arrCanvasMap.length || rectCopy.nCopyCanvasID < 0)
-                        return;
-                    if(!rectPaste.visible)
-                        return;
-
-                    let x1 = rectCopy.x + rectCopy.width - 1;
-                    let y1 = rectCopy.y + rectCopy.height - 1;
-
-                    //let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
-                    let by = parseInt(rectPaste.y / _config.sizeMapBlockSize.height);
-
-                    //let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
-                    let by0 = parseInt(rectCopy.y / _config.sizeMapBlockSize.height);
-                    let bx1 = parseInt(x1 / _config.sizeMapBlockSize.width);
-                    let by1 = parseInt(y1 / _config.sizeMapBlockSize.height);
-
-                    //console.debug("!!!1", parseInt(rectCopy.x / _config.sizeMapBlockSize.width), by0, bx1, by1)
-
-                    for(; by0 <= by1; ++by0, ++by) {
-                        //超出地图
-                        if(by >= _config.sizeMapSize.height) {
-                            //console.debug("!1", by, _config.sizeMapSize.height)
-                            break;
-                        }
-
-                        //检测arrMapData是否正常
-                        if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0]))
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by0] = [];
-
-                        let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
-                        let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
-                        for(; bx0 <= bx1; ++bx0, ++bx) {
-                            //超出地图
-                            if(bx >= _config.sizeMapSize.width) {
-                                //console.debug("!2", bx, _config.sizeMapSize.width)
-                                break;
-                            }
-
-                            //检测arrMapData是否正常
-                            //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
-                            //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
-
-
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = arrMapData[rectCopy.nCopyCanvasID][by0][bx0];
-
-                            //console.debug("!!!2", by0, bx0, bx, by, arrMapData[rectCopy.nCopyCanvasID][by0][bx0]);
-                        }
-                    }
-
-                    //!!注意这里(Screen.devicePixelRatio)
-                    let ctx = canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].getContext("2d");
-                    ctx.drawImage(canvasMapContainer.arrCanvasMap[rectCopy.nCopyCanvasID],
-                                  rectCopy.x * Screen.devicePixelRatio, rectCopy.y * Screen.devicePixelRatio,
-                                  rectCopy.width * Screen.devicePixelRatio, rectCopy.height * Screen.devicePixelRatio,
-                                  rectPaste.x, rectPaste.y,
-                                  rectCopy.width * Screen.devicePixelRatio, rectCopy.height * Screen.devicePixelRatio);
-                    canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
-                    //console.debug("!!!3", rectCopy.x, rectCopy.y, rectPaste.x, rectPaste.y, rectCopy.width, rectCopy.height)
+                    if(itemToolbar.nBar === 1)
+                        itemToolbar.nBar = 0;
+                    else
+                        itemToolbar.nBar = 1;
                 }
             }
-        }
-
-
-
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.maximumWidth: parent.width
-            Layout.preferredHeight: 30
-            Layout.minimumHeight: 0
-            Layout.maximumHeight: 30
 
             Button {
-                //Layout.minimumWidth: 65
-                Layout.maximumWidth: 70
-                //Layout.preferredWidth: 100
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                //Layout.preferredWidth: implicitWidth
+
+                //x: 130
+                //width: 100
+                //height: 30
+                font.pointSize: _config.nFontPointSize
+                text: "事件>"
+                onClicked: {
+                    if(itemToolbar.nBar === 2)
+                        itemToolbar.nBar = 0;
+                    else
+                        itemToolbar.nBar = 2;
+                }
+            }
+
+            Button {
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                //Layout.preferredWidth: implicitWidth
+
+                //x: 130
+                //width: 100
+                //height: 30
+                font.pointSize: _config.nFontPointSize
+                text: "操作>"
+                onClicked: {
+                    if(itemToolbar.nBar === 3)
+                        itemToolbar.nBar = 0;
+                    else
+                        itemToolbar.nBar = 3;
+                }
+            }
+
+            Button {
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredWidth: implicitWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -893,136 +694,9 @@ Item {
             }
 
             Button {
-                //Layout.minimumWidth: 65
-                Layout.maximumWidth: 70
-                //Layout.preferredWidth: 100
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                //x: 520
-                font.pointSize: _config.nFontPointSize
-                text: "E+"
-                onClicked: {
-                    textEventName.text = '';
-
-                    dialogEvent.nEventIndex = -1;
-                    dialogEvent.open();
-                }
-            }
-
-            Button {
-                //Layout.minimumWidth: 65
-                Layout.maximumWidth: 70
-                //Layout.preferredWidth: 100
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                //x: 520
-                font.pointSize: _config.nFontPointSize
-                text: "E-"
-
-                onClicked: {
-                    _private.deleteEvent(listviewEvents.currentIndex);
-                }
-            }
-
-            //事件列表
-            ListView {
-                id: listviewEvents
-
-                Layout.minimumWidth: 60
-                //Layout.maximumWidth: 100
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                //x: 300
-                //anchors.fill: parent
-                //width: 200
-                //height: 200
-
-
-                clip: true
-
-                //snapMode: ListView.SnapOneItem
-                orientation:ListView.Horizontal
-
-                //model: listEventsData
-                model: ListModel {
-                    id: listmodelEventsData
-                    //ListElement { key: "全部"; value: "-1" }
-                }
-
-                delegate: ItemDelegate {
-                    width: 30
-                    height: listviewEvents.height
-                    //color: index % 2 ? "lightgreen" : "lightblue"
-                    //color: "lightblue"
-                    highlighted: listviewEvents.currentIndex === index
-                    Rectangle {
-                        anchors.fill: parent
-                        color: listviewEvents.currentIndex === index ? "lightgreen" : "lightblue"
-                    }
-
-                    Label {
-                        anchors.centerIn: parent
-                        font.pointSize: 10
-                        text: {
-                            switch(index) {
-                            //case 0:
-                                //return "设置障碍";
-                            //case 1:
-                                //return "设置事件";
-                            default:
-                                return index;
-                            }
-                        }
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            /*switch(index) {
-                            case 0:
-                            case 1:
-                                //_config.nDrawMapType = 3;
-                                listviewEvents.currentIndex = index;
-                                canvasMapContainer.nCurrentCanvasMap = index;
-                                break;
-                            default:
-                                listviewEvents.currentIndex = index;
-                                canvasMapContainer.nCurrentCanvasMap = index;
-                                break;
-                            }*/
-
-                            //选择图层
-                            listviewEvents.currentIndex = index;
-                            //canvasMapContainer.nCurrentCanvasMap = index;
-
-                            console.debug("[MapEditor]", index, listviewEvents.currentIndex);
-                            //console.debug(key,value);
-
-                            //let obj = compListItem.createObject(null, {key: 999, value: 666});
-                            //listmodelEventsData.append({key: "666", value: "999"});
-                        }
-                        onDoubleClicked: {
-                            //显示事件编辑器
-
-                            bVisible = !bVisible;
-                            dialogEvent.nEventIndex = index;
-                            textEventName.text = listmodelEventsData.get(index)["EventName"];
-                            ////textCode.text = listmodelEventsData.get(index)["EventCode"];
-                            //textCode.text = objEventsData[textEventName.text];
-                            //textCode.setPlainText(objEventsData[textEventName.text]);
-
-                            dialogEvent.open();
-                            //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
-                        }
-                    }
-                }
-            }
-
-            Button {
-                //Layout.minimumWidth: 55
-                Layout.maximumWidth: 55
-                //Layout.preferredWidth: 100
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredWidth: implicitWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -1030,25 +704,7 @@ Item {
                 //width: 100
                 //height: 30
                 font.pointSize: _config.nFontPointSize
-                text: "测"
-                onClicked: {
-                    loaderTestMap.item.init({map: _private.strMapName});
-                    loaderTestMap.show();
-                }
-            }
-
-            Button {
-                //Layout.minimumWidth: 55
-                Layout.maximumWidth: 55
-                //Layout.preferredWidth: 100
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                //x: 130
-                //width: 100
-                //height: 30
-                font.pointSize: _config.nFontPointSize
-                text: "H"
+                text: "帮助"
                 onClicked: {
 
                     rootGameMaker.showMsg('
@@ -1082,11 +738,28 @@ Item {
                 }
             }
 
+            Button {
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredWidth: implicitWidth
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                //x: 130
+                //width: 100
+                //height: 30
+                font.pointSize: _config.nFontPointSize
+                text: "测试"
+                onClicked: {
+                    loaderTestMap.item.init({map: _private.strMapName});
+                    loaderTestMap.show();
+                }
+            }
 
             Button {
-                //Layout.minimumWidth: 55
-                Layout.maximumWidth: 55
-                //Layout.preferredWidth: 100
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredWidth: implicitWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -1109,8 +782,8 @@ Item {
 
 
             Button {
-                //Layout.minimumWidth: 65
-                Layout.maximumWidth: 70
+                //Layout.minimumWidth: 60
+                Layout.maximumWidth: 60
                 //Layout.preferredWidth: 100
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -1125,7 +798,7 @@ Item {
             }
 
             Rectangle {
-                Layout.minimumWidth: 30
+                Layout.minimumWidth: 10
                 Layout.maximumWidth: 30
                 //Layout.preferredWidth: 100
                 Layout.fillWidth: true
@@ -1163,7 +836,7 @@ Item {
                         //for(let j in cfg.MapData[k]) {
                         //arrMapData[k] = cfg.MapData[k];
                         */
-                        console.debug("[MapEditor]focus:", root.focus, root.focus, userMainProject.focus, itemRootScaled.focus, rootWindow.focus);
+                        console.debug("[MapEditor]focus:", root.focus, root.focus, loaderUserMainProject.focus, itemRootScaled.focus, rootWindow.focus);
                         console.debug("[MapEditor]", filedialogOpenMapBlock.folder);
 
                         console.debug("[MapEditor]imageMapBlock:", itemMapBlockContainer.currentMapBlock.imageMapBlock.source);
@@ -1179,6 +852,480 @@ Item {
             }
 
         }
+
+
+        Item {
+            id: itemToolbar
+
+            property int nBar: 0
+
+            Layout.fillWidth: true
+            Layout.maximumWidth: parent.width
+            Layout.preferredHeight: 42
+            Layout.minimumHeight: 0
+            Layout.maximumHeight: 42
+
+
+            visible: itemToolbar.nBar !== 0
+            clip: true
+
+
+            RowLayout {
+                /*Layout.fillWidth: true
+                Layout.maximumWidth: parent.width
+                Layout.preferredHeight: 30
+                Layout.minimumHeight: 0
+                Layout.maximumHeight: 30
+                */
+                anchors.fill: parent
+
+                visible: itemToolbar.nBar === 1
+
+
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    Layout.fillWidth: true
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.fillHeight: true
+
+                    //x: 520
+                    font.pointSize: _config.nFontPointSize
+                    text: "层+"
+                    onClicked: {
+                        _private.createCanvasMap(_private.initMapData([], [-1,-1,-1]));
+                    }
+                }
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    Layout.fillWidth: true
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.fillHeight: true
+
+                    //x: 520
+                    //y: 30
+                    font.pointSize: _config.nFontPointSize
+                    text: "层-"
+                    onClicked: {
+
+                        if(listmodelCanvasMap.count < 1)
+                            return;
+
+                        _private.removeCanvasMap();
+                    }
+                }
+
+                //图层列表
+                ListView {
+                    id: listviewCanvasMap
+
+                    //Layout.minimumWidth: 100
+                    //Layout.maximumWidth: 100
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    //x: 300
+                    //anchors.fill: parent
+                    //width: 200
+                    //height: 200
+
+
+                    clip: true
+
+                    //snapMode: ListView.SnapOneItem
+                    orientation:ListView.Horizontal
+
+                    model: ListModel {
+                        id: listmodelCanvasMap
+                        //ListElement { key: "全部"; value: "-1" }
+                    }
+
+                    delegate: ItemDelegate {
+                        width: 30
+                        height: listviewCanvasMap.height
+                        //color: index % 2 ? "lightgreen" : "lightblue"
+                        //color: "lightblue"
+                        highlighted: listviewCanvasMap.currentIndex === index
+                        Rectangle {
+                            anchors.fill: parent
+                            color: listviewCanvasMap.currentIndex === index ? "lightgreen" : "lightblue"
+                            //color: listviewCanvasMap.currentIndex === index ? "lightgreen" : (canvasMapContainer.arrCanvasMap[index].visible ? "lightblue" : "lightgray")
+                        }
+
+                        Label {
+                            anchors.centerIn: parent
+
+                            font.pointSize: 10
+                            //需要判断 canvasMapContainer.arrCanvasMap[index] 是否存在，因为在删除地图层时对象会在最后删除，会导致有绑定错误
+                            font.strikeout: canvasMapContainer.arrCanvasMap[index] ? (canvasMapContainer.arrCanvasMap[index].opacity === 0 ? true : false) : false
+                            font.underline: canvasMapContainer.arrCanvasMap[index] ? (canvasMapContainer.arrCanvasMap[index].opacity === 0.5 ? true : false) : false
+
+                            text: {
+                                switch(index) {
+                                //case 0:
+                                    //return "设置障碍";
+                                //case 1:
+                                    //return "设置事件";
+                                default:
+                                    return index;
+                                }
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                /*switch(index) {
+                                case 0:
+                                case 1:
+                                    //_config.nDrawMapType = 3;
+                                    listviewCanvasMap.currentIndex = index;
+                                    canvasMapContainer.nCurrentCanvasMap = index;
+                                    break;
+                                default:
+                                    listviewCanvasMap.currentIndex = index;
+                                    canvasMapContainer.nCurrentCanvasMap = index;
+                                    break;
+                                }*/
+
+                                //选择图层
+                                listviewCanvasMap.currentIndex = index;
+                                canvasMapContainer.nCurrentCanvasMap = index;
+
+                                console.debug("[MapEditor]", index, listviewCanvasMap.currentIndex);
+                                //console.debug(key,value);
+
+                                //let obj = compListItem.createObject(null, {key: 999, value: 666});
+                                //listmodelCanvasMap.append({key: "666", value: "999"});
+                            }
+                            onDoubleClicked: {
+                                //!!!隐藏图层，这里加隐藏标志
+                                //bVisible = !bVisible;
+                                //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
+                                if(fOpacity === 0)
+                                    fOpacity = 1;
+                                else if(fOpacity === 1)
+                                    fOpacity = 0.5;
+                                else if(fOpacity === 0.5)
+                                    fOpacity = 0;
+                                canvasMapContainer.arrCanvasMap[index].opacity = fOpacity;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            RowLayout {
+                /*Layout.fillWidth: true
+                Layout.maximumWidth: parent.width
+                Layout.preferredHeight: 30
+                Layout.minimumHeight: 0
+                Layout.maximumHeight: 30
+                */
+                anchors.fill: parent
+
+                visible: itemToolbar.nBar === 2
+
+
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    //x: 520
+                    font.pointSize: _config.nFontPointSize
+                    text: "E+"
+                    onClicked: {
+                        textEventName.text = '';
+
+                        dialogEvent.nEventIndex = -1;
+                        dialogEvent.open();
+                    }
+                }
+
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    //x: 520
+                    font.pointSize: _config.nFontPointSize
+                    text: "E-"
+
+                    onClicked: {
+                        _private.deleteEvent(listviewEvents.currentIndex);
+                    }
+                }
+
+                //事件列表
+                ListView {
+                    id: listviewEvents
+
+                    //Layout.minimumWidth: 60
+                    //Layout.maximumWidth: 100
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    //x: 300
+                    //anchors.fill: parent
+                    //width: 200
+                    //height: 200
+
+
+                    clip: true
+
+                    //snapMode: ListView.SnapOneItem
+                    orientation:ListView.Horizontal
+
+                    //model: listEventsData
+                    model: ListModel {
+                        id: listmodelEventsData
+                        //ListElement { key: "全部"; value: "-1" }
+                    }
+
+                    delegate: ItemDelegate {
+                        width: 30
+                        height: listviewEvents.height
+                        //color: index % 2 ? "lightgreen" : "lightblue"
+                        //color: "lightblue"
+                        highlighted: listviewEvents.currentIndex === index
+                        Rectangle {
+                            anchors.fill: parent
+                            color: listviewEvents.currentIndex === index ? "lightgreen" : "lightblue"
+                        }
+
+                        Label {
+                            anchors.centerIn: parent
+                            font.pointSize: 10
+                            text: {
+                                switch(index) {
+                                //case 0:
+                                    //return "设置障碍";
+                                //case 1:
+                                    //return "设置事件";
+                                default:
+                                    return index;
+                                }
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                /*switch(index) {
+                                case 0:
+                                case 1:
+                                    //_config.nDrawMapType = 3;
+                                    listviewEvents.currentIndex = index;
+                                    canvasMapContainer.nCurrentCanvasMap = index;
+                                    break;
+                                default:
+                                    listviewEvents.currentIndex = index;
+                                    canvasMapContainer.nCurrentCanvasMap = index;
+                                    break;
+                                }*/
+
+                                //选择图层
+                                listviewEvents.currentIndex = index;
+                                //canvasMapContainer.nCurrentCanvasMap = index;
+
+                                console.debug("[MapEditor]", index, listviewEvents.currentIndex);
+                                //console.debug(key,value);
+
+                                //let obj = compListItem.createObject(null, {key: 999, value: 666});
+                                //listmodelEventsData.append({key: "666", value: "999"});
+                            }
+                            onDoubleClicked: {
+                                //显示事件编辑器
+
+                                bVisible = !bVisible;
+                                dialogEvent.nEventIndex = index;
+                                textEventName.text = listmodelEventsData.get(index)["EventName"];
+                                ////textCode.text = listmodelEventsData.get(index)["EventCode"];
+                                //textCode.text = objEventsData[textEventName.text];
+                                //textCode.setPlainText(objEventsData[textEventName.text]);
+
+                                dialogEvent.open();
+                                //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
+                            }
+                        }
+                    }
+                }
+            }
+
+            RowLayout {
+                /*Layout.fillWidth: true
+                Layout.maximumWidth: parent.width
+                Layout.preferredHeight: 30
+                Layout.minimumHeight: 0
+                Layout.maximumHeight: 30
+                */
+                anchors.fill: parent
+
+                visible: itemToolbar.nBar === 3
+
+
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.alignment: Qt.AlignLeft
+
+
+                    //x: 130
+                    //width: 100
+                    //height: 30
+                    font.pointSize: _config.nFontPointSize
+                    text: "铺图"
+                    onClicked: {
+                        let nBlockImageCols = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.width / _config.sizeMapBlockSize.width);
+                        let nBlockImageRows = parseInt(itemMapBlockContainer.currentMapBlock.imageMapBlock.sourceSize.height / _config.sizeMapBlockSize.height);
+
+                        for(let by = 0; by < _config.sizeMapSize.height; ++by) {
+                            //超出地图块
+                            if(by >= nBlockImageRows)
+                                break;
+
+                            //检测arrMapData是否正常
+                            if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
+                                arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
+
+                            for(let bx = 0; bx < _config.sizeMapSize.width; ++bx) {
+                                //超出地图块
+                                if(bx >= nBlockImageCols)
+                                    break;
+
+                                //检测arrMapData是否正常
+                                //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
+                                //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
+
+
+                                arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [bx, by, itemMapBlockContainer.currentMapBlock.nIndex];
+
+                                //console.debug("!!!2", bx, by, nBlockImageCols, nBlockImageRows, _config.sizeMapSize.width, _config.sizeMapSize.height);
+                            }
+                        }
+
+                        let ctx = canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].getContext("2d");
+                        ctx.drawImage(itemMapBlockContainer.currentMapBlock.imageMapBlock.source,
+                                      0, 0);
+                        canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint();
+
+                    }
+                }
+
+                Button {
+                    //Layout.minimumWidth: 42
+                    Layout.maximumWidth: implicitWidth
+                    //Layout.preferredWidth: implicitWidth
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignLeft
+
+                    //x: 520
+                    font.pointSize: _config.nFontPointSize
+                    text: "粘贴"
+                    onClicked: {
+                        //flickableMapBlock.visible = !flickableMapBlock.visible;
+                        if(rectCopy.nCopyCanvasID >= canvasMapContainer.arrCanvasMap.length || rectCopy.nCopyCanvasID < 0)
+                            return;
+                        if(!rectPaste.visible)
+                            return;
+
+                        let x1 = rectCopy.x + rectCopy.width - 1;
+                        let y1 = rectCopy.y + rectCopy.height - 1;
+
+                        //let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
+                        let by = parseInt(rectPaste.y / _config.sizeMapBlockSize.height);
+
+                        //let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
+                        let by0 = parseInt(rectCopy.y / _config.sizeMapBlockSize.height);
+                        let bx1 = parseInt(x1 / _config.sizeMapBlockSize.width);
+                        let by1 = parseInt(y1 / _config.sizeMapBlockSize.height);
+
+                        //console.debug("!!!1", parseInt(rectCopy.x / _config.sizeMapBlockSize.width), by0, bx1, by1)
+
+                        for(; by0 <= by1; ++by0, ++by) {
+                            //超出地图
+                            if(by >= _config.sizeMapSize.height) {
+                                //console.debug("!1", by, _config.sizeMapSize.height)
+                                break;
+                            }
+
+                            //检测arrMapData是否正常
+                            if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0]))
+                                arrMapData[canvasMapContainer.nCurrentCanvasMap][by0] = [];
+
+                            let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
+                            let bx0 = parseInt(rectCopy.x / _config.sizeMapBlockSize.width);
+                            for(; bx0 <= bx1; ++bx0, ++bx) {
+                                //超出地图
+                                if(bx >= _config.sizeMapSize.width) {
+                                    //console.debug("!2", bx, _config.sizeMapSize.width)
+                                    break;
+                                }
+
+                                //检测arrMapData是否正常
+                                //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
+                                //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
+
+
+                                arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = arrMapData[rectCopy.nCopyCanvasID][by0][bx0];
+
+                                //console.debug("!!!2", by0, bx0, bx, by, arrMapData[rectCopy.nCopyCanvasID][by0][bx0]);
+                            }
+                        }
+
+                        //!!注意这里(Screen.devicePixelRatio)
+                        let ctx = canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].getContext("2d");
+                        ctx.drawImage(canvasMapContainer.arrCanvasMap[rectCopy.nCopyCanvasID],
+                                      rectCopy.x * Screen.devicePixelRatio, rectCopy.y * Screen.devicePixelRatio,
+                                      rectCopy.width * Screen.devicePixelRatio, rectCopy.height * Screen.devicePixelRatio,
+                                      rectPaste.x, rectPaste.y,
+                                      rectCopy.width * Screen.devicePixelRatio, rectCopy.height * Screen.devicePixelRatio);
+                        canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
+                        //console.debug("!!!3", rectCopy.x, rectCopy.y, rectPaste.x, rectPaste.y, rectCopy.width, rectCopy.height)
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Label {
+                    Layout.maximumWidth: contentWidth
+                    Layout.alignment: Qt.AlignRight
+
+                    text: '特殊图块值：'
+                }
+
+                TextField {
+                    id: textMapBlockSpecial
+
+                    //Layout.minimumWidth: 60
+                    //Layout.maximumWidth: Math.max(implicitWidth, contentWidth)
+                    //Layout.preferredWidth: 100
+                    //Layout.fillWidth: true
+                    Layout.preferredWidth: Math.max(60, contentWidth)
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignRight
+
+                    placeholderText: ''
+                    text: '1'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+                }
+            }
+        }
+
+
+
 
 //地图块区域
         //地图块
@@ -1706,29 +1853,36 @@ Item {
                         anchors.fill: parent
                         z: 998
 
+                        //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
                             _private.clearCanvas(canvasBlockSpecial);
 
                             //地图上绘制 特殊图块
                             let ctx = getContext("2d");
-                            ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
                             for(let i in objMapBlockSpecialData) {
                                 let p = i.split(',');
-                                let x = parseInt(p[0]);
-                                let y = parseInt(p[1]);
+                                let bx = parseInt(p[0]);
+                                let by = parseInt(p[1]);
 
-                                //超出范围
-                                if(x >= _config.sizeMapSize.width || y >= _config.sizeMapSize.height) {
+                                //如果越界
+                                if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height) {
                                     delete objMapBlockSpecialData[i];
                                     continue;
                                 }
 
-                                //绘制方块
-                                ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                                canvasBlockSpecial.paintBlock(bx, by, objMapBlockSpecialData[i], ctx);
                             }
 
                             requestPaint();
+                        }
 
+                        //绘制一块
+                        function paintBlock(bx, by, specialValue, ctx) {
+                            if(_private.objSpecialInfo[specialValue])
+                                ctx.fillStyle = _private.objSpecialInfo[specialValue].Color;
+                            else
+                                ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
+                            ctx.fillRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
                         }
                     }
 
@@ -1738,6 +1892,7 @@ Item {
                         anchors.fill: parent
                         z: 998
 
+                        //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
                             _private.clearCanvas(canvasEvent);
 
@@ -1749,37 +1904,41 @@ Item {
                             }
 
                             let ctx = canvasEvent.getContext("2d");
-                            ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
 
                             for(let i in objMapEventsData) {
                                 let p = i.split(',');
-                                let x = parseInt(p[0]);
-                                let y = parseInt(p[1]);
+                                let bx = parseInt(p[0]);
+                                let by = parseInt(p[1]);
 
-                                //超出范围
-                                if(x >= _config.sizeMapSize.width || y >= _config.sizeMapSize.height) {
+                                //如果越界
+                                if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height) {
                                     delete objMapEventsData[i];
                                     continue;
                                 }
 
-
-                                //绘制方块
-                                ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
-
-                                //绘制文字
-                                let eventID = listviewEvents.currentIndex1;
-                                //ctx.textAlign="left";
-                                //ctx.textBaseLine="middle";
-                                ctx.strokeStyle = "blue";
-                                ctx.lineWidth = 1;
-                                ctx.font = "bold %1px 微软雅黑".arg(_config.sizeMapBlockSize.height / 2);
-                                //console.debug("tmpEventIndex", tmpEventIndex, objMapEventsData[i], tmpEventIndex.indexOf(objMapEventsData[i]), tmpEventIndex.indexOf(objMapEventsData[i]).toString())
-                                ctx.strokeText(tmpEventIndex.indexOf(objMapEventsData[i]).toString(), (x + 0.4) * _config.sizeMapBlockSize.width, (y + 0.2) * _config.sizeMapBlockSize.height + _config.sizeMapBlockSize.height / 2, _config.sizeMapBlockSize.width);
-
-                                //console.debug("绘制方块", x, y, (x + 0.4), (y + 0.2), (x + 0.4) * _config.sizeMapBlockSize.width)
+                                canvasEvent.paintBlock(bx, by, tmpEventIndex.indexOf(objMapEventsData[i]).toString(), ctx);
                             }
 
                             requestPaint();
+                        }
+
+                        //绘制一块
+                        function paintBlock(bx, by, text, ctx) {
+                            ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
+                            //绘制方块
+                            ctx.fillRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+
+                            //绘制文字
+                            //let eventID = listviewEvents.currentIndex1;
+                            //ctx.textAlign="left";
+                            //ctx.textBaseLine="middle";
+                            ctx.strokeStyle = "blue";
+                            ctx.lineWidth = 1;
+                            ctx.font = "bold %1px 微软雅黑".arg(_config.sizeMapBlockSize.height / 2);
+                            //console.debug("tmpEventIndex", tmpEventIndex, objMapEventsData[i], tmpEventIndex.indexOf(objMapEventsData[i]), tmpEventIndex.indexOf(objMapEventsData[i]).toString())
+                            ctx.strokeText(text, (bx + 0.4) * _config.sizeMapBlockSize.width, (by + 0.2) * _config.sizeMapBlockSize.height + _config.sizeMapBlockSize.height / 2, _config.sizeMapBlockSize.width);
+
+                            //console.debug("绘制方块", bx, by, (bx + 0.4), (by + 0.2), (bx + 0.4) * _config.sizeMapBlockSize.width)
                         }
                     }
 
@@ -1811,11 +1970,7 @@ Item {
                         //height: 20
                         z: 998
 
-                        Text {
-                            text: `(${parent.x / _config.sizeMapBlockSize.width}, ${parent.y / _config.sizeMapBlockSize.height})`
-                        }
                     }
-
                 }
 
 
@@ -1960,6 +2115,7 @@ Item {
                             rectPaste.width = _config.sizeMapBlockSize.width;
                             rectPaste.height = _config.sizeMapBlockSize.height;
                             rectPaste.visible = true;
+                            textTips.refresh(bx, by);
 
                             //Platform.showToast("%1,%2".arg(bx).arg(by));
                             //console.debug(bx, by);
@@ -2045,7 +2201,8 @@ Item {
             MouseArea {
 
                 //鹰：曲线救国（安卓上的长按有问题）
-                property point pointMousePressBegin //Press时坐标
+                property point pointMousePressBegin //Press时的坐标
+                property point pointLastDraw //上一次有效绘制时的坐标
                 property int nMousePressType: 0 //0为初始；1为单击；2为双击；3为长按
 
 
@@ -2064,19 +2221,10 @@ Item {
 
 
                 //绘制地图
-                function drawMap(mouse) {
+                function drawMap(bx, by) {
 
                     //地图层个数为0
                     if(canvasMapContainer.arrCanvasMap.length === 0)
-                        return;
-
-                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
-                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
-
-                    //如果越界
-                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
                         return;
 
                     //console.time("drawMap");
@@ -2085,54 +2233,54 @@ Item {
                     if(_config.bMapClean) {
                         /*/如果是障碍层
                         if(canvasMapContainer.nCurrentCanvasMap === 0) {
-                            if(arrMapData[0][y][x] !== -1) {
-                                arrMapData[0][y][x] = -1;
-                                arrMapRepaintPoint.push(Qt.point(x, y));
+                            if(arrMapData[0][by][bx] !== -1) {
+                                arrMapData[0][by][bx] = -1;
+                                arrMapRepaintPoint.push(Qt.point(bx, by));
                                 canvasMapContainer.arrCanvasMap[0].requestPaint(); //重新绘图
                             }
                         }
                         //如果是事件层
                         else if(canvasMapContainer.nCurrentCanvasMap === 1) {
-                            if(arrMapData[1][y][x] !== -1) {
-                                arrMapData[1][y][x] = -1;
-                                arrMapRepaintPoint.push(Qt.point(x, y));
+                            if(arrMapData[1][by][bx] !== -1) {
+                                arrMapData[1][by][bx] = -1;
+                                arrMapRepaintPoint.push(Qt.point(bx, by));
                                 canvasMapContainer.arrCanvasMap[1].requestPaint(); //重新绘图
                             }
                         }
                         //地图层
                         else {
-                            if(arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x].toString() !== '-1,-1,-1') {
-                                arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x] = [-1,-1,-1];   //
-                                arrMapRepaintPoint.push(Qt.point(x, y));
+                            if(arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx].toString() !== '-1,-1,-1') {
+                                arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [-1,-1,-1];   //
+                                arrMapRepaintPoint.push(Qt.point(bx, by));
                                 canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
                             }
                         }*/
 
                         //地图层，且有图块
-                        if(arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x].toString() !== '-1,-1,-1') {
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x] = [-1,-1,-1];   //
-                            canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].arrMapRepaintPoint.push(Qt.point(x, y));
+                        if(arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx].toString() !== '-1,-1,-1') {
+                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [-1,-1,-1];   //
+                            canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].arrMapRepaintPoint.push(Qt.point(bx, by));
                             canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
                         }
-                        //console.debug("删除", y, x, arrMapData[y][x])
+                        //console.debug("删除", by, bx, arrMapData[by][bx])
                     }
 
                     /*/障碍物
                     else if(canvasMapContainer.nCurrentCanvasMap === 0) {
-                        if(arrMapData[0][y][x] !== 1) {
-                            arrMapData[0][y][x] = 1;   //
-                            arrMapRepaintPoint.push(Qt.point(x, y));
+                        if(arrMapData[0][by][bx] !== 1) {
+                            arrMapData[0][by][bx] = 1;   //
+                            arrMapRepaintPoint.push(Qt.point(bx, by));
                             canvasMapContainer.arrCanvasMap[0].requestPaint(); //重新绘图
 
-                            //console.debug("设置障碍", y, x, arrMapData[0][y][x]);
+                            //console.debug("设置障碍", by, bx, arrMapData[0][by][bx]);
                         }
                     }
 
                     //事件
                     else if(canvasMapContainer.nCurrentCanvasMap === 1) {
-                        if(arrMapData[1][y][x] !== 1) {
-                            arrMapData[1][y][x] = 1;   //
-                            arrMapRepaintPoint.push(Qt.point(x, y));
+                        if(arrMapData[1][by][bx] !== 1) {
+                            arrMapData[1][by][bx] = 1;   //
+                            arrMapRepaintPoint.push(Qt.point(bx, by));
                             canvasMapContainer.arrCanvasMap[1].requestPaint(); //重新绘图
                         }
                     }*/
@@ -2140,13 +2288,13 @@ Item {
                     //绘制模式
                     else {
                         //检测arrMapData是否正常
-                        if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][y]))
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][y] = [];
-                        else if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x]))
-                            arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x] = [-1,-1,-1];
+                        if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
+                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
+                        else if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx]))
+                            arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [-1,-1,-1];
                         else {
                             //图块相同，则不绘
-                            let _block = arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x];
+                            let _block = arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx];
                             if(
                                 _block[2] === itemMapBlockContainer.currentMapBlock.nIndex &&     //地图块相同
                                 _block[0] === itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.x && //x相同
@@ -2155,22 +2303,22 @@ Item {
                                 return;
                         }
 
-                        arrMapData[canvasMapContainer.nCurrentCanvasMap][y][x] = [itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.x, itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.y, itemMapBlockContainer.currentMapBlock.nIndex];
-                        canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].arrMapRepaintPoint.push(Qt.point(x, y));
+                        arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.x, itemMapBlockContainer.currentMapBlock.pointSelectedMapBlock.y, itemMapBlockContainer.currentMapBlock.nIndex];
+                        canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].arrMapRepaintPoint.push(Qt.point(bx, by));
                         canvasMapContainer.arrCanvasMap[canvasMapContainer.nCurrentCanvasMap].requestPaint(); //重新绘图
 
 
-                        //console.debug(x,y)
+                        //console.debug(bx,by)
                     }
                     //else
-                        //console.debug("err:", _config.bMapBlockSpecial, arrMapData[0][y][x])
+                        //console.debug("err:", _config.bMapBlockSpecial, arrMapData[0][by][bx])
                     //mouse.accept = true;  //无用
 
                     //console.timeEnd("drawMap");
                 }
 
                 //绘制事件
-                function drawEvent(mouse) {
+                function drawEvent(bx, by) {
 
                     //地图层个数为0
                     if(canvasMapContainer.arrCanvasMap.length === 0)
@@ -2179,16 +2327,7 @@ Item {
                     if(listmodelEventsData.count === 0)
                         return;
 
-                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
-                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
-
-                    //如果越界
-                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
-                        return;
-
-                    let strIndex = [x, y].toString();
+                    let strIndex = [bx, by].toString();
 
 
                     /*console.debug("strIndex", strIndex, objMapEventsData[strIndex]);
@@ -2209,60 +2348,42 @@ Item {
                         delete objMapEventsData[strIndex];
 
                         let ctx = canvasEvent.getContext("2d");
-                        ctx.clearRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
-                        canvasEvent.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
+                        ctx.clearRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasEvent.markDirty(Qt.rect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height));
 
                     }
                     else {
                         //console.debug("objMapEventsData", JSON.stringify(objMapEventsData));
+
                         //如果已经定义过事件
-                        if(objMapEventsData[strIndex] !== undefined)
-                            return;
+                        //if(objMapEventsData[strIndex] !== undefined)
+                        //    return;
 
                         objMapEventsData[strIndex] = listmodelEventsData.get(listviewEvents.currentIndex)["EventName"];
 
 
                         //绘制
                         let ctx = canvasEvent.getContext("2d");
-                        //绘制方块
-                        ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
-                        ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        ctx.clearRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasEvent.paintBlock(bx, by, listviewEvents.currentIndex.toString(), ctx);
 
-                        //绘制文字
-                        //ctx.textAlign="left";
-                        //ctx.textBaseLine="middle";
-                        ctx.strokeStyle = "blue";
-                        ctx.lineWidth = 1;
-                        ctx.font = "bold %1px 微软雅黑".arg(_config.sizeMapBlockSize.height / 2);
-                        ctx.strokeText(listviewEvents.currentIndex.toString(), (x + 0.4) * _config.sizeMapBlockSize.width, (y + 0.2) * _config.sizeMapBlockSize.height + _config.sizeMapBlockSize.height / 2, _config.sizeMapBlockSize.width);
-
-
-                        canvasEvent.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
+                        canvasEvent.markDirty(Qt.rect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height));
 
                     }
 
-                    //console.debug("绘制事件：", x, y);
+                    //console.debug("绘制事件：", bx, by);
 
                 }
 
 
                 //绘制特殊图块
-                function drawBlockSpecial(mouse) {
+                function drawBlockSpecial(bx, by) {
 
                     //地图层个数为0
                     if(canvasMapContainer.arrCanvasMap.length === 0)
                         return;
 
-                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
-                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
-                    let x = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let y = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
-
-                    //如果越界
-                    if(x < 0 || y < 0 || y >= _config.sizeMapSize.height || x >= _config.sizeMapSize.width)
-                        return;
-
-                    let strIndex = [x, y].toString();
+                    let strIndex = [bx, by].toString();
 
 
                     /*console.debug("strIndex", strIndex, objMapBlockSpecialData[strIndex]);
@@ -2276,34 +2397,56 @@ Item {
                         delete objMapBlockSpecialData[strIndex];
 
                         let ctx = canvasBlockSpecial.getContext("2d");
-                        ctx.clearRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
-                        canvasBlockSpecial.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
+                        ctx.clearRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasBlockSpecial.markDirty(Qt.rect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height));
 
                     }
                     else {
-                        //console.debug("objMapBlockSpecialData", objMapBlockSpecialData);
+                        console.debug("objMapBlockSpecialData", objMapBlockSpecialData, parseInt(textMapBlockSpecial.text));
+
                         //如果已经定义过
-                        if(objMapBlockSpecialData[strIndex] !== undefined)
+                        //if(objMapBlockSpecialData[strIndex] !== undefined)
+                        //    return;
+
+                        let specialValue;
+                        try {
+                            specialValue = eval(textMapBlockSpecial.text);
+                        }
+                        //如果值无效
+                        catch(e) {
+                            dialogCommon.show({
+                                Msg: '特殊图块值无效，请输入一个数字（支持二进制、八进制和十六进制）',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function(){
+                                    return;
+                                },
+                                OnRejected: ()=>{
+                                    return;
+                                },
+                            });
                             return;
+                        }
+
 
                         //!!障碍ID
-                        objMapBlockSpecialData[strIndex] = rMapBlockSpecialType_Obstacle;
+                        objMapBlockSpecialData[strIndex] = specialValue;
 
                         let ctx = canvasBlockSpecial.getContext("2d");
-                        ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
-                        ctx.fillRect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        ctx.clearRect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
+                        canvasBlockSpecial.paintBlock(bx, by, specialValue, ctx);
 
                         /*ctx.strokeStyle = "blue";
                         ctx.lineWidth = 1;
                         ctx.font = "bold 30px 微软雅黑";
-                        ctx.strokeText(listviewEvents.currentIndex.toString(), x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height);
+                        ctx.strokeText(listviewEvents.currentIndex.toString(), bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height);
                         */
 
-                        canvasBlockSpecial.markDirty(Qt.rect(x * _config.sizeMapBlockSize.width, y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width / 2, _config.sizeMapBlockSize.height / 2));
+
+                        canvasBlockSpecial.markDirty(Qt.rect(bx * _config.sizeMapBlockSize.width, by * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height));
 
                     }
 
-                    //console.debug("绘制特殊：", x, y);
+                    //console.debug("绘制特殊：", bx, by);
                 }
 
                 onPressed: {
@@ -2317,6 +2460,7 @@ Item {
                     //drawMap(mouse);
                     //flickable.enabled = false;
                     pointMousePressBegin = Qt.point(mouse.x, mouse.y);
+                    pointLastDraw = Qt.point(-1, -1);
 
                     _config.bMapClean = false;
 
@@ -2329,6 +2473,22 @@ Item {
                     //如果 nMousePressType 还没确认，且鼠标移动，则为单击移动
                     if(nMousePressType === 0 && pointMousePressBegin !== Qt.point(mouse.x, mouse.y))
                         nMousePressType = 1;
+
+
+                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
+                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
+                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
+
+                    //如果越界
+                    if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height)
+                        return;
+
+                    if(pointLastDraw === Qt.point(bx, by))
+                        return;
+                    else
+                        pointLastDraw = Qt.point(bx, by);
+
 
                     /*switch(nMousePressType) {
                     case 1:
@@ -2343,20 +2503,17 @@ Item {
                     }*/
                     if(nMousePressType === 1 || nMousePressType === 2) {
                         if(_config.bMapDraw) {
-                            drawMap(mouse);
+                            drawMap(bx, by);
                         }
                         else if(_config.bMapEvent) {
-                            drawEvent(mouse);
+                            drawEvent(bx, by);
                         }
                         else if(_config.bMapBlockSpecial) {
-                            drawBlockSpecial(mouse);
+                            drawBlockSpecial(bx, by);
                         }
                     }
                     //复制选区
                     else if(nMousePressType === 3) {
-                        let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                        let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
-
                         if(bx === rectCopy.pointStart.x) {
                             rectCopy.x = bx * _config.sizeMapBlockSize.width;
                             rectCopy.width = _config.sizeMapBlockSize.width;
@@ -2401,36 +2558,55 @@ Item {
                 }
 
                 onClicked: {
+                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
+                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
+                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
+
+                    //如果越界
+                    if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height)
+                        return;
+
+
                     //如果 nMousePressType 还没确认，且鼠标没有移动，则为单击
                     //if(nMousePressType === 0 && pointMousePressBegin === Qt.point(mouse.x, mouse.y))
                     //    drawMap(mouse);
 
                     if(nMousePressType === 0) {
                         if(_config.bMapDraw) {
-                            drawMap(mouse);
+                            drawMap(bx, by);
                         }
                         else if(_config.bMapEvent) {
-                            drawEvent(mouse);
+                            drawEvent(bx, by);
                         }
                         else if(_config.bMapBlockSpecial) {
-                            drawBlockSpecial(mouse);
+                            drawBlockSpecial(bx, by);
                         }
                     }
 
-
-                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                     rectPaste.x = bx * _config.sizeMapBlockSize.width;
                     rectPaste.y = by * _config.sizeMapBlockSize.height;
                     rectPaste.width = _config.sizeMapBlockSize.width;
                     rectPaste.height = _config.sizeMapBlockSize.height;
                     rectPaste.visible = true;
+                    textTips.refresh(bx, by);
 
                     //Platform.showToast("%1,%2".arg(bx).arg(by));
                 }
 
                 onDoubleClicked: {
+
+                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
+                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
+                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
+
+                    //如果越界
+                    if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height)
+                        return;
+
+
                     //nOpType = 2;
                     nMousePressType = 2;
                     //drawEvent(mouse);
@@ -2448,14 +2624,22 @@ Item {
                 }
 
                 onPressAndHold: {
+
+                    //x、y是 canvasMapContainer 上的 地图帧的图块坐标（鼠标点击），arrMapData[y][x]是原图的坐标（都是块坐标）
+                    //!!必须加上flickable的content坐标，且除以canvasMapContainer.scale才是正常的缩放后的坐标
+                    let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
+                    let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
+
+                    //如果越界
+                    if(bx < 0 || by < 0 || bx >= _config.sizeMapSize.width || by >= _config.sizeMapSize.height)
+                        return;
+
+
                     //如果 nMousePressType 还没确认，且鼠标没有移动，则为长按移动
                     if(nMousePressType === 0 && pointMousePressBegin === Qt.point(mouse.x, mouse.y)) {
                         nMousePressType = 3;
                         //drawBlockSpecial(mouse);
 
-
-                        let bx = parseInt((mouse.x + flickable.contentX) / _config.sizeMapBlockSize.width / canvasMapContainer.scale);
-                        let by = parseInt((mouse.y + flickable.contentY) / _config.sizeMapBlockSize.height / canvasMapContainer.scale);
 
                         rectCopy.x = bx * _config.sizeMapBlockSize.width;
                         rectCopy.y = by * _config.sizeMapBlockSize.height;
@@ -2472,6 +2656,61 @@ Item {
             }
         }
 
+        /*Rectangle {
+            //anchors.bottom: parent.top
+            Layout.fillWidth: true
+            height: textTips.contentHeight
+
+            color: '#FFFFFFFF'
+
+            Text {
+                id: textTips
+
+                function refresh(x, y) {
+                    let bx = x / _config.sizeMapBlockSize.width, by = y / _config.sizeMapBlockSize.height;
+                    let ret = `(${bx},${by})`;
+                    let strPost = `${bx},${by}`;
+                    if(strPost in objMapBlockSpecialData)
+                        ret += '(特殊：' + objMapBlockSpecialData[strPost] + ')';
+                    if(strPost in objMapEventsData)
+                        ret += '(事件：' + objMapEventsData[strPost] + ')';
+
+                    //return ret;
+                    text = ret;
+                }
+
+
+                textFormat: Text.RichText
+            }
+        }
+        */
+        Label {
+            id: textTips
+
+
+            Layout.fillWidth: true
+            height: contentHeight
+
+
+            function refresh(bx, by) {
+                //let bx = x / _config.sizeMapBlockSize.width, by = y / _config.sizeMapBlockSize.height;
+                let ret = `坐标：${bx},${by}`;
+                let strPost = `${bx},${by}`;
+                if(strPost in objMapBlockSpecialData) {
+                    ret += '，特殊：' + objMapBlockSpecialData[strPost];
+                    if(_private.objSpecialInfo[objMapBlockSpecialData[strPost]])
+                        ret += '（' + _private.objSpecialInfo[objMapBlockSpecialData[strPost]].Name + '）';
+                }
+                if(strPost in objMapEventsData)
+                    ret += '，事件：' + objMapEventsData[strPost];
+
+                //return ret;
+                text = ret;
+            }
+
+
+            textFormat: Label.RichText
+        }
     }
 
 
@@ -2821,7 +3060,7 @@ Item {
                 //win下，Canvas.save 不支持 file: 开头的路径
                 path = path.replace("file:/", "").replace("//", "");
 
-                if(!FrameManager.sl_qml_DirExists(path))
+                //if(!FrameManager.sl_qml_DirExists(path))
                     FrameManager.sl_qml_CreateFolder(path);
 
                 canvasOutput.save(path + GameMakerGlobal.separator + _private.strMapName + '.png');
@@ -2966,6 +3205,9 @@ Item {
         //地图名 和 地图缩放倍数（暂存）
         property string strMapName: ""
         //property real nMapScaled: 1
+
+        //特殊图块信息
+        property var objSpecialInfo: ({1: {Color: '#7FFF7F7F', Name: '障碍'}, 2: {Color: '#7F00FF00', Name: '草地'}})
 
 
         function loadScript() {

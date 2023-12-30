@@ -461,8 +461,8 @@ Item {
 
         //换背景图
         readonly property var background: function(image='') {
-            //console.debug('!!!!image:::', image, GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image)))
-            imageBackground.source = GlobalJS.toURL(GameMakerGlobal.imageResourceURL(image));
+            //console.debug('!!!!image:::', image, GameMakerGlobal.imageResourceURL(image));
+            imageBackground.source = GameMakerGlobal.imageResourceURL(image);
         }
 
 
@@ -948,6 +948,8 @@ Item {
                         id: tSpriteEffectMyCombatant
 
                         anchors.centerIn: parent
+                        width: spriteSrc ? implicitWidth : 60
+                        height: spriteSrc ? implicitHeight : 60
 
                         test: false
 
@@ -1188,6 +1190,8 @@ Item {
                         id: tSpriteEffectEnemy
 
                         anchors.centerIn: parent
+                        width: spriteSrc ? implicitWidth : 60
+                        height: spriteSrc ? implicitHeight : 60
 
                         test: false
 

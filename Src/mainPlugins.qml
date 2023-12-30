@@ -90,7 +90,7 @@ Item {
                 //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
 
                 //FrameManager.sl_qml_CreateFolder(projectPath);
-                let ret = FrameManager.sl_qml_ExtractDir(Global.toPath(fUrl), projectUrl);
+                let ret = FrameManager.sl_qml_ExtractDir(GlobalJS.toPath(fUrl), projectUrl);
 
 
                 if(ret.length > 0) {

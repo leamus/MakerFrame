@@ -289,6 +289,8 @@ Item {
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
 
+        removeButtonVisible: false
+
 
         onClicked: {
             visible = false;

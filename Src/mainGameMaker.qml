@@ -121,7 +121,7 @@ Item {
                     textinputDialogCommonInput.visible = true;
                     dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
                     dialogCommon.fOnAccepted = ()=>{
-                        GameMakerGlobal.config.strCurrentProjectName = dialogCommon.input;
+                        _private.changeProject(dialogCommon.input);
 
                         let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
                         FrameManager.sl_qml_CreateFolder(projectPath);
@@ -168,11 +168,11 @@ Item {
                     dialogCommon.input = GameMakerGlobal.config.strCurrentProjectName;
                     dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
                     dialogCommon.fOnAccepted = ()=>{
-                        if(FrameManager.sl_qml_RenameFolder(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
-                            GameMakerGlobal.config.strCurrentProjectName = dialogCommon.input;
+                        if(FrameManager.sl_qml_RenameFile(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input) > 0) {
+                            _private.changeProject(dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
                         }
                         else {
-                            console.warn("重命名失败：", dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName)
+                            console.warn("重命名失败：", GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input);
                         }
 
                         rootGameMaker.forceActiveFocus();
@@ -854,7 +854,8 @@ Item {
                                 let ret = FrameManager.sl_qml_ExtractDir(projectPath + ".zip", projectPath);
 
                                 if(ret.length > 0) {
-                                    GameMakerGlobal.config.strCurrentProjectName = "Leamus";
+                                    _private.changeProject('Leamus');
+
                                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
                                     dialogCommon.msg = "成功";
                                 }
@@ -1122,8 +1123,7 @@ Item {
             }
 
             _private.loadModule("");
-            GameMakerGlobal.config.strCurrentProjectName = item;
-            //GameMakerGlobal.settings.setValue('$ProjectName', item);
+            _private.changeProject(item);
 
 
             //loader.visible = true;
@@ -1195,11 +1195,12 @@ Item {
                 //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
 
                 FrameManager.sl_qml_CreateFolder(projectPath);
-                let ret = FrameManager.sl_qml_ExtractDir(Global.toPath(fUrl), projectPath);
+                let ret = FrameManager.sl_qml_ExtractDir(GlobalJS.toPath(fUrl), projectPath);
 
 
                 if(ret.length > 0) {
-                    GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_qml_BaseName(fUrl);
+                    _private.changeProject(FrameManager.sl_qml_BaseName(fUrl));
+
                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
                     dialogCommon.msg = "成功";
                 }
@@ -1637,7 +1638,19 @@ Item {
                 console.debug("Loader.Ready");
                 //loader.item.forceActiveFocus();
             }*/
+        }
 
+
+        //切换工程，转移和检查工程引擎变量
+        function changeProject(newProject, oldProject=null) {
+            if(oldProject !== null) {
+                GameMakerGlobal.settings.setValue("$RPG/" + newProject, GameMakerGlobal.settings.value("$RPG/" + oldProject));
+                GameMakerGlobal.settings.setValue("$RPG/" + oldProject, undefined);
+            }
+            if(GameMakerGlobal.settings.value("$RPG/" + newProject) === undefined)
+                GameMakerGlobal.settings.setValue("$RPG/" + newProject, {});
+
+            GameMakerGlobal.config.strCurrentProjectName = newProject;
         }
 
 

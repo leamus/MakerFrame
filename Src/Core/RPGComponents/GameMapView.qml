@@ -14,7 +14,8 @@ import cn.Leamus.MakerFrame 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-//import LGlobal 1.0
+
+import '..'
 
 
 import "qrc:/QML"
@@ -40,7 +41,7 @@ Item {
         itemFrontMapContainer.visible = false;
 
         //let cfg = File.read(mapPath);
-        let mapInfo = FrameManager.sl_qml_ReadFile(Global.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
+        let mapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
         //console.debug("cfg", cfg, mapPath);
 
         if(mapInfo === "")
@@ -79,7 +80,7 @@ Item {
             itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
         }
 
-        imageMapBlock.source = GlobalJS.toURL(GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]));
+        imageMapBlock.source = GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]);
 
         //载入新地图块图片
         for(let tc in itemBackMapContainer.arrCanvas) {
@@ -255,11 +256,40 @@ Item {
     }
 
 
-    //地图块大小（用于缩放地图块）
+//CanvasMask操作
+    function createCanvasMask(_parent=itemBackMapContainer) {
+        let cm = compCanvasMask.createObject(_parent);
+        arrCanvasMask.push(cm);
+        return cm;
+    }
+
+    function refreshCanvasMask(index, data) {
+        arrCanvasMask[index].objMaskData = data;
+        arrCanvasMask[index].requestPaint();
+    }
+
+    function removeCanvasMask(index) {
+        let cm = arrCanvasMask.splice(index, 1)[0];
+        cm.destroy();
+    }
+    /*例子：
+        itemViewPort.createCanvasMask(itemViewPort.itemBackMapContainer);
+        itemViewPort.refreshCanvasMask(0, {'16,16': {Color: '#7F0000FF'}, '15,16': {Color: '#7F0000FF'}, '17,16': {Color: '#7F0000FF'}, '16,15': {Color: '#7F0000FF'}, '16,17': {Color: '#7F0000FF'}});
+    */
+
+
+
+    //地图块大小（乘以缩放后的）
     property size sizeMapBlockSize
 
     //前景地图遮挡人物透明度
     property real rMapOpacity: 1
+    //前景地图遮挡人物透明度
+    property bool bSmooth: true
+
+
+    property var arrCanvasMask: []
+
 
     property alias gameScene: gameScene
     property alias itemContainer: itemContainer
@@ -280,6 +310,87 @@ Item {
 
     focus: true
     clip: true
+
+
+
+    Component {
+        id: compCanvasMask
+
+        //遮罩层（提供绘制格子）
+        Canvas {
+            id: canvasMask
+
+            property var objMaskData: ({})
+
+            anchors.fill: parent
+
+            smooth: bSmooth
+
+
+            onPaint: {  //绘制地图
+
+                //地图块没有准备好
+                /*if(imageMapBlock.status !== Image.Ready) {
+                    console.debug("[GameMapView]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                    return;
+                }*/
+
+                if(!available) {
+                    console.debug("[GameMapView]canvasMask：地图块没有准备好：");
+                    return;
+                }
+                /*if(!isImageLoaded(imageMapBlock.source)) {
+                    console.debug("[GameMapView]canvasBackMap：地图块图片没有载入：");
+                    //loadImage(imageMapBlock.source);
+                    return;
+                }*/
+
+
+                let ctx = getContext("2d");
+
+                //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
+                //ctx.fillRect(0, 0, width, height);
+                ctx.clearRect(0, 0, width, height);
+
+
+                for(let i in objMaskData) {
+                    let p = i.split(',');
+                    let bx = parseInt(p[0]);
+                    let by = parseInt(p[1]);
+
+                    //如果越界
+                    if(bx < 0 || by < 0 || bx >= itemContainer.mapInfo.MapSize[0] || by >= itemContainer.mapInfo.MapSize[1]) {
+                        //delete objMaskData[i];
+                        continue;
+                    }
+
+                    if(objMaskData[i])
+                        ctx.fillStyle = objMaskData[i].Color;
+                    else
+                        ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
+                    ctx.fillRect(bx * sizeMapBlockSize.width, by * sizeMapBlockSize.height, sizeMapBlockSize.width, sizeMapBlockSize.height);
+                }
+
+                requestPaint();
+
+
+                console.debug("[GameMapView]canvasMask onPaint");
+            }
+
+            onImageLoaded: {    //载入图片完成
+                requestPaint(); //重新绘图
+
+                console.debug("[GameMapView]canvasMask onImageLoaded");
+            }
+
+
+            Component.onCompleted: {
+                //loadImage(image1);  //载入图片
+                //loadImage(image2);
+                console.debug("[GameMapView]canvasMask Component.onCompleted");
+            }
+        }
+    }
 
 
 
@@ -389,7 +500,7 @@ Item {
 
                     anchors.fill: parent
 
-                    smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
+                    smooth: bSmooth
 
 
                     onPaint: {  //绘制地图
@@ -505,6 +616,7 @@ Item {
             }
 
 
+
             //精灵容器
             Item {
                 id: itemRoleContainer
@@ -549,6 +661,7 @@ Item {
             }
 
 
+
             //前景地图容器
             Item {
                 id: itemFrontMapContainer
@@ -560,7 +673,7 @@ Item {
 
                     anchors.fill: parent
 
-                    smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
+                    smooth: bSmooth
 
                     opacity: rMapOpacity
 
@@ -676,6 +789,13 @@ Item {
             }
         }
     }
+
+    QtObject {
+        id: _private
+
+
+    }
+
 
 
     /*/游戏对话框

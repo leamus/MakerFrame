@@ -227,10 +227,12 @@ let $config = {
 //游戏初始化（游戏开始和载入存档时调用）
 function *$gameInit() {
 
+    //读取init.js文件的所有变量和函数，并复制给game.gf
     try {
         let initJS = _private.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator));
         Object.assign(game.gf, initJS);
-    }catch(e){}
+    }
+    catch(e){}
 
 
     //每秒恢复
@@ -270,6 +272,11 @@ function *$gameInit() {
     return true;
 }
 
+//游戏退出
+function $gameExit() {
+    game.save();  //存档
+}
+
 
 //存档前调用
 function *$beforeSave() {
@@ -301,7 +308,7 @@ function *$beforeLoadmap(mapName) {
     }
 }
 
-//读档后调用
+//打开地图后调用
 function *$afterLoadmap(mapName) {
     if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
@@ -313,7 +320,7 @@ function *$afterLoadmap(mapName) {
 
 /*/创建战斗角色
 function $createCombatant(fightRoleRId, showName) {
-    //console.debug('[FightScene]createCombatant');
+    //console.debug('createCombatant');
     if(!fightRoleRId)
         fightRoleRId = '深林孤鹰';
     if(!showName)
@@ -396,7 +403,7 @@ function $createCombatant(fightRoleRId, showName) {
 
 //战斗角色
 function $Combatant(fightRoleRId, showName) {
-    //console.debug('[FightScene]$Combatant');
+    //console.debug('$Combatant');
     if(!fightRoleRId)
         fightRoleRId = '深林孤鹰';
     if(!showName)
@@ -584,7 +591,7 @@ let $showGoodsName = function(goods, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(goodsPath + goods.$rid + game.$gameMakerGlobal.separator + goods.$image).
-            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(goods.$image))).
+            arg(game.$gameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -616,7 +623,7 @@ let $showCombatantName = function(combatant, flags=null) {
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(fightRolePath + combatant.$rid + game.$gameMakerGlobal.separator + combatant.$avatar).
-            arg(game.$globalJS.toURL(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar))).
+            arg(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -805,7 +812,7 @@ function *$fightRolesRound(round) {
         if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
         if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
     });
-    //console.debug("[FightScene]all", arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
+    //console.debug("all", arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
 
 
     //循环每个战斗人物
@@ -820,8 +827,8 @@ function *$fightRolesRound(round) {
 }
 
 
-//技能效果算法
-function $skillEffectAlgorithm(combatant, targetCombatant, Params) {
+//战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
+function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //if(!Params)
     //    return;
     //if(Params.Skill === 0)
@@ -960,7 +967,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
         else {
             combatant.$$fightData.$choice.$type = -2;
             //combatant.$$fightData.$choice.$attack = -1;
-            //console.warn('[!FightScene]', combatant.$$fightData.$choice.$type)
+            //console.warn('[!GameCommonScript]', combatant.$$fightData.$choice.$type)
         }
 
     }
@@ -1414,7 +1421,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
             return fightSkill.$check;
     }
     else
-        console.warn('[!GameMakerGlobal]commonCheckSkill:', choiceType);
+        console.warn('[!GameMakerGlobalJS]commonCheckSkill:', choiceType);
 
     //return true;
 }

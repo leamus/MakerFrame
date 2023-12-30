@@ -89,12 +89,12 @@ Item {
         //cfg.SpriteType;
         textSpriteName.text = cfg.SpriteName;
 
-        sprite.spriteSrc = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
+        sprite.spriteSrc = GameMakerGlobal.spriteResourceURL(cfg.Image);
         //textSpriteImageURL.text = cfg.Image;
         //textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf("/") + 1);
         textSpriteImageResourceName.text = cfg.Image;
         textSpriteImageResourceName.enabled = false;
-        textSpriteImageURL.text = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(cfg.Image));
+        textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
         textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
         textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
         textSpriteFrameCount.text = cfg.FrameCount.toString();
@@ -108,7 +108,7 @@ Item {
         textSpriteHeight.text = cfg.SpriteSize[1].toString();
 
         if(cfg.Sound) {
-            textSpriteSoundURL.text = GlobalJS.toURL(GameMakerGlobal.soundResourceURL(cfg.Sound));
+            textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(cfg.Sound);
             sprite.soundeffectName = cfg.Sound;
         }
         else {
@@ -787,7 +787,7 @@ Item {
                     onClicked: {
                         //dialogSpriteImageData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.spriteResourceURL();
+                        let path = GameMakerGlobal.spriteResourcePath();
 
                         l_listSpriteImageResource.show(path, "*", 0x002, 0x00);
                         l_listSpriteImageResource.visible = true;
@@ -829,10 +829,10 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(Global.toPath(textSpriteImageURL.text))) {
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteImageURL.text))) {
                 open();
                 //visible = true;
-                labelSpriteImageDialogTips.text = "路径错误或文件不存在:" + Global.toPath(textSpriteImageURL.text);
+                labelSpriteImageDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteImageURL.text);
                 Platform.showToast("路径错误或文件不存在");
                 return;
             }
@@ -842,7 +842,7 @@ Item {
             //系统图片
             //if(dialogSpriteImageData.nChoiceType === 1) {
             if(checkboxSaveSpriteImageResource.checked) {
-                let ret = FrameManager.sl_qml_CopyFile(Global.toPath(textSpriteImageURL.text), GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text), false);
+                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textSpriteImageURL.text), GameMakerGlobal.spriteResourcePath(textSpriteImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteImageDialogTips.text = "拷贝资源失败，是否重名或目录不可写？";
@@ -861,7 +861,7 @@ Item {
                 //console.debug("ttt", textSpriteImageURL.text, Qt.resolvedUrl(textSpriteImageURL.text))
             }
             //textSpriteImageURL.text = textSpriteImageResourceName.text;
-            textSpriteImageURL.text = GlobalJS.toURL(GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text));
+            textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text);
 
 
             sprite.spriteSrc = textSpriteImageURL.text;
@@ -935,11 +935,11 @@ Item {
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
 
+        //removeButtonVisible: false
+
 
         onClicked: {
-            let filepath = GameMakerGlobal.spriteResourceURL(item);
-
-            textSpriteImageURL.text = GlobalJS.toURL(filepath);
+            textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(item);
             textSpriteImageResourceName.text = item;
             console.debug("[SpriteEditor]List Clicked:", textSpriteImageURL.text)
 
@@ -961,7 +961,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[SpriteEditor]filepath", filepath);
+            console.debug("[SpriteEditor]filepath", textSpriteImageURL.text);
         }
 
         onCanceled: {
@@ -975,17 +975,21 @@ Item {
         }
 
         onRemoveClicked: {
-            /*let dirUrl = Platform.getExternalDataPath() + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
+            let filepath = GameMakerGlobal.spriteResourcePath(item);
 
-            dialogCommon.text = "确认删除?";
-            dialogCommon.fOnAccepted = ()=>{
-                console.debug("[SpriteEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
-                removeItem(index);
-            };
-            dialogCommon.fOnRejected = ()=>{
-            };
-            dialogCommon.open();
-            */
+            dialogCommon.show({
+                Msg: '确认删除？',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function(){
+                    console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
+                    removeItem(index);
+
+                    l_listSpriteImageResource.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    l_listSpriteImageResource.forceActiveFocus();
+                },
+            });
         }
     }
 
@@ -1136,7 +1140,7 @@ Item {
                     onClicked: {
                         //dialogSpriteSoundDataData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.soundResourceURL();
+                        let path = GameMakerGlobal.soundResourcePath();
 
                         l_listSpriteSoundResource.show(path, "*", 0x002, 0x00);
                         l_listSpriteSoundResource.visible = true;
@@ -1194,10 +1198,10 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(Global.toPath(textSpriteSoundURL.text))) {
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteSoundURL.text))) {
                 open();
                 //visible = true;
-                labelSpriteSoundDialogTips.text = "路径错误或文件不存在:" + Global.toPath(textSpriteSoundURL.text);
+                labelSpriteSoundDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteSoundURL.text);
                 Platform.showToast("路径错误或文件不存在");
                 return;
             }
@@ -1207,7 +1211,7 @@ Item {
             //音效
             //if(dialogSpriteSoundData.nChoiceType === 1) {
             if(checkboxSaveSpriteSoundResource.checked) {
-                let ret = FrameManager.sl_qml_CopyFile(Global.toPath(textSpriteSoundURL.text), GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text), false);
+                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textSpriteSoundURL.text), GameMakerGlobal.soundResourcePath(textSpriteSoundResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteSoundDialogTips.text = "拷贝到资源目录失败";
@@ -1227,7 +1231,7 @@ Item {
             }
             //textSpriteSoundURL.text = textSpriteSoundResourceName.text;
 
-            textSpriteSoundURL.text = GlobalJS.toURL(GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text));
+            textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
             sprite.soundeffectName = textSpriteSoundResourceName.text;
 
             textSpriteSoundResourceName.enabled = true;
@@ -1297,13 +1301,13 @@ Item {
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
 
+        //removeButtonVisible: false
+
 
         onClicked: {
-            let filepath = GameMakerGlobal.soundResourceURL(item);
-
-            textSpriteSoundURL.text = GlobalJS.toURL(filepath);
+            textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(item);
             textSpriteSoundResourceName.text = item;
-            console.debug("[SpriteEditor]List Clicked:", textSpriteSoundURL.text)
+            //console.debug("[SpriteEditor]List Clicked:", textSpriteSoundURL.text);
 
             textSpriteSoundURL.enabled = false;
             textSpriteSoundResourceName.enabled = false;
@@ -1323,7 +1327,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[SpriteEditor]filepath", filepath);
+            console.debug("[SpriteEditor]filepath", textSpriteSoundURL.text);
         }
 
         onCanceled: {
@@ -1337,17 +1341,21 @@ Item {
         }
 
         onRemoveClicked: {
-            /*let dirUrl = Platform.getExternalDataPath() + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
+            let filepath = GameMakerGlobal.soundResourcePath(item);
 
-            dialogCommon.text = "确认删除?";
-            dialogCommon.fOnAccepted = ()=>{
-                console.debug("[SpriteEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
-                removeItem(index);
-            };
-            dialogCommon.fOnRejected = ()=>{
-            };
-            dialogCommon.open();
-            */
+            dialogCommon.show({
+                Msg: '确认删除？',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function(){
+                    console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
+                    removeItem(index);
+
+                    l_listSpriteSoundResource.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    l_listSpriteSoundResource.forceActiveFocus();
+                },
+            });
         }
     }
 
@@ -1555,9 +1563,8 @@ Item {
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.json';
 
-            /*if(FrameManager.sl_qml_DirExists(path))
-                ;
-            FrameManager.sl_qml_CreateFolder(path);
+            /*//if(FrameManager.sl_qml_DirExists(path))
+                FrameManager.sl_qml_CreateFolder(path);
             */
 
 

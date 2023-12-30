@@ -665,8 +665,8 @@ NPC事件的四种写法（前两种支持同步调用）：
     function *$gameOverScript(params) {
     //通用逃跑算法
     function $runAwayAlgorithm(team, roleIndex) {
-    //技能效果算法
-    function $skillEffectAlgorithm(team1, team2, skillEffect) {
+    //战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
+    function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //战斗开始通用脚本；
     function *$commonFightStartScript() {
     //战斗回合通用脚本；

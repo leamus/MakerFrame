@@ -4,6 +4,12 @@ import QtQuick 2.14
 import Qt.labs.settings 1.1
 
 
+import _Global 1.0
+
+
+import "qrc:/QML"
+
+
 import "GameMakerGlobal.js" as GameMakerGlobalJS
 
 
@@ -105,25 +111,29 @@ QtObject {
 
     //下面函数是返回 某类型资源 的绝对路径（参数都是可选）
 
-    function mapResourceURL(filepath) {
+    property var mapResourceURL: filepath=>GlobalJS.toURL(mapResourcePath(filepath))
+    function mapResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMapResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
-    function roleResourceURL(filepath) {
+    property var roleResourceURL: filepath=>GlobalJS.toURL(roleResourcePath(filepath))
+    function roleResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strRoleResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
-    function spriteResourceURL(filepath) {
+    property var spriteResourceURL: filepath=>GlobalJS.toURL(spriteResourcePath(filepath))
+    function spriteResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSpriteResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
-    function goodsResourceURL(filepath) {
+    property var goodsResourceURL: filepath=>GlobalJS.toURL(goodsResourcePath(filepath))
+    function goodsResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strGoodsResourceDirName;
         if(filepath)
             return ret + separator + filepath;
@@ -131,7 +141,8 @@ QtObject {
     }
 
 
-    function soundResourceURL(filepath) {
+    property var soundResourceURL: filepath=>GlobalJS.toURL(soundResourcePath(filepath))
+    function soundResourcePath(filepath) {
         let ret;
 
         if(!filepath)
@@ -164,7 +175,8 @@ QtObject {
         return ret;
     }
 
-    function musicResourceURL(filepath) {
+    property var musicResourceURL: filepath=>GlobalJS.toURL(musicResourcePath(filepath))
+    function musicResourcePath(filepath) {
         let ret;
 
         if(!filepath)
@@ -197,7 +209,8 @@ QtObject {
         return ret;
     }
 
-    function imageResourceURL(filepath) {
+    property var imageResourceURL: filepath=>GlobalJS.toURL(imageResourcePath(filepath))
+    function imageResourcePath(filepath) {
         let ret;
 
         if(!filepath)
@@ -230,7 +243,8 @@ QtObject {
         return ret;
     }
 
-    function videoResourceURL(filepath) {
+    property var videoResourceURL: filepath=>GlobalJS.toURL(videoResourcePath(filepath))
+    function videoResourcePath(filepath) {
         let ret;
 
         if(!filepath)
@@ -263,27 +277,31 @@ QtObject {
         return ret;
     }
 
+
+
     Component.onCompleted: {
-        //提交访问信息
-        let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
-        let xhr = new XMLHttpRequest;
-        xhr.open("POST", url, true);  //建立间接，要求异步响应
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
-        xhr.onreadystatechange = function() {  //绑定响应状态事件监听函数
-            if (xhr.readyState == 4) {  //监听readyState状态
-                if (xhr.status == 200) {  //监听HTTP状态码
-                    //console.log('XMLHttpRequest:', xhr.responseText);  //接收数据
-                    //infoCallback(JSON.parse(xhr.responseText));
+        if(Platform.compileType() === 'release') {
+            //提交访问信息
+            let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
+            let xhr = new XMLHttpRequest;
+            xhr.open("POST", url, true);  //建立间接，要求异步响应
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
+            xhr.onreadystatechange = function() {  //绑定响应状态事件监听函数
+                if (xhr.readyState == 4) {  //监听readyState状态
+                    if (xhr.status == 200) {  //监听HTTP状态码
+                        //console.log('XMLHttpRequest:', xhr.responseText);  //接收数据
+                        //infoCallback(JSON.parse(xhr.responseText));
+                    }
+                    else
+                        //0, '', '网页内容', object, null, '',
+                        console.warn('Request ERROR:', xhr.status, xhr.statusText/*, xhr.responseText*/, xhr, xhr.responseXML, xhr.responseType, url);
                 }
-                else
-                    //0, '', '网页内容', object, null, '',
-                    console.warn('Request ERROR:', xhr.status, xhr.statusText/*, xhr.responseText*/, xhr, xhr.responseXML, xhr.responseType, url);
+                //else
+                //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
             }
-            //else
-            //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
+            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}`);  //发送请求
+            //xhr.send();
         }
-        xhr.send(`client=${Qt.platform.os}_${Platform.sysInfo.buildCpuArchitecture}(${Platform.compileType()})&product=${settings.category}&timestamp=${Number(new Date())}`);  //发送请求
-        //xhr.send();
 
 
         FrameManager.addImportPath(urlRPGCorePath);

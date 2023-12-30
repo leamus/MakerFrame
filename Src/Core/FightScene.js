@@ -676,7 +676,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         return 1;
         //break;
 
-    case 3:    //结算 技能效果
+    case 3:    //调用战斗技能算法
         SkillEffectResult = game.$sys.resources.commonScripts["fight_skill_algorithm"](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
         //SkillEffectResult = (doSkillEffect(role1.$$fightData.$teams, role1.$$fightData.$index, role2.$$fightData.$teams, role2.$$fightData.$index, tSkillEffect));
 
