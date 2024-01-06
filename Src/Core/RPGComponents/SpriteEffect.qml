@@ -33,7 +33,7 @@ Item {
 
 
     //被点击
-    signal s_clicked();
+    //signal s_clicked();
 
     //每次播放结束
     signal s_looped();
@@ -106,6 +106,9 @@ Item {
     property point offsetIndex: Qt.point(0, 0)  //行、列 偏移
     property real rXScale: 1        //1为原图，-1为X轴镜像，其他值为X轴缩放
     property real rYScale: 1        //1为原图，-1为Y轴镜像，其他值为Y轴缩放
+    property alias offsetX: animatedsprite.x
+    property alias offsetY: animatedsprite.y
+
 
     property alias animatedsprite: animatedsprite
     property alias running: animatedsprite.running
@@ -121,9 +124,11 @@ Item {
     property alias nColorOverlayStep: colorOverlay.nStep
     property alias nColorOverlayInterval: colorOverlay.nInterval
 
+    property alias mouseArea: mouseArea
+
 
     //测试，可以点击和显示调试信息
-    property alias test: mouseArea.enabled
+    property bool bTest: false
 
 
     //是否准备开始（不适用系统的running是因为系统先调用current
@@ -145,7 +150,8 @@ Item {
 
         width: root.width; height: root.height     //一个帧的大小，会缩放
 
-        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.verticalCenter: parent.verticalCenter
 
         smooth: true
 
@@ -162,7 +168,7 @@ Item {
         frameDuration: interval     //切换速度
 
         onRunningChanged: {
-            if(test)
+            if(bTest)
                 console.debug('!!!RunningChanged:', running, spriteSrc);
         }
 
@@ -174,7 +180,7 @@ Item {
         onFinished: {
             timerSound.stop();
             root.s_finished();
-            if(test)
+            if(bTest)
                 console.debug('!!!onFinished:', loops, soundeffect.source, finished, spriteSrc);
         }
 
@@ -202,7 +208,7 @@ Item {
                 root.s_looped();
             }
 
-            if(test)
+            if(bTest)
                 console.debug('!!!onCurrentFrameChanged:', currentFrame);
         }
 
@@ -239,8 +245,8 @@ Item {
             color = arrColors[nStep];
         }
 
-        anchors.fill: animatedsprite;
-        source: animatedsprite;
+        anchors.fill: animatedsprite
+        source: animatedsprite
         color: "#00000000"
 
         Behavior on color {
@@ -323,7 +329,7 @@ Item {
             root.s_looped();
             root.s_finished();
 
-            if(test)
+            if(bTest)
                 console.debug('!!!timerInterval onTriggered', interval);
         }
     }
@@ -358,7 +364,7 @@ Item {
         anchors.fill: parent
         onClicked: {
             root.restart();
-            s_clicked();
+            //s_clicked();
 
             //console.debug('!!!start')
         }

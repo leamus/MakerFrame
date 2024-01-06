@@ -14,7 +14,7 @@ Item {
     id: root
 
 
-    signal s_clicked();
+    //signal s_clicked();
 
 
 
@@ -33,6 +33,7 @@ Item {
     }
 
     //开始播放动画（和方向有关）
+    //running为 boolean 为是否运行，为其他值保持不变
     function start(tdirect, running=true) {
         //if(walkSprite === undefined)
         //    return;
@@ -141,13 +142,13 @@ Item {
     property alias nDirection: walkSprite.nDirection
 
 
-    property var test: false
+    property bool bTest: false
 
 
     width: 0
     height: 0
-    //implicitWidth: width
-    //implicitHeight: height
+    implicitWidth: walkSprite.running ? walkSprite.implicitWidth : actionSprite.implicitWidth
+    implicitHeight: walkSprite.running ? walkSprite.implicitHeight : actionSprite.implicitHeight
 
     focus: true
 
@@ -227,12 +228,15 @@ Item {
         property int nDirection: -1
 
         //width: root.width; height: root.height     //一个帧的大小，会缩放
-        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.verticalCenter: parent.verticalCenter
 
         smooth: true
 
         animatedsprite.loops: AnimatedSprite.Infinite
 
+
+        bTest: root.bTest
     }
 
 
@@ -247,6 +251,7 @@ Item {
             start();
         }
 
+
         onS_finished: {
             visible = false;
             walkSprite.visible = true;
@@ -255,12 +260,15 @@ Item {
 
         visible: false
         //width: root.width; height: root.height     //一个帧的大小，会缩放
-        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.verticalCenter: parent.verticalCenter
 
         smooth: true
 
         animatedsprite.loops: AnimatedSprite.Infinite
 
+
+        bTest: root.bTest
     }
 
 
@@ -289,7 +297,7 @@ Item {
 
         anchors.fill: parent
         onClicked: {
-            if(test) {
+            if(bTest) {
                 ++nIndex;
                 if(nIndex > 3)
                     nIndex = 0;
@@ -320,7 +328,7 @@ Item {
                 //console.debug("[Role]Test Start");
             }
 
-            s_clicked();
+            //s_clicked();
         }
     }
 

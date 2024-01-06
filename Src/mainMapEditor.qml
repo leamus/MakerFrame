@@ -88,7 +88,7 @@ Item {
             let cfg = FrameManager.sl_qml_ReadFile(filePath);
             //console.debug("[mainMapEditor]filePath：", filePath);
 
-            if(cfg === "")
+            if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
             //console.debug("cfg", cfg);
@@ -619,7 +619,7 @@ Item {
             let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
             //console.debug("cfg", cfg);
 
-            if(cfg === "")
+            if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
             //console.debug("cfg", cfg);
@@ -725,7 +725,7 @@ Item {
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
             console.debug("cfg", cfg, fileUrl);
 
-            if(cfg === "")
+            if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
             //console.debug("cfg", cfg);

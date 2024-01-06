@@ -35,20 +35,24 @@ Item {
 
 
     //打开地图
-    function openMap(mapPath) {
+    function openMap(mapPath, mapInfo=null) {
 
         itemBackMapContainer.visible = false;
         itemFrontMapContainer.visible = false;
 
-        //let cfg = File.read(mapPath);
-        let mapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
-        //console.debug("cfg", cfg, mapPath);
+        if(!mapInfo) {
+            //let cfg = File.read(mapPath);
+            mapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
+            //console.debug("cfg", cfg, mapPath);
 
-        if(mapInfo === "")
-            return false;
-        mapInfo = JSON.parse(mapInfo);
-        //console.debug("cfg", cfg);
-        //loader.setSource("./MapEditor_1.qml", {});
+            if(!mapInfo) {
+                console.warn('[!GameMapView]Map Load Error:', mapName, mapPath);
+                return false;
+            }
+            mapInfo = JSON.parse(mapInfo);
+            //console.debug("cfg", cfg);
+            //loader.setSource("./MapEditor_1.qml", {});
+        }
 
 
         //地图数据
@@ -110,9 +114,18 @@ Item {
             itemContainer.mapEventBlocks[parseInt(p[0]) + parseInt(p[1]) * itemContainer.mapInfo.MapSize[0]] = itemContainer.mapInfo.MapEventData[i];
         }
 
-        //console.debug("itemContainer.mapEventBlocks", JSON.stringify(itemContainer.mapEventBlocks))
+        itemContainer.mapSpecialBlocks = {};
+        //转换事件的地图块的坐标为地图块的ID
+        for(let i in itemContainer.mapInfo.MapBlockSpecialData) {
+            let p = i.split(',');
+            itemContainer.mapSpecialBlocks[parseInt(p[0]) + parseInt(p[1]) * itemContainer.mapInfo.MapSize[0]] = itemContainer.mapInfo.MapBlockSpecialData[i];
+        }
 
-        return true;
+
+        console.debug('[GameMapView]openMap', mapPath, itemViewPort.itemContainer.width, itemViewPort.itemContainer.height);
+        //console.debug("mapEventBlocks,mapSpecialBlocks", JSON.stringify(itemContainer.mapEventBlocks), JSON.stringify(itemContainer.mapSpecialBlocks));
+
+        return mapInfo;
     }
 
     //释放
@@ -263,6 +276,10 @@ Item {
         return cm;
     }
 
+    function canvasMask(index) {
+        return arrCanvasMask[index];
+    }
+
     function refreshCanvasMask(index, data) {
         arrCanvasMask[index].objMaskData = data;
         arrCanvasMask[index].requestPaint();
@@ -293,12 +310,13 @@ Item {
 
     property alias gameScene: gameScene
     property alias itemContainer: itemContainer
-
     property alias itemRoleContainer: itemRoleContainer
     property alias itemBackMapContainer: itemBackMapContainer
     property alias itemFrontMapContainer: itemFrontMapContainer
     property alias canvasBackMap: canvasBackMap
     property alias canvasFrontMap: canvasFrontMap
+
+    property alias mapInfo: itemContainer.mapInfo
 
     property alias mouseArea: mouseArea
 
@@ -441,7 +459,9 @@ Item {
 
 
             property var mapInfo: null          //地图数据（map.json）
-            property var mapEventBlocks: ({})   //有事件的地图块ID（换算后的）
+
+            property var mapEventBlocks: ({})   //有事件的地图块ID（从左到右从上到下从0开始的ID）
+            property var mapSpecialBlocks: ({})   //有特殊标记的地图块ID（从左到右从上到下从0开始的ID）
 
             //property var image1: "1.jpg"
             //property var image2: "2.png"

@@ -282,11 +282,9 @@ let $config = {
 function *$gameInit() {
 
     //读取init.js文件的所有变量和函数，并复制给game.gf
-    try {
-        let initJS = _private.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator));
+    let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator));
+    if(initJS)
         Object.assign(game.gf, initJS);
-    }
-    catch(e){}
 
 
     //每秒恢复
@@ -441,6 +439,8 @@ function $Combatant(fightRoleRId, showName) {
             $index: -1,              //所在队伍下标
             $teamsID: [0, 1],         //0：我方；1：敌方；2：友军。下标：己方、对方、友方
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
+
+            //RPG组件：
             $teamsComp: [],
             $comp: null,
             $spriteEffect: null,
@@ -1542,7 +1542,8 @@ function *$commonFightInitScript(teams, fightData) {
     if(fightInitScript)
         yield fight.run([fightInitScript, 'fight init2'], -2, teams, fightData);
 
-    if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
+    if('FightInitScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
         yield fight.run([fightData.FightInitScript, 'fight init3'], -2, teams, fightData);
 }
 
@@ -1561,7 +1562,8 @@ function *$commonFightStartScript(teams, fightData) {
         yield fight.run([fightStartScript, 'fight start2'], -2, teams, fightData);
 
     //fighting战斗的回调函数
-    if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
+    if('FightStartScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
         yield fight.run([fightData.FightStartScript, 'fight start3'], -2, teams, fightData);
 
 }
@@ -1580,7 +1582,8 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
         yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
 
     //fighting战斗的回调函数
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
+    if('FightRoundScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
         yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
     */
 
@@ -1616,7 +1619,8 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
         yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
 
     //fighting战斗的回调函数
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
+    if('FightRoundScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
         yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
 
 }
@@ -1636,7 +1640,8 @@ function *$commonFightEndScript(r, teams, fightData) {
         yield fight.run([fightEndScript, 'fight end20'], -2, r, 0, teams, fightData);
 
     //fighting战斗的回调函数
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
+    if('FightEndScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
         yield fight.run([fightData.FightEndScript, 'fight end30'], -2, r, 0, teams, fightData);
 
 
@@ -1697,7 +1702,8 @@ function *$commonFightEndScript(r, teams, fightData) {
         game.run([fightEndScript, 'fight end21'], -1, r, 1, teams, fightData);
 
     //fighting战斗的回调函数
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
+    if('FightEndScript' in fightData)
+    //if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
         game.run([fightData.FightEndScript, 'fight end31'], -1, r, 1, teams, fightData);
 
 

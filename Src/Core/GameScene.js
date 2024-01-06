@@ -533,17 +533,18 @@ function loadResources() {
         for(let item of items) {
             let data = getGoodsResource(item, true);
             if(data) {
-                console.debug("[GameScene]载入Goods", item);
+                //console.debug("[GameScene]载入Goods", item);
             }
-            else
-                console.warn("[!GameScene]载入Goods ERROR", item);
+            else {
+                //console.warn("[!GameScene]载入Goods ERROR", item);
+            }
 
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "goods.json";
             //console.debug(path, items, item, filePath)
             let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
-            if(data !== "") {
+            if(data) {
                 data = JSON.parse(data);
                 let t = GlobalJS._eval(data["Goods"]);
                 if(t) {
@@ -567,17 +568,18 @@ function loadResources() {
         for(let item of items) {
             let data = getSkillResource(item, true);
             if(data) {
-                console.debug("[GameScene]载入FightSkill", item);
+                //console.debug("[GameScene]载入FightSkill", item);
             }
-            else
-                console.warn("[!GameScene]载入FightSkill ERROR", item);
+            else {
+                //console.warn("[!GameScene]载入FightSkill ERROR", item);
+            }
 
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_skill.json";
             //console.debug(path, items, item, filePath)
             let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
-            if(data !== "") {
+            if(data) {
                 data = JSON.parse(data);
                 let t = GlobalJS._eval(data["FightSkill"]);
                 if(t) {
@@ -601,11 +603,11 @@ function loadResources() {
         for(let item of items) {
             let data = getFightScriptResource(item, true);
             if(data) {
-                console.debug("[GameScene]载入FightScript", item);
+                //console.debug("[GameScene]载入FightScript", item);
             }
-            else
-                console.warn("[!GameScene]载入FightScript ERROR", item);
-
+            else {
+                //console.warn("[!GameScene]载入FightScript ERROR", item);
+            }
 
         }
     }
@@ -620,10 +622,11 @@ function loadResources() {
         for(let item of items) {
             let data = getFightRoleResource(item, true);
             if(data) {
-                console.debug("[GameScene]载入FightRole Script", item);
+                //console.debug("[GameScene]载入FightRole Script", item);
             }
-            else
-                console.warn("[!GameScene]载入FightRole Script ERROR", item);
+            else {
+                //console.warn("[!GameScene]载入FightRole Script ERROR", item);
+            }
 
 
 
@@ -657,12 +660,48 @@ function loadResources() {
             //console.debug(path, items, item)
             let data = getSpriteResource(item, true);
             if(data) {
-                console.debug("[GameScene]载入Sprite", item);
+                //console.debug("[GameScene]载入Sprite", item);
             }
-            else
-                console.warn("[!GameScene]载入Sprite ERROR", item);
+            else {
+                //console.warn("[!GameScene]载入Sprite ERROR", item);
+            }
         }
     }
+
+    if(_private.config.nLoadAllResources) {
+        //读特效信息
+        path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName;
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+
+        for(let item of items) {
+            //console.debug(path, items, item)
+            let data = getRoleResource(item, true);
+            if(data) {
+                //console.debug("[GameScene]载入Role", item);
+            }
+            else {
+                //console.warn("[!GameScene]载入Role ERROR", item);
+            }
+        }
+    }
+
+    if(_private.config.nLoadAllResources) {
+        //读特效信息
+        path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName;
+        items = FrameManager.sl_qml_listDir(GlobalJS.toPath(path), "*", 0x001 | 0x2000 | 0x4000, 0x00);
+
+        for(let item of items) {
+            //console.debug(path, items, item)
+            let data = getMapResource(item, true);
+            if(data) {
+                //console.debug("[GameScene]载入Map", item);
+            }
+            else {
+                //console.warn("[!GameScene]载入Map ERROR", item);
+            }
+        }
+    }
+
 
 
     //let data;
@@ -674,7 +713,7 @@ function loadResources() {
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
-    if(data !== "") {
+    if(data) {
         data = JSON.parse(data)["List"];
         for(let m in data) {
             _private.objImages[data[m]["Name"]] = data[m]["URL"];
@@ -689,7 +728,7 @@ function loadResources() {
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
-    if(data !== "") {
+    if(data) {
         data = JSON.parse(data)["List"];
         for(let m in data) {
             _private.objMusic[data[m]["Name"]] = data[m]["URL"];
@@ -704,7 +743,7 @@ function loadResources() {
     //console.debug("data", filePath, data)
     //console.debug("cfg", cfg, filePath);
 
-    if(data !== "") {
+    if(data) {
         data = JSON.parse(data)["List"];
         for(let m in data) {
             _private.objVideos[data[m]["Name"]] = data[m]["URL"];
@@ -840,6 +879,8 @@ function unloadResources() {
             _private.spritesResource[i].$$cache.audio.destroy();
     }
     _private.spritesResource = {};
+    _private.rolesResource = {};
+    _private.mapsResource = {};
 
     rootSoundEffect.objCacheSoundEffects = {};
 
@@ -880,12 +921,12 @@ function getCommonScriptResource(flags=0b1, defaultValue, ...names) {
 
 
 //获取 Goods 资源
-function getGoodsResource(item, forceReload=false) {
+function getGoodsResource(item, forceLoad=false) {
 
     //读取
     if(_private.goodsResource[item]) //如果有
         return _private.goodsResource[item];
-    else if(_private.config.nLoadAllResources && !forceReload)  //如果已经加载了所有的资源
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
         return null;
 
 
@@ -907,19 +948,21 @@ function getGoodsResource(item, forceReload=false) {
         else
             _private.goodsResource[item].__proto__ = _proto_;
 
+        console.debug("[GameScene]载入Goods", item);
         return data;
     }
 
+    console.warn("[!GameScene]载入Goods ERROR", item);
     return null;
 }
 
 //获取 Skills 资源
-function getSkillResource(item, forceReload=false) {
+function getSkillResource(item, forceLoad=false) {
 
     //读取
     if(_private.skillsResource[item]) //如果有
         return _private.skillsResource[item];
-    else if(_private.config.nLoadAllResources && !forceReload)  //如果已经加载了所有的资源
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
         return null;
 
 
@@ -941,19 +984,21 @@ function getSkillResource(item, forceReload=false) {
         else
             _private.skillsResource[item].__proto__ = _proto_;
 
+        console.debug("[GameScene]载入FightSkill", item);
         return data;
     }
 
+    console.warn("[!GameScene]载入FightSkill ERROR", item);
     return null;
 }
 
 //获取 FightScript 资源
-function getFightScriptResource(item, forceReload=false) {
+function getFightScriptResource(item, forceLoad=false) {
 
     //读取
     if(_private.fightScriptsResource[item]) //如果有
         return _private.fightScriptsResource[item];
-    else if(_private.config.nLoadAllResources && !forceReload)  //如果已经加载了所有的资源
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
         return null;
 
 
@@ -975,19 +1020,21 @@ function getFightScriptResource(item, forceReload=false) {
         else
             _private.fightScriptsResource[item].__proto__ = _proto_;
 
+        console.debug("[GameScene]载入FightScript", item);
         return data;
     }
 
+    console.warn("[!GameScene]载入FightScript ERROR", item);
     return null;
 }
 
 //获取 FightRole 资源
-function getFightRoleResource(item, forceReload=false) {
+function getFightRoleResource(item, forceLoad=false) {
 
     //读取
     if(_private.fightRolesResource[item]) //如果有
         return _private.fightRolesResource[item];
-    else if(_private.config.nLoadAllResources && !forceReload)  //如果已经加载了所有的资源
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
         return null;
 
 
@@ -1012,20 +1059,23 @@ function getFightRoleResource(item, forceReload=false) {
             _private.fightRolesResource[item].__proto__ = _private.objCommonScripts["combatant_class"].prototype;
         }
 
+        console.debug("[GameScene]载入FightRole Script", item);
         return data;
     }
 
+    console.warn("[!GameScene]载入FightRole Script ERROR", item);
     return null;
 }
 
 
+
 //获取 Sprite 资源
-function getSpriteResource(item, forceReload=false) {
+function getSpriteResource(item, forceLoad=false) {
 
     //读取
     if(_private.spritesResource[item]) //如果有
         return _private.spritesResource[item];
-    else if(_private.config.nLoadAllResources && !forceReload)  //如果已经加载了所有的资源
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
         return null;
 
 
@@ -1055,12 +1105,77 @@ function getSpriteResource(item, forceReload=false) {
         let cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
+        console.debug("[GameScene]载入Sprite", item);
         return data;
     }
 
+    console.warn("[!GameScene]载入Sprite ERROR", item);
     return null;
 }
 
+//获取 Role 资源
+function getRoleResource(item, forceLoad=false) {
+
+    //读取
+    if(_private.rolesResource[item]) //如果有
+        return _private.rolesResource[item];
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
+        return null;
+
+
+    //读角色信息
+    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName;
+
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.json"));
+    if(data)
+        data = JSON.parse(data);
+
+    //写入
+    if(data) {
+        _private.rolesResource[item] = data;
+        _private.rolesResource[item].$rid = item;
+        //_private.rolesResource[item].__proto__ = _private.rolesResource[item].$commons;
+
+        console.debug("[GameScene]载入Role", item);
+        return data;
+    }
+
+    console.warn("[!GameScene]载入Role ERROR", item);
+    return null;
+}
+
+//获取 Map 资源
+function getMapResource(item, forceLoad=false) {
+
+    //读取
+    if(_private.mapsResource[item]) //如果有
+        return _private.mapsResource[item];
+    else if(_private.config.nLoadAllResources && !forceLoad)  //如果已经加载了所有的资源
+        return null;
+
+
+    //读特效信息
+    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName;
+
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json"));
+    if(data)
+        data = JSON.parse(data);
+
+    //写入
+    if(data) {
+        _private.mapsResource[item] = data;
+        _private.mapsResource[item].$rid = item;
+        //_private.mapsResource[item].__proto__ = _private.mapsResource[item].$commons;
+
+        let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(path + GameMakerGlobal.separator + item));
+
+        console.debug("[GameScene]载入Map", item);
+        return data;
+    }
+
+    console.warn("[!GameScene]载入Map ERROR", item);
+    return null;
+}
 
 
 
@@ -1071,7 +1186,7 @@ function getSkillObject(skill, forceNew=true) {
     if(GlobalLibraryJS.isString(skill)) {
         let resSkill = GameSceneJS.getSkillResource(skill);
         if(!resSkill) {
-            console.warn('[!GameScene]没有技能：', skill);
+            //console.warn('[!GameScene]没有技能：', skill);
             return null;
         }
 
@@ -1111,7 +1226,7 @@ function getSkillObject(skill, forceNew=true) {
         else {
             resSkill = GameSceneJS.getSkillResource(skill.RId);
             if(!resSkill) {
-                console.warn('[!GameScene]没有技能：', skill.RId);
+                //console.warn('[!GameScene]没有技能：', skill.RId);
                 return null;
             }
 
@@ -1141,7 +1256,7 @@ function getGoodsObject(goods, forceNew=true) {
     if(GlobalLibraryJS.isString(goods)) {
         let resGoods = GameSceneJS.getGoodsResource(goods);
         if(!resGoods) {
-            console.warn('[!GameScene]没有道具：', goods);
+            //console.warn('[!GameScene]没有道具：', goods);
             return null;
         }
 
@@ -1181,7 +1296,7 @@ function getGoodsObject(goods, forceNew=true) {
         else {
             resGoods = GameSceneJS.getGoodsResource(goods.RId);
             if(!resGoods) {
-                console.warn('[!GameScene]没有道具：', goods.RId);
+                //console.warn('[!GameScene]没有道具：', goods.RId);
                 return null;
             }
 
@@ -1237,7 +1352,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
     if(GlobalLibraryJS.isString(fightrole)) {
         let resFightRole = GameSceneJS.getFightRoleResource(fightrole);
         if(!resFightRole) {
-            console.warn('[!GameScene]没有战斗角色：', fightrole);
+            //console.warn('[!GameScene]没有战斗角色：', fightrole);
             return null;
         }
 
@@ -1275,7 +1390,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
         else {
             resFightRole = GameSceneJS.getFightRoleResource(fightrole.RId);
             if(!resFightRole) {
-                console.warn('[!GameScene]没有战斗角色：', fightrole.RId);
+                //console.warn('[!GameScene]没有战斗角色：', fightrole.RId);
                 return null;
             }
             //创建战斗人物
@@ -1345,7 +1460,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
     if(GlobalLibraryJS.isString(fightscript)) {
         let resFightScript = GameSceneJS.getFightScriptResource(fightscript);
         if(!resFightScript) {
-            console.warn('[!GameScene]没有战斗脚本：', fightscript);
+            //console.warn('[!GameScene]没有战斗脚本：', fightscript);
             return null;
         }
 
@@ -1387,7 +1502,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
         else {
             resFightScript = GameSceneJS.getFightScriptResource(fightscript.RId);
             if(!resFightScript) {
-                console.warn('[!GameScene]没有战斗脚本：', fightscript.RId);
+                //console.warn('[!GameScene]没有战斗脚本：', fightscript.RId);
                 return null;
             }
 
@@ -1422,7 +1537,11 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
     let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     */
 
-    let data = GameSceneJS.getSpriteResource(spriteEffectRId);
+    let data;
+    if(GlobalLibraryJS.isString(spriteEffectRId))
+        data = GameSceneJS.getSpriteResource(spriteEffectRId);
+    else
+        data = spriteEffectRId;
 
     if(data) {
         if(!spriteEffect) {
@@ -1442,6 +1561,8 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
         //spriteEffect.height = parseInt(textSpriteHeight.text);
         spriteEffect.implicitWidth = parseInt(data.SpriteSize[0]);
         spriteEffect.implicitHeight = parseInt(data.SpriteSize[1]);
+        spriteEffect.offsetX = data.XOffset !== undefined ? parseInt(data.XOffset) : 0;
+        spriteEffect.offsetY = data.YOffset !== undefined ? parseInt(data.YOffset) : 0;
         spriteEffect.opacity = parseFloat(data.Opacity);
         spriteEffect.rXScale = parseFloat(data.XScale);
         spriteEffect.rYScale = parseFloat(data.YScale);
@@ -1461,7 +1582,57 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
         return spriteEffect;
     }
 
-    console.warn("[!GameScene]载入特效失败：" + spriteEffectRId);
+    //console.warn("[!GameScene]载入特效失败：" + spriteEffectRId);
+    return null;
+}
+
+//载入角色，返回角色对象
+//如果 roleComp 为null，则 创建1个 roleComp 组件并返回
+function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
+    //console.debug("[FightScene]loadRoleComp0");
+
+    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRId + GameMakerGlobal.separator + "role.json";
+    //console.debug("[FightScene]filePath2：", filePath);
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+    */
+
+    let data;
+    if(GlobalLibraryJS.isString(roleRId))
+        data = GameSceneJS.getRoleResource(roleRId);
+    else
+        data = roleRId;
+
+    if(data) {
+        if(!roleComp) {
+            roleComp = compRole.createObject(parent);
+            roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+            roleComp.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+        }
+
+        roleComp.spriteSrc = GameMakerGlobal.roleResourceURL(data.Image);
+        roleComp.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
+        roleComp.nFrameCount = data.FrameCount;
+        roleComp.arrFrameDirectionIndex = data.FrameIndex;
+        roleComp.interval = data.FrameInterval;
+        //roleComp.implicitWidth = data.RoleSize[0];
+        //roleComp.implicitHeight = data.RoleSize[1];
+        roleComp.width = data.RoleSize[0];
+        roleComp.height = data.RoleSize[1];
+        roleComp.x1 = data.RealOffset[0];
+        roleComp.y1 = data.RealOffset[1];
+        roleComp.width1 = data.RealSize[0];
+        roleComp.height1 = data.RealSize[1];
+        roleComp.rectShadow.opacity = isNaN(parseFloat(data.ShadowOpacity)) ? 0.3 : parseFloat(data.ShadowOpacity);
+
+        //roleComp.bTest = true;
+
+        roleComp.refresh();
+
+
+        return [data, roleComp];
+    }
+
+    //console.warn("[!GameScene]载入角色失败：" + roleRId);
     return null;
 }
 
@@ -1874,7 +2045,7 @@ function onTriggered() {
             offsetMoveX = role.$$arrMoveDirection[0] !== 0 ? (offsetMoveX || 1) : 0;
             offsetMoveY = role.$$arrMoveDirection[1] !== 0 ? (offsetMoveY || 1) : 0;
 
-            //x、y轴上移动的方向
+            //x、y轴上移动的方向（x为1、3表示右、左；y为0、2表示上、下）
             let directionX = offsetMoveX === 0 ? -1 : role.$$arrMoveDirection[0] > 0 ? 1 : 3;
             let directionY = offsetMoveY === 0 ? -1 : role.$$arrMoveDirection[1] > 0 ? 2 : 0;
 
@@ -2098,7 +2269,6 @@ function onTriggered() {
                 else {
                     mainRole.$$targetsPos.shift();
                     if(mainRole.$$targetsPos.length === 0) {
-                        mainRole.$$nActionType = 0;
                         _private.stopAction(1, -1);
 
 
@@ -2341,7 +2511,7 @@ function onTriggered() {
         let offsetMoveX = 0;
         let offsetMoveY = 0;
 
-        const dta = _private.rSceneMoveSpeed * realinterval;
+        const dta = _private.config.rSceneMoveSpeed * realinterval;
 
         //let arrKeys = Object.keys(_private.arrPressedKeys);
         if(_private.arrPressedKeys.length > 0) {
@@ -2412,14 +2582,15 @@ function onTriggered() {
 
 
 //计算角色多方向行动时的偏移
+//direction：x、y轴上移动的方向（x为1、3表示右、左；y为0、2表示上、下）
 //注意：当 单向移动时，返回可以移动的偏移（因为定向移动还需要判断一次）；
 function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY) {
     if(directionX === -1 || directionY === -1) {
-        if(directionX !== -1)   //如果只是y方向移动
+        if(directionX !== -1)   //如果x方向移动
             offsetMoveX = fComputeRoleMoveOffset(role, directionX, offsetMoveX);
         else
             offsetMoveX = 0;
-        if(directionY !== -1)   //如果只是y方向移动
+        if(directionY !== -1)   //如果y方向移动
             offsetMoveY = fComputeRoleMoveOffset(role, directionY, offsetMoveY);
         else
             offsetMoveY = 0;

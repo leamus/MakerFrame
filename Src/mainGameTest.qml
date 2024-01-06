@@ -174,7 +174,7 @@ Item {
                 let cfg = FrameManager.sl_qml_ReadFile(filePath);
                 //console.debug("cfg", cfg, filePath);
 
-                if(cfg === "")
+                if(!cfg)
                     return false;
                 cfg = JSON.parse(cfg);
                 //console.debug("cfg", cfg);

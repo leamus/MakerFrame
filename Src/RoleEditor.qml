@@ -1063,7 +1063,7 @@ Item {
 
                     anchors.fill: parent
 
-                    test: true
+                    bTest: true
                     //width: 37;
                     //height: 58;
 
@@ -1079,9 +1079,9 @@ Item {
                     height1: 58;
                     moveSpeed: 100;*/
 
-                    onS_clicked: {
+                    /*onS_clicked: {
                         root.forceActiveFocus();
-                    }
+                    }*/
                 }
             }
         }
@@ -1520,7 +1520,6 @@ Item {
             width: parent.width
             placeholderText: "输入脚本命令"
 
-            //textFormat: Text.RichText
             selectByKeyboard: true
             selectByMouse: true
             wrapMode: TextEdit.Wrap

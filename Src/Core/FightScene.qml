@@ -29,7 +29,7 @@ import "FightScene.js" as FightSceneJS
 
 
 /*
-    鹰：_private.myCombatants 和 _private.enemies 是 我方和敌方 的数据（$Combatant()返回的对象）
+    鹰：fight.myCombatants 和 fight.enemies 是 我方和敌方 的数据（$Combatant()返回的对象）
       repeaterMyCombatants 和 repeaterEnemies 是 我方和敌方 的精灵组件，和上面一一对应，用itemAt()来获取
 */
 
@@ -121,7 +121,9 @@ Item {
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
 
-        _private.enemies = [];
+        //我方
+        fight.myCombatants = [...game.fighthero()];
+        fight.enemies = [];
         ////_private.arrTempLoopedAllFightRoles = [];
         _private.nRound = 0;
         //_private.nStep = 0;
@@ -151,9 +153,10 @@ Item {
             //console.debug("[GameFightScript]filePath：", filePath);
 
             data = FrameManager.sl_qml_ReadFile(filePath);
+            if(!data)
+                return;
             data = JSON.parse(data);
-
-            if(data === "") {
+            if(!data) {
                 return;
             }
         }
@@ -191,10 +194,6 @@ Item {
 
 
 
-        //我方
-        _private.myCombatants = [...game.fighthero()];
-
-
         //敌方
 
         //敌人数量
@@ -217,9 +216,9 @@ Item {
             enemyCount = fightScriptData.$enemyCount;   //如果是数字
         }
 
-        _private.enemies.length = enemyCount;
+        fight.enemies.length = enemyCount;
 
-        for(let i = 0; i < _private.enemies.length; ++i) {
+        for(let i = 0; i < fight.enemies.length; ++i) {
             let tIndex;
             if(enemyRandom) //随机
                 tIndex = GlobalLibraryJS.random(0, fightScriptData.$enemiesData.length);
@@ -227,18 +226,18 @@ Item {
                 tIndex = i % fightScriptData.$enemiesData.length;
 
             //创建敌人
-            _private.enemies[i] = game.$sys.getFightRoleObject(fightScriptData.$enemiesData[tIndex], true);
+            fight.enemies[i] = game.$sys.getFightRoleObject(fightScriptData.$enemiesData[tIndex], true);
 
             //从 propertiesWithExtra 设置人物的 HP和MP
             //fight.run(function() {
-                //game.addprops(_private.enemies[i], {HP: 2, MP: 1}, 0);
+                //game.addprops(fight.enemies[i], {HP: 2, MP: 1}, 0);
             //});
         }
 
 
         //初始化脚本
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
-            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"], 'fight_init_script'], -2, [_private.myCombatants, _private.enemies], fightScriptData)
+            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"], 'fight_init_script'], -2, [fight.myCombatants, fight.enemies], fightScriptData)
         }
 
 
@@ -250,8 +249,8 @@ Item {
 
         //我方
         //repeaterMyCombatants.model =
-        repeaterMyCombatants.nCount = _private.myCombatants.length;
-        for(i = 0; i < _private.myCombatants.length; ++i) {
+        repeaterMyCombatants.nCount = fight.myCombatants.length;
+        for(i = 0; i < fight.myCombatants.length; ++i) {
             if(repeaterMyCombatants.model.count <= i)
                 repeaterMyCombatants.model.append({modelData: i});
             repeaterMyCombatants.itemAt(i).visible = true;
@@ -259,7 +258,7 @@ Item {
             repeaterMyCombatants.itemAt(i).spriteEffect.stop();
 
 
-            FightSceneJS.resetFightRole(_private.myCombatants[i], repeaterMyCombatants.itemAt(i), i, 0);
+            FightSceneJS.resetFightRole(fight.myCombatants[i], repeaterMyCombatants.itemAt(i), i, 0);
 
         }
         for(; i < repeaterMyCombatants.model.count; ++i) {
@@ -270,9 +269,9 @@ Item {
 
 
         //敌方
-        //repeaterEnemies.model = _private.enemies.length = enemyCount;
-        repeaterEnemies.nCount = _private.enemies.length;
-        for(i = 0; i < _private.enemies.length; ++i) {
+        //repeaterEnemies.model = fight.enemies.length = enemyCount;
+        repeaterEnemies.nCount = fight.enemies.length;
+        for(i = 0; i < fight.enemies.length; ++i) {
             if(repeaterEnemies.model.count <= i)
                 repeaterEnemies.model.append({modelData: i});
             repeaterEnemies.itemAt(i).visible = true;
@@ -280,7 +279,7 @@ Item {
             repeaterEnemies.itemAt(i).spriteEffect.stop();
 
 
-            FightSceneJS.resetFightRole(_private.enemies[i], repeaterEnemies.itemAt(i), i, 1);
+            FightSceneJS.resetFightRole(fight.enemies[i], repeaterEnemies.itemAt(i), i, 1);
 
         }
         //隐藏剩下的
@@ -297,13 +296,13 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([_private.myCombatants, _private.enemies,], _private.fightData), 'fight start1'], -2);
+        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies,], _private.fightData), 'fight start1'], -2);
 
 
         //GlobalLibraryJS.setTimeout(function() {
             //战斗起始脚本
             //if(_private.fightStartScript) {
-            //    fight.run([_private.fightStartScript, 'fight start2'], -1, [_private.myCombatants, _private.enemies,], _private.fightData);
+            //    fight.run([_private.fightStartScript, 'fight start2'], -1, [fight.myCombatants, fight.enemies,], _private.fightData);
             //}
 
 
@@ -330,7 +329,7 @@ Item {
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
 
-        //_private.enemies = [];
+        //fight.enemies = [];
         //_private.arrTempLoopedAllFightRoles = [];
         //_private.nRound = 0;
         ////_private.nStep = 0;
@@ -345,18 +344,17 @@ Item {
         _private.mapSpriteEffectsTemp = {};
 
 
-        for(let i in _private.myCombatants) {
-            //_private.myCombatants[i].$$fightData.$buffs = {};
+        for(let i in fight.myCombatants) {
+            //fight.myCombatants[i].$$fightData.$buffs = {};
 
             //必须清空lastTarget，否则有可能下次指向不存在的敌人
-            _private.myCombatants[i].$$fightData.$lastChoice.$targets = undefined;
-            _private.myCombatants[i].$$fightData.$choice.$targets = undefined;
-            delete _private.myCombatants[i].$$fightData.$info;
+            fight.myCombatants[i].$$fightData.$lastChoice.$targets = undefined;
+            fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
+            delete fight.myCombatants[i].$$fightData.$info;
         }
 
 
 
-        rootGameScene.focus = true;
         rootFightScene.visible = false;
 
         game.stage(0);
@@ -374,8 +372,8 @@ Item {
 
 
     property QtObject fight: QtObject {
-        readonly property alias myCombatants: _private.myCombatants
-        readonly property alias enemies: _private.enemies
+        property var myCombatants: []
+        property var enemies: []
 
 
         //!!兼容旧代码
@@ -394,7 +392,7 @@ Item {
                 return;
             }
             else {
-                let fightResult = game.$sys.resources.commonScripts["check_all_combatants"](_private.myCombatants, repeaterMyCombatants, _private.enemies, repeaterEnemies);
+                let fightResult = game.$sys.resources.commonScripts["check_all_combatants"](fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
                 if(result !== null) {
                     fightResult.result = result;
                     FightSceneJS.fightOver(fightResult);
@@ -491,10 +489,10 @@ Item {
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
             checkToFight: FightSceneJS.checkToFight,
 
-            getCombatantSkills: FightSceneJS.getCombatantSkills,
+            getCombatantSkills: game.$gameMakerGlobalJS.getCombatantSkills,
 
-            gfChoiceSingleCombatantSkill: FightSceneJS.gfChoiceSingleCombatantSkill,
-            gfNoChoiceSkill: FightSceneJS.gfNoChoiceSkill,
+            gfChoiceSingleCombatantSkill: game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill,
+            gfNoChoiceSkill: game.$gameMakerGlobalJS.gfNoChoiceSkill,
 
             saveLast: FightSceneJS.saveLast,
             loadLast: FightSceneJS.loadLast,
@@ -525,20 +523,20 @@ Item {
                     if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$comp) {
                         game.$sys.resources.commonScripts["refresh_combatant"](combatant, false);
                         combatant.$$fightData.$info.$comp.refresh(combatant);
-                        //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+                        //repeaterMyCombatants.itemAt(i).propertyBar.refresh(fight.myCombatants[i].$$propertiesWithExtra.HP);
                     }
                 }
 
                 if(GlobalLibraryJS.isNumber(combatant)) {
                     if(combatant === -1 || combatant === 0)
-                        for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-                            refresh(_private.myCombatants[i]);
-                            //repeaterMyCombatants.itemAt(i).propertyBar.refresh(_private.myCombatants[i].$$propertiesWithExtra.HP);
+                        for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
+                            refresh(fight.myCombatants[i]);
+                            //repeaterMyCombatants.itemAt(i).propertyBar.refresh(fight.myCombatants[i].$$propertiesWithExtra.HP);
                         }
                     if(combatant === -1 || combatant === 1)
-                        for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-                            refresh(_private.enemies[i]);
-                            //repeaterEnemies.itemAt(i).propertyBar.refresh(_private.enemies[i].$$propertiesWithExtra.HP);
+                        for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
+                            refresh(fight.enemies[i]);
+                            //repeaterEnemies.itemAt(i).propertyBar.refresh(fight.enemies[i].$$propertiesWithExtra.HP);
                         }
                 }
                 else {
@@ -576,29 +574,29 @@ Item {
 
                 switch(teamID) {
                 case 0:
-                    if(index < 0 || index > _private.myCombatants.length)
-                        index = _private.myCombatants.length;
+                    if(index < 0 || index > fight.myCombatants.length)
+                        index = fight.myCombatants.length;
 
-                    _private.myCombatants.splice(index, 0, fightrole);
+                    fight.myCombatants.splice(index, 0, fightrole);
                     repeaterMyCombatants.model.insert(index, {modelData: index});
                     FightSceneJS.resetFightRole(fightrole, repeaterMyCombatants.itemAt(index), index, teamID);
 
-                    for(; index < _private.myCombatants.length; ++index)
-                        _private.myCombatants[index].$$fightData.$info.$index = index;
+                    for(; index < fight.myCombatants.length; ++index)
+                        fight.myCombatants[index].$$fightData.$info.$index = index;
 
                     ++repeaterMyCombatants.nCount;
 
                     break;
                 case 1:
-                    if(index < 0 || index > _private.enemies.length)
-                        index = _private.enemies.length;
+                    if(index < 0 || index > fight.enemies.length)
+                        index = fight.enemies.length;
 
-                    _private.enemies.splice(index, 0, fightrole);
+                    fight.enemies.splice(index, 0, fightrole);
                     repeaterEnemies.model.insert(index, {modelData: index});
                     FightSceneJS.resetFightRole(fightrole, repeaterEnemies.itemAt(index), index, teamID);
 
-                    for(; index < _private.enemies.length; ++index)
-                        _private.enemies[index].$$fightData.$info.$index = index;
+                    for(; index < fight.enemies.length; ++index)
+                        fight.enemies[index].$$fightData.$info.$index = index;
 
                     ++repeaterEnemies.nCount;
 
@@ -617,31 +615,31 @@ Item {
 
                 switch(teamID) {
                 case 0:
-                    if(index < 0 || index >= _private.myCombatants.length)
+                    if(index < 0 || index >= fight.myCombatants.length)
                         return false;
 
-                    ret = _private.myCombatants.splice(index, 1);
+                    ret = fight.myCombatants.splice(index, 1);
                     repeaterMyCombatants.model.remove(index, 1);
                     ret[0].$$fightData.$info.$index = -1;
                     ////_private.arrTempLoopedAllFightRoles.splice(_private.arrTempLoopedAllFightRoles.indexOf(ret[0]), 1);
 
-                    for(; index < _private.myCombatants.length; ++index)
-                        _private.myCombatants[index].$$fightData.$info.$index = index;
+                    for(; index < fight.myCombatants.length; ++index)
+                        fight.myCombatants[index].$$fightData.$info.$index = index;
 
                     --repeaterMyCombatants.nCount;
 
                     break;
                 case 1:
-                    if(index < 0 || index >= _private.enemies.length)
+                    if(index < 0 || index >= fight.enemies.length)
                         return false;
 
-                    ret = _private.enemies.splice(index, 1);
+                    ret = fight.enemies.splice(index, 1);
                     repeaterEnemies.model.remove(index, 1);
                     ret[0].$$fightData.$info.$index = -1;
                     ////_private.arrTempLoopedAllFightRoles.splice(_private.arrTempLoopedAllFightRoles.indexOf(ret[0]), 1);
 
-                    for(; index < _private.enemies.length; ++index)
-                        _private.enemies[index].$$fightData.$info.$index = index;
+                    for(; index < fight.enemies.length; ++index)
+                        fight.enemies[index].$$fightData.$info.$index = index;
 
                     --repeaterEnemies.nCount;
 
@@ -951,7 +949,7 @@ Item {
                         width: spriteSrc ? implicitWidth : 60
                         height: spriteSrc ? implicitHeight : 60
 
-                        test: false
+                        //bTest: false
 
 
                         MouseArea {
@@ -965,7 +963,7 @@ Item {
                                 //if(_private.nStep === 1) {
 
                                     //没血的跳过
-                                    if(_private.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
+                                    if(fight.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
                                         return;
 
 
@@ -1005,7 +1003,7 @@ Item {
                                     menuFightRoleChoice.show(game.$sys.resources.commonScripts["fight_menus"].$menus);
                                 }
                                 else if(tRootMyCombatantComp.bCanClick === true) {
-                                    FightSceneJS.skillChoice(1, _private.myCombatants[modelData]);
+                                    FightSceneJS.skillStepChoiced(1, fight.myCombatants[modelData]);
                                 }
 
                                 return;
@@ -1193,7 +1191,7 @@ Item {
                         width: spriteSrc ? implicitWidth : 60
                         height: spriteSrc ? implicitHeight : 60
 
-                        test: false
+                        //bTest: false
 
 
                         MouseArea {
@@ -1205,7 +1203,7 @@ Item {
 
                                 if(_private.genFightChoice !== null) {
                                     if(tRootEnemyComp.bCanClick === true) {
-                                        FightSceneJS.skillChoice(1, _private.enemies[modelData]);
+                                        FightSceneJS.skillStepChoiced(1, fight.enemies[modelData]);
                                     }
                                 }
                             }
@@ -1388,13 +1386,13 @@ Item {
 
                     / * /如果装备了武器，且武器有技能
                     if(type === 1) {
-                        let tWeapon = _private.myCombatants[_private.nChoiceFightRoleIndex].$equipment['武器'];
+                        let tWeapon = fight.myCombatants[_private.nChoiceFightRoleIndex].$equipment['武器'];
                         if(tWeapon)
                             tlistSkills = game.$sys.getGoodsResource(tWeapon.$rid).$skills;
                     }
                     //人物本身技能
                     else if(type === 0) {
-                        tlistSkills = _private.myCombatants[_private.nChoiceFightRoleIndex]
+                        tlistSkills = fight.myCombatants[_private.nChoiceFightRoleIndex]
                     }* /
 
                     FightSceneJS.showSkillsOrGoods(1);
@@ -1410,24 +1408,24 @@ Item {
 
             //信息
             case 3:
-                fight.$sys.showFightRoleInfo(_private.myCombatants[_private.nChoiceFightRoleIndex].$index);
+                fight.$sys.showFightRoleInfo(fight.myCombatants[_private.nChoiceFightRoleIndex].$index);
 
                 break;
 
             //休息
             case 4:
 
-                /*for(let i = 0; i < _private.myCombatants.length; ++i) {
-                    if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+                /*for(let i = 0; i < fight.myCombatants.length; ++i) {
+                    if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
                     //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                        _private.myCombatants[i].$$fightData.$choice.$targets = -2;
-                        _private.myCombatants[i].$$fightData.$choice.$attack = -2;
+                        fight.myCombatants[i].$$fightData.$choice.$targets = -2;
+                        fight.myCombatants[i].$$fightData.$choice.$attack = -2;
                     }
                 }
                 let ret = _private.genFighting.run();
                 * /
 
-                let combatant = _private.myCombatants[_private.nChoiceFightRoleIndex];
+                let combatant = fight.myCombatants[_private.nChoiceFightRoleIndex];
                 combatant.$$fightData.$choice.$type = 1;
                 combatant.$$fightData.$choice.$attack = undefined;
                 combatant.$$fightData.$choice.$targets = undefined;
@@ -1503,10 +1501,10 @@ Item {
             /*ColorButton {
                 text: "随机普通攻击"
                 onButtonClicked: {
-                    for(let i = 0; i < _private.myCombatants.length; ++i) {
+                    for(let i = 0; i < fight.myCombatants.length; ++i) {
                         if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                            //_private.myCombatants[i].$$fightData.$lastChoice.$targets = _private.myCombatants[i].$$fightData.$choice.$targets;
-                            _private.myCombatants[i].$$fightData.$choice.$targets = undefined;
+                            //fight.myCombatants[i].$$fightData.$lastChoice.$targets = fight.myCombatants[i].$$fightData.$choice.$targets;
+                            fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
                         }
                     }
                 }
@@ -1551,7 +1549,7 @@ Item {
             //anchors.centerIn: parent
 
             onS_Choice: {
-                _private.myCombatants[0].$$fightData.defenseProp = _private.myCombatants[0].$$fightData.attackProp = index;
+                fight.myCombatants[0].$$fightData.defenseProp = fight.myCombatants[0].$$fightData.attackProp = index;
 
                 /*while(1) {
                     console.time("round");
@@ -1760,13 +1758,6 @@ Item {
 
 
 
-        //我方和敌方数据
-        //内容为：$Combatant() 返回的对象（包含各种数据）
-        property var myCombatants: []
-        property var enemies: []                //动态创建
-
-
-
         //回合
         property int nRound: 0
 
@@ -1846,7 +1837,6 @@ Item {
         tb1.refresh([100, 50, 20);
         //console.debug(tb, tb1, tb.refresh === tb1.refresh)
         */
-
 
 
         FrameManager.globalObject().fight = fight;

@@ -229,7 +229,7 @@ Item {
                                 let cfg = FrameManager.sl_qml_ReadFile(filePath);
                                 //console.debug("[mainImageEditor]filePath：", filePath);
 
-                                if(cfg === "")
+                                if(!cfg)
                                     return false;
 
                                 console.debug('!!!', JSON.stringify(JSON.parse(cfg)["List"]))
@@ -279,7 +279,7 @@ Item {
                                 let cfg = FrameManager.sl_qml_ReadFile(filePath);
                                 //console.debug("[mainImageEditor]filePath：", filePath);
 
-                                if(cfg === "")
+                                if(!cfg)
                                     return false;
                                 */
 

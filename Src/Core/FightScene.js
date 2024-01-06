@@ -1,410 +1,359 @@
 ﻿
-/*
-技能选择系统：
-  原理：
-  步骤：
-    1、进入战斗，先init（做初始化，创建战斗人物、调用start脚本、创建genFighting，进入gfFighting循环）；
-    2、gfFighting中：
-      a、运行 runCombatantRoundScript 战斗人物回合脚本（处理buff等）；
-      b、检查战斗是否结束；
-      c、调用 round 回合脚本；
-      d、我方开始战斗选择和步骤；
-      e、调用 round 回合脚本；
-      f、运行战斗人物回合 fnRound；
-    3、我方开始战斗选择和步骤：
-      a、如果 _private.genFightChoice 为null，则弹出 选择菜单；
-      b、点击 选择菜单后，根据通用脚本的$fightMenus，分别调用 fight.$sys.showSkillsOrGoods（0、1、2分别是普通攻击、技能、物品）、休息；
-      c、选择 技能或道具后，调用 FightSceneJS.choicedSkillOrGoods，进行判断是否可用，并赋值_private.genFightChoice，进入skillChoice；
-      d、skillChoice：技能步骤选择完后进行的处理（_private.genFightChoice），选择完毕后再次判断是否可用，并检测是否可以战斗；
-      e、点人物：如果 _private.genFightChoice 已经有值 且 人物可点，则调用FightSceneJS.skillChoice；
-    4、我方选择完毕后，进行战斗回合：yield *fnRound();
-      a、调用 通用脚本的fight_roles_round脚本，对每一次返回的战斗人物进行一次战斗人物回合；
-      b、调用一次 runCombatantRoundScript；
-      c、调用 FightSceneJS.combatantUseSkillOrGoods(combatant)；
-      d、调用一次 runCombatantRoundScript；
-      e、进行 技能的动画播放、道具收尾 和数据处理；
-      f、检测是否结束战斗；
-    5、combatantUseSkillOrGoods：
-      a、调用 通用脚本 fight_role_choice_skills_or_goods_algorithm 的算法，返回我方（将已选的放在最优先）或敌方能使用技能的数组，返回1不做处理（比如乱）；
-      b、将返回的技能数组遍历，检查是否可用，并将技能步骤检查一次（比如有可能已选的对方已下场，则重新自动选择），每个步骤都会返回所有可选可能性数组，已选的最优先；
-      c、复现完毕后再检查一次是否可用；返回0表示技能和步骤可用；返回-1表示不可用；
-
-  新增技能步骤：
-    1、目前选择的每个步骤只有两种选择类型：战斗人物和菜单（Type分别为1和2）；
-    2、如果要新增类型，则：
-      a、Type为3及以上
-      b、在选择后调用 skillChoice(n, 值);，表示进行下一个选择步骤
-      c、skillSetUsing 函数里加上Type判断，且进行选择步骤的初始化，返回false表示等待，返回true表示不等待；
-      d、skillChoiceCanUsing 函数里加上Type判断，且将进行选择步骤的所有可能性返回（供自动调用使用，比如敌方）；返回false表示没有选择对象；返回true表示此次选择步骤不需要选择；
-        如果是我方，则会将 已经选择过的步骤值 压栈作为 第一次选择 来判断（如果不符合则会依次判断栈内容）
-*/
-
-
-//系统的单人技能(选择对方）
-//yield返回参数对象：Type（选择类型）、Step（第几个步骤，实际用来：1、此步骤的值在$targets的下标；2、战斗时 获取我方战斗人物的lastChoice.$targets[step]步骤的值 再次判断）；TeamFlags（队伍标记）、Filter（战斗人物筛选）、Enabled（是否可选）
-//  Type为1：选择战斗人物
-//    yield入参：TeamFlags：0b1为己方；0b10为对方；Filter（筛选函数）；Enabled：设置选择标记还是取消选择
-//  Type为2：弹出选择菜单
-//    yield入参：Title（菜单标题）；Items（选项）；Style（样式）；
-//yield false：表示选择失败并重新进行此轮选择
-//返回true表示选择完毕并成功
-function *gfChoiceSingleCombatantSkill(skill, combatant, params={TeamFlags: 0b11, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}}) {
-    //FightSceneJS.setTeamReadyToChoice(0b10, 0b1, true);
-
-    //战斗人物选择
-    let c = yield {Type: 1, Step: 0, TeamFlags: params.TeamFlags, Filter: params.Filter, Enabled: true};
-
-    //判断是否符合条件
-    /*while(1) {
-        if(c.Value && c.Value.$$propertiesWithExtra.HP[0] > 0)
-            break;
-        else
-            yield false;
+//保存上次
+function saveLast(combatant=true) {
+    if(combatant === true)
+        for(let tc of fight.myCombatants) {
+        //for(let i = 0; i < fight.myCombatants.length; ++i) {
+            if(tc.$$propertiesWithExtra.HP[0] > 0) {
+            //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
+                tc.$$fightData.$lastChoice = {};
+                GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$lastChoice, tc.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
+                //tc.$$fightData.$lastTarget = tc.$$fightData.$targets;
+                //tc.$$fightData.$lastAttackSkill = tc.$$fightData.$attackSkill;
+                //tc.$$fightData.$lastChoiceType = tc.$$fightData.$choiceType;
+            }
+        }
+    else {
+        combatant.$$fightData.$lastChoice = {};
+        GlobalLibraryJS.copyPropertiesToObject(combatant.$$fightData.$lastChoice, combatant.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
+        //combatant.$$fightData.$lastTarget = combatant.$$fightData.$targets;
+        //combatant.$$fightData.$lastAttackSkill = combatant.$$fightData.$attackSkill;
+        //combatant.$$fightData.$lastChoiceType = combatant.$$fightData.$choiceType;
     }
-    */
-
-    combatant.$$fightData.$choice.$targets = [[c.Value]];
-
-    //取消 战斗人物选择状态
-    yield {Type: 1, TeamFlags: params.TeamFlags, Filter: params.Filter, Enabled: false};
-
-
-    //返回true表示选择完毕并成功
-    return true;
 }
 
-//不用选择（比如多人技能）
-//yield false：表示选择失败并重新进行此轮选择
-//返回true表示选择完毕并成功
-function *gfNoChoiceSkill(skill, combatant) {
-    combatant.$$fightData.$choice.$targets = [-1];
-
-
-    //菜单示例
-    //let c = yield {Type: 2, Step: 1, Title: '深林孤鹰', Items: [1,2,3,4,5]};
-    //console.warn(c, JSON.stringify(c));
-    //combatant.$$fightData.$choice.$targets.push(c.Value);
-
-
-    //yield false;
-
-    //返回true表示选择完毕并成功
-    return true;
-}
-
-
-
-//战斗人物 已选择的 技能或道具 处理
-//  我方的技能如果不能使用，切换为普通攻击；敌方随机使用技能
-//返回 <0 表示休息不使用技能（比如所有技能都不能用、休息等）
-function combatantUseSkillOrGoods(combatant) {
-
-    //休息
-    if(combatant.$$fightData.$choice.$type === 1)
-        return -1;
-
-
-    //所有可使用的技能或道具 数组（倒序使用）
-    let useSkillsOrGoods;
-    //选择的技能或道具
-    let choiceSkillOrGoods;
-    let skill;
-
-
-    useSkillsOrGoods = game.$sys.resources.commonScripts["fight_role_choice_skills_or_goods_algorithm"](combatant);
-    //不做处理
-    if(useSkillsOrGoods === true)
-        return 1;
-
-
-    //!循环测试所有技能，直到有可以用的
-    //对我方来说检查一次
-    useNextSkill:
-    while(1) {
-        choiceSkillOrGoods = useSkillsOrGoods.pop();    //从最后开始
-        if(!choiceSkillOrGoods) {   //没有技能了
-            combatant.$$fightData.$choice.$type = -1;
-            return -1;
-        }
-
-
-        combatant.$$fightData.$choice.$attack = choiceSkillOrGoods;
-        if(choiceSkillOrGoods.$objectType === game.$sys.protoObjects.skill.$objectType)
-            combatant.$$fightData.$choice.$type = 3;
-        else if(choiceSkillOrGoods.$objectType === game.$sys.protoObjects.goods.$objectType)
-            combatant.$$fightData.$choice.$type = 2;
-
-        //检测技能 或 道具是否可以使用（我方和敌方人物刚选择技能时判断）
-        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 10);
-        if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
-            //fight.msg(checkSkill || "不能使用", 50);
-            continue;
-        }
-        else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
-            //fight.msg(...checkSkill);
-            continue;
-        }
-        else if(checkSkill !== true) {   //如果不可用
-            //fight.msg("不能使用", 50);
-            continue;
-        }
-
-
-        let genFightChoice = null;
-
-
-        //普通攻击 或 技能
-        if(combatant.$$fightData.$choice.$type === 3) {
-            skill = choiceSkillOrGoods;
-            if(/*skill && */skill.$commons.$choiceScript)
-                genFightChoice = skill.$commons.$choiceScript(skill, combatant);
-            //else if(!skill) {   //如果不可用
-            //    continue;
-            //}
-        }
-        //道具
-        else if(combatant.$$fightData.$choice.$type === 2) {
-            let goods = combatant.$$fightData.$choice.$attack;
-            if(GlobalLibraryJS.isArray(goods.$fight))
-                skill = goods.$fight[0];
-            //有一种情况为空：道具没有对应技能（$fight[0]），只运行收尾代码（$fightScript[3]）；
-            //if(!skill)
-            //    skill = {$targetCount: 0, $targetFlag: 0};
-
-            //如果有 $fightScript 和 $choiceScript
-            if(GlobalLibraryJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
-                genFightChoice = goods.$commons.$fightScript.$choiceScript(goods, combatant);
-            }
-            //!!兼容旧代码
-            else if(GlobalLibraryJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
-                genFightChoice = goods.$commons.$fightScript[0](goods, combatant);
-            }
-            //使用技能的
-            else if(/*skill && */skill.$commons.$choiceScript)
-                genFightChoice = skill.$commons.$choiceScript(skill, combatant);
-            //else if(!skill) {   //如果不可用
-            //    continue;
-            //}
-        }
-
-        //如果没有特定定义的 $choiceScript选择脚本，则使用系统的
-        if(!genFightChoice) {
-            //单人技能 且 目标敌方
-            if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
-                genFightChoice = FightSceneJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
-            }
-
-            //目标己方
-            else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
-                genFightChoice = FightSceneJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
-            }
-
-            //不选（全体）
-            //if(skill.$targetFlag === 0) {
-            else if(skill.$targetCount <= 0) {
-                genFightChoice = FightSceneJS.gfNoChoiceSkill(skill, combatant);
-            }
-            else {   //不可用
-                continue;
-            }
-        }
-
-
-
-        let ret = genFightChoice.next();
-
-        //循环 技能中的每一个选择
-        nextFightChoice:
-        for(;;) {
-            if(ret.done === true) { //选择完毕
-
-                //if(_private.nChoiceFightRoleIndex < 0 || _private.nChoiceFightRoleIndex >= _private.myCombatants.length)
-                //    return;
-
-
-                //检测技能 或 道具是否可以使用（我方和敌方人物选择技能的步骤完毕时判断）
-                let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 11);
-                if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
-                    //fight.msg(checkSkill || "不能使用", 50);
-                    break;
-                }
-                else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
-                    //fight.msg(...checkSkill);
-                    break;
-                }
-                else if(checkSkill !== true) {   //如果不可用
-                    //fight.msg("不能使用", 50);
-                    break;
-                }
-
-
-                //if(_private.nStage === 1)
-                //    checkToFight();
-                return 0;
-            }
-            else {
-                //所有可能的选择
-                let selecting = skillChoiceCanUsing(ret.value, combatant);
-
-                if(selecting === false)   //没有选择
-                    break;
-                else if(selecting === true) { //不需要选择，直接下一个 技能的选择步骤
-                    ret = genFightChoice.next();
+//type：0表示完全载入上次；1表示载入没有选择的
+function loadLast(combatant=true, type=0) {
+    if(combatant === true)
+        for(let tc of fight.myCombatants) {
+        //for(let i = 0; i < fight.myCombatants.length; ++i) {
+            //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
+            if(tc.$$propertiesWithExtra.HP[0] > 0) {
+                if(type === 1 && tc.$$fightData.$choice.$type !== -1) {   //已经有选择
                     continue;
                 }
-
-
-                //循环每一个备选择的
-                for(;;) {
-                    let tv = selecting.pop();
-                    if(tv === undefined)    //循环完毕
-                        continue useNextSkill;
-
-
-                    let tRet = genFightChoice.next({Type: ret.value.Type, Value: tv});
-
-                    if(tRet.value === false) {   //重新选择
-                        continue;
-                    }
-
-                    ret = tRet;
-                    continue nextFightChoice;
-                }
-
-            }
-        }
-    }
-
-
-
-
-
-    /*/修正 目标战斗角色
-
-    //if(choiceSkillOrGoods.$targetFlag === 0)
-    if(choiceSkillOrGoods.$targetCount <= 0)
-        combatant.$$fightData.$choice.$targets = -1;
-
-
-    //单人，对方
-    if((choiceSkillOrGoods.$targetCount > 0 || GlobalLibraryJS.isArray(choiceSkillOrGoods.$targetCount)) && (choiceSkillOrGoods.$targetFlag & 0b10)) {
-
-        //如果角色选择了目标，且目标还活着（否则随机选）
-        if(GlobalLibraryJS.isArray(combatant.$$fightData.$choice.$targets)) {
-            if(combatant.$$fightData.$choice.$targets[0].$$propertiesWithExtra.HP[0] <= 0) {
-                combatant.$$fightData.$choice.$targets = undefined;
-            }
-        }
-        else
-            combatant.$$fightData.$choice.$targets = undefined;
-
-
-        //如果没有指定对方，则随机选
-        if(combatant.$$fightData.$choice.$targets === undefined) {
-            //获得 对方还活着的 角色
-            let tarrAlive = [];
-            for(let tc of combatant.$$fightData.$info.$teams[1]) {
-                if(tc.$$propertiesWithExtra.HP[0] > 0)
-                    tarrAlive.push(tc);
-            }
-            //随机选择对方
-            //combatant.$$fightData.defenseProp = combatant.$$fightData.attackProp = GlobalLibraryJS.random(0, 5);
-
-            combatant.$$fightData.$choice.$targets = [tarrAlive[GlobalLibraryJS.random(0, tarrAlive.length)]];
-            //console.debug("t1", t, JSON.stringify(team2));
-
-            //roleSpriteEffect2 = repeaterSpriteEffect2.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
-        }
-
-        //console.debug("!!!", combatant.$$fightData.$choice.$targets)
-    }
-
-    //单人，己方
-    if((choiceSkillOrGoods.$targetCount > 0 || GlobalLibraryJS.isArray(choiceSkillOrGoods.$targetCount)) > 0 && (choiceSkillOrGoods.$targetFlag & 0b1)) {
-
-        //如果角色选择了目标（可以选择死亡角色）（否则随机选）
-        if(GlobalLibraryJS.isArray(combatant.$$fightData.$choice.$targets)) {
-            if(combatant.$$fightData.$choice.$targets[0].$$propertiesWithExtra.HP[0] <= 0) {
-                //combatant.$$fightData.$choice.$targets = undefined;
-            }
-        }
-        else
-            combatant.$$fightData.$choice.$targets = undefined;
-
-        if(combatant.$$fightData.$choice.$targets === undefined) {
-            //获得 己方还活着的 角色
-            let tarrAlive = [];
-            for(let tc of combatant.$$fightData.$info.$teams[0]) {
-                if(tc.$$propertiesWithExtra.HP[0] > 0)
-                    tarrAlive.push(tc);
-            }
-            //随机选择对方
-            //combatant.$$fightData.$info.defenseProp = combatant.$$fightData.$info.attackProp = GlobalLibraryJS.random(0, 5);
-
-            combatant.$$fightData.$choice.$targets = [tarrAlive[GlobalLibraryJS.random(0, tarrAlive.length)]];
-            //console.debug("t1", t, JSON.stringify(team2));
-
-            //roleSpriteEffect2 = repeaterSpriteEffect1.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
-        }
-
-        //console.debug("!!!", combatant.$$fightData.$choice.$targets)
-    }
-
-    */
-}
-
-
-
-//设置 某个 team 的所有 战斗人物 是否可点 并 设置效果
-//teamFlags:0b1为我方，0b10为敌方；
-//filter：战斗人物筛选函数；
-//enabled：true为可选，false为取消可选；
-//combatant：正在进行选择的战斗人物，有可能为null
-function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
-    if(!filter)
-        filter = function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}
-
-    if(enabled) {
-        if(teamFlags & 0b1) {
-            for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-                //if((_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0 && (combatantFlags & 0b1)) ||
-                //    (_private.myCombatants[i].$$propertiesWithExtra.HP[0] <= 0 && (combatantFlags & 0b10))
-                if(filter(_private.myCombatants[i], combatant)
-                ) {
-                //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                    repeaterMyCombatants.itemAt(i).setEnable(true);
+                else {
+                    GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$choice, tc.$$fightData.$lastChoice, {arrayRecursion: false, objectRecursion: 0});
+                    //tc.$$fightData.$targets = tc.$$fightData.$lastTarget;
+                    //tc.$$fightData.$attackSkill = tc.$$fightData.$lastAttackSkill;
+                    //tc.$$fightData.$choiceType = tc.$$fightData.$lastChoiceType;
                 }
             }
         }
-        if(teamFlags & 0b10) {
-            for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-                //if((_private.enemies[i].$$propertiesWithExtra.HP[0] > 0 && (combatantFlags & 0b1)) ||
-                //    (_private.enemies[i].$$propertiesWithExtra.HP[0] <= 0 && (combatantFlags & 0b10))
-                if(filter(_private.enemies[i], combatant)
-                ) {
-                //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                    repeaterEnemies.itemAt(i).setEnable(true);
-                }
-            }
-        }
-    }
     else {
-        if(teamFlags & 0b1) {
-            //全部取消闪烁
-            for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-                //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
-                    repeaterMyCombatants.itemAt(i).setEnable(false);
-                }
+        if(type === 1 && combatant.$$fightData.$choice.$type !== -1) {   //已经有选择
+            //continue;
+        }
+        else {
+            GlobalLibraryJS.copyPropertiesToObject(combatant.$$fightData.$choice, combatant.$$fightData.$lastChoice, {arrayRecursion: false, objectRecursion: 0});
+            //fight.myCombatants[i].$$fightData.$targets = fight.myCombatants[i].$$fightData.$lastTarget;
+            //fight.myCombatants[i].$$fightData.$attackSkill = fight.myCombatants[i].$$fightData.$lastAttackSkill;
+            //fight.myCombatants[i].$$fightData.$choiceType = fight.myCombatants[i].$$fightData.$lastChoiceType;
+        }
+    }
+}
+
+
+
+//重置刷新战斗人物（创建时调用）
+function resetFightRole(fightRole, fightRoleComp, index, teamID) {
+
+    game.$gameMakerGlobalJS.resetFightRole(fightRole, index, teamID, fight.myCombatants, fight.enemies);
+
+    //if(i >= repeaterMyCombatants.count)
+    //    break;
+    //console.debug("!!!", fight.myCombatants, i, fightRole, JSON.stringify(fightRole));
+
+    //fightRole.$$fightData.$actionData = {};
+    //fightRole.$$fightData.$buffs = {};
+    ////fight.myCombatants.$rid = fightScriptData.$enemiesData[tIndex].$rid;
+
+    if(teamID === 0) {    //我方
+        fightRole.$$fightData.$info.$teamsComp = [repeaterMyCombatants, repeaterEnemies];
+    }
+    else if(teamID === 1) { //敌方
+        fightRole.$$fightData.$info.$teamsComp = [repeaterEnemies, repeaterMyCombatants];
+
+    }
+
+    fightRole.$$fightData.$info.$comp = fightRoleComp;
+    fightRole.$$fightData.$info.$spriteEffect = fightRoleComp.spriteEffect;
+
+    //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
+
+    //fightRole.$$fightData.$choice.$type = -1;
+    ////fightRole.$$fightData.$lastChoice.$type = -1;
+    //fightRole.$$fightData.$choice.$attack = undefined;
+    ////fightRole.$$fightData.$lastChoice.$attack = undefined;
+    //这两句必须，否则会指向不存在的对象（比如第一场结束前选第4个敌人，第二场直接重复上次就出错了）；
+    //fightRole.$$fightData.$choice.$targets = undefined;
+    //fightRole.$$fightData.$lastChoice.$targets = undefined;
+
+    //fightRole.$$fightData.defenseSkill = undefined;
+    //fightRole.$$fightData.lastDefenseSkill = undefined;
+
+
+    /*/读取ActionData
+    let fightroleInfo = game.$sys.getFightRoleResource(fightRole.$rid);
+    if(fightroleInfo) {
+        for(let tn in fightroleInfo.ActionData) {
+            fightRole.$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
+        }
+    }
+    else
+        console.warn("[!FightScene]载入战斗精灵失败：" + fightRole.$rid);
+    */
+
+
+
+    //刷新组件
+    fightRoleComp.refresh(fightRole);
+    //fightRoleComp.strName = fightRole.$name;
+
+
+
+    FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
+
+    //刷新血条
+    //if(fightRole.$$propertiesWithExtra.HP[0] <= 0)
+    //    fightRole.$$propertiesWithExtra.HP[0] = 1;
+}
+
+
+
+
+
+
+//显示技能选择框
+//type：0为普通攻击；1为技能
+function showSkillsOrGoods(type) {
+
+    //普通攻击
+    if(type === 0) {
+        let arrSkillsName = [];
+        let arrSkills = [];
+
+        [arrSkillsName, arrSkills] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [0]);
+
+        //menuSkillsOrGoods.nType = 0;
+
+        //rectSkills.visible = true;
+        //menuSkillsOrGoods.show(arrSkillsName, arrSkills);
+
+        if(arrSkills.length === 0) {
+            fight.msg("没有技能", 50);
+            return;
+        }
+
+        //直接选择最后一个普通攻击
+        choicedSkillOrGoods(arrSkills.pop(), 3);
+    }
+    //技能
+    else if(type === 1) {
+        let arrSkillsName = [];
+        let arrSkills = [];
+
+        [arrSkillsName, arrSkills] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [1]);
+
+        menuSkillsOrGoods.strTitle = "选择技能";
+        menuSkillsOrGoods.nType = 3;
+
+        rectSkills.visible = true;
+        menuSkillsOrGoods.show(arrSkillsName, arrSkills);
+    }
+    //道具
+    else if(type === 2) {
+        let arrGoodsName = [];
+        let arrGoods = [];
+
+        //显示所有战斗可用的道具
+        for(let goods of game.gd["$sys_goods"]) {
+            //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
+            if(goods.$commons.$fightScript) {
+                arrGoods.push(goods);
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
             }
         }
-        if(teamFlags & 0b10) {
-            //全部取消闪烁
-            for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-                //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                if(_private.enemies[i].$$propertiesWithExtra.HP[0] > 0) {
-                    repeaterEnemies.itemAt(i).setEnable(false);
-                }
+
+        menuSkillsOrGoods.strTitle = "选择道具";
+        menuSkillsOrGoods.nType = 2;
+
+        rectSkills.visible = true;
+        menuSkillsOrGoods.show(arrGoodsName, arrGoods);
+    }
+}
+
+//选择技能/道具
+//type：3为技能，2为道具
+function choicedSkillOrGoods(used, type) {
+
+    //console.debug("~~~~~~~~~weapon", JSON.stringify(tWeapon))
+    //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.getGoodsResource(tWeapon.RId)))
+
+
+
+    let combatant = fight.myCombatants[_private.nChoiceFightRoleIndex];
+    combatant.$$fightData.$choice.$type = type;
+    combatant.$$fightData.$choice.$attack = used;
+
+
+    //console.debug('!!!1', JSON.stringify(used))
+
+    //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
+    if(type === 3 || type === 2) {
+        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](used, combatant, 0);
+        if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
+            fight.msg(checkSkill || "不能选择", 50);
+            return;
+        }
+        else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
+            fight.msg(...checkSkill);
+            return;
+        }
+        else if(checkSkill !== true) {   //如果不可用
+            fight.msg("不能选择", 50);
+            return;
+        }
+    }
+
+
+    //鹰：注释是避免 选择技能后直接点重复上次，会导致有可能攻击自己人的问题
+    //combatant.$$fightData.$lastChoice.$type = type;
+    //combatant.$$fightData.$lastChoice.$attack = used;
+
+    //console.debug("~~~~~~~~~~used: ", used);
+
+
+
+    //技能
+    let skill;
+
+    //普通攻击 或 技能
+    if(type === 3) {
+        skill = combatant.$$fightData.$choice.$attack;
+        if(skill && skill.$commons.$choiceScript)
+            _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
+        else if(!skill) {   //如果不可用
+            fight.msg("技能不能使用", 50);
+            return;
+        }
+    }
+    //道具
+    else if(type === 2) {
+        let goods = combatant.$$fightData.$choice.$attack;
+        if(GlobalLibraryJS.isArray(goods.$fight))
+            skill = goods.$fight[0];
+        //有一种情况为空：道具没有对应技能（$fight[0]），只运行收尾代码（$fightScript[3]）；
+        //if(!skill)
+        //    skill = {$targetCount: 0, $targetFlag: 0};
+
+        //如果有 $fightScript 和 $choiceScript
+        if(GlobalLibraryJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
+            _private.genFightChoice = goods.$commons.$fightScript.$choiceScript(goods, combatant);
+        }
+        //!!兼容旧代码
+        else if(GlobalLibraryJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
+            _private.genFightChoice = goods.$commons.$fightScript[0](goods, combatant);
+        }
+        //使用技能的
+        else if(skill && skill.$commons.$choiceScript)
+            _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
+        else if(!skill) {   //如果不可用
+            fight.msg("道具不能使用", 50);
+            return;
+        }
+    }
+
+    //如果没有特定定义的 $choiceScript选择脚本，则使用系统的
+    if(!_private.genFightChoice) {
+        //单人技能 且 目标敌方
+        if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+        }
+
+        //目标己方
+        else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+        }
+
+        //不选（全体）
+        //if(skill.$targetFlag === 0) {
+        else if(skill.$targetCount <= 0) {
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfNoChoiceSkill(skill, combatant);
+        }
+        else {   //不可用
+            fight.msg("不能使用", 50);
+            return;
+        }
+    }
+
+
+    //开始进入步骤选择
+    skillStepChoiced();
+}
+
+
+
+//技能步骤的选择
+//  进入技能的选择步骤后，一次选择完毕后的处理
+//type和value是传递给_private.genFightChoice的参数
+//  type：是技能选择步骤需要的类型，在技能选择的生成器函数中用yield返回的，这里重新给与；
+//  value：选择的结果，比如 type为1，value为选择的对象；type为2，value为菜单的下标
+function skillStepChoiced(type, value) {
+    if(_private.genFightChoice === null) {
+        console.warn('[!FightScene]_private.genFightChoice is NULL');
+        return;
+    }
+
+    let combatant = fight.myCombatants[_private.nChoiceFightRoleIndex];
+    let skillOrGoods = combatant.$$fightData.$choice.$attack;
+
+    let ret = _private.genFightChoice.next({Type: type, Value: value});
+    for(;;) {
+        if(ret.done === true) { //选择完毕
+
+            _private.genFightChoice = null;
+
+            FightSceneJS.saveLast(combatant);
+
+
+            //if(_private.nChoiceFightRoleIndex < 0 || _private.nChoiceFightRoleIndex >= fight.myCombatants.length)
+            //    return;
+
+            //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
+            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skillOrGoods, combatant, 1);
+            if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
+                fight.msg(checkSkill || "不能使用", 50);
+                return;
+            }
+            else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
+                fight.msg(...checkSkill);
+                return;
+            }
+            else if(checkSkill !== true) {   //如果技能不可用
+                fight.msg("不能使用", 50);
+                return;
+            }
+
+
+            //检查是否可以开始回合
+            if(_private.nStage === 1)
+                checkToFight();
+            return;
+        }
+        else {
+            //重新选择
+            if(ret.value === false)
+                return;
+
+            let res = FightSceneJS.skillStepGetReadyToChoice(ret.value, combatant);
+            if(res === true) {
+                ret = _private.genFightChoice.next();
+
+                continue;
+            }
+            else if(res === false) {
+                return;
             }
         }
     }
@@ -412,11 +361,11 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
 
 
 
-//设置 技能步骤 需要的对象（目前只有战斗人物和菜单），手动选择需要
+//设置 技能步骤 需要选择时的准备工作（目前只有战斗人物和菜单）（我方手动选择时调用）
 //params为参数，combatant为正在进行选择的战斗人物
 //返回true表示不需要等待选择，返回false表示需要等待选择
 //  !!新增技能选择类型，在这里新增
-function skillSetUsing(params, combatant) {
+function skillStepGetReadyToChoice(params, combatant) {
     if(params.Type === 1) {
         let team0Flag, team1Flag;   //己方和对方
         if(combatant.$$fightData.$info.$teamsID[0] === 0) {
@@ -454,7 +403,7 @@ function skillSetUsing(params, combatant) {
     else if(params.Type === 2) {
         fight.menu(params.Title, params.Items, params.Style, function(index, itemMenu) {
             itemMenu.visible = false;
-            FightSceneJS.skillChoice(2, index);
+            FightSceneJS.skillStepChoiced(2, index);
 
             itemMenu.destroy();
         });
@@ -469,168 +418,82 @@ function skillSetUsing(params, combatant) {
 }
 
 
-//根据params，返回 技能步骤所需的所有可选 对象（目前只有战斗人物和菜单）
-//  如果是我方，注意要把已经选择的压入到selecting的最后一个（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）；
-//  1、开始战斗时，我方会调用 技能选择生成器 来再次检查一次（并调整是否可用）；2、自动选择或敌人会调用
-//params为参数，combatant为正在进行选择的战斗人物
-//  !!新增技能选择类型，在这里新增
-function skillChoiceCanUsing(params, combatant) {
-    //所有可选的对象
-    let selecting = [];
 
-    //选择战斗人物
-    if(params.Type === 1) {
-        if(params.Enabled) {
+//设置 某个 team 的所有 战斗人物 是否可点 并 设置可点击效果
+//teamFlags:0b1为我方，0b10为敌方；
+//filter：战斗人物筛选函数；
+//enabled：true为可选，false为取消可选；
+//combatant：正在进行选择的战斗人物，有可能为null
+function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
+    if(!filter)
+        filter = function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}
 
-            //己方
-            if(params.TeamFlags & 0b1) {
-                //team.push(...combatant.$$fightData.$info.$teams[0]);
-                for(let tc of combatant.$$fightData.$info.$teams[0]) {
-                    //if((tc.$$propertiesWithExtra.HP[0] > 0 && (params.CombatantFlags & 0b1)) ||
-                    //    (tc.$$propertiesWithExtra.HP[0] <= 0 && (params.CombatantFlags & 0b10))
-                    if(params.Filter(tc, combatant)
-                    )
-                        selecting.push(tc);
-                }
-            }
-            //对方
-            if(params.TeamFlags & 0b10) {
-                //team.push(...combatant.$$fightData.$info.$teams[1]);
-                for(let tc of combatant.$$fightData.$info.$teams[1]) {
-                    //if((tc.$$propertiesWithExtra.HP[0] > 0 && (params.CombatantFlags & 0b1)) ||
-                    //    (tc.$$propertiesWithExtra.HP[0] <= 0 && (params.CombatantFlags & 0b10))
-                    if(params.Filter(tc, combatant)
-                    )
-                        selecting.push(tc);
-                }
-            }
-
-            selecting = GlobalLibraryJS.disorderArray(selecting);
-
-            //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
-            if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
-                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
-                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets[params.Step])
+    if(enabled) {
+        if(teamFlags & 0b1) {
+            for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
+                //if((fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0 && (combatantFlags & 0b1)) ||
+                //    (fight.myCombatants[i].$$propertiesWithExtra.HP[0] <= 0 && (combatantFlags & 0b10))
+                if(filter(fight.myCombatants[i], combatant)
                 ) {
-                //selecting.push(...combatant.$$fightData.$lastChoice.$targets);
-
-                //循环每个选择的战斗人物，并根据条件来压入 上次选择的
-                for(let tc of combatant.$$fightData.$lastChoice.$targets[params.Step]) {
-                    //if((tc.$$propertiesWithExtra.HP[0] > 0 && (params.CombatantFlags & 0b1)) ||
-                    //    (tc.$$propertiesWithExtra.HP[0] <= 0 && (params.CombatantFlags & 0b10))
-                    if(params.Filter(tc, combatant)
-                    ) {
-                        selecting.push(tc);
-                    }
+                //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
+                    repeaterMyCombatants.itemAt(i).setEnable(true);
                 }
             }
         }
-        //取消人物选择状态，则不处理
-        else {
-            //ret = genFightChoice.next();
-
-            return true;
+        if(teamFlags & 0b10) {
+            for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
+                //if((fight.enemies[i].$$propertiesWithExtra.HP[0] > 0 && (combatantFlags & 0b1)) ||
+                //    (fight.enemies[i].$$propertiesWithExtra.HP[0] <= 0 && (combatantFlags & 0b10))
+                if(filter(fight.enemies[i], combatant)
+                ) {
+                //if(repeaterEnemies.itemAt(i).opacity !== 0) {
+                    repeaterEnemies.itemAt(i).setEnable(true);
+                }
+            }
         }
     }
-    //选择菜单
-    else if(params.Type === 2) {
-        //可选择 的是 0 到 Items的长度
-        selecting = [...new Array(params.Items.length).keys()];
-
-        //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
-        if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
-            GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
-            GlobalLibraryJS.isValidNumber(combatant.$$fightData.$lastChoice.$targets[params.Step])
-            ) {
-            selecting.push(combatant.$$fightData.$lastChoice.$targets[params.Step]);
-        }
-    }
-
     else {
-        console.warn('[!FightScene]没有这种选择');
-        return false;
+        if(teamFlags & 0b1) {
+            //全部取消闪烁
+            for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
+                //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
+                if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+                    repeaterMyCombatants.itemAt(i).setEnable(false);
+                }
+            }
+        }
+        if(teamFlags & 0b10) {
+            //全部取消闪烁
+            for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
+                //if(repeaterEnemies.itemAt(i).opacity !== 0) {
+                if(fight.enemies[i].$$propertiesWithExtra.HP[0] > 0) {
+                    repeaterEnemies.itemAt(i).setEnable(false);
+                }
+            }
+        }
     }
-
-    return selecting;
 }
 
 
 
+//判断是否可以开始回合
+function checkToFight() {
+    if(_private.nStage === 2)
+        return false;
 
-
-
-//重置刷新战斗人物（创建时调用）
-function resetFightRole(fightRole, fightRoleComp, index, teamID) {
-
-    fightRoleComp.refresh(fightRole);
-    //fightRoleComp.strName = fightRole.$name;
-
-
-
-    //if(i >= repeaterMyCombatants.count)
-    //    break;
-    //console.debug("!!!", _private.myCombatants, i, fightRole, JSON.stringify(fightRole));
-    if(!fightRole.$$fightData)
-        fightRole.$$fightData = {};
-
-    //fightRole.$$fightData.$actionData = {};
-    //fightRole.$$fightData.$buffs = {};
-    ////_private.myCombatants.$rid = fightScriptData.$enemiesData[tIndex].$rid;
-
-    fightRole.$$fightData.$info = {};
-    fightRole.$$fightData.$info.$index = parseInt(index);
-    if(teamID === 0) {    //我方
-        fightRole.$$fightData.$info.$teamsID = [0, 1];
-        fightRole.$$fightData.$info.$teams = [_private.myCombatants, _private.enemies];
-        fightRole.$$fightData.$info.$teamsComp = [repeaterMyCombatants, repeaterEnemies];
-
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, false);
-    }
-    else if(teamID === 1) { //敌方
-        fightRole.$$fightData.$info.$teamsID = [1, 0];
-        fightRole.$$fightData.$info.$teams = [_private.enemies, _private.myCombatants];
-        fightRole.$$fightData.$info.$teamsComp = [repeaterEnemies, repeaterMyCombatants];
-
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, true);
-        //_private.enemies[i].$rid = fightScriptData.$enemiesData[tIndex].$rid;
-
-    }
-
-    fightRole.$$fightData.$info.$comp = fightRoleComp;
-    fightRole.$$fightData.$info.$spriteEffect = fightRoleComp.spriteEffect;
-
-    //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-
-    //fightRole.$$fightData.$choice.$type = -1;
-    ////fightRole.$$fightData.$lastChoice.$type = -1;
-    //fightRole.$$fightData.$choice.$attack = undefined;
-    ////fightRole.$$fightData.$lastChoice.$attack = undefined;
-    //这两句必须，否则会指向不存在的对象（比如第一场结束前选第4个敌人，第二场直接重复上次就出错了）；
-    //fightRole.$$fightData.$choice.$targets = undefined;
-    //fightRole.$$fightData.$lastChoice.$targets = undefined;
-
-    //fightRole.$$fightData.defenseSkill = undefined;
-    //fightRole.$$fightData.lastDefenseSkill = undefined;
-
-
-    /*/读取ActionData
-    let fightroleInfo = game.$sys.getFightRoleResource(fightRole.$rid);
-    if(fightroleInfo) {
-        for(let tn in fightroleInfo.ActionData) {
-            fightRole.$$fightData.$actionData[fightroleInfo.ActionData[tn].ActionName] = fightroleInfo.ActionData[tn].SpriteName;
+    //遍历，判断target
+    for(let i = 0; i < fight.myCombatants.length; ++i) {
+        if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+        //if(repeaterEnemies.itemAt(i).opacity !== 0) {
+            //如果 没选择 且 有技能
+            if(fight.myCombatants[i].$$fightData.$choice.$type === -1 && fight.myCombatants[i].$skills.length > 0) {
+                return false;
+            }
         }
     }
-    else
-        console.warn("[!FightScene]载入战斗精灵失败：" + fightRole.$rid);
-    */
 
-
-
-    FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
-
-    //刷新血条
-    //if(fightRole.$$propertiesWithExtra.HP[0] <= 0)
-    //    fightRole.$$propertiesWithExtra.HP[0] = 1;
+    let ret = _private.genFighting.run();
+    return true;
 }
 
 
@@ -657,7 +520,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
     case 1: //刷新人物信息
         //fight.$sys.refreshCombatant(-1);
 
-        for(let tc of [..._private.myCombatants, ..._private.enemies]) {
+        for(let tc of [...fight.myCombatants, ...fight.enemies]) {
             fight.$sys.refreshCombatant(tc);
         }
 
@@ -1080,313 +943,6 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
 
 
-
-
-
-//得到某个战斗角色的 所有 普通技能 和 技能；
-//types：技能的type，系统默认 0为普通攻击，1为技能
-//flags：0b1，包括战斗人物自身拥有的技能；0b10：包括战斗人物拥有的所有装备上附带的所有的技能；
-//返回数组：[技能名数组, 技能数组]。
-function getCombatantSkills(combatant, types=[0, 1], flags=0b11) {
-    let arrSkillsName = [], arrSkills = [];
-
-    if(flags & 0b1) {
-        //人物所有的
-        for(let skill of combatant.$skills) {
-            if(types.indexOf(skill.$type) >= 0) {
-                arrSkillsName.push(skill.$name);
-                arrSkills.push(skill);
-            }
-        }
-    }
-
-    if(flags & 0b10) {
-        //道具所有的
-        for(let te in combatant.$equipment) {
-            let tWeapon = combatant.$equipment[te];
-
-            if(/*tWeapon && */tWeapon.$skills && tWeapon.$skills.length > 0)
-                for(let skill of tWeapon.$skills) {
-                    /*let skill;
-                    if(GlobalLibraryJS.isString(tskill)) {
-                        skill = {$rid: tskill};
-                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill).$properties);
-                    }
-                    else {
-                        skill = {$rid: tskill.RId};
-                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill.RId).$properties);
-                        GlobalLibraryJS.copyPropertiesToObject(skill, tskill);
-                    }*/
-
-                    if(types.indexOf(skill.$type) >= 0) {
-                        arrSkillsName.push(skill.$name);
-                        arrSkills.push(skill);
-                    }
-                }
-        }
-    }
-
-    return [arrSkillsName, arrSkills];
-}
-
-
-//显示技能选择框
-//type：0为普通攻击；1为技能
-function showSkillsOrGoods(type) {
-
-    //普通攻击
-    if(type === 0) {
-        let arrSkillsName = [];
-        let arrSkills = [];
-
-        [arrSkillsName, arrSkills] = FightSceneJS.getCombatantSkills(_private.myCombatants[_private.nChoiceFightRoleIndex], [0]);
-
-        //menuSkillsOrGoods.nType = 0;
-
-        //rectSkills.visible = true;
-        //menuSkillsOrGoods.show(arrSkillsName, arrSkills);
-
-        if(arrSkills.length === 0) {
-            fight.msg("没有技能", 50);
-            return;
-        }
-        //直接选择最后一个普通攻击
-        choicedSkillOrGoods(arrSkills.pop(), 3);
-    }
-    //技能
-    else if(type === 1) {
-        let arrSkillsName = [];
-        let arrSkills = [];
-
-        [arrSkillsName, arrSkills] = FightSceneJS.getCombatantSkills(_private.myCombatants[_private.nChoiceFightRoleIndex], [1]);
-
-        menuSkillsOrGoods.strTitle = "选择技能";
-        menuSkillsOrGoods.nType = 3;
-
-        rectSkills.visible = true;
-        menuSkillsOrGoods.show(arrSkillsName, arrSkills);
-    }
-    //道具
-    else if(type === 2) {
-        let arrGoodsName = [];
-        let arrGoods = [];
-
-        //显示所有战斗可用的道具
-        for(let goods of game.gd["$sys_goods"]) {
-            //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
-            if(goods.$commons.$fightScript) {
-                arrGoods.push(goods);
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
-            }
-        }
-
-        menuSkillsOrGoods.strTitle = "选择道具";
-        menuSkillsOrGoods.nType = 2;
-
-        rectSkills.visible = true;
-        menuSkillsOrGoods.show(arrGoodsName, arrGoods);
-    }
-}
-
-//选择技能
-//type：3为技能，2为物品
-function choicedSkillOrGoods(used, type) {
-
-    //console.debug("~~~~~~~~~weapon", JSON.stringify(tWeapon))
-    //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.getGoodsResource(tWeapon.RId)))
-
-
-
-    let combatant = _private.myCombatants[_private.nChoiceFightRoleIndex];
-    combatant.$$fightData.$choice.$type = type;
-    combatant.$$fightData.$choice.$attack = used;
-
-
-    //console.debug('!!!1', JSON.stringify(used))
-
-    //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
-    if(type === 3 || type === 2) {
-        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](used, combatant, 0);
-        if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
-            fight.msg(checkSkill || "不能选择", 50);
-            return;
-        }
-        else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
-            fight.msg(...checkSkill);
-            return;
-        }
-        else if(checkSkill !== true) {   //如果不可用
-            fight.msg("不能选择", 50);
-            return;
-        }
-    }
-
-
-    //鹰：注释是避免 选择技能后直接点重复上次，会导致有可能攻击自己人的问题
-    //combatant.$$fightData.$lastChoice.$type = type;
-    //combatant.$$fightData.$lastChoice.$attack = used;
-
-    //console.debug("~~~~~~~~~~used: ", used);
-
-
-
-    //技能
-    let skill;
-
-    //普通攻击 或 技能
-    if(type === 3) {
-        skill = combatant.$$fightData.$choice.$attack;
-        if(skill && skill.$commons.$choiceScript)
-            _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
-        else if(!skill) {   //如果不可用
-            fight.msg("技能不能使用", 50);
-            return;
-        }
-    }
-    //道具
-    else if(type === 2) {
-        let goods = combatant.$$fightData.$choice.$attack;
-        if(GlobalLibraryJS.isArray(goods.$fight))
-            skill = goods.$fight[0];
-        //有一种情况为空：道具没有对应技能（$fight[0]），只运行收尾代码（$fightScript[3]）；
-        //if(!skill)
-        //    skill = {$targetCount: 0, $targetFlag: 0};
-
-        //如果有 $fightScript 和 $choiceScript
-        if(GlobalLibraryJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
-            _private.genFightChoice = goods.$commons.$fightScript.$choiceScript(goods, combatant);
-        }
-        //!!兼容旧代码
-        else if(GlobalLibraryJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
-            _private.genFightChoice = goods.$commons.$fightScript[0](goods, combatant);
-        }
-        //使用技能的
-        else if(skill && skill.$commons.$choiceScript)
-            _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
-        else if(!skill) {   //如果不可用
-            fight.msg("道具不能使用", 50);
-            return;
-        }
-    }
-
-    //如果没有特定定义的 $choiceScript选择脚本，则使用系统的
-    if(!_private.genFightChoice) {
-        //单人技能 且 目标敌方
-        if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
-            _private.genFightChoice = FightSceneJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
-        }
-
-        //目标己方
-        else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
-            _private.genFightChoice = FightSceneJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
-        }
-
-        //不选（全体）
-        //if(skill.$targetFlag === 0) {
-        else if(skill.$targetCount <= 0) {
-            _private.genFightChoice = FightSceneJS.gfNoChoiceSkill(skill, combatant);
-        }
-        else {   //不可用
-            fight.msg("不能使用", 50);
-            return;
-        }
-    }
-
-    //开始进入选择
-    skillChoice();
-}
-
-
-
-//技能的选择
-//  进入技能的选择步骤后，一次选择完毕后的处理
-//type和value是传递给_private.genFightChoice的参数
-//  type：是技能选择步骤需要的类型，在技能选择的生成器函数中用yield返回的，这里重新给与；
-//  value：选择的结果，比如 type为1，value为选择的对象；type为2，value为菜单的下标
-function skillChoice(type, value) {
-    if(_private.genFightChoice === null) {
-        console.warn('[!FightScene]_private.genFightChoice is NULL');
-        return;
-    }
-
-    let combatant = _private.myCombatants[_private.nChoiceFightRoleIndex];
-    let skillOrGoods = combatant.$$fightData.$choice.$attack;
-
-    let ret = _private.genFightChoice.next({Type: type, Value: value});
-    for(;;) {
-        if(ret.done === true) { //选择完毕
-
-            _private.genFightChoice = null;
-
-            FightSceneJS.saveLast(combatant);
-
-
-            //if(_private.nChoiceFightRoleIndex < 0 || _private.nChoiceFightRoleIndex >= _private.myCombatants.length)
-            //    return;
-
-            //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
-            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skillOrGoods, combatant, 1);
-            if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
-                fight.msg(checkSkill || "不能使用", 50);
-                return;
-            }
-            else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
-                fight.msg(...checkSkill);
-                return;
-            }
-            else if(checkSkill !== true) {   //如果技能不可用
-                fight.msg("不能使用", 50);
-                return;
-            }
-
-
-            //检查是否可以开始回合
-            if(_private.nStage === 1)
-                checkToFight();
-            return;
-        }
-        else {
-            //重新选择
-            if(ret.value === false)
-                return;
-
-            let res = FightSceneJS.skillSetUsing(ret.value, combatant);
-            if(res === true) {
-                ret = _private.genFightChoice.next();
-
-                continue;
-            }
-            else if(res === false) {
-                return;
-            }
-        }
-    }
-}
-
-
-//判断是否可以开始回合
-function checkToFight() {
-    if(_private.nStage === 2)
-        return false;
-
-    //遍历，判断target
-    for(let i = 0; i < _private.myCombatants.length; ++i) {
-        if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
-        //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-            //如果 没选择 且 有技能
-            if(_private.myCombatants[i].$$fightData.$choice.$type === -1 && _private.myCombatants[i].$skills.length > 0) {
-                return false;
-            }
-        }
-    }
-
-    let ret = _private.genFighting.run();
-    return true;
-}
-
-
-
-
 //刷新 FightRole 的 action 到 sprite 并播放 loop 次
 function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 
@@ -1418,14 +974,14 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 
 //重置所有Roles位置
 function resetRolesPosition() {
-    for(let i = 0; i < _private.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
+    for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
         let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](0, i);
         let tRoleSpriteEffect = repeaterMyCombatants.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
         tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
     }
 
-    for(let i = 0; i < _private.enemies.length /*repeaterEnemies.nCount*/; ++i) {
+    for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
         let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](1, i);
         let tRoleSpriteEffect = repeaterEnemies.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
@@ -1433,38 +989,6 @@ function resetRolesPosition() {
     }
 }
 
-
-//战斗人物回合脚本
-//stage：0为回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
-function *runCombatantRoundScript(combatant, stage) {
-    //执行 战斗人物回合 脚本
-    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, stage);
-
-    if(combatantRoundScript === null) {
-        return null;
-    }
-    else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
-        for(let tCombatantActionSpriteData of combatantRoundScript) {
-            let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-
-            if(SkillEffectResult === 1)
-                yield 0;
-            else if(SkillEffectResult === 0) {
-
-            }
-            else {
-
-            }
-        }
-    }
-
-
-    //重新计算属性
-    fight.$sys.refreshCombatant(combatant);
-
-
-    return 0;
-}
 
 
 
@@ -1475,10 +999,10 @@ function *fnRound() {
 
 
     /*/敌人 选择防御
-    for(let tc in _private.enemies) {
-        let tSkillIndexArray = GlobalLibraryJS.getDifferentNumber(0, _private.enemies[tc].$skills.length);
+    for(let tc in fight.enemies) {
+        let tSkillIndexArray = GlobalLibraryJS.getDifferentNumber(0, fight.enemies[tc].$skills.length);
         //!!!!!这里需要加入：1、普通攻击概率；2、魔法值不足；3、最后还是普通攻击
-        _private.enemies[tc].$$fightData.$choice.$attack = _private.enemies[tc].$skills[tSkillIndexArray[0]].RId;
+        fight.enemies[tc].$$fightData.$choice.$attack = fight.enemies[tc].$skills[tSkillIndexArray[0]].RId;
     }*/
 
 
@@ -1516,7 +1040,7 @@ function *fnRound() {
             //战斗人物回合脚本
             yield *runCombatantRoundScript(combatant, 1);
 
-            ret = FightSceneJS.combatantUseSkillOrGoods(combatant);
+            ret = game.$gameMakerGlobalJS.combatantChoiceSkillOrGoods(combatant);
 
             yield *runCombatantRoundScript(combatant, 2);
 
@@ -1733,14 +1257,14 @@ function *gfFighting() {
         //console.debug("[FightScene]Fighting...");
 
         /*let tTeamsParam = [
-            _private.myCombatants,
-            _private.enemies,
+            fight.myCombatants,
+            fight.enemies,
         ];*/
 
 
 
         //循环每个队伍，开始遍历运行 Buff
-        for(let tcombatant of [..._private.myCombatants, ..._private.enemies]) {
+        for(let tcombatant of [...fight.myCombatants, ...fight.enemies]) {
 
             //战斗人物回合脚本
             let ret = yield *runCombatantRoundScript(tcombatant, 0);
@@ -1762,12 +1286,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript, 'fight round21'], -1, _private.nRound, 0, [_private.myCombatants, _private.enemies,], _private.fightData);
+        //    fight.run([_private.fightRoundScript, 'fight round21'], -1, _private.nRound, 0, [fight.myCombatants, fight.enemies,], _private.fightData);
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round11'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight round11'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1796,7 +1320,7 @@ function *gfFighting() {
 
         /*for(let ti = 0; ti < repeaterEnemies.count; ++ti) {
             //if(repeaterEnemies.itemAt(ti).opacity !== 0) {
-            if(_private.enemies[ti].$$propertiesWithExtra.HP[0] > 0) {
+            if(fight.enemies[ti].$$propertiesWithExtra.HP[0] > 0) {
                 repeaterEnemies.itemAt(ti).colorOverlayStop();
             }
         }*/
@@ -1807,12 +1331,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript, 'fight round22'], -1, _private.nRound, 1, [_private.myCombatants, _private.enemies,], _private.fightData);
+        //    fight.run([_private.fightRoundScript, 'fight round22'], -1, _private.nRound, 1, [fight.myCombatants, fight.enemies,], _private.fightData);
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight round12'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight round12'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1851,7 +1375,7 @@ function *gfFighting() {
 
 
         //清空
-        for(let tcombatant of _private.myCombatants) {
+        for(let tcombatant of fight.myCombatants) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
@@ -1863,7 +1387,7 @@ function *gfFighting() {
                 //tcombatant.$$fightData.$choice.$type = -1;
             //}
         }
-        for(let tcombatant of _private.enemies) {
+        for(let tcombatant of fight.enemies) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
@@ -1901,6 +1425,41 @@ function *gfFighting() {
     }
 }
 
+
+//战斗人物回合脚本
+//stage：0为回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
+function *runCombatantRoundScript(combatant, stage) {
+    //执行 战斗人物回合 脚本
+    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, stage);
+
+    if(combatantRoundScript === null) {
+        return null;
+    }
+    else if(GlobalLibraryJS.isGenerator(combatantRoundScript)) {
+        for(let tCombatantActionSpriteData of combatantRoundScript) {
+            let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
+
+            if(SkillEffectResult === 1)
+                yield 0;
+            else if(SkillEffectResult === 0) {
+
+            }
+            else {
+
+            }
+        }
+    }
+
+
+    //重新计算属性
+    fight.$sys.refreshCombatant(combatant);
+
+
+    return 0;
+}
+
+
+
 //逃跑处理
 function runAway() {
 
@@ -1916,7 +1475,7 @@ function runAway() {
 
     //如果是true，则调用通用逃跑算法
     if(_private.runAway === true) {
-        if(game.$sys.resources.commonScripts["common_run_away_algorithm"](_private.myCombatants, -1)) {
+        if(game.$sys.resources.commonScripts["common_run_away_algorithm"](fight.myCombatants, -1)) {
             fight.over(-2);
             return;
         }
@@ -1934,14 +1493,14 @@ function runAway() {
         yield fight.msg("逃跑失败");
 
         //全部设置为 休息
-        for(let i = 0; i < _private.myCombatants.length; ++i) {
-            if(_private.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+        for(let i = 0; i < fight.myCombatants.length; ++i) {
+            if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts["fight_combatant_set_choice"](_private.myCombatants[i], 1, false);
-                //_private.myCombatants[i].$$fightData.$choice.$type = 1;
-                //_private.myCombatants[i].$$fightData.$choice.$attack = undefined;
-                //_private.myCombatants[i].$$fightData.$choice.$targets = undefined;
+                game.$sys.resources.commonScripts["fight_combatant_set_choice"](fight.myCombatants[i], 1, false);
+                //fight.myCombatants[i].$$fightData.$choice.$type = 1;
+                //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
+                //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
             }
         }
         //!!这里使用事件的形式执行genFighting，因为genFighting中也有 fight 脚本，貌似对之后的脚本造成了影响!!
@@ -1955,60 +1514,6 @@ function runAway() {
 }
 
 
-//保存上次
-function saveLast(combatant=true) {
-    if(combatant === true)
-        for(let tc of _private.myCombatants) {
-        //for(let i = 0; i < _private.myCombatants.length; ++i) {
-            if(tc.$$propertiesWithExtra.HP[0] > 0) {
-            //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                tc.$$fightData.$lastChoice = {};
-                GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$lastChoice, tc.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
-                //tc.$$fightData.$lastTarget = tc.$$fightData.$targets;
-                //tc.$$fightData.$lastAttackSkill = tc.$$fightData.$attackSkill;
-                //tc.$$fightData.$lastChoiceType = tc.$$fightData.$choiceType;
-            }
-        }
-    else {
-        combatant.$$fightData.$lastChoice = {};
-        GlobalLibraryJS.copyPropertiesToObject(combatant.$$fightData.$lastChoice, combatant.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
-        //combatant.$$fightData.$lastTarget = combatant.$$fightData.$targets;
-        //combatant.$$fightData.$lastAttackSkill = combatant.$$fightData.$attackSkill;
-        //combatant.$$fightData.$lastChoiceType = combatant.$$fightData.$choiceType;
-    }
-}
-
-//type：0表示完全载入上次；1表示载入没有选择的
-function loadLast(combatant=true, type=0) {
-    if(combatant === true)
-        for(let tc of _private.myCombatants) {
-        //for(let i = 0; i < _private.myCombatants.length; ++i) {
-            //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            if(tc.$$propertiesWithExtra.HP[0] > 0) {
-                if(type === 1 && tc.$$fightData.$choice.$type !== -1) {   //已经有选择
-                    continue;
-                }
-                else {
-                    GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$choice, tc.$$fightData.$lastChoice, {arrayRecursion: false, objectRecursion: 0});
-                    //tc.$$fightData.$targets = tc.$$fightData.$lastTarget;
-                    //tc.$$fightData.$attackSkill = tc.$$fightData.$lastAttackSkill;
-                    //tc.$$fightData.$choiceType = tc.$$fightData.$lastChoiceType;
-                }
-            }
-        }
-    else {
-        if(type === 1 && combatant.$$fightData.$choice.$type !== -1) {   //已经有选择
-            //continue;
-        }
-        else {
-            GlobalLibraryJS.copyPropertiesToObject(combatant.$$fightData.$choice, combatant.$$fightData.$lastChoice, {arrayRecursion: false, objectRecursion: 0});
-            //_private.myCombatants[i].$$fightData.$targets = _private.myCombatants[i].$$fightData.$lastTarget;
-            //_private.myCombatants[i].$$fightData.$attackSkill = _private.myCombatants[i].$$fightData.$lastAttackSkill;
-            //_private.myCombatants[i].$$fightData.$choiceType = _private.myCombatants[i].$$fightData.$lastChoiceType;
-        }
-    }
-}
-
 
 //调用脚本
 function fightOver(result) {
@@ -2016,13 +1521,12 @@ function fightOver(result) {
     //if(result !== undefined && result !== null) {
         //战斗结束脚本
         //if(_private.fightEndScript) {
-        //    fight.run([_private.fightEndScript, 'fight end'], -1, result, [_private.myCombatants, _private.enemies,], _private.fightData);
+        //    fight.run([_private.fightEndScript, 'fight end'], -1, result, [fight.myCombatants, fight.enemies,], _private.fightData);
         //}
 
-        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [_private.myCombatants, _private.enemies,], _private.fightData), 'fight end2']);
+        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight end2']);
     //}
 }
-
 
 
 
@@ -2042,6 +1546,8 @@ function resetFightScene() {
     FightSceneJS.setTeamReadyToChoice(0b11, filter, false, null);
 
 }
+
+
 
 function showFightRoleInfo(nIndex) {
     gameMenuWindow.showWindow(0b10, nIndex);
@@ -2088,7 +1594,7 @@ function readFightRole(role) {
     //let data = File.read(filePath);
     let data = FrameManager.sl_qml_ReadFile(filePath);
 
-    if(data !== "") {
+    if(data) {
         data = JSON.parse(data);
 
         GlobalLibraryJS.copyPropertiesToObject(role, data.Property);
@@ -2121,7 +1627,7 @@ function loadFightSkillInfo(fightSkillName) {
 
         let data = FrameManager.sl_qml_ReadFile(filePath);
 
-        if(data !== "") {
+        if(data) {
             data = JSON.parse(data);
             //console.debug("data", data);
             try {
@@ -2178,7 +1684,7 @@ function doSkillEffect(team1, roleIndex1, team2, roleIndex2, skillEffect) {
 function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     //console.debug("[FightScene]doSkillEffect");
     //console.debug(team1, roleIndex1, team2, roleIndex2, skillEffect);
-    //console.debug(JSON.stringify(_private.myCombatants), JSON.stringify(_private.enemies))
+    //console.debug(JSON.stringify(fight.myCombatants), JSON.stringify(fight.enemies))
 
     //!!!!!!修改
     let role1 = team1[roleIndex1];
@@ -2218,8 +1724,8 @@ function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Global.frameData.arrayEnemyPets[0].$$fightData.attackProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
 
-    msgbox.textArea.append(name1 + "使用【" + GameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + "】攻击");
-    msgbox.textArea.append(name1 + "使用【" + GameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + "】防御");
+    msgbox.textArea.append(name1 + "使用【" + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + "】攻击");
+    msgbox.textArea.append(name1 + "使用【" + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + "】防御");
     //msgbox.textArea.append(name2 + "使用" + role2.$$fightData.attackProp + "攻击");
     //msgbox.textArea.append(name2 + "使用" + role2.$$fightData.defenseProp + "防御");
 

@@ -48,8 +48,8 @@ Item {
         //textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
         //textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
         //textSpriteFrameCount.text = cfg.FrameCount.toString();
-        textSpriteFrameOffsetX.text = "0";
-        textSpriteFrameOffsetY.text = "0";
+        textSpriteFrameOffsetColumn.text = "0";
+        textSpriteFrameOffsetRow.text = "0";
 
         textSpriteFrameInterval.text = "200";
         //sprite.width = parseInt(textSpriteWidth.text);
@@ -62,6 +62,8 @@ Item {
         textSpriteSoundResourceName.text = "";
         textSpriteSoundResourceName.enabled = false;
         textSoundDelay.text = "0";
+        textSpriteFrameOffsetX.text = "0";
+        textSpriteFrameOffsetY.text = "0";
         textSpriteOpacity.text = "1";
         textSpriteFrameXScale.text = "1";
         textSpriteFrameYScale.text = "1";
@@ -76,7 +78,7 @@ Item {
         let cfg = FrameManager.sl_qml_ReadFile(filePath);
         console.debug("[SpriteEditor]filePath：", filePath);
 
-        if(cfg === "")
+        if(!cfg)
             return false;
         cfg = JSON.parse(cfg);
         //console.debug("cfg", cfg);
@@ -98,8 +100,8 @@ Item {
         textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
         textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
         textSpriteFrameCount.text = cfg.FrameCount.toString();
-        textSpriteFrameOffsetX.text = cfg.OffsetIndex[0].toString();
-        textSpriteFrameOffsetY.text = cfg.OffsetIndex[1].toString();
+        textSpriteFrameOffsetColumn.text = cfg.OffsetIndex[0].toString();
+        textSpriteFrameOffsetRow.text = cfg.OffsetIndex[1].toString();
 
         textSpriteFrameInterval.text = cfg.FrameInterval.toString();
         //sprite.width = parseInt(textSpriteWidth.text);
@@ -119,6 +121,8 @@ Item {
         textSpriteSoundResourceName.text = cfg.Sound;
         textSpriteSoundResourceName.enabled = false;
         textSoundDelay.text = cfg.SoundDelay.toString();
+        textSpriteFrameOffsetX.text = cfg.XOffset !== undefined ? cfg.XOffset.toString() : "0";
+        textSpriteFrameOffsetY.text = cfg.YOffset !== undefined ? cfg.YOffset.toString() : "0";
         textSpriteOpacity.text = cfg.Opacity.toString();
         textSpriteFrameXScale.text = cfg.XScale.toString();
         textSpriteFrameYScale.text = cfg.YScale.toString();
@@ -238,11 +242,12 @@ Item {
 
                     rootGameMaker.showMsg('
   特效大小：游戏中显示的大小；
+  特效偏移：帧在特效内的x、y轴偏移；
   X/Y轴缩放：可以在x、y方向进行缩放，且可以为负数（x、y轴的镜像）；
-  透明度：0-1之间的小数；
   帧宽高：将图片切割为每一帧的大小（如果图片显示有问题，则可能这里不正确）；
   帧数：连续播放的帧数；
-  帧偏移：从第几列、第几行开始（然后连续的n张）；
+  起始帧：从第几列、第几行开始（然后连续的n张）；
+  透明度：0-1之间的小数；
   帧切换速度：你懂的；
   音效播放延时：帧播放多少毫秒后开始播放音效；
 
@@ -391,6 +396,86 @@ Item {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
+                text: "X/Y轴偏移"
+            }
+
+            TextField {
+                id: textSpriteFrameOffsetX
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "0"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshSprite();
+                }
+            }
+
+            TextField {
+                id: textSpriteFrameOffsetY
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "0"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshSprite();
+                }
+            }
+
+            Label {
+                font.pointSize: _config.nLabelFontSize
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 10
+                text: "透明度"
+            }
+
+            TextField {
+                id: textSpriteOpacity
+
+                Layout.preferredWidth: 50
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: _private.nColumnHeight
+
+                text: "1"
+                font.pointSize: _config.nTextFontSize
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onEditingFinished: {
+                    _private.refreshSprite();
+                }
+            }
+
+        }
+
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.9
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
+
+            Label {
+                font.pointSize: _config.nLabelFontSize
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 10
                 text: "帧宽高"
             }
 
@@ -479,11 +564,11 @@ Item {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "帧偏移（列/行）"
+                text: "起始帧（列/行）"
             }
 
             TextField {
-                id: textSpriteFrameOffsetX
+                id: textSpriteFrameOffsetColumn
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -501,40 +586,13 @@ Item {
                 }
             }
             TextField {
-                id: textSpriteFrameOffsetY
+                id: textSpriteFrameOffsetRow
 
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 //Layout.preferredHeight: _private.nColumnHeight
 
                 text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "透明度"
-            }
-
-            TextField {
-                id: textSpriteOpacity
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
                 font.pointSize: _config.nTextFontSize
 
                 //selectByKeyboard: true
@@ -630,7 +688,8 @@ Item {
 
                     anchors.fill: parent
 
-                    test: true
+                    mouseArea.enabled: true
+                    bTest: true
                     nType: 1
                     //width: 37;
                     //height: 58;
@@ -639,9 +698,9 @@ Item {
                     /*nFrameCount: 3;
                     interval: 100;*/
 
-                    onS_clicked: {
+                    /*onS_clicked: {
                         root.forceActiveFocus();
-                    }
+                    }*/
                 }
             }
 
@@ -1446,6 +1505,7 @@ Item {
 
         TextArea {
             id: textScript
+            width: parent.width
             placeholderText: "输入脚本命令"
 
             selectByKeyboard: true
@@ -1514,13 +1574,15 @@ Item {
 
             sprite.sizeFrame = Qt.size(parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text));
             sprite.nFrameCount = parseInt(textSpriteFrameCount.text);
-            sprite.offsetIndex = Qt.point(parseInt(textSpriteFrameOffsetX.text), parseInt(textSpriteFrameOffsetY.text));
+            sprite.offsetIndex = Qt.point(parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text));
 
             sprite.interval = parseInt(textSpriteFrameInterval.text);
             //sprite.width = parseInt(textSpriteWidth.text);
             //sprite.height = parseInt(textSpriteHeight.text);
             sprite.implicitWidth = parseInt(textSpriteWidth.text);
             sprite.implicitHeight = parseInt(textSpriteHeight.text);
+            sprite.offsetX = parseInt(textSpriteFrameOffsetX.text);
+            sprite.offsetY = parseInt(textSpriteFrameOffsetY.text);
             sprite.opacity = parseFloat(textSpriteOpacity.text);
             sprite.rXScale = parseFloat(textSpriteFrameXScale.text);
             sprite.rYScale = parseFloat(textSpriteFrameYScale.text);
@@ -1578,10 +1640,12 @@ Item {
             outputData.SpriteSize = [parseInt(textSpriteWidth.text), parseInt(textSpriteHeight.text)];
             outputData.FrameSize = [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)];
             outputData.FrameCount = parseInt(textSpriteFrameCount.text);
-            outputData.OffsetIndex = [parseInt(textSpriteFrameOffsetX.text), parseInt(textSpriteFrameOffsetY.text)];
+            outputData.OffsetIndex = [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)];
 
             outputData.FrameInterval = parseInt(textSpriteFrameInterval.text);
             outputData.Image = textSpriteImageResourceName.text;
+            outputData.XOffset = parseInt(textSpriteFrameOffsetX.text);
+            outputData.YOffset = parseInt(textSpriteFrameOffsetY.text);
             outputData.Opacity = parseFloat(textSpriteOpacity.text);
             outputData.XScale = parseFloat(textSpriteFrameXScale.text);
             outputData.YScale = parseFloat(textSpriteFrameYScale.text);

@@ -95,7 +95,7 @@ Item {
             //let cfg = File.read(filePath);
             let cfg = FrameManager.sl_qml_ReadFile(filePath);
 
-            if(cfg !== "") {
+            if(cfg) {
                 cfg = JSON.parse(cfg);
                 //console.debug("cfg", cfg);
                 //loader.setSource("./MapEditor_1.qml", {});

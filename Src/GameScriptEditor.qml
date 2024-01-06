@@ -352,7 +352,7 @@ Item {
             //let cfg = File.read(filePath);
             let data = FrameManager.sl_qml_ReadFile(path);
 
-            if(data !== "") {
+            if(data) {
                 notepadScript.setPlainText(data);
                 notepadScript.toBegin();
             }
