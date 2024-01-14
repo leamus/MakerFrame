@@ -156,7 +156,7 @@ Item {
 
         }
         else {  //是脚本
-            game.run([startScript, 'game_start']);
+            game.run([startScript(), 'game_start']);
         }
 
 
@@ -673,6 +673,7 @@ Item {
                 role.$name = role.RId;
             }
             role.$rid = role.RId;
+            role.$type = 1;
 
 
             for(let th of _private.arrMainRoles) {
@@ -1065,6 +1066,7 @@ Item {
                 role.$name = role.RId;
             }
             role.$rid = role.RId;
+            role.$type = 2;
 
 
             if(_private.objRoles[role.$id] !== undefined)
@@ -2266,7 +2268,8 @@ Item {
             game.run(function*() {
                 let fightHeros = game.fighthero();
                 if(fightHeros.length === 0) {
-                    game.run(function *(){yield game.msg('没有战斗人物', 10);});
+                    //game.run(function *(){yield game.msg('没有战斗人物', 10);});
+                    yield game.msg('没有战斗人物', 10);
                     return;
                 }
 
@@ -3549,6 +3552,7 @@ Item {
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined) {
                 console.warn('[!GameScene]运行脚本未定义!!!');
+                //console.exception(123);
                 return false;
             }
 
@@ -6084,14 +6088,19 @@ Item {
 
 
             //播放一个动作
-            function action(tsprite) {
-                GameSceneJS.loadSpriteEffect(tsprite.RId, rootRole.actionSprite, tsprite.$loops);
-                if(GlobalLibraryJS.isValidNumber(tsprite.width))
-                    rootRole.actionSprite.width = tsprite.width;
-                if(GlobalLibraryJS.isValidNumber(tsprite.height))
-                    rootRole.actionSprite.height = tsprite.height;
-                rootRole.actionSprite.x = tsprite.x || 0;
-                rootRole.actionSprite.y = tsprite.y || 0;
+            function action(data) {
+                if(GlobalLibraryJS.isString(data))
+                    data = {RId: data};
+
+                GameSceneJS.loadSpriteEffect(data, rootRole.actionSprite, data.$loops ?? 1);
+
+                if(GlobalLibraryJS.isValidNumber(data.$width))
+                    rootRole.actionSprite.width = data.$width;
+                if(GlobalLibraryJS.isValidNumber(data.$height))
+                    rootRole.actionSprite.height = data.$height;
+                rootRole.actionSprite.x = data.$x ?? 0;
+                rootRole.actionSprite.y = data.$y ?? 0;
+
                 rootRole.actionSprite.playAction();
             }
 
@@ -6256,13 +6265,13 @@ Item {
                 onClicked: {
                     //console.debug('clicked: parent.id', parent.id)
                     if(parent.clicked)
-                        game.run(parent.clicked, -1, parent);
+                        game.run(parent.clicked(parent), -1, );
                 }
 
                 onDoubleClicked: {
                     //game.delimage(parent.id);
                     if(parent.doubleClicked)
-                        game.run(parent.doubleClicked, -1, parent);
+                        game.run(parent.doubleClicked(parent), -1, );
                 }
             }
         }
@@ -6297,26 +6306,26 @@ Item {
                 onClicked: {
                     //console.debug('clicked: parent.id', parent.id)
                     if(parent.clicked)
-                        game.run(parent.clicked, -1, parent);
+                        game.run(parent.clicked(parent), -1, );
                 }
 
                 onDoubleClicked: {
                     //game.delimage(parent.id);
                     if(parent.doubleClicked)
-                        game.run(parent.doubleClicked, -1, parent);
+                        game.run(parent.doubleClicked(parent), -1, );
                 }
             }
 
             onS_looped: {
                 //console.debug('clicked: parent.id', parent.id)
                 if(looped)
-                    game.run(looped, -1, this);
+                    game.run(looped(this), -1, );
             }
 
             onS_finished: {
                 //game.delimage(parent.id);
                 if(finished)
-                    game.run(finished, -1, this);
+                    game.run(finished(this), -1, );
             }
         }
     }

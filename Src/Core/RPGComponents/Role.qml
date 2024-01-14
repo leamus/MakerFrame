@@ -1,5 +1,9 @@
 ﻿import QtQuick 2.14
 
+//安卓assets的bug（详见QML_Pleafles）
+import RPGComponents 1.0
+
+
 /*
 
   鹰：由于Sprite的source和 frameX、 frameY 修改无效，所以只能用Component进行创建，使用refresh进行删除重建。
@@ -15,6 +19,7 @@ Item {
 
 
     //signal s_clicked();
+    signal s_ActionFinished();
 
 
 
@@ -255,6 +260,8 @@ Item {
         onS_finished: {
             visible = false;
             walkSprite.visible = true;
+
+            s_ActionFinished();
         }
 
 

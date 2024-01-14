@@ -40,13 +40,14 @@ let $config = {
             $color: 'red',
             $opacity: 0.6,
             $image: '',
-            $clicked: function*() {
+            $clicked: function() {
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
-                    return;
+                    return false;
 
                 game.$sys.interact();
+                return false;
             },
         },
         {
@@ -56,14 +57,15 @@ let $config = {
             $color: 'blue',
             $opacity: 0.6,
             $image: '',
-            $clicked: function*() {
+            $clicked: function() {
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
-                    return;
+                    return false;
 
                 game.window(1);
                 //game.window(1, {MaskColor: '#00000000'});
+                return false;
             },
         },
         {
@@ -470,9 +472,9 @@ function $Combatant(fightRoleRId, showName) {
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
 
             //RPG组件：
-            $teamsComp: [],
-            $comp: null,
-            $spriteEffect: null,
+            //$teamsComp: [],
+            //$comp: null,
+            //$spriteEffect: null,
 
         },
 

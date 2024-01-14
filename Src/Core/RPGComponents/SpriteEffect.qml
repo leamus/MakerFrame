@@ -6,8 +6,6 @@ import QtGraphicalEffects 1.0
 import _Global 1.0
 import _Global.Button 1.0
 
-//import LGlobal 1.0
-
 
 import "qrc:/QML"
 

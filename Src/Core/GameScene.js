@@ -463,7 +463,7 @@ function loadResources() {
                 button.s_pressed.connect(function(){
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    game.run(tConfig.$clicked);
+                    game.run(tConfig.$clicked());
                 });
             }
 
@@ -1539,9 +1539,9 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
 
     let data;
     if(GlobalLibraryJS.isString(spriteEffectRId))
-        data = GameSceneJS.getSpriteResource(spriteEffectRId);
-    else
-        data = spriteEffectRId;
+        spriteEffectRId = {RId: spriteEffectRId};
+    data = GameSceneJS.getSpriteResource(spriteEffectRId.RId);
+    GlobalLibraryJS.copyPropertiesToObject(data, spriteEffectRId, {onlyCopyExists: true});
 
     if(data) {
         if(!spriteEffect) {
@@ -1728,7 +1728,7 @@ function buttonAClicked() {
             if(!tScript)    //!!!兼容旧的
                 tScript = game.gf[_private.objRoles[r].$data.$id];
             if(tScript) {
-                game.run([tScript, _private.objRoles[r].$data.$id], _private.objRoles[r]);
+                game.run([tScript(_private.objRoles[r]), _private.objRoles[r].$data.$id]);
                 //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$data.$id));
 
                 return; //!!只执行一次事件
@@ -1757,28 +1757,22 @@ function mapEvent(eventName, role) {
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'];
     if(!tScript && role.$$type === 1)    //!!兼容旧的
         tScript = game.f[eventName];
-    if(!tScript)
-        if(role.$$type === 1)
-            tScript = game.gf['$' + eventName];
-        else
-            tScript = game.gf['$' + role.$data.$id + '_' + eventName + '_map'];
-    if(!tScript && role.$$type === 1)    //!!兼容旧的
-        tScript = game.gf[eventName];
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件:' + role.$data.$id + '_' + eventName + '_map'], role);
+        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图事件:' + role.$data.$id + '_' + eventName + '_map'], );
     //game.run([tScript, '地图事件:' + eventName]);
 
 
-    //调用一个总的
-    tScript = itemViewPort.mapScript['$map_' + eventName];
+    //调用总事件处理
+    tScript = game.gf['$' + eventName + '_map'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图事件:map_' + eventName], role);
+        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图事件:map_' + eventName], );
 
 
 
-    console.debug("[GameScene]mapEvent:", role.$data.$id + '_' + eventName + '_map');    //触发
+    console.debug("[GameScene]mapEvent:", role.$data.$id + '_' + eventName + '_map');
 }
+
 //离开事件触发
 function mapEventCanceled(eventName, role) {
     let tScript;
@@ -1794,22 +1788,16 @@ function mapEventCanceled(eventName, role) {
             tScript = game.f['$' + eventName + '_map_leave'];
         else
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-    if(!tScript)
-        if(role.$$type === 1)
-            tScript = game.gf['$' + eventName + '_map_leave'];
-        else
-            tScript = game.gf['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'], role);
+        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'], );
     //game.run([tScript, '地图事件离开:' + eventName + '_leave']);
 
 
-    //调用一个总的
-    tScript = itemViewPort.mapScript['$_map_leave_' + eventName];
+    //调用总事件处理
+    tScript = game.gf['$' + eventName + '_map_leave'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '地图离开事件:map_leave_' + eventName], role);
+        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图离开事件:map_leave_' + eventName], );
 
 
 
@@ -1827,7 +1815,7 @@ function mapClickEvent(x, y) {
     if(!tScript)
         tScript = game.gf[eventName];
     if(tScript)
-        game.run([tScript, eventName], -1, Math.floor(x / itemViewPort.sizeMapBlockSize.width), Math.floor(y / itemViewPort.sizeMapBlockSize.height), x, y);
+        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockSize.width), Math.floor(y / itemViewPort.sizeMapBlockSize.height), x, y), eventName], -1, );
 
     //console.debug(mouse.x, mouse.y,
     //              Math.floor(mouse.x / itemViewPort.sizeMapBlockSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockSize.height))
@@ -1846,7 +1834,7 @@ function roleClickEvent(role, dx, dy) {
     if(!tScript)
         tScript = game.gf[eventName];
     if(tScript) {
-        game.run([tScript, role.$data.$id], role);
+        game.run([tScript(role), role.$data.$id], );
         //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$name));
 
         return; //!!只执行一次事件
@@ -1906,7 +1894,15 @@ function onTriggered() {
             else
                 _private.objGlobalTimers[tt][2] = _private.objGlobalTimers[tt][0];
 
-            GlobalJS.createScript(_private.asyncScript, 0, -1, [game.gf[tt], '全局定时器事件:' + tt]);
+            let tScript;
+            if(itemViewPort.mapScript)
+                tScript = itemViewPort.mapScript[tt];
+            if(!tScript)
+                tScript = game.f[tt];
+            if(!tScript)
+                tScript = game.gf[tt];
+
+            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(realinterval), '全局定时器事件:' + tt]);
             //game.run([game.gf[tt], tt]);
 
             //GlobalJS.runScript(_private.asyncScript, 0, "game.gf['%1']()".arg(tt));
@@ -1941,7 +1937,7 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '定时器事件:' + tt], tt);
+            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(realinterval), '定时器事件:' + tt], );
             //game.run([tScript, tt]);
             //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(tt));
         }
@@ -1999,7 +1995,7 @@ function onTriggered() {
                         if(!tScript)
                             tScript = game.gf[eventName];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色Arrive事件:' + role.$data.$id], role);
+                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '角色Arrive事件:' + role.$data.$id], );
                             //game.run([tScript, role.$name]);
                     }
                     else
@@ -2131,7 +2127,7 @@ function onTriggered() {
                     tScript = game.gf[eventName];
                 if(tScript) {
                     let keep = false;   //是否是持续碰撞；
-                    let key = 'role_' + _private.objRoles[r].$data.$id;
+                    let key = '$role_' + _private.objRoles[r].$data.$id;
                     if(role.$$collideRoles[key] !== undefined) {
                         keep = true;
                         collideRoles[key] = role.$$collideRoles[key] + realinterval;
@@ -2139,7 +2135,7 @@ function onTriggered() {
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞角色事件:' + role.$data.$id], role, _private.objRoles[r], keep);
+                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.objRoles[r], keep), '角色碰撞角色事件:' + role.$data.$id], );
                 }
             }
         }
@@ -2159,6 +2155,7 @@ function onTriggered() {
                     Qt.rect(_private.arrMainRoles[r].x + _private.arrMainRoles[r].x1, _private.arrMainRoles[r].y + _private.arrMainRoles[r].y1, _private.arrMainRoles[r].width1, _private.arrMainRoles[r].height1),
                 )
             ) {
+                let keep = false;   //是否是持续碰撞；
                 let eventName = `$${role.$data.$id}_collide`;
                 let tScript = itemViewPort.mapScript[eventName];
                 if(!tScript)
@@ -2166,15 +2163,21 @@ function onTriggered() {
                 if(!tScript)
                     tScript = game.gf[eventName];
                 if(tScript) {
-                    let keep = false;   //是否是持续碰撞；
-                    let key = 'hero_' + _private.arrMainRoles[r].$data.$id;
+                    let key = '$hero_' + _private.arrMainRoles[r].$data.$id;
                     if(role.$$collideRoles[key] !== undefined) {
                         keep = true;
                         collideRoles[key] = role.$$collideRoles[key] + realinterval;
                     }
                     else
                         collideRoles[key] = realinterval;
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '角色碰撞主角事件:' + role.$data.$id], role, _private.arrMainRoles[r], keep);
+                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.arrMainRoles[r], keep), '角色碰撞主角事件:' + role.$data.$id], );
+                }
+
+
+                //调用总事件处理
+                tScript = game.gf['$collide'];
+                if(tScript) {
+                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.arrMainRoles[r], keep), '主角碰撞事件:' + role.$data.$id], );
                 }
             }
         }
@@ -2279,7 +2282,7 @@ function onTriggered() {
                         if(!tScript)
                             tScript = game.gf[eventName];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript, '主角Arrive事件:' + mainRole.$data.$id], mainRole);
+                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(mainRole), '主角Arrive事件:' + mainRole.$data.$id], );
                             //game.run([tScript, mainRole.$name]);
                     }
                     else
@@ -2585,15 +2588,56 @@ function onTriggered() {
 //direction：x、y轴上移动的方向（x为1、3表示右、左；y为0、2表示上、下）
 //注意：当 单向移动时，返回可以移动的偏移（因为定向移动还需要判断一次）；
 function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY) {
+    let collideObstacle = 0;
+
+    //运行触碰边界脚本
+    let runScript = function() {
+        if(collideObstacle !== 0) {
+            let eventName = `$${role.$data.$id}_collide_obstacle`;
+            let tScript = itemViewPort.mapScript[eventName];
+            if(!tScript)
+                tScript = game.f[eventName];
+            if(!tScript)
+                tScript = game.gf[eventName];
+            if(tScript) {
+                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, collideObstacle), '角色碰撞障碍事件:' + role.$data.$id], );
+            }
+
+
+            //调用总事件处理
+            if(role.$$type === 1) {
+                tScript = game.gf['$collide_obstacle'];
+                if(tScript) {
+                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, collideObstacle), '主角碰撞障碍事件:' + role.$data.$id], );
+                }
+            }
+        }
+
+
+        //放在这里是因为，上面的脚本使用时可以访问到原来的 role.$$collideRoles，来确定是否第一次碰撞；
+        let continueScript = function() {
+            if(GlobalLibraryJS.isComponent(role))
+                role.$$collideRoles['$obstacle'] = collideObstacle;
+        }
+        GlobalJS.createScript(_private.asyncScript, 0, -1, [continueScript, '角色碰撞障碍事件2:' + role.$data.$id], );
+    }
+
+
+
+    //如果是一个方向上移动，则简单判断即可
     if(directionX === -1 || directionY === -1) {
         if(directionX !== -1)   //如果x方向移动
-            offsetMoveX = fComputeRoleMoveOffset(role, directionX, offsetMoveX);
+            [offsetMoveX, collideObstacle] = fComputeRoleMoveOffset(role, directionX, offsetMoveX);
         else
             offsetMoveX = 0;
         if(directionY !== -1)   //如果y方向移动
-            offsetMoveY = fComputeRoleMoveOffset(role, directionY, offsetMoveY);
+            [offsetMoveY, collideObstacle] = fComputeRoleMoveOffset(role, directionY, offsetMoveY);
         else
             offsetMoveY = 0;
+
+
+        runScript();
+
 
         if(offsetMoveX === 0 && offsetMoveY === 0)
             return false;
@@ -2681,14 +2725,19 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
 
         return true;
     }
+
+
+    let dx, dy, tCollideObstacle1, tCollideObstacle2;
     //如果x方向移动的多，则以y为步进，循环计算y和x方向的可移动偏移
     if(offsetMoveX > offsetMoveY) {
+        //let tCollideObstacle = 0;   //临时接受数据
+
         let proportion = offsetMoveX / offsetMoveY; //倍数；y步进时，每次x都会乘以这个数
         let ox = 0; //上次的x偏差（因为计算dx时会四舍五入，下次计算时要去掉这个偏差再计算）
         //y步进循环
         for(let oy = 1; oy <= offsetMoveY; ++oy) {
-            let dy = fComputeRoleMoveOffset(role, directionY, 1);   //y方向偏移
-            let dx = fComputeRoleMoveOffset(role, directionX, Math.round(proportion + ox)); //x方向偏移
+            [dy, tCollideObstacle1] = fComputeRoleMoveOffset(role, directionY, 1);   //y方向偏移
+            [dx, tCollideObstacle2] = fComputeRoleMoveOffset(role, directionX, Math.round(proportion + ox)); //x方向偏移
 
 
             if(directionX === 1)
@@ -2710,8 +2759,8 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
         let proportion = offsetMoveY / offsetMoveX;
         let oy = 0;
         for(let ox = 1; ox <= offsetMoveX; ++ox) {
-            let dx = fComputeRoleMoveOffset(role, directionX, 1);
-            let dy = fComputeRoleMoveOffset(role, directionY, Math.round(proportion + oy));
+            [dx, tCollideObstacle1] = fComputeRoleMoveOffset(role, directionX, 1);
+            [dy, tCollideObstacle2] = fComputeRoleMoveOffset(role, directionY, Math.round(proportion + oy));
 
 
             if(directionX === 1)
@@ -2728,27 +2777,48 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
         }
     }
 
+
+    collideObstacle = tCollideObstacle1 | tCollideObstacle2;
+    runScript();
+
+
     return true;
 }
 
 //计算 role 在 derect方向 在 offsetMove 距离中最多能移动的距离
 //  Role向direction方向移动offsetMove，如果遇到障碍或其他role，则返回离最近障碍的距离
 function fComputeRoleMoveOffset(role, direction, offsetMove) {
+    let collideObstacle = 0;
 
     if(offsetMove <= 0)
-        return 0;
+        return [0, 0];
 
-    if(role.width1 <= 0 || role.height1 <= 0)
-        return offsetMove;
+    //如果影子为0 或 全部可穿透，直接判断地图距离即可
+    if(role.width1 <= 0 || role.height1 <= 0 || (role.$data.$penetrate & 0b11) === 0b11) {
+        [offsetMove, collideObstacle] = fComputeRoleMoveToMapBound(role, direction, offsetMove);
+        return [offsetMove, collideObstacle];
+    }
 
-    offsetMove = fComputeRoleMoveToObstacleOffset(role, direction, offsetMove);
+
+    //判断 角色的距离（角色的碰撞不在这里检测）
+    if((role.$data.$penetrate & 0b1) === 0) {
+        offsetMove = fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
+    }
 
     if(offsetMove <= 0)
-        return 0;
+        return [0, 0];
 
-    offsetMove = fComputeRoleMoveToRolesOffset(role, direction, offsetMove);
 
-    return offsetMove;
+    //判断角色离障碍的距离（必须放在最后，因为这里有检测碰撞）
+    if((role.$data.$penetrate & 0b10) === 0) {
+        [offsetMove, collideObstacle] = fComputeRoleMoveToObstacleOffset(role, direction, offsetMove);
+    }
+    //否则只检测边界
+    else
+        [offsetMove, collideObstacle] = fComputeRoleMoveToMapBound(role, direction, offsetMove);
+
+
+    return [offsetMove, collideObstacle];
 }
 
 //计算 role 在 direction 方向 在 offsetMove 距离中碰到其他roles的距离
@@ -2927,25 +2997,73 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
 }
 
 
+//计算地图边界
+function fComputeRoleMoveToMapBound(role, direction, offsetMove) {
+    let collideObstacle = 0;
+
+    //计算距离
+    switch(direction) {
+    case 3:
+
+        //如果超过地图左，则返回到左边的距离
+        if(role.x + role.x1 - offsetMove < 0) {
+            offsetMove = role.x + role.x1;
+            collideObstacle = 0b1000;
+        }
+        break;
+    case 1:
+
+        //如果超过地图右，则返回到右边的距离
+        if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width) {
+            offsetMove = itemViewPort.itemContainer.width - (role.x + role.x2) - 1;
+            collideObstacle = 0b0010;
+        }
+        break;
+    case 0: //同Left
+
+        //如果超过地图上，则返回到上边的距离
+        if(role.y + role.y1 - offsetMove < 0) {
+            offsetMove = role.y + role.y1;
+            collideObstacle = 0b0001;
+        }
+        break;
+    case 2:   //同Right
+
+        //如果超过地图下，则返回到下边的距离
+        if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height) {
+            offsetMove = itemViewPort.itemContainer.height - (role.y + role.y2) - 1;
+            collideObstacle = 0b0100;
+        }
+        break;
+    }
+
+    return [offsetMove, collideObstacle];
+}
+
 //计算 role 在 moveDirection 方向 在 offsetMove 距离中碰到障碍的距离
+//返回碰到障碍的距离和是否碰到障碍
 //  障碍算法：从direction方向依次循环每个地图块，如果遇到障碍就返回距离（肯定是最近）
 function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
+    let collideObstacle = 0;
 
     if(offsetMove <= 0)
-        return 0;
+        return [0, 0];
 
     let computeOver = false;//是否计算完毕（遇到图块就停止）
     //计算移动后占用图块
     let usedMapBlocks;
 
+    [offsetMove, collideObstacle] = fComputeRoleMoveToMapBound(role, direction, offsetMove);
 
-    //计算障碍距离（值为按键值）
+    //计算障碍距离
     switch(direction) {
     case 3:
 
-        //如果超过地图左，则返回到左边的距离
-        if(role.x + role.x1 - offsetMove < 0)
+        /*/如果超过地图左，则返回到左边的距离
+        if(role.x + role.x1 - offsetMove < 0) {
             offsetMove = role.x + role.x1;
+            collideObstacle = 0b1000;
+        }*/
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
 
@@ -2963,6 +3081,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         //计算离障碍距离
                         offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
+                        collideObstacle = 0b1000;
                         computeOver = true;
                     }
                     if(computeOver)
@@ -2976,9 +3095,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
     case 1:
 
-        //如果超过地图右，则返回到右边的距离
-        if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width)
+        /*/如果超过地图右，则返回到右边的距离
+        if(role.x + role.x2 + offsetMove >= itemViewPort.itemContainer.width) {
             offsetMove = itemViewPort.itemContainer.width - (role.x + role.x2) - 1;
+            collideObstacle = 0b0010;
+        }*/
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
 
@@ -2994,6 +3115,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
+                        collideObstacle = 0b0010;
                         computeOver = true;
                     }
                     if(computeOver)
@@ -3007,9 +3129,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
     case 0: //同Left
 
-        //如果超过地图上，则返回到上边的距离
-        if(role.y + role.y1 - offsetMove < 0)
+        /*/如果超过地图上，则返回到上边的距离
+        if(role.y + role.y1 - offsetMove < 0) {
             offsetMove = role.y + role.y1;
+            collideObstacle = 0b0001;
+        }*/
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
 
@@ -3025,6 +3149,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
+                        collideObstacle = 0b0001;
                         computeOver = true;
                     }
                     if(computeOver)
@@ -3038,9 +3163,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
     case 2:   //同Right
 
-        //如果超过地图下，则返回到下边的距离
-        if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height)
+        /*/如果超过地图下，则返回到下边的距离
+        if(role.y + role.y2 + offsetMove >= itemViewPort.itemContainer.height) {
             offsetMove = itemViewPort.itemContainer.height - (role.y + role.y2) - 1;
+            collideObstacle = 0b0100;
+        }*/
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
 
@@ -3056,6 +3183,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
+                        collideObstacle = 0b0100;
                         computeOver = true;
                     }
                     if(computeOver)
@@ -3071,7 +3199,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
         return;
     }
 
-    return offsetMove;
+    return [offsetMove, collideObstacle];
 }
 
 

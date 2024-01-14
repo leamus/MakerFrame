@@ -692,7 +692,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             //保存到列表中，退出时会删除所有，防止删除错误
             _private.mapSpriteEffectsTemp[combatantActionSpriteDataID] = spriteEffect;
             spriteEffect.s_finished.connect(function(){
-                if(spriteEffect)
+                if(GlobalLibraryJS.isComponent(spriteEffect))
                     spriteEffect.destroy();
                 delete _private.mapSpriteEffectsTemp[combatantActionSpriteDataID];
             });
@@ -829,7 +829,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
         let spriteEffect = compCacheWordMove.createObject(fightScene);
         spriteEffect.parallelAnimation.finished.connect(function(){
-            if(spriteEffect)
+            if(GlobalLibraryJS.isComponent(spriteEffect))
                 spriteEffect.destroy();
         });
 
@@ -1286,12 +1286,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript, 'fight round21'], -1, _private.nRound, 0, [fight.myCombatants, fight.enemies,], _private.fightData);
+        //    fight.run([_private.fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round21'], -1, );
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight round11'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round11'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1331,12 +1331,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript, 'fight round22'], -1, _private.nRound, 1, [fight.myCombatants, fight.enemies,], _private.fightData);
+        //    fight.run([_private.fightRoundScript( _private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round22'], -1,);
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight round12'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round12'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1411,7 +1411,7 @@ function *gfFighting() {
         //回合开始脚本
         if(_private.fightRoundScript) {
             //console.debug("运行回合事件!!!", _private.nRound)
-            if(GlobalJS.createScript(_private.asyncScript, 0, 0, _private.fightRoundScript, _private.nRound, 1) === 0)
+            if(GlobalJS.createScript(_private.asyncScript, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
                 _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
         }*/
 
@@ -1521,10 +1521,10 @@ function fightOver(result) {
     //if(result !== undefined && result !== null) {
         //战斗结束脚本
         //if(_private.fightEndScript) {
-        //    fight.run([_private.fightEndScript, 'fight end'], -1, result, [fight.myCombatants, fight.enemies,], _private.fightData);
+        //    fight.run([_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end'], -1, );
         //}
 
-        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies,], _private.fightData), 'fight end2']);
+        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end2']);
     //}
 }
 

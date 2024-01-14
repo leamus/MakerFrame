@@ -186,10 +186,11 @@ Item {
 
         //data = data.$createData(fightScriptParams);
         //data.__proto__ = _private.fightInfo;
-        _private.fightData = fightScriptData;
 
 
-        _private.runAway = (fightScriptData.$runAway === undefined ? true : fightScriptData.$runAway);
+        fight.fightScript = fightScriptData;
+
+        _private.runAway = (fight.fightScript.$runAway === undefined ? true : fight.fightScript.$runAway);
 
 
 
@@ -201,19 +202,19 @@ Item {
         let enemyRandom = false;    //随机排列
 
         //如果是数组
-        if(GlobalLibraryJS.isArray(fightScriptData.$enemyCount)) {
-            if(fightScriptData.$enemyCount.length === 1)
-                enemyCount = fightScriptData.$enemyCount[0];
+        if(GlobalLibraryJS.isArray(fight.fightScript.$enemyCount)) {
+            if(fight.fightScript.$enemyCount.length === 1)
+                enemyCount = fight.fightScript.$enemyCount[0];
             else
-                enemyCount = GlobalLibraryJS.random(fightScriptData.$enemyCount[0], fightScriptData.$enemyCount[1] + 1);
+                enemyCount = GlobalLibraryJS.random(fight.fightScript.$enemyCount[0], fight.fightScript.$enemyCount[1] + 1);
 
             enemyRandom = true;
         }
-        else if(fightScriptData.$enemyCount === true) {
-            enemyCount = fightScriptData.$enemiesData.length;
+        else if(fight.fightScript.$enemyCount === true) {
+            enemyCount = fight.fightScript.$enemiesData.length;
         }
         else {
-            enemyCount = fightScriptData.$enemyCount;   //如果是数字
+            enemyCount = fight.fightScript.$enemyCount;   //如果是数字
         }
 
         fight.enemies.length = enemyCount;
@@ -221,12 +222,12 @@ Item {
         for(let i = 0; i < fight.enemies.length; ++i) {
             let tIndex;
             if(enemyRandom) //随机
-                tIndex = GlobalLibraryJS.random(0, fightScriptData.$enemiesData.length);
+                tIndex = GlobalLibraryJS.random(0, fight.fightScript.$enemiesData.length);
             else    //顺序
-                tIndex = i % fightScriptData.$enemiesData.length;
+                tIndex = i % fight.fightScript.$enemiesData.length;
 
             //创建敌人
-            fight.enemies[i] = game.$sys.getFightRoleObject(fightScriptData.$enemiesData[tIndex], true);
+            fight.enemies[i] = game.$sys.getFightRoleObject(fight.fightScript.$enemiesData[tIndex], true);
 
             //从 propertiesWithExtra 设置人物的 HP和MP
             //fight.run(function() {
@@ -237,7 +238,7 @@ Item {
 
         //初始化脚本
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
-            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"], 'fight_init_script'], -2, [fight.myCombatants, fight.enemies], fightScriptData)
+            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript), 'fight_init_script'], -2, );
         }
 
 
@@ -296,13 +297,13 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies,], _private.fightData), 'fight start1'], -2);
+        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript), 'fight start1'], -2);
 
 
         //GlobalLibraryJS.setTimeout(function() {
             //战斗起始脚本
             //if(_private.fightStartScript) {
-            //    fight.run([_private.fightStartScript, 'fight start2'], -1, [fight.myCombatants, fight.enemies,], _private.fightData);
+            //    fight.run([_private.fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript), 'fight start2'], -1, );
             //}
 
 
@@ -372,8 +373,12 @@ Item {
 
 
     property QtObject fight: QtObject {
+        //我方和敌方
         property var myCombatants: []
         property var enemies: []
+
+        //战斗脚本
+        property var fightScript: null
 
 
         //!!兼容旧代码
@@ -1777,13 +1782,6 @@ Item {
         //我方按钮
         //property var arrMenu: ["普通攻击", "技能", "物品", '信息', "休息"]
 
-
-        //脚本
-        //property var fightInfo
-        property var fightData  //脚本数据
-        //property var fightRoundScript
-        //property var fightStartScript
-        //property var fightEndScript
 
         //逃跑
         property var runAway

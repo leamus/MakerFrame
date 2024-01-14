@@ -33,7 +33,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: "1.7.5.240106"
+    property string version: "1.7.6.240109"
 
 
     //配置
@@ -55,6 +55,10 @@ QtObject {
                 return Platform.getExternalDataPath() + separator + "RPGMaker";
                 //return "assets:";   //"."  //'qrc:'
             case 'windows':
+                if(Platform.compileType() === 'release')
+                    return "RPGMaker";
+                else
+                    return 'F:/_Projects/Pets/MakerFrame/RPGMaker';
             default:
                 return "RPGMaker";
                 //return '.';
@@ -70,12 +74,12 @@ QtObject {
         property string strSaveDataPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return Platform.getExternalDataPath() + separator + "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
+                return strWorkPath + separator + "SaveData" + separator + strCurrentProjectName;
                 //return Platform.getExternalDataPath() + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
                 //return Platform.getSdcardPath() + separator + "Leamus" + separator + "RPGGame" + separator + strCurrentProjectName + separator + "SaveData";
             case 'windows':
             default:
-                return "RPGMaker" + separator + "SaveData" + separator + strCurrentProjectName;
+                return strWorkPath + separator + "SaveData" + separator + strCurrentProjectName;
                 //return "SaveData";
             }
         }
