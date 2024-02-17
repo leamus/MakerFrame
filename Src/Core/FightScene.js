@@ -672,7 +672,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         break;
 
     case 20: {   //Sprite
-            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, compSpriteEffect.createObject(fightScene), combatantActionSpriteData.Loops);
+            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, null, combatantActionSpriteData.Loops, fightScene);
 
             if(spriteEffect === null)
                 break;
@@ -685,15 +685,18 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //检测ID是否重复
             if(_private.mapSpriteEffectsTemp[combatantActionSpriteDataID] !== undefined) {
-                _private.mapSpriteEffectsTemp[combatantActionSpriteDataID].destroy();
+                game.$sys.unloadSpriteEffect(_private.mapSpriteEffectsTemp[combatantActionSpriteDataID]);
+                //_private.mapSpriteEffectsTemp[combatantActionSpriteDataID].destroy();
                 delete _private.mapSpriteEffectsTemp[combatantActionSpriteDataID];
             }
 
             //保存到列表中，退出时会删除所有，防止删除错误
             _private.mapSpriteEffectsTemp[combatantActionSpriteDataID] = spriteEffect;
             spriteEffect.s_finished.connect(function(){
-                if(GlobalLibraryJS.isComponent(spriteEffect))
-                    spriteEffect.destroy();
+                if(GlobalLibraryJS.isComponent(spriteEffect)) {
+                    game.$sys.unloadSpriteEffect(spriteEffect);
+                    //spriteEffect.destroy();
+                }
                 delete _private.mapSpriteEffectsTemp[combatantActionSpriteDataID];
             });
             //spriteEffect.z = 999;
@@ -829,8 +832,9 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
         let spriteEffect = compCacheWordMove.createObject(fightScene);
         spriteEffect.parallelAnimation.finished.connect(function(){
-            if(GlobalLibraryJS.isComponent(spriteEffect))
+            if(GlobalLibraryJS.isComponent(spriteEffect)) {
                 spriteEffect.destroy();
+            }
         });
 
 
@@ -1084,14 +1088,15 @@ function *fnRound() {
 
                     //得到技能生成器函数
                     //let genActionAndSprite = fightSkillInfo.$commons.$playScript(combatant);
-                    _private.asyncScript.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
+                    //_private.asyncScript.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant), Tips: '$playScript'}, );
 
 
                     //循环 技能（或者 道具技能）包含的特效
                     while(1) {
 
                         //一个特效
-                        let tCombatantActionSpriteData = _private.asyncScript.run(SkillEffectResult);
+                        let [tCombatantActionSpriteData] = _private.asyncScript.run(SkillEffectResult);
                         //console.debug("~~~~~", JSON.stringify(tCombatantActionSpriteData));
 
                         //方案2：新的 Generator来执行
@@ -1162,21 +1167,26 @@ function *fnRound() {
 
 
                 let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
+
                 //得到技能生成器函数
                 //let genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
                 //if(goodsInfo.$commons.$fightScript['$playScript'])
                 //    _private.asyncScript.create(goodsInfo.$commons.$fightScript['$playScript'](goods, combatant), '$playScript', -1);
+
                 if(goodsInfo.$commons.$fightScript['$completeScript'])
-                    _private.asyncScript.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
+                    //_private.asyncScript.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), Tips: '$completeScript'}, );
                 else if(goodsInfo.$commons.$fightScript['$overScript'])
-                    _private.asyncScript.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
+                    //_private.asyncScript.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), Tips: '$overScript'}, );
                 else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
-                    _private.asyncScript.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
+                    //_private.asyncScript.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant), Tips: '$overScript'}, );
 
                 while(1) {
 
                     //一个特效
-                    let tCombatantActionSpriteData = _private.asyncScript.run(SkillEffectResult);
+                    let [tCombatantActionSpriteData] = _private.asyncScript.run(SkillEffectResult);
                     //如果动画结束
                     if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
                         break;
@@ -1206,7 +1216,7 @@ function *fnRound() {
 
 
             //执行产生的脚本
-            //fight.run(null);
+            //fight.run(false);
 
 
 
@@ -1360,7 +1370,7 @@ function *gfFighting() {
             }, 'continueFight']);
 
             //开始执行脚本队列
-            //fight.run(null);
+            //fight.run(false);
 
             yield;
         }

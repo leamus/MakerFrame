@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -188,13 +188,15 @@ Item {
 
 
                 //loader.item.openMap(item);
-                let tScript = "game.loadmap('%1');game.createhero('%2');game.movehero(%3,%4);game.setinterval(6);game.goon();yield game.msg('欢迎来到鹰歌Maker世界！');".
-                    arg(textMapName.text).
-                    arg(textRoleName.text).
-                    arg(textMapBlockX.text ? textMapBlockX.text : 0).
-                    arg(textMapBlockY.text ? textMapBlockY.text : 0)
-                    ;
-                loader.item.init(tScript);
+                let tScript = function*() {
+                    game.loadmap(textMapName.text);
+                    game.createhero(textRoleName.text);
+                    game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                    game.interval(16);
+                    game.goon();
+                    yield game.msg('欢迎来到鹰歌Maker世界！');
+                }
+                loader.item.init(tScript, true);
             }
         }
 

@@ -26,28 +26,11 @@ function loadResources() {
         _private.objCommonScripts["combatant_info"] = tCommoncript.$combatantInfo;
         _private.objCommonScripts["show_goods_name"] = tCommoncript.$showGoodsName;
         _private.objCommonScripts["show_combatant_name"] = tCommoncript.$showCombatantName;
-        _private.objCommonScripts["common_check_skill"] = tCommoncript.$commonCheckSkill;
         _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
-        _private.objCommonScripts["check_all_combatants"] = tCommoncript.$checkAllCombatants;
         _private.objCommonScripts["game_over_script"] = tCommoncript.$gameOverScript;
-        _private.objCommonScripts["common_run_away_algorithm"] = tCommoncript.$commonRunAwayAlgorithm;
-        _private.objCommonScripts["fight_skill_algorithm"] = tCommoncript.$fightSkillAlgorithm || tCommoncript.$skillEffectAlgorithm;
-        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = tCommoncript.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-        _private.objCommonScripts["fight_init_script"] = tCommoncript.$commonFightInitScript;
-        _private.objCommonScripts["fight_start_script"] = tCommoncript.$commonFightStartScript;
-        _private.objCommonScripts["fight_round_script"] = tCommoncript.$commonFightRoundScript;
-        _private.objCommonScripts["fight_end_script"] = tCommoncript.$commonFightEndScript;
-        _private.objCommonScripts["fight_combatant_position_algorithm"] = tCommoncript.$fightCombatantPositionAlgorithm;
-        _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
-        _private.objCommonScripts["fight_skill_melee_position_algorithm"] = tCommoncript.$fightSkillMeleePositionAlgorithmt;
-        _private.objCommonScripts["fight_combatant_set_choice"] = tCommoncript.$fightCombatantSetChoice;
-        _private.objCommonScripts["fight_menus"] = tCommoncript.$fightMenus;
-        _private.objCommonScripts["fight_buttons"] = tCommoncript.$fightButtons;
         //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
         //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
         //_private.objCommonScripts["use_goods_script"] = tCommoncript.commonUseGoodsScript;
-        _private.objCommonScripts["fight_roles_round"] = tCommoncript.$fightRolesRound;
-        _private.objCommonScripts["combatant_round_script"] = tCommoncript.$combatantRoundScript;
 
         //_private.objCommonScripts["events"] = tCommoncript.$events;
         //_private.objCommonScripts["get_buff"] = tCommoncript.$getBuff;
@@ -128,101 +111,12 @@ function loadResources() {
     else
         console.debug("[GameScene]载入计算属性脚本OK");
 
-    if(!_private.objCommonScripts["check_all_combatants"]) {
-        _private.objCommonScripts["check_all_combatants"] = GameMakerGlobalJS.$checkAllCombatants;
-        console.debug("[!GameScene]载入系统计算属性脚本");
-    }
-    else
-        console.debug("[GameScene]载入计算属性脚本OK");
-
     if(!_private.objCommonScripts["game_over_script"]) {
         _private.objCommonScripts["game_over_script"] = GameMakerGlobalJS.$gameOverScript;
         console.debug("[!GameScene]载入系统游戏结束脚本");
     }
     else
         console.debug("[GameScene]载入游戏结束脚本OK");
-
-    if(!_private.objCommonScripts["fight_skill_algorithm"]) {
-        _private.objCommonScripts["fight_skill_algorithm"] = GameMakerGlobalJS.$fightSkillAlgorithm;
-        console.debug("[!GameScene]载入系统战斗算法");
-    }
-    else
-        console.debug("[GameScene]载入战斗算法OK");  //, _private.objCommonScripts["fight_skill_algorithm"], data, eval("()=>{}"));
-
-    if(!_private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"]) {
-        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = GameMakerGlobalJS.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-        console.debug("[!GameScene]载入战斗人物选择技能或物品算法");
-    }
-    else
-        console.debug("[GameScene]载入战斗人物选择技能或物品算法OK");
-
-
-    if(!_private.objCommonScripts["fight_init_script"]) {
-        _private.objCommonScripts["fight_init_script"] = GameMakerGlobalJS.$commonFightInitScript;
-        console.debug("[!GameScene]载入系统战斗初始化脚本");
-    }
-    else
-        console.debug("[GameScene]载入战斗初始化脚本OK");
-    if(!_private.objCommonScripts["fight_start_script"]) {
-        _private.objCommonScripts["fight_start_script"] = GameMakerGlobalJS.$commonFightStartScript;
-        console.debug("[!GameScene]载入系统战斗开始脚本");
-    }
-    else
-        console.debug("[GameScene]载入战斗开始脚本OK");
-    if(!_private.objCommonScripts["fight_round_script"]) {
-        _private.objCommonScripts["fight_round_script"] = GameMakerGlobalJS.$commonFightRoundScript;
-        console.debug("[!GameScene]载入系统战斗回合脚本");
-    }
-    else
-        console.debug("[GameScene]载入战斗回合脚本OK");
-    if(!_private.objCommonScripts["fight_end_script"]) {
-        _private.objCommonScripts["fight_end_script"] = GameMakerGlobalJS.$commonFightEndScript;
-        console.debug("[!GameScene]载入系统战斗结束脚本");
-    }
-    else
-        console.debug("[GameScene]载入战斗结束脚本OK");
-
-    if(!_private.objCommonScripts["fight_combatant_position_algorithm"]) {
-        _private.objCommonScripts["fight_combatant_position_algorithm"] = GameMakerGlobalJS.$fightCombatantPositionAlgorithm;
-        console.debug("[!GameScene]载入系统战斗坐标算法");
-    }
-    else
-        console.debug("[GameScene]载入战斗坐标算法OK");
-
-    if(!_private.objCommonScripts["fight_combatant_melee_position_algorithm"]) {
-        _private.objCommonScripts["fight_combatant_melee_position_algorithm"] = GameMakerGlobalJS.$fightCombatantMeleePositionAlgorithm;
-        console.debug("[!GameScene]载入系统战斗近战坐标算法");
-    }
-    else
-        console.debug("[GameScene]载入战斗近战坐标算法OK");
-
-    if(!_private.objCommonScripts["fight_skill_melee_position_algorithm"]) {
-        _private.objCommonScripts["fight_skill_melee_position_algorithm"] = GameMakerGlobalJS.$fightSkillMeleePositionAlgorithm;
-        console.debug("[!GameScene]载入系统战斗特效坐标算法");
-    }
-    else
-        console.debug("[GameScene]载入战斗特效坐标算法OK");
-
-    if(!_private.objCommonScripts["fight_combatant_set_choice"]) {
-        _private.objCommonScripts["fight_combatant_set_choice"] = GameMakerGlobalJS.$fightCombatantSetChoice;
-        console.debug("[!GameScene]载入系统设置 战斗人物的 初始化 或 休息");
-    }
-    else
-        console.debug("[GameScene]载入设置 战斗人物的 初始化 或 休息OK");
-
-    if(!_private.objCommonScripts["fight_menus"]) {
-        _private.objCommonScripts["fight_menus"] = GameMakerGlobalJS.$fightMenus;
-        console.debug("[!GameScene]载入系统战斗菜单");
-    }
-    else
-        console.debug("[GameScene]载入战斗菜单OK");
-
-    if(!_private.objCommonScripts["fight_buttons"]) {
-        _private.objCommonScripts["fight_buttons"] = GameMakerGlobalJS.$fightButtons;
-        console.debug("[!GameScene]载入系统战斗按钮");
-    }
-    else
-        console.debug("[GameScene]载入战斗按钮OK");
 
     /*if(!_private.objCommonScripts["resume_event_script"]) {
         _private.objCommonScripts["resume_event_script"] = GameMakerGlobalJS.$resumeEventScript;
@@ -246,20 +140,6 @@ function loadResources() {
         console.debug("[GameScene]载入通用使用道具脚本OK");
     */
 
-    if(!_private.objCommonScripts["common_run_away_algorithm"]) {
-        _private.objCommonScripts["common_run_away_algorithm"] = GameMakerGlobalJS.$commonRunAwayAlgorithm;
-        console.debug("[!GameScene]载入系统逃跑算法");
-    }
-    else
-        console.debug("[GameScene]载入逃跑算法OK");
-
-    if(!_private.objCommonScripts["fight_roles_round"]) {
-        _private.objCommonScripts["fight_roles_round"] = GameMakerGlobalJS.$fightRolesRound;
-        console.debug("[!GameScene]载入系统战斗人物回合顺序");
-    }
-    else
-        console.debug("[GameScene]载入战斗人物回合顺序OK");
-
     if(!_private.objCommonScripts["combatant_info"]) {
         _private.objCommonScripts["combatant_info"] = GameMakerGlobalJS.$combatantInfo;
         console.debug("[!GameScene]载入系统战斗人物信息");
@@ -280,20 +160,6 @@ function loadResources() {
     }
     else
         console.debug("[GameScene]载入显示战斗人物名称信息OK");
-
-    if(!_private.objCommonScripts["common_check_skill"]) {
-        _private.objCommonScripts["common_check_skill"] = GameMakerGlobalJS.$commonCheckSkill;
-        console.debug("[!GameScene]载入系统通用检查技能脚本");
-    }
-    else
-        console.debug("[GameScene]载入通用检查技能脚本OK");
-
-    if(!_private.objCommonScripts["combatant_round_script"]) {
-        _private.objCommonScripts["combatant_round_script"] = GameMakerGlobalJS.$combatantRoundScript;
-        console.debug("[!GameScene]载入系统通用Buff脚本");
-    }
-    else
-        console.debug("[GameScene]载入通用Buff脚本OK");
 
     /*
     if(!_private.objCommonScripts["events"]) {
@@ -848,7 +714,7 @@ function loadResources() {
 
 
 
-    game.setinterval(16);
+    game.interval(16);
     game.scale(1);
 
 }
@@ -1200,8 +1066,8 @@ function getSkillObject(skill, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(skill)) {
         let resSkill;
-        //如果已是 技能对象
         if(skill.$rid && (resSkill = GameSceneJS.getSkillResource(skill.$rid))) {
+            //如果已是 技能对象 且 不需要新建
             if(forceNew === false && skill.__proto__ === resSkill) {    //直接返回
                 retSkill = skill;
                 //skill.__proto__ = resSkill;
@@ -1269,8 +1135,8 @@ function getGoodsObject(goods, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(goods)) {
         let resGoods;
-        //如果已是 道具对象
         if(goods.$rid && (resGoods = GameSceneJS.getGoodsResource(goods.$rid))) {
+            //如果已是 道具对象 且 不需要新建
             if(forceNew === false && goods.__proto__ === resGoods) {    //直接返回
                 retGoods = goods;
                 //goods.__proto__ = resGoods;
@@ -1283,7 +1149,7 @@ function getGoodsObject(goods, forceNew=true) {
                 else
                     retGoods = {};
                 */
-                retGoods = {};
+                retGoods = {$count: 0};
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
@@ -1367,8 +1233,8 @@ function getFightRoleObject(fightrole, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(fightrole)) {
         let resFightRole;
-        //如果已是 战斗人物对象!!注意这里有可能判断错误
         if(fightrole.$rid && (resFightRole = GameSceneJS.getFightRoleResource(fightrole.$rid))) {
+            //如果已是 战斗人物对象 且 不需要新建（!!!注意这里有可能判断错误）
             if(forceNew === false && fightrole.__proto__ === resFightRole) {    //直接返回
                 retFightRole = fightrole;
                 //fightrole.__proto__ = resFightRole;
@@ -1474,8 +1340,8 @@ function getFightScriptObject(fightscript, forceNew=true) {
     }
     else if(GlobalLibraryJS.isObject(fightscript)) {
         let resFightScript;
-        //如果已是 战斗脚本对象
         if(fightscript.$rid && (resFightScript = GameSceneJS.getFightScriptResource(fightscript.$rid))) {
+            //如果已是 战斗脚本对象 且 不需要新建
             if(forceNew === false && fightscript.__proto__ === resFightScript) {    //直接返回
                 retFightScript = fightscript;
                 //fightscript.__proto__ = resFightScript;
@@ -1545,7 +1411,8 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
 
     if(data) {
         if(!spriteEffect) {
-            spriteEffect = compCacheSpriteEffect.createObject(parent);
+            //spriteEffect = compCacheSpriteEffect.createObject(parent);
+            spriteEffect = _private.cacheSprites.create(parent);
             spriteEffect.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
         else if(spriteEffect.running === true)
@@ -1585,6 +1452,12 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
     //console.warn("[!GameScene]载入特效失败：" + spriteEffectRId);
     return null;
 }
+
+function unloadSpriteEffect(spriteEffect) {
+    //spriteEffect.destroy();
+    _private.cacheSprites.release(spriteEffect);
+}
+
 
 //载入角色，返回角色对象
 //如果 roleComp 为null，则 创建1个 roleComp 组件并返回
@@ -1759,14 +1632,14 @@ function mapEvent(eventName, role) {
         tScript = game.f[eventName];
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图事件:' + role.$data.$id + '_' + eventName + '_map'], );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
     //game.run([tScript, '地图事件:' + eventName]);
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图事件:map_' + eventName], );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图事件:map_' + eventName}, );
 
 
 
@@ -1790,14 +1663,14 @@ function mapEventCanceled(eventName, role) {
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'], );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
     //game.run([tScript, '地图事件离开:' + eventName + '_leave']);
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map_leave'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '地图离开事件:map_leave_' + eventName], );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图离开事件:map_leave_' + eventName}, );
 
 
 
@@ -1902,7 +1775,7 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(realinterval), '全局定时器事件:' + tt]);
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(realinterval), Tips: '全局定时器事件:' + tt});
             //game.run([game.gf[tt], tt]);
 
             //GlobalJS.runScript(_private.asyncScript, 0, "game.gf['%1']()".arg(tt));
@@ -1937,7 +1810,7 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(realinterval), '定时器事件:' + tt], );
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(realinterval), Tips: '定时器事件:' + tt}, );
             //game.run([tScript, tt]);
             //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(tt));
         }
@@ -1995,7 +1868,7 @@ function onTriggered() {
                         if(!tScript)
                             tScript = game.gf[eventName];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role), '角色Arrive事件:' + role.$data.$id], );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '角色Arrive事件:' + role.$data.$id}, );
                             //game.run([tScript, role.$name]);
                     }
                     else
@@ -2033,8 +1906,8 @@ function onTriggered() {
 
             //计算走路
             //x、y轴上移动的距离（乘以比率）
-            let offsetMoveX = Math.round(role.$data.$speed * realinterval);
-            let offsetMoveY = Math.round(role.$data.$speed * realinterval);
+            let offsetMoveX = Math.round(role.$$speed * realinterval);
+            let offsetMoveY = Math.round(role.$$speed * realinterval);
             offsetMoveX = Math.round(offsetMoveX * Math.abs(role.$$arrMoveDirection[0]));
             offsetMoveY = Math.round(offsetMoveY * Math.abs(role.$$arrMoveDirection[1]));
             //如果有移动，至少移动1
@@ -2135,7 +2008,7 @@ function onTriggered() {
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.objRoles[r], keep), '角色碰撞角色事件:' + role.$data.$id], );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.objRoles[r], keep), Tips: '角色碰撞角色事件:' + role.$data.$id}, );
                 }
             }
         }
@@ -2170,14 +2043,14 @@ function onTriggered() {
                     }
                     else
                         collideRoles[key] = realinterval;
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.arrMainRoles[r], keep), '角色碰撞主角事件:' + role.$data.$id], );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], keep), Tips: '角色碰撞主角事件:' + role.$data.$id}, );
                 }
 
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, _private.arrMainRoles[r], keep), '主角碰撞事件:' + role.$data.$id], );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], keep), Tips: '主角碰撞事件:' + role.$data.$id}, );
                 }
             }
         }
@@ -2282,7 +2155,7 @@ function onTriggered() {
                         if(!tScript)
                             tScript = game.gf[eventName];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(mainRole), '主角Arrive事件:' + mainRole.$data.$id], );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(mainRole), Tips: '主角Arrive事件:' + mainRole.$data.$id}, );
                             //game.run([tScript, mainRole.$name]);
                     }
                     else
@@ -2305,8 +2178,8 @@ function onTriggered() {
         //下面是移动代码
 
         //计算 真实移动偏移，初始为 角色速度 * 时间差
-        let offsetMoveX = Math.round(mainRole.$data.$speed * realinterval);
-        let offsetMoveY = Math.round(mainRole.$data.$speed * realinterval);
+        let offsetMoveX = Math.round(mainRole.$$speed * realinterval);
+        let offsetMoveY = Math.round(mainRole.$$speed * realinterval);
 
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
         //鹰：摇杆、键盘统一 放在 doMove 中处理
@@ -2600,7 +2473,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(!tScript)
                 tScript = game.gf[eventName];
             if(tScript) {
-                GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, collideObstacle), '角色碰撞障碍事件:' + role.$data.$id], );
+                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle), Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
             }
 
 
@@ -2608,18 +2481,22 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, 0, -1, [tScript(role, collideObstacle), '主角碰撞障碍事件:' + role.$data.$id], );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle), Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
                 }
             }
         }
 
 
         //放在这里是因为，上面的脚本使用时可以访问到原来的 role.$$collideRoles，来确定是否第一次碰撞；
-        let continueScript = function() {
+        /*let continueScript = function() {
             if(GlobalLibraryJS.isComponent(role))
                 role.$$collideRoles['$obstacle'] = collideObstacle;
+            return null;
         }
-        GlobalJS.createScript(_private.asyncScript, 0, -1, [continueScript, '角色碰撞障碍事件2:' + role.$data.$id], );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: continueScript, Tips: '角色碰撞障碍事件2:' + role.$data.$id}, );
+        */
+        //这里不用事件队列了（因为很容易积攒事件），可以使用参数中的 collideObstacle 体现当时的状态；
+        role.$$collideRoles['$obstacle'] = collideObstacle;
     }
 
 

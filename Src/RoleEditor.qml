@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -227,7 +227,7 @@ Item {
   每个方向帧数：每个方向的行走图有多少帧；
   上右下左：将一张图切割为 m列*n行 个帧，则角色的上、右、下、左的 第一个帧 分别是 哪列哪行（可以理解为x、y坐标，0开始）；
   移动速度：角色在地图上的移动速度。这个值单位是 像素/毫秒（为了适应各种刷新率下速度一致），具体要根据图块大小来设置（一般设置为0.1-0.2即可）；
-  可穿透：角色是否可以穿过（0或1）；
+  可穿透：角色是否可以穿过角色或障碍（0b1为可穿透其他角色，0b10为可穿透障碍）；
   显示名字：角色头顶是否显示名字（0或1）；
   头像和大小：使用对话命令的时候，会带有这个头像；
 
@@ -1096,11 +1096,13 @@ Item {
         id: filedialogOpenRoleImage
 
         title: "选择角色图片"
-        selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Image files (*.jpg *.png *.bmp)", "All files (*)" ]
+
+        selectMultiple: false
         selectExisting: true
         selectFolder: false
+
         visible: false
         onAccepted: {
             //root.focus = true;

@@ -1,7 +1,7 @@
 import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -2613,13 +2613,13 @@ Item {
                     _config.bMapClean = true;
 
                     if(_config.bMapDraw) {
-                        drawMap(mouse);
+                        drawMap(bx, by);
                     }
                     else if(_config.bMapEvent) {
-                        drawEvent(mouse);
+                        drawEvent(bx, by);
                     }
                     else if(_config.bMapBlockSpecial) {
-                        drawBlockSpecial(mouse);
+                        drawBlockSpecial(bx, by);
                     }
                 }
 
@@ -3002,31 +3002,36 @@ Item {
 
 
     /*Dialog1.FileDialog {
-         id: fileDialogSave2
-         title: "保存文件"
-         selectMultiple: false
-         //folder: shortcuts.home
-         folder: GlobalJS._FixLocalPath_W("Map")
-         selectFolder: true
-         visible: false
-         onAccepted: {
-             //root.focus = true;
-             root.forceActiveFocus();
+        id: fileDialogSave2
+
+        visible: false
+
+        title: "保存文件"
+        //folder: shortcuts.home
+        folder: GlobalJS._FixLocalPath_W("Map")
+
+        selectMultiple: false
+        selectExisting: true
+        selectFolder: true
+
+        onAccepted: {
+            //root.focus = true;
+            root.forceActiveFocus();
 
 
-             //console.debug("You chose: " + fileUrl, fileUrls);
-             exportMap(fileUrl);
-         }
-         onRejected: {
-             root.forceActiveFocus();
+            //console.debug("You chose: " + fileUrl, fileUrls);
+            exportMap(fileUrl);
+        }
+        onRejected: {
+            root.forceActiveFocus();
 
 
-             //console.log("Canceled");
-             //Qt.quit();
-         }
-         Component.onCompleted: {
-         }
-     }
+            //console.log("Canceled");
+            //Qt.quit();
+        }
+        Component.onCompleted: {
+        }
+    }
     */
 
 

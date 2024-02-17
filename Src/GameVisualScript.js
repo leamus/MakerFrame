@@ -241,7 +241,7 @@ let data = (function() {
                                 },
 
                                 '游戏刷新率': {
-                                    command: ['游戏刷新率', 'game.setinterval(%1);', '', 0, true, 'red', 'white'],
+                                    command: ['游戏刷新率', 'game.interval(%1);', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*刷新率', 'number', true, 0, '16', 'green'],
                                     ],

@@ -3,6 +3,7 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
 import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
+//import Qt.labs.platform 1.1
 
 
 import cn.Leamus.MakerFrame 1.0
@@ -1072,13 +1073,13 @@ Item {
                     onDoubleClicked: {
                         let n = Math.random();
                         if(n < 0.25)
-                            Qt.openUrlExternally('https://play.tudou.com/v_show/id_XMjYxMDEyNzk5Mg==');
+                            Qt.openUrlExternally('https://gitee.com/openkylin/maker-frame');
                         else if(n < 0.5)
-                            Qt.openUrlExternally('https://play.tudou.com/v_show/id_XMjYxMDEyNzk5Mg==');
+                            Qt.openUrlExternally('https://github.com/leamus/MakerFrame');
                         else if(n < 0.75)
-                            Qt.openUrlExternally('https://play.tudou.com/v_show/id_XMjYxMDEyNzk5Mg==');
+                            Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame');
                         else if(n < 1)
-                            Qt.openUrlExternally('https://play.tudou.com/v_show/id_XMjYxMDEyNzk5Mg==');
+                            Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame');
                     }
                 }
             }
@@ -1160,14 +1161,17 @@ Item {
     //打开工程 对话框
     Dialog1.FileDialog {
         id: filedialogOpenProject
+
         visible: false
 
         title: "选择项目包文件"
-        selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "zip files (*.zip)", "All files (*)" ]
+
+        selectMultiple: false
         selectExisting: true
         selectFolder: false
+
         onAccepted: {
             //rootGameMaker.focus = true;
             //loader.focus = true;
@@ -1444,7 +1448,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                rectDebugButton.nCount = 0;
                 rectDebugWindow.visible = true;
                 rectDebugWindow.forceActiveFocus();
             }
@@ -1459,6 +1462,8 @@ Item {
 
 
         function close() {
+            rectDebugButton.nCount = 0;
+
             rectDebugWindow.visible = false;
             //loader.focus = true;
             loader.forceActiveFocus();
@@ -1655,7 +1660,7 @@ Item {
 
 
         //显示调试窗口
-        function showConsoleWindow(msgType, msg) {
+        function appendDebugMessage(msgType, msg) {
 
             if(Global.filterMessage(msgType, msg))
                 return;
@@ -1743,11 +1748,11 @@ Item {
 
 
     Component.onCompleted: {
-        rootWindow.s_MessageHandler.connect(_private.showConsoleWindow);
+        rootWindow.s_MessageHandler.connect(_private.appendDebugMessage);
 
 
         if(!GameMakerGlobal.settings.value('$RunTimes')) {
-            rectHelpWindow.showMsg('<font size=6>  初来乍到？先看看 简易教程 或 关于 来了解一下引擎吧，或者加群获取各种 示例工程 玩玩</font>');
+            rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
             GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else
@@ -1769,7 +1774,7 @@ Item {
     }
 
     Component.onDestruction: {
-        rootWindow.s_MessageHandler.disconnect(_private.showConsoleWindow);
+        rootWindow.s_MessageHandler.disconnect(_private.appendDebugMessage);
 
         delete FrameManager.globalObject().GameMakerGlobal;
 

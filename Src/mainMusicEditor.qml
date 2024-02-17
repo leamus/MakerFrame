@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 import QtMultimedia 5.14
 
@@ -244,13 +244,16 @@ Item {
     Dialog1.FileDialog {
         id: filedialog
 
+        visible: false
+
         title: "选择音乐文件"
-        selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Music files (*.wav *.mp3 *.wma *.ogg *.mid)", "All files (*)" ]
+
+        selectMultiple: false
         selectExisting: true
         selectFolder: false
-        visible: false
+
         onAccepted: {
             console.debug("[mainMusicEditor]You chose: " + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();

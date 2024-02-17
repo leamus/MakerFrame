@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -94,13 +94,14 @@ let $config = {
             $color: 'red',
             $opacity: 0.6,
             $image: '',
-            $clicked: function*() {
+            $clicked: function() {
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
-                    return;
+                    return null;
 
                 game.$sys.interact();
+                return null;
             },
         },
         {
@@ -110,14 +111,15 @@ let $config = {
             $color: 'blue',
             $opacity: 0.6,
             $image: '',
-            $clicked: function*() {
+            $clicked: function() {
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
-                    return;
+                    return null;
 
                 game.window(1);
                 //game.window(1, {MaskColor: '#00000000'});
+                return null;
             },
         },
         {
@@ -222,7 +224,7 @@ let $config = {
             $backgroundColor: 'black',
             $borderColor: '#FFFFFF',
             $fontSize: 16,
-            $fontColor: 'black',
+            $fontColor: 'white',
             $titleBackgroundColor: '#FF0035A8',
             $titleBorderColor: '#00000000',
             $titleFontSize: 16,
@@ -279,93 +281,117 @@ let $config = {
 
 
 //游戏初始化（游戏开始和载入存档时调用）
-function *$gameInit() {
+function *$gameInit(firstRun) {
 
-    //读取init.js文件的所有变量和函数，并复制给game.gf
-    let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator));
-    if(initJS)
-        Object.assign(game.gf, initJS);
-
-
-    //每秒恢复
-    function resumeEventScript(combatant) {
-
-        if(combatant.$$propertiesWithExtra.HP[0] <= 0)
-            return;
-
-        game.addprops(combatant, {'HP': [2], 'MP': [2]});
+    //读取init.js文件（包括插件的）的所有变量和函数，并复制给game.gf
+    if(FrameManager.sl_qml_FileExists(game.$projectpath + GameMakerGlobal.separator + 'init.js')) {
+        let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath));
+        if(initJS) {
+            Object.assign(game.gf, initJS);
+            if(initJS.$init)
+                game.run(initJS.$init);
+        }
     }
+    let plugins = game.plugin();
+    for(let tp0 in plugins) {
+        for(let tp1 in plugins[tp0]) {
+            let initJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
+            if(FrameManager.sl_qml_FileExists(initJSPath + GameMakerGlobal.separator + 'init.js')) {
+                let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(initJSPath));
+                if(initJS) {
+                    Object.assign(game.gf, initJS);
+                    if(initJS.$init)
+                        game.run(initJS.$init);
+                }
+            }
+        }
+    }
+
 
     //每秒恢复事件
     game.addtimer('resume_event', 1000, -1, true);
     game.gf['resume_event'] = function() {
-        for(let h in game.gd['$sys_fight_heros']) {
-            resumeEventScript(game.gd['$sys_fight_heros'][h]);
+        for(let combatant of game.gd['$sys_fight_heros']) {
+            if(combatant.$$propertiesWithExtra.HP[0] > 0)
+                game.addprops(combatant, {'HP': [2], 'MP': [2]});
         }
     }
 
 
     //点击屏幕事件
     game.gf['$map_click'] = function(bx, by, x, y) {
-        if(game.hero(0).$$nActionType !== -1) {
-            let rolePos = game.hero(0).pos();
+        let hero = game.hero(0);
+        if(hero && hero.$$nActionType !== -1) {
+            let rolePos = hero.pos();
             //简单走
             //game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});
             //A*算法走
-            game.hero(0, {$action: 2, $targetBlocks: game.$gameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
+            game.hero(hero, {$action: 2, $targetBlocks: game.$gameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
         }
+        return null;
     }
 
 
-    yield game.msg('合理安排时间');
+    if(firstRun)
+        yield game.msg('合理安排时间');
+
 
     game.goon();
 
-    return true;
+
+    return null;
 }
 
 //游戏退出
 function $gameExit() {
     game.save();  //存档
+
+    return null;
 }
 
 
 //存档前调用
 function *$beforeSave() {
     //game.gd['save_datetime'] = Date.now();
-    return true;
+    return null;
 }
 
 //读档前调用
 function *$beforeLoad() {
-    return true;
+    return null;
 }
 
 //存档后调用
 function *$afterSave() {
-    return true;
+    return null;
 }
 
 //读档后调用
 function *$afterLoad() {
-    return true;
+    return null;
 }
 
 
 //打开地图前调用
 function *$beforeLoadmap(mapName) {
-    if(game.$globalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
+    /*if(game.$globalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run([ts(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 0});
     }
+    */
+
+    return null;
 }
 
 //打开地图后调用
 function *$afterLoadmap(mapName) {
-    if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
+    /*if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run([ts(mapName), 'afterLoadmap'], {Priority: -1, Type: 0, Running: 0});
     }
+    */
+
+    return null;
 }
 
 
@@ -441,9 +467,9 @@ function $Combatant(fightRoleRId, showName) {
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
 
             //RPG组件：
-            $teamsComp: [],
-            $comp: null,
-            $spriteEffect: null,
+            //$teamsComp: [],
+            //$comp: null,
+            //$spriteEffect: null,
 
         },
 
@@ -474,7 +500,8 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 
 function 属性(p, n=0) {
     let ret;
-    if(game.$globalLibraryJS.isValidNumber(n)) {
+    if(game.$globalLibraryJS.isValidNumber(n) || game.$globalLibraryJS.isStringNumber(n)) {
+        n = parseFloat(n);
         if(game.$globalLibraryJS.isString(mappingCombatantProperty[p])) {
             this.$properties[mappingCombatantProperty[p]] += n;
             ret = this.$properties[mappingCombatantProperty[p]];
@@ -489,7 +516,8 @@ function 属性(p, n=0) {
 
 function 附加属性(p, n=0) {
     let ret;
-    if(game.$globalLibraryJS.isValidNumber(n)) {
+    if(game.$globalLibraryJS.isValidNumber(n) || game.$globalLibraryJS.isStringNumber(n)) {
+        n = parseFloat(n);
         if(game.$globalLibraryJS.isString(mappingCombatantProperty[p])) {
             this.$$propertiesWithExtra[mappingCombatantProperty[p]] += n;
             ret = this.$$propertiesWithExtra[mappingCombatantProperty[p]];
@@ -694,9 +722,11 @@ function computeCombatantPropertiesWithExtra(combatant) {
     combatant.$$propertiesWithExtra = game.$globalLibraryJS.deepCopyObject(combatant.$properties);
 
     //行走速度改变示例代码1/3
-    //let 行走速度;
-    //if(combatant.$index === 0)
-    //    行走速度 = game.gd['$sys_main_roles'][0].MoveSpeed;
+    let 行走速度 = 0;
+    if(combatant.$index === 0 && game.hero(0))
+        //行走速度 = game.gd['$sys_main_roles'][0].$speed;
+        行走速度 = game.hero(0).$data.$speed;
+        //行走速度 = game.hero(0).$data.__proto__.MoveSpeed;
 
     //循环装备
     for(let te in combatant.$equipment) {
@@ -714,14 +744,15 @@ function computeCombatantPropertiesWithExtra(combatant) {
 
 
         //行走速度改变示例代码2/3
-        //if(combatant.$index === 0 && combatant.$equipment[te].行走速度)
-        //    行走速度 += combatant.$equipment[te].行走速度;
+        if(combatant.$index === 0 && combatant.$equipment[te].行走速度)
+            行走速度 += combatant.$equipment[te].行走速度;
 
     }
 
     //行走速度改变示例代码3/3
-    //if(combatant.$index === 0)
-    //    game.hero(0, {$speed: 行走速度});
+    if(combatant.$index === 0 && game.hero(0))
+        //game.hero(0, {$speed: 行走速度});
+        game.hero(0).$$speed = 行走速度;
 
 
 
@@ -760,6 +791,8 @@ function *$gameOverScript(params) {
         game.$sys.release(false);
         game.$sys.init(true, false);
     }
+
+    return null;
 }
 
 
@@ -1298,6 +1331,8 @@ function *combatantRoundEffects(combatant, round, stage) {
             delete buffs[tbuffsIndex]; //删除
         }
     }
+
+    return null;
 }
 
 
@@ -1545,6 +1580,9 @@ function *$commonFightInitScript(teams, fightData) {
     if('FightInitScript' in fightData)
     //if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
         yield fight.run([fightData.FightInitScript, 'fight init3'], -2, teams, fightData);
+
+
+    return null;
 }
 
 //战斗开始通用脚本；
@@ -1566,6 +1604,8 @@ function *$commonFightStartScript(teams, fightData) {
     //if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
         yield fight.run([fightData.FightStartScript, 'fight start3'], -2, teams, fightData);
 
+
+    return null;
 }
 
 //战斗回合通用脚本；
@@ -1623,6 +1663,8 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
     //if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
         yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
 
+
+    return null;
 }
 
 //战斗结束通用脚本；
@@ -1719,9 +1761,13 @@ function *$commonFightEndScript(r, teams, fightData) {
         //game.stage(0);
         //game.goon('$fight');
 
+        return null;
     });
 
     //console.debug(JSON.stringify(r), r.exp, r.money);
+
+
+    return null;
 }
 
 
@@ -1852,13 +1898,14 @@ let $fightButtons = [
                 fight.$sys.continueFight();
             }
             else if(fight.$sys.stage() === 2)
-                return;
+                return null;
         },
     },
     {
         $text: '逃跑',
         $action: function*(button) {
             fight.$sys.runAway();
+            return null;
         },
     },
     {
@@ -1875,14 +1922,14 @@ let $fightButtons = [
                     fight.$sys.continueFight();
                 }
                 else
-                    return false;
+                    return null;
             }
             else {
                 button.text = '手动攻击';
 
                 fight.$sys.autoAttack(0);
             }
-            return false;
+            return null;
         },
     },
 ];

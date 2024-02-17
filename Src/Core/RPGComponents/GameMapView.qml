@@ -46,7 +46,7 @@ Item {
             //console.debug("cfg", cfg, mapPath);
 
             if(!mapInfo) {
-                console.warn('[!GameMapView]Map Load Error:', mapName, mapPath);
+                console.warn('[!GameMapView]Map Load Error:', mapPath);
                 return false;
             }
             mapInfo = JSON.parse(mapInfo);
@@ -270,21 +270,25 @@ Item {
 
 
 //CanvasMask操作
+    //插件一个 canvas
     function createCanvasMask(_parent=itemBackMapContainer) {
         let cm = compCanvasMask.createObject(_parent);
         arrCanvasMask.push(cm);
         return cm;
     }
 
+    //返回 canvas
     function canvasMask(index) {
         return arrCanvasMask[index];
     }
 
+    //刷新 canvas
     function refreshCanvasMask(index, data) {
         arrCanvasMask[index].objMaskData = data;
         arrCanvasMask[index].requestPaint();
     }
 
+    //删除 canvas
     function removeCanvasMask(index) {
         let cm = arrCanvasMask.splice(index, 1)[0];
         cm.destroy();
@@ -338,6 +342,7 @@ Item {
         Canvas {
             id: canvasMask
 
+            //数据
             property var objMaskData: ({})
 
             anchors.fill: parent

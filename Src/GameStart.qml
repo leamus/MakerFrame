@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -58,7 +58,7 @@ Item {
             textGameStartScript.setPlainText(
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
-game.setinterval(16);
+game.interval(16);
 //game.loadmap('鹰歌地图');
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);

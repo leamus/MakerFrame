@@ -892,15 +892,22 @@ Item {
   5、测试没问题后可点 保存按钮 来保存当前脚本；点击 编译 来使用当前脚本（此时上一层界面会自动替换为编译后的脚本）；
   6、语法：
     有缩进的命令（比如 函数/生成器、块开始 等），必须有 块结束 匹配，否则语法错误；
-    所有的代码尽量写在 函数/生成器 中，不同的 函数/生成器 有不同的作用，比如：
-      *$start：表示载入事件（地图载入或游戏载入）；
-      *$地图事件名：表示主角进入地图事件块时的事件；
-      *$地图事件名_leave：表示主角离开地图事件块时的事件；
-      *$NPC名：表示主角与NPC对话时的事件；
-      *$map_click：地图点击事件；
-      *$NPC名_click：NPC点击事件；
-      *$NPC名_collide：主角与NPC或NPC与NPC的触碰事件；
-      *$NPC名_arrive：主角或NPC自动行走到达目的地时触发的事件；
+    所有的代码尽量写在 函数/生成器 中，一般的 函数/生成器 由用户自己来调用，特定的系统名称在不同时机由系统自动调用（一般会依次在地图脚本、game.f、game.gf中搜寻，找到后只调用一次便结束，没有则不会触发），比如：
+      $start：表示载入事件（地图载入或游戏载入）；
+      $地图事件名：表示主角进入地图事件块时的事件；
+      $地图事件名_leave：表示主角离开地图事件块时的事件（同时也会调用 game.gf中的 $事件名_map_leave）；
+      $NPCid：表示主角与NPC对话时的事件；
+      $map_click：地图点击事件；
+      $角色id_click：角色点击事件；
+      $NPCid_collide：NPC 与 主角/NPC 的触碰事件；
+      $角色id_collide_obstacle：角色 与 地图障碍/边界 的碰撞事件；
+      $角色id_arrive：角色自动行走到达目的地时触发的事件；
+      定时器名：创建定时器后会自动调用定时器事件（包括全局和地图定时器）；
+      特有全局事件（game.gf）：这些事件会在上述对应事件触发后仍会触发。
+        $地图事件名_map：地图事件；
+        $地图事件名_map_leave：地图离开事件；
+        $collide：主角与NPC碰撞事件；
+        $collide_obstacle：主角 与 地图障碍/边界 的碰撞事件；
 注意：
   1、必须点击 编译 才可以使用；
   2、带 *号 的参数表示是必选，反之可以省略；带 @号 的参数表示可以长按选择；
@@ -1464,7 +1471,7 @@ Item {
                     strCreateMenu += "Notepad {id: tNote; objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: tNote.textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: tNote.textArea.focus ? 2 : 1; bCode: true;} ".arg(defaultValue).arg(param[0]);
                     break;
                 case 'label':
-                    strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ color: 'white'; font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap;} ".arg(param[0]);
+                    strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap;} ".arg(param[0]);
                     break;
                 default:
                     strCreateMenu += "TextField {objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ text: '%1'; placeholderText: '%2'; selectByMouse: true;} ".arg(defaultValue).arg(param[0]);

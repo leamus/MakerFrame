@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 import QtGraphicalEffects 1.0
 import QtMultimedia 5.14
@@ -115,8 +115,9 @@ Item {
 
 
 
-    //游戏开始脚本
-    //startScript为true，则载入start.js；为字符串，则直接运行startScript
+    //游戏初始化脚本
+    //startScript为true，则载入start.js；为函数/生成器，则直接运行startScript；为false则不执行；
+    //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）
     function init(startScript=true, bLoadResources=true, gameData=null) {
         game.gd['$sys_fight_heros'] = [];
         //game.gd['$sys_hidden_fight_heros'] = [];
@@ -137,6 +138,45 @@ Item {
         //game.gf['$sys'] = _private.objCommonScripts;
 
 
+        //恢复游戏数据
+        if(gameData)
+            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+
+
+        //init脚本
+        if(_private.objCommonScripts['game_init'])
+            game.run([_private.objCommonScripts['game_init'](bLoadResources), 'game_init']);
+
+
+
+        //所有插件初始化
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
+                    //_private.objPlugins[tc][tp].$init();
+                    game.run([_private.objPlugins[tc][tp].$init(bLoadResources), 'plugin_init']);
+
+
+        //钩子函数调用
+        for(let vfInit in game.$sys.hooks.init) {
+            game.run([game.$sys.hooks.init[vfInit](bLoadResources), 'hook_init:' + vfInit]);
+        }
+
+
+
+        game.pause();
+        game.goon('$release');
+
+        //game.run([function(){game.goon(true);}, 'goon']);
+
+        //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
+        //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
+        //GlobalLibraryJS.setTimeout(function() {
+        //        setSceneToRole(_private.sceneRole);
+        //    },10,rootGameScene
+        //);
+
+
         //读取 start.js 脚本
         if(startScript === true) {
             /*
@@ -153,41 +193,12 @@ Item {
                 game.run([_private.objCommonScripts['game_start'](), 'game_start']);
         }
         else if(startScript === false) {
-
+        }
+        else if(startScript === null) {
         }
         else {  //是脚本
             game.run([startScript(), 'game_start']);
         }
-
-
-        //恢复游戏数据
-        if(gameData)
-            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
-
-
-        //init脚本
-        if(_private.objCommonScripts['game_init'])
-            game.run([_private.objCommonScripts['game_init'](), 'game_init']);
-
-
-        //所有插件初始化
-        for(let tc in _private.objPlugins)
-            for(let tp in _private.objPlugins[tc])
-                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
-                    _private.objPlugins[tc][tp].$init();
-
-
-        game.pause();
-        game.goon('$release');
-
-        //game.run([function(){game.goon(true);}, 'goon']);
-
-        //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
-        //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
-        //GlobalLibraryJS.setTimeout(function() {
-        //        setSceneToRole(_private.sceneRole);
-        //    },10,rootGameScene
-        //);
     }
 
 
@@ -200,11 +211,18 @@ Item {
         game.pause('$release');
 
 
+
         //所有插件释放
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc])
                 if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false)
                     _private.objPlugins[tc][tp].$release();
+
+
+        //钩子函数调用
+        for(let vfRelease in game.$sys.hooks.release) {
+            game.run([game.$sys.hooks.release[vfRelease](bUnloadResources), 'hook_release:' + vfRelease]);
+        }
 
 
         game.scale(1);
@@ -460,7 +478,7 @@ Item {
             //载入beforeLoadmap脚本
             let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
             if(beforeLoadmap)
-                game.run([beforeLoadmap(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 0});
+                game.run([beforeLoadmap(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 1});
 
 
             timer.running = false;
@@ -817,7 +835,7 @@ Item {
                 if(props.$penetrate !== undefined)   //可穿透
                     hero.$penetrate = /*heroComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
-                    hero.$speed = /*heroComp.moveSpeed = */parseFloat(props.$speed);
+                    hero.$speed = heroComp.$$speed = parseFloat(props.$speed);
                 if(props.$scale && props.$scale[0] !== undefined) { //缩放
                     hero.$scale[0] = heroComp.rXScale = props.$scale[0];
                 }
@@ -905,12 +923,16 @@ Item {
                 }
 
 
-                //其他属性直接赋值
-                let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
-                for(let tp in props) {
-                    if(usedProps.indexOf(tp) >= 0)
-                        continue;
-                    hero[tp] = props[tp];
+                //如果不是从 createhero 过来的（createhero过来的，hero和props是一个对象）
+                if(props !== hero) {
+                    //其他属性直接赋值
+                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                    //for(let tp in props) {
+                    for(let tp of Object.keys(props)) {
+                        if(usedProps.indexOf(tp) >= 0)
+                            continue;
+                        hero[tp] = props[tp];
+                    }
                 }
             }
 
@@ -921,7 +943,7 @@ Item {
         //hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
         readonly property var delhero: function(hero=-1) {
 
-            let tmpDelHero = function () {
+            let tmpDelHero = function(mainRole) {
                 mainRole.spriteSrc = '';
                 mainRole.nFrameCount = 0;
                 mainRole.width = 0;
@@ -954,6 +976,7 @@ Item {
                 for(let tr of _private.arrMainRoles) {
                     //tr.destroy();
                     tr.visible = false;
+                    tmpDelHero(mainRole);
 
                     for(let c of tr.$tmpComponents) {
                         if(GlobalLibraryJS.isComponent(c))
@@ -963,8 +986,6 @@ Item {
                 }
                 _private.arrMainRoles = [];
                 game.gd['$sys_main_roles'] = [];
-
-                tmpDelHero();
 
                 return true;
             }
@@ -1003,11 +1024,13 @@ Item {
             }
             _private.arrMainRoles[index].$tmpComponents = [];
 
+
+            //!!!如果多个主角，需要修改这个代码!!!
             //_private.arrMainRoles[index].destroy();
             delete _private.arrMainRoles[index];
             delete game.gd['$sys_main_roles'][index];
 
-            tmpDelHero();
+            tmpDelHero(mainRole);
 
             //修正下标
             for(; index < game.gd['$sys_main_roles'].length; ++index) {
@@ -1151,7 +1174,7 @@ Item {
                 if(props.$penetrate !== undefined)   //可穿透
                     role.$penetrate = /*roleComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
-                    role.$speed = /*roleComp.moveSpeed = */parseFloat(props.$speed);
+                    role.$speed = roleComp.$$speed = parseFloat(props.$speed);
                 if(props.$scale && props.$scale[0] !== undefined) {
                     role.$scale[0] = roleComp.rXScale = props.$scale[0];
                 }
@@ -1249,12 +1272,16 @@ Item {
                     roleComp.stop();
 
 
-                //其他属性直接赋值
-                let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
-                for(let tp in props) {
-                    if(usedProps.indexOf(tp) >= 0)
-                        continue;
-                    role[tp] = props[tp];
+                //如果不是从 createrole 过来的（createrole过来的，role和props是一个对象）
+                if(props !== hero) {
+                    //其他属性直接赋值
+                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                    //for(let tp in props) {
+                    for(let tp of Object.keys(props)) {
+                        if(usedProps.indexOf(tp) >= 0)
+                            continue;
+                        role[tp] = props[tp];
+                    }
                 }
             }
 
@@ -1810,16 +1837,25 @@ Item {
         //goods可以为 道具资源名、 或 标准创建格式的对象（带有RId、Params和其他属性），或道具本身（带有$rid），或 下标；
         //count为0表示使用goods内的$count；
         readonly property var getgoods: function(goods, count=0) {
+            if(!count)
+                count = 0;
 
             if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
-                goods = GameSceneJS.getGoodsObject(goods, true);
+                goods = GameSceneJS.getGoodsObject(goods, false);
 
-                if(count)
-                    goods.$count = count;
                 if(!goods.$count)
-                    return false;
+                    goods.$count = 0;
+                else {
+                    count += goods.$count;
+                    goods.$count = 0;
+                }
 
                 if(!goods.$stackable) {
+                    if(count > 0)
+                        goods.$count = count;
+                    else
+                        return false;
+
                     game.gd['$sys_goods'].push(goods);
                     return goods.$count;
                 }
@@ -1836,9 +1872,13 @@ Item {
                 }
 
                 goods = GameSceneJS.getGoodsObject(goods);
-                goods.$count = count;
 
                 if(!goods.$stackable) {
+                    if(count > 0)
+                        goods.$count = count;
+                    else
+                        return false;
+
                     game.gd['$sys_goods'].push(goods);
                     return goods.$count;
                 }
@@ -1867,12 +1907,17 @@ Item {
             for(let tg of game.gd['$sys_goods']) {
                 //找到
                 if(tg && tg.$rid === goods.$rid && tg.$stackable) {
-                    tg.$count += goods.$count;
+                    tg.$count += count;
                     return tg.$count;
                 }
             }
 
             //如果没有找到
+
+            if(count > 0)
+                goods.$count = count;
+            else
+                return false;
             game.gd['$sys_goods'].push(goods);
             return goods.$count;
         }
@@ -2260,77 +2305,20 @@ Item {
         }
 
 
-        //载入 fightScript 脚本 并进入战斗；
-        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
-        //params是给战斗脚本$createData的参数。
+        //兼容旧代码！！！
+
         readonly property var fighting: function(fightScript) {
-
-            game.run(function*() {
-                let fightHeros = game.fighthero();
-                if(fightHeros.length === 0) {
-                    //game.run(function *(){yield game.msg('没有战斗人物', 10);});
-                    yield game.msg('没有战斗人物', 10);
-                    return;
-                }
-
-                game.pause('$fight');
-                //_private.nStage = 1;
-                game.stage(1);
-
-
-                //loaderFightScene.test();
-                //loaderFightScene.init(GameSceneJS.getFightScriptObject(fightScript));
-
-                fight.run(loaderFightScene.init, -1, GameSceneJS.getFightScriptObject(fightScript));
-
-
-                //暂停脚本，直到stage为0
-                // 鹰：必须写在这里，因为如果有多个fighting同时运行，则会出错（因为Timer会一直game.run）
-                while(game.stage() !== 0)
-                    yield null;
-
-            });
+            fight.fighting(fightScript);
         }
 
-        //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
-        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
-        //flag：0b1为行动时遇敌，0b10为静止时遇敌；
-        //params是给战斗脚本$createData的参数；
-        //会覆盖之前的fighton；
         readonly property var fighton: function(fightScript, probability=5, flag=3, interval=1000) {
-            game.gd['$sys_random_fight'] = [fightScript, probability, flag, interval];
-
-            game.deltimer('$sys_random_fight_timer', true);
-            game.addtimer('$sys_random_fight_timer', interval, -1, true);
-            game.gf['$sys_random_fight_timer'] = function() {
-
-                //判断行动或静止状态
-
-                //行动中
-                if(mainRole.isMoving()) {
-                    if((0b1 & flag) === 0)
-                        return;
-                }
-                else {
-                    if((0b10 & flag) === 0)
-                        return;
-                }
-
-
-                if(GlobalLibraryJS.randTarget(probability, 100) === 1) {
-                    //game.createfightenemy();
-                    game.fighting(fightScript);
-                }
-            }
+            fight.fighton(fightScript, probability, flag, interval);
         }
 
-        //关闭随机战斗。
         readonly property var fightoff: function() {
-            delete game.gd['$sys_random_fight'];
-
-            game.deltimer('$sys_random_fight_timer', true);
-            delete game.gf['$sys_random_fight_timer'];
+            fight.fightoff();
         }
+
 
         //加入定时器；
         //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；
@@ -2858,7 +2846,7 @@ Item {
 
             let sprite = _private.objTmpSprites[id];
             //载入资源
-            sprite = GameSceneJS.loadSpriteEffect(spriteEffectRId, sprite, properties.$loops, properties.$parent);
+            sprite = GameSceneJS.loadSpriteEffect(spriteEffectRId, sprite, properties.$loops, null);
             if(sprite === null)
                 return false;
 
@@ -3249,10 +3237,12 @@ Item {
         }
 
         //设置游戏刷新率（interval毫秒）。
-        readonly property var setinterval: function(interval) {
+        readonly property var interval: function(interval=16) {
             if(GlobalLibraryJS.isValidNumber(interval)) {
                 _private.config.nInterval = interval;
             }
+            else
+                return game.gd['$sys_fps'];
 
             if(_private.config.nInterval <= 0)
                 _private.config.nInterval = 16;
@@ -3354,7 +3344,7 @@ Item {
 
             //载入before_save脚本
             if(_private.objCommonScripts['before_save'])
-                game.run([_private.objCommonScripts['before_save'](), 'before_save'], {Priority: -3, Type: 0, Running: 0});
+                game.run([_private.objCommonScripts['before_save'](), 'before_save'], {Priority: -3, Type: 0, Running: 1});
 
 
 
@@ -3415,7 +3405,7 @@ Item {
 
             //载入after_load脚本
             if(_private.objCommonScripts['before_load'])
-                game.run([_private.objCommonScripts['before_load'](), 'before_load'], {Priority: -3, Type: 0, Running: 0});
+                game.run([_private.objCommonScripts['before_load'](), 'before_load'], {Priority: -3, Type: 0, Running: 1});
 
 
 
@@ -3461,7 +3451,7 @@ Item {
             //setSceneToRole(_private.sceneRole);
 
             //其他
-            game.setinterval(game.gd['$sys_fps']);
+            game.interval(game.gd['$sys_fps']);
             game.scale(game.gd['$sys_scale']);
 
             game.playmusic(game.gd['$sys_music']);
@@ -3473,9 +3463,11 @@ Item {
             */
 
 
+            /*/写在钩子函数里了
             if(game.gd['$sys_random_fight']) {
                 game.fighton(...game.gd['$sys_random_fight']);
             }
+            */
 
 
             //载入after_load脚本
@@ -3495,6 +3487,9 @@ Item {
         //返回插件
         //参数0是组织/开发者名，参数1是插件名
         readonly property var plugin: function(...params) {
+            if(params.length < 2)
+                return _private.objPlugins;
+
             let plugin = _private.objPlugins[params[0]][params[1]];
             if(plugin && plugin.$autoLoad === false) {
                 plugin.$autoLoad = true;
@@ -3527,7 +3522,7 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+            let data = FrameManager.sl_qml_ReadFile(filePath);
 
             if(!data) {
                 console.warn('[!GameScene]loadjson Fail:', filePath);
@@ -3538,33 +3533,37 @@ Item {
 
 
         //将代码放入 系统脚本引擎（asyncScript）中 等候执行；
-        //  vScript 为执行脚本（字符串、函数、生成器函数、生成器对象都可以），如果为null则表示强制执行队列，为true表示下次js事件循环再运行
+        //  vScript 为执行脚本（字符串、函数、生成器函数、生成器对象都可以），如果为false则表示强制执行队列，为true表示下次js事件循环再运行，为null直接返回，为undefined报错后返回；
         //    可以为数组（vScript是执行脚本时 为 第二个下标为tips，是null或true时为给_private.asyncScript.lastEscapeValue值）；
         //  scriptProps：
         //    如果为数字，表示优先级Priority；
         //      Type默认为0，Running默认为1，Value默认为无；
         //    如果为对象，则有以下参数：
-        //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾；-2为立即执行（此时代码前必须有yield）；-3为将此代码执行完毕再返回（注意：1、代码里yield不能返回了；2、此时Running必须为0）；
+        //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
         //      Type为运行类型（如果为0，表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
         //      Running为1或2，表示如果队列里如果为空则执行（区别为：1是下一个JS事件循环执行，2是立即执行）；为0时不执行；
         //      Value：传递给事件队列的值，无则默认上一次的；
         //      AsyncScript：脚本队列，无则本脚本队列
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
-            if(vScript === undefined) {
-                console.warn('[!GameScene]运行脚本未定义!!!');
+            if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
+                console.warn('[!GameScene]运行脚本未定义（可忽略）');
                 //console.exception(123);
-                return false;
+                return undefined;
+            }
+            if(vScript === null) {
+                return null;
             }
 
 
             //参数
-            let priority, runType = 0, running = 1, value, asyncScript;
+            let priority, runType = 0, running = 1, value, asyncScript, tips;
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
                 asyncScript = scriptProps.AsyncScript || _private.asyncScript;
                 priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
                 runType = GlobalLibraryJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : 0;
                 running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : 1;
                 value = Object.keys(scriptProps).indexOf('Value') < 0 ? asyncScript.lastEscapeValue : scriptProps.Value;
+                tips = scriptProps.Tips;
             }
             else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
                 asyncScript = _private.asyncScript;
@@ -3575,18 +3574,13 @@ Item {
             }
             else {
                 console.warn('[!GameScene]运行脚本属性错误!!!');
-                return false;
+                return null;
             }
 
 
-            //直接运行
-            if(vScript === null) {
-                asyncScript.run(value);
-                return 1;
-            }
 
             //下次js循环运行
-            else if(vScript === true) {
+            if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
                         asyncScript.run(asyncScript.lastEscapeValue);
@@ -3595,39 +3589,35 @@ Item {
                 asyncScript.lastEscapeValue = value;
                 asyncScript.runNextEventLoop('game.run1');
 
+                return 1;
+            }
+            //直接运行
+            else if(vScript === false) {
+                asyncScript.run(value);
                 return 0;
             }
-
-            else if(vScript === false) {
-                return false;
+            else if(GlobalLibraryJS.isArray(vScript)) {
+                tips = vScript[1] ?? tips;
+                vScript = vScript[0];
             }
+            //else {
+            //    console.warn('[!GameScene]运行脚本属性错误!!!');
+            //    return null;
+            //}
 
 
             if(runType === 0) { //vScript是代码
 
             }
             else {  //vScript是文件名
-                let tScript;
-                if(GlobalLibraryJS.isArray(vScript)) {
-                    tScript = vScript[0];
-                }
-                else {
-                    tScript = vScript;
-                }
-
-                tScript = tScript.trim();
                 if(!scriptProps.Path)
                     scriptProps.Path = game.$projectpath;
-
-                if(GlobalLibraryJS.isArray(vScript))
-                    vScript[0] = scriptProps.Path + GameMakerGlobal.separator + tScript;
-                else
-                    vScript = scriptProps.Path + GameMakerGlobal.separator + tScript;
+                vScript = scriptProps.Path + GameMakerGlobal.separator + vScript.trim();
             }
 
             //可以立刻执行
-            if(GlobalJS.createScript(asyncScript, runType, priority, vScript, ...params) === 0) {
-                //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(null)，导致执行两次
+            if(GlobalJS.createScript(asyncScript, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params) === 0) {
+                //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
 
                 if(running === 1) {
@@ -3639,11 +3629,13 @@ Item {
                     */
                     asyncScript.lastEscapeValue = value;
                     asyncScript.runNextEventLoop('game.run');
-                }
-                else if(running === 2)
-                    asyncScript.run(value);
 
-                return 0;
+                    return 1;
+                }
+                else if(running === 2) {
+                    asyncScript.run(value);
+                    return 0;
+                }
             }
         }
 
@@ -3657,7 +3649,7 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            if(GlobalJS.createScript(_private.asyncScript, 1, priority, filePath) === 0)
+            if(GlobalJS.createScript(_private.asyncScript, {Type: 1, Priority: priority, Script: filePath, Tips: filePath}, ) === 0)
                 return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
         }
 
@@ -3823,6 +3815,7 @@ Item {
             getMapResource: GameSceneJS.getMapResource,
 
             loadSpriteEffect: GameSceneJS.loadSpriteEffect,
+            unloadSpriteEffect: GameSceneJS.unloadSpriteEffect,
             loadRoleEffect: GameSceneJS.loadRoleEffect,
 
             components: {
@@ -3838,6 +3831,11 @@ Item {
 
             protoObjects: {},
 
+            //钩子函数
+            hooks: {
+                init: {},   //初始化函数（参数为bLoadResources）
+                release: {},    //释放函数（参数为bUnloadResources）
+            },
         })
 
 
@@ -4249,12 +4247,18 @@ Item {
                     //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
                 }
             }
-            if(gameMenuWindow.fCallback === true) {    //默认回调函数
-                callback(gameMenuWindow);
-            }
-            else if(GlobalLibraryJS.isFunction(gameMenuWindow.fCallback)) {  //用户自定义回调函数
+
+
+            if(GlobalLibraryJS.isFunction(gameMenuWindow.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                 if(gameMenuWindow.fCallback(gameMenuWindow) !== true)   //如果返回 非true，则继续调用默认回调函数
                     callback(gameMenuWindow);
+            }
+            else if(gameMenuWindow.fCallback === true) {    //默认回调函数
+                callback(gameMenuWindow);
+            }
+            else if(gameMenuWindow.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                callback(gameMenuWindow);
+                game.run(gameMenuWindow.fCallback, -1, gameMenuWindow);
             }
             else {   //不使用 回调函数
                 //gameMap.focus = true;
@@ -4344,12 +4348,18 @@ Item {
 
                 //itemTrade.destroy();
             };
-            if(dialogTrade.fCallback === true) {    //默认回调函数
-                callback(dialogTrade);
-            }
-            else if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {  //用户自定义回调函数
+
+
+            if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                 if(dialogTrade.fCallback(dialogTrade) !== true)   //如果返回 非true，则继续调用默认回调函数
                     callback(dialogTrade);
+            }
+            else if(dialogTrade.fCallback === true) {    //默认回调函数
+                callback(dialogTrade);
+            }
+            else if(dialogTrade.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                callback(dialogTrade);
+                game.run(dialogTrade.fCallback, -1, dialogTrade);
             }
             else {   //不使用 回调函数
                 //gameMap.focus = true;
@@ -4420,12 +4430,18 @@ Item {
 
                 //itemMsg.destroy();
             };
-            if(itemRootRoleMsg.fCallback === true) {    //默认回调函数
-                callback(code, itemRootRoleMsg);
-            }
-            else if(GlobalLibraryJS.isFunction(itemRootRoleMsg.fCallback)) {    //用户自定义回调函数
+
+
+            if(GlobalLibraryJS.isFunction(itemRootRoleMsg.fCallback)) {    //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                 if(itemRootRoleMsg.fCallback(code, itemRootRoleMsg) !== true)   //如果返回 非true，则继续调用默认回调函数
                     callback(code, itemRootRoleMsg);
+            }
+            else if(itemRootRoleMsg.fCallback === true) {    //默认回调函数
+                callback(code, itemRootRoleMsg);
+            }
+            else if(itemRootRoleMsg.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                callback(code, itemRootRoleMsg);
+                game.run(itemRootRoleMsg.fCallback, -1, code, itemRootRoleMsg);
             }
             else {   //不使用 回调函数
                 //gameMap.focus = true;
@@ -4685,7 +4701,7 @@ Item {
             rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
             textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            textGameInput.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+            textGameInput.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
             rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
@@ -4697,6 +4713,8 @@ Item {
 
             textGameInputTitle.text = title;
             textGameInput.text = pretext;
+
+            textGameInput.textArea.focus = true;
 
 
             visible = true;
@@ -4755,8 +4773,8 @@ Item {
 
                     Layout.alignment: Qt.AlignCenter
                     Layout.preferredWidth: parent.width
-                    Layout.preferredHeight: 36
-                    //implicitHeight: 60
+                    //Layout.preferredHeight: 36
+                    implicitHeight: Math.max(textGameInputTitle.implicitHeight, 60)
 
                     color: '#FF0035A8'
                     //color: '#EE00CC99'
@@ -4775,7 +4793,7 @@ Item {
                         font.pointSize: 16
                         font.bold: true
 
-                        wrapMode: Text.NoWrap
+                        wrapMode: Text.Wrap
                     }
 
                 }
@@ -4788,7 +4806,7 @@ Item {
                     Layout.preferredHeight: textGameInput.implicitHeight
 
 
-                    color: 'black'
+                    color: Global.style.backgroundColor
 
                     border {
                         color: '#60000000'
@@ -4806,8 +4824,9 @@ Item {
                         //horizontalAlignment: Text.AlignHCenter
                         //verticalAlignment: Text.AlignVCenter
 
-                        font.pointSize: 16
-                        font.bold: true
+                        textArea.font.pointSize: 16
+                        textArea.font.bold: true
+                        textArea.textFormat: TextArea.PlainText
 
                         /*placeholderTextColor: '#7F7F7F7F'
 
@@ -4852,13 +4871,19 @@ Item {
                                 //_private.asyncScript.run(textGameInput.text);
                             }
                         }
-                        //默认回调函数
-                        if(itemRootGameInput.fCallback === true) {
-                            callback(itemRootGameInput);
-                        }
-                        else if(GlobalLibraryJS.isFunction(itemRootGameInput.fCallback)) {  //用户自定义回调函数
+
+
+                        if(GlobalLibraryJS.isFunction(itemRootGameInput.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                             if(itemRootGameInput.fCallback(itemRootGameInput) !== true)
                                 callback(itemRootGameInput);
+                        }
+                        //默认回调函数
+                        else if(itemRootGameInput.fCallback === true) {
+                            callback(itemRootGameInput);
+                        }
+                        else if(itemRootGameInput.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                            callback(itemRootGameInput);
+                            game.run(itemRootGameInput.fCallback, -1, itemRootGameInput);
                         }
                         else {   //不使用 回调函数
                             //gameMap.focus = true;
@@ -5361,6 +5386,17 @@ Item {
         //依附在地图上的图片和特效，切换地图时删除
         property var arrayTmpMapComponents: []
 
+        property var cacheSprites: new GlobalLibraryJS.Cache({
+            Create: function(p){return compCacheSpriteEffect.createObject(p);},
+            Init: function(o, p){
+                o.visible = true;
+                o.parent=p;
+                return o;
+            },
+            Release: function(o){o.visible = false; o.stop();return o;},
+            Destroy: function(o){o.destroy();},
+        })
+
         //地图缓存（目前没用到）
         //property var objCacheMaps: ({})
 
@@ -5707,12 +5743,18 @@ Item {
 
                     itemMsg.destroy();
                 };
-                if(rootGameMsgDialog.fCallback === true) {    //默认回调函数
-                    callback(code, rootGameMsgDialog);
-                }
-                else if(GlobalLibraryJS.isFunction(rootGameMsgDialog.fCallback)) {  //用户自定义回调函数
+
+
+                if(GlobalLibraryJS.isFunction(rootGameMsgDialog.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                     if(rootGameMsgDialog.fCallback(code, rootGameMsgDialog) !== true)   //如果返回 非true，则继续调用默认回调函数
                         callback(code, rootGameMsgDialog);
+                }
+                else if(rootGameMsgDialog.fCallback === true) {    //默认回调函数
+                    callback(code, rootGameMsgDialog);
+                }
+                else if(rootGameMsgDialog.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                    callback(code, rootGameMsgDialog);
+                    game.run(rootGameMsgDialog.fCallback, -1, code, rootGameMsgDialog);
                 }
                 else {   //不使用 回调函数
                     //gameMap.focus = true;
@@ -5997,13 +6039,19 @@ Item {
                             //FrameManager.goon();
                             //console.debug('!!!asyncScript.run', index);
                         }
-                        //默认回调函数
-                        if(rootGameMenu.fCallback === true) {
-                            callback(index, rootGameMenu);
-                        }
-                        else if(GlobalLibraryJS.isFunction(rootGameMenu.fCallback)) {   //用户自定义回调函数
+
+
+                        if(GlobalLibraryJS.isFunction(rootGameMenu.fCallback)) {   //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
                             if(rootGameMenu.fCallback(index, rootGameMenu) !== true)
                                 callback(index, rootGameMenu);
+                        }
+                        //默认回调函数
+                        else if(rootGameMenu.fCallback === true) {
+                            callback(index, rootGameMenu);
+                        }
+                        else if(rootGameMenu.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
+                            callback(index, rootGameMenu);
+                            game.run(rootGameMenu.fCallback, -1, index, rootGameMenu);
                         }
                         else {  //不使用 回调函数
                             //gameMap.focus = true;
@@ -6168,7 +6216,7 @@ Item {
             property int $$type: -1  //不要修改（只读）；角色类型（1为主角，2为NPC）
 
             //property int $penetrate: 0  //可穿透
-            //property real moveSpeed: 0.3 //移动像素
+            property real $$speed: 0    //移动速度（每秒多少像素），角色自身速度+所有装备速度属性
 
             //行动类别；
             //0为停止；1为正常行走；2为动向移动；10为摇杆行走；-1为禁止操作
@@ -6285,7 +6333,7 @@ Item {
             //id号
             property var id
 
-            property bool bUsing: false
+            //property bool bUsing: false
 
             //回调函数
             property var clicked
@@ -6314,6 +6362,11 @@ Item {
                     if(parent.doubleClicked)
                         game.run(parent.doubleClicked(parent), -1, );
                 }
+            }
+
+
+            onS_playEffect: {
+                rootSoundEffect.playSoundEffect(soundeffectSource);
             }
 
             onS_looped: {

@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -714,13 +714,17 @@ Item {
 
     Dialog1.FileDialog {
         id: filedialogOpenSpriteImage
+
+        visible: false
+
         title: "选择特效图片"
-        selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Image files (*.jpg *.png *.bmp)", "All files (*)" ]
+
+        selectMultiple: false
         selectExisting: true
         selectFolder: false
-        visible: false
+
         onAccepted: {
             //root.focus = true;
             //loader.focus = true;
@@ -1067,13 +1071,16 @@ Item {
     Dialog1.FileDialog {
         id: filedialogOpenSpriteSound
 
+        visible: false
+
         title: "选择音效"
-        selectMultiple: false
         //folder: shortcuts.home
         nameFilters: [ "Sound files (*.wav)", "All files (*)" ]
+
+        selectMultiple: false
         selectExisting: true
         selectFolder: false
-        visible: false
+
         onAccepted: {
             //root.focus = true;
             //loader.focus = true;

@@ -190,6 +190,8 @@ Item {
                     sliderCount.from = 1;
                     sliderCount.to = arrData[index].$count > 0 ? arrData[index].$count : 99;
 
+                    _private.refreshTradeInfo();
+
 
                     itemCountBox.visible = true;
                     sliderCount.forceActiveFocus();
@@ -246,12 +248,17 @@ Item {
                         sliderCount.from = 1;
                         sliderCount.to = arrData[index].$count;
 
+                        _private.refreshTradeInfo();
+
 
                         itemCountBox.visible = true;
                         sliderCount.forceActiveFocus();
                     }
                     else
-                        game.run(function*(){yield game.msg('此物品不能卖');});
+                        //game.run(function(){
+                            game.msg('此物品不能卖', 20, '', 0, {Type: 0b10}, false);
+                            //return false;
+                        //});
 
                     return;
 
@@ -364,7 +371,8 @@ Item {
 
                 onMoved: {
                     textCountBoxCount.text = value;
-                    console.debug(value, position);
+
+                    //console.debug(value, position);
                 }
             }
 
@@ -400,17 +408,7 @@ Item {
 
 
                 onTextChanged: {
-                    let goods = itemCountBox.tradeData.goods;
-                    let count = parseInt(textCountBoxCount.text);
-
-                    if(itemCountBox.tradeData.type === 1) {
-                        textCountBoxMoney.text = '￥' + goods.$price[0] * count;
-                    }
-                    else {
-                        textCountBoxMoney.text = '￥' + goods.$price[1] * count;
-                    }
-
-                    sliderCount.value = parseInt(text);
+                    _private.refreshTradeInfo();
                 }
             }
 
@@ -460,12 +458,18 @@ Item {
                         //买
                         if(itemCountBox.tradeData.type === 1) {
                             if(game.gd["$sys_money"] < goods.$price[0] * count) {
-                                game.run(function*(){yield game.msg('金钱不足');});
+                                //game.run(function(){
+                                    game.msg('金钱不足', 20, '', 0, {Type: 0b10}, false);
+                                //    return false;
+                                //});
                                 return;
                             }
 
                             if(goods.$count <= 0 || count > goods.$count) {
-                                game.run(function*(){yield game.msg('出售道具不够');});
+                                //game.run(function(){
+                                    game.msg('出售道具不够', 20, '', 0, {Type: 0b10}, false);
+                                //    return false;
+                                //});
                                 return;
                             }
 
@@ -482,8 +486,10 @@ Item {
                                 root.refresh();
                             }
                             else
-                                game.run(function*(){yield game.msg('卖出道具不够');});
-
+                                //game.run(function(){
+                                    game.msg('卖出道具不够', 20, '', 0, {Type: 0b10}, false);
+                                    //return false;
+                                //});
                         }
 
 
@@ -511,6 +517,27 @@ Item {
                 }
             }
 
+        }
+    }
+
+
+    QtObject {  //私有数据,函数,对象等
+        id: _private
+
+        //刷新交易数据
+        function refreshTradeInfo() {
+
+            let goods = itemCountBox.tradeData.goods;
+            let count = parseInt(textCountBoxCount.text);
+
+            if(itemCountBox.tradeData.type === 1) {
+                textCountBoxMoney.text = '￥' + goods.$price[0] * count;
+            }
+            else {
+                textCountBoxMoney.text = '￥' + goods.$price[1] * count;
+            }
+
+            sliderCount.value = parseInt(textCountBoxCount.text);
         }
     }
 }

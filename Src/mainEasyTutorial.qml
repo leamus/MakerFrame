@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
 
@@ -399,7 +399,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.setscenerole(r)</font>：场景跟随某个角色。
 <font color='yellow'>game.pause()</font>：暂停游戏。
 <font color='yellow'>game.goon()</font>：继续游戏。
-<font color='yellow'>game.setinterval(interval)</font>：设置游戏刷新率（interval毫秒）。
+<font color='yellow'>game.interval(interval)</font>：设置游戏刷新率（interval毫秒）。
 
 <font color='yellow'>game.wait(time)</font>：暂停time毫秒。
 <font color='yellow'>game.rnd(start, end)</font>：返回start~end之间的随机整数（包含start，不包含end）。

@@ -1,8 +1,8 @@
 import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.14
-import QtQuick.Controls 1.2 as Controls1
-import QtQuick.Dialogs 1.2 as Dialog1
+//import QtQuick.Controls 1.3 as Controls1
+//import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 import QtMultimedia 5.14
 import Qt.labs.settings 1.1
@@ -293,7 +293,7 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             Layout.preferredWidth: parent.width
             //Layout.preferredHeight: root.nTitleHeight
-            implicitHeight: root.nTitleHeight   //鹰：删除会导致 binding loop 错误
+            implicitHeight: Math.max(textGameInputTitle.implicitHeight, root.nTitleHeight)  //鹰：删除会导致 binding loop 错误
 
             //visible: (root.strTitle !== false && root.strTitle !== null && root.strTitle !== undefined)
             visible: (root.strTitle)
