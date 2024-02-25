@@ -7,14 +7,11 @@ function loadResources() {
         game.cd = {};
 
 
-    let projectpath = game.$projectpath + GameMakerGlobal.separator;
-
-
 
     //读通用算法脚本
     let tCommoncript;
-    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(projectpath + 'common_script.js')))
-        tCommoncript = _private.jsEngine.load('common_script.js', GlobalJS.toURL(projectpath));
+    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'common_script.js')))
+        tCommoncript = _private.jsEngine.load('common_script.js', GlobalJS.toURL(game.$projectpath));
     if(tCommoncript) {
         _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
         _private.objCommonScripts['game_exit'] = tCommoncript.$gameExit;
@@ -372,9 +369,15 @@ function loadResources() {
 
 
     //起始脚本
-    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(projectpath + 'start.js'))) {
-        //载入初始脚本
-        let ts = _private.jsEngine.load('start.js', GlobalJS.toURL(projectpath));
+    {
+        let ts;
+        if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'main.js'))) {
+            ts = _private.jsEngine.load('main.js', GlobalJS.toURL(game.$projectpath));
+        }
+        //!!!兼容旧代码
+        else if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'start.js'))) {
+            ts = _private.jsEngine.load('start.js', GlobalJS.toURL(game.$projectpath));
+        }
         if(ts) {
             _private.objCommonScripts["game_start"] = ts.$start || ts.start;
             //_private.objCommonScripts["game_init"] = ts.$init || ts.init;
@@ -674,18 +677,18 @@ function loadResources() {
 
 
 //载入扩展 插件/组件
-    let componentPath = game.$projectpath + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
+    let pluginPath = game.$projectpath + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
 
     //循环三方根目录
-    for(let tc0 of FrameManager.sl_qml_listDir(GlobalJS.toPath(componentPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+    for(let tc0 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
         //if(tc0 === '$Leamus')
         //    continue;
 
         //循环三方插件目录
-        for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(componentPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+        for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
 
-            let jsPath = componentPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Components' + GameMakerGlobal.separator;
-            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + 'main.js')))
+            let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Components';
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js')))
                 continue;
 
             try {
@@ -1511,6 +1514,94 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
 
 
 
+//打开地图
+function openMap(mapName, forceRepaint=false) {
+    game.d['$sys_map'] = {};
+
+    let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
+
+    //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
+    if(forceRepaint || game.gd['$sys_map'].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
+
+        if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapName))) {
+            game.gd['$sys_map'].$name = null;
+
+            game.d['$sys_map'].$info = {};
+            game.d['$sys_map'].$name = null;
+            game.d['$sys_map'].$columns = 0;
+            game.d['$sys_map'].$rows = 0;
+            game.d['$sys_map'].$obstacles = [];
+
+
+            //!!!兼容旧代码
+            game.gd['$sys_map'].$$info = {};
+            game.gd['$sys_map'].$$columns = 0;
+            game.gd['$sys_map'].$$rows = 0;
+            game.gd['$sys_map'].$$obstacles = [];
+
+
+            //console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
+            return false;
+        }
+
+        //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
+        game.gd['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
+
+        game.d['$sys_map'].$info = itemViewPort.itemContainer.mapInfo;
+        game.d['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
+        game.d['$sys_map'].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+        game.d['$sys_map'].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+
+        game.d['$sys_map'].$obstacles = [];
+        for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
+            if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] & 0b1) {
+                game.d['$sys_map'].$obstacles.push(mb.split(','));
+            }
+        }
+        game.d['$sys_map'].$specials = itemViewPort.itemContainer.mapInfo.MapBlockSpecialData;
+
+
+        //!!!兼容旧代码
+        game.gd['$sys_map'].$$info = itemViewPort.itemContainer.mapInfo;
+        game.gd['$sys_map'].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+        game.gd['$sys_map'].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+        game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
+    }
+
+
+
+    //执行载入地图脚本
+
+    //之前的
+    //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData['$1'] !== undefined) {
+    //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData['$1']) === 0)
+    //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+    //}
+
+    //使用Component（太麻烦）
+    //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'));
+    //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'), scriptComp)
+    //let script = scriptComp.createObject({}, rootGameScene);
+
+    //let script = Qt.createQmlObject('import QtQuick 2.14;import 'map.js' as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
+    //script.destroy();
+    let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
+    itemViewPort.mapScript = ts;
+    if(ts.$start)
+        game.run([ts.$start(), 'map $start']);
+    else if(ts.start)
+        game.run([ts.start(), 'map start']);
+
+
+
+    //test();
+
+    return itemViewPort.itemContainer.mapInfo;
+}
+
+
+
+
 
 function buttonAClicked() {
     console.debug("[GameScene]buttonAClicked");
@@ -1529,19 +1620,19 @@ function buttonAClicked() {
     //人物方向
     switch(mainRole.direction()) {
     case 0:
-        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
         break;
     case 1:
-        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     case 2:
-        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.height / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.height / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
         break;
     case 3:
-        maxDistance = Math.ceil(itemViewPort.sizeMapBlockSize.width / 3);
+        maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.width / 3);
         usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     default:
@@ -1688,10 +1779,10 @@ function mapClickEvent(x, y) {
     if(!tScript)
         tScript = game.gf[eventName];
     if(tScript)
-        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockSize.width), Math.floor(y / itemViewPort.sizeMapBlockSize.height), x, y), eventName], -1, );
+        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y), eventName], -1, );
 
     //console.debug(mouse.x, mouse.y,
-    //              Math.floor(mouse.x / itemViewPort.sizeMapBlockSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockSize.height))
+    //              Math.floor(mouse.x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockScaledSize.height))
 
 }
 
@@ -2259,16 +2350,16 @@ function onTriggered() {
                 case -1:
                     if(mainRole.moveDirection === Qt.Key_Left) {
 
-                        let v = (px + 1) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x1);
+                        let v = (px + 1) * itemViewPort.sizeMapBlockScaledSize.width - (mainRole.x + mainRole.x1);
                         let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, v);
                         roleNewX = rolePos[0];
                         checkover = true;
 
-                        console.debug("碰到左边墙壁", px, (px + 1) * itemViewPort.sizeMapBlockSize.width, (mainRole.x + mainRole.x1), v);
+                        console.debug("碰到左边墙壁", px, (px + 1) * itemViewPort.sizeMapBlockScaledSize.width, (mainRole.x + mainRole.x1), v);
                     }
                     if(mainRole.moveDirection === Qt.Key_Right) {
 
-                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x2));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (px) * itemViewPort.sizeMapBlockScaledSize.width - (mainRole.x + mainRole.x2));
                         roleNewX = rolePos[0];
                         checkover = true;
 
@@ -2276,7 +2367,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Up) {
 
-                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y1));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py + 1) * itemViewPort.sizeMapBlockScaledSize.height - (mainRole.y + mainRole.y1));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2284,7 +2375,7 @@ function onTriggered() {
                     }
                     if(mainRole.moveDirection === Qt.Key_Down) {
 
-                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * itemViewPort.sizeMapBlockSize.height - (mainRole.y + mainRole.y2));
+                        let rolePos = fComputeRoleMoveOffset(mainRole, mainRole.moveDirection, (py) * itemViewPort.sizeMapBlockScaledSize.height - (mainRole.y + mainRole.y2));
                         roleNewX = rolePos[1];
                         checkover = true;
 
@@ -2358,7 +2449,7 @@ function onTriggered() {
 
 
         textPos.text = " 【%1】".
-            arg([Math.floor(centerX / itemViewPort.sizeMapBlockSize.width), Math.floor(centerY / itemViewPort.sizeMapBlockSize.height)])
+            arg([Math.floor(centerX / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(centerY / itemViewPort.sizeMapBlockScaledSize.height)])
             //.arg(itemViewPort.itemContainer.mapInfo.data.length)
         ;
 
@@ -2957,7 +3048,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         //计算离障碍距离
-                        offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockSize.width;    //计算人物与障碍距离
+                        offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockScaledSize.width;    //计算人物与障碍距离
                         collideObstacle = 0b1000;
                         computeOver = true;
                     }
@@ -2991,7 +3082,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
-                        offsetMove = (xb) * itemViewPort.sizeMapBlockSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
+                        offsetMove = (xb) * itemViewPort.sizeMapBlockScaledSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
                         collideObstacle = 0b0010;
                         computeOver = true;
                     }
@@ -3025,7 +3116,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
-                        offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockSize.height;    //计算人物与障碍距离
+                        offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockScaledSize.height;    //计算人物与障碍距离
                         collideObstacle = 0b0001;
                         computeOver = true;
                     }
@@ -3059,7 +3150,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
                 if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
                     if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
-                        offsetMove = (yb) * itemViewPort.sizeMapBlockSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
+                        offsetMove = (yb) * itemViewPort.sizeMapBlockScaledSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
                         collideObstacle = 0b0100;
                         computeOver = true;
                     }
@@ -3095,8 +3186,8 @@ function fChangeMainRoleDirection() {
     }
 
     //人物的占位最中央 所在地图的坐标
-    let bx = Math.floor((mainRole.x + mainRole.x1 + mainRole.width1 / 2) / itemViewPort.sizeMapBlockSize.width);
-    let by = Math.floor((mainRole.y + mainRole.y1 + mainRole.height1 / 2) / itemViewPort.sizeMapBlockSize.height);
+    let bx = Math.floor((mainRole.x + mainRole.x1 + mainRole.width1 / 2) / itemViewPort.sizeMapBlockScaledSize.width);
+    let by = Math.floor((mainRole.y + mainRole.y1 + mainRole.height1 / 2) / itemViewPort.sizeMapBlockScaledSize.height);
 
     switch(mainRole.moveDirection) {
     case Qt.Key_Left:
@@ -3120,9 +3211,9 @@ function fChangeMainRoleDirection() {
         }
 
         //左边距离和右边距离
-        let toffset1 = (mainRole.x + mainRole.x2) % itemViewPort.sizeMapBlockSize.width + 1;
-        let toffset2 = itemViewPort.sizeMapBlockSize.width - (mainRole.x + mainRole.x1) % itemViewPort.sizeMapBlockSize.width;
-        if(toffset1 > itemViewPort.sizeMapBlockSize.width / 3 && toffset2 > itemViewPort.sizeMapBlockSize.width / 3 ) {
+        let toffset1 = (mainRole.x + mainRole.x2) % itemViewPort.sizeMapBlockScaledSize.width + 1;
+        let toffset2 = itemViewPort.sizeMapBlockScaledSize.width - (mainRole.x + mainRole.x1) % itemViewPort.sizeMapBlockScaledSize.width;
+        if(toffset1 > itemViewPort.sizeMapBlockScaledSize.width / 3 && toffset2 > itemViewPort.sizeMapBlockScaledSize.width / 3 ) {
             //_private.startSprite(mainRole, Qt.Key_Up);
             console.debug("！！不能转方向返回")
             return;
@@ -3208,9 +3299,9 @@ function test() {
     //itemViewPort.itemContainer.mapInfo.events = [1, 40];
 
     //mainRole.x1 = 0;
-    //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockSize.height;
+    //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockScaledSize.height;
     //mainRole.width1 = 50;
     //mainRole.width1 = mainRole.width;
-    //mainRole.height1 = itemViewPort.sizeMapBlockSize.height;
+    //mainRole.height1 = itemViewPort.sizeMapBlockScaledSize.height;
     //mainRole.height1 = mainRole.height;
 }

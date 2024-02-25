@@ -12,7 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -33,8 +34,16 @@ Item {
 
 
     function init() {
-
-        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js';
+        let filePath;
+        if(FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'main.js')) {
+            filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'main.js';
+            _private.strMainJSName = 'main.js';
+        }
+        //!!!兼容旧代码
+        else if(FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js')) {
+            filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js';
+            _private.strMainJSName = 'start.js';
+        }
         //let data = File.read(filePath);
         let data = FrameManager.sl_qml_ReadFile(filePath);
         console.debug('[GameStart]filePath：', filePath);
@@ -363,7 +372,7 @@ game.goon();
             //buttonStartGame.enabled = true;
             //item.testFresh();
 
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js', 0);
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
 
             loaderGameScene.visible = true;
             loaderGameScene.focus = true;
@@ -404,6 +413,9 @@ game.goon();
 
     QtObject {
         id: _private
+
+        //js名
+        property string strMainJSName: 'main.js'
 
         property string strTemplate: `
 //鹰：可以包含其他文件：
@@ -508,14 +520,10 @@ function *$start() {
 
 
     Component.onCompleted: {
-        //FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
-
         console.debug("[GameStart]Component.onCompleted");
     }
 
     Component.onDestruction: {
-        //delete FrameManager.globalObject().GameMakerGlobal;
-
         console.debug("[GameStart]Component.onDestruction");
     }
 }

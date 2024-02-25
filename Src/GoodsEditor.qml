@@ -12,7 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -397,7 +398,7 @@ let data = (function() {
             dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     if(save())
                         s_close();
                     //root.forceActiveFocus();

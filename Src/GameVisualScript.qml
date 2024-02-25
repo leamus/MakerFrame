@@ -11,7 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -122,7 +123,9 @@ Item {
 
 
 
+    //指令集
     property var sysCommands: ({})
+    //指令树（分类）
     property var sysCommandsTree: []
 
 
@@ -814,6 +817,20 @@ Item {
                     loadData();
                 }
             }
+
+            Button {
+                Layout.fillWidth: true
+                text: "检查"
+                font.pointSize: 9
+                onClicked: {
+                    let jsScript = _private.compile();
+
+                    //console.debug(jsScript);
+
+                    let e = _private.checkError(jsScript);
+                    _private.showError(e, jsScript);
+                }
+            }
             Button {
                 Layout.fillWidth: true
                 text: "编译"
@@ -823,49 +840,11 @@ Item {
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);
 
-                    console.debug(_private.filepath + '.js', jsScript);
-                }
-            }
 
-            Button {
-                Layout.fillWidth: true
-                text: "测试"
-                font.pointSize: 9
-                onClicked: {
-                    let jsScript = _private.compile();
+                    let e = _private.checkError(jsScript);
+                    _private.showError(e, jsScript);
 
-                    console.debug(jsScript);
-
-                    try {
-                        eval('let __tJSScript__ = function(){%1}'.arg(jsScript));
-                    }
-                    catch(e) {
-                        dialogCommon.show({
-                            Msg: '存在语法错误：' + e,
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function(){
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-
-                        return;
-                    }
-
-                    dialogCommon.show({
-                        Msg: '不存在语法错误',
-                        Buttons: Dialog.Yes,
-                        OnAccepted: function(){
-                            root.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            root.forceActiveFocus();
-                        },
-                    });
-
-                    return;
+                    //console.debug(_private.filepath + '.js', jsScript);
                 }
             }
 
@@ -1325,10 +1304,11 @@ Item {
                     //root.focus = true;
                     root.forceActiveFocus();
                 },
-                OnDiscarded: function() {
+                /*OnDiscarded: function() {
                     //root.focus = true;
+                    dialogCommon.close();
                     root.forceActiveFocus();
-                },
+                },*/
             });
         }
 
@@ -1359,6 +1339,10 @@ Item {
 
         //保存文件路径
         property string filepath
+
+
+        //保存可视化行对应的代码行
+        property var arrVisual2CodeColumns: []
 
 
         //同listmodel，完全相同的内容（除了含有HTML代码），用来计算命令缩进
@@ -1566,8 +1550,128 @@ Item {
         }
 
 
+        function checkError(jsScript) {
+            try {
+                eval('let __tJSScript__ = function(){%1}'.arg(jsScript));
+            }
+            catch(e) {
+                return e;
+            }
+
+            return null;
+        }
+        function showError(e, jsScript) {
+            if(e) {
+                //console.debug(e.lineNumber, e.toString(), jsScript);
+
+
+                //找到相关源码（3行）
+                let source = jsScript.split("\n");  //源码数组
+                let contextSource = '';     //相关源码
+                let col = e.lineNumber - 1 - 1;
+                if(col < 0)
+                    col = 0;
+                for(let ti = 0; ti < 3; ++ti, ++col) {
+                    if(col >= source.length)
+                        break;
+                    contextSource += ('<font color="red">' + (col + 1) + '.</font> ' + GlobalLibraryJS.convertToHTML(source[col], ['<', '>', ' ']) + '<BR>');
+                }
+
+
+                //找到对应的 可视化指令行
+                let startCol = -1, endCol = -1;
+                //循环所有的 对应数组
+                for(col = 0; col < _private.arrVisual2CodeColumns.length - 1; ++col) {
+                    //方法1
+                    /*/如果 开始行没设置 且 报错代码行大于等于可视化对应的代码行（左边符合）
+                    if(startCol === -1 && _private.arrVisual2CodeColumns[col] <= e.lineNumber - 1) {
+                        //如果 报错代码行 小于 下一条可视化对应的代码行（右边符合），则找到
+                        if(_private.arrVisual2CodeColumns[col + 1] > e.lineNumber - 1) {
+                            startCol = col + 1;
+                            console.warn('startCol:', col);
+                        }
+                        //如果 这一条可视化和下一条可视化 对应的代码行 相同，且 报错代码行 小于等于 下一条可视化对应的代码行，则找到
+                        //  注意，这里不好理解的是，因为多条 可视化可能会生成一条代码行，所以这条语句就是符合这种情况
+                        //  比如 0,3,4,5,5,5,6，如果你要找0-3，则第2个就是；如果你要找5，则4就是
+                        else if(_private.arrVisual2CodeColumns[col] === _private.arrVisual2CodeColumns[col + 1] && _private.arrVisual2CodeColumns[col + 1] >= e.lineNumber - 1) {
+                            startCol = col + 1;
+                            console.warn('startCol:', col);
+                        }
+                        else
+                            continue;
+                    }*/
+
+                    //方法2：好理解（比如0,3,4,5,5,5,6，0-2对应的下标是0，4对应的下标是2）
+                    //如果 startCol 没设置
+                    if(startCol === -1) {
+                        //如果 相等，则就是这行
+                        if(_private.arrVisual2CodeColumns[col] === e.lineNumber - 1) {
+                            startCol = col + 1;     //显示的行数 +1
+                            //console.warn('startCol:', col);
+                        }
+                        //如果 代码行 小于 下一条可视化代码行，则就是这行
+                        else if(_private.arrVisual2CodeColumns[col + 1] > e.lineNumber - 1) {
+                            startCol = col + 1;
+                            //console.warn('startCol:', col);
+                        }
+                        else
+                            continue;
+                    }
+
+                    //如果 endCol 没设置 且 已经有 开始行 且 找到值不一样的
+                    if(endCol === -1 && startCol > 0 && _private.arrVisual2CodeColumns[col + 1] !== e.lineNumber - 1) {
+                        endCol = col + 1;            //显示的行数 +1
+                        //console.warn('endCol:', col);
+                        break;
+                    }
+                }
+                //没找到（有可能是大括号问题），显示最后一行
+                if(startCol === -1)
+                    startCol = col;            //显示的行数 +1
+
+                //console.warn(_private.arrVisual2CodeColumns);
+                //console.warn(e.lineNumber, startCol, endCol);
+
+
+                if(endCol > 0 && endCol !== startCol)
+                    startCol += ('-' + endCol);
+
+
+                dialogCommon.show({
+                    Msg: '第<font color="red">%1</font>行语法错误(源码第<font color="red">%2</font>行)：<font color="red">%3</font><BR>源码：<BR>%4'.
+                        arg(`${startCol}`).
+                        arg(e.lineNumber).arg(GlobalLibraryJS.convertToHTML(e.toString(), ['<', '>', ' '])).arg(contextSource),
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function(){
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
+
+                return;
+            }
+
+            dialogCommon.show({
+                Msg: '恭喜！没有语法错误',
+                Buttons: Dialog.Yes,
+                OnAccepted: function(){
+                    root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    root.forceActiveFocus();
+                },
+            });
+
+            return;
+        }
+
+
         //编译（结果为字符串）
         function compile() {
+            _private.arrVisual2CodeColumns = [0];
+
             let data = '';
             //循环每一条命令
             for(let i = 0; i < listmodel.count; ++i) {
@@ -1691,10 +1795,16 @@ Item {
                 if(cmd.status.enabled === false)
                     tstrCmd += '\r\n/*/\r\n';
 
+
+                if(sysCommands[cmdKey].command[4])
+                    tstrCmd += '\r\n';
+
+
+                _private.arrVisual2CodeColumns[i + 1] = _private.arrVisual2CodeColumns[i] + (tstrCmd.match(/\n/g) || []).length;
+
+
                 //!!!命令
                 data += tstrCmd;
-                if(sysCommands[cmdKey].command[4])
-                    data += '\r\n';
 
                 //一条命令完毕
             }
@@ -1706,7 +1816,7 @@ Item {
             dialogCommon.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     let jsScript = _private.compile();
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
                     root.s_Compile(jsScript);

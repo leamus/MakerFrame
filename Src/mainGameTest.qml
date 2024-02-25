@@ -12,7 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -34,12 +35,19 @@ Item {
 
 
     function init(cfg) {
-        if(cfg && cfg.map)
-            textMapName.text = cfg.map;
-        if(cfg && cfg.role)
-            textRoleName.text = cfg.role;
+        if(cfg && cfg.Map)
+            textMapName.text = cfg.Map;
+        if(cfg && cfg.Role)
+            textRoleName.text = cfg.Role;
+    }
+    function start() {
+        _private.start();
     }
 
+
+
+    property alias textMapName: textMapName.text
+    property alias textRoleName: textRoleName.text
 
 
     //width: 600
@@ -166,37 +174,7 @@ Item {
             text: "开始"
 
             onClicked: {
-                if(textMapName.text === "" || textRoleName.text === "")
-                    return;
-
-                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
-                //let cfg = File.read(filePath);
-                let cfg = FrameManager.sl_qml_ReadFile(filePath);
-                //console.debug("cfg", cfg, filePath);
-
-                if(!cfg)
-                    return false;
-                cfg = JSON.parse(cfg);
-                //console.debug("cfg", cfg);
-                //loader.setSource("./MapEditor_1.qml", {});
-                loader.item.openMap(cfg);
-                */
-
-                loader.visible = true;
-                loader.focus = true;
-                loader.item.focus = true;
-
-
-                //loader.item.openMap(item);
-                let tScript = function*() {
-                    game.loadmap(textMapName.text);
-                    game.createhero(textRoleName.text);
-                    game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
-                    game.interval(16);
-                    game.goon();
-                    yield game.msg('欢迎来到鹰歌Maker世界！');
-                }
-                loader.item.init(tScript, true);
+                _private.start();
             }
         }
 
@@ -319,6 +297,39 @@ Item {
     QtObject {
         id: _private
 
+        function start() {
+            if(textMapName.text === "" || textRoleName.text === "")
+                return;
+
+            /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
+            //let cfg = File.read(filePath);
+            let cfg = FrameManager.sl_qml_ReadFile(filePath);
+            //console.debug("cfg", cfg, filePath);
+
+            if(!cfg)
+                return false;
+            cfg = JSON.parse(cfg);
+            //console.debug("cfg", cfg);
+            //loader.setSource("./MapEditor_1.qml", {});
+            loader.item.openMap(cfg);
+            */
+
+            loader.visible = true;
+            loader.focus = true;
+            loader.item.focus = true;
+
+
+            //loader.item.openMap(item);
+            let tScript = function*() {
+                game.loadmap(textMapName.text);
+                game.createhero(textRoleName.text);
+                game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                game.interval(16);
+                game.goon();
+                yield game.msg('欢迎来到鹰歌Maker世界！');
+            }
+            loader.item.init(tScript, true);
+        }
     }
 
 

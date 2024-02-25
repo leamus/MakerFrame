@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.14
 
 //安卓assets的bug（详见QML_Pleafles）
-import RPGComponents 1.0
+//import RPGComponents 1.0
 
 
 /*

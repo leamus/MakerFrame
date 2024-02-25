@@ -12,7 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -713,7 +714,7 @@ Item {
         title: "选择地图文件"
         selectMultiple: false
         //folder: shortcuts.home
-        folder: GlobalJS._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
+        folder: GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + "Map")
         nameFilters: [ "Json files (*.json *.map *.jsn)", "All files (*)" ]
         selectExisting: true
         selectFolder: false
@@ -784,7 +785,7 @@ Item {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.getExternalDataPath() + GameMakerGlobal.separator + "Map")
+            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + "Map")
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
             //console.debug("filedialogOpenMap.folder:", filedialogOpenMap.folder)
@@ -802,8 +803,8 @@ Item {
             //l_listMaps.focus = true;
 
             //console.debug("path:", GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
-            //console.debug("path:", Qt.resolvedUrl(Platform.getExternalDataPath()));
-            //console.debug("path:", Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.getExternalDataPath())));
+            //console.debug("path:", Qt.resolvedUrl(Platform.externalDataPath));
+            //console.debug("path:", Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.externalDataPath)));
         }
     }
 

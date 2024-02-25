@@ -13,7 +13,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -452,7 +453,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "插件库"
+                text: "插 件"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainPlugins.qml");
@@ -1280,7 +1281,7 @@ Item {
 
 
                 FrameManager.sl_qml_clearComponentCache();
-                //FrameManager.sl_qml_trimComponentCache();
+                FrameManager.sl_qml_trimComponentCache();
 
             }
         }
@@ -1762,7 +1763,7 @@ Item {
 
 
 
-        FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
+        //FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
 
 
 
@@ -1776,7 +1777,7 @@ Item {
     Component.onDestruction: {
         rootWindow.s_MessageHandler.disconnect(_private.appendDebugMessage);
 
-        delete FrameManager.globalObject().GameMakerGlobal;
+        //delete FrameManager.globalObject().GameMakerGlobal;
 
         console.debug("[mainGameMaker]Component.onDestruction");
     }

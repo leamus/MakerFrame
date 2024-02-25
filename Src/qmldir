@@ -16,3 +16,6 @@ RoleEditor 1.0 RoleEditor.qml
 SpriteEditor 1.0 SpriteEditor.qml
 
 MapEditor 1.0 MapEditor.qml
+
+PluginsManager 1.0 PluginsManager.qml
+PluginsDownload 1.0 PluginsDownload.qml

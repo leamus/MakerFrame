@@ -11,7 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import 'qrc:/QML'
@@ -1369,14 +1370,16 @@ Item {
                 dialogCommon.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
-                    OnAccepted: function(){
-                        //dialogCommon.close();
+                    OnAccepted: function() {
                         root.forceActiveFocus();
                     },
-                    OnDiscarded: ()=>{
-                        //dialogCommon.close();
+                    OnRejected: ()=>{
                         root.forceActiveFocus();
                     },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+                        root.forceActiveFocus();
+                    },*/
                 });
                 return false;
             }
@@ -1630,7 +1633,7 @@ Item {
             dialogCommon.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     let jsScript = _private.compile();
                     if(jsScript === false)
                         return;

@@ -16,7 +16,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import RPGComponents 1.0
+//import RPGComponents 1.0
+import 'RPGComponents'
 
 
 import "qrc:/QML"
@@ -247,6 +248,8 @@ Item {
                     fight.fighton(...game.gd['$sys_random_fight']);
                 }
             }
+
+            return null;
         }
     }
 
@@ -2087,10 +2090,11 @@ Item {
 
     Component.onDestruction: {
 
-        delete FrameManager.globalObject().fight;
+        //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
+        if(FrameManager.globalObject().fight === fight)
+            delete FrameManager.globalObject().fight;
 
         console.debug("[FightScene]Component.onDestruction");
-
     }
 
 }

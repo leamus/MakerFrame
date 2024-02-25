@@ -34,7 +34,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.7.14.240215'
+    property string version: '1.7.17.240225'
 
 
     //配置
@@ -76,7 +76,7 @@ QtObject {
             switch(Qt.platform.os) {
             case 'android':
                 return strWorkPath + separator + 'SaveData' + separator + strCurrentProjectName;
-                //return Platform.getExternalDataPath() + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
+                //return Platform.externalDataPath + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
                 //return Platform.getSdcardPath() + separator + 'Leamus' + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
             case 'windows':
             default:
@@ -285,7 +285,24 @@ QtObject {
 
 
     Component.onCompleted: {
+        //!!解决 assets BUG
+        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
+            return;
+        //if(FrameManager.globalObject().GameMakerGlobal)
+        //    return;
+
+        FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
+
+
         if(Platform.compileType() === 'release') {
+            let userID = '', account = '', nickname = '';
+            if(Global.frameSettings.$userData) {
+                let userData = JSON.parse(FrameManager.sl_qml_Uncompress(Global.frameSettings.$userData, 1).toString());
+                userID = userData.info.id;
+                account = userData.info.account;
+                nickname = userData.info.nickname;
+            }
+
             //提交访问信息
             let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
             let xhr = new XMLHttpRequest;
@@ -304,7 +321,7 @@ QtObject {
                 //else
                 //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
             }
-            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}`);  //发送请求
+            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}`);  //发送请求
             //xhr.send();
         }
 
@@ -315,6 +332,14 @@ QtObject {
         console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobalJS);
     }
     Component.onDestruction: {
+        //!!解决 assets BUG
+        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
+            return;
+        //if(!FrameManager.globalObject().GameMakerGlobal)
+        //    return;
+
+        delete FrameManager.globalObject().GameMakerGlobal;
+
         console.debug('[GameMakerGlobal]Component.onDestruction');
     }
 }

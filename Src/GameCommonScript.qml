@@ -12,7 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
+////import RPGComponents 1.0
+//import 'Core/RPGComponents'
 
 
 import "qrc:/QML"
@@ -118,7 +119,7 @@ let $config = {
                     return null;
 
                 game.window(1);
-                //game.window(1, {MaskColor: '#00000000'});
+                //game.window(1, {MaskColor: 'transparent'});
                 return null;
             },
         },
@@ -195,7 +196,8 @@ let $config = {
             $borderColor: 'white',
             $fontSize: 16,
             $fontColor: 'white',
-            $maskColor: 'transparent',
+            $maskColor: '#01000000',
+            //$maskColor: '#00000000',  //全0会隐藏Mask，导致只能点击消息框才能有效
         },
         $msg: {
             $backgroundColor: '#BF6699FF',
@@ -226,7 +228,7 @@ let $config = {
             $fontSize: 16,
             $fontColor: 'white',
             $titleBackgroundColor: '#FF0035A8',
-            $titleBorderColor: '#00000000',
+            $titleBorderColor: 'transparent',
             $titleFontSize: 16,
             $titleFontColor: 'white',
             $maskColor: '#7FFFFFFF',
@@ -289,7 +291,7 @@ function *$gameInit(firstRun) {
         if(initJS) {
             Object.assign(game.gf, initJS);
             if(initJS.$init)
-                game.run(initJS.$init);
+                game.run(initJS.$init(firstRun));
         }
     }
     let plugins = game.plugin();
@@ -301,7 +303,7 @@ function *$gameInit(firstRun) {
                 if(initJS) {
                     Object.assign(game.gf, initJS);
                     if(initJS.$init)
-                        game.run(initJS.$init);
+                        game.run(initJS.$init(firstRun));
                 }
             }
         }
@@ -2106,7 +2108,7 @@ function $readSavesInfo(count=3) {
             dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     if(save())
                         s_close();
                     //root.forceActiveFocus();

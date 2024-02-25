@@ -59,12 +59,24 @@ Item {
         //itemContainer.mapInfo = JSON.parse(File.read(mapFilePath));
         itemContainer.mapInfo = mapInfo;
 
-        let nMapBlockScale = parseFloat(itemContainer.mapInfo.MapScale) || 1;
-        sizeMapBlockSize.width = Math.round(itemContainer.mapInfo.MapBlockSize[0] * nMapBlockScale);
-        sizeMapBlockSize.height = Math.round(itemContainer.mapInfo.MapBlockSize[1] * nMapBlockScale);
 
-        itemContainer.width = itemContainer.mapInfo.MapSize[0] * sizeMapBlockSize.width;
-        itemContainer.height = itemContainer.mapInfo.MapSize[1] * sizeMapBlockSize.height;
+        //地图大小（块）和地图块大小
+        sizeMapSize = Qt.size(itemContainer.mapInfo.MapSize[0], itemContainer.mapInfo.MapSize[1]);
+        sizeMapBlockSize = Qt.size(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1]);
+
+        //计算 _private.nMapDrawScale
+        const mapPixelCount = sizeMapSize.width * sizeMapBlockSize.width * sizeMapSize.height * sizeMapBlockSize.height;
+        for(_private.nMapDrawScale = 1; mapPixelCount / _private.nMapDrawScale >= nMapMaxPixelCount; ++_private.nMapDrawScale) {
+        }
+        //_private.nMapDrawScale = 2;
+        _private.sizeCanvas = Qt.size(sizeMapSize.width * sizeMapBlockSize.width / _private.nMapDrawScale, sizeMapSize.height * sizeMapBlockSize.height / _private.nMapDrawScale)
+
+        _private.rMapScale = parseFloat(itemContainer.mapInfo.MapScale) || 1;
+        sizeMapBlockScaledSize.width = Math.round(sizeMapBlockSize.width * _private.rMapScale);
+        sizeMapBlockScaledSize.height = Math.round(sizeMapBlockSize.height * _private.rMapScale);
+
+        itemContainer.width = sizeMapSize.width * sizeMapBlockScaledSize.width;
+        itemContainer.height = sizeMapSize.height * sizeMapBlockScaledSize.height;
 
         //如果地图小于等于场景，则将地图居中
         if(itemContainer.width < gameScene.width)
@@ -171,15 +183,15 @@ Item {
         let targetX;
         let targetY;
         if(dx.toString().indexOf('.') < 0)
-            targetX = parseInt((bx) * sizeMapBlockSize.width);
+            targetX = parseInt((bx) * sizeMapBlockScaledSize.width);
         else {
-            targetX = parseInt((bx + dx) * sizeMapBlockSize.width);
+            targetX = parseInt((bx + dx) * sizeMapBlockScaledSize.width);
             dx = 0;
         }
         if(dy.toString().indexOf('.') < 0)
-            targetY = parseInt((by) * sizeMapBlockSize.height);
+            targetY = parseInt((by) * sizeMapBlockScaledSize.height);
         else {
-            targetY = parseInt((by + dy) * sizeMapBlockSize.height);
+            targetY = parseInt((by + dy) * sizeMapBlockScaledSize.height);
             dy = 0;
         }
         //let targetX = role.x + role.x1 + parseInt(role.width1 / 2);
@@ -252,10 +264,10 @@ Item {
 
         //人物所占 起始和终止 的地图块ID，然后按序统计出来地图块
         ////+1、-1 是因为 小于等于图块 时，只占用1个图块
-        let xBlock1 = Math.floor((x1) / sizeMapBlockSize.width);
-        let xBlock2 = Math.floor((x2) / sizeMapBlockSize.width);
-        let yBlock1 = Math.floor((y1) / sizeMapBlockSize.height);
-        let yBlock2 = Math.floor((y2) / sizeMapBlockSize.height);
+        let xBlock1 = Math.floor((x1) / sizeMapBlockScaledSize.width);
+        let xBlock2 = Math.floor((x2) / sizeMapBlockScaledSize.width);
+        let yBlock1 = Math.floor((y1) / sizeMapBlockScaledSize.height);
+        let yBlock2 = Math.floor((y2) / sizeMapBlockScaledSize.height);
 
         /*/计算 所占的 地图块
         for(; yBlock1 <= yBlock2; ++yBlock1) {
@@ -300,15 +312,26 @@ Item {
 
 
 
-    //地图块大小（乘以缩放后的）
+    //最大地图像素数（超过则缩放）
+    property int nMapMaxPixelCount: 70*70*32*32
+
+    //地图大小（块）
+    property size sizeMapSize
+    //地图块大小
     property size sizeMapBlockSize
+    //地图块大小（乘以缩放后的）
+    property size sizeMapBlockScaledSize
+
+    readonly property alias sizeCanvas: _private.sizeCanvas
+
 
     //前景地图遮挡人物透明度
     property real rMapOpacity: 1
-    //前景地图遮挡人物透明度
+    //缩放是否平滑（false为按点缩放）
     property bool bSmooth: true
 
 
+    //Canvas遮罩层
     property var arrCanvasMask: []
 
 
@@ -345,9 +368,14 @@ Item {
             //数据
             property var objMaskData: ({})
 
-            anchors.fill: parent
+            //anchors.fill: parent
+            width: _private.sizeCanvas.width
+            height: _private.sizeCanvas.height
 
+            scale: _private.rMapScale * _private.nMapDrawScale
             smooth: bSmooth
+            transformOrigin: Item.TopLeft
+            //transformOrigin: Item.Center
 
 
             onPaint: {  //绘制地图
@@ -391,7 +419,7 @@ Item {
                         ctx.fillStyle = objMaskData[i].Color;
                     else
                         ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
-                    ctx.fillRect(bx * sizeMapBlockSize.width, by * sizeMapBlockSize.height, sizeMapBlockSize.width, sizeMapBlockSize.height);
+                    ctx.fillRect(bx * itemContainer.mapInfo.MapBlockSize[0], by * itemContainer.mapInfo.MapBlockSize[1], itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1]);
                 }
 
                 requestPaint();
@@ -523,9 +551,14 @@ Item {
                 Canvas {
                     id: canvasBackMap
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: _private.sizeCanvas.width
+                    height: _private.sizeCanvas.height
 
+                    scale: _private.rMapScale * _private.nMapDrawScale
                     smooth: bSmooth
+                    transformOrigin: Item.TopLeft
+                    //transformOrigin: Item.Center
 
 
                     onPaint: {  //绘制地图
@@ -566,8 +599,8 @@ Item {
                             ctx.drawImage(imageMapBlock.source,
                                           x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
                                           itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                          x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                          sizeMapBlockSize.width, sizeMapBlockSize.height);
+                                          x2 * sizeMapBlockScaledSize.width, y2 * sizeMapBlockScaledSize.height,
+                                          sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
@@ -595,7 +628,7 @@ Item {
                             //		console.debug("i:", i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                    //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
+                                    //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                                     if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
                                         continue;
@@ -604,8 +637,8 @@ Item {
                                     //x1、y1为源，x2、y2为目标
                                     let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
                                     let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * sizeMapBlockSize.width;
-                                    let y2 = j * sizeMapBlockSize.height;
+                                    let x2 = i * itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
+                                    let y2 = j * itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
                                     //console.debug(k,j,i, ":", x1,y1,x2,y2);
                                     //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
@@ -614,7 +647,7 @@ Item {
                                                   x1, y1,
                                                   itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
                                                   x2, y2,
-                                                  sizeMapBlockSize.width, sizeMapBlockSize.height
+                                                  itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale, itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale
                                     );
                                 }
                             }
@@ -696,9 +729,14 @@ Item {
                 Canvas {
                     id: canvasFrontMap
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: _private.sizeCanvas.width
+                    height: _private.sizeCanvas.height
 
+                    scale: _private.rMapScale * _private.nMapDrawScale
                     smooth: bSmooth
+                    transformOrigin: Item.TopLeft
+                    //transformOrigin: Item.Center
 
                     opacity: rMapOpacity
 
@@ -741,8 +779,8 @@ Item {
                             ctx.drawImage(imageMapBlock.source,
                                           x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
                                           itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
-                                          x2 * sizeMapBlockSize.width, y2 * sizeMapBlockSize.height,
-                                          sizeMapBlockSize.width, sizeMapBlockSize.height);
+                                          x2 * sizeMapBlockScaledSize.width, y2 * sizeMapBlockScaledSize.height,
+                                          sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
@@ -768,7 +806,7 @@ Item {
                             //		console.debug("i:", i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
-                                    //ctx.fillRect(x2, y2, sizeMapBlockSize.width, sizeMapBlockSize.height);
+                                    //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                                     if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
                                         continue;
@@ -777,8 +815,8 @@ Item {
                                     //x1、y1为源，x2、y2为目标
                                     let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
                                     let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * sizeMapBlockSize.width;
-                                    let y2 = j * sizeMapBlockSize.height;
+                                    let x2 = i * itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
+                                    let y2 = j * itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
                                     //console.debug(k,j,i, ":", x1,y1,x2,y2);
                                     //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
@@ -787,7 +825,7 @@ Item {
                                                   x1, y1,
                                                   itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
                                                   x2, y2,
-                                                  sizeMapBlockSize.width, sizeMapBlockSize.height
+                                                  itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale, itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale
                                     );
                                 }
                             }
@@ -819,6 +857,13 @@ Item {
         id: _private
 
 
+        //地图缩放
+        property real rMapScale: 1
+
+        //绘制地图时缩小倍数（防止太大出错）
+        property int nMapDrawScale: 1
+        //Canvas的大小
+        property size sizeCanvas
     }
 
 

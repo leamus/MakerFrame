@@ -16,7 +16,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import RPGComponents 1.0
+//import RPGComponents 1.0
+import 'RPGComponents'
 
 
 import 'qrc:/QML'
@@ -312,91 +313,6 @@ Item {
     }
 
 
-    //打开地图
-    function openMap(mapName, forceRepaint=false) {
-        game.d['$sys_map'] = {};
-
-        let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
-
-        //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
-        if(forceRepaint || game.gd['$sys_map'].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
-
-            if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapName))) {
-                game.gd['$sys_map'].$name = null;
-
-                game.d['$sys_map'].$info = {};
-                game.d['$sys_map'].$name = null;
-                game.d['$sys_map'].$columns = 0;
-                game.d['$sys_map'].$rows = 0;
-                game.d['$sys_map'].$obstacles = [];
-
-
-                //!!!兼容旧代码
-                game.gd['$sys_map'].$$info = {};
-                game.gd['$sys_map'].$$columns = 0;
-                game.gd['$sys_map'].$$rows = 0;
-                game.gd['$sys_map'].$$obstacles = [];
-
-
-                //console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
-                return false;
-            }
-
-            //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
-            game.gd['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
-
-            game.d['$sys_map'].$info = itemViewPort.itemContainer.mapInfo;
-            game.d['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
-            game.d['$sys_map'].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-            game.d['$sys_map'].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-
-            game.d['$sys_map'].$obstacles = [];
-            for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] & 0b1) {
-                    game.d['$sys_map'].$obstacles.push(mb.split(','));
-                }
-            }
-            game.d['$sys_map'].$specials = itemViewPort.itemContainer.mapInfo.MapBlockSpecialData;
-
-
-            //!!!兼容旧代码
-            game.gd['$sys_map'].$$info = itemViewPort.itemContainer.mapInfo;
-            game.gd['$sys_map'].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-            game.gd['$sys_map'].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-            game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
-        }
-
-
-
-        //执行载入地图脚本
-
-        //之前的
-        //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData['$1'] !== undefined) {
-        //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData['$1']) === 0)
-        //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-        //}
-
-        //使用Component（太麻烦）
-        //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'));
-        //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'), scriptComp)
-        //let script = scriptComp.createObject({}, rootGameScene);
-
-        //let script = Qt.createQmlObject('import QtQuick 2.14;import 'map.js' as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
-        //script.destroy();
-        let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
-        itemViewPort.mapScript = ts;
-        if(ts.$start)
-            game.run([ts.$start(), 'map $start']);
-        else if(ts.start)
-            game.run([ts.start(), 'map start']);
-
-
-
-        //test();
-
-        return itemViewPort.itemContainer.mapInfo;
-    }
-
     function updateAllRolesPos() {
 
     }
@@ -413,18 +329,18 @@ Item {
         //设置角色坐标
 
         //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-        if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
+        if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockScaledSize.width)
             role.x = itemViewPort.itemContainer.width - role.x2 - 1;
         else
             role.x = targetX - role.x1 - role.width1 / 2;
-        //role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
+        //role.x = bx * itemViewPort.sizeMapBlockScaledSize.width - role.x1;
 
         //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-        if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
+        if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockScaledSize.height)
             role.y = itemViewPort.itemContainer.height - role.y2 - 1;
         else
             role.y = targetY - role.y1 - role.height1 / 2;
-        //role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
+        //role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
 
         if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
     }
@@ -481,6 +397,14 @@ Item {
                 game.run([beforeLoadmap(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 1});
 
 
+            //执行之前地图的 $end 函数
+            if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
+                let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
+                if(ts.$end)
+                    game.run([ts.$end(), 'map $end'], {Priority: -3, Type: 0, Running: 1});
+            }
+
+
             timer.running = false;
 
 
@@ -502,7 +426,7 @@ Item {
             _private.stopAction(0);
 
 
-            let mapInfo = openMap(mapName, forceRepaint);
+            let mapInfo = GameSceneJS.openMap(mapName, forceRepaint);
 
 
             //载入地图会卡顿，重新开始计时会顺滑一点
@@ -1317,19 +1241,19 @@ Item {
 
 
                 //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-                //if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockSize.width)
+                //if(bx === itemViewPort.itemContainer.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockScaledSize.width)
                 //    role.x = itemViewPort.itemContainer.width - role.x2 - 1;
                 //else
                 //    role.x = roleCenterX - role.x1 - role.width1 / 2;
-                role.x = bx * itemViewPort.sizeMapBlockSize.width - role.x1;
+                role.x = bx * itemViewPort.sizeMapBlockScaledSize.width - role.x1;
 
 
                 //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-                //if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockSize.height)
+                //if(by === itemViewPort.itemContainer.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockScaledSize.height)
                 //    role.y = itemViewPort.itemContainer.height - role.y2 - 1;
                 //else
                 //    role.y = roleCenterY - role.y1 - role.height1 / 2;
-                role.y = by * itemViewPort.sizeMapBlockSize.height - role.y1;
+                role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
 
             }
             */
@@ -1419,8 +1343,8 @@ Item {
             else
                 return {
                     //地图块坐标
-                    bx: Math.floor(centerX / itemViewPort.sizeMapBlockSize.width),
-                    by: Math.floor(centerY / itemViewPort.sizeMapBlockSize.height),
+                    bx: Math.floor(centerX / itemViewPort.sizeMapBlockScaledSize.width),
+                    by: Math.floor(centerY / itemViewPort.sizeMapBlockScaledSize.height),
                     //实际坐标
                     x: role.x,
                     y: role.y,
@@ -3490,7 +3414,8 @@ Item {
             if(params.length < 2)
                 return _private.objPlugins;
 
-            let plugin = _private.objPlugins[params[0]][params[1]];
+            //let plugin = _private.objPlugins[params[0]][params[1]];
+            let plugin = GlobalLibraryJS.getObjectValue(_private.objPlugins, params[0], params[1]);
             if(plugin && plugin.$autoLoad === false) {
                 plugin.$autoLoad = true;
                 plugin.$load();
@@ -3547,7 +3472,9 @@ Item {
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
                 console.warn('[!GameScene]运行脚本未定义（可忽略）');
-                //console.exception(123);
+                console.debug(new Error().stack);
+                //console.exception('[!GameScene]运行脚本未定义（可忽略）');
+
                 return undefined;
             }
             if(vScript === null) {
@@ -3745,10 +3672,11 @@ Item {
             release: release,
             init: init,
 
-            screen: rootGameScene,      //屏幕（组件位置和大小固定）（所有，包含战斗场景）
-            viewport: itemViewPort,     //游戏视窗，组件位置和大小固定
-            scene: itemViewPort.gameScene,           //场景（组件位置和大小固定，但会被scale影响）
-            map: itemViewPort.itemContainer,         //地图，组件的容器（组件会改变大小和随地图移动）
+            screen: rootGameScene,          //屏幕（组件位置和大小固定）（所有，包含战斗场景）
+            viewport: itemViewPort,         //游戏视窗，组件位置和大小固定
+            scene: itemViewPort.gameScene,              //场景（组件位置和大小固定，但会被scale影响）
+            map: itemViewPort.itemContainer,            //地图，组件的容器（组件会改变大小和随地图移动），会覆盖所有元素
+            ground: itemViewPort.itemRoleContainer,     //地图地面，组件的容器（组件会改变大小和随地图移动），会根据z值判断是否覆盖元素
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
@@ -3971,7 +3899,7 @@ Item {
         }
 
         /*mouseArea.onPositionChanged: {
-            let blockPixel = Qt.point(Math.floor(mouse.x / itemViewPort.sizeMapBlockSize.width) * itemViewPort.sizeMapBlockSize.width, Math.floor(mouse.y / itemViewPort.sizeMapBlockSize.height) * itemViewPort.sizeMapBlockSize.height);
+            let blockPixel = Qt.point(Math.floor(mouse.x / itemViewPort.sizeMapBlockScaledSize.width) * itemViewPort.sizeMapBlockScaledSize.width, Math.floor(mouse.y / itemViewPort.sizeMapBlockScaledSize.height) * itemViewPort.sizeMapBlockScaledSize.height);
             console.warn(blockPixel.x, blockPixel.y);
         }*/
     }
@@ -5302,6 +5230,9 @@ Item {
             //存档m5的盐
             readonly property string strSaveDataSalt: '深林孤鹰@鹰歌联盟Leamus_' + GameMakerGlobal.config.strCurrentProjectName
 
+            //最大地图像素数
+            property int nMapMaxPixelCount: 70*70*32*32
+
 
             //下面是游戏中可以修改的
             property int nInterval: 16
@@ -6610,8 +6541,11 @@ Item {
     Component.onDestruction: {
         //release();
 
-        delete FrameManager.globalObject().game;
-        delete FrameManager.globalObject().g;
+        //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
+        if(FrameManager.globalObject().game === game) {
+            delete FrameManager.globalObject().game;
+            delete FrameManager.globalObject().g;
+        }
 
         console.debug('[GameScene]Component.onDestruction');
     }
