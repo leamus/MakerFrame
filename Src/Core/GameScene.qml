@@ -3813,8 +3813,8 @@ Item {
 
 
         //地图大小和视窗大小
-        readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
-        readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
+        //readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
+        //readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
 
 
 

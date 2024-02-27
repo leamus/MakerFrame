@@ -161,6 +161,7 @@ Item {
                     }
 
                     dialogCommon.show({
+                        TextFormat: Label.PlainText,
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
                                           .arg(menuJS.plugins[item]['Name'])
                                           .arg(menuJS.plugins[item]['Version'])
@@ -173,7 +174,7 @@ Item {
                         OnAccepted: function(){
 
                             let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            let zipPath = projectUrl + "Plugins/%1".arg(menuJS.plugins[item]['File']);
+                            let zipPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
                             //let nr = FrameManager.sl_qml_DownloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
                             let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
@@ -210,6 +211,26 @@ Item {
                                 if(ret.length > 0) {
                                     //console.debug(ret, projectUrl, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
                                     msg = "安装成功";
+
+
+                                    let jsPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'];
+                                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                                        try {
+                                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+
+                                            if(ts.$install) {
+                                                ts.$install();
+                                            }
+
+                                            //itemExtendsRoot.forceActiveFocus();
+                                            //l_list.visible = false;
+
+                                        }
+                                        catch(e) {
+                                            console.error('[!PluginsDownload]', e);
+                                            //return -1;
+                                        }
+                                    }
                                 }
                                 else
                                     msg = "安装失败";

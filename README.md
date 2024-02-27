@@ -1,7 +1,5 @@
 # MakerFrame框架_跨平台游戏引擎-RPG+ARPG+策略战棋+即时战略+文字等
 
-<img src="Images/game.png" style="margin-top:30px;"/>
-
 #### 介绍
 
 * 鹰歌MakerFrame框架 是一款由 Qt/QML/JAVA 构建的供二次开发的软件/游戏的制作及运行的开放式跨平台框架，它可以运行在Windows、Android、iOS、macOS、Linux（Ubuntu、包括国产化）等主流平台上，并提供了屏幕自适应、网络、热更新、数据库、文件管理、媒体播放器、浏览器内核等众多功能和扩展，可以用来开发多种游戏、引擎及软件等；

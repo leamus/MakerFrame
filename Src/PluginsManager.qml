@@ -192,39 +192,42 @@ Item {
 
                 //循环三方插件目录
                 for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
-                    arrPluginsName.push([tc0, tc1]);
-                    arrPluginsShowName.push('%1(%2)'.arg(tc1).arg(tc0));
+                    let showName = '';
+
+                    let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
+
+                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+
+                        try {
+                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
 
 
-                    /*
-                    let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends';
-
-                    if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js')))
-                        continue;
-
-                    try {
-                        let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+                            //放入 _private.objPlugins 中
+                            //if(ts.$pluginId !== undefined) {    //插件有ID
+                            //    _private.objPlugins[ts.$pluginId] = ts;
+                            //}
 
 
-                        //放入 _private.objPlugins 中
-                        //if(ts.$pluginId !== undefined) {    //插件有ID
-                        //    _private.objPlugins[ts.$pluginId] = ts;
-                        //}
-                        if(!GlobalLibraryJS.isObject(_private.objPlugins[tc0]))
-                            _private.objPlugins[tc0] = {};
-                        _private.objPlugins[tc0][tc1] = ts;
+                            //if(!GlobalLibraryJS.isObject(_private.objPlugins[tc0]))
+                            //    _private.objPlugins[tc0] = {};
+                            //_private.objPlugins[tc0][tc1] = ts;
 
 
-                        /*if(ts.$load && ts.$autoLoad !== false) {
-                            ts.$load();
+                            /*if(ts.$load && ts.$autoLoad !== false) {
+                                ts.$load();
+                            }
+                            */
+
+                            showName = ts.$name;
                         }
-                        * /
+                        catch(e) {
+                            console.error('[!PluginsManager]', e);
+                            continue;
+                        }
                     }
-                    catch(e) {
-                        console.error('[!PluginsManager]', e);
-                        continue;
-                    }
-                    */
+
+                    arrPluginsName.push([tc0, tc1]);
+                    arrPluginsShowName.push('%1(%2/%3)'.arg(showName).arg(tc0).arg(tc1));
                 }
             }
 
@@ -296,7 +299,27 @@ Item {
                     dialogCommon.show({
                         Msg: '确认删除?',
                         Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
+
+                            let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
+                            if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                                try {
+                                    let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+
+                                    if(ts.$uninstall) {
+                                        ts.$uninstall();
+                                    }
+
+                                    //itemExtendsRoot.forceActiveFocus();
+                                    //l_list.visible = false;
+
+                                }
+                                catch(e) {
+                                    console.error('[!PluginsManager]', e);
+                                    //return -1;
+                                }
+                            }
+
                             console.debug("[PluginsManager]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
                             l_list.removeItem(index);
                             _private.refresh();
