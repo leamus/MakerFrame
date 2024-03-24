@@ -313,7 +313,9 @@ Item {
 
 
     //最大地图像素数（超过则缩放）
-    property int nMapMaxPixelCount: 70*70*32*32
+    //32位安卓，70*70绘制一会就飘
+    //64位安卓：200*200左右很卡（250*250闪退），100*100：明显卡
+    property int nMapMaxPixelCount: 60*60*32*32 //Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
 
     //地图大小（块）
     property size sizeMapSize
@@ -372,10 +374,16 @@ Item {
             width: _private.sizeCanvas.width
             height: _private.sizeCanvas.height
 
+            //opacity: 1
             scale: _private.rMapScale * _private.nMapDrawScale
             smooth: bSmooth
+
             transformOrigin: Item.TopLeft
             //transformOrigin: Item.Center
+
+            renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+            renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
 
 
             onPaint: {  //绘制地图
@@ -422,7 +430,7 @@ Item {
                     ctx.fillRect(bx * itemContainer.mapInfo.MapBlockSize[0], by * itemContainer.mapInfo.MapBlockSize[1], itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1]);
                 }
 
-                requestPaint();
+                //requestPaint();
 
 
                 console.debug("[GameMapView]canvasMask onPaint");
@@ -545,8 +553,12 @@ Item {
             //背景地图容器
             Item {
                 id: itemBackMapContainer
-                anchors.fill: parent
+
                 property var arrCanvas: [canvasBackMap]
+
+                anchors.fill: parent
+
+
 
                 Canvas {
                     id: canvasBackMap
@@ -555,10 +567,16 @@ Item {
                     width: _private.sizeCanvas.width
                     height: _private.sizeCanvas.height
 
+                    //opacity: 1
                     scale: _private.rMapScale * _private.nMapDrawScale
                     smooth: bSmooth
+
                     transformOrigin: Item.TopLeft
                     //transformOrigin: Item.Center
+
+                    renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                    renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
 
 
                     onPaint: {  //绘制地图
@@ -653,9 +671,13 @@ Item {
                             }
                         }
 
+                        console.debug("[GameMapView]canvasMapBack onPaint");
+                    }
+
+                    onPainted: {
                         itemBackMapContainer.visible = true;
 
-                        console.debug("[GameMapView]canvasMapBack onPaint");
+                        console.debug("[GameMapView]canvasMapBack onPainted");
                     }
 
                     onImageLoaded: {    //载入图片完成
@@ -692,6 +714,9 @@ Item {
                         anchors.bottom: parent.top
                         anchors.horizontalCenter: parent.horizontalCenter
 
+                        //textArea.enabled: false
+                        textArea.readOnly: true
+
                         nMaxHeight: 32
 
                         onS_over: {
@@ -723,8 +748,12 @@ Item {
             //前景地图容器
             Item {
                 id: itemFrontMapContainer
-                anchors.fill: parent
+
                 property var arrCanvas: [canvasFrontMap]
+
+                anchors.fill: parent
+
+
 
                 Canvas {
                     id: canvasFrontMap
@@ -733,12 +762,16 @@ Item {
                     width: _private.sizeCanvas.width
                     height: _private.sizeCanvas.height
 
+                    opacity: rMapOpacity
                     scale: _private.rMapScale * _private.nMapDrawScale
                     smooth: bSmooth
+
                     transformOrigin: Item.TopLeft
                     //transformOrigin: Item.Center
 
-                    opacity: rMapOpacity
+                    renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                    renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
 
 
                     onPaint: {  //绘制地图
@@ -831,9 +864,13 @@ Item {
                             }
                         }
 
+                        console.debug("[GameMapView]canvasFrontMap onPaint");
+                    }
+
+                    onPainted: {
                         itemFrontMapContainer.visible = true;
 
-                        console.debug("[GameMapView]canvasFrontMap onPaint");
+                        console.debug("[GameMapView]canvasMapBack onPainted");
                     }
 
                     onImageLoaded: {    //载入图片完成
@@ -910,5 +947,16 @@ Item {
             //console.log("Cancel clicked");
         }
     }*/
+
+
+    Component.onCompleted: {
+        nMapMaxPixelCount = (Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
+
+        console.debug("[GameMapView]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[GameMapView]Component.onDestruction");
+    }
 }
 

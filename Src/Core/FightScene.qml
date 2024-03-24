@@ -200,7 +200,7 @@ Item {
             //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
             let button = compButtons.createObject(rowlayoutButtons);
             button.text = tb.$text;
-            button.clicked.connect(function(){
+            button.clicked.connect(function() {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 fight.run(tb.$action(button));
@@ -520,19 +520,27 @@ Item {
         }
 
 
+        //计算新属性
+        game.run(function() {
+            //计算新属性
+            for(let tfh of fight.myCombatants)
+            //for(let tfh of game.gd['$sys_fight_heros'])
+                game.$resources.commonScripts['refresh_combatant'](tfh);
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(-1);
+        }, {Running: 0});
+
 
         rootFightScene.visible = false;
+
+        rootGameScene.focus = true;
+
 
         game.stage(0);
         //_private.nStage = 0;
         game.goon('$fight');
 
         game.run(true);
-
-        //升级检测
-        //for(let h in game.gd["$sys_fight_heros"]) {
-        //    game.levelup(game.gd["$sys_fight_heros"][h]);
-        //}
     }
 
 
@@ -574,6 +582,8 @@ Item {
 
                     itemMsg.destroy();
 
+                    //rootFightScene.forceActiveFocus();
+
                     //不再执行默认的回调函数
                     return true;
                 }
@@ -597,6 +607,8 @@ Item {
                     //_private.asyncScript.run(index);
 
                     itemMenu.destroy();
+
+                    //rootFightScene.forceActiveFocus();
 
                     //不再执行默认的回调函数
                     return true;
@@ -768,7 +780,7 @@ Item {
             },
 
             //刷新战斗人物（目前只是血条）
-            //combatant可以为-1（全部）、0（我方）、1（敌方）、具体的某个战斗人物
+            //combatant可以为数字：-1（全部）、0（我方）、1（敌方） 或 具体的某个战斗人物对象
             refreshCombatant: function(combatant=-1) {
                 let refresh = function(combatant) {
                     if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$comp) {
@@ -1703,15 +1715,19 @@ Item {
     //游戏消息框，暂时不用
     Message {
         id: msgbox
+
+        visible: false
+
         //width: parent.width
         Layout.preferredWidth: parent.width
         Layout.preferredHeight: parent.height
         Layout.fillHeight: true
         //implicitHeight: parent.height / 2
         //height: parent.height / 2
+
+        textArea.enabled: false
         textArea.readOnly: true
         //text: ""
-        visible: false
     }
 
 

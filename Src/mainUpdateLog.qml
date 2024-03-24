@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.enabled: false
             textArea.readOnly: true
 
             textArea.selectByMouse: false
@@ -91,11 +92,11 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            //Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: '返回'
+            text: '返　回'
             onClicked: {
                 s_close();
             }
@@ -139,10 +140,32 @@ Item {
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
-正在开发：战旗引擎
+正在开发：无限地图（使用Canvas还是QNanoPainter？）、战旗引擎
+
+2024/3/23：发布 1.7.21.240323 版本（框架 1.3.28.240323版本）
+1、集成安卓Tap广告；
+2、修复一些问题；
+
+2024/3/19：发布 1.7.20.240317 版本（框架 1.3.27.240317版本）
+1、修复地图特效播放后出bug（缓存被删掉了）；
+2、增加game.loadmap的data参数；
+3、增强showSkillsOrGoods函数；
+4、修复QZXing库（用qt5.15.13编译就好了）；
+5、修复选择普通攻击总是最后一个的问题；
+6、增强Config.cfg中CopyFiles的功能，删掉Android_CopyFiles参数，修复底层文件（夹）函数的一些问题，增加底层文件权限等操作接口；
+7、修复打包Tap实名认证在高版本安卓中无法弹出问题；
+8、集成并封装安卓 穿山甲 广告SDK（快来赚钱吧~）；
+
+2024/3/12：发布 1.7.19.240312 版本
+1、修复Notepad和Message组件滑动后鼠标区域也滑动问题；
+2、调整修复可视化命令页面的布局；
+3、优化摇杆代码，使之更容易替换为其他摇杆；
+4、增强一些公用函数；
+5、修复重复载入地图时地图数据为空的Bug；
 
 2024/2/26：发布 1.7.18.240226 版本（框架 1.3.26.240226版本）
 1、优化插件管理，增加插件安装和卸载脚本；
+2、绕过地图多次载入会黑屏问题（貌似是QML的Bug，Canvas没有及时释放，Loader释放后才真正释放的奇怪问题）；
 
 2024/2/25：发布 1.7.17.240225 版本
 1、优化Canvas显示地图时的大小；

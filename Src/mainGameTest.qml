@@ -171,7 +171,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "开始"
+            text: "开　始"
 
             onClicked: {
                 _private.start();

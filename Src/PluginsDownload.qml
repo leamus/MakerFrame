@@ -171,7 +171,7 @@ Item {
                                           .arg(menuJS.plugins[item]['Description'])
                                           ,
                         Buttons: Dialog.Yes | Dialog.No,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
 
                             let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                             let zipPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
@@ -191,7 +191,7 @@ Item {
                                     dialogCommon.show({
                                         Msg: '下载失败：%1'.arg(FrameManager.sl_qml_Property("Code", nr)),
                                         Buttons: Dialog.Yes,
-                                        OnAccepted: function(){
+                                        OnAccepted: function() {
                                             root.forceActiveFocus();
                                         },
                                         OnRejected: ()=>{
@@ -238,7 +238,7 @@ Item {
                                 dialogCommon.show({
                                     Msg: msg,
                                     Buttons: Dialog.Yes,
-                                    OnAccepted: function(){
+                                    OnAccepted: function() {
                                         root.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
@@ -251,7 +251,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '正在下载，请等待（请勿进行其他操作）',
                                 Buttons: Dialog.NoButton,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     dialogCommon.open();
                                 },
                                 OnRejected: ()=>{

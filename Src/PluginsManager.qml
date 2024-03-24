@@ -274,7 +274,7 @@ Item {
                     dialogCommon.show({
                         Msg: '不能运行扩展',
                         Buttons: Dialog.Yes,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
                             l_list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
@@ -294,10 +294,24 @@ Item {
                 OnRemoveClicked: (index, item)=>{
                     let tc0 = arrPluginsName[index][0];
                     let tc1 = arrPluginsName[index][1];
-                    let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + tc0 + GameMakerGlobal.separator + tc1;
+                    let dirUrl = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
 
+                    let description = '';
+                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(dirUrl + GameMakerGlobal.separator + 'main.js'))) {
+                        try {
+                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(dirUrl));
+
+                            if(ts.$description) {
+                                description = '\r\n' + '描述：' + ts.$description;
+                            }
+                        }
+                        catch(e) {
+                            console.error('[!PluginsManager]', e);
+                        }
+                    }
                     dialogCommon.show({
-                        Msg: '确认删除?',
+                        TextFormat: Label.PlainText,
+                        Msg: '确认删除？' + description,
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
 

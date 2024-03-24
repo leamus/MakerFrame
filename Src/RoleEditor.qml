@@ -1421,7 +1421,7 @@ Item {
             dialogCommon.show({
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
                     removeItem(index);
 

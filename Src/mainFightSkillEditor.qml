@@ -114,7 +114,7 @@ Item {
             dialogCommon.show({
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     console.debug("[mainFightSkillEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
                     removeItem(index);
 

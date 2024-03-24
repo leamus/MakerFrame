@@ -286,7 +286,7 @@ let $config = {
 function *$gameInit(firstRun) {
 
     //读取init.js文件（包括插件的）的所有变量和函数，并复制给game.gf
-    if(FrameManager.sl_qml_FileExists(game.$projectpath + GameMakerGlobal.separator + 'init.js')) {
+    if(FrameManager.sl_qml_FileExists(game.$projectpath + game.$gameMakerGlobal.separator + 'init.js')) {
         let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath));
         if(initJS) {
             Object.assign(game.gf, initJS);
@@ -297,8 +297,8 @@ function *$gameInit(firstRun) {
     let plugins = game.plugin();
     for(let tp0 in plugins) {
         for(let tp1 in plugins[tp0]) {
-            let initJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
-            if(FrameManager.sl_qml_FileExists(initJSPath + GameMakerGlobal.separator + 'init.js')) {
+            let initJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
+            if(FrameManager.sl_qml_FileExists(initJSPath + game.$gameMakerGlobal.separator + 'init.js')) {
                 let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(initJSPath));
                 if(initJS) {
                     Object.assign(game.gf, initJS);
@@ -946,7 +946,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
 
                 //如果技能可用
                 //不是 普通技能，放在最后（第一次进行使用判断）
-                if(combatant.$$fightData.$choice.$attack.$type !== 0)
+                //if(combatant.$$fightData.$choice.$attack.$type !== 0)
                     useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
 
             }while(0);
@@ -1857,7 +1857,7 @@ let $fightMenus = {
     $menus: ['普通攻击', '技能', '物品', '信息', '休息'],
     $actions: [
         function(combatantIndex) {
-            fight.$sys.showSkillsOrGoods(0);
+            fight.$sys.showSkillsOrGoods(0, -1);
         },
         function(combatantIndex) {
             fight.$sys.showSkillsOrGoods(1);
@@ -2019,6 +2019,8 @@ function $readSavesInfo(count=3) {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                //textArea.enabled: false
+                //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
@@ -2042,7 +2044,7 @@ function $readSavesInfo(count=3) {
             //Layout.preferredHeight: 50
             Layout.bottomMargin: 10
 
-            text: "保存"
+            text: "保　存"
             onClicked: {
                 _private.save();
             }

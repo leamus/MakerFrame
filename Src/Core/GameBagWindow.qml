@@ -325,6 +325,7 @@ Item {
                 //Layout.maximumHeight: parent.height * 0.3
 
 
+                //textArea.enabled: false
                 textArea.readOnly: true
                 color: 'darkblue'
 

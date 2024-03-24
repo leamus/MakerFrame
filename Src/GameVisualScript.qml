@@ -64,7 +64,7 @@ Item {
                     dialogCommon.show({
                         Msg: '未下载【%1】命令集，请下载或选择其他命令集'.arg(tData.Name),
                         Buttons: Dialog.Yes,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
                             root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
@@ -750,7 +750,7 @@ Item {
                         dialogCommon.show({
                             Msg: '复制成功',
                             Buttons: Dialog.Yes,
-                            OnAccepted: function(){
+                            OnAccepted: function() {
                                 root.forceActiveFocus();
                             },
                             OnRejected: ()=>{
@@ -947,53 +947,80 @@ Item {
             }
         }
 
-        MouseArea {
+        Flickable {
+            id: flickable
             anchors.fill: parent
-            onClicked: {
-                parent.visible = false;
-                repeaterCommandButtons.model = 0;
-                containerCommandButtons.nChoicedMenu = -1;
+
+            //visible: false
+            clip: true
+
+
+            contentWidth: width
+            contentHeight: Math.max(containerCommandButtons.implicitHeight, height)
+            flickableDirection: Flickable.VerticalFlick
+
+
+            MouseArea {
+                //anchors.fill: parent
+                //width: parent.contentWidth
+                //height: parent.contentHeight
+                x: flickable.contentX
+                y: flickable.contentY
+                width: flickable.width
+                height: flickable.height
+
+                onClicked: {
+                    rectCommands.visible = false;
+                    repeaterCommandButtons.model = 0;
+                    containerCommandButtons.nChoicedMenu = -1;
+                }
             }
-        }
-
-        Flow {
-            id: containerCommandButtons
-
-            property int nChoicedMenu: -1
-            property var cmdList
 
 
-            anchors.centerIn: parent
-            width: parent.width * 0.9
-            height: parent.height * 0.9
+            Flow {
+                id: containerCommandButtons
 
-            spacing: 6
+                property int nChoicedMenu: -1
+                property var cmdList
 
-            Repeater {
-                id: repeaterCommandButtons
-                model: 0
-                ColorButton {
-                    //color: sysCommands[Object.keys(sysCommands)[index]].command[6]
-                    //text: sysCommands[Object.keys(sysCommands)[index]].command[0]
-                    colors: {
-                        if(containerCommandButtons.nChoicedMenu === -1) {
-                            let c = sysCommandsTree[index][1];
-                            return [c, c, c];
+                //anchors.fill: parent
+                //anchors.centerIn: parent
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                //anchors.top: parent.top
+                //anchors.topMargin: parent.height * 0.05
+                width: parent.width * 0.9
+                height: Math.max(implicitHeight, parent.height * 0.9)
+
+
+                spacing: 6
+
+                Repeater {
+                    id: repeaterCommandButtons
+                    model: 0
+                    ColorButton {
+                        //color: sysCommands[Object.keys(sysCommands)[index]].command[6]
+                        //text: sysCommands[Object.keys(sysCommands)[index]].command[0]
+                        colors: {
+                            if(containerCommandButtons.nChoicedMenu === -1) {
+                                let c = sysCommandsTree[index][1];
+                                return [c, c, c];
+                            }
+                            else {
+                                let c = sysCommands[sysCommandsTree[containerCommandButtons.nChoicedMenu][2][index]].command[6];
+                                return [c, c, c];
+                            }
                         }
-                        else {
-                            let c = sysCommands[sysCommandsTree[containerCommandButtons.nChoicedMenu][2][index]].command[6];
-                            return [c, c, c];
+                        text: {
+                            if(containerCommandButtons.nChoicedMenu === -1) {
+                                return sysCommandsTree[index][0];
+                            }
+                            else {
+                                return sysCommands[sysCommandsTree[containerCommandButtons.nChoicedMenu][2][index]].command[0];
+                            }
                         }
+                        onClicked: rectCommands.onCommandButtonClicked(index);
                     }
-                    text: {
-                        if(containerCommandButtons.nChoicedMenu === -1) {
-                            return sysCommandsTree[index][0];
-                        }
-                        else {
-                            return sysCommands[sysCommandsTree[containerCommandButtons.nChoicedMenu][2][index]].command[0];
-                        }
-                    }
-                    onClicked: rectCommands.onCommandButtonClicked(index);
                 }
             }
         }
@@ -1009,7 +1036,6 @@ Item {
         property bool bEdit: false
 
         anchors.centerIn: parent
-
         width: parent.width * 0.9
         height: parent.height * 0.9
 
@@ -1032,10 +1058,10 @@ Item {
         }*/
 
         ColumnLayout {
-            anchors.centerIn: parent
-
-            width: parent.width * 0.9
-            height: parent.height * 0.9
+            //anchors.centerIn: parent
+            //width: parent.width * 0.9
+            //height: parent.height * 0.9
+            anchors.fill: parent
 
 
             spacing: 6
@@ -1061,13 +1087,22 @@ Item {
                 contentHeight: Math.max(columnlayoutParams.implicitHeight, height)
                 flickableDirection: Flickable.VerticalFlick
 
+
+
                 ColumnLayout {
                     id: columnlayoutParams
 
                     //参数的所有组件
                     property var compParams: null
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    //anchors.centerIn: parent
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    //anchors.top: parent.top
+                    //anchors.topMargin: parent.height * 0.05
+                    width: parent.width * 0.9
+                    height: Math.max(implicitHeight, parent.height * 0.9)
 
                     spacing: 6
                 }
@@ -1088,7 +1123,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '有必填项没填',
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     root.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
@@ -1132,7 +1167,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '有必填项没填',
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     root.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
@@ -1187,7 +1222,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '检查结果：\r\n%1\r\n请注意：【有可能】不代表错误，因为这是一种简单的常量运行检查（并不是语法检查），如果涉及到变量和生成器请自行判断。'.arg(errString),
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     root.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
@@ -1199,7 +1234,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '参数格式无误',
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     root.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
@@ -1451,8 +1486,12 @@ Item {
                     //strCreateMenu += "TextField {property int nIndex: %1; placeholderText: '%2'; selectByMouse: true; Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter; Layout.fillWidth: true; MouseArea {anchors.fill: parent; onPressed: {parent.focus = true;} onDoubleClicked: {_private.showParamValues(parent); mouse.accepted = false;}} } ".arg(paramId).arg(param[0]);
                     strCreateMenu += "TextField {property int nIndex: %1; objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/  text: '%2'; placeholderText: '%3'; selectByMouse: true; onPressAndHold: {_private.showParamValues(this);} } ".arg(paramId).arg(defaultValue).arg(param[0]);
                     break;
+                case 'text':
+                    strCreateMenu += "Notepad {objectName: 'param'; width: parent.width; height: Math.min(textArea.implicitHeight, flickableParams.height / 2); /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: textArea.focus ? 2 : 1; bCode: false;} ".arg(defaultValue).arg(param[0]);
+                    //strCreateMenu += "TextArea {property int nIndex: %1; objectName: 'param'; width: parent.width; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/  text: '%2'; placeholderText: '%3'; selectByMouse: true; onPressAndHold: {_private.showParamValues(this);} } ".arg(paramId).arg(defaultValue).arg(param[0]);
+                    break;
                 case 'code':
-                    strCreateMenu += "Notepad {id: tNote; objectName: 'param'; width: parent.width; height: textArea.implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: tNote.textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: tNote.textArea.focus ? 2 : 1; bCode: true;} ".arg(defaultValue).arg(param[0]);
+                    strCreateMenu += "Notepad {objectName: 'param'; width: parent.width; height: Math.min(textArea.implicitHeight, flickableParams.height / 2); /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ textArea.text: '%1'; textArea.placeholderText: '%2'; textArea.textFormat: TextArea.PlainText; textArea.selectByMouse: true; textArea.selectByKeyboard: true; border.color: textArea.focus ? Global.style.accent : Global.style.hintTextColor; border.width: textArea.focus ? 2 : 1; bCode: true;} ".arg(defaultValue).arg(param[0]);
                     break;
                 case 'label':
                     strCreateMenu += "Label {width: parent.width; height: implicitHeight; /*Layout.alignment: Qt.AlignLeft | Qt.AlignTop; Layout.fillWidth: true;*/ font.pointSize: 16; text: '%1'; wrapMode: Label.Wrap;} ".arg(param[0]);
@@ -1642,7 +1681,7 @@ Item {
                         arg(`${startCol}`).
                         arg(e.lineNumber).arg(GlobalLibraryJS.convertToHTML(e.toString(), ['<', '>', ' '])).arg(contextSource),
                     Buttons: Dialog.Yes,
-                    OnAccepted: function(){
+                    OnAccepted: function() {
                         root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
@@ -1656,7 +1695,7 @@ Item {
             dialogCommon.show({
                 Msg: '恭喜！没有语法错误',
                 Buttons: Dialog.Yes,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
@@ -1753,19 +1792,20 @@ Item {
                             else
                                 templateCmd = templateCmd.arg('true');
                             break;
-                        case 'string':
-                            templateCmd = templateCmd.arg("`%1`".arg(tParam));
-                            break;
                         case 'string|number':
                             if(GlobalLibraryJS.isStringNumber(tParam))
                                 templateCmd = templateCmd.arg("%1".arg(tParam));
                             else
                                 templateCmd = templateCmd.arg("`%1`".arg(tParam));
                             break;
+                        case 'string':
+                        case 'text':
+                            templateCmd = templateCmd.arg("`%1`".arg(tParam));
+                            break;
                         case 'name':
+                        case 'code':
                         case 'json':
                         case 'unformatted':
-                        case 'code':
                         default:
                             templateCmd = templateCmd.arg("%1".arg(tParam));
                         }
@@ -1914,7 +1954,7 @@ Item {
 
 
             //2.载入自定义指令（全局）
-            let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts';
+            let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts';
             //console.debug(path);
             //console.debug('~~~', FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0));
 

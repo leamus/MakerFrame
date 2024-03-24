@@ -126,60 +126,131 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
 //显示技能选择框
 //type：0为普通攻击；1为技能
-function showSkillsOrGoods(type) {
+//value：直接使用第n个技能/道具，-1为最后一个，-2为随机
+function showSkillsOrGoods(type, value) {
+
+    let arrNames = [];
+    let arrData = [];
 
     //普通攻击
     if(type === 0) {
-        let arrSkillsName = [];
-        let arrSkills = [];
 
-        [arrSkillsName, arrSkills] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [0]);
+        [arrNames, arrData] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [0]);
 
         //menuSkillsOrGoods.nType = 0;
 
         //rectSkills.visible = true;
-        //menuSkillsOrGoods.show(arrSkillsName, arrSkills);
+        //menuSkillsOrGoods.show(arrNames, arrData);
 
-        if(arrSkills.length === 0) {
-            fight.msg("没有技能", 50);
-            return;
+        if(!GlobalLibraryJS.isNumber(value)) {
+            if(arrData.length === 1) {
+                choicedSkillOrGoods(arrData[0], 3);
+                return;
+            }
+
+
+            menuSkillsOrGoods.strTitle = "选择技能";
+            menuSkillsOrGoods.nType = 3;
+
+            rectSkills.visible = true;
+            menuSkillsOrGoods.show(arrNames, arrData);
         }
+        else {
+            if(arrData.length === 0) {
+                fight.msg("没有技能", 50);
+                return;
+            }
+            else if(value === -2)
+                value = GlobalLibraryJS.random(0, arrData.length);
+            //else if(value === -1)
+            //    value = arrData.length - 1;
+            else if(value >= 0 && value < arrData.length)
+                ;
+            else
+                value = arrData.length - 1;
 
-        //直接选择最后一个普通攻击
-        choicedSkillOrGoods(arrSkills.pop(), 3);
+            //直接选择最后一个普通攻击
+            choicedSkillOrGoods(arrData[value], 3);
+        }
     }
     //技能
     else if(type === 1) {
-        let arrSkillsName = [];
-        let arrSkills = [];
 
-        [arrSkillsName, arrSkills] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [1]);
+        [arrNames, arrData] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [1]);
 
-        menuSkillsOrGoods.strTitle = "选择技能";
-        menuSkillsOrGoods.nType = 3;
+        if(!GlobalLibraryJS.isNumber(value)) {
+            //if(arrData.length === 1) {
+            //    choicedSkillOrGoods(arrData[0], 3);
+            //    return;
+            //}
 
-        rectSkills.visible = true;
-        menuSkillsOrGoods.show(arrSkillsName, arrSkills);
+
+            menuSkillsOrGoods.strTitle = "选择技能";
+            menuSkillsOrGoods.nType = 3;
+
+            rectSkills.visible = true;
+            menuSkillsOrGoods.show(arrNames, arrData);
+        }
+        else {
+            if(arrData.length === 0) {
+                fight.msg("没有技能", 50);
+                return;
+            }
+            else if(value === -2)
+                value = GlobalLibraryJS.random(0, arrData.length);
+            //else if(value === -1)
+            //    value = arrData.length - 1;
+            else if(value >= 0 && value < arrData.length)
+                ;
+            else
+                value = arrData.length - 1;
+
+            //直接选择最后一个普通攻击
+            choicedSkillOrGoods(arrData[value], 3);
+        }
     }
     //道具
     else if(type === 2) {
-        let arrGoodsName = [];
-        let arrGoods = [];
 
         //显示所有战斗可用的道具
         for(let goods of game.gd["$sys_goods"]) {
             //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
             if(goods.$commons.$fightScript) {
-                arrGoods.push(goods);
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                arrData.push(goods);
+                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
             }
         }
 
-        menuSkillsOrGoods.strTitle = "选择道具";
-        menuSkillsOrGoods.nType = 2;
+        if(!GlobalLibraryJS.isNumber(value)) {
+            //if(arrData.length === 1) {
+            //    choicedSkillOrGoods(arrData[0], 2);
+            //    return;
+            //}
 
-        rectSkills.visible = true;
-        menuSkillsOrGoods.show(arrGoodsName, arrGoods);
+
+            menuSkillsOrGoods.strTitle = "选择道具";
+            menuSkillsOrGoods.nType = 2;
+
+            rectSkills.visible = true;
+            menuSkillsOrGoods.show(arrNames, arrData);
+        }
+        else {
+            if(arrData.length === 0) {
+                fight.msg("没有道具", 50);
+                return;
+            }
+            else if(value === -2)
+                value = GlobalLibraryJS.random(0, arrData.length);
+            //else if(value === -1)
+            //    value = arrData.length - 1;
+            else if(value >= 0 && value < arrData.length)
+                ;
+            else
+                value = arrData.length - 1;
+
+            //直接选择最后一个道具
+            choicedSkillOrGoods(arrData[value], 2);
+        }
     }
 }
 
@@ -692,7 +763,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //保存到列表中，退出时会删除所有，防止删除错误
             _private.mapSpriteEffectsTemp[combatantActionSpriteDataID] = spriteEffect;
-            spriteEffect.s_finished.connect(function(){
+            spriteEffect.s_finished.connect(function() {
                 if(GlobalLibraryJS.isComponent(spriteEffect)) {
                     game.$sys.unloadSpriteEffect(spriteEffect);
                     //spriteEffect.destroy();
@@ -831,7 +902,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
     case 30: //显示动态文字
 
         let spriteEffect = compCacheWordMove.createObject(fightScene);
-        spriteEffect.parallelAnimation.finished.connect(function(){
+        spriteEffect.parallelAnimation.finished.connect(function() {
             if(GlobalLibraryJS.isComponent(spriteEffect)) {
                 spriteEffect.destroy();
             }
@@ -854,7 +925,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             combatantActionSpriteData.Interval = timerRoleSprite.interval = 1000;
             timerRoleSprite.start();
         }
-        else if(combatantActionSpriteData.Interval > 0){
+        else if(combatantActionSpriteData.Interval > 0) {
             timerRoleSprite.interval = combatantActionSpriteData.Interval;
             timerRoleSprite.start();
         }

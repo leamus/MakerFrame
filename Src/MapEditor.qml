@@ -285,6 +285,9 @@ Item {
             _private.removeCanvasMap();
         }
 
+        canvasMapContainer.width = 0;
+        canvasMapContainer.height = 0;
+
 
 
         canvasMapBlock1.unloadImage(imageMapBlock1.source);
@@ -340,8 +343,8 @@ Item {
 
 
         //绘制所有 0层及以上 canvas
-        canvasOutput.bExport = true;
-        canvasOutput.requestPaint();
+        canvasExport.bExport = true;
+        canvasExport.requestPaint();
 
         //canvasMapContainer.arrCanvasMap[0].save(newPath + "/output_0.png");
         //canvasMapContainer.arrCanvasMap[1].save(newPath + "/output_1.png");
@@ -593,7 +596,7 @@ Item {
                         dialogCommon.show({
                               Msg: '请先保存地图',
                               Buttons: Dialog.Yes,
-                              OnAccepted: function(){
+                              OnAccepted: function() {
                                   root.forceActiveFocus();
                               },
                               OnRejected: ()=>{
@@ -1335,10 +1338,12 @@ Item {
 
                     //地图块
                     Canvas {
-
                         id: canvasMapBlock1
 
                         anchors.fill: parent
+
+                        renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                        renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
 
 
                         //边框
@@ -1479,16 +1484,17 @@ Item {
                                           state, available);
                         }
 
+                        onPainted: {
+                            console.debug("[MapEditor]canvasMapBlock：onPainted");
+                        }
+
                         onImageLoaded: {    //载入图片完成
                             requestPaint(); //重新绘图
+                            console.debug("[MapEditor]canvasMapBlock：onImageLoaded");
 
                             /*for(let k in canvasMapContainer.arrCanvasMap)
                                 canvasMapContainer.arrCanvasMap[k].requestPaint();
                             */
-
-
-
-                            console.debug("[MapEditor]canvasMapBlock：onImageLoaded");
                         }
 
                         onAvailableChanged: {
@@ -1593,6 +1599,11 @@ Item {
 
 
                             anchors.fill: parent
+
+
+                            renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                            renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
 
 
                             onPaint: {  //
@@ -1716,6 +1727,10 @@ Item {
                                 //console.timeEnd("onPaint");
                             }
 
+                            onPainted: {
+                                console.debug("[MapEditor]canvas：onPainted");
+                            }
+
                             onImageLoaded: {
                                 requestPaint();
                                 console.debug("[MapEditor]canvas：onImageLoaded");
@@ -1742,8 +1757,15 @@ Item {
                     Canvas {
                         id: canvasBlockSpecial
 
+
                         anchors.fill: parent
                         z: 998
+
+
+                        renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                        renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
+
 
                         //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
@@ -1781,8 +1803,15 @@ Item {
                     Canvas {
                         id: canvasEvent
 
+
                         anchors.fill: parent
                         z: 998
+
+
+                        renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+                        renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
+
 
                         //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
@@ -2309,7 +2338,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '特殊图块值无效，请输入一个数字（支持二进制、八进制和十六进制）',
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     return;
                                 },
                                 OnRejected: ()=>{
@@ -2830,7 +2859,7 @@ Item {
                         dialogCommon.show({
                               Msg: '请先保存地图',
                               Buttons: Dialog.Yes,
-                              OnAccepted: function(){
+                              OnAccepted: function() {
                                   root.forceActiveFocus();
                               },
                               OnRejected: ()=>{
@@ -2860,6 +2889,9 @@ Item {
 
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
+
+                //textArea.enabled: false
+                //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: "请输入脚本"
@@ -2930,9 +2962,18 @@ Item {
 
 
     Canvas {
-        id: canvasOutput
+        id: canvasExport
+
         property bool bExport: false
+
         visible: false
+        width: canvasMapContainer.width
+        height: canvasMapContainer.height
+
+
+        renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
+        renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
+
 
         onPaint: {
             if(bExport) {
@@ -2945,28 +2986,31 @@ Item {
 
                     ctx.drawImage(canvasMapContainer.arrCanvasMap[i], 0, 0);
 
-                    //canvasOutput.width = canvasMapContainer.width;
-                    //canvasOutput.height = canvasMapContainer.height;
+                    //canvasExport.width = canvasMapContainer.width;
+                    //canvasExport.height = canvasMapContainer.height;
                 }
-
-                let path = GameMakerGlobal.config.strProjectRootPath +
-                    GameMakerGlobal.separator +
-                    GameMakerGlobal.config.strCurrentProjectName +
-                    GameMakerGlobal.separator + 'Outputs' +
-                    GameMakerGlobal.separator + 'Maps';
-                //win下，Canvas.save 不支持 file: 开头的路径
-                path = path.replace("file:/", "").replace("//", "");
-
-                //if(!FrameManager.sl_qml_DirExists(path))
-                    FrameManager.sl_qml_CreateFolder(path);
-
-                canvasOutput.save(path + GameMakerGlobal.separator + _private.strMapName + '.png');
-                //FrameManager.sl_qml_WriteFile(canvasOutput.toDataURL("image/png"), strOutputPath + '/output_map.png', 0);
-                //console.debug("canvasOutput ok", strOutputPath + "/output_map.png", Qt.resolvedUrl(strOutputPath + "/output_map.png"));
-                bExport = false;
-
-                //console.debug("output:", canvasOutput.width, canvasOutput.height);
             }
+        }
+
+        onPainted: {
+            let path = GameMakerGlobal.config.strProjectRootPath +
+                GameMakerGlobal.separator +
+                GameMakerGlobal.config.strCurrentProjectName +
+                GameMakerGlobal.separator + 'Outputs' +
+                GameMakerGlobal.separator + 'Maps';
+            //win下，Canvas.save 不支持 file: 开头的路径
+            path = path.replace("file:/", "").replace("//", "");
+
+            //if(!FrameManager.sl_qml_DirExists(path))
+                FrameManager.sl_qml_CreateFolder(path);
+
+            canvasExport.save(path + GameMakerGlobal.separator + _private.strMapName + '.png');
+            //FrameManager.sl_qml_WriteFile(canvasExport.toDataURL("image/png"), strOutputPath + '/output_map.png', 0);
+            //console.debug("canvasExport ok", strOutputPath + "/output_map.png", Qt.resolvedUrl(strOutputPath + "/output_map.png"));
+            bExport = false;
+
+            //console.debug("output:", canvasExport.width, canvasExport.height);
+            console.debug("[MapEditor]canvasExport：onPainted");
         }
     }
 
@@ -3193,7 +3237,7 @@ Item {
             //计算 _config.nMapDrawScale
             let mapWidth = _config.sizeMapSize.width * _config.sizeMapBlockSize.width;
             let mapHeight = _config.sizeMapSize.height * _config.sizeMapBlockSize.height;
-            for(_config.nMapDrawScale = 1; mapWidth * mapHeight / _config.nMapDrawScale >= _config.nMapMaxPixelCount; ++_config.nMapDrawScale) {
+            for(_config.nMapDrawScale = 1; mapWidth * mapHeight / _config.nMapDrawScale > _config.nMapMaxPixelCount; ++_config.nMapDrawScale) {
             }
 
 
@@ -3201,8 +3245,8 @@ Item {
             canvasMapContainer.width = mapWidth / _config.nMapDrawScale;
             canvasMapContainer.height = mapHeight / _config.nMapDrawScale;
 
-            canvasOutput.width = canvasMapContainer.width;
-            canvasOutput.height = canvasMapContainer.height;
+            //canvasExport.width = canvasMapContainer.width;
+            //canvasExport.height = canvasMapContainer.height;
 
             flickableMapBlock.implicitHeight = _config.sizeMapBlockSize.height * 3;
 
@@ -3344,7 +3388,9 @@ Item {
             listmodelCanvasMap.remove(listmodelCanvasMap.count - 1, 1);
 
             arrMapData.pop();
-            canvasMapContainer.arrCanvasMap.pop().destroy();
+            let canvasMap = canvasMapContainer.arrCanvasMap.pop();
+            canvasMap.unloadImage(imageMapBlock1.source);
+            canvasMap.destroy();
             canvasMapContainer.nCurrentCanvasMap = canvasMapContainer.arrCanvasMap.length - 1;
         }
 
@@ -3428,7 +3474,9 @@ Item {
         property size sizeMapSize//: Qt.size(20, 20);
 
         //最大地图像素数（超过则缩放）
-        property int nMapMaxPixelCount: 70*70*32*32
+        //32位安卓，70*70绘制一会就飘
+        //64位安卓：200*200左右很卡（250*250闪退），100*100：明显卡
+        property int nMapMaxPixelCount: 60*60*32*32 //Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
         //绘制地图时缩小倍数（防止太大出错）
         property int nMapDrawScale: 1
 
@@ -3464,16 +3512,22 @@ Item {
         console.debug("[MapEditor]Back Key");
     }
     Keys.onPressed: {
-        console.debug("[MapEditor]key:", event, event.key, event.text)
+        console.debug("[MapEditor]key:", event, event.key, event.text);
     }
 
 
     Component.onCompleted: {
+        _config.nMapMaxPixelCount = (Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
+
         //console.debug(Qt.point(1,1) === Qt.point(1,1), Qt.point(0,1) === Qt.point(1,1));    //true false
 
         //!!!导入图块图片
         //imageMapBlock1.source = "./1.png";
         //createNewMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
         console.debug("[MapEditor]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[MapEditor]Component.onDestruction");
     }
 }

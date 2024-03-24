@@ -197,7 +197,7 @@ Item {
             Layout.minimumHeight: 20
             Layout.fillHeight: true
 
-            text: "地  图"
+            text: "地　图"
             onClicked: {
                 if(Platform.compileType() === "debug") {
                     _private.loadModule("mainMapEditor.qml");
@@ -226,7 +226,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "角  色"
+                text: "角　色"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainRoleEditor.qml");
@@ -248,7 +248,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "特  效"
+                text: "特　效"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainSpriteEditor.qml");
@@ -270,7 +270,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "道  具"
+                text: "道　具"
                 onClicked: {
                     /*textinputDialogCommonInput.visible = false;
                     dialogCommon.standardButtons = Dialog.Ok;
@@ -431,7 +431,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "脚  本"
+                text: "脚　本"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("GameScriptEditor.qml");
@@ -453,7 +453,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "插 件"
+                text: "插　件"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainPlugins.qml");
@@ -576,7 +576,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "测试"
+                text: "测　试"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainGameTest.qml");
@@ -601,7 +601,7 @@ Item {
                 onClicked: {
                     if(Qt.platform.os === "android") {
 
-                        let path = Platform.getExternalDataPath() + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
+                        let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
 
                         let jsFiles = FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0);
                         jsFiles.sort();
@@ -628,7 +628,7 @@ Item {
                             dialogCommon.show({
                                 Msg: '请将 %1 文件下载并放入%2文件夹下'.arg(missingFiles).arg(path),
                                 Buttons: Dialog.Yes,
-                                OnAccepted: function(){
+                                OnAccepted: function() {
                                     rootGameMaker.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
@@ -644,7 +644,7 @@ Item {
                         dialogCommon.show({
                             Msg: '打包会删除原来打包的目录 %1，确定吗？'.arg(outputDir),
                             Buttons: Dialog.Yes | Dialog.No,
-                            OnAccepted: function(){
+                            OnAccepted: function() {
 
                                 dialogCommon.close();
 
@@ -671,7 +671,7 @@ Item {
                                     dialogCommon.show({
                                         Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
                                         Buttons: Dialog.Yes,
-                                        OnAccepted: function(){
+                                        OnAccepted: function() {
                                             rootGameMaker.forceActiveFocus();
                                         },
                                         OnRejected: ()=>{
@@ -818,7 +818,7 @@ Item {
                     dialogCommon.show({
                         Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
                         Buttons: Dialog.Yes | Dialog.No,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
 
                             enabled = false;
 
@@ -839,7 +839,7 @@ Item {
                                     dialogCommon.show({
                                         Msg: '下载失败：%1'.arg(FrameManager.sl_qml_Property("Code", nr)),
                                         Buttons: Dialog.Yes,
-                                        OnAccepted: function(){
+                                        OnAccepted: function() {
                                             rootGameMaker.forceActiveFocus();
                                         },
                                         OnRejected: ()=>{
@@ -918,7 +918,7 @@ Item {
                 //Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "教程"
+                text: "教　程"
                 onClicked: {
                     if(Platform.compileType() === "debug") {
                         _private.loadModule("mainTutorial.qml");
@@ -1064,7 +1064,7 @@ Item {
                 //Layout.preferredWidth: 1
 
                 font.pointSize: 12
-                text: qsTr("RPG引擎 Ver：" + GameMakerGlobal.version)
+                text: qsTr("Ver：" + GameMakerGlobal.version)
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
 
@@ -1370,6 +1370,7 @@ Item {
 
 
                     textArea.color: 'white'
+                    //textArea.enabled: false
                     textArea.readOnly: true
                     textArea.selectByMouse: false
 
@@ -1526,10 +1527,11 @@ Item {
 
                     nMaximumBlockCount: 0
 
-                    textArea.color: 'white'
+                    //textArea.enabled: false
                     //textArea.readOnly: true
                     //textArea.selectByKeyboard: true
                     //textArea.selectByMouse: true
+                    textArea.color: 'white'
 
                     textArea.text: ''
                     textArea.placeholderText: ""
@@ -1544,6 +1546,38 @@ Item {
                         border.width: textDebugInfo.textArea.focus ? 2 : 1
                     }
                 }
+
+                /*ScrollView {
+                    id: scrollView
+                    anchors.fill: parent
+                    anchors.margins: 9
+                    ListView {
+                        id: resultView
+                        model: ListModel {
+                            id: outputModel
+                        }
+                        delegate: ColumnLayout {
+                            width: ListView.view.width
+                            Label {
+                                Layout.fillWidth: true
+                                color: 'green'
+                                text: "> " + model.expression
+                            }
+                            Label {
+                                Layout.fillWidth: true
+                                color: 'blue'
+                                text: "" + model.result
+                            }
+                            Rectangle {
+                                height: 1
+                                Layout.fillWidth: true
+                                color: '#333'
+                                opacity: 0.2
+                            }
+                        }
+                    }
+                }
+                */
             }
 
             TextField {
@@ -1576,18 +1610,28 @@ Item {
                 }
 
 
-                Keys.onEnterPressed: {
+                onAccepted: {
+                    selectAll();
+
                     let t = text;
                     //text = '';
+                    //console.info(GlobalLibraryJS.safeEval(t).result);
+                    console.info(eval(t));
+                }
+                /*Keys.onEnterPressed: {
                     selectAll();
+
+                    let t = text;
+                    //text = '';
                     console.info(eval(t));
                 }
                 Keys.onReturnPressed: {
+                    selectAll();
+
                     let t = text;
                     //text = '';
-                    selectAll();
                     console.info(eval(t));
-                }
+                }*/
             }
 
             RowLayout {

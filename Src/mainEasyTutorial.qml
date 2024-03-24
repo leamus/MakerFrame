@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.enabled: false
             textArea.readOnly: true
 
             textArea.selectByMouse: false
@@ -91,11 +92,11 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            //Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返回"
+            text: "返　回"
             onClicked: {
                 s_close();
             }
@@ -166,7 +167,7 @@ Item {
 
 目前支持（已封装）的脚本命令（中括号[]为可选参数）：
 
-<font color='yellow'>game.loadmap("地图名")</font>：载入地图并执行地图载入事件；成功返回true。
+<font color='yellow'>game.loadmap("地图名", 数据, forceRepait)</font>：载入地图并执行地图载入事件；成功返回true。
 
 //在屏幕中间显示提示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -239,7 +240,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
 //其他参数：$id、$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
 //  $name为游戏名；
-//  $action为0表示静止，为1表示随机移动；
+//  $action为-1表示静止，0和1表示随机移动（正在静止和正在移动），2为定向移动；
 //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
 //  $start表示角色是否自动动作（true或false)；
 //成功返回true。
@@ -826,7 +827,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
 4、函数
   函数（方法）可看作是一系列脚本命令组成的可复用的代码块。
   定义有3种：
-  function 函数名(参数。。。){	//可以没有参数
+  function 函数名(参数。。。) {	//可以没有参数
     脚本命令、语句。。。
   }
 
@@ -839,7 +840,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
   函数名(实参。。。);
 
   还有一种特殊的函数（其实叫生成器）：
-  function *函数名(参数。。。){	//注意和普通函数名只是多了个 * 号
+  function *函数名(参数。。。) {	//注意和普通函数名只是多了个 * 号
     脚本命令、语句。。。
   }
 

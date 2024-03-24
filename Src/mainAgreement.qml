@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.enabled: false
             textArea.readOnly: true
 
             textArea.selectByMouse: false
@@ -91,11 +92,11 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            //Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返回"
+            text: "返　回"
             onClicked: {
                 s_close();
             }

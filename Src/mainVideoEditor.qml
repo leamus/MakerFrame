@@ -106,7 +106,7 @@ Item {
                     dialogCommon.show({
                         Msg: '确认删除？',
                         Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
                             root.forceActiveFocus();
 
                             FrameManager.sl_qml_DeleteFile(GameMakerGlobal.videoResourcePath(modelData));
@@ -176,7 +176,7 @@ Item {
                         Msg: '请输入新文件名',
                         Input: _private.arrVideos[listview.currentIndex],
                         Buttons: Dialog.Yes,
-                        OnAccepted: function(){
+                        OnAccepted: function() {
                             root.forceActiveFocus();
 
                             let newFileName = dialogCommon.input.trim();
@@ -324,7 +324,7 @@ Item {
                 Msg: '请输入新文件名',
                 Input: filename,
                 Buttons: Dialog.Yes,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     root.forceActiveFocus();
 
                     let newFileName = dialogCommon.input.trim();

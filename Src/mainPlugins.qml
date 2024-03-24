@@ -72,7 +72,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr("插  件")
+            text: qsTr("插　件")
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -84,7 +84,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "管 理"
+            text: "管　理"
             onClicked: {
                 _private.loadModule('PluginsManager.qml');
             }
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "下 载"
+            text: "下　载"
             onClicked: {
                 _private.loadModule('PluginsDownload.qml');
             }

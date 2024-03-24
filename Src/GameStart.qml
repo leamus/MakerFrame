@@ -152,6 +152,8 @@ game.goon();
 
                 color: Global.style.backgroundColor
 
+                //textArea.enabled: false
+                //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: ''

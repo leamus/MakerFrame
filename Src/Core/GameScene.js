@@ -173,8 +173,10 @@ function loadResources() {
 
     //是否提前载入所有资源
     _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'), 0);
+    //万向移动
     _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'), true);
-    _private.config.rJoystickMinimumProportion = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick', '$joystickMinimumProportion'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick', '$joystickMinimumProportion'), true);
+    //
+    joystick.rJoystickMinimumProportion = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick', '$joystickMinimumProportion'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick', '$joystickMinimumProportion'), true);
 
     //地图遮挡透明度
     itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
@@ -323,7 +325,7 @@ function loadResources() {
                     button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
                 button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
-                button.s_pressed.connect(function(){
+                button.s_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     game.run(tConfig.$clicked());
@@ -1458,6 +1460,10 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
 
 function unloadSpriteEffect(spriteEffect) {
     //spriteEffect.destroy();
+    if(!spriteEffect) {
+        console.warn('[!GameScene]缓存释放失败:', spriteEffect);
+        return;
+    }
     _private.cacheSprites.release(spriteEffect);
 }
 
@@ -1543,30 +1549,30 @@ function openMap(mapName, forceRepaint=false) {
             //console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
             return false;
         }
-
-        //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
-        game.gd['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
-
-        game.d['$sys_map'].$info = itemViewPort.itemContainer.mapInfo;
-        game.d['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
-        game.d['$sys_map'].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-        game.d['$sys_map'].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-
-        game.d['$sys_map'].$obstacles = [];
-        for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
-            if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] & 0b1) {
-                game.d['$sys_map'].$obstacles.push(mb.split(','));
-            }
-        }
-        game.d['$sys_map'].$specials = itemViewPort.itemContainer.mapInfo.MapBlockSpecialData;
-
-
-        //!!!兼容旧代码
-        game.gd['$sys_map'].$$info = itemViewPort.itemContainer.mapInfo;
-        game.gd['$sys_map'].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-        game.gd['$sys_map'].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
-        game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
     }
+
+    //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
+    game.gd['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
+
+    game.d['$sys_map'].$info = itemViewPort.itemContainer.mapInfo;
+    game.d['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
+    game.d['$sys_map'].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+    game.d['$sys_map'].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+
+    game.d['$sys_map'].$obstacles = [];
+    for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
+        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] & 0b1) {
+            game.d['$sys_map'].$obstacles.push(mb.split(','));
+        }
+    }
+    game.d['$sys_map'].$specials = itemViewPort.itemContainer.mapInfo.MapBlockSpecialData;
+
+
+    //!!!兼容旧代码
+    game.gd['$sys_map'].$$info = itemViewPort.itemContainer.mapInfo;
+    game.gd['$sys_map'].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
+    game.gd['$sys_map'].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+    game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
 
 
 
@@ -1587,10 +1593,6 @@ function openMap(mapName, forceRepaint=false) {
     //script.destroy();
     let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
     itemViewPort.mapScript = ts;
-    if(ts.$start)
-        game.run([ts.$start(), 'map $start']);
-    else if(ts.start)
-        game.run([ts.start(), 'map start']);
 
 
 
@@ -1848,7 +1850,7 @@ function onTriggered() {
                 delete _private.objGlobalTimers[tt];
                 continue;
             }
-            else if(_private.objGlobalTimers[tt][1] > 0){
+            else if(_private.objGlobalTimers[tt][1] > 0) {
                 --_private.objGlobalTimers[tt][1];
             }
 
@@ -1883,7 +1885,7 @@ function onTriggered() {
                 delete _private.objTimers[tt];
                 continue;
             }
-            else if(_private.objTimers[tt][1] > 0){
+            else if(_private.objTimers[tt][1] > 0) {
                 --_private.objTimers[tt][1];
             }
 
@@ -2274,25 +2276,25 @@ function onTriggered() {
 
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
         //鹰：摇杆、键盘统一 放在 doMove 中处理
-        if(_private.config.rJoystickMinimumProportion > 0 && mainRole.$$nActionType === 10 && _private.arrPressedKeys.length === 0) {
+        if(joystick.rJoystickMinimumProportion > 0 && mainRole.$$nActionType === 10 && _private.arrPressedKeys.length === 0) {
             /*let tOffset;    //遥感百分比
             if(mainRole.direction() === 3 || mainRole.direction() === 1) {
-                tOffset = Math.abs(joystick.pointInput.x);
+                tOffset = Math.abs(_private.pointWalkDeviation.x);
             }
             else {
-                tOffset = Math.abs(joystick.pointInput.y);
+                tOffset = Math.abs(_private.pointWalkDeviation.y);
             }
             //小于最小值
-            if(tOffset < _private.config.rJoystickMinimumProportion)
-                tOffset = _private.config.rJoystickMinimumProportion;
+            if(tOffset < joystick.rJoystickMinimumProportion)
+                tOffset = joystick.rJoystickMinimumProportion;
             offsetMove = Math.round(offsetMove * tOffset);
             */
 
-            /*let tOffsetX = Math.abs(joystick.pointInput.x), tOffsetY = Math.abs(joystick.pointInput.y);
+            /*let tOffsetX = Math.abs(_private.pointWalkDeviation.x), tOffsetY = Math.abs(_private.pointWalkDeviation.y);
             //小于最小值
-            if(tOffsetX < _private.config.rJoystickMinimumProportion)
+            if(tOffsetX < joystick.rJoystickMinimumProportion)
                 tOffsetX = 0;
-            if(tOffsetY < _private.config.rJoystickMinimumProportion)
+            if(tOffsetY < joystick.rJoystickMinimumProportion)
                 tOffsetY = 0;
             offsetMoveX = Math.round(offsetMoveX * tOffsetX);
             offsetMoveY = Math.round(offsetMoveY * tOffsetY);
@@ -2492,16 +2494,16 @@ function onTriggered() {
                 offsetMoveY = Math.round(dta);
         }
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        else if(_private.config.rJoystickMinimumProportion > 0) {
+        else if(joystick.rJoystickMinimumProportion > 0) {
             offsetMoveX = Math.round(dta);
             offsetMoveY = Math.round(dta);
 
             let tOffset;    //遥感百分比
-            //if(Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion) {
-                offsetMoveX = Math.round(offsetMoveX * joystick.pointInput.x);
+            //if(Math.abs(_private.pointWalkDeviation.x) < joystick.rJoystickMinimumProportion) {
+                offsetMoveX = Math.round(offsetMoveX * _private.pointWalkDeviation.x);
             //}
-            //if(Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion) {
-                offsetMoveY = Math.round(offsetMoveY * joystick.pointInput.y);
+            //if(Math.abs(_private.pointWalkDeviation.y) < joystick.rJoystickMinimumProportion) {
+                offsetMoveY = Math.round(offsetMoveY * _private.pointWalkDeviation.y);
             //}
         }
 

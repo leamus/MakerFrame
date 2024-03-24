@@ -166,6 +166,8 @@ let data = (function() {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+            //textArea.enabled: false
+            //textArea.readOnly: true
             textArea.textFormat: TextArea.PlainText
             textArea.text: ''
             textArea.placeholderText: '输入脚本'
@@ -198,7 +200,7 @@ let data = (function() {
                         dialogCommon.show({
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
-                            OnAccepted: function(){
+                            OnAccepted: function() {
                                 root.forceActiveFocus();
                             },
                             OnRejected: ()=>{

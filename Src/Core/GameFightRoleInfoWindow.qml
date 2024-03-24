@@ -245,6 +245,7 @@ Item {
             //textArea.horizontalAlignment: Text.AlignHCenter
             textArea.verticalAlignment: Text.AlignVCenter
 
+            //textArea.enabled: false
             textArea.readOnly: true
 
             //horizontalAlignment: Text.AlignHCenter
@@ -355,6 +356,7 @@ Item {
             //horizontalAlignment: Text.AlignHCenter
             textArea.verticalAlignment: Text.AlignVCenter
 
+            //textArea.enabled: false
             textArea.readOnly: true
             textArea.selectByMouse: false
             textArea.color: 'white'

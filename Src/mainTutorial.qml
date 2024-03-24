@@ -72,7 +72,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr("教  程")
+            text: qsTr("教　程")
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -84,7 +84,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "关于"
+            text: "关　于"
             onClicked: {
                 _private.loadModule('mainAbout.qml');
             }

@@ -133,6 +133,7 @@ Notepad {
     font.pointSize: 16
 
 
+    //textArea.enabled: false
     textArea.readOnly: true
     textArea.color: 'white'
     textArea.selectByKeyboard: false

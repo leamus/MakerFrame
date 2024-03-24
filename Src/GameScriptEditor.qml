@@ -117,6 +117,8 @@ Item {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
 
+                //textArea.enabled: false
+                //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
                 textArea.placeholderText: '请输入算法脚本'
@@ -144,6 +146,7 @@ Item {
                 id: buttonVisual
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredWidth: 30
                 //Layout.preferredHeight: 50
                 Layout.bottomMargin: 10
 
@@ -213,7 +216,7 @@ Item {
                 dialogCommon.show({
                     Msg: '编辑的文件非js/qml文件，不能用可视化',
                     Buttons: Dialog.Ok,
-                    OnAccepted: function(){
+                    OnAccepted: function() {
                         root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
@@ -371,7 +374,7 @@ Item {
             dialogCommon.show({
                 Msg: '确认删除：' + path,
                 Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     if(FrameManager.sl_qml_DirExists(path)) {
                         console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_RemoveRecursively(path));
                         removeItem(index);
@@ -434,7 +437,7 @@ Item {
                 dialogCommon.show({
                     Msg: '名称不能为空',
                     Buttons: Dialog.Ok,
-                    OnAccepted: function(){
+                    OnAccepted: function() {
                         root.forceActiveFocus();
                     },
                     OnRejected: ()=>{

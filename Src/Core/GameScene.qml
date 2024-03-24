@@ -144,6 +144,16 @@ Item {
             GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
 
 
+        //计算新属性
+        game.run(function() {
+            //计算新属性
+            for(let tfh of game.gd['$sys_fight_heros'])
+                _private.objCommonScripts['refresh_combatant'](tfh);
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(-1);
+        });
+
+
         //init脚本
         if(_private.objCommonScripts['game_init'])
             game.run([_private.objCommonScripts['game_init'](bLoadResources), 'game_init']);
@@ -387,29 +397,26 @@ Item {
     property QtObject game: QtObject {
 
         //载入地图并执行地图载入事件；成功返回 地图信息。
-        readonly property var loadmap: function(mapName, forceRepaint=false) {
+        readonly property var loadmap: function(mapName, data, forceRepaint=false) {
             if(!mapName)
                 return false;
 
             //载入beforeLoadmap脚本
             let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
             if(beforeLoadmap)
-                game.run([beforeLoadmap(mapName), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 1});
+                game.run([beforeLoadmap(mapName, data), 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 1});
 
 
             //执行之前地图的 $end 函数
             if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
                 let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
                 if(ts.$end)
-                    game.run([ts.$end(), 'map $end'], {Priority: -3, Type: 0, Running: 1});
+                    game.run([ts.$end(data), 'map $end'], {Priority: -3, Type: 0, Running: 1});
             }
 
 
             timer.running = false;
 
-
-            game.d = {};
-            game.f = {};
 
             for(let c of _private.arrayTmpMapComponents) {
                 if(GlobalLibraryJS.isComponent(c))
@@ -425,6 +432,9 @@ Item {
             mainRole.$$mapEventsTriggering = {};
             _private.stopAction(0);
 
+            game.d = {};
+            game.f = {};
+
 
             let mapInfo = GameSceneJS.openMap(mapName, forceRepaint);
 
@@ -434,10 +444,18 @@ Item {
             timer.nLastTime = 0;
 
 
+
+            if(itemViewPort.mapScript.$start)
+                game.run([itemViewPort.mapScript.$start(data), 'map $start']);
+            else if(itemViewPort.mapScript.start)
+                game.run([itemViewPort.mapScript.start(data), 'map start']);
+
+
+
             //载入after_loadmap脚本
             let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
             if(afterLoadmap)
-                game.run([afterLoadmap(mapName), 'afterLoadmap'], {Priority: -1, Type: 0, Running: 1});
+                game.run([afterLoadmap(mapName, data), 'afterLoadmap'], {Priority: -1, Type: 0, Running: 1});
 
 
             return mapInfo;
@@ -2052,8 +2070,11 @@ Item {
             //计算新属性
             let continueScript = function() {
                 //计算新属性
-                for(let tfh of game.gd['$sys_fight_heros'])
-                    _private.objCommonScripts['refresh_combatant'](tfh);
+                _private.objCommonScripts['refresh_combatant'](fighthero);
+
+                //for(let tfh of game.gd['$sys_fight_heros'])
+                //    _private.objCommonScripts['refresh_combatant'](tfh);
+
                 //刷新战斗时人物数据
                 //fight.$sys.refreshCombatant(-1);
             }
@@ -2768,7 +2789,7 @@ Item {
                 properties.$loops = 1;
 
 
-            let sprite = _private.objTmpSprites[id];
+            let sprite = _private.objTmpSprites[id] || compCacheSpriteEffect.createObject(null);
             //载入资源
             sprite = GameSceneJS.loadSpriteEffect(spriteEffectRId, sprite, properties.$loops, null);
             if(sprite === null)
@@ -3028,6 +3049,7 @@ Item {
             if(id === undefined || id === null || id === -1) {
                 for(let ti in _private.objTmpSprites)
                     _private.objTmpSprites[ti].destroy();
+                    //_private.cacheSprites.release(_private.objTmpSprites[ti]);
 
                 _private.objTmpSprites = {};
                 return true;
@@ -3036,6 +3058,7 @@ Item {
             let sprite = _private.objTmpSprites[id];
             if(sprite) {
                 sprite.destroy();
+                //_private.cacheSprites.release(sprite);
                 delete _private.objTmpSprites[id];
 
                 return true;
@@ -3157,7 +3180,7 @@ Item {
             //joystick.enabled = true;
             //buttonA.enabled = true;
 
-            rootGameScene.forceActiveFocus();
+            //rootGameScene.forceActiveFocus();
         }
 
         //设置游戏刷新率（interval毫秒）。
@@ -3361,7 +3384,7 @@ Item {
 
 
             //地图
-            game.loadmap(game.gd['$sys_map'].$name, true);
+            game.loadmap(game.gd['$sys_map'].$name, null, true);
 
             //读取主角
             for(let th of game.gd['$sys_main_roles']) {
@@ -3484,6 +3507,9 @@ Item {
 
             //参数
             let priority, runType = 0, running = 1, value, asyncScript, tips;
+            if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
+                scriptProps = {Priority: scriptProps};
+            }
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
                 asyncScript = scriptProps.AsyncScript || _private.asyncScript;
                 priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
@@ -3491,13 +3517,6 @@ Item {
                 running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : 1;
                 value = Object.keys(scriptProps).indexOf('Value') < 0 ? asyncScript.lastEscapeValue : scriptProps.Value;
                 tips = scriptProps.Tips;
-            }
-            else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
-                asyncScript = _private.asyncScript;
-                priority = scriptProps;
-                runType = 0;
-                running = 1;
-                value = asyncScript.lastEscapeValue;
             }
             else {
                 console.warn('[!GameScene]运行脚本属性错误!!!');
@@ -3808,6 +3827,8 @@ Item {
         //上次帧间隔时长
         property int $frameDuration: 0
 
+        property alias pointWalkDeviation: _private.pointWalkDeviation
+
         //property real fAspectRatio: Screen.width / Screen.height
 
 
@@ -3945,7 +3966,8 @@ Item {
         Joystick {
             id: joystick
 
-            property real rJoystickIgnore: 0.1  //忽略的最大偏移比
+            //忽略的最大偏移比
+            property real rJoystickMinimumProportion: 0.2   //开启摇杆加速功能（最低速度使能）
 
             anchors.left: parent.left
             anchors.bottom: parent.bottom
@@ -3988,26 +4010,14 @@ Item {
                     return;
 
 
-                if(Math.abs(pointInput.x) < rJoystickIgnore && Math.abs(pointInput.y) < rJoystickIgnore) {    //忽略
-                    _private.stopAction(0);
+                //忽略
+                if(Math.abs(pointInput.x) < rJoystickMinimumProportion && Math.abs(pointInput.y) < rJoystickMinimumProportion) { //小于使能
+                    _private.pointWalkDeviation = Qt.point(0, 0);
                     return;
                 }
 
-                if(Math.abs(pointInput.x) > Math.abs(pointInput.y)) {
+                _private.pointWalkDeviation = pointInput;
 
-                    if(pointInput.x > 0)
-                        _private.doAction(0, Qt.Key_Right);
-                    else
-                        _private.doAction(0, Qt.Key_Left);
-                }
-                else {
-                    if(pointInput.y > 0)
-                        _private.doAction(0, Qt.Key_Down);
-                    else
-                        _private.doAction(0, Qt.Key_Up);
-                }
-
-                mainRole.$$nActionType = 10;
             }
         }
 
@@ -4113,8 +4123,9 @@ Item {
         Connections {
             target: loaderFightScene
 
+            ignoreUnknownSignals: true
+
             function onS_FightOver() {
-                rootGameScene.focus = true;
             }
         }
 
@@ -4173,6 +4184,9 @@ Item {
                     game.goon(pauseGame);
                     game.run(true);
                     //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+
+
+                    //rootGameScene.forceActiveFocus();
                 }
             }
 
@@ -4275,6 +4289,9 @@ Item {
 
 
                 //itemTrade.destroy();
+
+
+                //rootGameScene.forceActiveFocus();
             };
 
 
@@ -4310,9 +4327,6 @@ Item {
                 //dialogTrade.destroy();
                 ////FrameManager.goon();
             }
-
-
-            rootGameScene.forceActiveFocus();
         }
     }
 
@@ -4357,6 +4371,9 @@ Item {
 
 
                 //itemMsg.destroy();
+
+
+                //rootGameScene.forceActiveFocus();
             };
 
 
@@ -4400,7 +4417,7 @@ Item {
 
         function show(role, msg, pretext, interval, keeptime, style) {
 
-            if(GlobalLibraryJS.isString(role)) {
+            if(role && GlobalLibraryJS.isString(role)) {
                 do {
                     let roleName = role;
                     role = game.hero(roleName);
@@ -4440,7 +4457,7 @@ Item {
             let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
             //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
             //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
-            if(role !== null) {
+            if(GlobalLibraryJS.isObject(role) && role.$data) {
                 if(role.$data.$name && bShowName)
                     pretext = role.$data.$name + '：' + pretext;
                 if(role.$data.$avatar && bShowAvatar)
@@ -4514,10 +4531,11 @@ Item {
 
 
             textArea.enabled: false
+            textArea.readOnly: true
 
             textArea.onReleased: {
                 itemRootRoleMsg.clicked();
-                //rootGameScene.forceActiveFocus();
+                ////rootGameScene.forceActiveFocus();
             }
 
             onS_over: {
@@ -4538,7 +4556,7 @@ Item {
 
             //onPressed: {
             onReleased: {
-                //rootGameScene.forceActiveFocus();
+                ////rootGameScene.forceActiveFocus();
                 //console.debug('MultiPointTouchArea1')
                 itemRootRoleMsg.over();
                 //console.debug('MultiPointTouchArea2')
@@ -4752,6 +4770,8 @@ Item {
                         //horizontalAlignment: Text.AlignHCenter
                         //verticalAlignment: Text.AlignVCenter
 
+                        //textArea.enabled: false
+                        //textArea.readOnly: true
                         textArea.font.pointSize: 16
                         textArea.font.bold: true
                         textArea.textFormat: TextArea.PlainText
@@ -4798,6 +4818,9 @@ Item {
                                 game.run(true, {Value: textGameInput.text});
                                 //_private.asyncScript.run(textGameInput.text);
                             }
+
+
+                            //rootGameScene.forceActiveFocus();
                         }
 
 
@@ -5249,8 +5272,8 @@ Item {
             //下面是从配置中读取的：
             //是否游戏提前载入所有资源
             property int nLoadAllResources: 0
+            //万向移动
             property bool bWalkAllDirections: true
-            property real rJoystickMinimumProportion: 0.2   //开启摇杆加速功能（最低速度比例）
 
 
             //角色切换状态时长（毫秒）
@@ -5260,6 +5283,32 @@ Item {
             //从行动 切换 停止状态概率
             property int arrRoleChangeStopProbability: 60
 
+        }
+
+        //主角移动偏移
+        property point pointWalkDeviation
+        onPointWalkDeviationChanged: {
+            //移动为0
+            if(_private.pointWalkDeviation.x === 0 && _private.pointWalkDeviation.y === 0) {
+                _private.stopAction(0);
+                return;
+            }
+
+            if(Math.abs(_private.pointWalkDeviation.x) > Math.abs(_private.pointWalkDeviation.y)) {
+
+                if(_private.pointWalkDeviation.x > 0)
+                    _private.doAction(0, Qt.Key_Right);
+                else
+                    _private.doAction(0, Qt.Key_Left);
+            }
+            else {
+                if(_private.pointWalkDeviation.y > 0)
+                    _private.doAction(0, Qt.Key_Down);
+                else
+                    _private.doAction(0, Qt.Key_Up);
+            }
+
+            mainRole.$$nActionType = 10;
         }
 
         //场景跟踪角色
@@ -5319,7 +5368,7 @@ Item {
 
         property var cacheSprites: new GlobalLibraryJS.Cache({
             Create: function(p){return compCacheSpriteEffect.createObject(p);},
-            Init: function(o, p){
+            Init: function(o, p) {
                 o.visible = true;
                 o.parent=p;
                 return o;
@@ -5345,17 +5394,17 @@ Item {
                 //四向
                 if(!_private.config.bWalkAllDirections) {
                     //判断x、y的偏移哪个大
-                    if(Math.abs(joystick.pointInput.x) > Math.abs(joystick.pointInput.y)) {
-                        mainRole.$$arrMoveDirection[0] = Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.x;
+                    if(Math.abs(_private.pointWalkDeviation.x) > Math.abs(_private.pointWalkDeviation.y)) {
+                        mainRole.$$arrMoveDirection[0] = Math.abs(_private.pointWalkDeviation.x) < joystick.rJoystickMinimumProportion ? 0 : _private.pointWalkDeviation.x;
                     }
                     else {
-                        mainRole.$$arrMoveDirection[1] = Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.y;
+                        mainRole.$$arrMoveDirection[1] = Math.abs(_private.pointWalkDeviation.y) < joystick.rJoystickMinimumProportion ? 0 : _private.pointWalkDeviation.y;
                     }
                 }
                 //多向
                 else {
-                    mainRole.$$arrMoveDirection[0] = Math.abs(joystick.pointInput.x) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.x;
-                    mainRole.$$arrMoveDirection[1] = Math.abs(joystick.pointInput.y) < _private.config.rJoystickMinimumProportion ? 0 : joystick.pointInput.y;
+                    mainRole.$$arrMoveDirection[0] = Math.abs(_private.pointWalkDeviation.x) < joystick.rJoystickMinimumProportion ? 0 : _private.pointWalkDeviation.x;
+                    mainRole.$$arrMoveDirection[1] = Math.abs(_private.pointWalkDeviation.y) < joystick.rJoystickMinimumProportion ? 0 : _private.pointWalkDeviation.y;
                 }
             }
             //键盘
@@ -5590,7 +5639,7 @@ Item {
             dialogCommon.show({
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     if(!bTest) {
                         if(_private.objCommonScripts['game_exit'])
                             _private.objCommonScripts['game_exit']();
@@ -5673,6 +5722,9 @@ Item {
 
 
                     itemMsg.destroy();
+
+
+                    //rootGameScene.forceActiveFocus();
                 };
 
 
@@ -5804,10 +5856,11 @@ Item {
 
 
                 textArea.enabled: false
+                textArea.readOnly: true
 
                 textArea.onReleased: {
                     rootGameMsgDialog.clicked();
-                    //rootGameScene.forceActiveFocus();
+                    ////rootGameScene.forceActiveFocus();
                 }
 
                 onS_over: {
@@ -5828,7 +5881,7 @@ Item {
 
                 //onPressed: {
                 onReleased: {
-                    //rootGameScene.forceActiveFocus();
+                    ////rootGameScene.forceActiveFocus();
                     //显示完毕，则关闭
                     if(rootGameMsgDialog.nShowStatus === 0)
                         rootGameMsgDialog.over();
@@ -5968,6 +6021,10 @@ Item {
 
                             itemMenu.destroy();
                             //FrameManager.goon();
+
+
+                            //rootGameScene.forceActiveFocus();
+
                             //console.debug('!!!asyncScript.run', index);
                         }
 
@@ -6094,6 +6151,9 @@ Item {
                 height: parent.height * 0.2
                 anchors.bottom: rootRole.textName.top
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                textArea.enabled: false
+                textArea.readOnly: true
 
                 nMaxHeight: 32
 
@@ -6325,30 +6385,12 @@ Item {
 
 
 
-    /*  限制挺多：1、workerScript.sendMessage 只能一个参数，且只能传递一些数据，函数不能传递；
-    WorkerScript {
-        id: workerScriptWalk
-        source: 'computeWalkPath.mjs'
-
-        onMessage: {
-            console.warn('Worker')
-        }
-    }
-    mjs文件内容：
-    WorkerScript.onMessage = function(message) {
-        // ... long-running operations and calculations are done here
-        WorkerScript.sendMessage({ 'ret': 666});
-    }
-    */
-
-
-
     //应用程序信号
     Connections {
         target: Qt.application
 
         function onStateChanged() {
-            switch(Qt.application.state){
+            switch(Qt.application.state) {
             case Qt.ApplicationActive:   //每次窗口激活时触发
                 _private.arrPressedKeys = [];
                 //mainRole.$$nMoveDirectionFlag = 0;

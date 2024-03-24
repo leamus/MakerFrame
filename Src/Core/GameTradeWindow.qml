@@ -256,7 +256,7 @@ Item {
                         sliderCount.forceActiveFocus();
                     }
                     else
-                        //game.run(function(){
+                        //game.run(function() {
                             game.msg('此物品不能卖', 20, '', 0, {Type: 0b10}, false);
                             //return false;
                         //});
@@ -295,6 +295,7 @@ Item {
             textArea.color: 'white'
             textArea.font.pointSize: 16
             textArea.font.bold: true
+            //textArea.enabled: false
             textArea.readOnly: true
             textArea.selectByMouse: false
             textArea.wrapMode: Text.Wrap
@@ -459,7 +460,7 @@ Item {
                         //买
                         if(itemCountBox.tradeData.type === 1) {
                             if(game.gd["$sys_money"] < goods.$price[0] * count) {
-                                //game.run(function(){
+                                //game.run(function() {
                                     game.msg('金钱不足', 20, '', 0, {Type: 0b10}, false);
                                 //    return false;
                                 //});
@@ -467,7 +468,7 @@ Item {
                             }
 
                             if(goods.$count <= 0 || count > goods.$count) {
-                                //game.run(function(){
+                                //game.run(function() {
                                     game.msg('出售道具不够', 20, '', 0, {Type: 0b10}, false);
                                 //    return false;
                                 //});
@@ -487,7 +488,7 @@ Item {
                                 root.refresh();
                             }
                             else
-                                //game.run(function(){
+                                //game.run(function() {
                                     game.msg('卖出道具不够', 20, '', 0, {Type: 0b10}, false);
                                     //return false;
                                 //});

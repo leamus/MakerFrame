@@ -578,7 +578,7 @@ Item {
             dialogCommon.show({
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function(){
+                OnAccepted: function() {
                     console.debug("[mainMapEditor]删除地图资源：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_DeleteFile(path));
                     removeItem(index);
 
@@ -770,6 +770,11 @@ Item {
             function onS_close() {
                 _private.refresh();
 
+                //!!!!!!作用：绕过 多次载入地图编辑器时黑屏 的问题
+                //  经详细排查，貌似是内存不足（创建新图层引起的），但奇怪的是，即使destroy成功，内存也不会释放，但这个Loader释放后就正常了。
+                //  游戏中因为没有创建新图层所以不会有问题。
+                loader.source = '';
+                loader.source = './MapEditor.qml';
                 loader.visible = false;
                 //root.focus = true;
                 root.forceActiveFocus();
