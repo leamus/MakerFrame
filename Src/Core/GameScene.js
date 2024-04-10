@@ -707,7 +707,8 @@ function loadResources() {
 
 
                 if(ts.$load && ts.$autoLoad !== false) {
-                    ts.$load();
+                    //ts.$load();
+                    game.run([ts.$load(), 'plugin_load:' + tc0 + tc1]);
                 }
             }
             catch(e) {
@@ -732,7 +733,8 @@ function unloadResources() {
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false)
-                _private.objPlugins[tc][tp].$unload();
+                //_private.objPlugins[tc][tp].$unload();
+                game.run([_private.objPlugins[tc][tp].$load(), 'plugin_load:' + tc + tp]);
 
 
     loaderFightScene.unload();
@@ -1399,7 +1401,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 
 //载入特效，返回特效对象
-//如果 spriteEffect 为null，则 创建1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
+//如果 spriteEffect 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
 function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemViewPort.itemRoleContainer) {
     //console.debug("[FightScene]loadSpriteEffect0");
 
@@ -1418,38 +1420,76 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
         if(!spriteEffect) {
             //spriteEffect = compCacheSpriteEffect.createObject(parent);
             spriteEffect = _private.cacheSprites.create(parent);
-            spriteEffect.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+            spriteEffect.nSpriteType = data.SpriteType;
+            spriteEffect.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
-        else if(spriteEffect.running === true)
-            spriteEffect.stop();
+        else {//if(spriteEffect.bRunning === true)
+            spriteEffect.nSpriteType = data.SpriteType;
+            spriteEffect.sprite.stop();
+        }
 
-        spriteEffect.spriteSrc = GameMakerGlobal.spriteResourceURL(data.Image);
-        spriteEffect.sizeFrame = Qt.size(parseInt(data.FrameSize[0]), parseInt(data.FrameSize[1]));
-        spriteEffect.nFrameCount = parseInt(data.FrameCount);
-        spriteEffect.offsetIndex = Qt.point(parseInt(data.OffsetIndex[0]), parseInt(data.OffsetIndex[1]));
 
-        spriteEffect.interval = parseInt(data.FrameInterval);
-        //spriteEffect.width = parseInt(textSpriteWidth.text);
-        //spriteEffect.height = parseInt(textSpriteHeight.text);
-        spriteEffect.implicitWidth = parseInt(data.SpriteSize[0]);
-        spriteEffect.implicitHeight = parseInt(data.SpriteSize[1]);
-        spriteEffect.offsetX = data.XOffset !== undefined ? parseInt(data.XOffset) : 0;
-        spriteEffect.offsetY = data.YOffset !== undefined ? parseInt(data.YOffset) : 0;
-        spriteEffect.opacity = parseFloat(data.Opacity);
-        spriteEffect.rXScale = parseFloat(data.XScale);
-        spriteEffect.rYScale = parseFloat(data.YScale);
+        /*switch(data.SpriteType) {
+        case 1:
+            spriteEffect.sourceComponent = compSpriteEffect;
+            break;
+        case 2:
+            spriteEffect.sourceComponent = compDirSpriteEffect;
+            break;
+        }
+        */
+
+
+        spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+
+        spriteEffect.width = parseInt(data.SpriteSize[0]);
+        spriteEffect.height = parseInt(data.SpriteSize[1]);
+        //spriteEffect.implicitWidth = (data.SpriteSize[0]);
+        //spriteEffect.implicitHeight = (data.SpriteSize[1]);
+        spriteEffect.rXOffset = data.XOffset !== undefined ? (data.XOffset) : 0;
+        spriteEffect.rYOffset = data.YOffset !== undefined ? (data.YOffset) : 0;
+        spriteEffect.opacity = (data.Opacity);
+        spriteEffect.rXScale = (data.XScale);
+        spriteEffect.rYScale = (data.YScale);
 
         if(data.Sound) {
-            spriteEffect.soundeffectName = data.Sound;
+            spriteEffect.strSoundeffectName = data.Sound;
         }
         else {
-            spriteEffect.soundeffectName = "";
+            spriteEffect.strSoundeffectName = "";
         }
-        //console.debug("!!!", data.Sound, spriteEffect.soundeffectName)
-        spriteEffect.soundeffectDelay = parseInt(data.SoundDelay);
+        //console.debug("!!!", data.Sound, spriteEffect.strSoundeffectName)
+        spriteEffect.nSoundeffectDelay = (data.SoundDelay);
 
-        spriteEffect.animatedsprite.loops = loops;
+        spriteEffect.nLoops = loops;
         //spriteEffect.restart();
+
+
+        if(spriteEffect.nSpriteType === 1) {
+            spriteEffect.nFrameCount = (data.FrameCount);
+            spriteEffect.nInterval = (data.FrameInterval);
+
+            spriteEffect.sprite.sizeFrame = Qt.size((data.FrameSize[0]), (data.FrameSize[1]));
+
+            spriteEffect.sprite.pointOffsetIndex = Qt.point((data.OffsetIndex[0]), (data.OffsetIndex[1]));
+        }
+        else if(spriteEffect.nSpriteType === 2) {
+            spriteEffect.nFrameCount = data.FrameData[1];
+            spriteEffect.nInterval = data.FrameData[2];
+
+            spriteEffect.sprite.nFrameStartIndex = data.FrameSize[0];
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
+            if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
+                //_private.jsEngine.clear();
+                let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
+                spriteEffect.sprite.fnRefresh = ts.$refresh;
+                //FrameManager.sl_qml_clearComponentCache();
+            }
+
+        }
+
 
         return spriteEffect;
     }
@@ -1471,7 +1511,7 @@ function unloadSpriteEffect(spriteEffect) {
 //载入角色，返回角色对象
 //如果 roleComp 为null，则 创建1个 roleComp 组件并返回
 function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
-    //console.debug("[FightScene]loadRoleComp0");
+    console.debug('[GameScene]loadRole:', roleRId);
 
     /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRId + GameMakerGlobal.separator + "role.json";
     //console.debug("[FightScene]filePath2：", filePath);
@@ -1488,27 +1528,67 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
         if(!roleComp) {
             roleComp = compRole.createObject(parent);
             roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
-            roleComp.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+            //roleComp.customSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
 
-        roleComp.spriteSrc = GameMakerGlobal.roleResourceURL(data.Image);
-        roleComp.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
-        roleComp.nFrameCount = data.FrameCount;
-        roleComp.arrFrameDirectionIndex = data.FrameIndex;
-        roleComp.interval = data.FrameInterval;
-        //roleComp.implicitWidth = data.RoleSize[0];
-        //roleComp.implicitHeight = data.RoleSize[1];
-        roleComp.width = data.RoleSize[0];
-        roleComp.height = data.RoleSize[1];
+        roleComp.nSpriteType = data.SpriteType ?? 1;
+        roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+        if(roleComp.nSpriteType === 1) {
+            roleComp.sprite.sprite.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
+            roleComp.nFrameCount = data.FrameCount;
+            roleComp.nInterval = data.FrameInterval;
+
+            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
+            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
+            //roleComp.implicitWidth = data.RoleSize[0];
+            //roleComp.implicitHeight = data.RoleSize[1];
+            roleComp.width = data.RoleSize[0];
+            roleComp.height = data.RoleSize[1];
+            roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
+            roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
+
+            roleComp.arrActionsData = data.FrameIndex;
+
+        }
+        else if(roleComp.nSpriteType === 2) {
+            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
+            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
+            //roleComp.implicitWidth = data.RoleSize[0];
+            //roleComp.implicitHeight = data.RoleSize[1];
+            roleComp.width = data.RoleSize[0];
+            roleComp.height = data.RoleSize[1];
+            roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
+            roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
+
+
+            //roleComp.sprite.strOffsetPositionsFile = GameMakerGlobal.spriteResourcePath(data.Image + GameMakerGlobal.separator + data.OffsetPositionsFile);
+            roleComp.arrActionsData = data.FrameIndex;
+            /*nFrameStartIndex = ;
+            fGetImageName = ;
+            fGetImageFixPosition = ;
+            fGetImageFixPositions = ;
+            */
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRId;
+            if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
+                let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
+                roleComp.sprite.sprite.fnRefresh = ts.$refresh;
+            }
+
+        }
+        else if(roleComp.nSpriteType === 3) {
+
+        }
         roleComp.x1 = data.RealOffset[0];
         roleComp.y1 = data.RealOffset[1];
         roleComp.width1 = data.RealSize[0];
         roleComp.height1 = data.RealSize[1];
-        roleComp.rectShadow.opacity = isNaN(parseFloat(data.ShadowOpacity)) ? 0.3 : parseFloat(data.ShadowOpacity);
+        roleComp.rectShadow.opacity = isNaN((data.ShadowOpacity)) ? 0.3 : (data.ShadowOpacity);
 
         //roleComp.bTest = true;
 
-        roleComp.refresh();
+        roleComp.reset();
 
 
         return [data, roleComp];
@@ -1841,11 +1921,11 @@ function onTriggered() {
 
     //遍历全局定时器
     for(let tt in _private.objGlobalTimers) {
-        _private.objGlobalTimers[tt][2] -= realinterval;
+        _private.objGlobalTimers[tt][0] -= realinterval;
 
         //触发
-        if(_private.objGlobalTimers[tt][2] <= 0) {
-            //如果0个
+        if(_private.objGlobalTimers[tt][0] <= 0) {
+            //如果次数完毕
             if(_private.objGlobalTimers[tt][1] === 0) {
                 delete _private.objGlobalTimers[tt];
                 continue;
@@ -1853,12 +1933,8 @@ function onTriggered() {
             else if(_private.objGlobalTimers[tt][1] > 0) {
                 --_private.objGlobalTimers[tt][1];
             }
+            _private.objGlobalTimers[tt][0] = _private.objGlobalTimers[tt][2];
 
-            //如果次数完毕
-            if(_private.objGlobalTimers[tt][1] === 0)
-                delete _private.objGlobalTimers[tt];
-            else
-                _private.objGlobalTimers[tt][2] = _private.objGlobalTimers[tt][0];
 
             let tScript;
             if(itemViewPort.mapScript)
@@ -1868,19 +1944,24 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(realinterval), Tips: '全局定时器事件:' + tt});
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][3], _private.objGlobalTimers[tt][1], realinterval), Tips: '全局定时器事件:' + tt});
             //game.run([game.gf[tt], tt]);
 
             //GlobalJS.runScript(_private.asyncScript, 0, "game.gf['%1']()".arg(tt));
+
+
+            //如果次数完毕
+            if(_private.objGlobalTimers[tt][1] === 0)
+                delete _private.objGlobalTimers[tt];
         }
     }
     //遍历定时器
     for(let tt in _private.objTimers) {
-        _private.objTimers[tt][2] -= realinterval;
+        _private.objTimers[tt][0] -= realinterval;
 
         //触发
-        if(_private.objTimers[tt][2] <= 0) {
-            //如果0个
+        if(_private.objTimers[tt][0] <= 0) {
+            //如果次数完毕
             if(_private.objTimers[tt][1] === 0) {
                 delete _private.objTimers[tt];
                 continue;
@@ -1888,12 +1969,8 @@ function onTriggered() {
             else if(_private.objTimers[tt][1] > 0) {
                 --_private.objTimers[tt][1];
             }
+            _private.objTimers[tt][0] = _private.objTimers[tt][2];
 
-            //如果次数完毕
-            if(_private.objTimers[tt][1] === 0)
-                delete _private.objTimers[tt];
-            else
-                _private.objTimers[tt][2] = _private.objTimers[tt][0];
 
             let tScript;
             if(itemViewPort.mapScript)
@@ -1903,9 +1980,14 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(realinterval), Tips: '定时器事件:' + tt}, );
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][3], _private.objTimers[tt][1], realinterval), Tips: '定时器事件:' + tt}, );
             //game.run([tScript, tt]);
             //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(tt));
+
+
+            //如果次数完毕
+            if(_private.objTimers[tt][1] === 0)
+                delete _private.objTimers[tt];
         }
     }
 
@@ -2078,6 +2160,16 @@ function onTriggered() {
             //if(_private.objRoles[r].width1 === 0 || _private.objRoles[r].height1 === 0)
             //    continue;
 
+
+            let key = '$role_' + _private.objRoles[r].$data.$id;
+            let eventName = `$${role.$data.$id}_collide`;
+            let tScript = itemViewPort.mapScript[eventName];
+            if(!tScript)
+                tScript = game.f[eventName];
+            if(!tScript)
+                tScript = game.gf[eventName];
+
+            //如果有碰撞
             if(
                 //(role.$data.$penetrate === 0 && _private.objRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
@@ -2085,23 +2177,22 @@ function onTriggered() {
                     Qt.rect(_private.objRoles[r].x + _private.objRoles[r].x1, _private.objRoles[r].y + _private.objRoles[r].y1, _private.objRoles[r].width1, _private.objRoles[r].height1),
                 )
             ) {
-                let eventName = `$${role.$data.$id}_collide`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
                 if(tScript) {
-                    let keep = false;   //是否是持续碰撞；
-                    let key = '$role_' + _private.objRoles[r].$data.$id;
+                    let keep = 0;   //是否是持续碰撞；
                     if(role.$$collideRoles[key] !== undefined) {
-                        keep = true;
+                        keep = 1;
                         collideRoles[key] = role.$$collideRoles[key] + realinterval;
                     }
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.objRoles[r], keep), Tips: '角色碰撞角色事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objRoles[r], role, keep, collideRoles[key]), Tips: '角色碰撞角色事件:' + role.$data.$id}, );
+                }
+            }
+            //这次没有碰撞 且 上次有碰撞
+            else if(key in role.$$collideRoles) {
+                if(tScript) {
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objRoles[r], role, -1, collideRoles[key]), Tips: '角色碰撞角色离开事件:' + role.$data.$id}, );
                 }
             }
         }
@@ -2114,6 +2205,15 @@ function onTriggered() {
             //if(_private.arrMainRoles[r].width1 === 0 || _private.arrMainRoles[r].height1 === 0)
             //    continue;
 
+
+            let key = '$hero_' + _private.arrMainRoles[r].$data.$id;
+            let eventName = `$${role.$data.$id}_collide`;
+            let tScript = itemViewPort.mapScript[eventName];
+            if(!tScript)
+                tScript = game.f[eventName];
+            if(!tScript)
+                tScript = game.gf[eventName];
+
             if(
                 //(role.$data.$penetrate === 0 && _private.arrMainRoles[r].$data.$penetrate === 0) &&
                 GlobalLibraryJS.checkRectangleClashed(
@@ -2121,17 +2221,10 @@ function onTriggered() {
                     Qt.rect(_private.arrMainRoles[r].x + _private.arrMainRoles[r].x1, _private.arrMainRoles[r].y + _private.arrMainRoles[r].y1, _private.arrMainRoles[r].width1, _private.arrMainRoles[r].height1),
                 )
             ) {
-                let keep = false;   //是否是持续碰撞；
-                let eventName = `$${role.$data.$id}_collide`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
+                let keep = 0;   //是否是持续碰撞；
                 if(tScript) {
-                    let key = '$hero_' + _private.arrMainRoles[r].$data.$id;
                     if(role.$$collideRoles[key] !== undefined) {
-                        keep = true;
+                        keep = 1;
                         collideRoles[key] = role.$$collideRoles[key] + realinterval;
                     }
                     else
@@ -2144,6 +2237,12 @@ function onTriggered() {
                 tScript = game.gf['$collide'];
                 if(tScript) {
                     GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], keep), Tips: '主角碰撞事件:' + role.$data.$id}, );
+                }
+            }
+            //这次没有碰撞 且 上次有碰撞
+            else if(key in role.$$collideRoles) {
+                if(tScript) {
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], -1, collideRoles[key]), Tips: '角色碰撞主角离开事件:' + role.$data.$id}, );
                 }
             }
         }
@@ -2558,7 +2657,25 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
 
     //运行触碰边界脚本
     let runScript = function() {
+        let keep = 0;
+        //此次有触碰
         if(collideObstacle !== 0) {
+            //如果和上次触碰一样，重复触碰
+            if(collideObstacle === role.$$collideRoles['$obstacle'])
+                keep = 1;
+            //不一样，视为新触碰
+            else
+                keep = 0;
+        }
+        //上次有触碰
+        else if(role.$$collideRoles['$obstacle'] !== 0 && role.$$collideRoles['$obstacle'] !== undefined)
+            keep = -1;
+        //两次都没有触碰
+        else
+            return;
+
+        //碰撞障碍
+        //if(collideObstacle !== 0) {
             let eventName = `$${role.$data.$id}_collide_obstacle`;
             let tScript = itemViewPort.mapScript[eventName];
             if(!tScript)
@@ -2566,7 +2683,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(!tScript)
                 tScript = game.gf[eventName];
             if(tScript) {
-                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle), Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
+                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle, keep), Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
             }
 
 
@@ -2574,10 +2691,10 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle), Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle, 0), Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
                 }
             }
-        }
+        //}
 
 
         //放在这里是因为，上面的脚本使用时可以访问到原来的 role.$$collideRoles，来确定是否第一次碰撞；

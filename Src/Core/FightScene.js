@@ -641,7 +641,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
         //计算间隔多久开始下一个
         if(combatantActionSpriteData.Interval === -1) {
-            combatantActionSpriteData.Interval = timerRoleSprite.interval = combatantSpriteEffect.nFrameCount * combatantSpriteEffect.interval * combatantActionSpriteData.Loops;
+            combatantActionSpriteData.Interval = timerRoleSprite.interval = combatantSpriteEffect.nFrameCount * combatantSpriteEffect.nInterval * combatantActionSpriteData.Loops;
             timerRoleSprite.start();
         }
         else if(combatantActionSpriteData.Interval > 0) {
@@ -654,7 +654,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
         //计算播放时长
         if(combatantActionSpriteData.Duration === -1)
-            combatantActionSpriteData.Duration = combatantSpriteEffect.nFrameCount * combatantSpriteEffect.interval * combatantActionSpriteData.Loops;
+            combatantActionSpriteData.Duration = combatantSpriteEffect.nFrameCount * combatantSpriteEffect.nInterval * combatantActionSpriteData.Loops;
         else if(combatantActionSpriteData.Duration === undefined || combatantActionSpriteData.Duration === null)
             combatantActionSpriteData.Duration = combatantActionSpriteData.Interval;
 
@@ -786,7 +786,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //计算间隔多久开始下一个
             if(combatantActionSpriteData.Interval === -1) {
-                combatantActionSpriteData.Interval = timerRoleSprite.interval = spriteEffect.nFrameCount * spriteEffect.interval * combatantActionSpriteData.Loops;
+                combatantActionSpriteData.Interval = timerRoleSprite.interval = spriteEffect.nFrameCount * spriteEffect.nInterval * combatantActionSpriteData.Loops;
                 timerRoleSprite.start();
             }
             else if(combatantActionSpriteData.Interval > 0) {
@@ -798,7 +798,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //计算播放时长
             if(combatantActionSpriteData.Duration === -1)
-                combatantActionSpriteData.Duration = spriteEffect.nFrameCount * spriteEffect.interval * combatantActionSpriteData.Loops;
+                combatantActionSpriteData.Duration = spriteEffect.nFrameCount * spriteEffect.nInterval * combatantActionSpriteData.Loops;
             else if(combatantActionSpriteData.Duration === undefined || combatantActionSpriteData.Duration === null)
                 combatantActionSpriteData.Duration = combatantActionSpriteData.Interval;
 
@@ -884,7 +884,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 spriteEffect.numberanimationSpriteEffectY.start();
             }
 
-            spriteEffect.restart();
+            spriteEffect.sprite.restart();
 
             //多特效
             //MultiSprite
@@ -1040,7 +1040,7 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
         return false;
     }
 
-    spriteEffect.restart();
+    spriteEffect.sprite.restart();
 
     return true;
 }
@@ -1585,9 +1585,9 @@ function runAway() {
             }
         }
         //!!这里使用事件的形式执行genFighting，因为genFighting中也有 fight 脚本，貌似对之后的脚本造成了影响!!
-        GlobalLibraryJS.setTimeout(function() {
+        GlobalLibraryJS.runNextEventLoop(function() {
             let ret = _private.genFighting.run();
-        },0,rootFightScene,'fight runaway');
+        }/*,0,rootFightScene*/,'fight runaway');
     }
 
     fight.run([continueScript, '逃跑失败脚本']);

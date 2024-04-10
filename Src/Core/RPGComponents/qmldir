@@ -9,6 +9,8 @@ GameButton 1.0 GameButton.qml
 
 
 SpriteEffect 1.0 SpriteEffect.qml
+FileSpriteEffect 1.0 FileSpriteEffect.qml
+DirSpriteEffect 1.0 DirSpriteEffect.qml
 
 Role 1.0 Role.qml
 

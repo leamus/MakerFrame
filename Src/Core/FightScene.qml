@@ -419,7 +419,8 @@ Item {
                 repeaterMyCombatants.model.append({modelData: i});
             repeaterMyCombatants.itemAt(i).visible = true;
             repeaterMyCombatants.itemAt(i).opacity = 1;
-            repeaterMyCombatants.itemAt(i).spriteEffect.stop();
+            if(repeaterMyCombatants.itemAt(i).spriteEffect.sprite)
+                repeaterMyCombatants.itemAt(i).spriteEffect.sprite.stop();
 
 
             FightSceneJS.resetFightRole(fight.myCombatants[i], repeaterMyCombatants.itemAt(i), i, 0);
@@ -427,7 +428,8 @@ Item {
         }
         for(; i < repeaterMyCombatants.model.count; ++i) {
             repeaterMyCombatants.itemAt(i).visible = false;
-            repeaterMyCombatants.itemAt(i).spriteEffect.stop();
+            if(repeaterMyCombatants.itemAt(i).spriteEffect.sprite)
+                repeaterMyCombatants.itemAt(i).spriteEffect.sprite.stop();
         }
 
 
@@ -440,7 +442,8 @@ Item {
                 repeaterEnemies.model.append({modelData: i});
             repeaterEnemies.itemAt(i).visible = true;
             repeaterEnemies.itemAt(i).opacity = 1;
-            repeaterEnemies.itemAt(i).spriteEffect.stop();
+            if(repeaterEnemies.itemAt(i).spriteEffect.sprite)
+                repeaterEnemies.itemAt(i).spriteEffect.sprite.stop();
 
 
             FightSceneJS.resetFightRole(fight.enemies[i], repeaterEnemies.itemAt(i), i, 1);
@@ -449,7 +452,8 @@ Item {
         //隐藏剩下的
         for(; i < repeaterEnemies.model.count; ++i) {
             repeaterEnemies.itemAt(i).visible = false;
-            repeaterEnemies.itemAt(i).spriteEffect.stop();
+            if(repeaterEnemies.itemAt(i).spriteEffect.sprite)
+                repeaterEnemies.itemAt(i).spriteEffect.sprite.stop();
         }
 
 
@@ -1170,11 +1174,11 @@ Item {
                     //设置为可点或不可点
                     function setEnable(enable=true) {
                         if(enable) {
-                            tSpriteEffectMyCombatant.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            tSpriteEffectMyCombatant.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
                             tRootMyCombatantComp.bCanClick = true;
                         }
                         else {
-                            tSpriteEffectMyCombatant.colorOverlayStop();
+                            tSpriteEffectMyCombatant.sprite.colorOverlayStop();
                             tRootMyCombatantComp.bCanClick = false;
                         }
                     }
@@ -1209,8 +1213,8 @@ Item {
                         id: tSpriteEffectMyCombatant
 
                         anchors.centerIn: parent
-                        width: spriteSrc ? implicitWidth : 60
-                        height: spriteSrc ? implicitHeight : 60
+                        width: strSource ? implicitWidth : 60
+                        height: strSource ? implicitHeight : 60
 
                         //bTest: false
 
@@ -1412,11 +1416,11 @@ Item {
                     //设置为可点或不可点
                     function setEnable(enable=true) {
                         if(enable) {
-                            tSpriteEffectEnemy.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            tSpriteEffectEnemy.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
                             tRootEnemyComp.bCanClick = true;
                         }
                         else {
-                            tSpriteEffectEnemy.colorOverlayStop();
+                            tSpriteEffectEnemy.sprite.colorOverlayStop();
                             tRootEnemyComp.bCanClick = false;
                         }
                     }
@@ -1451,8 +1455,8 @@ Item {
                         id: tSpriteEffectEnemy
 
                         anchors.centerIn: parent
-                        width: spriteSrc ? implicitWidth : 60
-                        height: spriteSrc ? implicitHeight : 60
+                        width: strSource ? implicitWidth : 60
+                        height: strSource ? implicitHeight : 60
 
                         //bTest: false
 
@@ -1949,7 +1953,10 @@ Item {
         ColorButton {
             text: "退出战斗"
             onButtonClicked: {
-                fight.over(-2);
+                FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2});
+                rootFightScene.visible = false;
+                rootGameScene.forceActiveFocus();
+
                 //强制退出后，由于执行逻辑变化（没有按正常逻辑走），导致多次执行game.msg，返回地图模式会被暂停，所以加一个正常继续
                 game.run(() => {game.goon(true);})
             }

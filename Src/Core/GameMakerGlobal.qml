@@ -17,13 +17,16 @@ import 'GameMakerGlobal.js' as GameMakerGlobalJS
 QtObject {
 
     //可存储配置
-    //  目前存储：$RPG/工程名（game.cd引擎变量）、$PauseMusic、$PauseSound、$RunTimes
+    //  目前存储：$RPG/工程名（game.cd引擎变量，用到了$PauseMusic、$PauseSound）、$RunTimes、$RunDuration
     property Settings settings: Settings {
         id: settings
         category: 'RPGMaker'    //类别
         //fileName: 'RPGMaker.ini'
 
+        //当前工程
         property string $strCurrentProjectName: 'Project'
+        property int $RunTimes: 0
+        property int $RunDuration: 0
     }
 
 
@@ -34,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.7.21.240318'
+    property string version: '1.9.2.240408'
 
 
     //配置
@@ -98,7 +101,6 @@ QtObject {
         //资源 目录名
         property string strResourceDirName: 'Resources'
         property string strMapResourceDirName: strResourceDirName + separator + 'Maps'
-        property string strRoleResourceDirName: strResourceDirName + separator + 'Roles'
         property string strSpriteResourceDirName: strResourceDirName + separator + 'Sprites'
         property string strGoodsResourceDirName: strResourceDirName + separator + 'Goods'
         property string strImageResourceDirName: strResourceDirName + separator + 'Images'
@@ -106,6 +108,8 @@ QtObject {
         property string strSoundResourceDirName: strResourceDirName + separator + 'Sounds'
         property string strVideoResourceDirName: strResourceDirName + separator + 'Videos'
 
+        //!!!兼容旧代码!!!
+        property string strRoleResourceDirName: strResourceDirName + separator + 'Sprites'
     }
 
 
@@ -119,13 +123,6 @@ QtObject {
     property var mapResourceURL: filepath=>GlobalJS.toURL(mapResourcePath(filepath))
     function mapResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMapResourceDirName;
-        if(filepath)
-            return ret + separator + filepath;
-        return ret;
-    }
-    property var roleResourceURL: filepath=>GlobalJS.toURL(roleResourcePath(filepath))
-    function roleResourcePath(filepath) {
-        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strRoleResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
@@ -282,6 +279,39 @@ QtObject {
         return ret;
     }
 
+    //!!!兼容旧代码!!!
+    property var roleResourceURL: filepath=>GlobalJS.toURL(roleResourcePath(filepath))
+    function roleResourcePath(filepath) {
+        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strRoleResourceDirName;
+        if(filepath)
+            return ret + separator + filepath;
+        return ret;
+    }
+
+
+
+    //使用时长
+    property Timer timer: Timer {
+        //id: timer
+
+        property var nLastTime: new Date().getTime()
+
+        repeat: true
+        interval: 6000
+        triggeredOnStart: false
+        running: true
+        onRunningChanged: {
+            //if(running === true)
+            //    nLastTime = new Date().getTime();
+        }
+
+        onTriggered: {
+            let now = new Date().getTime();
+            settings.$RunDuration += parseInt((now - nLastTime) / 1000);
+            nLastTime = now;
+        }
+    }
+
 
 
     Component.onCompleted: {
@@ -321,7 +351,7 @@ QtObject {
                 //else
                 //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
             }
-            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}`);  //发送请求
+            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`);  //发送请求
             //xhr.send();
         }
 

@@ -6,12 +6,12 @@
 
 /*
 
-  鹰：由于Sprite的source和 frameX、 frameY 修改无效，所以只能用Component进行创建，使用refresh进行删除重建。
-    //!!!后期想办法把refresh去掉
+  鹰：由于Sprite的source和 frameX、 frameY 修改无效，所以只能用Component进行创建，使用reset进行删除重建。
+    //!!!后期想办法把reset去掉
     问题：1、无法初始化时直接显示某个Sprite，只能是第一个Srite；
       2、无法显示某个Sprite的某一帧；
       3、running为false时jumpTo无效，只能在后面调用一次 start和stop；
-      4、refresh（也就是重新创建组件）后立刻调用start（也就是 jumpTo）无效，只能延时1ms后调用才有效。
+      4、reset（也就是重新创建组件）后立刻调用start（也就是 jumpTo）无效，只能延时1ms后调用才有效。
 */
 
 Item {
@@ -19,90 +19,103 @@ Item {
 
 
     //signal s_clicked();
-    signal s_ActionFinished();
+    //signal s_ActionFinished();
 
 
 
     //刷新重建
-    function refresh() {
+    function reset() {
         start(2, null);
-        walkSprite.animatedsprite.currentFrame = 0;
+        if(root.sprite.sprite)
+            root.sprite.reset();
     }
 
     //删除
     function unload() {
-        if(walkSprite) {
-            //walkSprite.destroy();
-            //walkSprite = undefined;
+        nSpriteType = 0;
+
+        if(root.sprite) {
+            //root.sprite.nSpriteType = 0;
+            //root.sprite.destroy();
+            //root.sprite = undefined;
         }
     }
 
     //开始播放动画（和方向有关）
     //running为 boolean 为是否运行，为其他值保持不变
-    function start(tdirect, running=true) {
-        //if(walkSprite === undefined)
+    function start(tdirection, running=true) {
+        //if(root.sprite === undefined)
         //    return;
-        //walkSprite.jumpTo(d);
+        //root.sprite.jumpTo(d);
+        let tnDirection = nDirection;
 
-        switch(tdirect) {
+        switch(tdirection) {
         case Qt.Key_Up:
         case 0:
-            walkSprite.jumpTo("Up");
-            //walkSprite.jumpTo("Up");
-            //walkSprite.goalSprite = "Up";
-            //walkSprite.currentSprite = "Up";
+            root.sprite.jumpTo('$Up');
+            //root.sprite.jumpTo('$Up');
+            //root.sprite.sprite.goalSprite = '$Up';
+            //root.sprite.sprite.currentSprite = '$Up';
             break;
         case Qt.Key_Right:
         case 1:
-            walkSprite.jumpTo("Right");
-            //walkSprite.jumpTo("Right");
-            //walkSprite.goalSprite = "Right";
-            //walkSprite.currentSprite = "Right";
+            root.sprite.jumpTo('$Right');
+            //root.sprite.jumpTo('$Right');
+            //root.sprite.sprite.goalSprite = '$Right';
+            //root.sprite.sprite.currentSprite = '$Right';
             break;
         case 2:
         case Qt.Key_Down:
-            walkSprite.jumpTo("Down");
-            //walkSprite.jumpTo("Down");
-            //walkSprite.goalSprite = "Down";
-            //walkSprite.currentSprite = "Down";
+            root.sprite.jumpTo('$Down');
+            //root.sprite.jumpTo('$Down');
+            //root.sprite.sprite.goalSprite = '$Down';
+            //root.sprite.sprite.currentSprite = '$Down';
             break;
         case Qt.Key_Left:
         case 3:
-            walkSprite.jumpTo("Left");
-            //walkSprite.jumpTo("Left");
-            //walkSprite.goalSprite = "Left";
-            //walkSprite.currentSprite = "Left";
+            root.sprite.jumpTo('$Left');
+            //root.sprite.jumpTo('$Left');
+            //root.sprite.sprite.goalSprite = '$Left';
+            //root.sprite.sprite.currentSprite = '$Left';
             break;
         }
 
-        if(running === true || running === false)
-            walkSprite.running = running;
+        if(running === true) {
+            if(nDirection === tnDirection)
+                root.sprite.start();
+            else
+                root.sprite.restart();
+        }
+        else if(running === false)
+            root.sprite.stop();
 
 
         //静态换方向
-        /*if(walkSprite.running === false) {
+        /*if(root.sprite.sprite.running === false) {
             start();
             stop();
         }
         else
             start();*/
 
-        //console.debug("[Role]start", walkSprite, walkSprite.state, walkSprite.currentSprite)
+        //console.debug("[Role]start", root.sprite, root.sprite.sprite.state, root.sprite.sprite.currentSprite)
     }
 
     //停止动画
     function stop() {
-        //if(walkSprite === undefined)
+        //if(root.sprite === undefined)
         //    return;
-        walkSprite.running = false;
+        //console.warn(nSpriteType, root.sprite.nSpriteType)
+        if(root.sprite.sprite)
+            root.sprite.stop();
     }
 
     //行走方向
     function direction(type=0) {
         if(type === 0)
-            return walkSprite.nDirection;
+            return root.nDirection;
         else {
-            switch(walkSprite.nDirection) {
+            switch(root.nDirection) {
             case 0:
                 return Qt.Key_Up;
             case 1:
@@ -116,16 +129,38 @@ Item {
     }
 
 
+    /*function playSprite() {
+        root.sprite.sprite.visible = false;
+        customsprite.sprite.visible = true;
+        customsprite.start();
+    }
+    */
 
-    property alias spriteSrc: walkSprite.spriteSrc   //精灵图片
-    property alias sizeFrame: walkSprite.sizeFrame     //一帧的宽高
-    property alias nFrameCount: walkSprite.nFrameCount //一个方向有几张图片
-    property var arrFrameDirectionIndex: [[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
-    property alias interval: walkSprite.interval  //帧切换速度
 
+
+    property int nSpriteType: 0
+    onNSpriteTypeChanged: {
+        switch(nSpriteType) {
+        case 1:
+            sprite.nSpriteType = 1;
+            break;
+        case 2:
+            sprite.nSpriteType = 2;
+            break;
+        default:
+            sprite.nSpriteType = 0;
+        }
+    }
+
+    property alias strSource: spriteEffect.strSource   //精灵图片
+    property alias nFrameCount: spriteEffect.nFrameCount //一个方向有几张图片
+    property alias nInterval: spriteEffect.nInterval  //帧切换速度
+    property alias arrActionsData: spriteEffect.arrActionsData
     //缩放
-    property alias rXScale: walkSprite.rXScale
-    property alias rYScale: walkSprite.rYScale
+    property alias rXScale: spriteEffect.rXScale
+    property alias rYScale: spriteEffect.rYScale
+    property alias rXOffset: spriteEffect.rXOffset       //x偏移
+    property alias rYOffset: spriteEffect.rYOffset       //y偏移
 
 
     //x1、y1为 场景中 人物的 有效占位（占地图） 起始点 偏移（相对于x，y），x2、y2为 有效占位 终止点 偏移，width1、height1为有效占位宽高
@@ -140,20 +175,23 @@ Item {
     property alias mouseArea: mouseArea
 
 
-    property alias sprite: walkSprite
-    property alias actionSprite: actionSprite
+    property bool bSmooth: false
+    property alias sprite: spriteEffect
+    //property alias customSprite: customSprite
 
-    //目前行走特效的方向
-    property alias nDirection: walkSprite.nDirection
+    //目前角色的方向
+    property int nDirection: -1
 
 
-    property bool bTest: false
+    property alias bTest: spriteEffect.bTest
 
 
     width: 0
     height: 0
-    implicitWidth: walkSprite.running ? walkSprite.implicitWidth : actionSprite.implicitWidth
-    implicitHeight: walkSprite.running ? walkSprite.implicitHeight : actionSprite.implicitHeight
+    //implicitWidth: root.sprite.sprite.visible ? root.sprite.sprite.implicitWidth : customSprite.implicitWidth
+    //implicitHeight: root.sprite.sprite.visible ? root.sprite.sprite.implicitHeight : customSprite.implicitHeight
+    implicitWidth: root.sprite.sprite ? root.sprite.sprite.implicitWidth : 0
+    implicitHeight: root.sprite.sprite ? root.sprite.sprite.implicitHeight: 0
 
     focus: true
 
@@ -162,106 +200,192 @@ Item {
 
 
     SpriteEffect {
-        id: walkSprite
+        id: spriteEffect
 
 
-        function jumpTo(action) {
 
-            if(action === 'Up') {
-                width = root.width;
-                height = root.height;
-                walkSprite.animatedsprite.frameX = root.arrFrameDirectionIndex[0][0] * root.sizeFrame.width;
-                walkSprite.animatedsprite.frameY = root.arrFrameDirectionIndex[0][1] * root.sizeFrame.height;     //起始位置
-                //walkSprite.spriteSrc = root.spriteSrc;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                walkSprite.animatedsprite.currentFrame = 0;
+        function action(actionName) {
+            sprite.nFrameStartIndex = arrActionsData[actionName][0];
+            nFrameCount = arrActionsData[actionName][1];
+            nInterval = arrActionsData[actionName][2];
 
-                nDirection = 0;
+            sprite.restart();
+        }
+
+        function jumpTo(tdirection) {
+            if(nSpriteType === 1) {
+                if(tdirection === '$Up') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[0][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[0][1] * root.sizeFrame.height;     //起始位置
+                    sprite.pointOffsetIndex = Qt.point(arrActionsData[0][0], arrActionsData[0][1]);
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+                    nCurrentFrame = 0;
+
+                    nDirection = 0;
+                }
+                else if(tdirection === '$Right') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[1][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[1][1] * root.sizeFrame.height;     //起始位置
+                    sprite.pointOffsetIndex = Qt.point(arrActionsData[1][0], arrActionsData[1][1]);
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+                    nCurrentFrame = 0;
+
+                    nDirection = 1;
+                }
+                else if(tdirection === '$Down') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[2][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[2][1] * root.sizeFrame.height;     //起始位置
+                    sprite.pointOffsetIndex = Qt.point(arrActionsData[2][0], arrActionsData[2][1]);
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+                    nCurrentFrame = 0;
+
+                    nDirection = 2;
+                }
+                else if(tdirection === '$Left') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[3][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[3][1] * root.sizeFrame.height;     //起始位置
+                    sprite.pointOffsetIndex = Qt.point(arrActionsData[3][0], arrActionsData[3][1]);
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+                    nCurrentFrame = 0;
+
+                    nDirection = 3;
+                }
             }
-            else if(action === 'Right') {
-                width = root.width;
-                height = root.height;
-                walkSprite.animatedsprite.frameX = root.arrFrameDirectionIndex[1][0] * root.sizeFrame.width;
-                walkSprite.animatedsprite.frameY = root.arrFrameDirectionIndex[1][1] * root.sizeFrame.height;     //起始位置
-                //walkSprite.spriteSrc = root.spriteSrc;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                walkSprite.animatedsprite.currentFrame = 0;
+            else if(nSpriteType === 2) {
+                if(tdirection === '$Up') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[0][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[0][1] * root.sizeFrame.height;     //起始位置
+                    //action('$Up');
+                    sprite.nFrameStartIndex = arrActionsData['$Up'][0];
+                    nFrameCount = arrActionsData['$Up'][1];
+                    nInterval = arrActionsData['$Up'][2];
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
 
-                nDirection = 1;
-            }
-            else if(action === 'Down') {
-                width = root.width;
-                height = root.height;
-                walkSprite.animatedsprite.frameX = root.arrFrameDirectionIndex[2][0] * root.sizeFrame.width;
-                walkSprite.animatedsprite.frameY = root.arrFrameDirectionIndex[2][1] * root.sizeFrame.height;     //起始位置
-                //walkSprite.spriteSrc = root.spriteSrc;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                walkSprite.animatedsprite.currentFrame = 0;
+                    nDirection = 0;
+                }
+                else if(tdirection === '$Right') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[1][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[1][1] * root.sizeFrame.height;     //起始位置
+                    //action('$Right');
+                    sprite.nFrameStartIndex = arrActionsData['$Right'][0];
+                    nFrameCount = arrActionsData['$Right'][1];
+                    nInterval = arrActionsData['$Right'][2];
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
 
-                nDirection = 2;
-            }
-            else if(action === 'Left') {
-                width = root.width;
-                height = root.height;
-                walkSprite.animatedsprite.frameX = root.arrFrameDirectionIndex[3][0] * root.sizeFrame.width;
-                walkSprite.animatedsprite.frameY = root.arrFrameDirectionIndex[3][1] * root.sizeFrame.height;     //起始位置
-                //walkSprite.spriteSrc = root.spriteSrc;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                walkSprite.animatedsprite.currentFrame = 0;
+                    nDirection = 1;
+                }
+                else if(tdirection === '$Down') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[2][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[2][1] * root.sizeFrame.height;     //起始位置
+                    //action('$Down');
+                    sprite.nFrameStartIndex = arrActionsData['$Down'][0];
+                    nFrameCount = arrActionsData['$Down'][1];
+                    nInterval = arrActionsData['$Down'][2];
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
 
-                nDirection = 3;
+                    nDirection = 2;
+                }
+                else if(tdirection === '$Left') {
+                    //width = root.width;
+                    //height = root.height;
+                    //walkSprite.animatedsprite.frameX = arrActionsData[3][0] * root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameY = arrActionsData[3][1] * root.sizeFrame.height;     //起始位置
+                    //action('$Left');
+                    sprite.nFrameStartIndex = arrActionsData['$Left'][0];
+                    nFrameCount = arrActionsData['$Left'][1];
+                    nInterval = arrActionsData['$Left'][2];
+                    //walkSprite.strSource = root.strSource;
+                    //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+                    //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+                    //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+                    //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+                    //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+
+                    nDirection = 3;
+                }
             }
         }
 
 
-        property int nDirection: -1
+
+        //帧数据
+        //  类型为1时，[[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
+        //  类型为2时，{'动作名': [帧起始号, 帧数, 帧速度]}
+        property var arrActionsData: []
+
 
         //width: root.width; height: root.height     //一个帧的大小，会缩放
         //anchors.horizontalCenter: parent.horizontalCenter
         //anchors.verticalCenter: parent.verticalCenter
+        width: root.width
+        height: root.height
 
-        smooth: true
+        smooth: root.bSmooth
 
-        animatedsprite.loops: AnimatedSprite.Infinite
-
-
-        bTest: root.bTest
+        nLoops: AnimatedSprite.Infinite
     }
 
 
-    //动作精灵
+
+    /*/自定义精灵
     SpriteEffect {
-        id: actionSprite
-
-
-        function playAction() {
-            walkSprite.visible = false;
-            visible = true;
-            start();
-        }
+        id: customSprite
 
 
         onS_finished: {
             visible = false;
-            walkSprite.visible = true;
+            root.sprite.sprite.visible = true;
 
-            s_ActionFinished();
+            //s_ActionFinished();
         }
 
 
@@ -277,6 +401,7 @@ Item {
 
         bTest: root.bTest
     }
+    */
 
 
 
@@ -310,28 +435,28 @@ Item {
                     nIndex = 0;
                 switch(nIndex) {
                 case 0:
-                    walkSprite.jumpTo("Up");
-                    //walkSprite.goalSprite = "Up";
-                    //walkSprite.currentSprite = "Up";
+                    root.sprite.jumpTo('$Up');
+                    //root.sprite.sprite.goalSprite = '$Up';
+                    //root.sprite.sprite.currentSprite = '$Up';
                     break;
                 case 1:
-                    walkSprite.jumpTo("Right");
-                    //walkSprite.goalSprite = "Right";
-                    //walkSprite.currentSprite = "Right";
+                    root.sprite.jumpTo('$Right');
+                    //root.sprite.sprite.goalSprite = '$Right';
+                    //root.sprite.sprite.currentSprite = '$Right';
                     break;
                 case 2:
-                    walkSprite.jumpTo("Down");
-                    //walkSprite.goalSprite = "Down";
-                    //walkSprite.currentSprite = "Down";
+                    root.sprite.jumpTo('$Down');
+                    //root.sprite.sprite.goalSprite = '$Down';
+                    //root.sprite.sprite.currentSprite = '$Down';
                     break;
                 case 3:
-                    walkSprite.jumpTo("Left");
-                    //walkSprite.goalSprite = "Left";
-                    //walkSprite.currentSprite = "Left";
+                    root.sprite.jumpTo('$Left');
+                    //root.sprite.sprite.goalSprite = '$Left';
+                    //root.sprite.sprite.currentSprite = '$Left';
                     break;
                 }
 
-                walkSprite.running = true;
+                root.sprite.restart();
                 //console.debug("[Role]Test Start");
             }
 
@@ -344,26 +469,21 @@ Item {
     Keys.onPressed: {
         switch(event.key) {
         case Qt.Key_Up:
-            walkSprite.jumpTo("Up");
-            walkSprite.running = true;
-            event.accepted = true;
+            root.sprite.jumpTo('$Up');
             break;
         case Qt.Key_Right:
-            walkSprite.jumpTo("Right");
-            walkSprite.running = true;
-            event.accepted = true;
+            root.sprite.jumpTo('$Right');
             break;
         case Qt.Key_Left:
-            walkSprite.jumpTo("Left");
-            walkSprite.running = true;
-            event.accepted = true;
+            root.sprite.jumpTo('$Left');
             break;
         case Qt.Key_Down:
-            walkSprite.jumpTo("Down");
-            walkSprite.running = true;
-            event.accepted = true;
+            root.sprite.jumpTo('$Down');
             break;
         }
+        root.sprite.start();
+
+        event.accepted = true;
         //console.debug("[Role]Keys.onPressed:", event.key);
     }
 
@@ -373,7 +493,7 @@ Item {
         case Qt.Key_Right:
         case Qt.Key_Left:
         case Qt.Key_Down:
-            walkSprite.running = false;
+            root.sprite.stop();
             event.accepted = true;
             //console.debug("[Role]Keys.onReleased:", event.key);
             break;
@@ -383,7 +503,7 @@ Item {
 
 
     Component.onCompleted: {
-
+        console.debug('[Role]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
 
     Component.onDestruction: {

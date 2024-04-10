@@ -45,7 +45,7 @@ import 'GameScene.js' as GameSceneJS
     5、障碍判断：人物所占地图块和障碍地图块比较；
       角色障碍判断：两个矩形重叠算法；
 
-    gameScene是视窗，itemContainer是整个地图、精灵的容器，角色移动时，itemContainer也在移动，一直会将角色移动在最中央。
+    gameScene是视窗，itemContainer是整个地图、特效的容器，角色移动时，itemContainer也在移动，一直会将角色移动在最中央。
 
 
   说明：占用的全局属性、事件和定时器：
@@ -145,13 +145,13 @@ Item {
 
 
         //计算新属性
-        game.run(function() {
+        game.run([function() {
             //计算新属性
             for(let tfh of game.gd['$sys_fight_heros'])
                 _private.objCommonScripts['refresh_combatant'](tfh);
             //刷新战斗时人物数据
             //fight.$sys.refreshCombatant(-1);
-        });
+        }, 'refresh_combatant']);
 
 
         //init脚本
@@ -165,7 +165,7 @@ Item {
             for(let tp in _private.objPlugins[tc])
                 if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false)
                     //_private.objPlugins[tc][tp].$init();
-                    game.run([_private.objPlugins[tc][tp].$init(bLoadResources), 'plugin_init']);
+                    game.run([_private.objPlugins[tc][tp].$init(), 'plugin_init:' + tc + tp]);
 
 
         //钩子函数调用
@@ -227,7 +227,8 @@ Item {
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc])
                 if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false)
-                    _private.objPlugins[tc][tp].$release();
+                    //_private.objPlugins[tc][tp].$release();
+                    game.run([_private.objPlugins[tc][tp].$release(), 'plugin_release:' + tc + tp]);
 
 
         //钩子函数调用
@@ -277,13 +278,6 @@ Item {
 
         //itemMenu.visible = false;
         //menuGame.hide();
-
-        /*/
-        for(let i in _private.objTmpSprites) {
-            _private.objTmpSprites[i].destroy();
-        }
-        _private.objTmpSprites = {};
-        */
 
 
         game.d = {};
@@ -358,6 +352,9 @@ Item {
     //设置主角坐标（块坐标）
     function setMainRolePos(bx, by, index=0) {
         let mainRole = _private.arrMainRoles[index];
+
+        if(mainRole === undefined)
+            return false;
 
         setRolePos(mainRole, bx, by);
         //setSceneToRole(_private.sceneRole);
@@ -499,7 +496,7 @@ Item {
             //loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
-            return true;
+            return itemGameMsg;
         }
 
         //在屏幕下方显示信息。
@@ -649,7 +646,7 @@ Item {
             }
 
 
-            let [cfg, roleComp] = GameSceneJS.loadRole(role.RId, mainRole);
+            let [cfg, roleComp] = GameSceneJS.loadRole(role.RId, mainRole) || [];
             if(!cfg) {
                 return false;
             }
@@ -764,8 +761,8 @@ Item {
                 //修改属性
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
 
-                //!!!后期想办法把refresh去掉
-                //mainRole.refresh();
+                //!!!后期想办法把reset去掉
+                //mainRole.reset();
 
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
@@ -886,7 +883,7 @@ Item {
         readonly property var delhero: function(hero=-1) {
 
             let tmpDelHero = function(mainRole) {
-                mainRole.spriteSrc = '';
+                mainRole.strSource = '';
                 mainRole.nFrameCount = 0;
                 mainRole.width = 0;
                 mainRole.height = 0;
@@ -908,7 +905,7 @@ Item {
 
                 //其他属性（用户自定义）
                 mainRole.$props = {};
-                mainRole.refresh();
+                mainRole.reset();
 
                 _private.stopAction(0);
             }
@@ -969,8 +966,10 @@ Item {
 
             //!!!如果多个主角，需要修改这个代码!!!
             //_private.arrMainRoles[index].destroy();
-            delete _private.arrMainRoles[index];
-            delete game.gd['$sys_main_roles'][index];
+            //delete _private.arrMainRoles[index];
+            //delete game.gd['$sys_main_roles'][index];
+            _private.arrMainRoles.splice(index, 1);
+            game.gd['$sys_main_roles'].splice(index, 1);
 
             tmpDelHero(mainRole);
 
@@ -1106,8 +1105,8 @@ Item {
                 //修改属性
                 //GlobalLibraryJS.copyPropertiesToObject(roleComp, props, true);
 
-                //!!!后期想办法把refresh去掉
-                //roleComp.refresh();
+                //!!!后期想办法把reset去掉
+                //roleComp.reset();
 
                 if(props.$name !== undefined)   //修改名字
                     role.$name = roleComp.textName.text = props.$name;
@@ -2266,9 +2265,9 @@ Item {
 
 
         //加入定时器；
-        //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；
+        //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；params为自定义参数（回调时传入）；
         //成功返回true。
-        readonly property var addtimer: function(timerName, interval, times, bGlobal=false) {
+        readonly property var addtimer: function(timerName, interval, times=1, bGlobal=false, params=null) {
             let objTimer;
             if(bGlobal)
                 objTimer = _private.objGlobalTimers;
@@ -2278,7 +2277,9 @@ Item {
             if(objTimer[timerName] !== undefined)
                 return false;
 
-            objTimer[timerName] = [interval, times, interval];
+            //0：剩余时长（每帧减）；1：剩余次数（每次减）；2：时长（备份）；3：回调参数；
+            objTimer[timerName] = [interval, times, interval, params];
+
             return true;
         }
 
@@ -2388,54 +2389,61 @@ Item {
         }
 
 
-        //播放视频
-        //video是视频名称；properties包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
+        //播放视频；
+        //videoParams是视频名称或对象（包含RId）；videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
         //  也可以 $x、$y、$width、$height。
-        readonly property var playvideo: function(video, properties={}, pauseGame=true) {
+        readonly property var playvideo: function(videoParams, pauseGame=true) {
+            if(GlobalLibraryJS.isString(videoParams)) {
+                videoParams = {RId: videoParams};
+            }
+            else if(GlobalLibraryJS.isObject(videoParams)) {
 
-            let fileURL = GameMakerGlobal.videoResourceURL(video);
+            }
+            else
+                return false;
+
+
+            let fileURL = GameMakerGlobal.videoResourceURL(videoParams.RId);
             //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
-            //    console.warn('[!GameScene]video no exist：', video, fileURL)
+            //    console.warn('[!GameScene]video no exist：', videoParams.RId, fileURL)
             //    return false;
             //}
 
             //if(_private.objVideos[videoRId] === undefined)
             //    return false;
-            if(properties === undefined)
-                properties = {};
 
-            if(properties.$videoOutput === undefined)
-                properties.$videoOutput = {};
-            if(properties.$mediaPlayer === undefined)
-                properties.$mediaPlayer = {};
+            if(videoParams.$videoOutput === undefined)
+                videoParams.$videoOutput = {};
+            if(videoParams.$mediaPlayer === undefined)
+                videoParams.$mediaPlayer = {};
 
 
-            if(properties.$videoOutput.$width === undefined && properties.$width === undefined)
+            if(videoParams.$videoOutput.$width === undefined && videoParams.$width === undefined)
                 videoOutput.width = Qt.binding(function(){return videoOutput.implicitWidth});
-            else if(properties.$width === -1)
+            else if(videoParams.$width === -1)
                 videoOutput.width = rootGameScene.width;
-            else if(GlobalLibraryJS.isValidNumber(properties.$width)) {
-                videoOutput.width = properties.$width * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(videoParams.$width)) {
+                videoOutput.width = videoParams.$width * Screen.pixelDensity;
             }
 
-            if(properties.$videoOutput.$height === undefined && properties.$height === undefined)
+            if(videoParams.$videoOutput.$height === undefined && videoParams.$height === undefined)
                 videoOutput.height = Qt.binding(function(){return videoOutput.implicitHeight});
-            else if(properties.$height === -1)
+            else if(videoParams.$height === -1)
                 videoOutput.height = rootGameScene.height;
-            else if(GlobalLibraryJS.isValidNumber(properties.$height)) {
-                videoOutput.height = properties.$height * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(videoParams.$height)) {
+                videoOutput.height = videoParams.$height * Screen.pixelDensity;
             }
 
 
             mediaPlayer.source = fileURL;
 
-            GlobalLibraryJS.copyPropertiesToObject(videoOutput, properties.$videoOutput, {onlyCopyExists: true});
-            GlobalLibraryJS.copyPropertiesToObject(mediaPlayer, properties.$mediaPlayer, {onlyCopyExists: true});
+            GlobalLibraryJS.copyvideoParamsToObject(videoOutput, videoParams.$videoOutput, {onlyCopyExists: true});
+            GlobalLibraryJS.copyvideoParamsToObject(mediaPlayer, videoParams.$mediaPlayer, {onlyCopyExists: true});
             /*
             let tKeys = Object.keys(videoOutput);
-            for(let tp in properties)
+            for(let tp in videoParams)
                 if(tKeys.indexOf(tp) >= 0)
-                    videoOutput[tp] = properties[tp];
+                    videoOutput[tp] = videoParams[tp];
             */
 
             itemVideo.pauseGame = pauseGame;
@@ -2445,14 +2453,14 @@ Item {
             //console.debug(itemViewPort.gameScene.color)
             //console.debug(itemViewPort.gameScene.color==='#ccffffff');
         }
-        //结束播放
+        //结束播放；
         readonly property var stopvideo: function() {
             itemVideo.stop();
         }
 
         //显示图片；
-        //image为图片名；properties为图片属性；id为图片标识（用来控制和删除）；
-        //properties：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked 事件的回调函数；
+        //imageParams为图片名或对象（包含RId）；id为图片标识（用来控制和删除）；
+        //imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked 事件的回调函数；
         //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
@@ -2461,18 +2469,25 @@ Item {
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
         //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
-        readonly property var showimage: function(image, properties={}, id=undefined) {
-            let fileURL = GameMakerGlobal.imageResourceURL(image);
+        readonly property var showimage: function(imageParams, id=undefined) {
+            if(GlobalLibraryJS.isString(imageParams)) {
+                imageParams = {RId: imageParams};
+            }
+            else if(GlobalLibraryJS.isObject(imageParams)) {
+
+            }
+            else
+                return false;
+
+
+            let fileURL = GameMakerGlobal.imageResourceURL(imageParams.RId);
             //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
-            //    console.warn('[!GameScene]image no exist：', video, fileURL)
+            //    console.warn('[!GameScene]image no exist：', imageParams.RId, fileURL)
             //    return false;
             //}
 
-            //if(_private.objImages[image] === undefined)
+            //if(_private.objImages[imageParams.RId] === undefined)
             //    return false;
-
-            if(id === undefined || id === null)
-                id = image;
 
             /*image.source = GameMakerGlobal.imageResourceURL(imageRId);
             image.x = x;
@@ -2487,65 +2502,90 @@ Item {
                 image.height = h;
             */
 
-            //properties.source = fileURL;
+            //imageParams.source = fileURL;
 
 
-            let tmp = _private.objTmpImages[id];
+            //父组件
+            let parentComp;
+            //暂存位置
+            let objTmpImages;
+            //游戏视窗
+            if(imageParams.$parent === 1) {
+                parentComp = itemViewPort;
+
+                objTmpImages = _private.objTmpImages;
+            }
+            //会改变大小
+            else if(imageParams.$parent === 2) {
+                parentComp = itemViewPort.gameScene;
+
+                objTmpImages = _private.objTmpImages;
+            }
+            //会改变大小和随地图移动
+            else if(imageParams.$parent === 3) {
+                parentComp = itemViewPort.itemContainer;
+
+                objTmpImages = _private.arrayTmpMapComponents;
+            }
+            //某角色上
+            else if(GlobalLibraryJS.isString(imageParams.$parent)) {
+                let role = game.hero(imageParams.$parent);
+                if(!role)
+                    role = game.role(imageParams.$parent);
+                if(role) {
+                    parentComp = role;
+
+                    objTmpImages = role.$tmpComponents;
+                }
+                else {
+                    console.warn('[!GameScene]找不到：', imageParams.$parent);
+                    //delimage(id);
+                    return;
+                }
+            }
+            //固定屏幕上
+            else {
+                parentComp = rootGameScene;
+
+                objTmpImages = _private.objTmpImages;
+            }
+
+
+            if(id === undefined || id === null)
+                id = imageParams.RId;
+
+            let tmp = objTmpImages[id];
             //如果缓存中没有，则创建
             if(!tmp) {
                 //let image = Qt.createQmlObject('import QtQuick 2.14; Image {}', rootGameScene);
 
-                tmp = compCacheImage.createObject(null, {source: fileURL});
+                tmp = compCacheImage.createObject(null);
                 //随场景缩放
                 //tmp = compCacheImage.createObject(itemViewPort.gameScene, {source: fileURL});
                 //tmp = compCacheImage.createObject(rootGameScene, {source: fileURL});
                 //随地图移动
                 //tmp = compCacheImage.createObject(itemViewPort.itemContainer, {source: fileURL});
 
-                _private.objTmpImages[id] = tmp;
-                tmp.id = id;
+                objTmpImages[id] = tmp;
+                tmp.$id = id;
                 //tmp.anchors.centerIn = rootGameScene;
             }
+
             //取出组件，循环赋值
-            else {
+            //else {
                 tmp.visible = false;
                 tmp.source = fileURL;
-                //tmp.parent = properties.$parent;
+                //tmp.parent = imageParams.$parent;
                 /*
                 let tKeys = Object.keys(tmp);
-                for(let tp in properties)
+                for(let tp in imageParams)
                     if(tKeys.indexOf(tp) >= 0)
-                        tmp[tp] = properties[tp];
+                        tmp[tp] = imageParams[tp];
                 */
-            }
+            //}
 
-
-            //游戏视窗
-            if(properties.$parent === 1)
-                properties.$parent = itemViewPort;
-            //会改变大小
-            else if(properties.$parent === 2)
-                properties.$parent = itemViewPort.gameScene;
-            //会改变大小和随地图移动
-            else if(properties.$parent === 3) {
-                properties.$parent = itemViewPort.itemContainer;
-                _private.arrayTmpMapComponents.push(tmp);
-            }
-            //某角色上
-            else if(GlobalLibraryJS.isString(properties.$parent)) {
-                let role = game.hero(properties.$parent);
-                if(!role)
-                    role = game.role(properties.$parent);
-                if(role) {
-                    properties.$parent = role;
-                    role.$tmpComponents.push(tmp);
-                }
-            }
-            //固定屏幕上
-            else
-                properties.$parent = rootGameScene;
-
-            tmp.parent = properties.$parent;
+            tmp.parent = parentComp;
+            //tmp.parent = imageParams.$parent;
 
 
             //if(_private.spritesResource[imageRId] === undefined) {
@@ -2553,28 +2593,31 @@ Item {
             //}
 
 
+
+            //改变大小和位置
+
             //宽高比固定，为1 宽度适应高度，为2高度适应宽度
             let widthOrHeightAdaption = 0;
 
             //默认原宽度
-            if(properties.$width === undefined && properties.width === undefined)
+            if(imageParams.$width === undefined && imageParams.width === undefined)
                 tmp.width = tmp.implicitWidth;
             //屏宽
-            else if(properties.$width === -1)
+            else if(imageParams.$width === -1)
                 tmp.width = Qt.binding(function(){return rootGameScene.width});
-            else if(GlobalLibraryJS.isArray(properties.$width)) {
-                switch(properties.$width[1]) {
+            else if(GlobalLibraryJS.isArray(imageParams.$width)) {
+                switch(imageParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
-                    tmp.width = properties.$width[0] * Screen.pixelDensity;
+                    tmp.width = imageParams.$width[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    tmp.width = Qt.binding(function(){return properties.$width[0] * properties.$parent.width});
+                    tmp.width = Qt.binding(function(){return imageParams.$width[0] * parentComp.width});
                     break;
                 //如果是 自身百分比
                 case 3:
-                    tmp.width = properties.$width[0] * tmp.implicitWidth;
+                    tmp.width = imageParams.$width[0] * tmp.implicitWidth;
                     break;
                 //宽度适应高度
                 case 4:
@@ -2582,36 +2625,36 @@ Item {
                     break;
                 //跨平台宽度
                 case 5:
-                    tmp.width = Qt.binding(function(){return Global.dpW(properties.$width[0])});
+                    tmp.width = Qt.binding(function(){return Global.dpW(imageParams.$width[0])});
                     break;
                 //按像素
                 default:
-                    tmp.width = properties.$width[0];
+                    tmp.width = imageParams.$width[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$width)) {
-                tmp.width = properties.$width * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(imageParams.$width)) {
+                tmp.width = imageParams.$width * Screen.pixelDensity;
             }
 
             //默认原高
-            if(properties.$height === undefined && properties.height === undefined)
+            if(imageParams.$height === undefined && imageParams.height === undefined)
                 tmp.height = tmp.implicitHeight;
             //屏高
-            else if(properties.$height === -1)
+            else if(imageParams.$height === -1)
                 tmp.height = Qt.binding(function(){return rootGameScene.height});
-            else if(GlobalLibraryJS.isArray(properties.$height)) {
-                switch(properties.$height[1]) {
+            else if(GlobalLibraryJS.isArray(imageParams.$height)) {
+                switch(imageParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
-                    tmp.height = properties.$height[0] * Screen.pixelDensity;
+                    tmp.height = imageParams.$height[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    tmp.height = Qt.binding(function(){return properties.$height[0] * properties.$parent.height});
+                    tmp.height = Qt.binding(function(){return imageParams.$height[0] * parentComp.height});
                     break;
                 //如果是 自身百分比
                 case 3:
-                    tmp.height = properties.$height[0] * tmp.implicitHeight;
+                    tmp.height = imageParams.$height[0] * tmp.implicitHeight;
                     break;
                 //高度适应宽度
                 case 4:
@@ -2619,142 +2662,196 @@ Item {
                     break;
                 //跨平台高度
                 case 5:
-                    tmp.height = Qt.binding(function(){return Global.dpH(properties.$height[0])});
+                    tmp.height = Qt.binding(function(){return Global.dpH(imageParams.$height[0])});
                     break;
                 //按像素
                 default:
-                    tmp.height = properties.$height[0];
+                    tmp.height = imageParams.$height[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$height)) {
-                tmp.height = properties.$height * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(imageParams.$height)) {
+                tmp.height = imageParams.$height * Screen.pixelDensity;
             }
 
             //宽度适应高度、高度适应宽度（乘以倍率）
             if(widthOrHeightAdaption === 1)
-                tmp.width = tmp.height / tmp.implicitHeight * tmp.implicitWidth * properties.$width[0];
+                tmp.width = tmp.height / tmp.implicitHeight * tmp.implicitWidth * imageParams.$width[0];
             else if(widthOrHeightAdaption === 2)
-                tmp.height = tmp.width / tmp.implicitWidth * tmp.implicitHeight * properties.$height[0];
+                tmp.height = tmp.width / tmp.implicitWidth * tmp.implicitHeight * imageParams.$height[0];
 
 
             //默认居中
-            if(properties.$x === undefined && properties.x === undefined)
-                tmp.x = Qt.binding(function(){return (properties.$parent.width - tmp.width) / 2});
-                //tmp.x = (properties.$parent.width - tmp.width) / 2;
-            else if(GlobalLibraryJS.isArray(properties.$x)) {
-                switch(properties.$x[1]) {
+            if(imageParams.$x === undefined && imageParams.x === undefined)
+                tmp.x = Qt.binding(function(){return (parentComp.width - tmp.width) / 2});
+                //tmp.x = (parentComp.width - tmp.width) / 2;
+            else if(GlobalLibraryJS.isArray(imageParams.$x)) {
+                switch(imageParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
-                    tmp.x = properties.$x[0] * Screen.pixelDensity;
+                    tmp.x = imageParams.$x[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] * properties.$parent.width});
+                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * parentComp.width});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] + (properties.$parent.width - tmp.width) / 2});
+                    tmp.x = Qt.binding(function(){return imageParams.$x[0] + (parentComp.width - tmp.width) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (properties.$parent.width - tmp.width) / 2});
+                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * Screen.pixelDensity + (parentComp.width - tmp.width) / 2});
                     break;
                 //跨平台x
                 case 5:
-                    tmp.x = Qt.binding(function(){return Global.dpW(properties.$x[0])});
+                    tmp.x = Qt.binding(function(){return Global.dpW(imageParams.$x[0])});
                     break;
                 //按像素
                 default:
-                    tmp.x = properties.$x[0];
+                    tmp.x = imageParams.$x[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$x)) {
-                tmp.x = properties.$x * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(imageParams.$x)) {
+                tmp.x = imageParams.$x * Screen.pixelDensity;
             }
 
             //默认居中
-            if(properties.$y === undefined && properties.y === undefined)
-                tmp.y = Qt.binding(function(){return (properties.$parent.height - tmp.height) / 2});
-                //tmp.y = (properties.$parent.height - tmp.height) / 2;
-            else if(GlobalLibraryJS.isArray(properties.$y)) {
-                switch(properties.$y[1]) {
+            if(imageParams.$y === undefined && imageParams.y === undefined)
+                tmp.y = Qt.binding(function(){return (parentComp.height - tmp.height) / 2});
+                //tmp.y = (parentComp.height - tmp.height) / 2;
+            else if(GlobalLibraryJS.isArray(imageParams.$y)) {
+                switch(imageParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
-                    tmp.y = properties.$y[0] * Screen.pixelDensity;
+                    tmp.y = imageParams.$y[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] * properties.$parent.height});
+                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * parentComp.height});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] + (properties.$parent.height - tmp.height) / 2});
+                    tmp.y = Qt.binding(function(){return imageParams.$y[0] + (parentComp.height - tmp.height) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (properties.$parent.height - tmp.height) / 2});
+                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * Screen.pixelDensity + (parentComp.height - tmp.height) / 2});
                     break;
                 //跨平台y
                 case 5:
-                    tmp.y = Qt.binding(function(){return Global.dpH(properties.$y[0])});
+                    tmp.y = Qt.binding(function(){return Global.dpH(imageParams.$y[0])});
                     break;
                 //按像素
                 default:
-                    tmp.y = properties.$y[0];
+                    tmp.y = imageParams.$y[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$y)) {
-                tmp.y = properties.$y * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(imageParams.$y)) {
+                tmp.y = imageParams.$y * Screen.pixelDensity;
             }
 
 
-            if(properties.$clicked === null)
-                tmp.clicked = function(image){game.delimage(image.id)};
-            else// if(properties.$clicked !== undefined)
-                tmp.clicked = properties.$clicked;
+            if(imageParams.$clicked === null)
+                tmp.clicked = function(image){game.delimage(image.$id)};
+            else// if(imageParams.$clicked !== undefined)
+                tmp.clicked = imageParams.$clicked;
 
 
-            if(properties.$doubleClicked === null)
-                tmp.doubleClicked = function(image){game.delimage(image.id)};
-            else// if(properties.$doubleClicked !== undefined)
-                tmp.doubleClicked = properties.$doubleClicked;
+            if(imageParams.$doubleClicked === null)
+                tmp.doubleClicked = function(image){game.delimage(image.$id)};
+            else// if(imageParams.$doubleClicked !== undefined)
+                tmp.doubleClicked = imageParams.$doubleClicked;
 
 
-            if(properties.$visible === undefined)
-                properties.visible = true;
+            if(imageParams.$visible === undefined)
+                imageParams.visible = true;
             else
-                properties.visible = properties.$visible;
+                imageParams.visible = imageParams.$visible;
 
 
 
-            GlobalLibraryJS.copyPropertiesToObject(tmp, properties, {onlyCopyExists: true, objectRecursion: 0});
+            GlobalLibraryJS.copyPropertiesToObject(tmp, imageParams, {onlyCopyExists: true, objectRecursion: 0});
 
 
-            return id;
+            return tmp;
         }
-        //删除图片，id为图片标识
-        readonly property var delimage: function(id=-1) {
-            if(id === undefined || id === null || id === -1) {
+        //删除图片；
+        //idParams为：-1：全部屏幕上的组件；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id和$parent属性（同showimage）；
+        readonly property var delimage: function(idParams=-1) {
+            if(idParams === -1) {
                 for(let ti in _private.objTmpImages)
                     _private.objTmpImages[ti].destroy();
 
                 _private.objTmpImages = {};
                 return true;
             }
+            else if(GlobalLibraryJS.isNumber(idParams)) {
+                idParams = {$id: idParams};
+            }
+            else if(GlobalLibraryJS.isString(idParams)) {
+                idParams = {$id: idParams};
+            }
+            else if(GlobalLibraryJS.isObject(idParams)) {
 
-            let image = _private.objTmpImages[id];
-            if(image) {
-                image.destroy();
-                delete _private.objTmpImages[id];
+            }
+            else
+                return false;
+
+
+            //暂存位置
+            let objTmpImages;
+            //游戏视窗
+            if(idParams.$parent === 1) {
+                //idParams.$parent = itemViewPort;
+
+                objTmpImages = _private.objTmpImages;
+            }
+            //会改变大小
+            else if(idParams.$parent === 2) {
+                //idParams.$parent = itemViewPort.gameScene;
+
+                objTmpImages = _private.objTmpImages;
+            }
+            //会改变大小和随地图移动
+            else if(idParams.$parent === 3) {
+                //idParams.$parent = itemViewPort.itemContainer;
+
+                objTmpImages = _private.arrayTmpMapComponents;
+            }
+            //某角色上
+            else if(GlobalLibraryJS.isString(idParams.$parent)) {
+                let role = game.hero(idParams.$parent);
+                if(!role)
+                    role = game.role(idParams.$parent);
+                if(role) {
+                    //idParams.$parent = role;
+
+                    objTmpImages = role.$tmpComponents;
+                }
+                else
+                    return false;
+            }
+            //固定屏幕上
+            else {
+                //idParams.$parent = rootGameScene;
+
+                objTmpImages = _private.objTmpImages;
+            }
+
+
+            let tmp = objTmpImages[idParams.$id];
+            if(tmp) {
+                tmp.destroy();
+                delete objTmpImages[idParams.$id];
 
                 return true;
             }
-            return false;
+            return null;
         }
 
-        //显示精灵
-        //spriteEffectRId为精灵名；properties为精灵属性；id为精灵标识（用来控制和删除）
-        //properties：包含 SpriteEffect组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked、$looped、$finished 事件的回调函数；
+        //显示特效；
+        //spriteParams为特效名或对象（包含RId）；id为特效标识（用来控制和删除）
+        //spriteParams为对象：包含 SpriteEffect组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked、$looped、$finished 事件的回调函数；
         //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
@@ -2763,9 +2860,25 @@ Item {
         //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
         //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
         //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；字符串表示显示在某个角色上；
-        readonly property var showsprite: function(spriteEffectRId, properties={}, id=undefined) {
-            if(id === undefined || id === null)
-                id = spriteEffectRId;
+        readonly property var showsprite: function(spriteParams, id=undefined) {
+            if(GlobalLibraryJS.isString(spriteParams)) {
+                spriteParams = {RId: spriteParams};
+            }
+            else if(GlobalLibraryJS.isObject(spriteParams)) {
+
+            }
+            else
+                return false;
+
+
+            //let fileURL = GameMakerGlobal.imageResourceURL(spriteParams.RId);
+            //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
+            //    console.warn('[!GameScene]sprite no exist：', spriteParams.RId, fileURL)
+            //    return false;
+            //}
+
+            //if(_private.objSprites[spriteParams.RId] === undefined)
+            //    return false;
 
             /*image.source = GameMakerGlobal.imageResourceURL(spriteEffectRId);
             image.x = x;
@@ -2781,57 +2894,75 @@ Item {
             */
 
             //let data = _private.spritesResource[spriteEffectRId];
-            //properties.spriteSrc = GameMakerGlobal.spriteResourceURL(data.Image);
+            //spriteParams.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
 
 
-
-            if(properties.$loops === undefined)
-                properties.$loops = 1;
-
-
-            let sprite = _private.objTmpSprites[id] || compCacheSpriteEffect.createObject(null);
-            //载入资源
-            sprite = GameSceneJS.loadSpriteEffect(spriteEffectRId, sprite, properties.$loops, null);
-            if(sprite === null)
-                return false;
-
-            sprite.visible = false;
-            _private.objTmpSprites[id] = sprite;
-            sprite.id = id;
-
-
+            //父组件
+            let parentComp;
+            //暂存位置
+            let objTmpSprites;
             //游戏视窗
-            if(properties.$parent === 1)
-                properties.$parent = itemViewPort;
+            if(spriteParams.$parent === 1) {
+                parentComp = itemViewPort;
+
+                objTmpSprites = _private.objTmpSprites;
+            }
             //会改变大小
-            if(properties.$parent === 2)
-                properties.$parent = itemViewPort.gameScene;
+            if(spriteParams.$parent === 2) {
+                parentComp = itemViewPort.gameScene;
+
+                objTmpSprites = _private.objTmpSprites;
+            }
             //会改变大小和随地图移动
-            else if(properties.$parent === 3) {
-                properties.$parent = itemViewPort.itemContainer;
-                _private.arrayTmpMapComponents.push(sprite);
+            else if(spriteParams.$parent === 3) {
+                parentComp = itemViewPort.itemContainer;
+
+                objTmpSprites = _private.arrayTmpMapComponents;
             }
             //某角色上
-            else if(GlobalLibraryJS.isString(properties.$parent)) {
-                let role = game.hero(properties.$parent);
+            else if(GlobalLibraryJS.isString(spriteParams.$parent)) {
+                let role = game.hero(spriteParams.$parent);
                 if(!role)
-                    role = game.role(properties.$parent);
+                    role = game.role(spriteParams.$parent);
                 if(role) {
-                    properties.$parent = role;
-                    role.$tmpComponents.push(sprite);
+                    parentComp = role;
+
+                    objTmpSprites = role.$tmpComponents;
                 }
                 else {
-                    console.warn('找不到：', properties.$parent);
-                    delsprite(id);
+                    console.warn('[!GameScene]找不到：', spriteParams.$parent);
+                    //delsprite(id);
                     return;
                 }
             }
             //固定屏幕上
-            else
-                properties.$parent = rootGameScene;
+            else {
+                parentComp = rootGameScene;
 
-            sprite.parent = properties.$parent;
+                objTmpSprites = _private.objTmpSprites;
+            }
 
+
+            if(spriteParams.$loops === undefined)
+                spriteParams.$loops = 1;
+
+
+            if(id === undefined || id === null)
+                id = spriteParams.RId;
+
+            let sprite = objTmpSprites[id] || compCacheSpriteEffect.createObject(null);
+            //刷新特效属性
+            sprite = GameSceneJS.loadSpriteEffect(spriteParams.RId, sprite, spriteParams.$loops, null);
+            if(sprite === null)
+                return false;
+
+            sprite.visible = false;
+            objTmpSprites[id] = sprite;
+            sprite.$id = id;
+
+
+            sprite.parent = parentComp;
+            //sprite.parent = spriteParams.$parent;
 
 
 
@@ -2842,24 +2973,24 @@ Item {
 
             //改变大小
             //默认原宽
-            if(properties.$width  === undefined && properties.width === undefined)
+            if(spriteParams.$width  === undefined && spriteParams.width === undefined)
                 sprite.width = sprite.implicitWidth;
             //屏宽
-            else if(properties.$width === -1)
+            else if(spriteParams.$width === -1)
                 sprite.width = Qt.binding(function(){return rootGameScene.width});
-            else if(GlobalLibraryJS.isArray(properties.$width)) {
-                switch(properties.$width[1]) {
+            else if(GlobalLibraryJS.isArray(spriteParams.$width)) {
+                switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
-                    sprite.width = properties.$width[0] * Screen.pixelDensity;
+                    sprite.width = spriteParams.$width[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    sprite.width = Qt.binding(function(){return properties.$width[0] * properties.$parent.width});
+                    sprite.width = Qt.binding(function(){return spriteParams.$width[0] * parentComp.width});
                     break;
                 //如果是 自身百分比
                 case 3:
-                    sprite.width = properties.$width[0] * sprite.implicitWidth;
+                    sprite.width = spriteParams.$width[0] * sprite.implicitWidth;
                     break;
                 //宽度适应高度
                 case 4:
@@ -2867,36 +2998,36 @@ Item {
                     break;
                 //跨平台宽度
                 case 5:
-                    sprite.width = Qt.binding(function(){return Global.dpW(properties.$width[0])});
+                    sprite.width = Qt.binding(function(){return Global.dpW(spriteParams.$width[0])});
                     break;
                 //按像素
                 default:
-                    sprite.width = properties.$width[0];
+                    sprite.width = spriteParams.$width[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$width)) {
-                sprite.width = properties.$width * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(spriteParams.$width)) {
+                sprite.width = spriteParams.$width * Screen.pixelDensity;
             }
 
             //默认原高
-            if(properties.$height === undefined && properties.height === undefined)
+            if(spriteParams.$height === undefined && spriteParams.height === undefined)
                 sprite.height = sprite.implicitHeight;
             //全屏
-            else if(properties.$height === -1)
+            else if(spriteParams.$height === -1)
                 sprite.height = Qt.binding(function(){return rootGameScene.height});
-            else if(GlobalLibraryJS.isArray(properties.$height)) {
-                switch(properties.$height[1]) {
+            else if(GlobalLibraryJS.isArray(spriteParams.$height)) {
+                switch(spriteParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
-                    sprite.height = properties.$height[0] * Screen.pixelDensity;
+                    sprite.height = spriteParams.$height[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    sprite.height = Qt.binding(function(){return properties.$height[0] * properties.$parent.height});
+                    sprite.height = Qt.binding(function(){return spriteParams.$height[0] * parentComp.height});
                     break;
                 //如果是 自身百分比
                 case 3:
-                    sprite.height = properties.$height[0] * sprite.implicitHeight;
+                    sprite.height = spriteParams.$height[0] * sprite.implicitHeight;
                     break;
                 //高度适应宽度
                 case 4:
@@ -2904,133 +3035,133 @@ Item {
                     break;
                 //跨平台高度
                 case 5:
-                    sprite.height = Qt.binding(function(){return Global.dpH(properties.$height[0])});
+                    sprite.height = Qt.binding(function(){return Global.dpH(spriteParams.$height[0])});
                     break;
                 //按像素
                 default:
-                    sprite.height = properties.$height[0];
+                    sprite.height = spriteParams.$height[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$height)) {
-                sprite.height = properties.$height * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(spriteParams.$height)) {
+                sprite.height = spriteParams.$height * Screen.pixelDensity;
             }
 
             //宽度适应高度、高度适应宽度（乘以倍率）
             if(widthOrHeightAdaption === 1)
-                sprite.width = sprite.height / sprite.implicitHeight * sprite.implicitWidth * properties.$width[0];
+                sprite.width = sprite.height / sprite.implicitHeight * sprite.implicitWidth * spriteParams.$width[0];
             else if(widthOrHeightAdaption === 2)
-                sprite.height = sprite.width / sprite.implicitWidth * sprite.implicitHeight * properties.$height[0];
+                sprite.height = sprite.width / sprite.implicitWidth * sprite.implicitHeight * spriteParams.$height[0];
 
 
             //默认居中
-            if(properties.$x === undefined && properties.x === undefined)
-                sprite.x = Qt.binding(function(){return (properties.$parent.width - sprite.width) / 2});
-                //sprite.x = (properties.$parent.width - sprite.width) / 2;
-            else if(GlobalLibraryJS.isArray(properties.$x)) {
-                switch(properties.$x[1]) {
+            if(spriteParams.$x === undefined && spriteParams.x === undefined)
+                sprite.x = Qt.binding(function(){return (parentComp.width - sprite.width) / 2});
+                //sprite.x = (parentComp.width - sprite.width) / 2;
+            else if(GlobalLibraryJS.isArray(spriteParams.$x)) {
+                switch(spriteParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
-                    sprite.x = properties.$x[0] * Screen.pixelDensity;
+                    sprite.x = spriteParams.$x[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] * properties.$parent.width});
+                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * parentComp.width});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] + (properties.$parent.width - sprite.width) / 2});
+                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] + (parentComp.width - sprite.width) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.x = Qt.binding(function(){return properties.$x[0] * Screen.pixelDensity + (properties.$parent.width - sprite.width) / 2});
+                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * Screen.pixelDensity + (parentComp.width - sprite.width) / 2});
                     break;
                 //跨平台x
                 case 5:
-                    sprite.x = Qt.binding(function(){return Global.dpW(properties.$x[0])});
+                    sprite.x = Qt.binding(function(){return Global.dpW(spriteParams.$x[0])});
                     break;
                 //按像素
                 default:
-                    sprite.x = properties.$x[0];
+                    sprite.x = spriteParams.$x[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$x)) {
-                sprite.x = properties.$x * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(spriteParams.$x)) {
+                sprite.x = spriteParams.$x * Screen.pixelDensity;
             }
 
             //默认居中
-            if(properties.$y === undefined && properties.y === undefined)
-                sprite.y = Qt.binding(function(){return (properties.$parent.height - sprite.height) / 2});
-                //sprite.y = (properties.$parent.height - sprite.height) / 2;
-            else if(GlobalLibraryJS.isArray(properties.$y)) {
-                switch(properties.$y[1]) {
+            if(spriteParams.$y === undefined && spriteParams.y === undefined)
+                sprite.y = Qt.binding(function(){return (parentComp.height - sprite.height) / 2});
+                //sprite.y = (parentComp.height - sprite.height) / 2;
+            else if(GlobalLibraryJS.isArray(spriteParams.$y)) {
+                switch(spriteParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
-                    sprite.y = properties.$y[0] * Screen.pixelDensity;
+                    sprite.y = spriteParams.$y[0] * Screen.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] * properties.$parent.height});
+                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * parentComp.height});
                     break;
                 //如果是 居中偏移像素
                 case 3:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] + (properties.$parent.height - sprite.height) / 2});
+                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] + (parentComp.height - sprite.height) / 2});
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.y = Qt.binding(function(){return properties.$y[0] * Screen.pixelDensity + (properties.$parent.height - sprite.height) / 2});
+                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * Screen.pixelDensity + (parentComp.height - sprite.height) / 2});
                     break;
                 //跨平台y
                 case 5:
-                    sprite.y = Qt.binding(function(){return Global.dpH(properties.$y[0])});
+                    sprite.y = Qt.binding(function(){return Global.dpH(spriteParams.$y[0])});
                     break;
                 //按像素
                 default:
-                    sprite.y = properties.$y[0];
+                    sprite.y = spriteParams.$y[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(properties.$y)) {
-                sprite.y = properties.$y * Screen.pixelDensity;
+            else if(GlobalLibraryJS.isValidNumber(spriteParams.$y)) {
+                sprite.y = spriteParams.$y * Screen.pixelDensity;
             }
 
 
-            if(properties.$clicked === null)
-                sprite.clicked = function(sprite){game.delsprite(sprite.id)};
-            else// if(properties.$clicked !== undefined)
-                sprite.clicked = properties.$clicked;
+            if(spriteParams.$clicked === null)
+                sprite.clicked = function(sprite){game.delsprite(sprite.$id)};
+            else// if(spriteParams.$clicked !== undefined)
+                sprite.clicked = spriteParams.$clicked;
 
-            if(properties.$doubleClicked === null)
-                sprite.doubleClicked = function(sprite){game.delsprite(sprite.id)};
-            else// if(properties.$doubleClicked !== undefined)
-                sprite.doubleClicked = properties.$doubleClicked;
+            if(spriteParams.$doubleClicked === null)
+                sprite.doubleClicked = function(sprite){game.delsprite(sprite.$id)};
+            else// if(spriteParams.$doubleClicked !== undefined)
+                sprite.doubleClicked = spriteParams.$doubleClicked;
 
 
-            if(properties.$looped === null)
-                //sprite.looped = function(sprite){game.delsprite(sprite.id)};
+            if(spriteParams.$looped === null)
+                //sprite.looped = function(sprite){game.delsprite(sprite.$id)};
                 sprite.looped = null;
-            else// if(properties.$looped !== undefined)
-                sprite.looped = properties.$looped;
+            else// if(spriteParams.$looped !== undefined)
+                sprite.looped = spriteParams.$looped;
 
-            if(properties.$finished === null)
-                //sprite.finished = function(sprite){game.delsprite(sprite.id)};
+            if(spriteParams.$finished === null)
+                //sprite.finished = function(sprite){game.delsprite(sprite.$id)};
                 sprite.finished = null;
-            else// if(properties.$finished !== undefined)
-                sprite.finished = properties.$finished;
+            else// if(spriteParams.$finished !== undefined)
+                sprite.finished = spriteParams.$finished;
 
 
 
-            if(properties.$visible === undefined)
-                properties.visible = true;
+            if(spriteParams.$visible === undefined)
+                spriteParams.visible = true;
             else
-                properties.visible = properties.$visible;
+                spriteParams.visible = spriteParams.$visible;
 
 
 
-            GlobalLibraryJS.copyPropertiesToObject(sprite, properties, {onlyCopyExists: true, objectRecursion: 0});
+            GlobalLibraryJS.copyPropertiesToObject(sprite, spriteParams, {onlyCopyExists: true, objectRecursion: 0});
             /*/复制属性
             let tKeys = Object.keys(sprite);
-            for(let tp in properties)
+            for(let tp in spriteParams)
                 if(tKeys.indexOf(tp) >= 0)
-                    sprite[tp] = properties[tp];
+                    sprite[tp] = spriteParams[tp];
             */
 
             //if(_private.spritesResource[spriteEffectRId] === undefined) {
@@ -3041,12 +3172,13 @@ Item {
 
             sprite.restart();
 
-            return id;
+            return sprite;
         }
 
-        //删除精灵，id为精灵标识
-        readonly property var delsprite: function(id=-1) {
-            if(id === undefined || id === null || id === -1) {
+        //删除特效；
+        //idParams为：-1：全部屏幕上的特效组件；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id和$parent属性（同showsprite）；
+        readonly property var delsprite: function(idParams=-1) {
+            if(idParams === -1) {
                 for(let ti in _private.objTmpSprites)
                     _private.objTmpSprites[ti].destroy();
                     //_private.cacheSprites.release(_private.objTmpSprites[ti]);
@@ -3054,35 +3186,98 @@ Item {
                 _private.objTmpSprites = {};
                 return true;
             }
+            else if(GlobalLibraryJS.isNumber(idParams)) {
+                idParams = {$id: idParams};
+            }
+            else if(GlobalLibraryJS.isString(idParams)) {
+                idParams = {$id: idParams};
+            }
+            else if(GlobalLibraryJS.isObject(idParams)) {
 
-            let sprite = _private.objTmpSprites[id];
+            }
+            else
+                return false;
+
+
+            //暂存位置
+            let objTmpSprites;
+            //游戏视窗
+            if(idParams.$parent === 1) {
+                //idParams.$parent = itemViewPort;
+
+                objTmpSprites = _private.objTmpSprites;
+            }
+            //会改变大小
+            else if(idParams.$parent === 2) {
+                //idParams.$parent = itemViewPort.gameScene;
+
+                objTmpSprites = _private.objTmpSprites;
+            }
+            //会改变大小和随地图移动
+            else if(idParams.$parent === 3) {
+                //idParams.$parent = itemViewPort.itemContainer;
+
+                objTmpSprites = _private.arrayTmpMapComponents;
+            }
+            //某角色上
+            else if(GlobalLibraryJS.isString(idParams.$parent)) {
+                let role = game.hero(idParams.$parent);
+                if(!role)
+                    role = game.role(idParams.$parent);
+                if(role) {
+                    //idParams.$parent = role;
+
+                    objTmpSprites = role.$tmpComponents;
+                }
+                else
+                    return false;
+            }
+            //固定屏幕上
+            else {
+                //idParams.$parent = rootGameScene;
+
+                objTmpSprites = _private.objTmpSprites;
+            }
+
+
+            let sprite = objTmpSprites[idParams.$id];
             if(sprite) {
                 sprite.destroy();
                 //_private.cacheSprites.release(sprite);
-                delete _private.objTmpSprites[id];
+                delete objTmpSprites[idParams.$id];
 
                 return true;
             }
 
-            return false;
+            return null;
         }
 
 
         //设置操作（遥感可用和可见、键盘可用）；
         //参数$gamepad的$visible和$enabled，$keyboard的$enabled；
+        //  也可以是 二进制数字
         //参数为空则返回遥感组件，可自定义；
         readonly property var control: function(config={}) {
             if(!config)
                 return itemGamePad;
 
-            if(config && config.$gamepad) {
-                if(config.$gamepad.$visible !== undefined)
-                    itemGamePad.visible = config.$gamepad.$visible;
-                if(config.$gamepad.$enabled !== undefined)
-                    itemGamePad.enabled = config.$gamepad.$enabled;
+            if(config && config.$gamepad !== undefined) {
+                if(GlobalLibraryJS.isNumber(config.$gamepad)) {
+                    itemGamePad.enabled = config.$gamepad & 0b1;
+                    itemGamePad.visible = config.$gamepad & 0b10;
+                }
+                else {
+                    if(config.$gamepad.$enabled !== undefined)
+                        itemGamePad.enabled = config.$gamepad.$enabled;
+                    if(config.$gamepad.$visible !== undefined)
+                        itemGamePad.visible = config.$gamepad.$visible;
+                }
             }
-            if(config && config.$keyboard) {
-                if(config.$keyboard.$enabled !== undefined)
+            if(config && config.$keyboard !== undefined) {
+                if(GlobalLibraryJS.isNumber(config.$keyboard)) {
+                    _private.config.bKeyboard = config.$keyboard & 0b1;
+                }
+                else if(config.$keyboard.$enabled !== undefined)
                     _private.config.bKeyboard = config.$keyboard.$enabled;
             }
         }
@@ -3279,8 +3474,9 @@ Item {
             return false;
         }
 
-        //!!存档，showName为显示名。
-        //game.gd 开头为 $$ 的键不会保存
+        //存档（将game.gd存为 文件，开头为 $$ 的键不会保存）
+        //showName为显示名；
+        //type为0普通保存，为1弃用压缩；
         //返回存档数据
         readonly property var save: function(fileName='autosave', showName='', type=1, compressionLevel=-1) {
             fileName = fileName.trim();
@@ -3441,8 +3637,10 @@ Item {
             let plugin = GlobalLibraryJS.getObjectValue(_private.objPlugins, params[0], params[1]);
             if(plugin && plugin.$autoLoad === false) {
                 plugin.$autoLoad = true;
-                plugin.$load();
-                plugin.$init();
+                game.run([plugin.$load(), 'plugin_load:' + params[0] + params[1]]);
+                game.run([plugin.$init(), 'plugin_init:' + params[0] + params[1]]);
+                //plugin.$load();
+                //plugin.$init();
             }
 
             return plugin;
@@ -3488,10 +3686,10 @@ Item {
         //      Type默认为0，Running默认为1，Value默认为无；
         //    如果为对象，则有以下参数：
         //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
-        //      Type为运行类型（如果为0，表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
-        //      Running为1或2，表示如果队列里如果为空则执行（区别为：1是下一个JS事件循环执行，2是立即执行）；为0时不执行；
+        //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
+        //      Running为1或2，表示如果队列里如果为空则：1（默认）是发送一个JS事件在下一个JS事件循环里执行，2是立即执行；为0时不处理；
         //      Value：传递给事件队列的值，无则默认上一次的；
-        //      AsyncScript：脚本队列，无则本脚本队列
+        //      AsyncScript：脚本队列，无则默认 本脚本队列
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
                 console.warn('[!GameScene]运行脚本未定义（可忽略）');
@@ -3675,7 +3873,7 @@ Item {
         readonly property var $config: GameMakerGlobal.config
 
         //!!兼容旧代码；插件（直接访问，不推荐）
-        readonly property var $plugins: _private.objPlugins
+        readonly property alias $plugins: _private.objPlugins
 
 
         /*property var $fight: QtObject {
@@ -3763,7 +3961,7 @@ Item {
 
             loadSpriteEffect: GameSceneJS.loadSpriteEffect,
             unloadSpriteEffect: GameSceneJS.unloadSpriteEffect,
-            loadRoleEffect: GameSceneJS.loadRoleEffect,
+            loadRole: GameSceneJS.loadRole,
 
             components: {
                 joystick: joystick,
@@ -3786,6 +3984,7 @@ Item {
         })
 
 
+        //注意：除了通用脚本，其他资源有可能还没有载入，所以应该使用getXxx来返回；
         readonly property QtObject $resources: QtObject {
             readonly property alias goods: _private.goodsResource
             readonly property alias fightRoles: _private.fightRolesResource
@@ -3794,10 +3993,12 @@ Item {
             readonly property alias sprites: _private.spritesResource
             readonly property alias roles: _private.rolesResource
             readonly property alias maps: _private.mapsResource
+            readonly property alias plugins: _private.objPlugins
 
             readonly property alias commonScripts: _private.objCommonScripts
         }
 
+        //缓存
         readonly property QtObject $caches: QtObject {
             readonly property alias jsEngine: _private.jsEngine
             readonly property alias asyncScript: _private.asyncScript
@@ -5362,7 +5563,7 @@ Item {
 
 
         property var objTmpImages: ({})      //临时图片组件（用户创建，退出游戏删除用）
-        property var objTmpSprites: ({})      //临时精灵组件（用户创建，退出游戏删除用）
+        property var objTmpSprites: ({})      //临时特效组件（用户创建，退出游戏删除用）
         //依附在地图上的图片和特效，切换地图时删除
         property var arrayTmpMapComponents: []
 
@@ -5373,7 +5574,7 @@ Item {
                 o.parent=p;
                 return o;
             },
-            Release: function(o){o.visible = false; o.stop();return o;},
+            Release: function(o){o.visible = false; o.sprite.stop();return o;},
             Destroy: function(o){o.destroy();},
         })
 
@@ -6110,11 +6311,11 @@ Item {
 
             //某角色是否在移动
             function isMoving() {
-                //return role.sprite.running;
+                //return role.sprite.bRunning;
                 return (rootRole.$$nActionType !== 0 && rootRole.$$nActionType !== -1);
             }
 
-            //停止播放
+            //停止移动
             function stopMoving() {
                 //role.$$nMoveDirectionFlag = 0;
                 rootRole.$$nActionType = rootRole.$$nActionType === -1 ? -1 : 0;
@@ -6123,21 +6324,39 @@ Item {
             }
 
 
-            //播放一个动作
-            function action(data) {
+            /*/播放一个动作
+            function playSprite(data) {
                 if(GlobalLibraryJS.isString(data))
                     data = {RId: data};
 
-                GameSceneJS.loadSpriteEffect(data, rootRole.actionSprite, data.$loops ?? 1);
+                GameSceneJS.loadSpriteEffect(data, rootRole.customSprite, data.$loops ?? 1);
 
                 if(GlobalLibraryJS.isValidNumber(data.$width))
-                    rootRole.actionSprite.width = data.$width;
+                    rootRole.customSprite.width = data.$width;
                 if(GlobalLibraryJS.isValidNumber(data.$height))
-                    rootRole.actionSprite.height = data.$height;
-                rootRole.actionSprite.x = data.$x ?? 0;
-                rootRole.actionSprite.y = data.$y ?? 0;
+                    rootRole.customSprite.height = data.$height;
+                rootRole.customSprite.x = data.$x ?? 0;
+                rootRole.customSprite.y = data.$y ?? 0;
 
-                rootRole.actionSprite.playAction();
+                rootRole.customSprite.playSprite();
+            }
+            */
+            function playSprite(data) {
+                if(GlobalLibraryJS.isString(data))
+                    data = {RId: data};
+
+                data.$parent ?? (data.$parent = rootRole);
+                data.$finished ?? (data.$finished = function(sprite) {
+                    rootRole.sprite.visible = true;
+                    sprite.visible = false;
+
+                    return false;
+                });
+
+                rootRole.sprite.visible = false;
+                game.showsprite(data, '$Sprite');
+                //let sprite = compCacheSpriteEffect.createObject(null);
+                //GameSceneJS.loadSpriteEffect(data, sprite, data.$loops ?? 1);
             }
 
 
@@ -6191,7 +6410,7 @@ Item {
             //property string $id: ''
 
 
-            //自定义属性（系统包含一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
+            //自定义属性（也包含系统一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
             //主角的会被保存，NPC不会
             property var $data: null
             //property string $name: ''
@@ -6240,14 +6459,14 @@ Item {
 
 
             //缩放效果是否平滑过度
-            sprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
-            actionSprite.animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
+            bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
+            //customSprite.bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
 
 
-            //spriteSrc: './Role2.png'
+            //strSource: './Role2.png'
             //sizeFrame: Qt.size(32, 48)
             //nFrameCount: 4
-            //arrFrameDirectionIndex: [[0,3],[0,2],[0,0],[0,1]]
+            //arrActionsData: [[0,3],[0,2],[0,0],[0,1]]
 
 
             mouseArea.onClicked: {
@@ -6285,8 +6504,9 @@ Item {
 
         //Image {
         AnimatedImage {
-            //id号
-            property var id
+            //id号 和 父组件代号
+            property var $id
+            property var $parent
 
             //回调函数
             property var clicked
@@ -6302,13 +6522,13 @@ Item {
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
 
                 onClicked: {
-                    //console.debug('clicked: parent.id', parent.id)
+                    //console.debug('clicked: parent.$id', parent.$id)
                     if(parent.clicked)
                         game.run(parent.clicked(parent), -1, );
                 }
 
                 onDoubleClicked: {
-                    //game.delimage(parent.id);
+                    //game.delimage(parent.$id);
                     if(parent.doubleClicked)
                         game.run(parent.doubleClicked(parent), -1, );
                 }
@@ -6321,8 +6541,9 @@ Item {
         id: compCacheSpriteEffect
 
         SpriteEffect {
-            //id号
-            property var id
+            //id号 和 父组件代号
+            property var $id
+            property var $parent
 
             //property bool bUsing: false
 
@@ -6335,7 +6556,7 @@ Item {
 
             //visible: false
 
-            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+            smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
 
 
             MouseArea {
@@ -6343,13 +6564,13 @@ Item {
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
 
                 onClicked: {
-                    //console.debug('clicked: parent.id', parent.id)
+                    //console.debug('clicked: parent.$id', parent.$id)
                     if(parent.clicked)
                         game.run(parent.clicked(parent), -1, );
                 }
 
                 onDoubleClicked: {
-                    //game.delimage(parent.id);
+                    //game.delsprite(parent.$id);
                     if(parent.doubleClicked)
                         game.run(parent.doubleClicked(parent), -1, );
                 }
@@ -6361,15 +6582,17 @@ Item {
             }
 
             onS_looped: {
-                //console.debug('clicked: parent.id', parent.id)
+                //console.debug('clicked: parent.$id', parent.$id)
                 if(looped)
                     game.run(looped(this), -1, );
             }
 
             onS_finished: {
-                //game.delimage(parent.id);
+                //game.delsprite(parent.$id);
                 if(finished)
                     game.run(finished(this), -1, );
+                else
+                    visible = false;
             }
         }
     }
@@ -6566,7 +6789,7 @@ Item {
     Component.onCompleted: {
         mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
         mainRole.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
-        mainRole.actionSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+        //mainRole.customSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
 
 
         //console.debug('[GameScene]globalObject：', FrameManager.globalObject().game);
