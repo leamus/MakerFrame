@@ -75,7 +75,8 @@ Item {
 
                 Label {
                     //id: tlable
-                    text: '*@Buff类型'
+                    visible: false
+                    text: '*@类型'
                 }
 
                 /*ComboBox {
@@ -98,7 +99,7 @@ Item {
                         radius: 6
                     }
                     onActivated: {
-                        console.debug('activated:', comboType.currentIndex,
+                        console.debug('[GameVisualFightSkill]ComboBox:', comboType.currentIndex,
                                       comboType.currentText,
                                       comboType.currentValue);
 
@@ -125,7 +126,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*@Buff类型'
+                    placeholderText: '*@类型'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -269,7 +270,11 @@ Item {
 
                 Button {
                     id: tbutton
+
+                    implicitWidth: 30
+
                     text: 'x'
+
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRootBuff) {
@@ -305,6 +310,7 @@ Item {
 
                 Label {
                     //id: tlable
+                    visible: false
                     text: '*效果'
                 }
 
@@ -317,7 +323,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*@类型'
+                    placeholderText: '*@属性'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -450,7 +456,11 @@ Item {
 
                 Button {
                     id: tbutton
+
+                    implicitWidth: 30
+
                     text: 'x'
+
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRootEffect) {
@@ -552,7 +562,7 @@ Item {
                             }
 
                             onActivated: {
-                                console.debug('activated:', comboType.currentIndex,
+                                console.debug('[GameVisualFightSkill]ComboBox:', comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
 
@@ -779,6 +789,7 @@ Item {
 
                         spacing: 16
 
+
                         RowLayout {
 
                             Layout.fillWidth: true
@@ -793,9 +804,49 @@ Item {
                                 onClicked: {
                                     let c = compBuff.createObject(layoutBuff);
                                     _private.arrCacheComponent.push(c);
+
+                                    GlobalLibraryJS.setTimeout(function() {
+                                        if(flickable.contentHeight > flickable.height)
+                                            flickable.contentY = flickable.contentHeight - flickable.height;
+                                        }, 1, root, '');
+
                                 }
                             }
                         }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@Buff类型'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@Buff效果'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@持续回合数'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@概率'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                        }
+
                     }
 
                     ColumnLayout {
@@ -805,6 +856,7 @@ Item {
                         Layout.fillHeight: true
 
                         spacing: 16
+
 
                         RowLayout {
 
@@ -820,9 +872,49 @@ Item {
                                 onClicked: {
                                     let c = compEffect.createObject(layoutEffect);
                                     _private.arrCacheComponent.push(c);
+
+                                    GlobalLibraryJS.setTimeout(function() {
+                                        if(flickable.contentHeight > flickable.height)
+                                            flickable.contentY = flickable.contentHeight - flickable.height;
+                                        }, 1, root, '');
+
                                 }
                             }
                         }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@影响属性'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@效果值'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@倍率参考对象'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@倍率参考属性'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                        }
+
                     }
 
                     /*RowLayout {

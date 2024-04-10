@@ -181,7 +181,7 @@ let data = (function() {
                                 },
 
                                 '播放视频': {
-                                    command: ['播放视频', 'yield game.playvideo(%1, %2);', '播放视频', 0, true, 'red', 'white'],
+                                    command: ['播放视频', 'yield game.playvideo(Object.assign({RId: %1}, %2));', '播放视频', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@视频名', 'string', true, 1, GameMakerGlobal.videoResourcePath(), 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
@@ -195,7 +195,7 @@ let data = (function() {
                                },
 
                                 '显示图片': {
-                                    command: ['显示图片', 'game.showimage(%1,%2,%3);', '', 0, true, 'red', 'white'],
+                                    command: ['显示图片', 'game.showimage(Object.assign({RId: %1}, %2), %3);', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@图片名', 'string', true, 1, GameMakerGlobal.imageResourcePath(), 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
@@ -204,14 +204,15 @@ let data = (function() {
                                 },
 
                                 '删除图片': {
-                                    command: ['删除图片', 'game.delimage(%1);', '删除图片', 0, true, 'red', 'white'],
+                                    command: ['删除图片', 'game.delimage({$id: %1, $parent: %2});', '删除图片', 0, true, 'red', 'white'],
                                     params: [
                                         ['*id', 'string', true, 0, '', 'green'],
+                                        ['父组件', 'string|number', undefined, 0, '', 'green'],
                                     ],
                                 },
 
                                 '显示特效': {
-                                    command: ['显示特效', 'game.showsprite(%1,%2,%3);', '显示特效', 0, true, 'red', 'white'],
+                                    command: ['显示特效', 'game.showsprite(Object.assign({RId: %1}, %2), %3);', '显示特效', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@特效名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
@@ -220,12 +221,19 @@ let data = (function() {
                                 },
 
                                 '删除特效': {
-                                    command: ['删除特效', 'game.delsprite(%1);', '删除特效', 0, true, 'red', 'white'],
+                                    command: ['删除特效', 'game.delsprite({$id: %1, $parent: %2});', '删除特效', 0, true, 'red', 'white'],
                                     params: [
                                         ['*id', 'string', true, 0, '', 'green'],
+                                        ['父组件', 'string|number', undefined, 0, '', 'green'],
                                     ],
                                 },
 
+                                '挂载特效': {
+                                    command: ['挂载特效', 'Qt.createQmlObject(\'import QtQuick 2.14;PropertyAnimation {property: "opacity";from: 0; to: 1; duration: 1000; running: true; target: %1}; onStopped: this.destroy();\', %1);', '挂载特效', 0, true, 'red', 'white'],
+                                    params: [
+                                        ['*父组件', 'string', true, 0, '', 'green'],
+                                    ],
+                                },
 
                                 '场景缩放': {
                                     command: ['场景缩放', 'game.scale(%1);', '', 0, true, 'red', 'white'],

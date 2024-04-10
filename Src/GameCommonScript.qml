@@ -143,7 +143,7 @@ let $config = {
         //窗口显示事件
         $show: function(newFlags, windowFlags) {
             //if(newFlags & 0b1)
-            //    game.showimage('FightScene2.jpg', {$width: -1, $height: -1}, 'aaa');
+            //    game.showimage(, {RId: 'FightScene2.jpg', $width: -1, $height: -1}, 'aaa');
         },
         //窗口隐藏事件
         $hide: function(newFlags, windowFlags) {
@@ -283,7 +283,7 @@ let $config = {
 
 
 //游戏初始化（游戏开始和载入存档时调用）
-function *$gameInit(firstRun) {
+function *$gameInit(newGame) {
 
     //读取init.js文件（包括插件的）的所有变量和函数，并复制给game.gf
     if(FrameManager.sl_qml_FileExists(game.$projectpath + game.$gameMakerGlobal.separator + 'init.js')) {
@@ -291,7 +291,7 @@ function *$gameInit(firstRun) {
         if(initJS) {
             Object.assign(game.gf, initJS);
             if(initJS.$init)
-                game.run(initJS.$init(firstRun));
+                game.run(initJS.$init(newGame));
         }
     }
     let plugins = game.plugin();
@@ -303,7 +303,7 @@ function *$gameInit(firstRun) {
                 if(initJS) {
                     Object.assign(game.gf, initJS);
                     if(initJS.$init)
-                        game.run(initJS.$init(firstRun));
+                        game.run(initJS.$init(newGame));
                 }
             }
         }
@@ -334,7 +334,7 @@ function *$gameInit(firstRun) {
     }
 
 
-    if(firstRun)
+    if(newGame)
         yield game.msg('合理安排时间');
 
 
@@ -1639,9 +1639,9 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
         if(fight.$sys.autoAttack() === 1) {
             //自动重复上次类型，也可以根据需要改写
             fight.$sys.loadLast();
-            /*game.$globalLibraryJS.setTimeout(function() {
+            /*game.$globalLibraryJS.runNextEventLoop(function() {
                     fight.$sys.continueFight();
-                },0,root
+                },
             );*/
         }
 

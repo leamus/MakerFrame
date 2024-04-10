@@ -73,6 +73,7 @@ Item {
 
                 Label {
                     //id: tlable
+                    visible: false
                     text: '*@敌人：'
                 }
 
@@ -85,7 +86,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*@敌人'
+                    placeholderText: '*@敌人角色'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -118,7 +119,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '敌人参数（可省略）'
+                    placeholderText: '参数（可省略）'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -127,7 +128,11 @@ Item {
 
                 Button {
                     id: tbutton
+
+                    implicitWidth: 30
+
                     text: 'x'
+
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
@@ -393,6 +398,42 @@ Item {
 
                         spacing: 16
 
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '增加'
+
+                            onClicked: {
+                                let c = comp.createObject(layoutEnemyLayout);
+                                _private.arrCacheComponent.push(c);
+
+                                GlobalLibraryJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@敌人角色'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '参数（可省略）'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                        }
+
                         RowLayout {
                             id: layoutFirstEnemy
 
@@ -400,6 +441,7 @@ Item {
                             Layout.preferredHeight: 30
 
                             Label {
+                                visible: false
                                 text: '*@敌人：'
                             }
 
@@ -411,7 +453,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: ''
-                                placeholderText: '*@敌人'
+                                placeholderText: '*@敌人角色'
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -442,21 +484,13 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                                 text: ''
-                                placeholderText: '敌人参数（可省略）'
+                                placeholderText: '参数（可省略）'
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
                                 //wrapMode: TextEdit.Wrap
                             }
 
-                            Button {
-                                text: '增加'
-
-                                onClicked: {
-                                    let c = comp.createObject(layoutEnemyLayout);
-                                    _private.arrCacheComponent.push(c);
-                                }
-                            }
                         }
                     }
                 }

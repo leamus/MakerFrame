@@ -89,8 +89,21 @@ Item {
             loader.item.focus = true;
             //visible = false;
 
-            loader.item.openSprite(item);
 
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json";
+            console.debug("[mainSpriteEditor]filePath：", filePath);
+
+            let cfg = FrameManager.sl_qml_ReadFile(filePath);
+            //let cfg = File.read(filePath);
+
+            if(!cfg)
+                return false;
+
+            cfg = JSON.parse(cfg);
+            //console.debug("cfg", cfg);
+            //loader.setSource("./MapEditor_1.qml", {});
+
+            loader.item.openSprite(cfg);
         }
 
         onRemoveClicked: {

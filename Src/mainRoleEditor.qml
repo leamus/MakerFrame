@@ -89,19 +89,21 @@ Item {
             loader.item.focus = true;
             //visible = false;
 
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.json";
 
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.json";
             console.debug("[mainRoleEditor]filePath：", filePath);
 
-            //let cfg = File.read(filePath);
             let cfg = FrameManager.sl_qml_ReadFile(filePath);
+            //let cfg = File.read(filePath);
 
-            if(cfg) {
-                cfg = JSON.parse(cfg);
-                //console.debug("cfg", cfg);
-                //loader.setSource("./MapEditor_1.qml", {});
-                loader.item.openRole(cfg);
-            }
+            if(!cfg)
+                return false;
+
+            cfg = JSON.parse(cfg);
+            //console.debug("cfg", cfg);
+            //loader.setSource("./MapEditor_1.qml", {});
+
+            loader.item.openRole(cfg);
         }
 
         onRemoveClicked: {

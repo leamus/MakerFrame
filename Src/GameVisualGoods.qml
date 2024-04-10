@@ -143,7 +143,11 @@ Item {
 
                 Button {
                     id: tbutton
+
+                    implicitWidth: 30
+
                     text: 'x'
+
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
@@ -171,7 +175,6 @@ Item {
 
     ColumnLayout {
         //anchors.fill: parent
-
         anchors.centerIn: parent
         width: parent.width * 0.96
         height: parent.height * 0.96
@@ -215,7 +218,7 @@ Item {
 
                     anchors.fill: parent
 
-                    spacing: 16
+                    //spacing: 16
 
 
                     RowLayout {
@@ -246,7 +249,7 @@ Item {
                             }
 
                             onActivated: {
-                                console.debug('activated:', comboType.currentIndex,
+                                console.debug('[GameVisualGoods]ComboBox:', comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
 
@@ -712,6 +715,42 @@ Item {
                     }
 
 
+                    Button {
+                        Layout.fillWidth: true
+
+                        text: '增加效果'
+
+                        onClicked: {
+                            let c = comp.createObject(layoutEffectsLayout);
+                            _private.arrCacheComponent.push(c);
+
+                            GlobalLibraryJS.setTimeout(function() {
+                                if(flickable.contentHeight > flickable.height)
+                                    flickable.contentY = flickable.contentHeight - flickable.height;
+                                }, 1, root, '');
+
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Label {
+                            Layout.preferredWidth: 1
+                            Layout.fillWidth: true
+
+                            text: '*@属性'
+                            //font.pointSize: _config.nTextFontSize
+                        }
+                        Label {
+                            Layout.preferredWidth: 1
+                            Layout.fillWidth: true
+
+                            text: '*@效果值'
+                            //font.pointSize: _config.nTextFontSize
+                        }
+                    }
+
                     ColumnLayout {
                         id: layoutEffectsLayout
 
@@ -720,16 +759,6 @@ Item {
 
                         spacing: 16
 
-                        Button {
-                            Layout.fillWidth: true
-
-                            text: '增加效果'
-
-                            onClicked: {
-                                let c = comp.createObject(layoutEffectsLayout);
-                                _private.arrCacheComponent.push(c);
-                            }
-                        }
                     }
                 }
             }

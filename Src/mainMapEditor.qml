@@ -79,6 +79,8 @@ Item {
             }*/
             if(index === 0) {
                 dialogMapData.nCreateMapType = 1;
+                textMapBlockImageURL.enabled = false;
+                textMapBlockResourceName.enabled = true;
                 dialogMapData.open();
                 return;
             }
@@ -106,9 +108,10 @@ Item {
             textBlockWidth.text = cfg.MapBlockSize[0];
             textBlockHeight.text = cfg.MapBlockSize[1];
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
+            textMapBlockImageURL.enabled = false;
             textMapBlockResourceName.text = cfg.MapBlockImage[0];
             //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
-            textMapBlockResourceName.enabled = false;
+            textMapBlockResourceName.enabled = true;
 
             dialogMapData.open();
 
@@ -323,7 +326,10 @@ Item {
 
                 Label {
                     id: labelDialogTips
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
+
+                    wrapMode: Label.WrapAnywhere
                     color: "red"
                     text: ""
                 }
@@ -333,13 +339,14 @@ Item {
         onAccepted: {
             //地图块路径 操作
 
-            if(textMapBlockImageURL.text.length === 0) {
+            /*if(textMapBlockImageURL.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = "路径不能为空";
                 Platform.showToast("路径不能为空");
                 return;
             }
+            */
             if(textMapBlockResourceName.text.length === 0) {
                 open();
                 //visible = true;
@@ -347,16 +354,6 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textMapBlockImageURL.text))) {
-                open();
-                //visible = true;
-                labelDialogTips.text = "图块路径错误或文件不存在:" + GlobalJS.toPath(textMapBlockImageURL.text);
-                Platform.showToast("图块路径错误或文件不存在");
-                return;
-            }
-
-
-
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
@@ -381,7 +378,17 @@ Item {
 
                 //console.debug("ttt", textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
             }
+
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
+
+            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textMapBlockImageURL.text))) {
+                open();
+                //visible = true;
+                labelDialogTips.text = "图块路径错误或文件不存在:" + GlobalJS.toPath(textMapBlockImageURL.text);
+                Platform.showToast("图块路径错误或文件不存在");
+                return;
+            }
+
 
 
             //创建地图工作
@@ -410,11 +417,11 @@ Item {
             }
 
             textMapBlockImageURL.text = "";
+            textMapBlockImageURL.enabled = false;
             textMapBlockResourceName.text = "";
             textMapBlockResourceName.enabled = true;
+
             labelDialogTips.text = "";
-            textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.enabled = true;
 
 
             //visible = false;
@@ -428,8 +435,10 @@ Item {
         }
         onRejected: {
             textMapBlockImageURL.text = "";
+            textMapBlockImageURL.enabled = false;
             textMapBlockResourceName.text = "";
             textMapBlockResourceName.enabled = true;
+
             labelDialogTips.text = "";
 
 
@@ -542,7 +551,7 @@ Item {
             //console.debug("[mainMapEditor]List Clicked::", textMapBlockImageURL.text)
 
             textMapBlockImageURL.enabled = false
-            textMapBlockResourceName.enabled = false;
+            textMapBlockResourceName.enabled = true;
 
 
             dialogMapData.visible = true;

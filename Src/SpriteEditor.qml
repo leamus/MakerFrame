@@ -34,6 +34,15 @@ Item {
     signal s_close();
     onS_close: {
         //sprite.unload();
+        sprite.nSpriteType = 0;
+
+
+        _private.strTextBackupSpriteName = '';
+        _private.strTextBackupSpriteImageURL = '';
+        _private.strTextBackupSpriteImageResourceName = '';
+        _private.strTextBackupSpriteSoundURL = '';
+        _private.strTextBackupSpriteSoundResourceName = '';
+
     }
 
 
@@ -41,11 +50,9 @@ Item {
     function newSprite() {
 
         textSpriteName.text = "";
-
-        sprite.spriteSrc = "";
+;
         textSpriteImageURL.text = "";
         textSpriteImageResourceName.text = "";
-        textSpriteImageResourceName.enabled = false;
         //textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
         //textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
         //textSpriteFrameCount.text = cfg.FrameCount.toString();
@@ -58,10 +65,8 @@ Item {
         //textSpriteWidth.text = cfg.SpriteSize[0].toString();
         //textSpriteHeight.text = cfg.SpriteSize[1].toString();
 
-        sprite.soundeffectName = "";
         textSpriteSoundURL.text = "";
         textSpriteSoundResourceName.text = "";
-        textSpriteSoundResourceName.enabled = false;
         textSoundDelay.text = "0";
         textSpriteFrameOffsetX.text = "0";
         textSpriteFrameOffsetY.text = "0";
@@ -69,42 +74,22 @@ Item {
         textSpriteFrameXScale.text = "1";
         textSpriteFrameYScale.text = "1";
 
+        textCode.text = _private.strTextCode;
+
         _private.refreshSprite();
     }
 
-    function openSprite(spriteName) {
-
-        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + "sprite.json";
-        //let cfg = File.read(filePath);
-        let cfg = FrameManager.sl_qml_ReadFile(filePath);
-        console.debug("[SpriteEditor]filePath：", filePath);
-
-        if(!cfg)
-            return false;
-        cfg = JSON.parse(cfg);
-        //console.debug("cfg", cfg);
-        //loader.setSource("./MapEditor_1.qml", {});
-
+    function openSprite(cfg) {
 
         console.debug("[SpriteEditor]openSprite:", JSON.stringify(cfg))
 
         //cfg.Version;
-        //cfg.SpriteType;
         textSpriteName.text = cfg.SpriteName;
 
-        sprite.spriteSrc = GameMakerGlobal.spriteResourceURL(cfg.Image);
         //textSpriteImageURL.text = cfg.Image;
         //textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf("/") + 1);
         textSpriteImageResourceName.text = cfg.Image;
-        textSpriteImageResourceName.enabled = false;
         textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
-        textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
-        textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
-        textSpriteFrameCount.text = cfg.FrameCount.toString();
-        textSpriteFrameOffsetColumn.text = cfg.OffsetIndex[0].toString();
-        textSpriteFrameOffsetRow.text = cfg.OffsetIndex[1].toString();
-
-        textSpriteFrameInterval.text = cfg.FrameInterval.toString();
         //sprite.width = parseInt(textSpriteWidth.text);
         //sprite.height = parseInt(textSpriteHeight.text);
         textSpriteWidth.text = cfg.SpriteSize[0].toString();
@@ -112,15 +97,12 @@ Item {
 
         if(cfg.Sound) {
             textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(cfg.Sound);
-            sprite.soundeffectName = cfg.Sound;
         }
         else {
             textSpriteSoundURL.text = "";
-            sprite.soundeffectName = "";
         }
 
         textSpriteSoundResourceName.text = cfg.Sound;
-        textSpriteSoundResourceName.enabled = false;
         textSoundDelay.text = cfg.SoundDelay.toString();
         textSpriteFrameOffsetX.text = cfg.XOffset !== undefined ? cfg.XOffset.toString() : "0";
         textSpriteFrameOffsetY.text = cfg.YOffset !== undefined ? cfg.YOffset.toString() : "0";
@@ -128,9 +110,38 @@ Item {
         textSpriteFrameXScale.text = cfg.XScale.toString();
         textSpriteFrameYScale.text = cfg.YScale.toString();
 
+        comboType.currentIndex = (cfg.SpriteType ?? 1) - 1;
+
+        if(comboType.currentIndex === 0) {
+            textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
+            textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
+
+            textSpriteFrameOffsetColumn.text = cfg.OffsetIndex[0].toString();
+            textSpriteFrameOffsetRow.text = cfg.OffsetIndex[1].toString();
+            textSpriteFrameCount.text = cfg.FrameCount.toString();
+            textSpriteFrameInterval.text = cfg.FrameInterval.toString();
+        }
+        else if(comboType.currentIndex === 1) {
+            textFrameStartIndex.text = cfg.FrameData[0].toString();
+            textSpriteFrameCount.text = cfg.FrameData[1].toString();
+            textSpriteFrameInterval.text = cfg.FrameData[2].toString();
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim() + GameMakerGlobal.separator + 'sprite.js';
+            if(FrameManager.sl_qml_FileExists(path)) {
+                textCode.text = FrameManager.sl_qml_ReadFile(path);
+            }
+            else
+                textCode.text = _private.strTextCode;
+
+        }
+
         _private.refreshSprite();
     }
 
+
+
+    property alias sprite: spriteEffect
 
 
     //width: 600
@@ -154,8 +165,687 @@ Item {
 
     //主界面
     ColumnLayout {
-        anchors.fill: parent
+        //anchors.fill: parent
+        anchors.centerIn: parent
+        width: parent.width * 0.96
+        height: parent.height * 0.96
 
+        //spacing: 16
+
+
+
+        Rectangle {
+            clip: true
+
+            Layout.preferredWidth: parent.width
+            Layout.preferredHeight: parent.height
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+
+            color: 'transparent'
+            border {
+                color: 'lightgray'
+                width: 1
+            }
+
+            Flickable {
+                id: flickable
+
+                //anchors.fill: parent
+
+                anchors.centerIn: parent
+                width: parent.width * 0.96
+                //height: parent.height * 0.9
+                height: parent.height * 0.96
+
+
+                contentWidth: width
+                contentHeight: Math.max(layout.implicitHeight)
+
+                flickableDirection: Flickable.VerticalFlick
+
+
+
+                ColumnLayout {
+                    id: layout
+
+                    //anchors.fill: parent
+                    width: flickable.width
+                    height: Math.max(flickable.height/*, implicitHeight*/)
+
+                    //spacing: 6
+
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '类型：'
+                        }
+
+                        ComboBox {
+                            id: comboType
+
+                            Layout.fillWidth: true
+
+
+                            model: ['典型行列图', '序列图片文件']
+
+                            background: Rectangle {
+                                //implicitWidth: comboBoxComponentItem.comboBoxWidth
+                                implicitHeight: 35
+                                //border.color: control.pressed ? "#6495ED" : "#696969"
+                                //border.width: control.visualFocus ? 2 : 1
+                                color: "transparent"
+                                //border.color: comboBoxComponentItem.color
+                                border.width: 2
+                                radius: 6
+                            }
+
+                            onActivated: {
+                                console.debug('[RoleEditor]ComboBox:', comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+
+                                _private.changeType();
+                            }
+                            /*onHighlighted: {
+                                console.debug('onHighlighted:', comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+                            }
+                            onAccepted: {
+                                console.debug(comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+                            }*/
+
+                        }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "[特效]"
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "大小"
+                        }
+
+                        TextField {
+                            id: textSpriteWidth
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "50"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '50';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "*"
+                        }
+
+                        TextField {
+                            id: textSpriteHeight
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "50"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '50';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "透明度"
+                        }
+
+                        TextField {
+                            id: textSpriteOpacity
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1.0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '1.0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                    }
+
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "X/Y轴偏移"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameOffsetX
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        TextField {
+                            id: textSpriteFrameOffsetY
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "X/Y轴缩放"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameXScale
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1.0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '1.0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        TextField {
+                            id: textSpriteFrameYScale
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1.0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '1.0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "[音效]"
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "播放延时"
+                        }
+
+                        TextField {
+                            id: textSoundDelay
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "[帧]"
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "帧数"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameCount
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "3"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '3';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "帧速度（ms）"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameInterval
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "100"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '100';
+
+                                _private.refreshSprite();
+                            }
+                        }
+                    }
+
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        visible: comboType.currentIndex === 0
+
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "帧大小"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameWidth
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "37"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '37';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "*"
+                        }
+                        TextField {
+                            id: textSpriteFrameHeight
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "58"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '58';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "起始帧（列/行）"
+                        }
+
+                        TextField {
+                            id: textSpriteFrameOffsetColumn
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+                        TextField {
+                            id: textSpriteFrameOffsetRow
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.9
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        visible: comboType.currentIndex === 1
+
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 10
+                            text: "起始序号"
+                        }
+
+                        TextField {
+                            id: textFrameStartIndex
+
+                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshSprite();
+                            }
+                        }
+                    }
+
+
+                    Label {
+                        Layout.preferredHeight: 30
+                        Layout.fillWidth: true
+
+                        visible: comboType.currentIndex === 1
+
+                        color: 'red'
+                        text: '注意：图片文件夹请自行复制到资源目录；预览请先保存'
+                        font.pointSize: _config.nTextFontSize
+
+                        horizontalAlignment: Label.AlignHCenter
+                        verticalAlignment: Label.AlignVCenter
+
+                    }
+
+                    RowLayout {
+                        Layout.preferredHeight: 50
+                        Layout.fillWidth: true
+
+                        visible: comboType.currentIndex === 1
+
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '编辑脚本'
+
+                            onClicked: {
+
+                                if(!textSpriteName.text.trim()) {
+                                    dialogCommon.show({
+                                          Msg: '请先保存角色',
+                                          Buttons: Dialog.Yes,
+                                          OnAccepted: function() {
+                                              root.forceActiveFocus();
+                                          },
+                                          OnRejected: ()=>{
+                                              root.forceActiveFocus();
+                                          },
+                                      });
+
+                                    return;
+                                }
+
+
+                                dialogScript.open();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.fillHeight: true
+
+            Rectangle {
+                id: rectSprite
+                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+
+                //Layout.preferredWidth: parseInt(textSpriteWidth.text)
+                //Layout.preferredHeight: parseInt(textSpriteHeight.text)
+
+                color: 'transparent'
+                border {
+                    width: 1
+                    color: 'lightgray'
+                }
+
+                SpriteEffect {
+                    id: spriteEffect
+
+
+                    onMouseAreaChanged: {
+                        //console.warn(666, mouseArea, nSpriteType, sprite)
+                        if(mouseArea) {
+                            mouseArea.enabled = true;
+                            mouseArea.clicked.connect(function(){
+                                root.forceActiveFocus();
+                            });
+                        }
+                    }
+
+                    anchors.fill: parent
+
+                    bTest: true
+                    nType: 1
+
+                    //width: 37;
+                    //height: 58;
+
+                    //sizeFrame: Qt.size(37, 58);
+                    /*nFrameCount: 3;
+                    interval: 100;*/
+
+                    /*onS_clicked: {
+                        root.forceActiveFocus();
+                    }*/
+                }
+            }
+        }
 
         RowLayout {
             //Layout.preferredWidth: root.width * 0.9
@@ -171,6 +861,10 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
+                    textSpriteImageURL.enabled = false;
+                    textSpriteImageResourceName.enabled = true;
+                    _private.strTextBackupSpriteImageURL = textSpriteImageURL.text;
+                    _private.strTextBackupSpriteImageResourceName = textSpriteImageResourceName.text;
                     dialogSpriteImageData.open();
                 }
             }
@@ -184,6 +878,10 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
+                    textSpriteSoundURL.enabled = false;
+                    textSpriteSoundResourceName.enabled = true;
+                    _private.strTextBackupSpriteSoundURL = textSpriteSoundURL.text;
+                    _private.strTextBackupSpriteSoundResourceName = textSpriteSoundResourceName.text;
                     dialogSpriteSoundData.open();
                 }
             }
@@ -222,6 +920,8 @@ Item {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
+                visible: comboType.currentIndex === 0
+
                 text: "原图"
                 font.pointSize: _config.nButtonFontSize
 
@@ -249,7 +949,7 @@ Item {
   帧数：连续播放的帧数；
   起始帧：从第几列、第几行开始（然后连续的n张）；
   透明度：0-1之间的小数；
-  帧切换速度：你懂的；
+  帧速度：你懂的；
   音效播放延时：帧播放多少毫秒后开始播放音效；
 
 ')
@@ -274,438 +974,12 @@ Item {
                         sprite.sprite.sprites[s].frameY = 20*s;
                         console.debug(sprite.sprite.sprites[s].frameY);
                     }*/
-                    dialogScript.open();
+                    dialogDebugScript.open();
                 }
             }
 
         }
 
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "特效大小"
-            }
-
-            TextField {
-                id: textSpriteWidth
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "50"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "*"
-            }
-
-            TextField {
-                id: textSpriteHeight
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "50"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "X/Y轴缩放"
-            }
-
-            TextField {
-                id: textSpriteFrameXScale
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            TextField {
-                id: textSpriteFrameYScale
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-        }
-
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "X/Y轴偏移"
-            }
-
-            TextField {
-                id: textSpriteFrameOffsetX
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            TextField {
-                id: textSpriteFrameOffsetY
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "透明度"
-            }
-
-            TextField {
-                id: textSpriteOpacity
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "帧宽高"
-            }
-
-            TextField {
-                id: textSpriteFrameWidth
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "37"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "*"
-            }
-            TextField {
-                id: textSpriteFrameHeight
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "58"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "帧数"
-            }
-
-            TextField {
-                id: textSpriteFrameCount
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "3"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-        }
-
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "起始帧（列/行）"
-            }
-
-            TextField {
-                id: textSpriteFrameOffsetColumn
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-            TextField {
-                id: textSpriteFrameOffsetRow
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.9
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "帧切换速度（ms）"
-            }
-
-            TextField {
-                id: textSpriteFrameInterval
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "100"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: "音效播放延时"
-            }
-
-            TextField {
-                id: textSoundDelay
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshSprite();
-                }
-            }
-        }
-
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.fillHeight: true
-
-            Rectangle {
-                id: rectSprite
-                Layout.alignment: Qt.AlignTop | Qt.AlignRight
-
-                //Layout.preferredWidth: parseInt(textSpriteWidth.text)
-                //Layout.preferredHeight: parseInt(textSpriteHeight.text)
-
-                color: 'transparent'
-                border {
-                    width: 1
-                    color: 'lightgray'
-                }
-
-                SpriteEffect {
-                    id: sprite
-
-                    anchors.fill: parent
-
-                    mouseArea.enabled: true
-                    bTest: true
-                    nType: 1
-                    //width: 37;
-                    //height: 58;
-
-                    //sizeFrame: Qt.size(37, 58);
-                    /*nFrameCount: 3;
-                    interval: 100;*/
-
-                    /*onS_clicked: {
-                        root.forceActiveFocus();
-                    }*/
-                }
-            }
-
-        }
     }
 
 
@@ -839,7 +1113,10 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: "选择图片"
+                    visible: comboType.currentIndex === 0
+
+                    text: "选择图片文件"
+
                     onClicked: {
                         //dialogSpriteImageData.nChoiceType = 1;
                         filedialogOpenSpriteImage.open();
@@ -853,7 +1130,10 @@ Item {
 
                         let path = GameMakerGlobal.spriteResourcePath();
 
-                        l_listSpriteImageResource.show(path, "*", 0x002, 0x00);
+                        if(comboType.currentIndex === 0)
+                            l_listSpriteImageResource.show(path, "*", 0x002, 0x00);
+                        if(comboType.currentIndex === 1)
+                            l_listSpriteImageResource.show(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listSpriteImageResource.visible = true;
                         //l_listSpriteImageResource.focus = true;
                         l_listSpriteImageResource.forceActiveFocus();
@@ -869,9 +1149,13 @@ Item {
 
                 Label {
                     id: labelSpriteImageDialogTips
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
+
+                    wrapMode: Label.WrapAnywhere
                     color: "red"
                     text: ""
+
                 }
             }
         }
@@ -879,13 +1163,13 @@ Item {
         onAccepted: {
             //路径 操作
 
-            if(textSpriteImageURL.text.length === 0) {
+            /*if(textSpriteImageURL.text.length === 0) {
                 open();
                 //visible = true;
                 labelSpriteImageDialogTips.text = "路径不能为空";
                 Platform.showToast("路径不能为空");
                 return;
-            }
+            }*/
             if(textSpriteImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
@@ -893,16 +1177,6 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteImageURL.text))) {
-                open();
-                //visible = true;
-                labelSpriteImageDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteImageURL.text);
-                Platform.showToast("路径错误或文件不存在");
-                return;
-            }
-
-
-
             //系统图片
             //if(dialogSpriteImageData.nChoiceType === 1) {
             if(checkboxSaveSpriteImageResource.checked) {
@@ -916,7 +1190,6 @@ Item {
                     //root.forceActiveFocus();
                     return;
                 }
-
             }
             else {  //资源图库
 
@@ -924,22 +1197,45 @@ Item {
 
                 //console.debug("ttt", textSpriteImageURL.text, Qt.resolvedUrl(textSpriteImageURL.text))
             }
+
             //textSpriteImageURL.text = textSpriteImageResourceName.text;
             textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(textSpriteImageResourceName.text);
 
 
-            sprite.spriteSrc = textSpriteImageURL.text;
+            if(comboType.currentIndex === 0) {
+                if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteImageURL.text))) {
+                    open();
+                    //visible = true;
+                    labelSpriteImageDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteImageURL.text);
+                    Platform.showToast("路径错误或文件不存在" + GlobalJS.toPath(textSpriteImageURL.text));
+                    return;
+                }
+            }
+            else if(comboType.currentIndex === 1) {
+                if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteImageURL.text))) {
+                    open();
+                    //visible = true;
+                    labelSpriteImageDialogTips.text = "路径错误或文件夹不存在:" + GlobalJS.toPath(textSpriteImageURL.text);
+                    Platform.showToast("路径错误或文件夹不存在" + GlobalJS.toPath(textSpriteImageURL.text));
+                    return;
+                }
+            }
+
+
+
             textSpriteImageURL.enabled = false;
             textSpriteImageResourceName.enabled = true;
 
 
+            _private.refreshSprite();
+
+
+            labelSpriteImageDialogTips.text = "";
             /*
             textSpriteImageURL.text = "";
             textSpriteImageResourceName.text = "";
             textSpriteImageResourceName.enabled = true;
-            labelSpriteImageDialogTips.text = "";
             */
-            _private.refreshSprite();
 
 
             //visible = false;
@@ -952,11 +1248,15 @@ Item {
             //console.log("Ok clicked");
         }
         onRejected: {
+            textSpriteImageURL.text = _private.strTextBackupSpriteImageURL;
+            textSpriteImageResourceName.text = _private.strTextBackupSpriteImageResourceName;
+
+
+            labelSpriteImageDialogTips.text = "";
             /*
             textSpriteImageURL.text = "";
             textSpriteImageResourceName.text = "";
             textSpriteImageResourceName.enabled = true;
-            labelSpriteImageDialogTips.text = "";
             */
 
 
@@ -987,7 +1287,6 @@ Item {
                 p = p.parent;
             }*/
         }
-
     }
 
 
@@ -1008,7 +1307,7 @@ Item {
             console.debug("[SpriteEditor]List Clicked:", textSpriteImageURL.text)
 
             textSpriteImageURL.enabled = false;
-            textSpriteImageResourceName.enabled = false;
+            textSpriteImageResourceName.enabled = true;
 
 
             dialogSpriteImageData.visible = true;
@@ -1056,13 +1355,6 @@ Item {
             });
         }
     }
-
-
-
-
-
-
-
 
 
 
@@ -1195,7 +1487,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: "选择音效"
+                    text: "选择音效文件"
                     onClicked: {
                         //dialogSpriteSoundData.nChoiceType = 1;
                         filedialogOpenSpriteSound.open();
@@ -1224,13 +1516,13 @@ Item {
                         textSpriteSoundURL.text = "";
                         textSpriteSoundResourceName.text = "";
 
-                        sprite.soundeffectName = "";
-
                         textSpriteSoundResourceName.enabled = true;
                         textSpriteSoundURL.enabled = true;
 
+                        labelSpriteSoundDialogTips.text = "";
                         dialogSpriteSoundData.close();
-                        //root.forceActiveFocus();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -1241,7 +1533,10 @@ Item {
 
                 Label {
                     id: labelSpriteSoundDialogTips
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
+
+                    wrapMode: Label.WrapAnywhere
                     color: "red"
                     text: ""
                 }
@@ -1251,13 +1546,15 @@ Item {
         onAccepted: {
             //路径 操作
 
-            if(textSpriteSoundURL.text.length === 0) {
+            /*if(textSpriteSoundURL.text.length === 0) {
                 open();
                 //visible = true;
                 labelSpriteSoundDialogTips.text = "路径不能为空";
                 Platform.showToast("路径不能为空");
                 return;
             }
+            */
+            /*
             if(textSpriteSoundResourceName.text.length === 0) {
                 open();
                 //visible = true;
@@ -1265,16 +1562,7 @@ Item {
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteSoundURL.text))) {
-                open();
-                //visible = true;
-                labelSpriteSoundDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteSoundURL.text);
-                Platform.showToast("路径错误或文件不存在");
-                return;
-            }
-
-
-
+            */
             //音效
             //if(dialogSpriteSoundData.nChoiceType === 1) {
             if(checkboxSaveSpriteSoundResource.checked) {
@@ -1288,27 +1576,42 @@ Item {
                     //root.forceActiveFocus();
                     return;
                 }
-
             }
-            else {  //资源图库
+            else {  //资源
 
                 //console.debug("ttt2:", filepath);
 
                 //console.debug("ttt", textSpriteSoundURL.text, Qt.resolvedUrl(textSpriteSoundURL.text))
             }
-            //textSpriteSoundURL.text = textSpriteSoundResourceName.text;
 
-            textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
-            sprite.soundeffectName = textSpriteSoundResourceName.text;
+            if(textSpriteSoundResourceName.text.trim()) {
+                //textSpriteSoundURL.text = textSpriteSoundResourceName.text;
+                textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
+
+                if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textSpriteSoundURL.text))) {
+                    open();
+                    //visible = true;
+                    labelSpriteSoundDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textSpriteSoundURL.text);
+                    Platform.showToast("路径错误或文件不存在");
+                    return;
+                }
+            }
+            else {
+                textSpriteSoundURL.text = '';
+                textSpriteSoundResourceName.text = '';
+            }
+
+
 
             textSpriteSoundResourceName.enabled = true;
             textSpriteSoundURL.enabled = false;
 
+
+            labelSpriteSoundDialogTips.text = "";
             /*
             textSpriteSoundURL.text = "";
             textSpriteSoundResourceName.text = "";
             textSpriteSoundResourceName.enabled = true;
-            labelSpriteSoundDialogTips.text = "";
             */
 
 
@@ -1322,11 +1625,15 @@ Item {
             //console.log("Ok clicked");
         }
         onRejected: {
+            textSpriteSoundURL.text = _private.strTextBackupSpriteSoundURL;
+            textSpriteSoundResourceName.text = _private.strTextBackupSpriteSoundResourceName;
+
+
+            labelSpriteSoundDialogTips.text = "";
             /*
             textSpriteSoundURL.text = "";
             textSpriteSoundResourceName.text = "";
             textSpriteSoundResourceName.enabled = true;
-            labelSpriteSoundDialogTips.text = "";
             */
 
 
@@ -1377,7 +1684,7 @@ Item {
             //console.debug("[SpriteEditor]List Clicked:", textSpriteSoundURL.text);
 
             textSpriteSoundURL.enabled = false;
-            textSpriteSoundResourceName.enabled = false;
+            textSpriteSoundResourceName.enabled = true;
 
 
             dialogSpriteSoundData.visible = true;
@@ -1429,6 +1736,75 @@ Item {
 
 
 
+    Dialog {
+        id: dialogScript
+
+        visible: false
+        title: "请输入脚本"
+        width: parent.width * 0.9
+        //height: parent.height * 0.9
+        anchors.centerIn: parent
+
+
+        modal: true
+        //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
+        //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            Notepad {
+                id: textCode
+
+                Layout.preferredWidth: parent.width
+
+                Layout.preferredHeight: textArea.implicitHeight
+                Layout.maximumHeight: root.height * 0.6
+                Layout.minimumHeight: 60
+                Layout.fillHeight: true
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+
+                //textArea.enabled: false
+                //textArea.readOnly: true
+                textArea.textFormat: TextArea.PlainText
+                textArea.text: ''
+                textArea.placeholderText: "请输入脚本"
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: textCode.textArea.focus ? 2 : 1
+                }
+
+                bCode: true
+            }
+        }
+
+
+        onAccepted: {
+            _private.saveJS();
+
+            _private.refreshRole();
+
+
+            root.forceActiveFocus();
+
+            //console.debug("[MapEditor]onAccepted");
+        }
+        onRejected: {
+            root.forceActiveFocus();
+
+            //console.debug("[MapEditor]onRejected");
+        }
+    }
+
+
+
 
 
     //导出特效对话框
@@ -1447,8 +1823,16 @@ Item {
             root.forceActiveFocus();
 
 
-            _private.exportSprite();
+            if(_private.exportSprite()) {
+                //第一次保存，重新刷新
+                if(_private.strTextBackupSpriteName === '')
+                    _private.refreshSprite();
 
+                textDialogMsg.text = '';
+            }
+            else {
+                open();
+            }
         }
         onRejected: {
             //root.focus = true;
@@ -1493,15 +1877,19 @@ Item {
                     //wrapMode: TextEdit.Wrap
                 }
             }*/
+
+            Label {
+                id: textDialogMsg
+                color: 'red'
+            }
         }
     }
 
 
 
 
-    //游戏对话框
     Dialog {
-        id: dialogScript
+        id: dialogDebugScript
 
         title: "执行脚本"
         width: 300
@@ -1569,7 +1957,42 @@ Item {
     QtObject {
         id: _private
 
-        //property string strSpriteName: ""
+
+        property string strTextBackupSpriteName: ''
+        property string strTextBackupSpriteImageURL
+        property string strTextBackupSpriteImageResourceName
+        property string strTextBackupSpriteSoundURL
+        property string strTextBackupSpriteSoundResourceName
+
+        property var jsEngine: new GlobalJS.JSEngine(root)
+
+        property string strTextCode: `
+let imageFixPositions;
+
+function $refresh(index, imageAnimate, path) {
+    if(imageFixPositions === undefined) {
+        imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
+        if(imageFixPositions)
+            imageFixPositions = imageFixPositions.split('\\r\\n');
+        else
+            imageFixPositions = null;
+    }
+
+    imageAnimate.source = path + GameMakerGlobal.separator + String(index+1).padStart(5, '0') + '.png';
+    let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
+    imageAnimate.rXOffset += parseInt(tx);
+    imageAnimate.rYOffset += parseInt(ty);
+}
+`
+
+
+
+        function changeType() {
+            //role.nSpriteType = comboType.currentIndex + 1;
+
+            _private.refreshSprite();
+        }
+
 
         function showImage() {
             image.source = textSpriteImageURL.text;
@@ -1579,34 +2002,74 @@ Item {
 
         //刷新
         function refreshSprite() {
+            /*switch(comboType.currentIndex) {
+            case 0:
+                loaderSprite.sourceComponent = compSpriteEffect;
+                break;
+            case 1:
+                loaderSprite.sourceComponent = compFileSpriteEffect;
+                break;
+            }
+            */
+            sprite.nSpriteType = comboType.currentIndex + 1;
+            //console.warn(comboType.currentIndex, loaderSprite.sourceComponent, loaderSprite.item);
+            //console.warn(sprite, sprite.nFrameCount);
+            //console.warn(loaderSprite.sourceComponent === compSpriteEffect);
 
-            sprite.sizeFrame = Qt.size(parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text));
+            sprite.strSource = textSpriteImageURL.text;
+
             sprite.nFrameCount = parseInt(textSpriteFrameCount.text);
-            sprite.offsetIndex = Qt.point(parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text));
 
-            sprite.interval = parseInt(textSpriteFrameInterval.text);
+            sprite.nInterval = parseInt(textSpriteFrameInterval.text);
             //sprite.width = parseInt(textSpriteWidth.text);
             //sprite.height = parseInt(textSpriteHeight.text);
-            sprite.implicitWidth = parseInt(textSpriteWidth.text);
-            sprite.implicitHeight = parseInt(textSpriteHeight.text);
-            sprite.offsetX = parseInt(textSpriteFrameOffsetX.text);
-            sprite.offsetY = parseInt(textSpriteFrameOffsetY.text);
+            //sprite.implicitWidth = parseInt(textSpriteWidth.text);
+            //sprite.implicitHeight = parseInt(textSpriteHeight.text);
+            sprite.rXOffset = parseInt(textSpriteFrameOffsetX.text);
+            sprite.rYOffset = parseInt(textSpriteFrameOffsetY.text);
             sprite.opacity = parseFloat(textSpriteOpacity.text);
             sprite.rXScale = parseFloat(textSpriteFrameXScale.text);
             sprite.rYScale = parseFloat(textSpriteFrameYScale.text);
 
-            //console.debug(sprite, sprite.soundeffectDelay)
-            sprite.soundeffectDelay = parseInt(textSoundDelay.text);
+            sprite.strSoundeffectName = textSpriteSoundURL.text;
+            //sprite.strSoundeffectName =  GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
+            //console.debug(sprite, sprite.nSoundeffectDelay)
+            sprite.nSoundeffectDelay = parseInt(textSoundDelay.text);
+
+
+            if(comboType.currentIndex === 0) {
+                //loaderSprite.sourceComponent = compSpriteEffect;
+                sprite.sprite.sizeFrame = Qt.size(parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text));
+
+                sprite.sprite.pointOffsetIndex = Qt.point(parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text));
+            }
+            else if(comboType.currentIndex === 1) {
+                //loaderSprite.sourceComponent = compFileSpriteEffect;
+
+                sprite.sprite.nFrameStartIndex = parseInt(textFrameStartIndex.text);
+
+
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim();
+                if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
+                    _private.jsEngine.clear();
+                    let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
+                    sprite.sprite.fnRefresh = ts.$refresh;
+                    //FrameManager.sl_qml_clearComponentCache();
+                }
+
+            }
+
 
             rectSprite.Layout.preferredWidth = parseInt(textSpriteWidth.text)
             rectSprite.Layout.preferredHeight = parseInt(textSpriteHeight.text)
 
 
+            sprite.sprite.reset();
             //sprite.refresh();
 
             /*sprite.sizeFrame = Qt.size(37, 58);
             sprite.nFrameCount = 3;
-            sprite.arrFrameDirectionIndex = [3,2,1,0];
+            arrActionsData = [3,2,1,0];
             sprite.interval = 100;
             sprite.width = 37;
             sprite.height = 58;
@@ -1620,16 +2083,23 @@ Item {
         }
 
 
+        function saveJS() {
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim();
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'sprite.js', 0);
+        }
+
         //导出特效
         function exportSprite() {
 
             let spriteName = textSpriteName.text.trim();
 
             if(spriteName.length === 0) {
-                Platform.showToast("特效名不能为空");
-                dialogSaveSprite.open();
+                //Platform.showToast("特效名不能为空");
+                textDialogMsg.text = "角色名不能为空";
+                //dialogSaveSprite.open();
                 return false;
             }
+
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.json';
 
@@ -1637,20 +2107,13 @@ Item {
                 FrameManager.sl_qml_CreateFolder(path);
             */
 
-
-
             let outputData = {};
 
-            outputData.Version = "0.6";
+            outputData.Version = "0.9";
             outputData.SpriteName = spriteName;
-            outputData.SpriteType = 1; //特效类型
+            outputData.SpriteType = comboType.currentIndex + 1; //特效类型
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
             outputData.SpriteSize = [parseInt(textSpriteWidth.text), parseInt(textSpriteHeight.text)];
-            outputData.FrameSize = [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)];
-            outputData.FrameCount = parseInt(textSpriteFrameCount.text);
-            outputData.OffsetIndex = [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)];
-
-            outputData.FrameInterval = parseInt(textSpriteFrameInterval.text);
             outputData.Image = textSpriteImageResourceName.text;
             outputData.XOffset = parseInt(textSpriteFrameOffsetX.text);
             outputData.YOffset = parseInt(textSpriteFrameOffsetY.text);
@@ -1661,6 +2124,20 @@ Item {
             outputData.Sound = textSpriteSoundResourceName.text;
             outputData.SoundDelay = parseInt(textSoundDelay.text);
 
+            if(comboType.currentIndex === 0) {
+                outputData.FrameSize = [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)];
+                outputData.FrameCount = parseInt(textSpriteFrameCount.text);
+                outputData.FrameInterval = parseInt(textSpriteFrameInterval.text);
+
+                outputData.OffsetIndex = [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)];
+            }
+            else if(comboType.currentIndex === 1) {
+                outputData.FrameData = [
+                    parseInt(textFrameStartIndex.text),
+                    parseInt(textSpriteFrameCount.text),
+                    parseInt(textSpriteFrameInterval.text),
+                ];
+            }
 
 
             //!!!导出为文件
@@ -1668,6 +2145,10 @@ Item {
             //let ret = File.write(filepath, JSON.stringify(outputData));
             let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
+
+
+            saveJS();
+
 
             console.debug("[SpriteEditor]exportSprite ret:", ret, filepath);
 
@@ -1684,6 +2165,9 @@ Item {
                 OnAccepted: function() {
                     if(exportSprite())
                         s_close();
+                    else {
+                        dialogSaveSprite.open();
+                    }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
@@ -1735,7 +2219,7 @@ Item {
 
         console.debug("[SpriteEditor]Keys.onReleased", event.isAutoRepeat);
 
-        //console.debug(sprite.arrFrameDirectionIndex);
+        //console.debug(arrActionsData);
         //console.debug(textSpriteFangXiangIndex.text.split(','));
     }
 

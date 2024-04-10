@@ -363,14 +363,18 @@ game.goon();
 
 
         onStatusChanged: {
-            console.log('[GameStart]loaderGameScene.status：', loaderGameScene.status);
+            console.log('[GameStart]loaderGameScene.status：', status);
 
-            if (loaderGameScene.status === Loader.Ready) {
+            if (status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+                source = '';
             }
         }
 
         onLoaded: {
-            console.debug('[GameStart]GameScene Loader onLoaded');
+            console.debug('[GameStart]loaderGameScene onLoaded');
             //buttonStartGame.enabled = true;
             //item.testFresh();
 
@@ -458,14 +462,14 @@ function *$start() {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.setTimeout(function() {game.load('存档' + c)}, 0, game);
+                        //game.$globalLibraryJS.runNextEventLoop(function() {game.load('存档' + c)},);
                         if(game.load('存档' + c))
                             break;
                         else
                             yield game.msg("读取失败");
                         continue;
                     case 3:
-                        //game.$globalLibraryJS.setTimeout(function() {game.load('autosave')}, 0, game);
+                        //game.$globalLibraryJS.runNextEventLoop(function() {game.load('autosave')},);
                         if(game.load('autosave'))
                             break;
                         else

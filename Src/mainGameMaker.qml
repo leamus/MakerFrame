@@ -659,27 +659,32 @@ Item {
 
 
                                 GlobalLibraryJS.setTimeout(function() {
-                                    FrameManager.sl_qml_RemoveRecursively(outputDir);
 
-                                    let ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[0], outputDir);
-                                    ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[1], outputDir);
-                                    ret = FrameManager.sl_qml_CopyFolder(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, outputDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
+                                    showBusyIndicator(true, function() {
+                                        FrameManager.sl_qml_RemoveRecursively(outputDir);
+
+                                        let ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[0], outputDir);
+                                        ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[1], outputDir);
+                                        ret = FrameManager.sl_qml_CopyFolder(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, outputDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
 
 
-                                    dialogCommon.close();
+                                        showBusyIndicator(false);
 
-                                    dialogCommon.show({
-                                        Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            rootGameMaker.forceActiveFocus();
-                                        },
+                                        dialogCommon.close();
+
+                                        dialogCommon.show({
+                                            Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
+                                            Buttons: Dialog.Yes,
+                                            OnAccepted: function() {
+                                                rootGameMaker.forceActiveFocus();
+                                            },
+                                            OnRejected: ()=>{
+                                                rootGameMaker.forceActiveFocus();
+                                            },
+                                        });
                                     });
 
-                                },1,rootGameMaker);
+                                },100,rootGameMaker);
 
 
                                 rootGameMaker.forceActiveFocus();
@@ -1796,12 +1801,16 @@ Item {
         rootWindow.s_MessageHandler.connect(_private.appendDebugMessage);
 
 
-        if(!GameMakerGlobal.settings.value('$RunTimes')) {
+        //if(!GameMakerGlobal.settings.$RunTimes) {
+        if(GameMakerGlobal.settings.value('$RunTimes') === 0) {
             rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
-            GameMakerGlobal.settings.setValue('$RunTimes', 1);
+            //GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
-        else
-            GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes')) + 1);
+        else {
+            //GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes')) + 1);
+        }
+        ++GameMakerGlobal.settings.$RunTimes;
+
         //if(GameMakerGlobal.settings.value('$ProjectName'))
         //    GameMakerGlobal.config.strCurrentProjectName = GameMakerGlobal.settings.value('$ProjectName');
 

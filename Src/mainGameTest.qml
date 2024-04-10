@@ -241,11 +241,25 @@ Item {
         asynchronous: false
 
 
+
+        onStatusChanged: {
+            console.log('[mainGameTest]loader.status：', status);
+
+            if (status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+                source = '';
+            }
+        }
+
         onLoaded: {
-            //item.testFresh();
             console.debug("[mainGameTest]Loader onLoaded");
+            //item.testFresh();
             item.bTest = true;
         }
+
+
 
         Connections {
             target: loader.item

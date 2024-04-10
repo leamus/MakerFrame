@@ -41,8 +41,8 @@ import './Core'
   图层：
     //0层：为障碍物、特殊效果
     //1层：事件层
-    0层：地板层
-    1层以上：遮挡层
+    n层及以下：地板层
+    n层以上：遮挡层
 
 
   导入：
@@ -1342,6 +1342,9 @@ Item {
 
                         anchors.fill: parent
 
+                        smooth: false
+                        antialiasing: false
+
                         renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
                         renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
 
@@ -1600,6 +1603,9 @@ Item {
 
                             anchors.fill: parent
 
+                            smooth: false
+                            antialiasing: false
+
 
                             renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
                             renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
@@ -1761,6 +1767,9 @@ Item {
                         anchors.fill: parent
                         z: 998
 
+                        smooth: false
+                        antialiasing: false
+
 
                         renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
                         renderTarget: Canvas.Image  //Canvas.FramebufferObject / Canvas.Image
@@ -1806,6 +1815,9 @@ Item {
 
                         anchors.fill: parent
                         z: 998
+
+                        smooth: false
+                        antialiasing: false
 
 
                         renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
@@ -2961,14 +2973,33 @@ Item {
 
 
 
+    /*
+      鹰：默认导出的图片大小会乘以 Screen.devicePixelRatio
+      如果不需要处理，则直接：
+                    ctx.drawImage(canvasMapContainer.arrCanvasMap[i],
+                        0, 0)
+        或：
+                    ctx.drawImage(canvasMapContainer.arrCanvasMap[i],
+                        0, 0,
+                        canvasMapContainer.arrCanvasMap[i].width, canvasMapContainer.arrCanvasMap[i].height,
+                        0, 0,
+                        canvasMapContainer.arrCanvasMap[i].width / 2, canvasMapContainer.arrCanvasMap[i].height / 2,
+                    );
+
+
+      如果导出需要原大小，则按以下方式处理（但导出图片不是点对点，貌似有抗锯齿）
+    */
     Canvas {
         id: canvasExport
 
         property bool bExport: false
 
         visible: false
-        width: canvasMapContainer.width
-        height: canvasMapContainer.height
+        width: canvasMapContainer.width / Screen.devicePixelRatio
+        height: canvasMapContainer.height / Screen.devicePixelRatio
+
+        smooth: false
+        antialiasing: false
 
 
         renderStrategy: Canvas.Threaded     //Canvas.Immediate / Canvas.Cooperative
@@ -2980,11 +3011,20 @@ Item {
 
                 let ctx = getContext("2d");
 
+                ////console.warn('!!!', ctx.imageSmoothingEnabled, ctx.imageSmoothingQuality);
+                //ctx.scale(Screen.devicePixelRatio, Screen.devicePixelRatio);
+
                 ctx.clearRect(0, 0, width, height);
 
                 for(let i = 0; i < canvasMapContainer.arrCanvasMap.length; ++i) {
 
-                    ctx.drawImage(canvasMapContainer.arrCanvasMap[i], 0, 0);
+                    ctx.drawImage(canvasMapContainer.arrCanvasMap[i],
+                        0, 0,
+                        canvasMapContainer.arrCanvasMap[i].width * Screen.devicePixelRatio, canvasMapContainer.arrCanvasMap[i].height * Screen.devicePixelRatio,
+                        0, 0,
+                        canvasMapContainer.arrCanvasMap[i].width, canvasMapContainer.arrCanvasMap[i].height,
+                    );
+
 
                     //canvasExport.width = canvasMapContainer.width;
                     //canvasExport.height = canvasMapContainer.height;
@@ -3009,8 +3049,7 @@ Item {
             //console.debug("canvasExport ok", strOutputPath + "/output_map.png", Qt.resolvedUrl(strOutputPath + "/output_map.png"));
             bExport = false;
 
-            //console.debug("output:", canvasExport.width, canvasExport.height);
-            console.debug("[MapEditor]canvasExport：onPainted");
+            console.debug("[MapEditor]canvasExport onPainted:", canvasExport.width, canvasExport.height);
         }
     }
 
@@ -3173,18 +3212,19 @@ Item {
             root.forceActiveFocus();
         }
 
-        onS_reload: function(code) {
+        onS_reloaded: function(code) {
             if(code === 1) {
                 qmlObject.init({Map: _private.strMapName});
-
-                visible = true;
             }
             else if(code === 2) {
                 qmlObject.init({Map: _private.strMapName, Role: textRoleName});
                 qmlObject.start();
-
-                visible = true;
             }
+            else {
+
+            }
+
+            visible = true;
         }
 
         /*//HotLoader可自动链接 s_close
@@ -3239,6 +3279,7 @@ Item {
             let mapHeight = _config.sizeMapSize.height * _config.sizeMapBlockSize.height;
             for(_config.nMapDrawScale = 1; mapWidth * mapHeight / _config.nMapDrawScale > _config.nMapMaxPixelCount; ++_config.nMapDrawScale) {
             }
+            //_config.nMapDrawScale = 2;
 
 
             //计算地图宽高

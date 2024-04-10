@@ -34,18 +34,35 @@ Item {
     signal s_close();
     onS_close: {
         role.unload();
+
+
+        _private.strTextBackupRoleName = '';
+        _private.strTextBackupRoleImageURL = '';
+        _private.strTextBackupRoleImageResourceName = '';
+
+
+        for(let tt of layoutAction2.arrCacheComponent) {
+            if(tt.bShowDelete)
+                tt.destroy();
+        }
+        layoutAction2.arrCacheComponent.length = 4;
+
+        for(let tt of layoutAction1.arrCacheComponent) {
+            if(tt.bShowDelete)
+                tt.destroy();
+        }
+        layoutAction1.arrCacheComponent.length = 4;
     }
 
 
 
     function newRole() {
+        comboType.currentIndex = 0;
 
         textRoleName.text = "";
 
-        role.spriteSrc = "";
         textRoleImageURL.text = "";
-        textRoleResourceName.text = "";
-        textRoleResourceName.enabled = false;
+        textRoleImageResourceName.text = "";
 //        textRoleFrameWidth.text = cfg.FrameSize[0].toString();
 //        textRoleFrameHeight.text = cfg.FrameSize[1].toString();
 //        textRoleFrameCount.text = cfg.FrameCount.toString();
@@ -62,11 +79,13 @@ Item {
 //        textRoleFrameInterval.text = cfg.FrameInterval.toString();
 //        textRoleWidth.text = cfg.RoleSize[0].toString();
 //        textRoleHeight.text = cfg.RoleSize[1].toString();
-//        textRoleTrueX.text = cfg.RealOffset[0].toString();
-//        textRoleTrueY.text = cfg.RealOffset[1].toString();
-//        textRoleTrueWidth.text = cfg.RealSize[0].toString();
-//        textRoleTrueHeight.text = cfg.RealSize[1].toString();
+//        textRoleRealX.text = cfg.RealOffset[0].toString();
+//        textRoleRealY.text = cfg.RealOffset[1].toString();
+//        textRoleRealWidth.text = cfg.RealSize[0].toString();
+//        textRoleRealHeight.text = cfg.RealSize[1].toString();
 //        textRoleSpeed.text = cfg.MoveSpeed.toString();
+
+        textCode.text = _private.strTextCode;
 
         _private.refreshRole();
     }
@@ -80,44 +99,138 @@ Item {
         //cfg.RoleType;
         textRoleName.text = cfg.RoleName;
 
-        role.spriteSrc = GameMakerGlobal.roleResourceURL(cfg.Image);
-        //textRoleImageURL.text = cfg.Image;
-        textRoleImageURL.text = GameMakerGlobal.roleResourceURL(cfg.Image);
-        //textRoleResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
-        textRoleResourceName.text = cfg.Image;
-        textRoleResourceName.enabled = false;
-        textRoleFrameWidth.text = cfg.FrameSize[0].toString();
-        textRoleFrameHeight.text = cfg.FrameSize[1].toString();
-        textRoleFrameCount.text = cfg.FrameCount.toString();
-
-        //textRoleFangXiangIndex.text = cfg.FrameIndex.toString();
-        textRoleUpIndexX.text = cfg.FrameIndex[0][0].toString();
-        textRoleUpIndexY.text = cfg.FrameIndex[0][1].toString();
-        textRoleRightIndexX.text = cfg.FrameIndex[1][0].toString();
-        textRoleRightIndexY.text = cfg.FrameIndex[1][1].toString();
-        textRoleDownIndexX.text = cfg.FrameIndex[2][0].toString();
-        textRoleDownIndexY.text = cfg.FrameIndex[2][1].toString();
-        textRoleLeftIndexX.text = cfg.FrameIndex[3][0].toString();
-        textRoleLeftIndexY.text = cfg.FrameIndex[3][1].toString();
-
-        textRoleFrameInterval.text = cfg.FrameInterval.toString();
-        //role.width = parseInt(textRoleWidth.text);
-        //role.height = parseInt(textRoleHeight.text);
-        textRoleWidth.text = cfg.RoleSize[0].toString();
-        textRoleHeight.text = cfg.RoleSize[1].toString();
-        textRoleTrueX.text = cfg.RealOffset[0].toString();
-        textRoleTrueY.text = cfg.RealOffset[1].toString();
-        textRoleTrueWidth.text = cfg.RealSize[0].toString();
-        textRoleTrueHeight.text = cfg.RealSize[1].toString();
-        textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
-        textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
-        textRoleSpeed.text = cfg.MoveSpeed !== undefined ? cfg.MoveSpeed.toString() : '0.1';
+        textRoleRealX.text = cfg.RealOffset[0].toString();
+        textRoleRealY.text = cfg.RealOffset[1].toString();
+        textRoleRealWidth.text = cfg.RealSize[0].toString();
+        textRoleRealHeight.text = cfg.RealSize[1].toString();
         textRoleShadowOpacity.text = cfg.ShadowOpacity !== undefined ? cfg.ShadowOpacity.toString() : '0.3';
+
+        textRoleSpeed.text = cfg.MoveSpeed !== undefined ? cfg.MoveSpeed.toString() : '0.1';
         textPenetrate.text = cfg.Penetrate !== undefined ? cfg.Penetrate.toString() : '0';
         textShowName.text = cfg.ShowName !== undefined ? cfg.ShowName.toString() : '1';
         textAvatar.text = cfg.Avatar !== undefined ? cfg.Avatar.toString() : '';
         textAvatarWidth.text = (cfg.AvatarSize && cfg.AvatarSize[0] !== undefined ? cfg.AvatarSize[0].toString() : '60');
         textAvatarHeight.text = (cfg.AvatarSize && cfg.AvatarSize[1] !== undefined ? cfg.AvatarSize[1].toString() : '60');
+
+        switch(cfg.SpriteType ?? 1) {
+        case 0:
+            comboType.currentIndex = 2;
+            break;
+        case 1:
+        case 2:
+        default:
+            comboType.currentIndex = (cfg.SpriteType ?? 1) - 1;
+            break;
+        }
+
+
+        if(comboType.currentIndex === 0) {
+            //textRoleImageURL.text = cfg.Image;
+            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            textRoleImageResourceName.text = cfg.Image;
+            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
+
+            textRoleFrameWidth.text = cfg.FrameSize[0].toString();
+            textRoleFrameHeight.text = cfg.FrameSize[1].toString();
+            textRoleFrameCount.text = cfg.FrameCount.toString();
+
+            textRoleFrameInterval.text = cfg.FrameInterval.toString();
+            //role.width = parseInt(textRoleWidth.text);
+            //role.height = parseInt(textRoleHeight.text);
+
+            textRoleXOffset.text = (cfg.RoleOffset && cfg.RoleOffset[0]) ? cfg.RoleOffset[0].toString() : '0';
+            textRoleYOffset.text = (cfg.RoleOffset && cfg.RoleOffset[1]) ? cfg.RoleOffset[1].toString() : '0';
+            textRoleWidth.text = cfg.RoleSize[0].toString();
+            textRoleHeight.text = cfg.RoleSize[1].toString();
+            textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
+            textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
+
+            //textRoleFangXiangIndex.text = cfg.FrameIndex.toString();
+            textRoleUpIndexX.text = cfg.FrameIndex[0][0].toString();
+            textRoleUpIndexY.text = cfg.FrameIndex[0][1].toString();
+            textRoleRightIndexX.text = cfg.FrameIndex[1][0].toString();
+            textRoleRightIndexY.text = cfg.FrameIndex[1][1].toString();
+            textRoleDownIndexX.text = cfg.FrameIndex[2][0].toString();
+            textRoleDownIndexY.text = cfg.FrameIndex[2][1].toString();
+            textRoleLeftIndexX.text = cfg.FrameIndex[3][0].toString();
+            textRoleLeftIndexY.text = cfg.FrameIndex[3][1].toString();
+        }
+        else if(comboType.currentIndex === 1) {
+            //textRoleImageURL.text = cfg.Image;
+            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            textRoleImageResourceName.text = cfg.Image;
+            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
+
+
+            for(let tt in cfg.FrameIndex) {
+                let tObj;
+                if(tt === '$Up') {
+                    tObj = layoutAction1.arrCacheComponent[0];
+                }
+                else if(tt === '$Right') {
+                    tObj = layoutAction1.arrCacheComponent[1];
+                }
+                else if(tt === '$Down') {
+                    tObj = layoutAction1.arrCacheComponent[2];
+                }
+                else if(tt === '$Left') {
+                    tObj = layoutAction1.arrCacheComponent[3];
+                }
+                else {
+                    tObj = compActions1.createObject(layoutAction1);
+                    layoutAction1.arrCacheComponent.push(tObj);
+                }
+
+                tObj.arrComps[0].text = tt;
+                tObj.arrComps[1].text = cfg.FrameIndex[tt][0];
+                tObj.arrComps[2].text = cfg.FrameIndex[tt][1];
+                tObj.arrComps[3].text = cfg.FrameIndex[tt][2];
+            }
+
+
+            textRoleXOffset.text = (cfg.RoleOffset && cfg.RoleOffset[0]) ? cfg.RoleOffset[0].toString() : '0';
+            textRoleYOffset.text = (cfg.RoleOffset && cfg.RoleOffset[1]) ? cfg.RoleOffset[1].toString() : '0';
+            textRoleWidth.text = cfg.RoleSize[0].toString();
+            textRoleHeight.text = cfg.RoleSize[1].toString();
+            textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
+            textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
+
+
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim() + GameMakerGlobal.separator + 'role.js';
+            if(FrameManager.sl_qml_FileExists(path)) {
+                textCode.text = FrameManager.sl_qml_ReadFile(path);
+            }
+            else
+                textCode.text = _private.strTextCode;
+
+        }
+        else if(comboType.currentIndex === 2) {
+
+            for(let tt in cfg.FrameIndex) {
+                let tObj;
+                if(tt === '$Up') {
+                    tObj = layoutAction1.arrCacheComponent[0];
+                }
+                else if(tt === '$Right') {
+                    tObj = layoutAction1.arrCacheComponent[1];
+                }
+                else if(tt === '$Down') {
+                    tObj = layoutAction1.arrCacheComponent[2];
+                }
+                else if(tt === '$Left') {
+                    tObj = layoutAction1.arrCacheComponent[3];
+                }
+                else {
+                    tObj = compActions2.createObject(layoutAction2);
+                    layoutAction2.arrCacheComponent.push(tObj);
+                }
+
+                tObj.arrComps[0].text = tt;
+                tObj.arrComps[1].text = cfg.FrameIndex[tt][0];
+            }
+        }
+
 
         _private.refreshRole();
     }
@@ -135,6 +248,281 @@ Item {
 
 
 
+    Component {
+        id: compActions2
+
+        Item {
+            id: tRoot
+
+            property bool bShowDelete: true
+            property alias textActionName: ttextActionName.text
+            property alias bActionReadOnly: ttextActionName.readOnly
+            property alias bActionColor: ttextActionName.color
+
+            //property alias textActionName: ttextActionName
+            //property alias textSpriteName: ttextSpriteName
+            property var arrComps: [ttextActionName, ttextSpriteName]
+
+
+            //anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.preferredHeight: 30
+
+            RowLayout {
+                anchors.fill: parent
+
+                TextField {
+                    id: ttextActionName
+
+                    objectName: 'ActionName'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: ''
+                    placeholderText: '*动作名'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                TextField {
+                    id: ttextSpriteName
+
+                    objectName: 'SpriteName'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: ''
+                    placeholderText: '*@特效名'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onPressAndHold: {
+                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+
+                        l_list.open({
+                            Data: path,
+                            OnClicked: (index, item)=>{
+                                text = item;
+
+                                l_list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                            OnCanceled: ()=>{
+                                l_list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                        });
+                    }
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                Button {
+                    implicitWidth: 30
+
+                    text: 'p'
+
+                    onClicked: {
+                        role.sprite.action(ttextActionName.text);
+                    }
+                }
+
+                Button {
+                    id: tbutton
+
+                    visible: bShowDelete
+                    implicitWidth: 30
+
+                    text: 'x'
+
+                    onClicked: {
+                        for(let tc in layoutAction2.arrCacheComponent) {
+                            if(layoutAction2.arrCacheComponent[tc] === tRoot) {
+                                layoutAction2.arrCacheComponent.splice(tc, 1);
+                                break;
+                            }
+                        }
+                        tRoot.destroy();
+
+                        _private.refreshRole();
+                    }
+                }
+            }
+        }
+    }
+
+
+    Component {
+        id: compActions1
+
+        Item {
+            id: tRoot
+
+            property bool bShowDelete: true
+            property alias textActionName: ttextActionName.text
+            property alias bActionReadOnly: ttextActionName.readOnly
+            property alias bActionColor: ttextActionName.color
+
+            //property alias textActionName: ttextActionName
+            //property alias textFrameStartIndex: ttextFrameStartIndex
+            //property alias textFrameCount: ttextFrameCount
+            property alias textFrameInterval: ttextFrameInterval
+            property var arrComps: [ttextActionName, ttextFrameStartIndex, ttextFrameCount, ttextFrameInterval]
+
+
+            //anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.preferredHeight: 30
+
+            RowLayout {
+                anchors.fill: parent
+
+                TextField {
+                    id: ttextActionName
+
+                    objectName: 'ActionName'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: ''
+                    placeholderText: '*动作名'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                TextField {
+                    id: ttextFrameStartIndex
+
+                    objectName: 'FrameStartIndex'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: '0'
+                    placeholderText: '*起始序号'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                TextField {
+                    id: ttextFrameCount
+
+                    objectName: 'FrameCount'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: '4'
+                    placeholderText: '*帧数'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                TextField {
+                    id: ttextFrameInterval
+
+                    objectName: 'FrameInterval'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    font.pointSize: _config.nTextFontSize
+                    text: '100'
+                    placeholderText: '*帧速度'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onEditingFinished: {
+                        //text = !isNaN(parseInt(text)) ? parseInt(text) : '0.1';
+
+                        _private.refreshRole();
+                    }
+                }
+
+                Button {
+                    implicitWidth: 30
+
+                    text: 'p'
+
+                    onClicked: {
+                        role.sprite.action(ttextActionName.text);
+                    }
+                }
+
+                Button {
+                    id: tbutton
+
+                    visible: bShowDelete
+                    implicitWidth: 30
+
+                    text: 'x'
+
+                    onClicked: {
+                        for(let tc in layoutAction1.arrCacheComponent) {
+                            if(layoutAction1.arrCacheComponent[tc] === tRoot) {
+                                layoutAction1.arrCacheComponent.splice(tc, 1);
+                                break;
+                            }
+                        }
+                        tRoot.destroy();
+
+                        _private.refreshRole();
+                    }
+                }
+            }
+        }
+    }
+
+
+
     Mask {
         anchors.fill: parent
         color: Global.style.backgroundColor
@@ -144,866 +532,1172 @@ Item {
 
     //主界面
     ColumnLayout {
-        anchors.fill: parent
+        //anchors.fill: parent
+        anchors.centerIn: parent
+        width: parent.width * 0.96
+        height: parent.height * 0.96
 
+        //spacing: 16
 
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
 
-            Button {
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
 
-                text: "图片资源"
-                font.pointSize: _config.nButtonFontSize
+        Rectangle {
+            clip: true
 
-                onClicked: {
-                    dialogRoleData.open();
-                }
-            }
-
-            Button {
-                visible: false
-
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
-                text: "刷新"
-                font.pointSize: _config.nButtonFontSize
-
-                onClicked: {
-                    _private.refreshRole();
-                }
-            }
-
-            Button {
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
-                text: "保存"
-                font.pointSize: _config.nButtonFontSize
-
-                onClicked: {
-
-                    dialogSaveRole.open();
-                }
-            }
-
-            Button {
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
-                text: "原图"
-                font.pointSize: _config.nButtonFontSize
-
-                onClicked: {
-                    if(textRoleImageURL.text)
-                        _private.showImage();
-                }
-            }
-
-            Button {
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
-                text: "帮助"
-                font.pointSize: _config.nButtonFontSize
-
-                onClicked: {
-
-                    rootGameMaker.showMsg('
-  角色大小：游戏中显示的大小（宽和高），根据你游戏整体风格来设置；
-  X/Y轴缩放：表示在X、Y方向上放大或缩小多少倍，负数表示镜像（反转）；
-  影子偏移坐标和大小：影子表示角色的实际占位，会影响角色到障碍或边界的碰撞，一般斜视地图的效果是将影子放在角色下半身，正视地图的效果是角色全部；
-  影子透明度：值范围 0~1，阴影程度；
-  帧切换速度：你懂的，一般我填100；
-  帧宽高：将图片切割为每一帧的大小（填错会导致显示效果出问题）；
-  每个方向帧数：每个方向的行走图有多少帧；
-  上右下左：将一张图切割为 m列*n行 个帧，则角色的上、右、下、左的 第一个帧 分别是 哪列哪行（可以理解为x、y坐标，0开始）；
-  移动速度：角色在地图上的移动速度。这个值单位是 像素/毫秒（为了适应各种刷新率下速度一致），具体要根据图块大小来设置（一般设置为0.1-0.2即可）；
-  可穿透：角色是否可以穿过角色或障碍（0b1为可穿透其他角色，0b10为可穿透障碍）；
-  显示名字：角色头顶是否显示名字（0或1）；
-  头像和大小：使用对话命令的时候，会带有这个头像；
-
-')
-                }
-            }
-
-            Button {
-                visible: Platform.compileType() === "debug" ? true : false
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
-                text: "Test"
-                font.pointSize: _config.nButtonFontSize
-
-                onClicked: {
-                    /*role.sprite.running = true;
-                    console.debug("[Role]test", role.sprite, role.sprite.state, role.sprite.currentSprite)
-                    console.debug(role.sprite.sprites);
-                    for(let s in role.sprite.sprites) {
-                        console.debug(role.sprite.sprites[s].frameY);
-                        role.sprite.sprites[s].frameY = 20*s;
-                        console.debug(role.sprite.sprites[s].frameY);
-                    }*/
-                    dialogScript.open();
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "角色大小"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleWidth
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "50"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "*"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleHeight
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "80"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                font.pointSize: _config.nLabelFontSize
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-                text: "X/Y轴缩放"
-            }
-
-            TextField {
-                id: textRoleFrameXScale
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            TextField {
-                id: textRoleFrameYScale
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "影子偏移坐标和大小"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleTrueX
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            TextField {
-                id: textRoleTrueY
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            TextField {
-                id: textRoleTrueWidth
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "50"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "*"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleTrueHeight
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                font.pointSize: _config.nTextFontSize
-                text: "80"
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "影子透明度"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleShadowOpacity
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0.5"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "帧切换速度（ms）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleFrameInterval
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "100"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "帧宽高"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleFrameWidth
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "37"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "*"
-                font.pointSize: _config.nLabelFontSize
-            }
-            TextField {
-                id: textRoleFrameHeight
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "58"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "每个方向帧数"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleFrameCount
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "3"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-
-        }
-
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "上向（列行）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleUpIndexX
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            TextField {
-                id: textRoleUpIndexY
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "右向（列行）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleRightIndexX
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            TextField {
-                id: textRoleRightIndexY
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "下向（列行）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleDownIndexX
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            TextField {
-                id: textRoleDownIndexY
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "左向（列行）"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleLeftIndexX
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-            TextField {
-                id: textRoleLeftIndexY
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    _private.refreshRole();
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "移动速度"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textRoleSpeed
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0.1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "可穿透"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textPenetrate
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "0"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    //_private.refreshRole();
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "显示名字"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            TextField {
-                id: textShowName
-
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: "1"
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onEditingFinished: {
-                    //_private.refreshRole();
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 10
-
-                text: "@头像和大小"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            //头像
-            TextField {
-                id: textAvatar
-
-                //Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-                Layout.preferredWidth: 90
-
-                text: ''
-                placeholderText: '@头像图片'
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-
-                onPressAndHold: {
-                    let path = GameMakerGlobal.imageResourcePath();
-
-                    l_list.open({
-                        Data: path,
-                        OnClicked: (index, item)=>{
-                            text = item;
-
-                            l_list.visible = false;
-                            root.forceActiveFocus();
-                        },
-                        OnCanceled: ()=>{
-                            l_list.visible = false;
-                            root.forceActiveFocus();
-                        },
-                    });
-                }
-            }
-
-            //头像宽
-            TextField {
-                id: textAvatarWidth
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: '60'
-                placeholderText: '头像宽'
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-            }
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredWidth: 10
-
-                text: "*"
-                font.pointSize: _config.nLabelFontSize
-            }
-
-            //头像高
-            TextField {
-                id: textAvatarHeight
-
-                Layout.preferredWidth: 30
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: _private.nColumnHeight
-
-                text: '60'
-                placeholderText: '头像高'
-                font.pointSize: _config.nTextFontSize
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-            }
-        }
-
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredWidth: parent.width
+            Layout.preferredHeight: parent.height
             Layout.fillHeight: true
+            Layout.fillWidth: true
+
+            color: 'transparent'
+            border {
+                color: 'lightgray'
+                width: 1
+            }
+
+            Flickable {
+                id: flickable
+
+                //anchors.fill: parent
+
+                anchors.centerIn: parent
+                width: parent.width * 0.96
+                //height: parent.height * 0.9
+                height: parent.height * 0.96
+
+
+                contentWidth: width
+                contentHeight: Math.max(layout.implicitHeight)
+
+                flickableDirection: Flickable.VerticalFlick
+
+
+
+                ColumnLayout {
+                    id: layout
+
+                    //anchors.fill: parent
+                    width: flickable.width
+                    height: Math.max(flickable.height/*, implicitHeight*/)
+
+                    //spacing: 6
+
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '类型：'
+                        }
+
+                        ComboBox {
+                            id: comboType
+
+                            Layout.fillWidth: true
+
+
+                            model: ['典型行走行列图', '序列图片文件', '从特效选择']
+
+                            background: Rectangle {
+                                //implicitWidth: comboBoxComponentItem.comboBoxWidth
+                                implicitHeight: 35
+                                //border.color: control.pressed ? "#6495ED" : "#696969"
+                                //border.width: control.visualFocus ? 2 : 1
+                                color: "transparent"
+                                //border.color: comboBoxComponentItem.color
+                                border.width: 2
+                                radius: 6
+                            }
+
+                            onActivated: {
+                                console.debug('[RoleEditor]ComboBox:', comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+
+                                _private.changeType();
+                            }
+                            /*onHighlighted: {
+                                console.debug('onHighlighted:', comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+                            }
+                            onAccepted: {
+                                console.debug(comboType.currentIndex,
+                                              comboType.currentText,
+                                              comboType.currentValue);
+                            }*/
+
+                        }
+                    }
+
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "移动速度"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleSpeed
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0.1"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '0.1';
+
+                                //_private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "可穿透"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textPenetrate
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                //_private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "显示名字"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textShowName
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '1';
+
+                                //_private.refreshRole();
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "@头像和大小"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        //头像
+                        TextField {
+                            id: textAvatar
+
+                            //Layout.preferredWidth: 50
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 90)
+
+                            text: ''
+                            placeholderText: '@头像图片'
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onPressAndHold: {
+                                let path = GameMakerGlobal.imageResourcePath();
+
+                                l_list.open({
+                                    Data: path,
+                                    OnClicked: (index, item)=>{
+                                        text = item;
+
+                                        l_list.visible = false;
+                                        root.forceActiveFocus();
+                                    },
+                                    OnCanceled: ()=>{
+                                        l_list.visible = false;
+                                        root.forceActiveFocus();
+                                    },
+                                });
+                            }
+                        }
+
+                        //头像宽
+                        TextField {
+                            id: textAvatarWidth
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: '60'
+                            placeholderText: '头像宽'
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                //_private.refreshRole();
+                            }
+                        }
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: 10
+
+                            text: "*"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        //头像高
+                        TextField {
+                            id: textAvatarHeight
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: '60'
+                            placeholderText: '头像高'
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                //_private.refreshRole();
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "[影子]"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "偏移和大小"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleRealX
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        TextField {
+                            id: textRoleRealY
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        TextField {
+                            id: textRoleRealWidth
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "50"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '50';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "*"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleRealHeight
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            font.pointSize: _config.nTextFontSize
+                            text: "80"
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '80';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "透明度"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleShadowOpacity
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0.5"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '0.5';
+
+                                _private.refreshRole();
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
+
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "[角色]"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "偏移"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleXOffset
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        TextField {
+                            id: textRoleYOffset
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "大小"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleWidth
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "50"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '50';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: "*"
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleHeight
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "80"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseInt(text)) ? parseInt(text) : '80';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        Label {
+                            font.pointSize: _config.nLabelFontSize
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+                            text: "X/Y轴缩放"
+                        }
+
+                        TextField {
+                            id: textRoleFrameXScale
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1.0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '1.0';
+
+                                _private.refreshRole();
+                            }
+                        }
+
+                        TextField {
+                            id: textRoleFrameYScale
+
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: _private.nColumnHeight
+
+                            text: "1.0"
+                            font.pointSize: _config.nTextFontSize
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                text = !isNaN(parseFloat(text)) ? parseFloat(text) : '1.0';
+
+                                _private.refreshRole();
+                            }
+                        }
+                    }
+
+                    /*RowLayout {
+                        visible: comboType.currentIndex === 0
+
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredHeight: 50
+
+                    }*/
+
+
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredWidth: parent.width
+
+                        visible: comboType.currentIndex === 0
+
+
+                        RowLayout {
+                            //Layout.preferredWidth: root.width * 0.96
+                            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 50
+
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "[帧]"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "宽高"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleFrameWidth
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "37"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '37';
+
+                                    _private.refreshRole();
+                                }
+                            }
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "*"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+                            TextField {
+                                id: textRoleFrameHeight
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "58"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '58';
+
+                                    _private.refreshRole();
+                                }
+                            }
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "帧数"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleFrameCount
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "3"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '3';
+
+                                    _private.refreshRole();
+                                }
+                            }
+
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "速度（ms）"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleFrameInterval
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "100"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '100';
+
+                                    _private.refreshRole();
+                                }
+                            }
+
+                        }
+
+
+                        RowLayout {
+                            //Layout.preferredWidth: root.width * 0.96
+                            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 50
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "上向（列行）"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleUpIndexX
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            TextField {
+                                id: textRoleUpIndexY
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "右向（列行）"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleRightIndexX
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            TextField {
+                                id: textRoleRightIndexY
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                        }
+
+                        RowLayout {
+                            //Layout.preferredWidth: root.width * 0.96
+                            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredHeight: 50
+
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "下向（列行）"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleDownIndexX
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            TextField {
+                                id: textRoleDownIndexY
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            Label {
+                                //Layout.preferredWidth: 80
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: 10
+
+                                text: "左向（列行）"
+                                font.pointSize: _config.nLabelFontSize
+                            }
+
+                            TextField {
+                                id: textRoleLeftIndexX
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                            TextField {
+                                id: textRoleLeftIndexY
+
+                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                //Layout.preferredHeight: _private.nColumnHeight
+
+                                text: "0"
+                                font.pointSize: _config.nTextFontSize
+
+                                //selectByKeyboard: true
+                                selectByMouse: true
+                                //wrapMode: TextEdit.Wrap
+
+                                onEditingFinished: {
+                                    text = !isNaN(parseInt(text)) ? parseInt(text) : '0';
+
+                                    _private.refreshRole();
+                                }
+                            }
+                        }
+                    }
+
+
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredWidth: parent.width
+
+                        visible: comboType.currentIndex === 2
+
+
+                        Button {
+                            Layout.fillWidth: true
+
+                            visible: false
+                            text: '增加动作'
+
+                            onClicked: {
+                                let c = compActions2.createObject(layoutAction2);
+                                layoutAction2.arrCacheComponent.push(c);
+
+                                GlobalLibraryJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+
+                        ColumnLayout {
+                            id: layoutAction2
+
+                            property var arrCacheComponent: []
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            spacing: 16
+
+                        }
+                    }
+
+
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        Layout.preferredWidth: parent.width
+
+                        visible: comboType.currentIndex === 1
+
+
+                        Label {
+                            Layout.fillWidth: true
+
+                            color: 'red'
+                            text: '注意：图片文件夹请自行复制到资源目录；预览请先保存'
+                            font.pointSize: _config.nTextFontSize
+
+                            horizontalAlignment: Label.AlignHCenter
+                            verticalAlignment: Label.AlignVCenter
+
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Button {
+                                Layout.fillWidth: true
+
+                                text: '编辑脚本'
+
+                                onClicked: {
+
+                                    if(!textRoleName.text.trim()) {
+                                        dialogCommon.show({
+                                              Msg: '请先保存角色',
+                                              Buttons: Dialog.Yes,
+                                              OnAccepted: function() {
+                                                  root.forceActiveFocus();
+                                              },
+                                              OnRejected: ()=>{
+                                                  root.forceActiveFocus();
+                                              },
+                                          });
+
+                                        return;
+                                    }
+
+
+                                    dialogScript.open();
+                                }
+                            }
+
+                            Button {
+                                Layout.fillWidth: true
+
+                                text: '增加动作'
+
+                                onClicked: {
+                                    let c = compActions1.createObject(layoutAction1);
+                                    layoutAction1.arrCacheComponent.push(c);
+
+                                    GlobalLibraryJS.setTimeout(function() {
+                                        if(flickable.contentHeight > flickable.height)
+                                            flickable.contentY = flickable.contentHeight - flickable.height;
+                                        }, 1, root, '');
+
+                                }
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '动作名'
+                                font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '起始序号'
+                                font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '帧数'
+                                font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '帧速度'
+                                font.pointSize: _config.nTextFontSize
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: layoutAction1
+
+                            property var arrCacheComponent: []
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            spacing: 16
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+
+            Item {
+                Layout.preferredWidth: 0
+                Layout.fillWidth: true
+            }
 
             Joystick {
                 id: joystick
 
-                Layout.alignment: Qt.AlignTop
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
                 //anchors.margins: 1 * Screen.pixelDensity
                 transformOrigin: Item.TopLeft
@@ -1045,10 +1739,14 @@ Item {
                 }
             }
 
+            Item {
+                Layout.preferredWidth: 0
+                Layout.fillWidth: true
+            }
 
             Rectangle {
                 id: rectRole
-                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+                Layout.alignment: Qt.AlignHCenter
 
                 //Layout.preferredWidth: parseInt(textSpriteWidth.text)
                 //Layout.preferredHeight: parseInt(textSpriteHeight.text)
@@ -1070,7 +1768,7 @@ Item {
 
                     //sizeFrame: Qt.size(37, 58);
                     /*nFrameCount: 3;
-                    arrFrameDirectionIndex: [3,2,1,0];
+                    arrActionsData: [3,2,1,0];
                     interval: 100;
                     width: 37;
                     height: 58;
@@ -1083,9 +1781,161 @@ Item {
                     /*onS_clicked: {
                         root.forceActiveFocus();
                     }*/
+
+                    mouseArea.onClicked: {
+                        root.forceActiveFocus();
+                    }
+
+
+                    //名字
+                    property Text textName: Text {
+                        parent: role
+                        visible: parseInt(textShowName.text) !== 0
+                        width: parent.width
+                        height: implicitHeight
+                        anchors.bottom: parent.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        color: 'white'
+
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        font.pointSize: 9
+                        font.bold: true
+                        text: textRoleName.text || '<角色名>'
+                        wrapMode: Text.NoWrap
+                    }
+
                 }
             }
+
+            Item {
+                Layout.preferredWidth: 0
+                Layout.fillWidth: true
+            }
         }
+
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
+                text: "图片资源"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+                    textRoleImageURL.enabled = false;
+                    textRoleImageResourceName.enabled = true;
+                    _private.strTextBackupRoleImageURL = textRoleImageURL.text;
+                    _private.strTextBackupRoleImageResourceName = textRoleImageResourceName.text;
+                    dialogRoleData.open();
+                }
+            }
+
+            Button {
+                visible: false
+
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                text: "刷新"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+                    _private.refreshRole();
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                text: "保存"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+                    _private.strTextBackupRoleName = textRoleName.text;
+
+                    dialogSaveRole.open();
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                visible: comboType.currentIndex === 0 || comboType.currentIndex === 2
+                text: "原图"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+                    if(textRoleImageURL.text)
+                        _private.showImage();
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                text: "帮助"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+
+                    rootGameMaker.showMsg('
+  角色大小：游戏中显示的大小（宽和高），根据你游戏整体风格来设置；
+  X/Y轴缩放：表示在X、Y方向上放大或缩小多少倍，负数表示镜像（反转）；
+  影子偏移坐标和大小：影子表示角色的实际占位，会影响角色到障碍或边界的碰撞，一般斜视地图的效果是将影子放在角色下半身，正视地图的效果是角色全部；
+  影子透明度：值范围 0~1，阴影程度；
+  帧速度：你懂的，一般100；
+  帧宽高：将图片切割为每一帧的大小（填错会导致显示效果出问题）；
+  帧数：每个方向的行走图有多少帧；
+  上右下左：将一张图切割为 m列*n行 个帧，则角色的上、右、下、左的 第一个帧 分别是 哪列哪行（可以理解为x、y坐标，0开始）；
+  移动速度：角色在地图上的移动速度。这个值单位是 像素/毫秒（为了适应各种刷新率下速度一致），具体要根据图块大小来设置（一般设置为0.1-0.2即可）；
+  可穿透：角色是否可以穿过角色或障碍（0b1为可穿透其他角色，0b10为可穿透障碍）；
+  显示名字：角色头顶是否显示名字（0或1）；
+  头像和大小：使用对话命令的时候，会带有这个头像；
+
+')
+                }
+            }
+
+            Button {
+                visible: Platform.compileType() === "debug" ? true : false
+                //Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.preferredHeight: 50
+
+                text: "Test"
+                font.pointSize: _config.nButtonFontSize
+
+                onClicked: {
+                    /*role.sprite.running = true;
+                    console.debug("[Role]test", role.sprite, role.sprite.state, role.sprite.currentSprite)
+                    console.debug(role.sprite.sprites);
+                    for(let s in role.sprite.sprites) {
+                        console.debug(role.sprite.sprites[s].frameY);
+                        role.sprite.sprites[s].frameY = 20*s;
+                        console.debug(role.sprite.sprites[s].frameY);
+                    }*/
+                    dialogDebugScript.open();
+                }
+            }
+
+        }
+
     }
 
 
@@ -1120,11 +1970,11 @@ Item {
             else
                 textRoleImageURL.text = FrameManager.sl_qml_UrlDecode(fileUrl);
 
-            textRoleResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
 
 
             textRoleImageURL.enabled = true;
-            textRoleResourceName.enabled = true;
+            textRoleImageResourceName.enabled = true;
 
 
             checkboxSaveResource.checked = true;
@@ -1143,6 +1993,7 @@ Item {
         }
         Component.onCompleted: {
             //visible = true;
+
         }
     }
 
@@ -1192,7 +2043,7 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 TextField {
-                    id: textRoleResourceName
+                    id: textRoleImageResourceName
                     Layout.fillWidth: true
                     placeholderText: "素材名"
 
@@ -1216,7 +2067,10 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: "选择图片"
+                    visible: comboType.currentIndex === 0
+
+                    text: "选择图片文件"
+
                     onClicked: {
                         //dialogRoleData.nChoiceType = 1;
                         filedialogOpenRoleImage.open();
@@ -1225,12 +2079,16 @@ Item {
                 }
                 Button {
                     text: "选择素材"
+
                     onClicked: {
                         //dialogRoleData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.roleResourcePath();
+                        let path = GameMakerGlobal.spriteResourcePath();
 
-                        l_listRoleResource.show(path, "*", 0x002, 0x00);
+                        if(comboType.currentIndex === 0)
+                            l_listRoleResource.show(path, "*", 0x002, 0x00);
+                        else if(comboType.currentIndex === 1)
+                            l_listRoleResource.show(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listRoleResource.visible = true;
                         //l_listRoleResource.focus = true;
                         l_listRoleResource.forceActiveFocus();
@@ -1246,7 +2104,10 @@ Item {
 
                 Label {
                     id: labelDialogTips
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
+
+                    wrapMode: Label.WrapAnywhere
                     color: "red"
                     text: ""
                 }
@@ -1256,34 +2117,24 @@ Item {
         onAccepted: {
             //路径 操作
 
-            if(textRoleImageURL.text.length === 0) {
+            /*if(textRoleImageURL.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = "路径不能为空";
                 Platform.showToast("路径不能为空");
                 return;
-            }
-            if(textRoleResourceName.text.length === 0) {
+            }*/
+            if(textRoleImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = "资源名不能为空";
                 Platform.showToast("资源名不能为空");
                 return;
             }
-            if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textRoleImageURL.text))) {
-                open();
-                //visible = true;
-                labelDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textRoleImageURL.text);
-                Platform.showToast("路径错误或文件不存在");
-                return;
-            }
-
-
-
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.roleResourcePath(textRoleResourceName.text), false);
+                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = "拷贝资源失败，是否重名或目录不可写？";
@@ -1301,22 +2152,48 @@ Item {
 
                 //console.debug("ttt", textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
             }
-            //textRoleImageURL.text = textRoleResourceName.text;
-            textRoleImageURL.text = GameMakerGlobal.roleResourceURL(textRoleResourceName.text);
+
+            //textRoleImageURL.text = textRoleImageResourceName.text;
+            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(textRoleImageResourceName.text);
 
 
-            role.spriteSrc = textRoleImageURL.text;
+            if(comboType.currentIndex === 0) {
+                if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                    open();
+                    //visible = true;
+                    labelDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textRoleImageURL.text);
+                    Platform.showToast("路径错误或文件不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    return;
+                }
+            }
+            else if(comboType.currentIndex === 1) {
+                if(!FrameManager.sl_qml_DirExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                    open();
+                    //visible = true;
+                    labelDialogTips.text = "路径错误或文件夹不存在:" + GlobalJS.toPath(textRoleImageURL.text);
+                    Platform.showToast("路径错误或文件夹不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    return;
+                }
+            }
+            else if(comboType.currentIndex === 2) {
+
+            }
+
+
+
             textRoleImageURL.enabled = false;
-            textRoleResourceName.enabled = true;
+            textRoleImageResourceName.enabled = true;
 
 
+            _private.refreshRole();
+
+
+            labelDialogTips.text = '';
             /*
             textRoleImageURL.text = "";
-            textRoleResourceName.text = "";
-            textRoleResourceName.enabled = true;
-            labelDialogTips.text = "";
+            textRoleImageResourceName.text = "";
+            textRoleImageResourceName.enabled = true;
             */
-            _private.refreshRole();
 
 
             //visible = false;
@@ -1329,11 +2206,15 @@ Item {
             //console.log("Ok clicked");
         }
         onRejected: {
+            textRoleImageURL.text = _private.strTextBackupRoleImageURL;
+            textRoleImageResourceName.text = _private.strTextBackupRoleImageResourceName;
+
+
+            labelDialogTips.text = "";
             /*
             textRoleImageURL.text = "";
-            textRoleResourceName.text = "";
-            textRoleResourceName.enabled = true;
-            labelDialogTips.text = "";
+            textRoleImageResourceName.text = "";
+            textRoleImageResourceName.enabled = true;
             */
 
 
@@ -1364,7 +2245,6 @@ Item {
                 p = p.parent;
             }*/
         }
-
     }
 
 
@@ -1380,12 +2260,12 @@ Item {
 
 
         onClicked: {
-            textRoleImageURL.text = GameMakerGlobal.roleResourceURL(item);
-            textRoleResourceName.text = item;
+            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(item);
+            textRoleImageResourceName.text = item;
             console.debug("[RoleEditor]List Clicked:", textRoleImageURL.text)
 
             textRoleImageURL.enabled = false;
-            textRoleResourceName.enabled = false;
+            textRoleImageResourceName.enabled = true;
 
 
             dialogRoleData.visible = true;
@@ -1416,7 +2296,7 @@ Item {
         }
 
         onRemoveClicked: {
-            let filepath = GameMakerGlobal.roleResourcePath(item);
+            let filepath = GameMakerGlobal.spriteResourcePath(item);
 
             dialogCommon.show({
                 Msg: '确认删除？',
@@ -1438,6 +2318,76 @@ Item {
 
 
 
+
+    Dialog {
+        id: dialogScript
+
+        visible: false
+        title: "请输入脚本"
+        width: parent.width * 0.9
+        //height: parent.height * 0.9
+        anchors.centerIn: parent
+
+
+        modal: true
+        //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
+        //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            Notepad {
+                id: textCode
+
+                Layout.preferredWidth: parent.width
+
+                Layout.preferredHeight: textArea.implicitHeight
+                Layout.maximumHeight: root.height * 0.6
+                Layout.minimumHeight: 60
+                Layout.fillHeight: true
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+
+                //textArea.enabled: false
+                //textArea.readOnly: true
+                textArea.textFormat: TextArea.PlainText
+                textArea.text: ''
+                textArea.placeholderText: "请输入脚本"
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: textCode.textArea.focus ? 2 : 1
+                }
+
+                bCode: true
+            }
+        }
+
+
+        onAccepted: {
+            _private.saveJS();
+
+            _private.refreshRole();
+
+
+            root.forceActiveFocus();
+
+            //console.debug("[MapEditor]onAccepted");
+        }
+        onRejected: {
+            root.forceActiveFocus();
+
+            //console.debug("[MapEditor]onRejected");
+        }
+    }
+
+
+
     //导出角色对话框
     Dialog {
         id: dialogSaveRole
@@ -1454,19 +2404,29 @@ Item {
             root.forceActiveFocus();
 
 
-            _private.exportRole();
+            if(_private.exportRole()) {
+                //第一次保存，重新刷新
+                if(_private.strTextBackupRoleName === '')
+                    _private.refreshRole();
 
+                textDialogMsg.text = '';
+            }
+            else {
+                open();
+            }
         }
         onRejected: {
             //root.focus = true;
             root.forceActiveFocus();
 
+            textRoleName.text = _private.strTextBackupRoleName;
 
             //console.log("Cancel clicked");
         }
 
         ColumnLayout {
             width: parent.width
+
             RowLayout {
                 width: parent.width
                 Label {
@@ -1500,15 +2460,19 @@ Item {
                     //wrapMode: TextEdit.Wrap
                 }
             }*/
+
+            Label {
+                id: textDialogMsg
+                color: 'red'
+            }
         }
     }
 
 
 
 
-    //游戏对话框
     Dialog {
-        id: dialogScript
+        id: dialogDebugScript
 
         title: "执行脚本"
         width: 300
@@ -1579,7 +2543,35 @@ Item {
 
         property int nColumnHeight: 50
 
-        //property string strRoleName: ""
+        property string strTextBackupRoleName: ''
+        property string strTextBackupRoleImageURL
+        property string strTextBackupRoleImageResourceName
+
+        property var jsEngine: new GlobalJS.JSEngine(root)
+
+        property string strTextCode: `
+let imageFixPositions;
+
+function $refresh(index, imageAnimate, path) {
+    if(imageFixPositions === undefined) {
+        imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
+        if(imageFixPositions)
+            imageFixPositions = imageFixPositions.split('\\r\\n');
+        else
+            imageFixPositions = null;
+    }
+
+    imageAnimate.source = path + GameMakerGlobal.separator + String(index+1).padStart(5, '0') + '.png';
+    let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
+    imageAnimate.rXOffset += parseInt(tx);
+    imageAnimate.rYOffset += parseInt(ty);
+}
+`
+
+
+        function changeType() {
+            _private.refreshRole();
+        }
 
 
         function showImage() {
@@ -1589,41 +2581,99 @@ Item {
 
 
         function refreshRole() {
-            role.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
-            role.nFrameCount = parseInt(textRoleFrameCount.text);
+            switch(comboType.currentIndex) {
+            case 2:
+                role.nSpriteType = 0;
+                break;
+            case 0:
+            case 1:
+            default:
+                role.nSpriteType = comboType.currentIndex + 1;
+                break;
+            }
 
-            //role.arrFrameDirectionIndex = textRoleFangXiangIndex.text.split(',');
-            role.arrFrameDirectionIndex = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                                           [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                                           [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                                           [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
+            role.strSource = textRoleImageURL.text;
 
-            role.interval = parseInt(textRoleFrameInterval.text);
-            //role.width = parseInt(textRoleWidth.text);
-            //role.height = parseInt(textRoleHeight.text);
-            role.implicitWidth = parseInt(textRoleWidth.text);
-            role.implicitHeight = parseInt(textRoleHeight.text);
-            role.x1 = parseInt(textRoleTrueX.text);
-            role.y1 = parseInt(textRoleTrueY.text);
-            role.width1 = parseInt(textRoleTrueWidth.text);
-            role.height1 = parseInt(textRoleTrueHeight.text);
-            role.rXScale = parseFloat(textRoleFrameXScale.text);
-            role.rYScale = parseFloat(textRoleFrameYScale.text);
-
+            role.x1 = parseInt(textRoleRealX.text);
+            role.y1 = parseInt(textRoleRealY.text);
+            role.width1 = parseInt(textRoleRealWidth.text);
+            role.height1 = parseInt(textRoleRealHeight.text);
             role.rectShadow.opacity = parseFloat(textRoleShadowOpacity.text);
+
 
             //role.moveSpeed = parseFloat(textRoleSpeed.text);
 
+            if(comboType.currentIndex === 0) {
 
-            rectRole.Layout.preferredWidth = rectRole.width = parseInt(textRoleWidth.text);
-            rectRole.Layout.preferredHeight = rectRole.height = parseInt(textRoleHeight.text);
+                role.nFrameCount = parseInt(textRoleFrameCount.text);
+                role.nInterval = parseInt(textRoleFrameInterval.text);
+
+                //role.width = parseInt(textRoleWidth.text);
+                //role.height = parseInt(textRoleHeight.text);
+                role.rXOffset = parseInt(textRoleXOffset.text);
+                role.rYOffset = parseInt(textRoleYOffset.text);
+                role.implicitWidth = parseInt(textRoleWidth.text);
+                role.implicitHeight = parseInt(textRoleHeight.text);
+                role.rXScale = parseFloat(textRoleFrameXScale.text);
+                role.rYScale = parseFloat(textRoleFrameYScale.text);
+
+                //role.arrActionsData = textRoleFangXiangIndex.text.split(',');
+                role.arrActionsData = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
+
+                role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
+            }
+            else if(comboType.currentIndex === 1) {
+
+                role.rXOffset = parseInt(textRoleXOffset.text);
+                role.rYOffset = parseInt(textRoleYOffset.text);
+                role.implicitWidth = parseInt(textRoleWidth.text);
+                role.implicitHeight = parseInt(textRoleHeight.text);
+                role.rXScale = parseFloat(textRoleFrameXScale.text);
+                role.rYScale = parseFloat(textRoleFrameYScale.text);
 
 
-            role.refresh();
+                role.arrActionsData = {};
+                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameInterval');
+
+                for(let tt in actionNames) {
+                    if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
+                        role.arrActionsData[actionNames[tt].text.trim()] = [
+                            parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
+                        ];
+                    else {
+                        return false;
+                    }
+                }
+
+
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim();
+                if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
+                    _private.jsEngine.clear();
+                    let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
+                    role.sprite.sprite.fnRefresh = ts.$refresh;
+                    //FrameManager.sl_qml_clearComponentCache();
+                }
+            }
+            else if(comboType.currentIndex === 2) {
+
+            }
+
+
+            rectRole.Layout.preferredWidth = rectRole.width = role.implicitWidth;
+            rectRole.Layout.preferredHeight = rectRole.height = role.implicitHeight;
+
+
+            role.reset();
 
             /*role.sizeFrame = Qt.size(37, 58);
             role.nFrameCount = 3;
-            role.arrFrameDirectionIndex = [3,2,1,0];
+            role.arrActionsData = [3,2,1,0];
             role.interval = 100;
             role.width = 37;
             role.height = 58;
@@ -1637,24 +2687,29 @@ Item {
         }
 
 
+        function saveJS() {
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim();
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+        }
+
         //导出角色
         function exportRole() {
 
             let roleName = textRoleName.text.trim();
 
             if(roleName.length === 0) {
-                Platform.showToast("角色名不能为空");
-                dialogSaveRole.open();
+                //Platform.showToast("角色名不能为空");
+                textDialogMsg.text = "角色名不能为空";
+                //dialogSaveRole.open();
                 return false;
             }
+
 
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!FrameManager.sl_qml_DirExists(path))
                 FrameManager.sl_qml_CreateFolder(path);
             */
-
-
 
             let outputData = {};
             /*outputData.Version = "0.6";
@@ -1664,40 +2719,100 @@ Item {
             outputData.RoleSize = [role.implicitWidth, role.implicitHeight];
             outputData.FrameSize = [role.sizeFrame.width, role.sizeFrame.height];
             outputData.FrameCount = role.nFrameCount;
-            outputData.FrameIndex = role.arrFrameDirectionIndex.toString();
+            outputData.FrameIndex = role.arrActionsData.toString();
             outputData.FrameInterval = role.interval;
             outputData.RealOffset = [role.x1, role.y1];
             outputData.RealSize = [role.width1, role.height1];
             outputData.MoveSpeed = role.moveSpeed;
-            outputData.Image = role.spriteSrc;
+            outputData.Image = role.strSource;
             */
-            outputData.Version = "0.6";
+            outputData.Version = "0.9";
             outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型
+            //outputData.SpriteType = comboType.currentIndex + 1;
+            switch(comboType.currentIndex) {
+            case 2:
+                outputData.SpriteType = 0;
+                break;
+            case 0:
+            case 1:
+            default:
+                outputData.SpriteType = comboType.currentIndex + 1;
+                break;
+            }
+
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
-            outputData.RoleSize = [parseInt(textRoleWidth.text), parseInt(textRoleHeight.text)];
-            outputData.FrameSize = [parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text)];
-            outputData.FrameCount = parseInt(textRoleFrameCount.text);
 
-            //outputData.FrameIndex = textRoleFangXiangIndex.text;
-            outputData.FrameIndex = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                                           [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                                           [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                                           [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
-
-            outputData.FrameInterval = parseInt(textRoleFrameInterval.text);
-            outputData.RealOffset = [parseInt(textRoleTrueX.text), parseInt(textRoleTrueY.text)];
-            outputData.RealSize = [parseInt(textRoleTrueWidth.text), parseInt(textRoleTrueHeight.text)];
-            outputData.Scale = [parseFloat(textRoleFrameXScale.text), parseFloat(textRoleFrameYScale.text)];
-            outputData.MoveSpeed = parseFloat(textRoleSpeed.text);
+            outputData.RealOffset = [parseInt(textRoleRealX.text), parseInt(textRoleRealY.text)];
+            outputData.RealSize = [parseInt(textRoleRealWidth.text), parseInt(textRoleRealHeight.text)];
             outputData.ShadowOpacity = parseFloat(textRoleShadowOpacity.text);
+
+            outputData.MoveSpeed = parseFloat(textRoleSpeed.text);
             outputData.Penetrate = parseInt(textPenetrate.text);
             outputData.ShowName = parseInt(textShowName.text);
 
-            outputData.Image = textRoleResourceName.text;
             outputData.Avatar = textAvatar.text;
             outputData.AvatarSize = [parseInt(textAvatarWidth.text), parseInt(textAvatarHeight.text)];
 
+            if(comboType.currentIndex === 0) {
+                outputData.Image = textRoleImageResourceName.text;
+
+                //outputData.FrameIndex = textRoleFangXiangIndex.text;
+                outputData.FrameIndex = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
+
+                outputData.FrameSize = [parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text)];
+                outputData.FrameCount = parseInt(textRoleFrameCount.text);
+                outputData.FrameInterval = parseInt(textRoleFrameInterval.text);
+
+                outputData.RoleOffset = [parseInt(textRoleXOffset.text), parseInt(textRoleYOffset.text)];
+                outputData.RoleSize = [parseInt(textRoleWidth.text), parseInt(textRoleHeight.text)];
+                outputData.Scale = [parseFloat(textRoleFrameXScale.text), parseFloat(textRoleFrameYScale.text)];
+            }
+            else if(comboType.currentIndex === 1) {
+                outputData.Image = textRoleImageResourceName.text;
+
+
+                outputData.FrameIndex = {};
+                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameInterval');
+
+                for(let tt in actionNames) {
+                    if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
+                        outputData.FrameIndex[actionNames[tt].text.trim()] = [
+                            parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
+                        ];
+                    else {
+                        textDialogMsg.text = "有必填项没填";
+                        return false;
+                    }
+                }
+
+
+                outputData.RoleOffset = [parseInt(textRoleXOffset.text), parseInt(textRoleYOffset.text)];
+                outputData.RoleSize = [parseInt(textRoleWidth.text), parseInt(textRoleHeight.text)];
+                outputData.Scale = [parseFloat(textRoleFrameXScale.text), parseFloat(textRoleFrameYScale.text)];
+            }
+            else if(comboType.currentIndex === 2) {
+                outputData.FrameIndex = {};
+                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'ActionName');
+                let SpriteNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'SpriteName');
+
+                for(let tt in actionNames) {
+                    if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim())
+                        outputData.FrameIndex[actionNames[tt].text.trim()] = [
+                            SpriteNames[tt].text.trim()
+                        ];
+                    else {
+                        textDialogMsg.text = "有必填项没填";
+                        return false;
+                    }
+                }
+            }
 
 
             //!!!导出为文件
@@ -1705,6 +2820,10 @@ Item {
             //let ret = File.write(filepath, JSON.stringify(outputData));
             let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
+
+
+            saveJS();
+
 
             console.debug("[RoleEditor]exportRole ret:", ret, filepath);
 
@@ -1817,6 +2936,9 @@ Item {
                 OnAccepted: function() {
                     if(exportRole())
                         s_close();
+                    else {
+                        dialogSaveRole.open();
+                    }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
@@ -1872,12 +2994,21 @@ Item {
 
         console.debug("[RoleEditor]Keys.onReleased", event.isAutoRepeat);
 
-        //console.debug(role.arrFrameDirectionIndex);
+        //console.debug(role.arrActionsData);
         //console.debug(textRoleFangXiangIndex.text.split(','));
     }
 
 
     Component.onCompleted: {
+        layoutAction1.arrCacheComponent.push(compActions1.createObject(layoutAction1, {bShowDelete: false, textActionName: '$Up', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction1.arrCacheComponent.push(compActions1.createObject(layoutAction1, {bShowDelete: false, textActionName: '$Right', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction1.arrCacheComponent.push(compActions1.createObject(layoutAction1, {bShowDelete: false, textActionName: '$Down', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction1.arrCacheComponent.push(compActions1.createObject(layoutAction1, {bShowDelete: false, textActionName: '$Left', bActionReadOnly: true, bActionColor: 'red'}));
 
+
+        layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Up', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Right', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Down', bActionReadOnly: true, bActionColor: 'red'}));
+        layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Left', bActionReadOnly: true, bActionColor: 'red'}));
     }
 }

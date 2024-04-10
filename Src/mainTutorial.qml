@@ -114,18 +114,6 @@ Item {
             }
         }
 
-        Button {
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
-
-            text: "侠道仙缘（引擎上架游戏）"
-            onClicked: {
-                Qt.openUrlExternally('https://www.taptap.cn/app/261814');
-            }
-        }
-
 
 
         Label {
@@ -199,6 +187,122 @@ Item {
             }
         }
 
+        ColumnLayout {
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+            //Layout.preferredHeight: 1
+            Layout.minimumHeight: 0
+
+
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                //Layout.preferredHeight: 1
+                Layout.minimumHeight: 0
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("上架游戏：")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+                }
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>侠道仙缘(Tap)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.taptap.cn/app/261814');
+                    }
+                }
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>剑心之誓(快爆)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.3839.com/a/164540.htm');
+                    }
+                }
+
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                //Layout.preferredHeight: 1
+                Layout.minimumHeight: 0
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>英语杀(Tap)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.taptap.cn/app/180050');
+                    }
+                }
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>英语杀(Steam)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://store.steampowered.com/app/934710');
+                    }
+                }
+            }
+        }
     }
 
 

@@ -73,6 +73,7 @@ Item {
 
                 Label {
                     //id: tlable
+                    visible: false
                     text: '*动作名'
                 }
 
@@ -94,6 +95,7 @@ Item {
 
                 Label {
                     //id: tlable
+                    visible: false
                     text: '@特效名'
                 }
 
@@ -133,7 +135,11 @@ Item {
 
                 Button {
                     id: tbutton
+
+                    implicitWidth: 30
+
                     text: 'x'
+
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
@@ -652,6 +658,42 @@ Item {
 
                         spacing: 16
 
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '增加'
+
+                            onClicked: {
+                                let c = comp.createObject(layoutActionLayout);
+                                _private.arrCacheComponent.push(c);
+
+                                GlobalLibraryJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*动作名'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '@特效名'
+                                //font.pointSize: _config.nTextFontSize
+                            }
+                        }
+
                         RowLayout {
                             id: layoutFirstAction
 
@@ -659,6 +701,7 @@ Item {
                             Layout.preferredHeight: 30
 
                             Label {
+                                visible: false
                                 text: '*动作名：'
                             }
 
@@ -668,8 +711,9 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                                enabled: false
+                                //enabled: false
 
+                                color: 'red'
                                 text: 'Normal'
                                 placeholderText: '*动作名'
 
@@ -681,6 +725,7 @@ Item {
 
                             }
                             Label {
+                                visible: false
                                 //id: tlable
                                 text: '@特效名'
                             }
@@ -714,15 +759,6 @@ Item {
                                             root.forceActiveFocus();
                                         },
                                     });
-                                }
-                            }
-
-                            Button {
-                                text: '增加'
-
-                                onClicked: {
-                                    let c = comp.createObject(layoutActionLayout);
-                                    _private.arrCacheComponent.push(c);
                                 }
                             }
                         }

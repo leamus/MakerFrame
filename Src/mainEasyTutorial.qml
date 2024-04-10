@@ -354,16 +354,16 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.popmusic();</font>：播放上一次存栈的音乐。一般用在战斗结束后（commonFightEndEvent已调用，不用写在战斗结束脚本中）。
 <font color='yellow'>game.seekmusic(offset=0);</font>：设置播放的音乐进度。
 
-//播放视频
-//video是视频名称；properties包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
+//播放视频；
+//videoParams是视频名称或对象（包含RId）；videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
 //  也可以 $x、$y、$width、$height。
 <font color='yellow'>game.playvideo(videoName, properties={});</font>
 
 <font color='yellow'>game.stopvideo()</font>：结束播放。
 
 //显示图片；
-//image为图片名；properties为图片属性；id为图片标识（用来控制和删除）；
-//properties：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked 事件的回调函数；
+//imageParams为图片名或对象（包含RId）；id为图片标识（用来控制和删除）；
+//imageParams为对象：包含 Image组件  的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked 事件的回调函数；
 //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
 //    不带$表示按像素；
 //    带$的属性有以下几种格式：
@@ -372,13 +372,15 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
 //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示全屏的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
 //  $parent：0表示显示在屏幕上（默认）；1表示显示在屏幕上（受scale影响）；2表示显示在地图上；字符串表示显示在某个角色上；
-<font color='yellow'>game.showimage(image, properties={}, id=undefined);</font>
+<font color='yellow'>game.showimage(imageParams, id=undefined);</font>
 
-<font color='yellow'>game.delimage(id)</font>：删除图片，id为图片标识。
+//删除图片；
+//idParams为：-1：全部屏幕上的图片组件；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id和$parent属性（同showimage）；
+<font color='yellow'>game.delimage(idParams)</font>
 
-//显示精灵
-//spriteEffectRId为精灵名；properties为精灵属性；id为精灵标识（用来控制和删除）
-//properties：包含 SpriteEffect组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked、$looped、$finished 事件的回调函数；
+//显示特效；
+//spriteParams为特效名或对象（包含RId）；id为特效标识（用来控制和删除）
+//spriteParams为对象：包含 SpriteEffect组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked、$looped、$finished 事件的回调函数；
 //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
 //    不带$表示按像素；
 //    带$的属性有以下几种格式：
@@ -387,10 +389,11 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
 //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示全屏的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
 //  $parent：0表示显示在屏幕上（默认）；1表示显示在屏幕上（受scale影响）；2表示显示在地图上；字符串表示显示在某个角色上；
-<font color='yellow'>game.showsprite(spriteEffectRId, properties={}, id=undefined);</font>
+<font color='yellow'>game.showsprite(spriteParams, id=undefined);</font>
 
-//删除精灵，id为精灵标识
-<font color='yellow'>game.delsprite(id=-1);</font>
+//删除特效；
+//idParams为：-1：全部屏幕上的特效组件；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id和$parent属性（同showsprite）；
+<font color='yellow'>game.delsprite(idParams=-1);</font>
 
 //设置操作（遥感可用和可见、键盘可用）；
 //参数$gamepad的$visible和$enabled，$keyboard的$enabled；
@@ -418,7 +421,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.date()</font>：返回 JS 的 new Date()对象。
 
 <font color='yellow'>game.checksave("文件名")</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>game.save("文件名", showName="", 是否压缩)</font>：存档（将game.gd存为 文件），showName为显示名。
+<font color='yellow'>game.save("文件名", showName="", type=1, compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，type为0普通保存，为1弃用压缩；返回存档数据
 <font color='yellow'>game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
 <font color='yellow'>game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
 
