@@ -210,16 +210,16 @@ Item {
             for(let tt in cfg.FrameIndex) {
                 let tObj;
                 if(tt === '$Up') {
-                    tObj = layoutAction1.arrCacheComponent[0];
+                    tObj = layoutAction2.arrCacheComponent[0];
                 }
                 else if(tt === '$Right') {
-                    tObj = layoutAction1.arrCacheComponent[1];
+                    tObj = layoutAction2.arrCacheComponent[1];
                 }
                 else if(tt === '$Down') {
-                    tObj = layoutAction1.arrCacheComponent[2];
+                    tObj = layoutAction2.arrCacheComponent[2];
                 }
                 else if(tt === '$Left') {
-                    tObj = layoutAction1.arrCacheComponent[3];
+                    tObj = layoutAction2.arrCacheComponent[3];
                 }
                 else {
                     tObj = compActions2.createObject(layoutAction2);
@@ -315,15 +315,16 @@ Item {
 
                         l_list.open({
                             Data: path,
-                            OnClicked: (index, item)=>{
+                            CustomData: this,
+                            OnClicked: (index, item, customData)=>{
                                 text = item;
 
                                 l_list.visible = false;
-                                root.forceActiveFocus();
+                                customData.forceActiveFocus();
                             },
-                            OnCanceled: ()=>{
+                            OnCanceled: (customData)=>{
                                 l_list.visible = false;
-                                root.forceActiveFocus();
+                                customData.forceActiveFocus();
                             },
                         });
                     }
@@ -1748,8 +1749,8 @@ Item {
                 id: rectRole
                 Layout.alignment: Qt.AlignHCenter
 
-                //Layout.preferredWidth: parseInt(textSpriteWidth.text)
-                //Layout.preferredHeight: parseInt(textSpriteHeight.text)
+                Layout.preferredWidth: role.width
+                Layout.preferredHeight: role.height
 
                 color: 'transparent'
                 border {
@@ -1760,9 +1761,8 @@ Item {
                 Role {
                     id: role
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
 
-                    bTest: true
                     //width: 37;
                     //height: 58;
 
@@ -1777,6 +1777,9 @@ Item {
                     width1: 37;
                     height1: 58;
                     moveSpeed: 100;*/
+
+                    bTest: true
+                    sprite.nType: 1
 
                     /*onS_clicked: {
                         root.forceActiveFocus();
@@ -2421,6 +2424,8 @@ Item {
 
             textRoleName.text = _private.strTextBackupRoleName;
 
+            textDialogMsg.text = '';
+
             //console.log("Cancel clicked");
         }
 
@@ -2434,6 +2439,7 @@ Item {
                 }
                 TextField {
                     id: textRoleName
+
                     Layout.fillWidth: true
                     placeholderText: "深林孤鹰"
                     text: ""
@@ -2592,28 +2598,19 @@ function $refresh(index, imageAnimate, path) {
                 break;
             }
 
-            role.strSource = textRoleImageURL.text;
-
-            role.x1 = parseInt(textRoleRealX.text);
-            role.y1 = parseInt(textRoleRealY.text);
-            role.width1 = parseInt(textRoleRealWidth.text);
-            role.height1 = parseInt(textRoleRealHeight.text);
-            role.rectShadow.opacity = parseFloat(textRoleShadowOpacity.text);
-
-
-            //role.moveSpeed = parseFloat(textRoleSpeed.text);
 
             if(comboType.currentIndex === 0) {
+                role.strSource = textRoleImageURL.text;
 
                 role.nFrameCount = parseInt(textRoleFrameCount.text);
                 role.nInterval = parseInt(textRoleFrameInterval.text);
 
-                //role.width = parseInt(textRoleWidth.text);
-                //role.height = parseInt(textRoleHeight.text);
+                role.width = parseInt(textRoleWidth.text);
+                role.height = parseInt(textRoleHeight.text);
                 role.rXOffset = parseInt(textRoleXOffset.text);
                 role.rYOffset = parseInt(textRoleYOffset.text);
-                role.implicitWidth = parseInt(textRoleWidth.text);
-                role.implicitHeight = parseInt(textRoleHeight.text);
+                //role.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.height = parseInt(textRoleHeight.text);
                 role.rXScale = parseFloat(textRoleFrameXScale.text);
                 role.rYScale = parseFloat(textRoleFrameYScale.text);
 
@@ -2626,11 +2623,14 @@ function $refresh(index, imageAnimate, path) {
                 role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
             }
             else if(comboType.currentIndex === 1) {
+                role.strSource = textRoleImageURL.text;
 
                 role.rXOffset = parseInt(textRoleXOffset.text);
                 role.rYOffset = parseInt(textRoleYOffset.text);
-                role.implicitWidth = parseInt(textRoleWidth.text);
-                role.implicitHeight = parseInt(textRoleHeight.text);
+                role.width = parseInt(textRoleWidth.text);
+                role.height = parseInt(textRoleHeight.text);
+                //role.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.height = parseInt(textRoleHeight.text);
                 role.rXScale = parseFloat(textRoleFrameXScale.text);
                 role.rYScale = parseFloat(textRoleFrameYScale.text);
 
@@ -2661,12 +2661,45 @@ function $refresh(index, imageAnimate, path) {
                 }
             }
             else if(comboType.currentIndex === 2) {
+                //role.implicitWidth = parseInt(textRoleWidth.text);
+                //role.implicitHeight = parseInt(textRoleHeight.text);
 
+                role.arrActionsData = {};
+                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'ActionName');
+                let SpriteNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'SpriteName');
+
+                for(let tt in actionNames) {
+                    if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
+                        //role.arrActionsData[actionNames[tt].text.trim()] = [
+                        //    SpriteNames[tt].text.trim()
+                        //];
+
+                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                        let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + SpriteNames[tt].text.trim() + GameMakerGlobal.separator + "sprite.json"));
+                        if(data)
+                            data = JSON.parse(data);
+                        //else
+                        //    return false;
+                        role.arrActionsData[actionNames[tt].text.trim()] = data;
+                    }
+                    else {
+                        textDialogMsg.text = "有必填项没填";
+                        return false;
+                    }
+                }
             }
 
+            role.x1 = parseInt(textRoleRealX.text);
+            role.y1 = parseInt(textRoleRealY.text);
+            role.width1 = parseInt(textRoleRealWidth.text);
+            role.height1 = parseInt(textRoleRealHeight.text);
+            role.rectShadow.opacity = parseFloat(textRoleShadowOpacity.text);
 
-            rectRole.Layout.preferredWidth = rectRole.width = role.implicitWidth;
-            rectRole.Layout.preferredHeight = rectRole.height = role.implicitHeight;
+            //role.moveSpeed = parseFloat(textRoleSpeed.text);
+
+
+            //rectRole.Layout.preferredWidth = rectRole.width = role.sprite.width;
+            //rectRole.Layout.preferredHeight = rectRole.height = role.sprite.height;
 
 
             role.reset();

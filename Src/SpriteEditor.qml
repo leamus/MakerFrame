@@ -910,6 +910,7 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
+                    _private.strTextBackupSpriteName = textSpriteName.text;
 
                     dialogSaveSprite.open();
                 }
@@ -1838,12 +1839,16 @@ Item {
             //root.focus = true;
             root.forceActiveFocus();
 
+            textSpriteName.text = _private.strTextBackupSpriteName;
+
+            textDialogMsg.text = '';
 
             //console.log("Cancel clicked");
         }
 
         ColumnLayout {
             width: parent.width
+
             RowLayout {
                 width: parent.width
                 Label {
@@ -1869,6 +1874,7 @@ Item {
                 TextField {
                     id: textMapScale
                     Layout.fillWidth: true
+                    selectByMouse: true
                     placeholderText: "1"
                     text: "1"
 

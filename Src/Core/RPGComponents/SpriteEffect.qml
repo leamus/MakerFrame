@@ -34,6 +34,8 @@ Loader {
         id: compFileSpriteEffect
 
         FileSpriteEffect {
+            anchors.fill: parent
+
             smooth: root.smooth
 
             strSource: root.strSource   //精灵图片路径
@@ -74,8 +76,13 @@ Loader {
             bTest: root.bTest
 
 
+            onS_started: root.s_started()
+            onS_refreshed: root.s_refreshed(currentFrame)
             onS_looped: root.s_looped()
             onS_finished: root.s_finished()
+            onS_paused: root.s_paused()
+            onS_stoped: root.s_stoped()
+
             onS_playEffect: root.s_playEffect(soundeffectSource)
         }
     }
@@ -84,6 +91,8 @@ Loader {
         id: compDirSpriteEffect
 
         DirSpriteEffect {
+            anchors.fill: parent
+
             smooth: root.smooth
 
             strSource: root.strSource   //精灵图片路径
@@ -124,8 +133,13 @@ Loader {
             bTest: root.bTest
 
 
+            onS_started: root.s_started()
+            onS_refreshed: root.s_refreshed(currentFrame)
             onS_looped: root.s_looped()
             onS_finished: root.s_finished()
+            onS_paused: root.s_paused()
+            onS_stoped: root.s_stoped()
+
             onS_playEffect: root.s_playEffect(soundeffectSource)
         }
     }
@@ -159,10 +173,14 @@ Loader {
 
 
 
+    signal s_started();
+    signal s_refreshed(int currentFrame);
     //每次播放结束
     signal s_looped();
     //停止播放
     signal s_finished();
+    signal s_paused();
+    signal s_stoped();
 
     //播放音效
     signal s_playEffect(string soundeffectSource)

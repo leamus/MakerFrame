@@ -846,6 +846,19 @@ Item {
                     setMainRolePos(parseInt(props.$bx), parseInt(props.$by), hero.$index);
 
 
+                //如果不是从 createhero 过来的（createhero过来的，hero和props是一个对象）
+                if(props !== hero) {
+                    //其他属性直接赋值
+                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                    //for(let tp in props) {
+                    for(let tp of Object.keys(props)) {
+                        if(usedProps.indexOf(tp) >= 0)
+                            continue;
+                        hero[tp] = props[tp];
+                    }
+                }
+
+
                 if(props.$direction !== undefined)
                     heroComp.start(props.$direction, null);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
@@ -859,19 +872,6 @@ Item {
                     heroComp.width1 = props.$realSize[0];
                     heroComp.height1 = props.$realSize[1];
                     //console.debug('!!!', props.$realSize)
-                }
-
-
-                //如果不是从 createhero 过来的（createhero过来的，hero和props是一个对象）
-                if(props !== hero) {
-                    //其他属性直接赋值
-                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
-                    //for(let tp in props) {
-                    for(let tp of Object.keys(props)) {
-                        if(usedProps.indexOf(tp) >= 0)
-                            continue;
-                        hero[tp] = props[tp];
-                    }
                 }
             }
 
@@ -1207,12 +1207,6 @@ Item {
                 }
 
 
-                if(props.$start === true)
-                    roleComp.start();
-                else if(props.$start === false)
-                    roleComp.stop();
-
-
                 //如果不是从 createrole 过来的（createrole过来的，role和props是一个对象）
                 if(props !== hero) {
                     //其他属性直接赋值
@@ -1224,6 +1218,13 @@ Item {
                         role[tp] = props[tp];
                     }
                 }
+
+
+                if(props.$start === true)
+                    roleComp.start();
+                else if(props.$start === false)
+                    roleComp.stop();
+
             }
 
 
@@ -2543,6 +2544,9 @@ Item {
                     return;
                 }
             }
+            else if(GlobalLibraryJS.isObject(imageParams.$parent)) {
+                parentComp = imageParams.$parent;
+            }
             //固定屏幕上
             else {
                 parentComp = rootGameScene;
@@ -2602,9 +2606,9 @@ Item {
             //默认原宽度
             if(imageParams.$width === undefined && imageParams.width === undefined)
                 tmp.width = tmp.implicitWidth;
-            //屏宽
+            //父组件宽
             else if(imageParams.$width === -1)
-                tmp.width = Qt.binding(function(){return rootGameScene.width});
+                tmp.width = Qt.binding(function(){return parentComp.width});
             else if(GlobalLibraryJS.isArray(imageParams.$width)) {
                 switch(imageParams.$width[1]) {
                 //如果是 固定宽度
@@ -2639,9 +2643,9 @@ Item {
             //默认原高
             if(imageParams.$height === undefined && imageParams.height === undefined)
                 tmp.height = tmp.implicitHeight;
-            //屏高
+            //父组件高
             else if(imageParams.$height === -1)
-                tmp.height = Qt.binding(function(){return rootGameScene.height});
+                tmp.height = Qt.binding(function(){return parentComp.height});
             else if(GlobalLibraryJS.isArray(imageParams.$height)) {
                 switch(imageParams.$height[1]) {
                 //如果是 固定高度
@@ -2935,6 +2939,9 @@ Item {
                     return;
                 }
             }
+            else if(GlobalLibraryJS.isObject(spriteParams.$parent)) {
+                parentComp = spriteParams.$parent;
+            }
             //固定屏幕上
             else {
                 parentComp = rootGameScene;
@@ -2950,6 +2957,7 @@ Item {
             if(id === undefined || id === null)
                 id = spriteParams.RId;
 
+            let spriteData = GameSceneJS.getSpriteResource(spriteParams.RId);
             let sprite = objTmpSprites[id] || compCacheSpriteEffect.createObject(null);
             //刷新特效属性
             sprite = GameSceneJS.loadSpriteEffect(spriteParams.RId, sprite, spriteParams.$loops, null);
@@ -2975,9 +2983,10 @@ Item {
             //默认原宽
             if(spriteParams.$width  === undefined && spriteParams.width === undefined)
                 sprite.width = sprite.implicitWidth;
-            //屏宽
+            //组件宽
             else if(spriteParams.$width === -1)
-                sprite.width = Qt.binding(function(){return rootGameScene.width});
+                //sprite.width = Qt.binding(function(){return parentComp.width});
+                sprite.width = spriteData.SpriteSize[0];
             else if(GlobalLibraryJS.isArray(spriteParams.$width)) {
                 switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
@@ -3012,9 +3021,10 @@ Item {
             //默认原高
             if(spriteParams.$height === undefined && spriteParams.height === undefined)
                 sprite.height = sprite.implicitHeight;
-            //全屏
+            //父组件高
             else if(spriteParams.$height === -1)
-                sprite.height = Qt.binding(function(){return rootGameScene.height});
+                //sprite.height = Qt.binding(function(){return parentComp.height});
+                sprite.height = spriteData.SpriteSize[1];
             else if(GlobalLibraryJS.isArray(spriteParams.$height)) {
                 switch(spriteParams.$height[1]) {
                 //如果是 固定高度
@@ -6345,7 +6355,7 @@ Item {
                 if(GlobalLibraryJS.isString(data))
                     data = {RId: data};
 
-                data.$parent ?? (data.$parent = rootRole);
+                data.$parent ?? (data.$parent = rootRole.$data.$id);
                 data.$finished ?? (data.$finished = function(sprite) {
                     rootRole.sprite.visible = true;
                     sprite.visible = false;
@@ -6413,6 +6423,7 @@ Item {
             //自定义属性（也包含系统一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
             //主角的会被保存，NPC不会
             property var $data: null
+            property var $script: null
             //property string $name: ''
             //property string $avatar: ''
             //property size $avatarSize: Qt.size(0, 0)
@@ -6467,6 +6478,127 @@ Item {
             //sizeFrame: Qt.size(32, 48)
             //nFrameCount: 4
             //arrActionsData: [[0,3],[0,2],[0,0],[0,1]]
+
+
+            sprite.onS_started: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_started`;
+                else
+                    eventName = `$role_${$data.$id}_action_started`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_started'];
+
+                if(tScript)
+                    tScript(strActionName);
+            }
+
+            sprite.onS_refreshed: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_refreshed`;
+                else
+                    eventName = `$role_${$data.$id}_action_refreshed`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_refreshed'];
+
+                if(tScript)
+                    tScript(currentFrame, strActionName);
+            }
+
+            sprite.onS_looped: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_looped`;
+                else
+                    eventName = `$role_${$data.$id}_action_looped`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_looped'];
+
+                if(tScript)
+                    tScript(strActionName);
+            }
+
+            sprite.onS_finished: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_finished`;
+                else
+                    eventName = `$role_${$data.$id}_action_finished`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_finished'];
+
+                if(tScript)
+                    tScript(strActionName);
+            }
+
+            sprite.onS_paused: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_paused`;
+                else
+                    eventName = `$role_${$data.$id}_action_paused`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_paused'];
+
+                if(tScript)
+                    tScript(strActionName);
+            }
+
+            sprite.onS_stoped: {
+                if(!$data)
+                    return;
+                let eventName;
+                if($$type === 1)
+                    eventName = `$hero_${$data.$id}_action_stoped`;
+                else
+                    eventName = `$role_${$data.$id}_action_stoped`;
+                let tScript = itemViewPort.mapScript[eventName];
+                if(!tScript)
+                    tScript = game.f[eventName];
+                if(!tScript)
+                    tScript = game.gf[eventName];
+                if(!tScript && $script)
+                    tScript = $script['$action_stoped'];
+
+                if(tScript)
+                    tScript(strActionName);
+            }
 
 
             mouseArea.onClicked: {

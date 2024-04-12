@@ -29,6 +29,8 @@ Item {
     //被点击
     //signal s_clicked();
 
+    signal s_started();
+    signal s_refreshed(int currentFrame);
     //每次播放结束
     signal s_looped();
     //停止播放
@@ -39,6 +41,8 @@ Item {
         if(bTest)
             console.debug('!!!onFinished:', soundeffect.source, strSource);
     }
+    signal s_paused();
+    signal s_stoped();
 
     //播放音效
     signal s_playEffect(string soundeffectSource)
@@ -87,6 +91,8 @@ Item {
             soundeffect.pause();
 
         _private.nState = 2;
+
+        s_paused();
     }
 
     //停止动画
@@ -102,6 +108,8 @@ Item {
         }
 
         _private.nState = 0;
+
+        s_stoped();
     }
 
     function refresh() {
@@ -378,9 +386,14 @@ Item {
                 }
             }
 
-            if(_private.nLoopedCount === root.nFrameStartIndex)
+            if(root.nCurrentFrame === 0) {
+                root.s_started();
+
                 if(strSoundeffectName)
                     timerSound.restart();
+            }
+
+            root.s_refreshed(root.nCurrentFrame);
 
             refresh();
         }
@@ -404,7 +417,7 @@ Item {
 
         onTriggered: {
             if(nType === 1) {
-                soundeffect.source = root.strSoundeffectName;
+                soundeffect.source = GameMakerGlobal.soundResourceURL(root.strSoundeffectName);
                 soundeffect.play();
             }
             else

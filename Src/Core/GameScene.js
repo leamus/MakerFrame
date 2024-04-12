@@ -1477,7 +1477,7 @@ function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemVie
             spriteEffect.nFrameCount = data.FrameData[1];
             spriteEffect.nInterval = data.FrameData[2];
 
-            spriteEffect.sprite.nFrameStartIndex = data.FrameSize[0];
+            spriteEffect.sprite.nFrameStartIndex = data.FrameData[0];
 
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
@@ -1532,8 +1532,14 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
         }
 
         roleComp.nSpriteType = data.SpriteType ?? 1;
-        roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
-        if(roleComp.nSpriteType === 1) {
+        if(roleComp.nSpriteType === 0) {
+            for(let ta in data.FrameIndex) {
+                roleComp.arrActionsData[ta] = getSpriteResource(data.FrameIndex[ta][0]);
+            }
+        }
+        else if(roleComp.nSpriteType === 1) {
+            roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+
             roleComp.sprite.sprite.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
             roleComp.nFrameCount = data.FrameCount;
             roleComp.nInterval = data.FrameInterval;
@@ -1551,6 +1557,8 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
 
         }
         else if(roleComp.nSpriteType === 2) {
+            roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+
             roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
             roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
             //roleComp.implicitWidth = data.RoleSize[0];
@@ -1575,9 +1583,6 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
                 let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
                 roleComp.sprite.sprite.fnRefresh = ts.$refresh;
             }
-
-        }
-        else if(roleComp.nSpriteType === 3) {
 
         }
         roleComp.x1 = data.RealOffset[0];
