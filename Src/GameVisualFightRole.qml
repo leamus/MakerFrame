@@ -650,18 +650,41 @@ Item {
                         }
                     }
 
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '额外属性:'
+                        }
+
+                        TextField {
+                            id: textExtraProperties
+
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                            text: ''
+                            placeholderText: '额外属性'
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+                        }
+                    }
+
                     ColumnLayout {
-                        id: layoutActionLayout
+                        //id: layoutActionLayout
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
                         Button {
                             Layout.fillWidth: true
 
-                            text: '增加'
+                            text: '增加动作'
 
                             onClicked: {
                                 let c = comp.createObject(layoutActionLayout);
@@ -683,84 +706,100 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*动作名'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '@特效名'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                         }
 
-                        RowLayout {
-                            id: layoutFirstAction
+                        ColumnLayout {
+                            id: layoutActionLayout
 
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.fillHeight: true
 
-                            Label {
-                                visible: false
-                                text: '*动作名：'
-                            }
+                            spacing: 16
 
-                            TextField {
-                                objectName: 'actionName'
-
+                            Item {
                                 Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredHeight: 30
 
-                                //enabled: false
+                                RowLayout {
+                                    id: layoutFirstAction
 
-                                color: 'red'
-                                text: 'Normal'
-                                placeholderText: '*动作名'
+                                    anchors.fill: parent
 
-                                readOnly: true
+                                    Label {
+                                        visible: false
+                                        text: '*动作名：'
+                                    }
 
-                                //selectByKeyboard: true
-                                selectByMouse: true
-                                //wrapMode: TextEdit.Wrap
+                                    TextField {
+                                        objectName: 'actionName'
 
-                            }
-                            Label {
-                                visible: false
-                                //id: tlable
-                                text: '@特效名'
-                            }
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            TextField {
-                                objectName: 'spriteName'
+                                        //enabled: false
 
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                        color: 'red'
+                                        text: 'Normal'
+                                        placeholderText: '*动作名'
 
-                                text: ''
-                                placeholderText: '@特效名'
+                                        readOnly: true
 
-                                //selectByKeyboard: true
-                                selectByMouse: true
-                                //wrapMode: TextEdit.Wrap
+                                        //selectByKeyboard: true
+                                        selectByMouse: true
+                                        //wrapMode: TextEdit.Wrap
 
-                                onPressAndHold: {
-                                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                                    }
+                                    Label {
+                                        visible: false
 
-                                    l_list.open({
-                                        Data: path,
-                                        OnClicked: (index, item)=>{
-                                            text = item;
+                                        text: '@特效名'
+                                    }
 
-                                            l_list.visible = false;
-                                            root.forceActiveFocus();
-                                        },
-                                        OnCanceled: ()=>{
-                                            l_list.visible = false;
-                                            root.forceActiveFocus();
-                                        },
-                                    });
+                                    TextField {
+                                        objectName: 'spriteName'
+
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                                        text: ''
+                                        placeholderText: '@特效名'
+
+                                        //selectByKeyboard: true
+                                        selectByMouse: true
+                                        //wrapMode: TextEdit.Wrap
+
+                                        onPressAndHold: {
+                                            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+
+                                            l_list.open({
+                                                Data: path,
+                                                OnClicked: (index, item)=>{
+                                                    text = item;
+
+                                                    l_list.visible = false;
+                                                    root.forceActiveFocus();
+                                                },
+                                                OnCanceled: ()=>{
+                                                    l_list.visible = false;
+                                                    root.forceActiveFocus();
+                                                },
+                                            });
+                                        }
+                                    }
                                 }
                             }
+
                         }
                     }
                 }
@@ -835,6 +874,13 @@ Item {
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+
+        property int nLabelFontSize: 10
+    }
 
     QtObject {
         id: _private
@@ -1012,7 +1058,8 @@ Item {
                 replace(/\$\$goods\$\$/g, GlobalLibraryJS.array2string(textGoods.text.trim().split(','))).
                 replace(/\$\$equipment\$\$/g, GlobalLibraryJS.array2string(textEquipment.text.trim().split(','))).
                 replace(/\$\$money\$\$/g, textMoney.text.trim() || '0').
-                replace(/\$\$EXP\$\$/g, textEXP.text.trim() || '0')
+                replace(/\$\$EXP\$\$/g, textEXP.text.trim() || '0').
+                replace(/\$\$ExtraProperties\$\$/g, textExtraProperties.text.trim()/* || 'undefined'*/)
             ;
 
             console.debug(data);
@@ -1063,10 +1110,10 @@ let data = (function() {
 
 
     //独立属性，用 combatant 来引用；会保存到存档中；
-    //params：使用对象{RId:xxx, Params: 。。。}创建时的对象参数。
+    //params：使用对象{RID:xxx, Params: 。。。}创建时的对象参数。
     let $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
         return {
-            $name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$,
+            $name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$, $$ExtraProperties$$
         };
     };
 
@@ -1074,7 +1121,7 @@ let data = (function() {
     //公用属性，可用 combatant.$commons 或 combatant 来引用；
     let $commons = {
 
-        //$name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$,
+        //$name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$, $$ExtraProperties$$
 
 
         //动作包含的 精灵名

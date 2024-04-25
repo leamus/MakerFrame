@@ -227,11 +227,13 @@ Item {
                 return;
             }
 
+
             let fileName = textFilePath.text.slice(0, textFilePath.text.lastIndexOf('.'));
-
-
+            if(textFilePath.text.indexOf('.js') >= 0)
+                fileName += '.vjs';
+            if(textFilePath.text.indexOf('.qml') >= 0)
+                fileName += '.vqml';
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + fileName;
-
             item.loadData(filePath);
 
 

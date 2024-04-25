@@ -328,7 +328,7 @@ function loadResources() {
                 button.s_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    game.run(tConfig.$clicked());
+                    game.run(tConfig.$clicked() ?? null);
                 });
             }
 
@@ -708,7 +708,7 @@ function loadResources() {
 
                 if(ts.$load && ts.$autoLoad !== false) {
                     //ts.$load();
-                    game.run([ts.$load(), 'plugin_load:' + tc0 + tc1]);
+                    game.run([ts.$load() ?? null, 'plugin_load:' + tc0 + tc1]);
                 }
             }
             catch(e) {
@@ -734,7 +734,7 @@ function unloadResources() {
         for(let tp in _private.objPlugins[tc])
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false)
                 //_private.objPlugins[tc][tp].$unload();
-                game.run([_private.objPlugins[tc][tp].$load(), 'plugin_load:' + tc + tp]);
+                game.run([_private.objPlugins[tc][tp].$load() ?? null, 'plugin_load:' + tc + tp]);
 
 
     loaderFightScene.unload();
@@ -924,12 +924,13 @@ function getFightRoleResource(item, forceLoad=false) {
 
         _private.fightRolesResource[item] = ts.data;
         _private.fightRolesResource[item].$rid = item;
+        let _proto_ = game.$sys.protoObjects.fightRole;
         if(_private.fightRolesResource[item].$commons) {
+            _private.fightRolesResource[item].$commons.__proto__ = _proto_;
             _private.fightRolesResource[item].__proto__ = _private.fightRolesResource[item].$commons;
-            _private.fightRolesResource[item].$commons.__proto__ = _private.objCommonScripts["combatant_class"].prototype;
         }
         else {
-            _private.fightRolesResource[item].__proto__ = _private.objCommonScripts["combatant_class"].prototype;
+            _private.fightRolesResource[item].__proto__ = _proto_;
         }
 
         console.debug("[GameScene]载入FightRole Script", item);
@@ -953,9 +954,9 @@ function getSpriteResource(item, forceLoad=false) {
 
 
     //读特效信息
-    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
 
-    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json"));
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + "sprite.json"));
     if(data)
         data = JSON.parse(data);
 
@@ -978,6 +979,12 @@ function getSpriteResource(item, forceLoad=false) {
         let cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
+
+        if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
+            _private.spritesResource[item].$script = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
+        }
+
+
         console.debug("[GameScene]载入Sprite", item);
         return data;
     }
@@ -997,9 +1004,9 @@ function getRoleResource(item, forceLoad=false) {
 
 
     //读角色信息
-    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName;
+    let path = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
 
-    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.json"));
+    let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + "role.json"));
     if(data)
         data = JSON.parse(data);
 
@@ -1008,6 +1015,12 @@ function getRoleResource(item, forceLoad=false) {
         _private.rolesResource[item] = data;
         _private.rolesResource[item].$rid = item;
         //_private.rolesResource[item].__proto__ = _private.rolesResource[item].$commons;
+
+
+        if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
+            _private.rolesResource[item].$script = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
+        }
+
 
         console.debug("[GameScene]载入Role", item);
         return data;
@@ -1097,19 +1110,20 @@ function getSkillObject(skill, forceNew=true) {
         }
 
         else {
-            resSkill = GameSceneJS.getSkillResource(skill.RId);
+            skill.RID = skill.RID ?? skill.RId;
+            resSkill = GameSceneJS.getSkillResource(skill.RID);
             if(!resSkill) {
-                //console.warn('[!GameScene]没有技能：', skill.RId);
+                //console.warn('[!GameScene]没有技能：', skill.RID);
                 return null;
             }
 
             //创建技能
-            retSkill = {$rid: skill.RId};
+            retSkill = {$rid: skill.RID};
             if(resSkill.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retSkill, resSkill.$createData(skill.Params));
-            //delete skill.RId;
+            //delete skill.RID;
             //delete skill.Params;
-            GlobalLibraryJS.copyPropertiesToObject(retSkill, skill, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
+            GlobalLibraryJS.copyPropertiesToObject(retSkill, skill, {filterExcept: {RID: undefined, Params: undefined}, filterRecursion: false});
             if(GlobalLibraryJS.isObject(forceNew))
                 GlobalLibraryJS.copyPropertiesToObject(retSkill, forceNew/*, true*/);
             retSkill.__proto__ = resSkill;
@@ -1133,7 +1147,7 @@ function getGoodsObject(goods, forceNew=true) {
             return null;
         }
 
-        retGoods = {$rid: goods};
+        retGoods = {$rid: goods, $count: 1};
         if(resGoods.$createData)
             GlobalLibraryJS.copyPropertiesToObject(retGoods, resGoods.$createData());
         if(GlobalLibraryJS.isObject(forceNew))
@@ -1156,7 +1170,7 @@ function getGoodsObject(goods, forceNew=true) {
                 else
                     retGoods = {};
                 */
-                retGoods = {$count: 0};
+                retGoods = {$count: 1};
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
@@ -1167,18 +1181,19 @@ function getGoodsObject(goods, forceNew=true) {
         }
 
         else {
-            resGoods = GameSceneJS.getGoodsResource(goods.RId);
+            goods.RID = goods.RID ?? goods.RId;
+            resGoods = GameSceneJS.getGoodsResource(goods.RID);
             if(!resGoods) {
-                //console.warn('[!GameScene]没有道具：', goods.RId);
+                //console.warn('[!GameScene]没有道具：', goods.RID);
                 return null;
             }
 
-            retGoods = {$rid: goods.RId};
+            retGoods = {$rid: goods.RID, $count: 1};
             if(resGoods.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, resGoods.$createData(goods.Params));
-            //delete goods.RId;
+            //delete goods.RID;
             //delete goods.Params;
-            GlobalLibraryJS.copyPropertiesToObject(retGoods, goods, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
+            GlobalLibraryJS.copyPropertiesToObject(retGoods, goods, {filterExcept: {RID: undefined, Params: undefined}, filterRecursion: false});
             if(GlobalLibraryJS.isObject(forceNew))
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
             retGoods.__proto__ = resGoods;
@@ -1261,19 +1276,20 @@ function getFightRoleObject(fightrole, forceNew=true) {
         }
 
         else {
-            resFightRole = GameSceneJS.getFightRoleResource(fightrole.RId);
+            fightrole.RID = fightrole.RID ?? fightrole.RId;
+            resFightRole = GameSceneJS.getFightRoleResource(fightrole.RID);
             if(!resFightRole) {
-                //console.warn('[!GameScene]没有战斗角色：', fightrole.RId);
+                //console.warn('[!GameScene]没有战斗角色：', fightrole.RID);
                 return null;
             }
             //创建战斗人物
-            retFightRole = {$rid: fightrole.RId};
-            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole.RId));
+            retFightRole = {$rid: fightrole.RID};
+            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole.RID));
             if(resFightRole.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData(fightrole.Params));
-            //delete fightrole.RId;
+            //delete fightrole.RID;
             //delete fightrole.Params;
-            GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {RId: undefined, Params: undefined, $$fightData: undefined}, filterRecursion: false});
+            GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {RID: undefined, Params: undefined, $$fightData: undefined}, filterRecursion: false});
             if(GlobalLibraryJS.isObject(forceNew))
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, forceNew/*, true*/);
             retFightRole.__proto__ = resFightRole;
@@ -1313,7 +1329,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
         for(let tt in retFightRole.$equipment) {
             let t = GameSceneJS.getGoodsObject(retFightRole.$equipment[tt], forceNew);
             if(t)
-                tequipment[tt] = t;
+                tequipment[t.$position] = t;
         }
         retFightRole.$equipment = tequipment;
     }
@@ -1373,19 +1389,20 @@ function getFightScriptObject(fightscript, forceNew=true) {
         }
 
         else {
-            resFightScript = GameSceneJS.getFightScriptResource(fightscript.RId);
+            fightscript.RID = fightscript.RID ?? fightscript.RId;
+            resFightScript = GameSceneJS.getFightScriptResource(fightscript.RID);
             if(!resFightScript) {
-                //console.warn('[!GameScene]没有战斗脚本：', fightscript.RId);
+                //console.warn('[!GameScene]没有战斗脚本：', fightscript.RID);
                 return null;
             }
 
             //创建战斗脚本
-            retFightScript = {$rid: fightscript.RId};
+            retFightScript = {$rid: fightscript.RID};
             if(resFightScript.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retFightScript, resFightScript.$createData(fightscript.Params));
-            //delete fightscript.RId;
+            //delete fightscript.RID;
             //delete fightscript.Params;
-            GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript, {filterExcept: {RId: undefined, Params: undefined}, filterRecursion: false});
+            GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript, {filterExcept: {RID: undefined, Params: undefined}, filterRecursion: false});
             if(GlobalLibraryJS.isObject(forceNew))
                 GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
             retFightScript.__proto__ = resFightScript;
@@ -1401,128 +1418,141 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 
 //载入特效，返回特效对象
-//如果 spriteEffect 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
-function loadSpriteEffect(spriteEffectRId, spriteEffect, loops=1, parent=itemViewPort.itemRoleContainer) {
+//spriteEffectParams是特效的资源名（会读取对应特效的信息）或特效的信息（不会再次读取）；
+//如果 spriteEffectComp 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
+function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=itemViewPort.itemRoleContainer) {
     //console.debug("[FightScene]loadSpriteEffect0");
 
-    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectRId + GameMakerGlobal.separator + "sprite.json";
+    /*if(GlobalLibraryJS.isString(spriteEffectParams))
+        spriteEffectParams = {RID: spriteEffectParams};
+    spriteEffectParams.RID = spriteEffectParams.RID ?? spriteEffectParams.RID ?? spriteEffectParams.RId;
+
+    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectParams + GameMakerGlobal.separator + "sprite.json";
     //console.debug("[FightScene]filePath2：", filePath);
     let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+    * /
+    let data = GameSceneJS.getSpriteResource(spriteEffectParams.RID);
+    GlobalLibraryJS.copyPropertiesToObject(data, spriteEffectParams, {onlyCopyExists: true});
     */
 
     let data;
-    if(GlobalLibraryJS.isString(spriteEffectRId))
-        spriteEffectRId = {RId: spriteEffectRId};
-    data = GameSceneJS.getSpriteResource(spriteEffectRId.RId);
-    GlobalLibraryJS.copyPropertiesToObject(data, spriteEffectRId, {onlyCopyExists: true});
+    if(GlobalLibraryJS.isString(spriteEffectParams))
+        data = GameSceneJS.getSpriteResource(spriteEffectParams);
+    else
+        data = spriteEffectParams;
 
     if(data) {
-        if(!spriteEffect) {
-            //spriteEffect = compCacheSpriteEffect.createObject(parent);
-            spriteEffect = _private.cacheSprites.create(parent);
-            spriteEffect.nSpriteType = data.SpriteType;
-            spriteEffect.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+        if(!spriteEffectComp) {
+            //spriteEffectComp = compCacheSpriteEffect.createObject(parent);
+            spriteEffectComp = _private.cacheSprites.create(parent);
+            spriteEffectComp.nSpriteType = data.SpriteType;
         }
-        else {//if(spriteEffect.bRunning === true)
-            spriteEffect.nSpriteType = data.SpriteType;
-            spriteEffect.sprite.stop();
+        else {//if(spriteEffectComp.bRunning === true)
+            spriteEffectComp.nSpriteType = data.SpriteType;
+            spriteEffectComp.sprite.stop();
+        }
+
+
+        spriteEffectComp.$info = data;
+        if(data.$script) {
+            spriteEffectComp.$script = data.$script;
         }
 
 
         /*switch(data.SpriteType) {
         case 1:
-            spriteEffect.sourceComponent = compSpriteEffect;
+            spriteEffectComp.sourceComponent = compSpriteEffect;
             break;
         case 2:
-            spriteEffect.sourceComponent = compDirSpriteEffect;
+            spriteEffectComp.sourceComponent = compDirSpriteEffect;
             break;
         }
         */
 
 
-        spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+        spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
 
-        spriteEffect.width = parseInt(data.SpriteSize[0]);
-        spriteEffect.height = parseInt(data.SpriteSize[1]);
-        //spriteEffect.implicitWidth = (data.SpriteSize[0]);
-        //spriteEffect.implicitHeight = (data.SpriteSize[1]);
-        spriteEffect.rXOffset = data.XOffset !== undefined ? (data.XOffset) : 0;
-        spriteEffect.rYOffset = data.YOffset !== undefined ? (data.YOffset) : 0;
-        spriteEffect.opacity = (data.Opacity);
-        spriteEffect.rXScale = (data.XScale);
-        spriteEffect.rYScale = (data.YScale);
+        //spriteEffectComp.sprite.width = parseInt(data.SpriteSize[0]);
+        //spriteEffectComp.sprite.height = parseInt(data.SpriteSize[1]);
+        spriteEffectComp.rXOffset = data.XOffset !== undefined ? (data.XOffset) : 0;
+        spriteEffectComp.rYOffset = data.YOffset !== undefined ? (data.YOffset) : 0;
+        spriteEffectComp.opacity = (data.Opacity);
+        spriteEffectComp.rXScale = (data.XScale);
+        spriteEffectComp.rYScale = (data.YScale);
 
         if(data.Sound) {
-            spriteEffect.strSoundeffectName = data.Sound;
+            spriteEffectComp.strSoundeffectName = data.Sound;
         }
         else {
-            spriteEffect.strSoundeffectName = "";
+            spriteEffectComp.strSoundeffectName = "";
         }
-        //console.debug("!!!", data.Sound, spriteEffect.strSoundeffectName)
-        spriteEffect.nSoundeffectDelay = (data.SoundDelay);
+        //console.debug("!!!", data.Sound, spriteEffectComp.strSoundeffectName)
+        spriteEffectComp.nSoundeffectDelay = (data.SoundDelay);
 
-        spriteEffect.nLoops = loops;
-        //spriteEffect.restart();
+        spriteEffectComp.nLoops = loops || 1;
+        //spriteEffectComp.restart();
 
 
-        if(spriteEffect.nSpriteType === 1) {
-            spriteEffect.nFrameCount = (data.FrameCount);
-            spriteEffect.nInterval = (data.FrameInterval);
+        if(spriteEffectComp.nSpriteType === 1) {
+            spriteEffectComp.nFrameCount = (data.FrameCount);
+            spriteEffectComp.nInterval = (data.FrameInterval);
 
-            spriteEffect.sprite.sizeFrame = Qt.size((data.FrameSize[0]), (data.FrameSize[1]));
+            //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
+            spriteEffectComp.sprite.sizeFrame = Qt.size((data.FrameSize[0]), (data.FrameSize[1]));
 
-            spriteEffect.sprite.pointOffsetIndex = Qt.point((data.OffsetIndex[0]), (data.OffsetIndex[1]));
+            spriteEffectComp.width = parseInt(data.SpriteSize[0]);
+            spriteEffectComp.height = parseInt(data.SpriteSize[1]);
+
+            spriteEffectComp.sprite.pointOffsetIndex = Qt.point((data.OffsetIndex[0]), (data.OffsetIndex[1]));
         }
-        else if(spriteEffect.nSpriteType === 2) {
-            spriteEffect.nFrameCount = data.FrameData[1];
-            spriteEffect.nInterval = data.FrameData[2];
+        else if(spriteEffectComp.nSpriteType === 2) {
+            spriteEffectComp.nFrameCount = data.FrameData[1];
+            spriteEffectComp.nInterval = data.FrameData[2];
 
-            spriteEffect.sprite.nFrameStartIndex = data.FrameData[0];
+            spriteEffectComp.sprite.nFrameStartIndex = data.FrameData[0];
+
+            spriteEffectComp.width = parseInt(data.SpriteSize[0]);
+            spriteEffectComp.height = parseInt(data.SpriteSize[1]);
 
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
-            if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
-                //_private.jsEngine.clear();
-                let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
-                spriteEffect.sprite.fnRefresh = ts.$refresh;
-                //FrameManager.sl_qml_clearComponentCache();
-            }
-
+            if(spriteEffectComp.$script)
+                spriteEffectComp.sprite.fnRefresh = spriteEffectComp.$script.$refresh;
         }
 
 
-        return spriteEffect;
+        return spriteEffectComp;
     }
 
-    //console.warn("[!GameScene]载入特效失败：" + spriteEffectRId);
+    //console.warn("[!GameScene]载入特效失败：" + spriteEffectParams);
     return null;
 }
 
-function unloadSpriteEffect(spriteEffect) {
-    //spriteEffect.destroy();
-    if(!spriteEffect) {
-        console.warn('[!GameScene]缓存释放失败:', spriteEffect);
+function unloadSpriteEffect(spriteEffectComp) {
+    //spriteEffectComp.destroy();
+    if(!spriteEffectComp) {
+        console.warn('[!GameScene]缓存释放失败:', spriteEffectComp);
         return;
     }
-    _private.cacheSprites.release(spriteEffect);
+    _private.cacheSprites.release(spriteEffectComp);
 }
 
 
-//载入角色，返回角色对象
-//如果 roleComp 为null，则 创建1个 roleComp 组件并返回
-function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
-    console.debug('[GameScene]loadRole:', roleRId);
+//载入角色，返回角色对象；
+//roleParams是角色的资源名（会读取对应角色的信息）或角色的信息（不会再次读取）；
+//如果 roleComp 为null，则 创建1个 roleComp 组件并返回；
+function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
+    console.debug('[GameScene]loadRole:', roleParams);
 
-    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRId + GameMakerGlobal.separator + "role.json";
+    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + "role.json";
     //console.debug("[FightScene]filePath2：", filePath);
     let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
     */
 
     let data;
-    if(GlobalLibraryJS.isString(roleRId))
-        data = GameSceneJS.getRoleResource(roleRId);
+    if(GlobalLibraryJS.isString(roleParams))
+        data = GameSceneJS.getRoleResource(roleParams);
     else
-        data = roleRId;
+        data = roleParams;
 
     if(data) {
         if(!roleComp) {
@@ -1530,6 +1560,13 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
             roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
             //roleComp.customSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
+
+
+        roleComp.$info = data;
+        if(data.$script) {
+            roleComp.$script = data.$script;
+        }
+
 
         roleComp.nSpriteType = data.SpriteType ?? 1;
         if(roleComp.nSpriteType === 0) {
@@ -1540,16 +1577,20 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
         else if(roleComp.nSpriteType === 1) {
             roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
 
-            roleComp.sprite.sprite.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
             roleComp.nFrameCount = data.FrameCount;
             roleComp.nInterval = data.FrameInterval;
 
-            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
-            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
+            //注意这个放在 roleComp.sprite.sprite.width 和 roleComp.sprite.sprite.height 之前
+            roleComp.sprite.sprite.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
+
             //roleComp.implicitWidth = data.RoleSize[0];
             //roleComp.implicitHeight = data.RoleSize[1];
+            //roleComp.width = data.RoleSize[0];
+            //roleComp.height = data.RoleSize[1];
             roleComp.width = data.RoleSize[0];
             roleComp.height = data.RoleSize[1];
+            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
+            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
             roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
             roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
 
@@ -1559,12 +1600,14 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
         else if(roleComp.nSpriteType === 2) {
             roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
 
-            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
-            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
             //roleComp.implicitWidth = data.RoleSize[0];
             //roleComp.implicitHeight = data.RoleSize[1];
+            //roleComp.width = data.RoleSize[0];
+            //roleComp.height = data.RoleSize[1];
             roleComp.width = data.RoleSize[0];
             roleComp.height = data.RoleSize[1];
+            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
+            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
             roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
             roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
 
@@ -1578,12 +1621,8 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
             */
 
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRId;
-            if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
-                let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
-                roleComp.sprite.sprite.fnRefresh = ts.$refresh;
-            }
-
+            if(roleComp.$script)
+                roleComp.sprite.sprite.fnRefresh = roleComp.$script.$refresh;
         }
         roleComp.x1 = data.RealOffset[0];
         roleComp.y1 = data.RealOffset[1];
@@ -1596,10 +1635,10 @@ function loadRole(roleRId, roleComp, parent=itemViewPort.itemRoleContainer) {
         roleComp.reset();
 
 
-        return [data, roleComp];
+        return roleComp;
     }
 
-    //console.warn("[!GameScene]载入角色失败：" + roleRId);
+    //console.warn("[!GameScene]载入角色失败：" + roleParams);
     return null;
 }
 
@@ -1612,7 +1651,7 @@ function openMap(mapName, forceRepaint=false) {
     let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
 
     //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
-    if(forceRepaint || game.gd['$sys_map'].$name !== mapName || !itemViewPort.itemContainer.mapInfo) {
+    if(forceRepaint || game.gd['$sys_map'].$name !== mapName || !itemViewPort.mapInfo) {
 
         if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapName))) {
             game.gd['$sys_map'].$name = null;
@@ -1636,27 +1675,27 @@ function openMap(mapName, forceRepaint=false) {
         }
     }
 
-    //game.$sys_map.$name = itemViewPort.itemContainer.mapInfo.MapName;
-    game.gd['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
+    //game.$sys_map.$name = itemViewPort.mapInfo.MapName;
+    game.gd['$sys_map'].$name = itemViewPort.mapInfo.MapName;
 
-    game.d['$sys_map'].$info = itemViewPort.itemContainer.mapInfo;
-    game.d['$sys_map'].$name = itemViewPort.itemContainer.mapInfo.MapName;
-    game.d['$sys_map'].$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-    game.d['$sys_map'].$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+    game.d['$sys_map'].$info = itemViewPort.mapInfo;
+    game.d['$sys_map'].$name = itemViewPort.mapInfo.MapName;
+    game.d['$sys_map'].$columns = itemViewPort.mapInfo.MapSize[0];
+    game.d['$sys_map'].$rows = itemViewPort.mapInfo.MapSize[1];
 
     game.d['$sys_map'].$obstacles = [];
-    for(let mb in itemViewPort.itemContainer.mapInfo.MapBlockSpecialData) {
-        if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[mb] & 0b1) {
+    for(let mb in itemViewPort.mapInfo.MapBlockSpecialData) {
+        if(itemViewPort.mapInfo.MapBlockSpecialData[mb] & 0b1) {
             game.d['$sys_map'].$obstacles.push(mb.split(','));
         }
     }
-    game.d['$sys_map'].$specials = itemViewPort.itemContainer.mapInfo.MapBlockSpecialData;
+    game.d['$sys_map'].$specials = itemViewPort.mapInfo.MapBlockSpecialData;
 
 
     //!!!兼容旧代码
-    game.gd['$sys_map'].$$info = itemViewPort.itemContainer.mapInfo;
-    game.gd['$sys_map'].$$columns = itemViewPort.itemContainer.mapInfo.MapSize[0];
-    game.gd['$sys_map'].$$rows = itemViewPort.itemContainer.mapInfo.MapSize[1];
+    game.gd['$sys_map'].$$info = itemViewPort.mapInfo;
+    game.gd['$sys_map'].$$columns = itemViewPort.mapInfo.MapSize[0];
+    game.gd['$sys_map'].$$rows = itemViewPort.mapInfo.MapSize[1];
     game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
 
 
@@ -1664,8 +1703,8 @@ function openMap(mapName, forceRepaint=false) {
     //执行载入地图脚本
 
     //之前的
-    //if(itemViewPort.itemContainer.mapInfo.SystemEventData !== undefined && itemViewPort.itemContainer.mapInfo.SystemEventData['$1'] !== undefined) {
-    //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.itemContainer.mapInfo.SystemEventData['$1']) === 0)
+    //if(itemViewPort.mapInfo.SystemEventData !== undefined && itemViewPort.mapInfo.SystemEventData['$1'] !== undefined) {
+    //    if(GlobalJS.createScript(_private.asyncScript, 0, 0, itemViewPort.mapInfo.SystemEventData['$1']) === 0)
     //        return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
     //}
 
@@ -1683,7 +1722,7 @@ function openMap(mapName, forceRepaint=false) {
 
     //test();
 
-    return itemViewPort.itemContainer.mapInfo;
+    return itemViewPort.mapInfo;
 }
 
 
@@ -1734,18 +1773,18 @@ function buttonAClicked() {
 
     for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
         for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-            mainRoleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
+            mainRoleUseBlocks.push(xb + yb * itemViewPort.mapInfo.MapSize[0]);
         }
     }
 
     //console.debug("人物占用图块：", usedMapBlocks,mainRoleUseBlocks)
 
     //循环地图事件（优先）
-    for(let event in itemViewPort.itemContainer.mapEventBlocks) {
+    for(let event in itemViewPort.mapEventBlocks) {
         //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
         if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {  //如果事件触发
-            //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], mainRole);   //触发事件
+            //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], mainRole);   //触发事件
 
             //放在这里运行事件，因为 loadmap 的地图事件会改掉所有原来的事件；
             //如果异步脚本 初始为空，且现在不为空
@@ -1754,33 +1793,36 @@ function buttonAClicked() {
 
             return; //!!只执行一次事件
         }
-        //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+        //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
     }
 
     //循环NPC
     for(let r in _private.objRoles) {
+        let role = _private.objRoles[r];
         if(GlobalLibraryJS.checkRectangleClashed(
             usePos,
-            Qt.rect(_private.objRoles[r].x + _private.objRoles[r].x1, _private.objRoles[r].y + _private.objRoles[r].y1, _private.objRoles[r].width1, _private.objRoles[r].height1),
+            Qt.rect(role.x + role.x1, role.y + role.y1, role.width1, role.height1),
             0
         )) {
-            console.debug("[GameScene]触发NPC事件：", _private.objRoles[r].$data.$id);
+            console.debug("[GameScene]触发NPC事件：", role.$data.$id);
 
             //获得脚本（地图脚本优先级 > game.f定义的）
-            let tScript = itemViewPort.mapScript['$' + _private.objRoles[r].$data.$id];
+            let tScript = itemViewPort.mapScript['$' + role.$data.$id];
             if(!tScript)    //!!!兼容旧的
-                tScript = itemViewPort.mapScript[_private.objRoles[r].$data.$id];
+                tScript = itemViewPort.mapScript[role.$data.$id];
             if(!tScript)
-                tScript = game.f['$' + _private.objRoles[r].$data.$id];
+                tScript = game.f['$' + role.$data.$id];
             if(!tScript)    //!!!兼容旧的
-                tScript = game.f[_private.objRoles[r].$data.$id];
+                tScript = game.f[role.$data.$id];
             if(!tScript)
-                tScript = game.gf['$' + _private.objRoles[r].$data.$id];
+                tScript = game.gf['$' + role.$data.$id];
             if(!tScript)    //!!!兼容旧的
-                tScript = game.gf[_private.objRoles[r].$data.$id];
+                tScript = game.gf[role.$data.$id];
+            if(!tScript && role.$script)
+                tScript = role.$script['$interactive'];
             if(tScript) {
-                game.run([tScript(_private.objRoles[r]), _private.objRoles[r].$data.$id]);
-                //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$data.$id));
+                game.run([tScript.call(role, role) ?? null, role.$data.$id]);
+                //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(role.$data.$id));
 
                 return; //!!只执行一次事件
             }
@@ -1808,16 +1850,18 @@ function mapEvent(eventName, role) {
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'];
     if(!tScript && role.$$type === 1)    //!!兼容旧的
         tScript = game.f[eventName];
+    if(!tScript && role.$script)
+        tScript = role.$script['$' + eventName + '_map'];
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
     //game.run([tScript, '地图事件:' + eventName]);
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图事件:map_' + eventName}, );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
 
 
 
@@ -1839,16 +1883,18 @@ function mapEventCanceled(eventName, role) {
             tScript = game.f['$' + eventName + '_map_leave'];
         else
             tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
+    if(!tScript && role.$script)
+        tScript = role.$script['$' + eventName + '_map_leave'];
 
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
     //game.run([tScript, '地图事件离开:' + eventName + '_leave']);
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map_leave'];
     if(tScript)
-        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '地图离开事件:map_leave_' + eventName}, );
+        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
 
 
 
@@ -1866,7 +1912,7 @@ function mapClickEvent(x, y) {
     if(!tScript)
         tScript = game.gf[eventName];
     if(tScript)
-        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y), eventName], -1, );
+        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y) ?? null, eventName], -1, );
 
     //console.debug(mouse.x, mouse.y,
     //              Math.floor(mouse.x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockScaledSize.height))
@@ -1884,8 +1930,10 @@ function roleClickEvent(role, dx, dy) {
         tScript = game.f[eventName];
     if(!tScript)
         tScript = game.gf[eventName];
+    if(!tScript && role.$script)
+        tScript = role.$script['$click'];
     if(tScript) {
-        game.run([tScript(role), role.$data.$id], );
+        game.run([tScript.call(role, role) ?? null, role.$data.$id], );
         //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$name));
 
         return; //!!只执行一次事件
@@ -1949,7 +1997,7 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][3], _private.objGlobalTimers[tt][1], realinterval), Tips: '全局定时器事件:' + tt});
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][3], _private.objGlobalTimers[tt][1], realinterval) ?? null, Tips: '全局定时器事件:' + tt});
             //game.run([game.gf[tt], tt]);
 
             //GlobalJS.runScript(_private.asyncScript, 0, "game.gf['%1']()".arg(tt));
@@ -1985,7 +2033,7 @@ function onTriggered() {
             if(!tScript)
                 tScript = game.gf[tt];
 
-            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][3], _private.objTimers[tt][1], realinterval), Tips: '定时器事件:' + tt}, );
+            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][3], _private.objTimers[tt][1], realinterval) ?? null, Tips: '定时器事件:' + tt}, );
             //game.run([tScript, tt]);
             //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(tt));
 
@@ -2047,8 +2095,10 @@ function onTriggered() {
                             tScript = game.f[eventName];
                         if(!tScript)
                             tScript = game.gf[eventName];
+                        if(!tScript && role.$script)
+                            tScript = role.$script['$arrive'];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role), Tips: '角色Arrive事件:' + role.$data.$id}, );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '角色Arrive事件:' + role.$data.$id}, );
                             //game.run([tScript, role.$name]);
                     }
                     else
@@ -2064,48 +2114,57 @@ function onTriggered() {
         //增加状态时间
         role.$$nActionStatusKeepTime += realinterval;
 
+
+        //如果没有 移动方向，则 停止移动
+        if(role.$$arrMoveDirection.length !== 2) {
+            role.stopMoving();
+            //continue;
+        }
+
         //走路状态
         if(role.$$nActionType === 1 || role.$$nActionType === 2) {
             //console.debug("walk status")
 
-            //随机走
-            if(role.$$nActionType === 1) {
-                //如果到达切换状态阈值
-                if(role.$$nActionStatusKeepTime > _private.config.nRoleChangeActionDuration) {
-                    role.$$nActionStatusKeepTime = 0;
+            do {
+                //随机走
+                if(role.$$nActionType === 1) {
+                    //如果到达切换状态阈值
+                    if(role.$$nActionStatusKeepTime > _private.config.nRoleChangeActionDuration) {
+                        role.$$nActionStatusKeepTime = 0;
 
-                    //概率停止
-                    if(GlobalLibraryJS.randTarget(_private.config.arrRoleChangeStopProbability, 100) !== 0) {
-                        role.stopMoving();
-                        continue;
+                        //概率停止
+                        if(GlobalLibraryJS.randTarget(_private.config.arrRoleChangeStopProbability, 100) !== 0) {
+                            role.stopMoving();
+                            break;
+                        }
                     }
-
                 }
-            }
 
 
-            //计算走路
-            //x、y轴上移动的距离（乘以比率）
-            let offsetMoveX = Math.round(role.$$speed * realinterval);
-            let offsetMoveY = Math.round(role.$$speed * realinterval);
-            offsetMoveX = Math.round(offsetMoveX * Math.abs(role.$$arrMoveDirection[0]));
-            offsetMoveY = Math.round(offsetMoveY * Math.abs(role.$$arrMoveDirection[1]));
-            //如果有移动，至少移动1
-            offsetMoveX = role.$$arrMoveDirection[0] !== 0 ? (offsetMoveX || 1) : 0;
-            offsetMoveY = role.$$arrMoveDirection[1] !== 0 ? (offsetMoveY || 1) : 0;
+                //计算走路
+                //x、y轴上移动的距离（乘以比率）
+                let offsetMoveX = Math.round(role.$$speed * realinterval);
+                let offsetMoveY = Math.round(role.$$speed * realinterval);
+                offsetMoveX = Math.round(offsetMoveX * Math.abs(role.$$arrMoveDirection[0]));
+                offsetMoveY = Math.round(offsetMoveY * Math.abs(role.$$arrMoveDirection[1]));
+                //如果有移动，至少移动1
+                offsetMoveX = role.$$arrMoveDirection[0] !== 0 ? (offsetMoveX || 1) : 0;
+                offsetMoveY = role.$$arrMoveDirection[1] !== 0 ? (offsetMoveY || 1) : 0;
 
-            //x、y轴上移动的方向（x为1、3表示右、左；y为0、2表示上、下）
-            let directionX = offsetMoveX === 0 ? -1 : role.$$arrMoveDirection[0] > 0 ? 1 : 3;
-            let directionY = offsetMoveY === 0 ? -1 : role.$$arrMoveDirection[1] > 0 ? 2 : 0;
+                //x、y轴上移动的方向（x为1、3表示右、左；y为0、2表示上、下）
+                let directionX = offsetMoveX === 0 ? -1 : role.$$arrMoveDirection[0] > 0 ? 1 : 3;
+                let directionY = offsetMoveY === 0 ? -1 : role.$$arrMoveDirection[1] > 0 ? 2 : 0;
 
-            let ret = fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY);
+                let ret = fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, offsetMoveY, centerX, centerY);
 
-            if(role.$$nActionType === 1) {
-                if(ret === false) {
-                    role.stopMoving();
-                    continue;
+                if(role.$$nActionType === 1) {
+                    if(ret === false) {
+                        role.stopMoving();
+                        break;
+                        //continue;
+                    }
                 }
-            }
+            }while(0);
         }
         //站立状态
         else if(role.$$nActionType === 0) {
@@ -2120,6 +2179,7 @@ function onTriggered() {
                     role.$$nActionType = 1;
                     role.$$arrMoveDirection = [0, -1];
                     role.start(Qt.Key_Up);
+
                     //_private.startSprite(role, Qt.Key_Up);
                     //role.moveDirection = Qt.Key_Up;
                     //role.start();
@@ -2128,6 +2188,7 @@ function onTriggered() {
                     role.$$nActionType = 1;
                     role.$$arrMoveDirection = [1, 0];
                     role.start(Qt.Key_Right);
+
                     //_private.startSprite(role, Qt.Key_Right);
                     //role.moveDirection = Qt.Key_Right;
                     //role.start();
@@ -2136,6 +2197,7 @@ function onTriggered() {
                     role.$$nActionType = 1;
                     role.$$arrMoveDirection = [0, 1];
                     role.start(Qt.Key_Down);
+
                     //_private.startSprite(role, Qt.Key_Down);
                     //role.moveDirection = Qt.Key_Down;
                     //role.start();
@@ -2144,6 +2206,7 @@ function onTriggered() {
                     role.$$nActionType = 1;
                     role.$$arrMoveDirection = [-1, 0];
                     role.start(Qt.Key_Left);
+
                     //_private.startSprite(role, Qt.Key_Left);
                     //role.moveDirection = Qt.Key_Left;
                     //role.start();
@@ -2154,6 +2217,7 @@ function onTriggered() {
 
 
 
+        //和其他角色触碰，key为$role_角色名或$hero_角色名，value为触碰时长
         let collideRoles = {};
 
         //与其他角色碰撞
@@ -2173,6 +2237,8 @@ function onTriggered() {
                 tScript = game.f[eventName];
             if(!tScript)
                 tScript = game.gf[eventName];
+            if(!tScript && role.$script)
+                tScript = role.$script['$collide'];
 
             //如果有碰撞
             if(
@@ -2191,13 +2257,13 @@ function onTriggered() {
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objRoles[r], role, keep, collideRoles[key]), Tips: '角色碰撞角色事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, Tips: '角色碰撞角色事件:' + role.$data.$id}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objRoles[r], role, -1, collideRoles[key]), Tips: '角色碰撞角色离开事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: '角色碰撞角色离开事件:' + role.$data.$id}, );
                 }
             }
         }
@@ -2218,6 +2284,8 @@ function onTriggered() {
                 tScript = game.f[eventName];
             if(!tScript)
                 tScript = game.gf[eventName];
+            if(!tScript && role.$script)
+                tScript = role.$script['$collide'];
 
             if(
                 //(role.$data.$penetrate === 0 && _private.arrMainRoles[r].$data.$penetrate === 0) &&
@@ -2234,20 +2302,43 @@ function onTriggered() {
                     }
                     else
                         collideRoles[key] = realinterval;
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], keep), Tips: '角色碰撞主角事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, Tips: '角色碰撞主角事件:' + role.$data.$id}, );
                 }
 
+
+                //主角脚本
+                if(_private.arrMainRoles[r].$script) {
+                    tScript = _private.arrMainRoles[r].$script['$collide'];
+                    if(tScript) {
+                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: '主角碰撞事件0:' + role.$data.$id}, );
+                    }
+                }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], keep), Tips: '主角碰撞事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: '主角碰撞事件1:' + role.$data.$id}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, _private.arrMainRoles[r], -1, collideRoles[key]), Tips: '角色碰撞主角离开事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: '角色碰撞主角离开事件:' + role.$data.$id}, );
+                }
+
+
+                //主角脚本
+                if(_private.arrMainRoles[r].$script) {
+                    tScript = _private.arrMainRoles[r].$script['$collide'];
+                    if(tScript) {
+                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: '主角碰撞离开事件0:' + role.$data.$id}, );
+                    }
+                }
+
+                //调用总事件处理
+                tScript = game.gf['$collide'];
+                if(tScript) {
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: '主角碰撞离开事件1:' + role.$data.$id}, );
                 }
             }
         }
@@ -2268,39 +2359,39 @@ function onTriggered() {
         //转换为 每个地图块ID
         for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                roleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
+                roleUseBlocks.push(xb + yb * itemViewPort.mapInfo.MapSize[0]);
             }
         }
 
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
-        for(let event in itemViewPort.itemContainer.mapEventBlocks) {
+        for(let event in itemViewPort.mapEventBlocks) {
             //console.debug("[GameScene]检测事件：", event, roleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(roleUseBlocks.indexOf(parseInt(event)) > -1) {
-                let isTriggered = role.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]] ||
-                    tEvents[itemViewPort.itemContainer.mapEventBlocks[event]];
+                let isTriggered = role.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
+                    tEvents[itemViewPort.mapEventBlocks[event]];
 
-                tEvents[itemViewPort.itemContainer.mapEventBlocks[event]] = event;  //加入
+                tEvents[itemViewPort.mapEventBlocks[event]] = event;  //加入
 
                 //如果已经被触发过
                 if(isTriggered) {
 
                     ////将触发的事件删除（role.$$mapEventsTriggering剩下的就是 下面要取消触发的事件 了）
-                    delete role.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]];
+                    delete role.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, roleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
-                GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], role);   //触发事件
+                //console.debug("[GameScene]mapEvent触发:", event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+                GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], role);   //触发事件
             }
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in role.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, roleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemViewPort.itemContainer.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug("[GameScene]mapEventCanceled触发:", event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
+            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         role.$$mapEventsTriggering = tEvents;
@@ -2328,21 +2419,21 @@ function onTriggered() {
 
             do {
                 if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x < centerX) {
-                    _private.doAction(2, Qt.Key_Left);
+                    _private.startMove(2, Qt.Key_Left);
                 }
                 else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].x >= 0 && mainRole.$$targetsPos[0].x > centerX) {
-                    _private.doAction(2, Qt.Key_Right);
+                    _private.startMove(2, Qt.Key_Right);
                 }
                 else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y < centerY) {
-                    _private.doAction(2, Qt.Key_Up);
+                    _private.startMove(2, Qt.Key_Up);
                 }
                 else if(mainRole.$$targetsPos[0] && mainRole.$$targetsPos[0].y >= 0 && mainRole.$$targetsPos[0].y > centerY) {
-                    _private.doAction(2, Qt.Key_Down);
+                    _private.startMove(2, Qt.Key_Down);
                 }
                 else {
                     mainRole.$$targetsPos.shift();
                     if(mainRole.$$targetsPos.length === 0) {
-                        _private.stopAction(1, -1);
+                        _private.stopMove(1, -1);
 
 
                         let eventName = `$${mainRole.$data.$id}_arrive`;
@@ -2351,8 +2442,10 @@ function onTriggered() {
                             tScript = game.f[eventName];
                         if(!tScript)
                             tScript = game.gf[eventName];
+                        if(!tScript && mainRole.$script)
+                            tScript = mainRole.$script['$arrive'];
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(mainRole), Tips: '主角Arrive事件:' + mainRole.$data.$id}, );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: '主角Arrive事件:' + mainRole.$data.$id}, );
                             //game.run([tScript, mainRole.$name]);
                     }
                     else
@@ -2444,14 +2537,14 @@ function onTriggered() {
         //转换事件的地图块的坐标为地图块的ID
         for(let i in roleUseBlocks) {
             //计算出 行列
-            let px = roleUseBlocks[i] % itemViewPort.itemContainer.mapInfo.MapSize[0];
-            let py = parseInt(roleUseBlocks[i] / itemViewPort.itemContainer.mapInfo.MapSize[0]);
+            let px = roleUseBlocks[i] % itemViewPort.mapInfo.MapSize[0];
+            let py = parseInt(roleUseBlocks[i] / itemViewPort.mapInfo.MapSize[0]);
             let strP = [px, py].toString();
 
-            console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+            console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
             //存在障碍
-            if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
-                switch(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP]) {
+            if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                switch(itemViewPort.mapInfo.MapBlockSpecialData[strP]) {
                     //!!!这里需要修改
                 case -1:
                     if(mainRole.moveDirection === Qt.Key_Left) {
@@ -2515,39 +2608,39 @@ function onTriggered() {
         //转换为 每个地图块ID
         for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
-                mainRoleUseBlocks.push(xb + yb * itemViewPort.itemContainer.mapInfo.MapSize[0]);
+                mainRoleUseBlocks.push(xb + yb * itemViewPort.mapInfo.MapSize[0]);
             }
         }
 
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
-        for(let event in itemViewPort.itemContainer.mapEventBlocks) {
+        for(let event in itemViewPort.mapEventBlocks) {
             //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {
-                let isTriggered = mainRole.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]] ||
-                    tEvents[itemViewPort.itemContainer.mapEventBlocks[event]];
+                let isTriggered = mainRole.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
+                    tEvents[itemViewPort.mapEventBlocks[event]];
 
-                tEvents[itemViewPort.itemContainer.mapEventBlocks[event]] = event;  //加入
+                tEvents[itemViewPort.mapEventBlocks[event]] = event;  //加入
 
                 //如果已经被触发过
                 if(isTriggered) {
 
                     ////将触发的事件删除（mainRole.$$mapEventsTriggering剩下的就是 下面要取消触发的事件 了）
-                    delete mainRole.$$mapEventsTriggering[itemViewPort.itemContainer.mapEventBlocks[event]];
+                    delete mainRole.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
-                GameSceneJS.mapEvent(itemViewPort.itemContainer.mapEventBlocks[event], mainRole);   //触发事件
+                //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+                GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], mainRole);   //触发事件
             }
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in mainRole.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, mainRoleUseBlocks, itemViewPort.itemContainer.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemViewPort.itemContainer.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.itemContainer.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug("[GameScene]mapEventCanceled触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
+            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         mainRole.$$mapEventsTriggering = tEvents;
@@ -2556,7 +2649,7 @@ function onTriggered() {
 
         textPos.text = " 【%1】".
             arg([Math.floor(centerX / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(centerY / itemViewPort.sizeMapBlockScaledSize.height)])
-            //.arg(itemViewPort.itemContainer.mapInfo.data.length)
+            //.arg(itemViewPort.mapInfo.data.length)
         ;
 
         textPos1.text = "[%1](%2),(%3),(%4),(%5)".
@@ -2687,8 +2780,10 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
                 tScript = game.f[eventName];
             if(!tScript)
                 tScript = game.gf[eventName];
+            if(!tScript && role.$script)
+                tScript = role.$script['$collide_obstacle'];
             if(tScript) {
-                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle, keep), Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
+                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
             }
 
 
@@ -2696,7 +2791,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(role, collideObstacle, 0), Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
                 }
             }
         //}
@@ -3166,11 +3261,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
             for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
-                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
+                    if(itemViewPort.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         //计算离障碍距离
                         offsetMove = (role.x + role.x1) - (xb + 1) * itemViewPort.sizeMapBlockScaledSize.width;    //计算人物与障碍距离
                         collideObstacle = 0b1000;
@@ -3201,11 +3296,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
             for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
-                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
+                    if(itemViewPort.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (xb) * itemViewPort.sizeMapBlockScaledSize.width - (role.x + role.x2) - 1;    //计算人物与障碍距离
                         collideObstacle = 0b0010;
                         computeOver = true;
@@ -3235,11 +3330,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
-                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
+                    if(itemViewPort.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (role.y + role.y1) - (yb + 1) * itemViewPort.sizeMapBlockScaledSize.height;    //计算人物与障碍距离
                         collideObstacle = 0b0001;
                         computeOver = true;
@@ -3269,11 +3364,11 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.itemContainer.mapInfo.MapBlockSpecialData)
+                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
-                if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] !== undefined) {
+                if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
-                    if(itemViewPort.itemContainer.mapInfo.MapBlockSpecialData[strP] & 0b1) {
+                    if(itemViewPort.mapInfo.MapBlockSpecialData[strP] & 0b1) {
                         offsetMove = (yb) * itemViewPort.sizeMapBlockScaledSize.height - (role.y + role.y2) - 1;    //计算人物与障碍距离
                         collideObstacle = 0b0100;
                         computeOver = true;
@@ -3384,7 +3479,7 @@ function fChangeMainRoleDirection() {
 
 function test() {
 
-    /*itemViewPort.itemContainer.mapInfo = {
+    /*itemViewPort.mapInfo = {
         //mapWidth: 800,
         //mapHeight: 600,
         //blockWidth: 50,
@@ -3420,7 +3515,7 @@ function test() {
     };*/
 
 
-    //itemViewPort.itemContainer.mapInfo.events = [1, 40];
+    //itemViewPort.mapInfo.events = [1, 40];
 
     //mainRole.x1 = 0;
     //mainRole.y1 = mainRole.height - itemViewPort.sizeMapBlockScaledSize.height;

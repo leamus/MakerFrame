@@ -97,6 +97,14 @@ Item {
                     console.debug(JSON.stringify(modelData));
                 }
 
+                onDoubleClicked: {
+                    mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
+                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                        mediaPlayer.pause();
+                    else
+                        mediaPlayer.play();
+                }
+
                 onRemoveClicked: {
                     //console.debug("delete", modelData);
                     //root.removeClicked(index, modelData.Name);
@@ -210,14 +218,17 @@ Item {
 
                 //Layout.preferredWidth: 60
 
-                text: "播放"
+                text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 
-                    mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
                     itemVideo.visible = true;
-                    mediaPlayer.play();
+                    mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
+                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                        mediaPlayer.pause();
+                    else
+                        mediaPlayer.play();
 
                     //console.debug("video:", textVideoName.text, mediaPlayer.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))

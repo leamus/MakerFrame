@@ -33,11 +33,11 @@ Item {
 
     signal s_close();
     onS_close: {
-        //sprite.unload();
-        sprite.nSpriteType = 0;
+        //spriteEffect.unload();
+        spriteEffect.nSpriteType = 0;
 
 
-        _private.strTextBackupSpriteName = '';
+        _private.strSpriteName = '';
         _private.strTextBackupSpriteImageURL = '';
         _private.strTextBackupSpriteImageResourceName = '';
         _private.strTextBackupSpriteSoundURL = '';
@@ -48,9 +48,10 @@ Item {
 
 
     function newSprite() {
+        comboType.currentIndex = 0;
 
         textSpriteName.text = "";
-;
+
         textSpriteImageURL.text = "";
         textSpriteImageResourceName.text = "";
         //textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
@@ -60,8 +61,8 @@ Item {
         textSpriteFrameOffsetRow.text = "0";
 
         textSpriteFrameInterval.text = "200";
-        //sprite.width = parseInt(textSpriteWidth.text);
-        //sprite.height = parseInt(textSpriteHeight.text);
+        //spriteEffect.width = parseInt(textSpriteWidth.text);
+        //spriteEffect.height = parseInt(textSpriteHeight.text);
         //textSpriteWidth.text = cfg.SpriteSize[0].toString();
         //textSpriteHeight.text = cfg.SpriteSize[1].toString();
 
@@ -74,9 +75,10 @@ Item {
         textSpriteFrameXScale.text = "1";
         textSpriteFrameYScale.text = "1";
 
-        textCode.text = _private.strTextCode;
-
         _private.refreshSprite();
+
+
+        _private.loadScript();
     }
 
     function openSprite(cfg) {
@@ -84,14 +86,14 @@ Item {
         console.debug("[SpriteEditor]openSprite:", JSON.stringify(cfg))
 
         //cfg.Version;
-        textSpriteName.text = cfg.SpriteName;
+        _private.strSpriteName = textSpriteName.text = cfg.SpriteName.trim();
 
         //textSpriteImageURL.text = cfg.Image;
         //textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf("/") + 1);
         textSpriteImageResourceName.text = cfg.Image;
         textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
-        //sprite.width = parseInt(textSpriteWidth.text);
-        //sprite.height = parseInt(textSpriteHeight.text);
+        //spriteEffect.width = parseInt(textSpriteWidth.text);
+        //spriteEffect.height = parseInt(textSpriteHeight.text);
         textSpriteWidth.text = cfg.SpriteSize[0].toString();
         textSpriteHeight.text = cfg.SpriteSize[1].toString();
 
@@ -126,17 +128,12 @@ Item {
             textSpriteFrameCount.text = cfg.FrameData[1].toString();
             textSpriteFrameInterval.text = cfg.FrameData[2].toString();
 
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim() + GameMakerGlobal.separator + 'sprite.js';
-            if(FrameManager.sl_qml_FileExists(path)) {
-                textCode.text = FrameManager.sl_qml_ReadFile(path);
-            }
-            else
-                textCode.text = _private.strTextCode;
-
         }
 
         _private.refreshSprite();
+
+
+        _private.loadScript(textSpriteName.text);
     }
 
 
@@ -244,7 +241,7 @@ Item {
                             }
 
                             onActivated: {
-                                console.debug('[RoleEditor]ComboBox:', comboType.currentIndex,
+                                console.debug('[SpriteEditor]ComboBox:', comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
 
@@ -764,18 +761,18 @@ Item {
                         Layout.preferredHeight: 50
                         Layout.fillWidth: true
 
-                        visible: comboType.currentIndex === 1
+                        //visible: comboType.currentIndex === 1
 
                         Button {
                             Layout.fillWidth: true
 
-                            text: '编辑脚本'
+                            text: '编辑脚本' + (comboType.currentIndex === 0 ? '（可选）' : '')
 
                             onClicked: {
 
-                                if(!textSpriteName.text.trim()) {
+                                if(!_private.strSpriteName) {
                                     dialogCommon.show({
-                                          Msg: '请先保存角色',
+                                          Msg: '请先保存特效',
                                           Buttons: Dialog.Yes,
                                           OnAccepted: function() {
                                               root.forceActiveFocus();
@@ -786,6 +783,16 @@ Item {
                                       });
 
                                     return;
+                                }
+
+
+                                //_private.loadScript(textSpriteName.text);
+                                if(!textCode.text &&
+                                        !FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteName + GameMakerGlobal.separator + 'sprite.js')) {
+                                    if(comboType.currentIndex === 1)
+                                        textCode.text = _private.strTemplateCode0;
+                                    else
+                                        textCode.text = '';
                                 }
 
 
@@ -805,8 +812,10 @@ Item {
                 id: rectSprite
                 Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
-                //Layout.preferredWidth: parseInt(textSpriteWidth.text)
-                //Layout.preferredHeight: parseInt(textSpriteHeight.text)
+                Layout.preferredWidth: parseInt(textSpriteWidth.text)
+                Layout.preferredHeight: parseInt(textSpriteHeight.text)
+                implicitWidth: spriteEffect.implicitWidth
+                implicitHeight: spriteEffect.implicitHeight
 
                 color: 'transparent'
                 border {
@@ -818,17 +827,7 @@ Item {
                     id: spriteEffect
 
 
-                    onMouseAreaChanged: {
-                        //console.warn(666, mouseArea, nSpriteType, sprite)
-                        if(mouseArea) {
-                            mouseArea.enabled = true;
-                            mouseArea.clicked.connect(function(){
-                                root.forceActiveFocus();
-                            });
-                        }
-                    }
-
-                    anchors.fill: parent
+                    //anchors.fill: parent
 
                     bTest: true
                     nType: 1
@@ -843,6 +842,20 @@ Item {
                     /*onS_clicked: {
                         root.forceActiveFocus();
                     }*/
+
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            //console.warn(666, mouseArea, nSpriteType, spriteEffect)
+                            root.forceActiveFocus();
+
+                            if(spriteEffect.status() === 1)
+                                spriteEffect.stop();
+                            else
+                                spriteEffect.restart();
+                        }
+                    }
                 }
             }
         }
@@ -910,7 +923,7 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
-                    _private.strTextBackupSpriteName = textSpriteName.text;
+                    //_private.strSpriteName = textSpriteName.text;
 
                     dialogSaveSprite.open();
                 }
@@ -967,13 +980,13 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
-                    /*sprite.sprite.running = true;
-                    console.debug("[Sprite]test", sprite.sprite, sprite.sprite.state, sprite.sprite.currentSprite)
-                    console.debug(sprite.sprite.sprites);
-                    for(let s in sprite.sprite.sprites) {
-                        console.debug(sprite.sprite.sprites[s].frameY);
-                        sprite.sprite.sprites[s].frameY = 20*s;
-                        console.debug(sprite.sprite.sprites[s].frameY);
+                    /*spriteEffect.sprite.running = true;
+                    console.debug("[SpriteEditor]test", spriteEffect.sprite, spriteEffect.sprite.state, spriteEffect.sprite.currentSprite)
+                    console.debug(spriteEffect.sprite.sprites);
+                    for(let s in spriteEffect.sprite.sprites) {
+                        console.debug(spriteEffect.sprite.sprites[s].frameY);
+                        spriteEffect.sprite.sprites[s].frameY = 20*s;
+                        console.debug(spriteEffect.sprite.sprites[s].frameY);
                     }*/
                     dialogDebugScript.open();
                 }
@@ -1325,7 +1338,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[SpriteEditor]filepath", textSpriteImageURL.text);
+            console.debug("[SpriteEditor]fileURL", textSpriteImageURL.text);
         }
 
         onCanceled: {
@@ -1702,7 +1715,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[SpriteEditor]filepath", textSpriteSoundURL.text);
+            console.debug("[SpriteEditor]fileURL", textSpriteSoundURL.text);
         }
 
         onCanceled: {
@@ -1756,6 +1769,35 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
+            Button {
+                Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: 'V'
+
+                onClicked: {
+                    /*if(!_private.strMapName) {
+                        dialogCommon.show({
+                              Msg: '请先保存地图',
+                              Buttons: Dialog.Yes,
+                              OnAccepted: function() {
+                                  root.forceActiveFocus();
+                              },
+                              OnRejected: ()=>{
+                                  root.forceActiveFocus();
+                              },
+                          });
+
+                        return;
+                    }
+                    */
+
+                    gameVisualScript.show();
+
+                    dialogScript.visible = false;
+                }
+            }
+
             Notepad {
                 id: textCode
 
@@ -1790,7 +1832,7 @@ Item {
         onAccepted: {
             _private.saveJS();
 
-            _private.refreshRole();
+            _private.refreshSprite();
 
 
             root.forceActiveFocus();
@@ -1806,51 +1848,89 @@ Item {
 
 
 
-
-
-    //导出特效对话框
+    //导出对话框
     Dialog {
         id: dialogSaveSprite
-        title: "请输入特效名称"
-        width: 300
-        height: 200
+        title: "请输入名称"
+        width: parent.width * 0.9
+        //height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
         anchors.centerIn: parent
 
         onAccepted: {
-            //root.focus = true;
-            root.forceActiveFocus();
-
-
-            if(_private.exportSprite()) {
-                //第一次保存，重新刷新
-                if(_private.strTextBackupSpriteName === '')
-                    _private.refreshSprite();
-
-                textDialogMsg.text = '';
-            }
-            else {
+            textSpriteName.text = textSpriteName.text.trim();
+            if(textSpriteName.text.length === 0) {
+                //Platform.showToast("名称不能为空");
+                textDialogMsg.text = "名称不能为空";
                 open();
+                return;
             }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
+
+            function fnSave() {
+                if(_private.exportSprite()) {
+                    //第一次保存，重新刷新
+                    if(_private.strSpriteName === '')
+                        _private.refreshSprite();
+
+                    _private.strSpriteName = textSpriteName.text;
+
+                    textDialogMsg.text = '';
+
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                }
+                else {
+                    open();
+                }
+            }
+
+            if(textSpriteName.text !== _private.strSpriteName && FrameManager.sl_qml_DirExists(path)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textSpriteName.text = _private.strSpriteName;
+
+                        textDialogMsg.text = '';
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+            }
+            else
+                fnSave();
+
         }
         onRejected: {
-            //root.focus = true;
-            root.forceActiveFocus();
-
-            textSpriteName.text = _private.strTextBackupSpriteName;
+            textSpriteName.text = _private.strSpriteName;
 
             textDialogMsg.text = '';
+
+
+            //root.focus = true;
+            root.forceActiveFocus();
 
             //console.log("Cancel clicked");
         }
 
         ColumnLayout {
             width: parent.width
+            height: implicitHeight
 
             RowLayout {
-                width: parent.width
+                //width: parent.width
                 Label {
                     text: qsTr("特效名：")
                 }
@@ -1918,7 +1998,7 @@ Item {
         onAccepted: {
             //root.focus = true;
             root.forceActiveFocus();
-            eval(textScript.text);
+            console.info(eval(textScript.text));
         }
         onRejected: {
             //root.focus = true;
@@ -1960,11 +2040,66 @@ Item {
 
 
 
+    //可视化
+    //Loader {
+    GameVisualScript {
+        id: gameVisualScript
+        //id: loaderVisualScript
+
+
+        function show() {
+            visible = true;
+            forceActiveFocus();
+            //item.forceActiveFocus();
+            //focus = true;
+            //item.focus = true;
+        }
+
+
+        anchors.fill: parent
+
+        visible: false
+        //focus: true
+
+
+        //source: "./GameVisualScript.qml"
+        //asynchronous: false
+
+
+        /*onLoaded: {
+            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.vjs";
+            //item.loadData(filePath);
+
+            console.debug("[MapEditor]loaderVisualScript onLoaded");
+        }
+        */
+
+        //Connections {
+        //    target: loaderVisualScript.item
+            onS_close: function() {
+                //_private.loadScript();
+                dialogScript.visible = true;
+
+
+                gameVisualScript.visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            onS_Compile: function(code) {
+                textCode.setPlainText(code);
+                textCode.toBegin();
+            }
+        //}
+    }
+
+
+
     QtObject {
         id: _private
 
 
-        property string strTextBackupSpriteName: ''
+        property string strSpriteName: ''
         property string strTextBackupSpriteImageURL
         property string strTextBackupSpriteImageResourceName
         property string strTextBackupSpriteSoundURL
@@ -1972,11 +2107,14 @@ Item {
 
         property var jsEngine: new GlobalJS.JSEngine(root)
 
-        property string strTextCode: `
+        property string strTemplateCode0: `
+//保存坐标偏移数据
 let imageFixPositions;
 
+//刷新图片和偏移坐标
 function $refresh(index, imageAnimate, path) {
     if(imageFixPositions === undefined) {
+        //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split('\\r\\n');
@@ -1984,7 +2122,9 @@ function $refresh(index, imageAnimate, path) {
             imageFixPositions = null;
     }
 
+    //设置图片路径（注意图片名字的生成，默认是 index序号+1，保留5位不足的补0，格式为png），请自行按需修改；
     imageAnimate.source = path + GameMakerGlobal.separator + String(index+1).padStart(5, '0') + '.png';
+    //从坐标偏移数据中读取坐标偏移并设置（默认index就是行数）；
     let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
     imageAnimate.rXOffset += parseInt(tx);
     imageAnimate.rYOffset += parseInt(ty);
@@ -1994,8 +2134,6 @@ function $refresh(index, imageAnimate, path) {
 
 
         function changeType() {
-            //role.nSpriteType = comboType.currentIndex + 1;
-
             _private.refreshSprite();
         }
 
@@ -2017,99 +2155,139 @@ function $refresh(index, imageAnimate, path) {
                 break;
             }
             */
-            sprite.nSpriteType = comboType.currentIndex + 1;
+            spriteEffect.nSpriteType = comboType.currentIndex + 1;
             //console.warn(comboType.currentIndex, loaderSprite.sourceComponent, loaderSprite.item);
-            //console.warn(sprite, sprite.nFrameCount);
+            //console.warn(spriteEffect, spriteEffect.nFrameCount);
             //console.warn(loaderSprite.sourceComponent === compSpriteEffect);
 
-            sprite.strSource = textSpriteImageURL.text;
+            spriteEffect.strSource = textSpriteImageURL.text;
 
-            sprite.nFrameCount = parseInt(textSpriteFrameCount.text);
+            spriteEffect.nFrameCount = parseInt(textSpriteFrameCount.text);
 
-            sprite.nInterval = parseInt(textSpriteFrameInterval.text);
-            //sprite.width = parseInt(textSpriteWidth.text);
-            //sprite.height = parseInt(textSpriteHeight.text);
-            //sprite.implicitWidth = parseInt(textSpriteWidth.text);
-            //sprite.implicitHeight = parseInt(textSpriteHeight.text);
-            sprite.rXOffset = parseInt(textSpriteFrameOffsetX.text);
-            sprite.rYOffset = parseInt(textSpriteFrameOffsetY.text);
-            sprite.opacity = parseFloat(textSpriteOpacity.text);
-            sprite.rXScale = parseFloat(textSpriteFrameXScale.text);
-            sprite.rYScale = parseFloat(textSpriteFrameYScale.text);
+            spriteEffect.nInterval = parseInt(textSpriteFrameInterval.text);
+            //spriteEffect.width = parseInt(textSpriteWidth.text);
+            //spriteEffect.height = parseInt(textSpriteHeight.text);
+            //spriteEffect.implicitWidth = parseInt(textSpriteWidth.text);
+            //spriteEffect.implicitHeight = parseInt(textSpriteHeight.text);
+            spriteEffect.rXOffset = parseInt(textSpriteFrameOffsetX.text);
+            spriteEffect.rYOffset = parseInt(textSpriteFrameOffsetY.text);
+            spriteEffect.opacity = parseFloat(textSpriteOpacity.text);
+            spriteEffect.rXScale = parseFloat(textSpriteFrameXScale.text);
+            spriteEffect.rYScale = parseFloat(textSpriteFrameYScale.text);
 
-            sprite.strSoundeffectName = textSpriteSoundURL.text;
-            //sprite.strSoundeffectName =  GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
-            //console.debug(sprite, sprite.nSoundeffectDelay)
-            sprite.nSoundeffectDelay = parseInt(textSoundDelay.text);
+            spriteEffect.strSoundeffectName = textSpriteSoundURL.text;
+            //spriteEffect.strSoundeffectName =  GameMakerGlobal.soundResourceURL(textSpriteSoundResourceName.text);
+            //console.debug(spriteEffect, spriteEffect.nSoundeffectDelay)
+            spriteEffect.nSoundeffectDelay = parseInt(textSoundDelay.text);
 
 
             if(comboType.currentIndex === 0) {
                 //loaderSprite.sourceComponent = compSpriteEffect;
-                sprite.sprite.sizeFrame = Qt.size(parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text));
 
-                sprite.sprite.pointOffsetIndex = Qt.point(parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text));
+                //注意这个放在 spriteEffect.sprite.width 和 spriteEffect.sprite.height 之前
+                spriteEffect.sprite.sizeFrame = Qt.size(parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text));
+
+                //spriteEffect.sprite.width = parseInt(textSpriteWidth.text);
+                //spriteEffect.sprite.height = parseInt(textSpriteHeight.text);
+                spriteEffect.width = parseInt(textSpriteWidth.text);
+                spriteEffect.height = parseInt(textSpriteHeight.text);
+
+                spriteEffect.sprite.pointOffsetIndex = Qt.point(parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text));
             }
             else if(comboType.currentIndex === 1) {
                 //loaderSprite.sourceComponent = compFileSpriteEffect;
 
-                sprite.sprite.nFrameStartIndex = parseInt(textFrameStartIndex.text);
+                spriteEffect.sprite.nFrameStartIndex = parseInt(textFrameStartIndex.text);
+
+                //spriteEffect.sprite.width = parseInt(textSpriteWidth.text);
+                //spriteEffect.sprite.height = parseInt(textSpriteHeight.text);
+                spriteEffect.width = parseInt(textSpriteWidth.text);
+                spriteEffect.height = parseInt(textSpriteHeight.text);
 
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim();
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
                 if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
-                    sprite.sprite.fnRefresh = ts.$refresh;
+                    spriteEffect.sprite.fnRefresh = ts.$refresh;
                     //FrameManager.sl_qml_clearComponentCache();
                 }
 
             }
 
 
-            rectSprite.Layout.preferredWidth = parseInt(textSpriteWidth.text)
-            rectSprite.Layout.preferredHeight = parseInt(textSpriteHeight.text)
+            //rectSprite.Layout.preferredWidth = parseInt(textSpriteWidth.text)
+            //rectSprite.Layout.preferredHeight = parseInt(textSpriteHeight.text)
 
 
-            sprite.sprite.reset();
-            //sprite.refresh();
+            spriteEffect.sprite.reset();
+            //spriteEffect.refresh();
 
-            /*sprite.sizeFrame = Qt.size(37, 58);
-            sprite.nFrameCount = 3;
+            /*spriteEffect.sizeFrame = Qt.size(37, 58);
+            spriteEffect.nFrameCount = 3;
             arrActionsData = [3,2,1,0];
-            sprite.interval = 100;
-            sprite.width = 37;
-            sprite.height = 58;
-            sprite.x1 = 0;
-            sprite.y1 = 0;
-            sprite.width1 = 37;
-            sprite.height1 = 58;
-            sprite.moveSpeed = 100;
+            spriteEffect.interval = 100;
+            spriteEffect.width = 37;
+            spriteEffect.height = 58;
+            spriteEffect.x1 = 0;
+            spriteEffect.y1 = 0;
+            spriteEffect.width1 = 37;
+            spriteEffect.height1 = 58;
+            spriteEffect.moveSpeed = 100;
             */
-            //console.debug("测试:", sprite.width, sprite.height, parseInt(textSpriteWidth.text), parseInt(textSpriteHeight.text))
+            //console.debug("测试:", spriteEffect.width, spriteEffect.height, parseInt(textSpriteWidth.text), parseInt(textSpriteHeight.text))
         }
 
 
+        function loadScript(spriteName) {
+            if(!spriteName) {
+                //textCode.text = _private.strTemplateCode0;
+                textCode.text = '';
+                gameVisualScript.loadData(null);
+                return;
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator;
+            //if(FrameManager.sl_qml_FileExists(path + 'sprite.js')) {
+            //File.read(path + 'sprite.js');
+            textCode.text = FrameManager.sl_qml_ReadFile(path + 'sprite.js') || '';
+            //textCode.setPlainText(data);
+            //textCode.toBegin();
+            gameVisualScript.loadData(path + 'sprite.vjs');
+        }
+
+        //保存js文件
         function saveJS() {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text.trim();
+            //第一次保存，重新刷新
+            if(_private.strSpriteName === '') {
+                if(comboType.currentIndex === 1)
+                    textCode.text = _private.strTemplateCode0;
+                else
+                    textCode.text = '';
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
             let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'sprite.js', 0);
+        }
+        //复制可视化
+        function copyVJS() {
+            //如果路径不为空，且是另存为，则赋值vjs文件
+            if(_private.strSpriteName !== '' && textSpriteName.text !== '' && _private.strSpriteName !== textSpriteName.text) {
+                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteName + GameMakerGlobal.separator + 'sprite.vjs';
+                if(FrameManager.sl_qml_FileExists(oldFilePath)) {
+                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text + GameMakerGlobal.separator + 'sprite.vjs';
+                    let ret = FrameManager.sl_qml_CopyFile(oldFilePath, newFilePath, true);
+                }
+            }
         }
 
         //导出特效
         function exportSprite() {
 
-            let spriteName = textSpriteName.text.trim();
-
-            if(spriteName.length === 0) {
-                //Platform.showToast("特效名不能为空");
-                textDialogMsg.text = "角色名不能为空";
-                //dialogSaveSprite.open();
-                return false;
-            }
-
-
+            let spriteName = textSpriteName.text;
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.json';
 
-            /*//if(FrameManager.sl_qml_DirExists(path))
+            /*//if(!FrameManager.sl_qml_DirExists(path))
                 FrameManager.sl_qml_CreateFolder(path);
             */
 
@@ -2154,6 +2332,8 @@ function $refresh(index, imageAnimate, path) {
 
 
             saveJS();
+
+            copyVJS();
 
 
             console.debug("[SpriteEditor]exportSprite ret:", ret, filepath);

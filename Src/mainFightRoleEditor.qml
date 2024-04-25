@@ -19,7 +19,7 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-import './Core'
+//import './Core'
 
 
 //import 'File.js' as File
@@ -71,22 +71,27 @@ Item {
         }
 
         onClicked: {
+            if(!loader.item)
+                return false;
+
             //if(item === "..") {
             //    l_list.visible = false;
             //    return;
             //}
+
+            loader.visible = true;
+            loader.focus = true;
+
+            loader.item.forceActiveFocus();
+            //loader.item.focus = true;
+
             if(index === 0) {
                 loader.item.init();
 
-                loader.visible = true;
-                loader.item.forceActiveFocus();
                 return;
             }
 
 
-            loader.visible = true;
-            loader.focus = true;
-            loader.item.focus = true;
             //visible = false;
 
             /*
@@ -143,23 +148,34 @@ Item {
 
 
         onLoaded: {
-            //item.testFresh();
+            showBusyIndicator(false);
+
+            //_private.refresh();
+
             console.debug("[mainFightRoleEditor]Loader onLoaded");
         }
 
         Connections {
             target: loader.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
             function onS_close() {
                 _private.refresh();
 
                 loader.visible = false;
                 //root.focus = true;
-                root.forceActiveFocus();
+                l_listFightRole.forceActiveFocus();
             }
         }
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
     QtObject {
         id: _private
@@ -171,12 +187,6 @@ Item {
             l_listFightRole.showList(list);
 
         }
-    }
-
-
-    //配置
-    QtObject {
-        id: config
     }
 
 
@@ -202,6 +212,11 @@ Item {
 
 
     Component.onCompleted: {
+        if(loader.status === Loader.Loading)
+            showBusyIndicator(true);
+
         _private.refresh();
+
+        console.debug("[mainFightRoleEditor]Component.onCompleted");
     }
 }

@@ -24,6 +24,11 @@ import "qrc:/QML"
     Bug：如果帧数为1，则精灵不会自动 stop，需要一个Timer来stop
       如果帧数为1，即使loops为-1且running为true，它也会下一个js事件中running设置为false而停止；
 
+
+    注意：
+      sizeFrame改变会影响width和height，说明：
+        frameWidth 和 frameHeight 改变会影响 implicitWidth和implicitHeight，因为root的implicit绑定了animatedsprite，所以root的width和height也变化了；
+        所以设置时，先设置sizeFrame，再设置 root的width 和 height
 */
 
 Item {
@@ -50,12 +55,15 @@ Item {
     //开始播放动画
     function start() {
         //console.debug('start:', animatedsprite.running, strSource)
-        if(animatedsprite.running)
+
+        if(_private.nState === 1)
+        //if(animatedsprite.running)
             return;
 
 
         if(nType === 1 && soundeffect.playbackState === Audio.PausedState)
             soundeffect.play();
+
         animatedsprite.start();
 
         //if(strSoundeffectName)
@@ -65,6 +73,8 @@ Item {
             timerInterval.interval = nInterval;
             timerInterval.start();
         }
+
+        _private.nState = 1;
     }
 
     //重新开始播放动画
@@ -82,20 +92,30 @@ Item {
             timerInterval.interval = nInterval;
             timerInterval.restart();
         }
+
+        _private.nState = 1;
     }
 
     function pause() {
+        if(_private.nState === 2)
+            return;
+
         animatedsprite.pause();
         timerSound.stop();
         timerInterval.stop();
         if(nType === 1 && soundeffect.playbackState === Audio.PlayingState)
             soundeffect.pause();
 
+        _private.nState = 2;
+
         s_paused();
     }
 
     //停止动画
     function stop(stopSound=true) {
+        if(_private.nState === 0)
+            return;
+
         //console.debug('stop:', animatedsprite.running, strSource)
         animatedsprite.stop();
         timerInterval.stop();
@@ -103,6 +123,8 @@ Item {
             timerSound.stop();
             soundeffect.stop();
         }
+
+        _private.nState = 0;
 
         s_stoped();
     }
@@ -113,6 +135,14 @@ Item {
 
     function reset() {
         nCurrentFrame = 0;
+    }
+
+    function status() {
+        return _private.nState;
+    }
+
+    function currentFrame() {
+        return nCurrentFrame;
     }
 
 
@@ -127,9 +157,9 @@ Item {
 
     readonly property int nSpriteType: 1
 
-    property string strSource: ""   //精灵图片路径
-    property int nFrameCount: 3 //帧数
-    property int nInterval: 100  //帧切换速度
+    property alias strSource: animatedsprite.source   //精灵图片路径
+    property alias nFrameCount: animatedsprite.frameCount //帧数
+    property alias nInterval: animatedsprite.frameDuration  //帧切换速度
     property alias nLoops: animatedsprite.loops //循环次数
     property real rXScale: 1        //1为原图，-1为X轴镜像，其他值为X轴缩放
     property real rYScale: 1        //1为原图，-1为Y轴镜像，其他值为Y轴缩放
@@ -171,8 +201,8 @@ Item {
     //property bool bStartToRunning: false
 
 
-    //width: 0
-    //height: 0
+    width: parent.width
+    height: parent.height
 
     implicitWidth: animatedsprite.implicitWidth
     implicitHeight: animatedsprite.implicitHeight
@@ -184,31 +214,50 @@ Item {
     AnimatedSprite {
         id: animatedsprite
 
+        function refreshToResolveBug() {
+            let s = source;
+            source = '';
+            source = s;
+        }
+
         width: root.width; height: root.height     //一个帧的大小，会缩放
+        onWidthChanged: {
+            refreshToResolveBug();
+            //Qt.callLater(refreshToResolveBug);
+            //GlobalLibraryJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
+            //GlobalLibraryJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+        }
+        onHeightChanged: {
+            refreshToResolveBug();
+            //Qt.callLater(refreshToResolveBug);
+            //GlobalLibraryJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
+            //GlobalLibraryJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+        }
 
         //anchors.horizontalCenter: parent.horizontalCenter
         //anchors.verticalCenter: parent.verticalCenter
 
         smooth: true
 
-        source: strSource
+        source: ''
         interpolate: false   //true（默认）：在帧之间插值，使帧切换更平滑
         running: false
         loops: 1
         //reverse: true
         finishBehavior: AnimatedSprite.FinishAtFinalFrame  //FinishAtInitialFrame
 
-        frameCount: nFrameCount       //帧的个数
+        frameCount: 3       //帧的个数
         frameX: pointOffsetIndex.x * sizeFrame.width; frameY: pointOffsetIndex.y * sizeFrame.height     //起始位置
         frameWidth: sizeFrame.width; frameHeight: sizeFrame.height //帧的宽高
-        frameDuration: nInterval     //切换速度
+        frameDuration: 100     //切换速度
 
         onRunningChanged: {
             if(bTest)
-                console.debug('[SpriteEffect]RunningChanged:', running, strSource);
+                console.debug('[FileSpriteEffect]RunningChanged:', running, strSource);
         }
 
         onSourceChanged: {
+            //console.warn('File source:', source)
             root.stop();
 
             currentFrame = 0;   //初始载入时 帧号为0（因为如果设置finishBehavior为FinishAtFinalFrame，则帧是最后一帧）
@@ -218,7 +267,7 @@ Item {
             timerSound.stop();
             root.s_finished();
             if(bTest)
-                console.debug('[SpriteEffect]onFinished:', loops, soundeffect.source, finished, strSource);
+                console.debug('[FileSpriteEffect]onFinished:', loops, soundeffect.source, finished, strSource);
         }
 
         //当前帧改变
@@ -253,7 +302,7 @@ Item {
             }
 
             if(bTest)
-                console.debug('[SpriteEffect]onCurrentFrameChanged:', currentFrame);
+                console.debug('[FileSpriteEffect]onCurrentFrameChanged:', currentFrame);
         }
 
         //transformOrigin: Item.BottomRight
@@ -374,7 +423,7 @@ Item {
             root.s_finished();
 
             if(bTest)
-                console.debug('[SpriteEffect]timerInterval onTriggered', interval);
+                console.debug('[FileSpriteEffect]timerInterval onTriggered', interval);
         }
     }
 
@@ -409,13 +458,13 @@ Item {
 
         anchors.fill: parent
         onClicked: {
-            if(animatedsprite.running)
+            if(_private.nState === 1)
                 root.stop();
             else
                 root.restart();
             //s_clicked();
 
-            //console.debug('[SpriteEffect]start')
+            //console.debug('[FileSpriteEffect]start')
         }
     }
 
@@ -456,8 +505,20 @@ Item {
 
     }*/
 
+
+    QtObject {  //私有数据,函数,对象等
+        id: _private
+
+
+        //0：stop，1：播放，2：暂停
+        property int nState: 0
+
+    }
+
+
+
     Component.onCompleted: {
-        console.debug('[SpriteEffect]Component.onCompleted:', Qt.resolvedUrl('.'));
+        console.debug('[FileSpriteEffect]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
 
     Component.onDestruction: {

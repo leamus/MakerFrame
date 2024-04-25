@@ -64,23 +64,27 @@ Item {
         onCanceled: {
             //loader.visible = true;
             //root.focus = true;
-            root.forceActiveFocus();
+            //root.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
-
+            //visible = false;
             s_close();
         }
 
         onClicked: {
+            if(!loader.item)
+                return false;
+
             //if(index === 0) {
             /*if(item === "..") {
                 visible = false;
                 return;
             }*/
+
+            textMapBlockImageURL.enabled = false;
+            textMapBlockResourceName.enabled = true;
+
             if(index === 0) {
                 dialogMapData.nCreateMapType = 1;
-                textMapBlockImageURL.enabled = false;
-                textMapBlockResourceName.enabled = true;
                 dialogMapData.open();
                 return;
             }
@@ -108,10 +112,8 @@ Item {
             textBlockWidth.text = cfg.MapBlockSize[0];
             textBlockHeight.text = cfg.MapBlockSize[1];
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
-            textMapBlockImageURL.enabled = false;
             textMapBlockResourceName.text = cfg.MapBlockImage[0];
             //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
-            textMapBlockResourceName.enabled = true;
 
             dialogMapData.open();
 
@@ -120,7 +122,7 @@ Item {
             //loader.focus = true;
             //loader.item.focus = true;
             //root.focus = true;
-            root.forceActiveFocus();
+            //root.forceActiveFocus();
             //visible = false;
 
         }
@@ -140,10 +142,10 @@ Item {
                     console.debug("[mainMapEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
                     removeItem(index);
 
-                    root.forceActiveFocus();
+                    l_listMaps.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    l_listMaps.forceActiveFocus();
                 },
             });
         }
@@ -311,8 +313,6 @@ Item {
 
                         l_listMapBlockResource.show(path, "*", 0x002, 0x00);
                         l_listMapBlockResource.visible = true;
-                        //l_listMapBlockResource.focus = true;
-                        l_listMapBlockResource.forceActiveFocus();
 
                         dialogMapData.visible = false;
                     }
@@ -395,8 +395,8 @@ Item {
 
             if(dialogMapData.nCreateMapType === 1) {
                 //loader.setSource("./MapEditor.qml", {});
-                //item.createNewMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
-                loader.item.createNewMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
+                //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
+                loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
                                              MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
                                              MapBlockImage: [textMapBlockResourceName.text]
                                          });
@@ -442,7 +442,7 @@ Item {
             labelDialogTips.text = "";
 
 
-            root.forceActiveFocus();
+            l_listMaps.forceActiveFocus();
 
 
             //console.log("Cancel clicked");
@@ -554,15 +554,15 @@ Item {
             textMapBlockResourceName.enabled = true;
 
 
-            dialogMapData.visible = true;
-
-
             checkboxSaveResource.checked = false;
             checkboxSaveResource.enabled = false;
 
 
+            dialogMapData.visible = true;
+
+
             //root.focus = true;
-            root.forceActiveFocus();
+            //root.forceActiveFocus();
             visible = false;
 
 
@@ -576,7 +576,7 @@ Item {
 
             //loader.visible = true;
             //root.focus = true;
-            root.forceActiveFocus();
+            //root.forceActiveFocus();
             //loader.item.focus = true;
             visible = false;
         }
@@ -591,10 +591,10 @@ Item {
                     console.debug("[mainMapEditor]删除地图资源：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_DeleteFile(path));
                     removeItem(index);
 
-                    root.forceActiveFocus();
+                    l_listMapBlockResource.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    l_listMapBlockResource.forceActiveFocus();
                 },
             });
         }
@@ -770,12 +770,18 @@ Item {
 
 
         onLoaded: {
-            //item.testFresh();
+            showBusyIndicator(false);
+
+            //_private.refresh();
+
             console.debug("[mainMapEditor]loader onLoaded");
         }
 
         Connections {
             target: loader.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
             function onS_close() {
                 _private.refresh();
 
@@ -786,12 +792,17 @@ Item {
                 loader.source = './MapEditor.qml';
                 loader.visible = false;
                 //root.focus = true;
-                root.forceActiveFocus();
+                l_listMaps.forceActiveFocus();
             }
         }
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
     QtObject {
         id: _private
@@ -823,12 +834,6 @@ Item {
     }
 
 
-    //配置
-    QtObject {
-        id: config
-    }
-
-
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
@@ -851,6 +856,11 @@ Item {
 
 
     Component.onCompleted: {
+        if(loader.status === Loader.Loading)
+            showBusyIndicator(true);
+
         _private.refresh();
+
+        console.debug("[mainMapEditor]Component.onCompleted");
     }
 }

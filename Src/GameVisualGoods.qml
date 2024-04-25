@@ -715,6 +715,30 @@ Item {
                     }
 
 
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '额外属性:'
+                        }
+
+                        TextField {
+                            id: textExtraProperties
+
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                            text: ''
+                            placeholderText: '额外属性'
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+                        }
+                    }
+
+
                     Button {
                         Layout.fillWidth: true
 
@@ -740,14 +764,16 @@ Item {
                             Layout.fillWidth: true
 
                             text: '*@属性'
-                            //font.pointSize: _config.nTextFontSize
+                            font.pointSize: _config.nLabelFontSize
+                            color: Global.style.color(Global.style.Yellow)
                         }
                         Label {
                             Layout.preferredWidth: 1
                             Layout.fillWidth: true
 
                             text: '*@效果值'
-                            //font.pointSize: _config.nTextFontSize
+                            font.pointSize: _config.nLabelFontSize
+                            color: Global.style.color(Global.style.Yellow)
                         }
                     }
 
@@ -833,6 +859,13 @@ Item {
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+
+        property int nLabelFontSize: 10
+    }
 
     QtObject {
         id: _private
@@ -1103,6 +1136,7 @@ Item {
                 replace(/\$\$color\$\$/g, textColor.text.trim()).
                 replace(/\$\$image\$\$/g, textImage.text.trim()).
                 replace(/\$\$size\$\$/g, '[%1, %2]'.arg(textImageWidth.text.trim() || 0).arg(textImageHeight.text.trim() || 0)).
+                replace(/\$\$ExtraProperties\$\$/g, textExtraProperties.text.trim() || 'undefined').
                 replace(/\$\$position\$\$/g, position).
                 replace(/\$\$skills\$\$/g, skills).
                 //replace(/\$\$stackable\$\$/g, textLuck.text.trim()).
@@ -1160,7 +1194,7 @@ let data = (function() {
 
 
     //独立属性，用 goods 来引用；会保存到存档中；
-    //params：使用对象{RId:xxx, Params: 。。。}创建道具时的对象参数。
+    //params：使用对象{RID:xxx, Params: 。。。}创建道具时的对象参数。
     let $createData = function (params) {
 
         return {
@@ -1180,6 +1214,8 @@ let data = (function() {
             $color: '$$color$$', //文字颜色
             $image: '$$image$$', //图片相对路径（相对于Resources/Images路径，../../表示项目根路径）
             $size: $$size$$,    //图像大小
+
+            $$ExtraProperties$$,
             */
         };
     };
@@ -1204,6 +1240,8 @@ let data = (function() {
         $color: '$$color$$', //文字颜色
         $image: '$$image$$', //图片相对路径（相对于Resources/Images路径，../../表示项目根路径）
         $size: $$size$$,    //图像大小
+
+        $$ExtraProperties$$,
 
 
         $$useScript$$

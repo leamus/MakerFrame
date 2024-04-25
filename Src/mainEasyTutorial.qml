@@ -167,19 +167,22 @@ Item {
 
 目前支持（已封装）的脚本命令（中括号[]为可选参数）：
 
-<font color='yellow'>game.loadmap("地图名", 数据, forceRepait)</font>：载入地图并执行地图载入事件；成功返回true。
+//载入地图并执行地图载入事件；成功返回 地图信息。
+//userData是用户传入数据，后期调用的钩子函数会传入；
+//forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
+<font color='yellow'>game.loadmap(mapRID, userData, forceRepait=false)</font>
 
 //在屏幕中间显示提示信息。
 //interval为文字显示间隔，为0则不使用；
 //pretext为已显示的文字；
-//keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
+//keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
 //style为样式；
 //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
 //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
-//pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
-//buttonNum为按钮数量（0-2，目前没用）。
-<font color='yellow'>game.msg(msg, interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true);</font>
+//pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
+//callback是结束时回调函数，默认为true（系统自动处理）；
+<font color='yellow'>game.msg(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, callback=true);</font>
 
 //在屏幕下方显示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -220,7 +223,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.input(title='', pretext='', pauseGame=true);</font>
 
 //创建主角；
-//role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
+//role：角色资源名 或 标准创建格式的对象（RID为角色资源名）。
 //  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by；
 //  $name为游戏显示名；
 //成功返回 对象。
@@ -237,7 +240,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.movehero(bx, by)</font>：将主角移动到地图 x、y 位置。
 
 //创建NPC；
-//role：角色资源名 或 标准创建格式的对象（RId为角色资源名）。
+//role：角色资源名 或 标准创建格式的对象（RID为角色资源名）。
 //其他参数：$id、$name、$showName、$speed、$scale、$avatar、$avatarSize、$direction、$action、$start、$x、$y、$bx、$by；
 //  $name为游戏名；
 //  $action为-1表示静止，0和1表示随机移动（正在静止和正在移动），2为定向移动；
@@ -267,14 +270,14 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.rolepos(role, pos);</font>
 
 //创建一个战斗主角；返回这个战斗主角对象；
-//fightrole为战斗主角资源名 或 标准创建格式的对象（带有RId、Params和其他属性）。
+//fightrole为战斗主角资源名 或 标准创建格式的对象（带有RID、Params和其他属性）。
 <font color='yellow'>game.createfighthero(fightrole);</font>
 <font color='yellow'>game.delfighthero(fighthero)</font>：删除一个战斗主角；fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（删除所有战斗主角）。
 <font color='yellow'>game.fighthero(fighthero=-1, type=1)</font>：返回战斗主角；fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（所有战斗主角）；type为0表示返回 对象，为1表示只返回名字（选择框用）。返回null表示没有，false错误；
 
 //获得技能；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
-//skill为技能资源名，或 标准创建格式的对象（带有RId、Params和其他属性），或技能本身（带有$RId）；
+//skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
 //skillIndex为替换到第几个（如果为-1或大于已有技能数，则追加）；
 //copyedNewProps是 从skills复制的创建的新技能的属性（如果skills为技能对象，会复制一个新技能，然后再复制copyedNewProps属性）；
 //成功返回true。
@@ -292,7 +295,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.levelup(fighthero)</font>：直接升一级。fighthero为下标，或战斗角色的name，或战斗角色对象；
 
 //背包内 获得 count个道具；返回背包中 改变后 道具个数，返回false表示错误。
-//goods可以为 道具资源名、 或 标准创建格式的对象（带有RId、Params和其他属性），或道具本身（带有$RId），或 下标；
+//goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
 //count为0表示使用goods内的$count；
 <font color='yellow'>game.getgoods(goods, count=0);</font>
 
@@ -307,7 +310,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 
 //直接装备一个道具（不是从背包中）；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
-//goods可以为 道具资源名、 或 标准创建格式的对象（带有RId、Params和其他属性），或道具本身（带有$RId），或 下标；
+//goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
 //newPosition：如果为空，则使用 goods 的 position 属性来装备；
 //copyedNewProps是 从goods复制的创建的新道具的属性（如果goods为道具对象，会复制一个新道具，然后再复制copyedNewProps属性，比如$count、$position）；
 //返回null表示错误；
@@ -317,16 +320,16 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
 <font color='yellow'>game.equipment(fighthero, positionName=null)</font>：返回某 fighthero 的装备；如果positionName为null，则返回所有装备；fighthero为下标，或战斗角色的name，或战斗角色对象；返回格式：单个：装备对象，多个：单个的数组；错误返回null。
 
-<font color='yellow'>game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品rid列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
+<font color='yellow'>game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品RID列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
 <font color='yellow'>game.money(m=0)</font>：获得金钱；返回金钱数目；
 
 //载入 fightScript 脚本 并进入战斗；
-//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
 //params是给战斗脚本$createData的参数。
 <font color='yellow'>game.fighting(fightScript);</font>
 
 //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
-//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
 //flag：0b1为行动时遇敌，0b10为静止时遇敌；
 //params是给战斗脚本$createData的参数；
 //会覆盖之前的fighton；
@@ -355,14 +358,14 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.seekmusic(offset=0);</font>：设置播放的音乐进度。
 
 //播放视频；
-//videoParams是视频名称或对象（包含RId）；videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
+//videoParams是视频名称或对象（包含RID）；videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
 //  也可以 $x、$y、$width、$height。
 <font color='yellow'>game.playvideo(videoName, properties={});</font>
 
 <font color='yellow'>game.stopvideo()</font>：结束播放。
 
 //显示图片；
-//imageParams为图片名或对象（包含RId）；id为图片标识（用来控制和删除）；
+//imageParams为图片名或对象（包含RID）；id为图片标识（用来控制和删除）；
 //imageParams为对象：包含 Image组件  的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked 事件的回调函数；
 //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
 //    不带$表示按像素；
@@ -379,7 +382,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.delimage(idParams)</font>
 
 //显示特效；
-//spriteParams为特效名或对象（包含RId）；id为特效标识（用来控制和删除）
+//spriteParams为特效名或对象（包含RID）；id为特效标识（用来控制和删除）
 //spriteParams为对象：包含 SpriteEffect组件 的所有属性 和 $x、$y、$width、$height、$parent 等属性；还包括 $clicked、$doubleClicked、$looped、$finished 事件的回调函数；
 //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
 //    不带$表示按像素；
@@ -639,7 +642,7 @@ NPC事件的四种写法（前两种支持同步调用）：
   3、战斗角色
     战斗角色的脚本都是可选的。
     格式：
-      let $createData = function(){return {RId: "killer2", $name: "敌人1", $properties: {HP: 5, healthHP: 5, remainHP: 5, EXP: 5}, $skills: [{RId: "fight"}], $goods: [{RId: '西瓜刀'}], $money: 5};}
+      let $createData = function(){return {RID: "killer2", $name: "敌人1", $properties: {HP: 5, healthHP: 5, remainHP: 5, EXP: 5}, $skills: [{RID: "fight"}], $goods: [{RID: '西瓜刀'}], $money: 5};}
         在战斗脚本中可以修改覆盖这些属性。
       function *$levelUpScript(combatant)：角色单独升级链
         如果不定义，则使用通用的升级链算法；

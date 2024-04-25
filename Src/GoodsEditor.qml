@@ -64,7 +64,7 @@ let data = (function() {
 
 
     //独立属性，用 goods 来引用；会保存到存档中；
-    //params：使用对象{RId:xxx, Params: 。。。}创建道具时的对象参数。
+    //params：使用对象{RID:xxx, Params: 。。。}创建道具时的对象参数。
     let $createData = function (params) {
 
         return {
@@ -361,6 +361,11 @@ let data = (function() {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
     QtObject {
         id: _private
 
@@ -369,31 +374,77 @@ let data = (function() {
 
 
         function save() {
-            let newName = textGoodsName.text = textGoodsName.text.trim();
+            textGoodsName.text = textGoodsName.text.trim();
 
-            if(newName.length === 0)
+            if(textGoodsName.text.length === 0) {
+                dialogCommon.show({
+                    Msg: '名称不能为空',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        textGoodsName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        textGoodsName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
                 return false;
-
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator;
-
-
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGoodsScript.textDocument), path + newName + GameMakerGlobal.separator + 'goods.js', 0);
-
-
-            //复制可视化
-            let oldName = _private.strSavedName.trim();
-            if(oldName) {
-                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'goods.vjs';
-                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'goods.vjs', true);
-                }
             }
 
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-            _private.strSavedName = newName;
+            function fnSave() {
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
 
-            return true;
+                //复制可视化
+                if(_private.strSavedName) {
+                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
+                    if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
+                    }
+                }
+
+                _private.strSavedName = textGoodsName.text;
+
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textGoodsName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
+                return false;
+            }
+            else {
+                fnSave();
+
+                return true;
+            }
         }
 
         function close() {
@@ -414,12 +465,6 @@ let data = (function() {
                 },
             });
         }
-    }
-
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 

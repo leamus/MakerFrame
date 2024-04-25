@@ -124,7 +124,7 @@ game.goon();
             Button {
                 text: 'v'
                 onClicked: {
-                    loaderVisualScript.show();
+                    gameVisualScript.show();
                 }
             }
         }
@@ -289,8 +289,11 @@ game.goon();
         }*/
     }
 
-    Loader {
-        id: loaderVisualScript
+    //Loader {
+    GameVisualScript {
+        id: gameVisualScript
+        //id: loaderVisualScript
+
 
 
         function show() {
@@ -298,43 +301,44 @@ game.goon();
             //forceActiveFocus();
             //item.forceActiveFocus();
             focus = true;
-            item.focus = true;
+            //item.focus = true;
         }
 
 
         anchors.fill: parent
 
         visible: false
-        focus: true
+        //focus: true
 
 
-        source: './GameVisualScript.qml'
-        asynchronous: false
+        //source: './GameVisualScript.qml'
+        //asynchronous: false
 
 
-        onLoaded: {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start';
+        /*onLoaded: {
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.vjs';
 
             item.loadData(filePath);
 
             console.debug('[GameStart]loaderVisualScript onLoaded');
         }
+        */
 
-        Connections {
-            target: loaderVisualScript.item
+        //Connections {
+        //    target: loaderVisualScript.item
             //忽略没有的信号
-            ignoreUnknownSignals: true
+            //ignoreUnknownSignals: true
 
-            function onS_close() {
+            onS_close: function() {
                 //init();
 
 
-                loaderVisualScript.visible = false;
+                gameVisualScript.visible = false;
                 root.forceActiveFocus();
                 //root.focus = true;
             }
 
-            function onS_Compile(code) {
+            onS_Compile: function(code) {
                 //console.debug(code)
                 if(code.indexOf('function *$start() {') < 0 && code.indexOf('function *start() {') < 0) {
                     code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
@@ -342,7 +346,7 @@ game.goon();
                 textGameStartScript.setPlainText(code);
                 textGameStartScript.toBegin();
             }
-        }
+        //}
     }
 
 
@@ -382,7 +386,8 @@ game.goon();
 
             loaderGameScene.visible = true;
             loaderGameScene.focus = true;
-            loaderGameScene.item.focus = true;
+            //loaderGameScene.item.focus = true;
+            loaderGameScene.item.forceActiveFocus();
 
             try {
                 loaderGameScene.item.init(true, true);
@@ -416,6 +421,11 @@ game.goon();
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
     QtObject {
         id: _private
@@ -492,12 +502,6 @@ function *$start() {
 }
 
         `
-    }
-
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 

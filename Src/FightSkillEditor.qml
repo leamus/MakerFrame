@@ -128,7 +128,7 @@ let data = (function() {
             //kill 动作特效，1次，等待播放结束
             yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant});
             //kill 特效，1次，等待播放结束，特效ID，对方和位置
-            yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, RId: 'Kill1', Combatant: targetCombatant, Position: 1});
+            yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'Kill1', Combatant: targetCombatant, Position: 1});
             //效果，Skill：KillType：
             SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
             harm = SkillEffectResult.shift().HP;
@@ -144,7 +144,7 @@ let data = (function() {
 
                 //再杀一次
                 yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant, Target: targetCombatant});
-                yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, RId: 'Kill2', Combatant: targetCombatant, Position: 1});
+                yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'Kill2', Combatant: targetCombatant, Position: 1});
 
                 SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
                 harm = SkillEffectResult.shift().HP;
@@ -366,6 +366,11 @@ let data = (function() {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
     QtObject {
         id: _private
 
@@ -374,31 +379,77 @@ let data = (function() {
 
 
         function save() {
-            let newName = textFightSkillName.text = textFightSkillName.text.trim();
+            textFightSkillName.text = textFightSkillName.text.trim();
 
-            if(newName.length === 0)
+            if(textFightSkillName.text.length === 0) {
+                dialogCommon.show({
+                    Msg: '名称不能为空',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        textFightSkillName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        textFightSkillName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
                 return false;
-
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator;
-
-
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_skill.js', 0);
-
-
-            //复制可视化
-            let oldName = _private.strSavedName.trim();
-            if(oldName) {
-                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_skill.vjs';
-                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_skill.vjs', true);
-                }
             }
 
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-            _private.strSavedName = newName;
+            function fnSave() {
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
 
-            return true;
+                //复制可视化
+                if(_private.strSavedName) {
+                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_skill.vjs';
+                    if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.vjs', true);
+                    }
+                }
+
+                _private.strSavedName = textFightSkillName.text;
+
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textFightSkillName.text)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textFightSkillName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
+                return false;
+            }
+            else {
+                fnSave();
+
+                return true;
+            }
         }
 
         function close() {
@@ -419,11 +470,6 @@ let data = (function() {
                 },
             });
         }
-    }
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 

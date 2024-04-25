@@ -33,7 +33,7 @@ Item {
 
     signal s_close();
     onS_close: {
-        audio.stop();
+        mediaPlayer.stop();
     }
 
 
@@ -94,6 +94,14 @@ Item {
                     //textMusicName.text = modelData;
 
                     console.debug(JSON.stringify(modelData));
+                }
+
+                onDoubleClicked: {
+                    mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
+                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                        mediaPlayer.pause();
+                    else
+                        mediaPlayer.play();
                 }
 
                 onRemoveClicked: {
@@ -209,15 +217,17 @@ Item {
 
                 //Layout.preferredWidth: 60
 
-                text: "播放"
+                text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
                     if(listview.currentIndex < 0)
                         return;
 
-                    audio.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
-                    audio.play();
-
-                    //console.debug("audio:", textMusicName.text, audio.source);
+                    mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
+                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                        mediaPlayer.pause();
+                    else
+                        mediaPlayer.play();
+                    //console.debug("mediaPlayer:", textMusicName.text, mediaPlayer.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
                     //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
                 }
@@ -230,7 +240,7 @@ Item {
 
                 text: "停止"
                 onClicked: {
-                    audio.stop();
+                    mediaPlayer.stop();
                 }
             }
         }
@@ -238,7 +248,7 @@ Item {
 
 
     MediaPlayer {
-        id: audio
+        id: mediaPlayer
     }
 
 

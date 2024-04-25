@@ -45,15 +45,15 @@ Item {
 
         clearData();
 
-        if(filePath)
+        if(filePath !== undefined)
             _private.filepath = filePath;
         else
             filePath = _private.filepath;
+        console.debug("[GameVisualScript]filePath：", filePath);
 
 
         //let data = File.read(filePath);
-        let data = FrameManager.sl_qml_ReadFile(filePath + '.vjs');
-        console.debug("[GameVisualScript]filePath：", filePath);
+        let data = filePath ? FrameManager.sl_qml_ReadFile(filePath) : null;
         //console.exception("????")
 
         //读取
@@ -116,9 +116,9 @@ Item {
         }
         */
 
-        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 1, TypeName: 'VisualScript', Name: _private.strCommandsName, Data: _private.listModelData}), _private.filepath + '.vjs', 0);
+        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 1, TypeName: 'VisualScript', Name: _private.strCommandsName, Data: _private.listModelData}), _private.filepath + '', 0);
 
-        //console.debug(_private.filepath + '.vjs', JSON.stringify(_private.listModelData))
+        //console.debug(_private.filepath + '', JSON.stringify(_private.listModelData))
     }
 
 
@@ -1220,7 +1220,7 @@ Item {
 
                         if(errString !== '') {
                             dialogCommon.show({
-                                Msg: '检查结果：\r\n%1\r\n请注意：【有可能】不代表错误，因为这是一种简单的常量运行检查（并不是语法检查），如果涉及到变量和生成器请自行判断。'.arg(errString),
+                                Msg: '检查结果：\r\n%1\r\n请注意：【有可能】不代表错误，因为这是一种简单的变量运行检查（并不是语法检查），且游戏环境并没有生成，所以如果涉及到变量和生成器请自行判断。'.arg(errString),
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
                                     root.forceActiveFocus();
@@ -1740,7 +1740,10 @@ Item {
                 //如果有处理函数
                 if(GlobalLibraryJS.isFunction(sysCommands[cmdKey].command[8])) {
                     let params = [];
-                    for(let j = 0; j < cmd.params.length; ++j) {
+                    //！！这里用 sysCommands[cmdKey].params 的原因是，有可能参数数目会修改，按系统的个数走而不是保存的个数
+                    for(let j = 0; j < /*cmd*/sysCommands[cmdKey].params.length; ++j) {
+                        if(sysCommands[cmdKey].params[j][1] === 'label')
+                            continue;
                         let tParamValue = cmd.params[j];
                         params.push(tParamValue);
                     }
@@ -1755,14 +1758,17 @@ Item {
                     //输出的指令下标
                     //let tmpOutputIndex = 0;
                     //循环参数组件
-                    for(let j = 0; j < cmd.params.length; ++j) {
+                    //这里用 sysCommands[cmdKey].params 的原因是，有可能参数数目会修改，按系统的个数走而不是保存的个数
+                    for(let j = 0; j < /*cmd*/sysCommands[cmdKey].params.length; ++j) {
+                        if(sysCommands[cmdKey].params[j][1] === 'label')
+                            continue;
                         //if(sysCommands[cmdKey].params[j][2] === undefined)
                         //    continue;
 
                         //let tParam = GlobalLibraryJS.chineseSymbols2EnglishSymbols(cmd.params[j]);
                         let tParam = cmd.params[j];
                         //如果参数为空
-                        if(tParam === '') {
+                        if(tParam === '' || tParam === undefined) {
                             //如果这个参数不需要
                             if(sysCommands[cmdKey].params[j][2] === false)
                                 templateCmd = templateCmd.arg('');
@@ -2026,6 +2032,7 @@ Item {
     }
 
     Component.onDestruction: {
+
     }
 }
 

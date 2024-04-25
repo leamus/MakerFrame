@@ -35,34 +35,34 @@ Item {
 
 
     //打开地图
-    function openMap(mapPath, mapInfo=null) {
+    function openMap(mapPath, tmapInfo=null) {
 
         itemBackMapContainer.visible = false;
         itemFrontMapContainer.visible = false;
 
-        if(!mapInfo) {
+        if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            mapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
+            tmapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
             //console.debug("cfg", cfg, mapPath);
 
-            if(!mapInfo) {
+            if(!tmapInfo) {
                 console.warn('[!GameMapView]Map Load Error:', mapPath);
                 return false;
             }
-            mapInfo = JSON.parse(mapInfo);
+            tmapInfo = JSON.parse(tmapInfo);
             //console.debug("cfg", cfg);
             //loader.setSource("./MapEditor_1.qml", {});
         }
 
 
         //地图数据
-        //itemContainer.mapInfo = JSON.parse(File.read(mapFilePath));
-        itemContainer.mapInfo = mapInfo;
+        //mapInfo = JSON.parse(File.read(mapFilePath));
+        mapInfo = tmapInfo;
 
 
         //地图大小（块）和地图块大小
-        sizeMapSize = Qt.size(itemContainer.mapInfo.MapSize[0], itemContainer.mapInfo.MapSize[1]);
-        sizeMapBlockSize = Qt.size(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1]);
+        sizeMapSize = Qt.size(mapInfo.MapSize[0], mapInfo.MapSize[1]);
+        sizeMapBlockSize = Qt.size(mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1]);
 
         //计算 _private.nMapDrawScale
         const mapPixelCount = sizeMapSize.width * sizeMapBlockSize.width * sizeMapSize.height * sizeMapBlockSize.height;
@@ -71,7 +71,7 @@ Item {
         //_private.nMapDrawScale = 2;
         _private.sizeCanvas = Qt.size(sizeMapSize.width * sizeMapBlockSize.width / _private.nMapDrawScale, sizeMapSize.height * sizeMapBlockSize.height / _private.nMapDrawScale)
 
-        _private.rMapScale = parseFloat(itemContainer.mapInfo.MapScale) || 1;
+        _private.rMapScale = parseFloat(mapInfo.MapScale) || 1;
         sizeMapBlockScaledSize.width = Math.round(sizeMapBlockSize.width * _private.rMapScale);
         sizeMapBlockScaledSize.height = Math.round(sizeMapBlockSize.height * _private.rMapScale);
 
@@ -96,7 +96,7 @@ Item {
             itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
         }
 
-        imageMapBlock.source = GameMakerGlobal.mapResourceURL(itemContainer.mapInfo.MapBlockImage[0]);
+        imageMapBlock.source = GameMakerGlobal.mapResourceURL(mapInfo.MapBlockImage[0]);
 
         //载入新地图块图片
         for(let tc in itemBackMapContainer.arrCanvas) {
@@ -119,31 +119,31 @@ Item {
         }
 
 
-        itemContainer.mapEventBlocks = {};
+        mapEventBlocks = {};
         //转换事件的地图块的坐标为地图块的ID
-        for(let i in itemContainer.mapInfo.MapEventData) {
+        for(let i in mapInfo.MapEventData) {
             let p = i.split(',');
-            itemContainer.mapEventBlocks[parseInt(p[0]) + parseInt(p[1]) * itemContainer.mapInfo.MapSize[0]] = itemContainer.mapInfo.MapEventData[i];
+            mapEventBlocks[parseInt(p[0]) + parseInt(p[1]) * mapInfo.MapSize[0]] = mapInfo.MapEventData[i];
         }
 
-        itemContainer.mapSpecialBlocks = {};
+        mapSpecialBlocks = {};
         //转换事件的地图块的坐标为地图块的ID
-        for(let i in itemContainer.mapInfo.MapBlockSpecialData) {
+        for(let i in mapInfo.MapBlockSpecialData) {
             let p = i.split(',');
-            itemContainer.mapSpecialBlocks[parseInt(p[0]) + parseInt(p[1]) * itemContainer.mapInfo.MapSize[0]] = itemContainer.mapInfo.MapBlockSpecialData[i];
+            mapSpecialBlocks[parseInt(p[0]) + parseInt(p[1]) * mapInfo.MapSize[0]] = mapInfo.MapBlockSpecialData[i];
         }
 
 
         console.debug('[GameMapView]openMap', mapPath, itemViewPort.itemContainer.width, itemViewPort.itemContainer.height);
-        //console.debug("mapEventBlocks,mapSpecialBlocks", JSON.stringify(itemContainer.mapEventBlocks), JSON.stringify(itemContainer.mapSpecialBlocks));
+        //console.debug("mapEventBlocks,mapSpecialBlocks", JSON.stringify(mapEventBlocks), JSON.stringify(mapSpecialBlocks));
 
-        return mapInfo;
+        return tmapInfo;
     }
 
     //释放
     function release() {
 
-        itemContainer.mapInfo = null;
+        mapInfo = null;
 
         for(let tc in itemBackMapContainer.arrCanvas) {
             itemBackMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
@@ -170,13 +170,13 @@ Item {
 
         if(bx < 0)
             bx = 0;
-        else if(bx >= itemContainer.mapInfo.MapSize[0])
-            bx = itemContainer.mapInfo.MapSize[0] - 1;
+        else if(bx >= mapInfo.MapSize[0])
+            bx = mapInfo.MapSize[0] - 1;
 
         if(by < 0)
             by = 0;
-        else if(by >= itemContainer.mapInfo.MapSize[1])
-            by = itemContainer.mapInfo.MapSize[1] - 1;
+        else if(by >= mapInfo.MapSize[1])
+            by = mapInfo.MapSize[1] - 1;
 
 
         //在目标图块最中央的 地图的坐标
@@ -272,7 +272,7 @@ Item {
         /*/计算 所占的 地图块
         for(; yBlock1 <= yBlock2; ++yBlock1) {
             for(let xb = xBlock1; xb <= xBlock2; xb ++) {
-                blocks.push(xb + yBlock1 * itemContainer.mapInfo.MapSize[0])
+                blocks.push(xb + yBlock1 * mapInfo.MapSize[0])
             }
         }
         return blocks;*/
@@ -345,7 +345,9 @@ Item {
     property alias canvasBackMap: canvasBackMap
     property alias canvasFrontMap: canvasFrontMap
 
-    property alias mapInfo: itemContainer.mapInfo
+    property var mapInfo: null          //地图数据（map.json）
+    property var mapEventBlocks: ({})   //有事件的地图块ID（从左到右从上到下从0开始的ID）
+    property var mapSpecialBlocks: ({})   //有特殊标记的地图块ID（从左到右从上到下从0开始的ID）
 
     property alias mouseArea: mouseArea
 
@@ -418,7 +420,7 @@ Item {
                     let by = parseInt(p[1]);
 
                     //如果越界
-                    if(bx < 0 || by < 0 || bx >= itemContainer.mapInfo.MapSize[0] || by >= itemContainer.mapInfo.MapSize[1]) {
+                    if(bx < 0 || by < 0 || bx >= mapInfo.MapSize[0] || by >= mapInfo.MapSize[1]) {
                         //delete objMaskData[i];
                         continue;
                     }
@@ -427,7 +429,7 @@ Item {
                         ctx.fillStyle = objMaskData[i].Color;
                     else
                         ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
-                    ctx.fillRect(bx * itemContainer.mapInfo.MapBlockSize[0], by * itemContainer.mapInfo.MapBlockSize[1], itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1]);
+                    ctx.fillRect(bx * mapInfo.MapBlockSize[0], by * mapInfo.MapBlockSize[1], mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1]);
                 }
 
                 //requestPaint();
@@ -498,11 +500,6 @@ Item {
         Item {
             id: itemContainer
 
-
-            property var mapInfo: null          //地图数据（map.json）
-
-            property var mapEventBlocks: ({})   //有事件的地图块ID（从左到右从上到下从0开始的ID）
-            property var mapSpecialBlocks: ({})   //有特殊标记的地图块ID（从左到右从上到下从0开始的ID）
 
             //property var image1: "1.jpg"
             //property var image2: "2.png"
@@ -606,23 +603,23 @@ Item {
 
                         //循环绘制地图块
                         /* 之前的
-                        for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
+                        for(let i = 0; i < mapInfo.data.length; i++)
                         {
                             //x1、y1为源，x2、y2为目标
-                            let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                            let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                            let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                            let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
+                            let x1 = mapInfo.data[i] % mapInfo.MapSize[0];    //12
+                            let y1 = parseInt(mapInfo.data[i] / mapInfo.MapSize[0]);  //16
+                            let x2 = i % mapInfo.MapSize[0];  //12
+                            let y2 = parseInt(i / mapInfo.MapSize[0]);    //16
 
                             ctx.drawImage(imageMapBlock.source,
-                                          x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                          itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                          x1 * mapInfo.MapBlockSize[0], y1 * mapInfo.MapBlockSize[1],
+                                          mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1],
                                           x2 * sizeMapBlockScaledSize.width, y2 * sizeMapBlockScaledSize.height,
                                           sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
-                            if(y2 > itemContainer.mapInfo.MapSize[1]) {
+                            if(y2 > mapInfo.MapSize[1]) {
                                 console.warn("WARNING!!!too many rows");
                                 break;
                             }
@@ -630,42 +627,42 @@ Item {
                         */
 
                         //绘制每一层
-                        for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
+                        for(let k = 0; k < mapInfo.MapCount; ++k) {
                             //console.debug("k:", k);
 
                             //如果前景色需要半透明，则背景的每一层都必须绘制，如果没有半透明，则不需要绘制不属于地板层的
                             if(rMapOpacity >= 1)
                                 //跳过不属于地板层的
-                                if(k >= itemContainer.mapInfo.MapOfRole)
+                                if(k >= mapInfo.MapOfRole)
                                     continue;
 
-                            for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
+                            for(let j = 0; j < mapInfo.MapData[k].length; ++j) {
                             //	console.debug("j:", j);
                                 //循环绘制地图块
-                                for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
+                                for(let i = 0; i < mapInfo.MapData[k][j].length; ++i) {
                             //		console.debug("i:", i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
                                     //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
-                                    if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
+                                    if(mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
                                         continue;
 
-                                    let _block = itemContainer.mapInfo.MapData[k][j][i];
+                                    let _block = mapInfo.MapData[k][j][i];
                                     //x1、y1为源，x2、y2为目标
-                                    let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                    let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
-                                    let y2 = j * itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
+                                    let x1 = _block[0] * mapInfo.MapBlockSize[0];
+                                    let y1 = _block[1] * mapInfo.MapBlockSize[1];
+                                    let x2 = i * mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
+                                    let y2 = j * mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
                                     //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                    //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
+                                    //console.debug(mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
 
                                     ctx.drawImage(imageMapBlock.source,
                                                   x1, y1,
-                                                  itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                                  mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1],
                                                   x2, y2,
-                                                  itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale, itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale
+                                                  mapInfo.MapBlockSize[0] / _private.nMapDrawScale, mapInfo.MapBlockSize[1] / _private.nMapDrawScale
                                     );
                                 }
                             }
@@ -801,23 +798,23 @@ Item {
 
                         //循环绘制地图块
                         /* 之前的
-                        for(let i = 0; i < itemContainer.mapInfo.data.length; i++)
+                        for(let i = 0; i < mapInfo.data.length; i++)
                         {
                             //x1、y1为源，x2、y2为目标
-                            let x1 = itemContainer.mapInfo.data[i] % itemContainer.mapInfo.MapSize[0];    //12
-                            let y1 = parseInt(itemContainer.mapInfo.data[i] / itemContainer.mapInfo.MapSize[0]);  //16
-                            let x2 = i % itemContainer.mapInfo.MapSize[0];  //12
-                            let y2 = parseInt(i / itemContainer.mapInfo.MapSize[0]);    //16
+                            let x1 = mapInfo.data[i] % mapInfo.MapSize[0];    //12
+                            let y1 = parseInt(mapInfo.data[i] / mapInfo.MapSize[0]);  //16
+                            let x2 = i % mapInfo.MapSize[0];  //12
+                            let y2 = parseInt(i / mapInfo.MapSize[0]);    //16
 
                             ctx.drawImage(imageMapBlock.source,
-                                          x1 * itemContainer.mapInfo.MapBlockSize[0], y1 * itemContainer.mapInfo.MapBlockSize[1],
-                                          itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                          x1 * mapInfo.MapBlockSize[0], y1 * mapInfo.MapBlockSize[1],
+                                          mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1],
                                           x2 * sizeMapBlockScaledSize.width, y2 * sizeMapBlockScaledSize.height,
                                           sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
-                            if(y2 > itemContainer.mapInfo.MapSize[1]) {
+                            if(y2 > mapInfo.MapSize[1]) {
                                 console.warn("WARNING!!!too many rows");
                                 break;
                             }
@@ -825,40 +822,40 @@ Item {
                         */
 
                         //绘制每一层
-                        for(let k = 0; k < itemContainer.mapInfo.MapCount; ++k) {
+                        for(let k = 0; k < mapInfo.MapCount; ++k) {
                             //console.debug("k:", k);
 
                             //跳过地板层
-                            if(k < itemContainer.mapInfo.MapOfRole)
+                            if(k < mapInfo.MapOfRole)
                                 continue;
 
-                            for(let j = 0; j < itemContainer.mapInfo.MapData[k].length; ++j) {
+                            for(let j = 0; j < mapInfo.MapData[k].length; ++j) {
                             //	console.debug("j:", j);
                                 //循环绘制地图块
-                                for(let i = 0; i < itemContainer.mapInfo.MapData[k][j].length; ++i) {
+                                for(let i = 0; i < mapInfo.MapData[k][j].length; ++i) {
                             //		console.debug("i:", i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
                                     //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
 
-                                    if(itemContainer.mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
+                                    if(mapInfo.MapData[k][j][i].toString() === '-1,-1,-1')
                                         continue;
 
-                                    let _block = itemContainer.mapInfo.MapData[k][j][i];
+                                    let _block = mapInfo.MapData[k][j][i];
                                     //x1、y1为源，x2、y2为目标
-                                    let x1 = _block[0] * itemContainer.mapInfo.MapBlockSize[0];
-                                    let y1 = _block[1] * itemContainer.mapInfo.MapBlockSize[1];
-                                    let x2 = i * itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
-                                    let y2 = j * itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
+                                    let x1 = _block[0] * mapInfo.MapBlockSize[0];
+                                    let y1 = _block[1] * mapInfo.MapBlockSize[1];
+                                    let x2 = i * mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
+                                    let y2 = j * mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
                                     //console.debug(k,j,i, ":", x1,y1,x2,y2);
-                                    //console.debug(itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
+                                    //console.debug(mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
 
                                     ctx.drawImage(imageMapBlock.source,
                                                   x1, y1,
-                                                  itemContainer.mapInfo.MapBlockSize[0], itemContainer.mapInfo.MapBlockSize[1],
+                                                  mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1],
                                                   x2, y2,
-                                                  itemContainer.mapInfo.MapBlockSize[0] / _private.nMapDrawScale, itemContainer.mapInfo.MapBlockSize[1] / _private.nMapDrawScale
+                                                  mapInfo.MapBlockSize[0] / _private.nMapDrawScale, mapInfo.MapBlockSize[1] / _private.nMapDrawScale
                                     );
                                 }
                             }

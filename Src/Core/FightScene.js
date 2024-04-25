@@ -259,7 +259,7 @@ function showSkillsOrGoods(type, value) {
 function choicedSkillOrGoods(used, type) {
 
     //console.debug("~~~~~~~~~weapon", JSON.stringify(tWeapon))
-    //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.getGoodsResource(tWeapon.RId)))
+    //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.getGoodsResource(tWeapon.RID)))
 
 
 
@@ -901,22 +901,22 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
     case 30: //显示动态文字
 
-        let spriteEffect = compCacheWordMove.createObject(fightScene);
-        spriteEffect.parallelAnimation.finished.connect(function() {
-            if(GlobalLibraryJS.isComponent(spriteEffect)) {
-                spriteEffect.destroy();
+        let wordmove = compCacheWordMove.createObject(fightScene);
+        wordmove.parallelAnimation.finished.connect(function() {
+            if(GlobalLibraryJS.isComponent(wordmove)) {
+                wordmove.destroy();
             }
         });
 
 
         //缩放
         if(combatantActionSpriteData.Scale !== undefined) {
-            spriteEffect.scale = combatantActionSpriteData.Scale;
+            wordmove.scale = combatantActionSpriteData.Scale;
         }
 
         //半透明
         if(combatantActionSpriteData.Opacity !== undefined) {
-            spriteEffect.opacity = combatantActionSpriteData.Opacity;
+            wordmove.opacity = combatantActionSpriteData.Opacity;
         }
 
 
@@ -934,35 +934,35 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
 
         if(combatantActionSpriteData.Duration > 0) {
-            spriteEffect.nMoveDuration = combatantActionSpriteData.Duration;
-            spriteEffect.nOpacityDuration = combatantActionSpriteData.Duration;
+            wordmove.nMoveDuration = combatantActionSpriteData.Duration;
+            wordmove.nOpacityDuration = combatantActionSpriteData.Duration;
         }
         else {
-            spriteEffect.nMoveDuration = 1000;
-            spriteEffect.nOpacityDuration = 1000;
+            wordmove.nMoveDuration = 1000;
+            wordmove.nOpacityDuration = 1000;
         }
 
         //颜色
         if(combatantActionSpriteData.Color !== undefined) {
-            spriteEffect.text.color = combatantActionSpriteData.Color;
-            //spriteEffect.text.styleColor = combatantActionSpriteData.Color;
-            spriteEffect.text.styleColor = "";
+            wordmove.text.color = combatantActionSpriteData.Color;
+            //wordmove.text.styleColor = combatantActionSpriteData.Color;
+            wordmove.text.styleColor = "";
         }
 
         //显示文字
         if(combatantActionSpriteData.Text !== undefined) {
-            spriteEffect.text.text = combatantActionSpriteData.Text;
+            wordmove.text.text = combatantActionSpriteData.Text;
         }
         /*/或者显示 Data字符串方法 的返回值（可以使用 SkillEffectResult 对象）
         if(combatantActionSpriteData.Data) {
             //console.debug(SkillEffectResult[0].value)
-            spriteEffect.text.text = GlobalJS._eval(combatantActionSpriteData.Data, "", {SkillEffectResult: SkillEffectResult});
-            //console.debug(spriteEffect.text.text)
+            wordmove.text.text = GlobalJS._eval(combatantActionSpriteData.Data, "", {SkillEffectResult: SkillEffectResult});
+            //console.debug(wordmove.text.text)
         }*/
 
         //文字大小
         if(combatantActionSpriteData.FontSize !== undefined) {
-            spriteEffect.text.font.pointSize = combatantActionSpriteData.FontSize;
+            wordmove.text.font.pointSize = combatantActionSpriteData.FontSize;
         }
 
         //位置（必须放在显示文字后）
@@ -972,33 +972,33 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             switch(combatantActionSpriteData.Position) {
             case 1:
                 /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role2.$$fightData.$teamsID, role2.$$fightData.$index);
-                spriteEffect.x = position.x - spriteEffect.width / 2;
-                spriteEffect.y = position.y - spriteEffect.height / 2;
+                wordmove.x = position.x - wordmove.width / 2;
+                wordmove.y = position.y - wordmove.height / 2;
                 */
 
                 break;
             case 4:
                 /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role1.$$fightData.$teamsID, role1.$$fightData.$index);
-                spriteEffect.x = position.x - spriteEffect.width / 2;
-                spriteEffect.y = position.y - spriteEffect.height / 2;
+                wordmove.x = position.x - wordmove.width / 2;
+                wordmove.y = position.y - wordmove.height / 2;
                 */
                 break;
             }
         }
         else {
             let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
-            spriteEffect.x = position.x - spriteEffect.width / 2;
-            spriteEffect.y = position.y - spriteEffect.height / 2;
+            wordmove.x = position.x - wordmove.width / 2;
+            wordmove.y = position.y - wordmove.height / 2;
         }
 
 
         //!!!!!!修改：加入偏移和透明？
-        spriteEffect.moveAniX.to = spriteEffect.x;
-        spriteEffect.moveAniY.to = spriteEffect.y - 66;
-        spriteEffect.opacityAni.from = spriteEffect.opacity;
-        spriteEffect.opacityAni.to = 0;
+        wordmove.moveAniX.to = wordmove.x;
+        wordmove.moveAniY.to = wordmove.y - 66;
+        wordmove.opacityAni.from = wordmove.opacity;
+        wordmove.opacityAni.to = 0;
 
-        spriteEffect.parallelAnimation.start();
+        wordmove.parallelAnimation.start();
 
 
 
@@ -1077,7 +1077,7 @@ function *fnRound() {
     for(let tc in fight.enemies) {
         let tSkillIndexArray = GlobalLibraryJS.getDifferentNumber(0, fight.enemies[tc].$skills.length);
         //!!!!!这里需要加入：1、普通攻击概率；2、魔法值不足；3、最后还是普通攻击
-        fight.enemies[tc].$$fightData.$choice.$attack = fight.enemies[tc].$skills[tSkillIndexArray[0]].RId;
+        fight.enemies[tc].$$fightData.$choice.$attack = fight.enemies[tc].$skills[tSkillIndexArray[0]].RID;
     }*/
 
 
@@ -1160,7 +1160,7 @@ function *fnRound() {
                     //得到技能生成器函数
                     //let genActionAndSprite = fightSkillInfo.$commons.$playScript(combatant);
                     //_private.asyncScript.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant), Tips: '$playScript'}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
 
                     //循环 技能（或者 道具技能）包含的特效
@@ -1246,13 +1246,13 @@ function *fnRound() {
 
                 if(goodsInfo.$commons.$fightScript['$completeScript'])
                     //_private.asyncScript.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), Tips: '$completeScript'}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
                 else if(goodsInfo.$commons.$fightScript['$overScript'])
                     //_private.asyncScript.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), Tips: '$overScript'}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
                 else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
                     //_private.asyncScript.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant), Tips: '$overScript'}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
 
                 while(1) {
 
@@ -1372,7 +1372,7 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round11'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight round11'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1417,7 +1417,7 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round12'], {Running: 1});
+        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight round12'], {Running: 1});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1605,7 +1605,7 @@ function fightOver(result) {
         //    fight.run([_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end'], -1, );
         //}
 
-        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end2']);
+        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2']);
     //}
 }
 

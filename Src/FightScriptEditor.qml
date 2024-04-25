@@ -70,15 +70,15 @@ let data = (function() {
             //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
             $runAway: true,
             $enemyCount: [1, 3],	//为数组（m-n）的随机排列，为数字则依次按顺序排列，如果为true则表示按顺序排列
-            //RId是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
+            //RID是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
             $enemiesData: [
-                {RId: 'killer2', $name: '敌人1', $properties: {HP: [5, 5, 5], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '西瓜刀', Params: {}}], $money: 5, $EXP: 5},
-                {RId: 'killer2', $name: '敌人2', $properties: {HP: [10, 10, 10], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '小刀', Params: {}}], $money: 10, $EXP: 10},
-                {RId: 'killer2', $name: '敌人3', $properties: {HP: [20, 20, 20], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '小草', Params: {}}], $money: 20, $EXP: 20},
-                {RId: 'killer2', $name: '敌人4', $properties: {HP: [50, 50, 50], speed: 1}, $skills: ['fight'], $goods: ['小草'], $money: 50, $EXP: 50},
-                {RId: 'killer2', $name: '敌人5', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 100, $EXP: 100},
-                {RId: 'killer2', $name: '敌人6', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 200, $EXP: 200},
-                {RId: 'killer2', $name: '敌人7', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 500, $EXP: 500},
+                {RID: 'killer2', $name: '敌人1', $properties: {HP: [5, 5, 5], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '西瓜刀', Params: {}}], $money: 5, $EXP: 5},
+                {RID: 'killer2', $name: '敌人2', $properties: {HP: [10, 10, 10], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '小刀', Params: {}}], $money: 10, $EXP: 10},
+                {RID: 'killer2', $name: '敌人3', $properties: {HP: [20, 20, 20], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '小草', Params: {}}], $money: 20, $EXP: 20},
+                {RID: 'killer2', $name: '敌人4', $properties: {HP: [50, 50, 50], speed: 1}, $skills: ['fight'], $goods: ['小草'], $money: 50, $EXP: 50},
+                {RID: 'killer2', $name: '敌人5', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 100, $EXP: 100},
+                {RID: 'killer2', $name: '敌人6', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 200, $EXP: 200},
+                {RID: 'killer2', $name: '敌人7', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 500, $EXP: 500},
             ],
         }
     };
@@ -95,15 +95,15 @@ let data = (function() {
         //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
         $runAway: true,
         $enemyCount: [1, 3],	//为数组（m-n）的随机排列，为数字则依次按顺序排列，如果为true则表示按顺序排列
-        //RId是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
+        //RID是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
         $enemiesData: [
-            {RId: 'killer2', $name: '敌人1', $properties: {HP: [5, 5, 5], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '西瓜刀', Params: {}}], $money: 5, $EXP: 5},
-            {RId: 'killer2', $name: '敌人2', $properties: {HP: [10, 10, 10], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '小刀', Params: {}}], $money: 10, $EXP: 10},
-            {RId: 'killer2', $name: '敌人3', $properties: {HP: [20, 20, 20], speed: 1}, $skills: [{RId: 'fight', Params: {}}], $goods: [{RId: '小草', Params: {}}], $money: 20, $EXP: 20},
-            {RId: 'killer2', $name: '敌人4', $properties: {HP: [50, 50, 50], speed: 1}, $skills: ['fight'], $goods: ['小草'], $money: 50, $EXP: 50},
-            {RId: 'killer2', $name: '敌人5', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 100, $EXP: 100},
-            {RId: 'killer2', $name: '敌人6', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 200, $EXP: 200},
-            {RId: 'killer2', $name: '敌人7', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 500, $EXP: 500},
+            {RID: 'killer2', $name: '敌人1', $properties: {HP: [5, 5, 5], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '西瓜刀', Params: {}}], $money: 5, $EXP: 5},
+            {RID: 'killer2', $name: '敌人2', $properties: {HP: [10, 10, 10], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '小刀', Params: {}}], $money: 10, $EXP: 10},
+            {RID: 'killer2', $name: '敌人3', $properties: {HP: [20, 20, 20], speed: 1}, $skills: [{RID: 'fight', Params: {}}], $goods: [{RID: '小草', Params: {}}], $money: 20, $EXP: 20},
+            {RID: 'killer2', $name: '敌人4', $properties: {HP: [50, 50, 50], speed: 1}, $skills: ['fight'], $goods: ['小草'], $money: 50, $EXP: 50},
+            {RID: 'killer2', $name: '敌人5', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 100, $EXP: 100},
+            {RID: 'killer2', $name: '敌人6', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 200, $EXP: 200},
+            {RID: 'killer2', $name: '敌人7', $properties: {HP: [100, 100, 100], speed: 1}, $skills: ['fight'], $goods: ['西瓜刀'], $money: 500, $EXP: 500},
         ],
         */
 
@@ -330,31 +330,77 @@ let data = (function() {
 
 
         function save() {
-            let newName = textFightScriptName.text = textFightScriptName.text.trim();
+            textFightScriptName.text = textFightScriptName.text.trim();
 
-            if(newName.length === 0)
+            if(textFightScriptName.text.length === 0) {
+                dialogCommon.show({
+                    Msg: '名称不能为空',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        textFightScriptName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        textFightScriptName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
                 return false;
-
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator;
-
-
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), path + newName + GameMakerGlobal.separator + 'fight_script.js', 0);
-
-
-            //复制可视化
-            let oldName = _private.strSavedName.trim();
-            if(oldName) {
-                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_script.vjs';
-                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_script.vjs', true);
-                }
             }
 
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
 
-            _private.strSavedName = newName;
+            function fnSave() {
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
 
-            return true;
+                //复制可视化
+                if(_private.strSavedName) {
+                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
+                    if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.vjs', true);
+                    }
+                }
+
+                _private.strSavedName = textFightScriptName.text;
+
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textFightScriptName.text)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textFightScriptName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
+                return false;
+            }
+            else {
+                fnSave();
+
+                return true;
+            }
         }
 
         function close() {

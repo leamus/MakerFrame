@@ -13,17 +13,17 @@ import "qrc:/QML"
 
 /*
 
-    //如果是循环播放（循环播放没有开始和结束信号）
+    //!!!！！！鹰：Loader内嵌套FileSpriteEffect：
+    //    不知为何 设置Loader 的width和height会导致无限创建特效（但是不会提醒），会导致特别卡，然后报错：
+    //  【Warning】SpriteEngine: Too many animations to fit in one texture...
+    //  【Warning】SpriteEngine: Your texture max size today is 16384
+    //spriteEffectComp.width = parseInt(data.SpriteSize[0]);
+    //spriteEffectComp.height = parseInt(data.SpriteSize[1]);
 
-    SoundEffect：
-    //鹰：play可以停止前面的播放，然后重新开始播放
-    //给source赋值时，会从硬盘读取；start时内存才会增加!!
-    //多个SoundEffect，同时赋值source会比同时start更卡；
-
-
-    Bug：如果帧数为1，则精灵不会自动 stop，需要一个Timer来stop
-      如果帧数为1，即使loops为-1且running为true，它也会下一个js事件中running设置为false而停止；
-
+    设计思路：
+      之前（因为上面的bug）：Role 的大小 是SpriteEffect（Loader）的大小，Loader的大小默认就是子组件的大小
+        所以设置大小时，设置 FileSpriteEffect/DirSpriteEffect 组件的 大小即可；
+      目前：解决了上面的Bug，所以可以设置Role和SpriteEffect大小了。
 */
 
 Loader {
@@ -34,11 +34,15 @@ Loader {
         id: compFileSpriteEffect
 
         FileSpriteEffect {
-            anchors.fill: parent
+            //anchors.fill: parent
 
             smooth: root.smooth
 
             strSource: root.strSource   //精灵图片路径
+            onStrSourceChanged: {
+                root.strSource = this.strSource;
+            }
+
             nFrameCount: root.nFrameCount //帧数
             nInterval: root.nInterval  //帧切换速度
             nLoops: root.nLoops //循环次数
@@ -56,8 +60,8 @@ Loader {
             //property alias mouseArea: mouseArea
 
             bSmooth: root.bSmooth
-            nCurrentFrame: root.nCurrentFrame
-            bRunning: root.bRunning
+            //nCurrentFrame: root.nCurrentFrame
+            //bRunning: root.bRunning
 
             nType: root.nType   //0表示不播放音效，只是触发 播放信号；1表示本组件播放音频（win下如果太多，会卡顿）
             strSoundeffectName: root.strSoundeffectName
@@ -91,11 +95,16 @@ Loader {
         id: compDirSpriteEffect
 
         DirSpriteEffect {
-            anchors.fill: parent
+            //anchors.fill: parent
+            //width: implicitWidth
+            //height: implicitHeight
 
             smooth: root.smooth
 
             strSource: root.strSource   //精灵图片路径
+            onStrSourceChanged: {
+                root.strSource = this.strSource;
+            }
             nFrameCount: root.nFrameCount //帧数
             nInterval: root.nInterval  //帧切换速度
             nLoops: root.nLoops //循环次数
@@ -113,8 +122,8 @@ Loader {
             //property alias mouseArea: mouseArea
 
             bSmooth: root.bSmooth
-            nCurrentFrame: root.nCurrentFrame
-            bRunning: root.bRunning
+            //nCurrentFrame: root.nCurrentFrame
+            //bRunning: root.bRunning
 
             nType: root.nType   //0表示不播放音效，只是触发 播放信号；1表示本组件播放音频（win下如果太多，会卡顿）
             strSoundeffectName: root.strSoundeffectName
@@ -146,29 +155,37 @@ Loader {
 
 
 
-    property var start: function() {
+    function start() {
         if(item)
             return item.start();
     }
-    property var restart: function() {
+    function restart() {
         if(item)
             return item.restart();
     }
-    property var pause: function() {
+    function pause() {
         if(item)
             return item.pause();
     }
-    property var stop: function(stopSound=true) {
+    function stop(stopSound=true) {
         if(item)
             return item.stop(stopSound);
     }
-    property var refresh: function() {
+    function refresh() {
         if(item)
             return item.refresh();
     }
-    property var reset: function() {
+    function reset() {
         if(item)
             return item.reset();
+    }
+    function status() {
+        if(item)
+            return item.status();
+    }
+    function currentFrame() {
+        if(item)
+            return item.status();
     }
 
 
@@ -190,6 +207,10 @@ Loader {
     property int nSpriteType: 0
 
     property string strSource: ""   //精灵图片路径
+    onStrSourceChanged: {
+        if(item)
+            item.strSource = this.strSource;
+    }
     property int nFrameCount: 3 //帧数
     property int nInterval: 100  //帧切换速度
     property int nLoops: AnimatedSprite.Infinite //循环次数
@@ -205,8 +226,8 @@ Loader {
     readonly property var mouseArea: item ? item.mouseArea : null
 
     property bool bSmooth: false
-    property int nCurrentFrame: 0
-    property bool bRunning: false
+    //property int nCurrentFrame: 0
+    //property bool bRunning: false
 
     property int nType: 0   //0表示不播放音效，只是触发 播放信号；1表示本组件播放音频（win下如果太多，会卡顿）
     property string strSoundeffectName: ''
@@ -229,14 +250,16 @@ Loader {
     //property bool bStartToRunning: false
 
 
-    //width: 0
-    //height: 0
+    width: if(parent)parent.width
+    height: if(parent)parent.height
 
     //implicitWidth: item.implicitWidth
     //implicitHeight: item.implicitHeight
 
     smooth: false
 
+
+    asynchronous: false
 
     sourceComponent: {
         switch(nSpriteType) {

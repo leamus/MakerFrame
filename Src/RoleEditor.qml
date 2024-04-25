@@ -35,8 +35,10 @@ Item {
     onS_close: {
         role.unload();
 
+        rectImage.visible = false;
 
-        _private.strTextBackupRoleName = '';
+
+        _private.strRoleName = '';
         _private.strTextBackupRoleImageURL = '';
         _private.strTextBackupRoleImageResourceName = '';
 
@@ -85,9 +87,10 @@ Item {
 //        textRoleRealHeight.text = cfg.RealSize[1].toString();
 //        textRoleSpeed.text = cfg.MoveSpeed.toString();
 
-        textCode.text = _private.strTextCode;
-
         _private.refreshRole();
+
+
+        _private.loadScript();
     }
 
 
@@ -97,7 +100,7 @@ Item {
 
         //cfg.Version;
         //cfg.RoleType;
-        textRoleName.text = cfg.RoleName;
+        _private.strRoleName = textRoleName.text = cfg.RoleName.trim();
 
         textRoleRealX.text = cfg.RealOffset[0].toString();
         textRoleRealY.text = cfg.RealOffset[1].toString();
@@ -195,15 +198,6 @@ Item {
             textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
             textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
 
-
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim() + GameMakerGlobal.separator + 'role.js';
-            if(FrameManager.sl_qml_FileExists(path)) {
-                textCode.text = FrameManager.sl_qml_ReadFile(path);
-            }
-            else
-                textCode.text = _private.strTextCode;
-
         }
         else if(comboType.currentIndex === 2) {
 
@@ -231,8 +225,10 @@ Item {
             }
         }
 
-
         _private.refreshRole();
+
+
+        _private.loadScript(textRoleName.text);
     }
 
 
@@ -342,7 +338,7 @@ Item {
                     text: 'p'
 
                     onClicked: {
-                        role.sprite.action(ttextActionName.text);
+                        _private.doAction(ttextActionName.text);
                     }
                 }
 
@@ -494,7 +490,7 @@ Item {
                     text: 'p'
 
                     onClicked: {
-                        role.sprite.action(ttextActionName.text);
+                        _private.doAction(ttextActionName.text);
                     }
                 }
 
@@ -1537,7 +1533,7 @@ Item {
                         Button {
                             Layout.fillWidth: true
 
-                            visible: false
+                            //visible: false
                             text: '增加动作'
 
                             onClicked: {
@@ -1552,6 +1548,26 @@ Item {
                             }
                         }
 
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*动作名'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@特效名'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
+                            }
+                        }
 
                         ColumnLayout {
                             id: layoutAction2
@@ -1563,6 +1579,43 @@ Item {
 
                             spacing: 16
 
+                        }
+                    }
+
+                    Button {
+                        Layout.fillWidth: true
+
+                        text: '编辑脚本'
+
+                        onClicked: {
+
+                            if(!_private.strRoleName) {
+                                dialogCommon.show({
+                                      Msg: '请先保存角色',
+                                      Buttons: Dialog.Yes,
+                                      OnAccepted: function() {
+                                          root.forceActiveFocus();
+                                      },
+                                      OnRejected: ()=>{
+                                          root.forceActiveFocus();
+                                      },
+                                  });
+
+                                return;
+                            }
+
+
+                            //_private.loadScript(textRoleName.text);
+                            if(!textCode.text &&
+                                    !FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.js')) {
+                                if(comboType.currentIndex === 1)
+                                    textCode.text = _private.strTemplateCode0;
+                                else
+                                    textCode.text = '';
+                            }
+
+
+                            dialogScript.open();
                         }
                     }
 
@@ -1579,7 +1632,7 @@ Item {
 
                             color: 'red'
                             text: '注意：图片文件夹请自行复制到资源目录；预览请先保存'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _config.nLabelFontSize
 
                             horizontalAlignment: Label.AlignHCenter
                             verticalAlignment: Label.AlignVCenter
@@ -1588,33 +1641,6 @@ Item {
 
                         RowLayout {
                             Layout.fillWidth: true
-
-                            Button {
-                                Layout.fillWidth: true
-
-                                text: '编辑脚本'
-
-                                onClicked: {
-
-                                    if(!textRoleName.text.trim()) {
-                                        dialogCommon.show({
-                                              Msg: '请先保存角色',
-                                              Buttons: Dialog.Yes,
-                                              OnAccepted: function() {
-                                                  root.forceActiveFocus();
-                                              },
-                                              OnRejected: ()=>{
-                                                  root.forceActiveFocus();
-                                              },
-                                          });
-
-                                        return;
-                                    }
-
-
-                                    dialogScript.open();
-                                }
-                            }
 
                             Button {
                                 Layout.fillWidth: true
@@ -1641,29 +1667,33 @@ Item {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
-                                text: '动作名'
-                                font.pointSize: _config.nTextFontSize
+                                text: '*动作名'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
-                                text: '起始序号'
-                                font.pointSize: _config.nTextFontSize
+                                text: '*起始序号'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
-                                text: '帧数'
-                                font.pointSize: _config.nTextFontSize
+                                text: '*帧数'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
-                                text: '帧速度'
-                                font.pointSize: _config.nTextFontSize
+                                text: '*帧速度'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                         }
 
@@ -1698,6 +1728,8 @@ Item {
             Joystick {
                 id: joystick
 
+                property var nLastDirection: null
+
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
                 //anchors.margins: 1 * Screen.pixelDensity
@@ -1709,6 +1741,7 @@ Item {
 
                 onPressedChanged: {
                     if(pressed === false) {
+                        nLastDirection = null;
                         _private.stopAction(0);
                     }
                     else
@@ -1723,17 +1756,25 @@ Item {
                     if(!pressed)
                         return;
 
+
+                    let direction;
+
                     if(Math.abs(pointInput.x) > Math.abs(pointInput.y)) {
                         if(pointInput.x > 0)
-                            _private.doAction(0, Qt.Key_Right);
+                            direction = Qt.Key_Right;
                         else
-                            _private.doAction(0, Qt.Key_Left);
+                            direction = Qt.Key_Left;
                     }
                     else {
                         if(pointInput.y > 0)
-                            _private.doAction(0, Qt.Key_Down);
+                            direction = Qt.Key_Down;
                         else
-                            _private.doAction(0, Qt.Key_Up);
+                            direction = Qt.Key_Up;
+                    }
+
+                    if(direction !== nLastDirection) {
+                        _private.doAction(0, direction);
+                        nLastDirection = direction;
                     }
 
                     //console.debug("[RoleEditor]onPointInputChanged", pointInput);
@@ -1778,7 +1819,7 @@ Item {
                     height1: 58;
                     moveSpeed: 100;*/
 
-                    bTest: true
+                    //bTest: true
                     sprite.nType: 1
 
                     /*onS_clicked: {
@@ -1786,6 +1827,10 @@ Item {
                     }*/
 
                     mouseArea.onClicked: {
+                        _private.refreshRole();
+
+                        fTestChangeDirection();
+
                         root.forceActiveFocus();
                     }
 
@@ -1811,6 +1856,18 @@ Item {
                     }
 
                 }
+            }
+
+            Item {
+                Layout.preferredWidth: 0
+                Layout.fillWidth: true
+            }
+
+            Image {
+                Layout.preferredWidth: parseInt(textAvatarWidth.text)
+                Layout.preferredHeight: parseInt(textAvatarHeight.text)
+
+                source: textAvatar.text ? GameMakerGlobal.imageResourceURL(textAvatar.text) : ''
             }
 
             Item {
@@ -1866,7 +1923,7 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
-                    _private.strTextBackupRoleName = textRoleName.text;
+                    //_private.strRoleName = textRoleName.text;
 
                     dialogSaveRole.open();
                 }
@@ -1877,7 +1934,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                visible: comboType.currentIndex === 0 || comboType.currentIndex === 2
+                visible: comboType.currentIndex === 0// || comboType.currentIndex === 2
                 text: "原图"
                 font.pointSize: _config.nButtonFontSize
 
@@ -2285,7 +2342,7 @@ Item {
 
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
-            console.debug("[RoleEditor]filepath", textRoleImageURL.text);
+            console.debug("[RoleEditor]fileURL", textRoleImageURL.text);
         }
 
         onCanceled: {
@@ -2305,7 +2362,7 @@ Item {
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
+                    console.debug("[RoleEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
                     removeItem(index);
 
                     l_listRoleResource.forceActiveFocus();
@@ -2340,6 +2397,35 @@ Item {
 
         ColumnLayout {
             anchors.fill: parent
+
+            Button {
+                Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: 'V'
+
+                onClicked: {
+                    /*if(!_private.strMapName) {
+                        dialogCommon.show({
+                              Msg: '请先保存地图',
+                              Buttons: Dialog.Yes,
+                              OnAccepted: function() {
+                                  root.forceActiveFocus();
+                              },
+                              OnRejected: ()=>{
+                                  root.forceActiveFocus();
+                              },
+                          });
+
+                        return;
+                    }
+                    */
+
+                    gameVisualScript.show();
+
+                    dialogScript.visible = false;
+                }
+            }
 
             Notepad {
                 id: textCode
@@ -2391,49 +2477,89 @@ Item {
 
 
 
-    //导出角色对话框
+    //导出对话框
     Dialog {
         id: dialogSaveRole
-        title: "请输入角色名称"
-        width: 300
-        height: 200
+        title: "请输入名称"
+        width: parent.width * 0.9
+        //height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
         anchors.centerIn: parent
 
         onAccepted: {
-            //root.focus = true;
-            root.forceActiveFocus();
-
-
-            if(_private.exportRole()) {
-                //第一次保存，重新刷新
-                if(_private.strTextBackupRoleName === '')
-                    _private.refreshRole();
-
-                textDialogMsg.text = '';
-            }
-            else {
+            textRoleName.text = textRoleName.text.trim();
+            if(textRoleName.text.length === 0) {
+                //Platform.showToast("名称不能为空");
+                textDialogMsg.text = "名称不能为空";
                 open();
+                return;
             }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
+
+            function fnSave() {
+                if(_private.exportRole()) {
+                    //第一次保存，重新刷新
+                    if(_private.strRoleName === '')
+                        _private.refreshRole();
+
+                    _private.strRoleName = textRoleName.text;
+
+                    textDialogMsg.text = '';
+
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                }
+                else {
+                    open();
+                }
+            }
+
+            if(textRoleName.text !== _private.strRoleName && FrameManager.sl_qml_DirExists(path)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textRoleName.text = _private.strRoleName;
+
+                        textDialogMsg.text = '';
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+            }
+            else
+                fnSave();
+
         }
         onRejected: {
-            //root.focus = true;
-            root.forceActiveFocus();
-
-            textRoleName.text = _private.strTextBackupRoleName;
+            textRoleName.text = _private.strRoleName;
 
             textDialogMsg.text = '';
+
+
+            //root.focus = true;
+            root.forceActiveFocus();
 
             //console.log("Cancel clicked");
         }
 
         ColumnLayout {
             width: parent.width
+            height: implicitHeight
 
             RowLayout {
-                width: parent.width
+                //width: parent.width
                 Label {
                     text: qsTr("角色名：")
                 }
@@ -2450,7 +2576,7 @@ Item {
                 }
             }
             /*RowLayout {
-                width: parent.width
+                //width: parent.width
                 Label {
                     text: qsTr("地图缩放：")
                 }
@@ -2501,7 +2627,7 @@ Item {
         onAccepted: {
             //root.focus = true;
             root.forceActiveFocus();
-            eval(textScript.text);
+            console.info(eval(textScript.text));
         }
         onRejected: {
             //root.focus = true;
@@ -2543,23 +2669,81 @@ Item {
 
 
 
+    //可视化
+    //Loader {
+    GameVisualScript {
+        id: gameVisualScript
+        //id: loaderVisualScript
+
+
+        function show() {
+            visible = true;
+            forceActiveFocus();
+            //item.forceActiveFocus();
+            //focus = true;
+            //item.focus = true;
+        }
+
+
+        anchors.fill: parent
+
+        visible: false
+        //focus: true
+
+
+        //source: "./.qml"
+        //asynchronous: false
+
+
+        /*onLoaded: {
+            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.vjs";
+            //item.loadData(filePath);
+
+            console.debug("[MapEditor]loaderVisualScript onLoaded");
+        }
+        */
+
+        //Connections {
+        //    target: loaderVisualScript.item
+            onS_close: function() {
+                //_private.loadScript();
+                dialogScript.visible = true;
+
+
+                gameVisualScript.visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            onS_Compile: function(code) {
+                textCode.setPlainText(code);
+                textCode.toBegin();
+            }
+        //}
+    }
+
+
+
     QtObject {
         id: _private
 
 
         property int nColumnHeight: 50
 
-        property string strTextBackupRoleName: ''
+        property string strRoleName: ''
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
         property var jsEngine: new GlobalJS.JSEngine(root)
 
-        property string strTextCode: `
+        property string strTemplateCode0: `
+//保存坐标偏移数据
 let imageFixPositions;
 
+//刷新图片和偏移坐标
 function $refresh(index, imageAnimate, path) {
     if(imageFixPositions === undefined) {
+        //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split('\\r\\n');
@@ -2567,7 +2751,9 @@ function $refresh(index, imageAnimate, path) {
             imageFixPositions = null;
     }
 
+    //设置图片路径（注意图片名字的生成，默认是 index序号+1，保留5位不足的补0，格式为png），请自行按需修改；
     imageAnimate.source = path + GameMakerGlobal.separator + String(index+1).padStart(5, '0') + '.png';
+    //从坐标偏移数据中读取坐标偏移并设置（默认index就是行数）；
     let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
     imageAnimate.rXOffset += parseInt(tx);
     imageAnimate.rYOffset += parseInt(ty);
@@ -2586,6 +2772,7 @@ function $refresh(index, imageAnimate, path) {
         }
 
 
+        //刷新
         function refreshRole() {
             switch(comboType.currentIndex) {
             case 2:
@@ -2600,6 +2787,16 @@ function $refresh(index, imageAnimate, path) {
 
 
             if(comboType.currentIndex === 0) {
+                //role.arrActionsData = textRoleFangXiangIndex.text.split(',');
+                role.arrActionsData = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
+
+                //注意这个放在 role.sprite.sprite.width 和 role.sprite.sprite.height 之前
+                role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
+
+
                 role.strSource = textRoleImageURL.text;
 
                 role.nFrameCount = parseInt(textRoleFrameCount.text);
@@ -2607,30 +2804,27 @@ function $refresh(index, imageAnimate, path) {
 
                 role.width = parseInt(textRoleWidth.text);
                 role.height = parseInt(textRoleHeight.text);
-                role.rXOffset = parseInt(textRoleXOffset.text);
-                role.rYOffset = parseInt(textRoleYOffset.text);
+                //role.sprite.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.sprite.height = parseInt(textRoleHeight.text);
                 //role.sprite.width = parseInt(textRoleWidth.text);
                 //role.sprite.height = parseInt(textRoleHeight.text);
+                role.rXOffset = parseInt(textRoleXOffset.text);
+                role.rYOffset = parseInt(textRoleYOffset.text);
                 role.rXScale = parseFloat(textRoleFrameXScale.text);
                 role.rYScale = parseFloat(textRoleFrameYScale.text);
 
-                //role.arrActionsData = textRoleFangXiangIndex.text.split(',');
-                role.arrActionsData = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
-
-                role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
             }
             else if(comboType.currentIndex === 1) {
                 role.strSource = textRoleImageURL.text;
 
-                role.rXOffset = parseInt(textRoleXOffset.text);
-                role.rYOffset = parseInt(textRoleYOffset.text);
                 role.width = parseInt(textRoleWidth.text);
                 role.height = parseInt(textRoleHeight.text);
+                //role.sprite.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.sprite.height = parseInt(textRoleHeight.text);
                 //role.sprite.width = parseInt(textRoleWidth.text);
                 //role.sprite.height = parseInt(textRoleHeight.text);
+                role.rXOffset = parseInt(textRoleXOffset.text);
+                role.rYOffset = parseInt(textRoleYOffset.text);
                 role.rXScale = parseFloat(textRoleFrameXScale.text);
                 role.rYScale = parseFloat(textRoleFrameYScale.text);
 
@@ -2652,7 +2846,7 @@ function $refresh(index, imageAnimate, path) {
                 }
 
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim();
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
                 if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
@@ -2720,24 +2914,52 @@ function $refresh(index, imageAnimate, path) {
         }
 
 
+        function loadScript(roleName) {
+            if(!roleName) {
+                //textCode.text = _private.strTemplateCode0;
+                textCode.text = '';
+                gameVisualScript.loadData(null);
+                return;
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator;
+            //if(FrameManager.sl_qml_FileExists(path + 'role.js')) {
+            //File.read(path + 'role.js');
+            textCode.text = FrameManager.sl_qml_ReadFile(path + 'role.js') || '';
+            //textCode.setPlainText(data);
+            //textCode.toBegin();
+            gameVisualScript.loadData(path + 'role.vjs');
+        }
+
+        //保存js文件
         function saveJS() {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text.trim();
+            //第一次保存，重新刷新
+            if(_private.strRoleName === '') {
+                if(comboType.currentIndex === 1)
+                    textCode.text = _private.strTemplateCode0;
+                else
+                    textCode.text = '';
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
             let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+        }
+        //复制可视化
+        function copyVJS() {
+            //如果路径不为空，且是另存为，则赋值vjs文件
+            if(_private.strRoleName !== '' && textRoleName.text !== '' && _private.strRoleName !== textRoleName.text) {
+                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.vjs';
+                if(FrameManager.sl_qml_FileExists(oldFilePath)) {
+                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text + GameMakerGlobal.separator + 'role.vjs';
+                    let ret = FrameManager.sl_qml_CopyFile(oldFilePath, newFilePath, true);
+                }
+            }
         }
 
         //导出角色
         function exportRole() {
 
-            let roleName = textRoleName.text.trim();
-
-            if(roleName.length === 0) {
-                //Platform.showToast("角色名不能为空");
-                textDialogMsg.text = "角色名不能为空";
-                //dialogSaveRole.open();
-                return false;
-            }
-
-
+            let roleName = textRoleName.text;
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!FrameManager.sl_qml_DirExists(path))
@@ -2857,6 +3079,8 @@ function $refresh(index, imageAnimate, path) {
 
             saveJS();
 
+            copyVJS();
+
 
             console.debug("[RoleEditor]exportRole ret:", ret, filepath);
 
@@ -2870,62 +3094,66 @@ function $refresh(index, imageAnimate, path) {
         property var keys: ({}) //保存按下的方向键
 
         //type为0表示按钮，type为1表示键盘（会保存key）
-        function doAction(type, key) {
-            switch(key) {
+        function doAction(type, action) {
+            _private.refreshRole();
+
+            role.start(action);
+
+            switch(action) {
             case Qt.Key_Down:
-                role.start(Qt.Key_Down);
+                //role.start(Qt.Key_Down);
                 //_private.startSprite(role, Qt.Key_Down);
                 //role.moveDirection = Qt.Key_Down; //移动方向
                 //role.start();
                 //timer.start();  //开始移动
                 if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
+                    keys[action] = true; //保存键盘按下
+                //keys.push(action);
                 break;
             case Qt.Key_Left:
-                role.start(Qt.Key_Left);
+                //role.start(Qt.Key_Left);
                 //_private.startSprite(role, Qt.Key_Left);
                 //role.moveDirection = Qt.Key_Left;
                 //role.start();
                 //timer.start();
                 if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
+                    keys[action] = true; //保存键盘按下
+                //keys.push(action);
                 break;
             case Qt.Key_Right:
-                role.start(Qt.Key_Right);
+                //role.start(Qt.Key_Right);
                 //_private.startSprite(role, Qt.Key_Right);
                 //role.moveDirection = Qt.Key_Right;
                 //role.start();
                 //timer.start();
                 if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
+                    keys[action] = true; //保存键盘按下
+                //keys.push(action);
                 break;
             case Qt.Key_Up:
-                role.start(Qt.Key_Up);
+                //role.start(Qt.Key_Up);
                 //_private.startSprite(role, Qt.Key_Up);
                 //role.moveDirection = Qt.Key_Up;
                 //role.start();
                 //timer.start();
                 if(type === 1)
-                    keys[key] = true; //保存键盘按下
-                //keys.push(key);
+                    keys[action] = true; //保存键盘按下
+                //keys.push(action);
                 break;
             default:
                 break;
             }
         }
 
-        function stopAction(type, key) {
+        function stopAction(type, action) {
 
             if(type === 1) {
-                switch(key) {
+                switch(action) {
                 case Qt.Key_Up:
                 case Qt.Key_Right:
                 case Qt.Key_Left:
                 case Qt.Key_Down:
-                    delete keys[key]; //从键盘保存中删除
+                    delete keys[action]; //从键盘保存中删除
 
                     //获取下一个已经按下的键
                     let l = Object.keys(keys);
@@ -2938,7 +3166,7 @@ function $refresh(index, imageAnimate, path) {
                         console.debug("[RoleEditor]_private.stopAction stop");
                     }
                     else {
-                        role.start(l[0]);
+                        doAction(-1, parseInt(l[0]));
                         //_private.startSprite(role, l[0]);
                         //role.moveDirection = l[0];    //弹出第一个按键
                         //role.start();

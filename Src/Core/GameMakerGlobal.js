@@ -88,7 +88,7 @@ let $config = {
         //窗口显示事件
         $show: function(newFlags, windowFlags) {
             //if(newFlags & 0b1)
-            //    game.showimage(, {RId: 'FightScene2.jpg', $width: -1, $height: -1}, 'aaa');
+            //    game.showimage(, {RID: 'FightScene2.jpg', $width: -1, $height: -1}, 'aaa');
         },
         //窗口隐藏事件
         $hide: function(newFlags, windowFlags) {
@@ -344,12 +344,12 @@ function *$afterLoadmap(mapName) {
 
 
 /*/创建战斗角色
-function $createCombatant(fightRoleRId, showName) {
+function $createCombatant(fightRoleRID, showName) {
     //console.debug('createCombatant');
-    if(!fightRoleRId)
-        fightRoleRId = '深林孤鹰';
+    if(!fightRoleRID)
+        fightRoleRID = '深林孤鹰';
     if(!showName)
-        showName = fightRoleRId;
+        showName = fightRoleRID;
 
 
     //属性定义
@@ -376,7 +376,7 @@ function $createCombatant(fightRoleRId, showName) {
 
 
     return {
-        $rid: fightRoleRId,  //战斗角色名（包含特效）
+        $rid: fightRoleRID,  //战斗角色名（包含特效）
 
         name: showName,     //游戏显示名
         index: -1,  //序号
@@ -427,12 +427,12 @@ function $createCombatant(fightRoleRId, showName) {
 
 
 //战斗角色
-function $Combatant(fightRoleRId, showName) {
+function $Combatant(fightRoleRID, showName) {
     //console.debug('$Combatant');
-    if(!fightRoleRId)
-        fightRoleRId = '深林孤鹰';
+    if(!fightRoleRID)
+        fightRoleRID = '深林孤鹰';
     if(!showName)
-        showName = fightRoleRId;
+        showName = fightRoleRID;
 
 
     //属性定义
@@ -460,8 +460,8 @@ function $Combatant(fightRoleRId, showName) {
 
 
     //战斗角色名（包含特效）
-    this.$rid = fightRoleRId;
-    //this.fightRoleRId = fightRoleRId;
+    this.$rid = fightRoleRID;
+    //this.fightRoleRID = fightRoleRID;
 
     this.$name = showName;     //游戏显示名
     this.$index = -1;  //序号（敌人为-1）
@@ -1042,10 +1042,10 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
 //          比如 毒 是回合开始前执行 buffScript，乱封眠 是 combatant 行动前执行 buffScript。
 //  params：
 //      BuffName：存储的 Buff 名称，如果不同则插入，如果相同则会覆盖；
-//      Override表示是否覆盖（如果不覆盖，则 Buff名 后加时间戳来防止重复）
+//      Override表示是否覆盖（如果不覆盖，则 Buff名 后加时间戳来防止重复），注意Properties的Buff是1个，如果需要按属性类型来覆盖，得自己定义BuffName；
 function getBuff(combatant, buffCode, params={}) {
     let buffNameKey;
-    let override = (params.Override === undefined ? true : false);
+    let override = params.Override ?? true;
     let round = params.Round || 5;
     let flags = params.Flags;
 
@@ -1503,8 +1503,8 @@ function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesCom
                 for(let goods of enemies[ti].$goods) {
                     /*let g;
                     if(game.$globalLibraryJS.isObject(teq)) { //如果直接是对象
-                        g = {$rid: teq.RId};
-                        game.$globalLibraryJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq.RId).$properties);
+                        g = {$rid: teq.RID};
+                        game.$globalLibraryJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq.RID).$properties);
                         game.$globalLibraryJS.copyPropertiesToObject(g, teq);
                     }
                     else if(game.$globalLibraryJS.isString(teq)) { //
@@ -1603,12 +1603,12 @@ function *$commonFightInitScript(teams, fightData) {
     yield fight.msg('通用战斗初始化事件', 0, '', 500);
 
 
-    let fightInitScript = fightData.$commons.$fightInitScript || fightData.$commons.FightInitScript;
+    let fightInitScript = fightData.$commons.$fightInitScript/* || fightData.$commons.FightInitScript*/;
     if(fightInitScript)
         yield fight.run([fightInitScript, 'fight init2'], -2, teams, fightData);
 
-    if('FightInitScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
+    //if('FightInitScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
         yield fight.run([fightData.FightInitScript, 'fight init3'], -2, teams, fightData);
 
 
@@ -1625,13 +1625,13 @@ function *$commonFightStartScript(teams, fightData) {
 
 
     //战斗开始脚本
-    let fightStartScript = fightData.$commons.$fightStartScript || fightData.$commons.FightStartScript;
+    let fightStartScript = fightData.$commons.$fightStartScript/* || fightData.$commons.FightStartScript*/;
     if(fightStartScript)
         yield fight.run([fightStartScript, 'fight start2'], -2, teams, fightData);
 
     //fighting战斗的回调函数
-    if('FightStartScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
+    //if('FightStartScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
         yield fight.run([fightData.FightStartScript, 'fight start3'], -2, teams, fightData);
 
 
@@ -1647,13 +1647,13 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 
 
     /*/战斗回合脚本
-    let fightRoundScript = fightData.$commons.$fightRoundScript || fightData.$commons.FightRoundScript;
+    let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript* /;
     if(fightRoundScript)
         yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
 
     //fighting战斗的回调函数
-    if('FightRoundScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
+    //if('FightRoundScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
         yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
     */
 
@@ -1684,13 +1684,13 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 
 
     //战斗回合脚本
-    let fightRoundScript = fightData.$commons.$fightRoundScript || fightData.$commons.FightRoundScript;
+    let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript*/;
     if(fightRoundScript)
         yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
 
     //fighting战斗的回调函数
-    if('FightRoundScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
+    //if('FightRoundScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
         yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
 
 
@@ -1707,13 +1707,13 @@ function *$commonFightEndScript(r, teams, fightData) {
 
 
     //战斗结束脚本1
-    let fightEndScript = fightData.$commons.$fightEndScript || fightData.$commons.FightEndScript;
+    let fightEndScript = fightData.$commons.$fightEndScript/* || fightData.$commons.FightEndScript*/;
     if(fightEndScript)
         yield fight.run([fightEndScript, 'fight end20'], -2, r, 0, teams, fightData);
 
     //fighting战斗的回调函数
-    if('FightEndScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
+    //if('FightEndScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
         yield fight.run([fightData.FightEndScript, 'fight end30'], -2, r, 0, teams, fightData);
 
 
@@ -1774,8 +1774,8 @@ function *$commonFightEndScript(r, teams, fightData) {
         game.run([fightEndScript, 'fight end21'], -1, r, 1, teams, fightData);
 
     //fighting战斗的回调函数
-    if('FightEndScript' in fightData)
-    //if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
+    //if('FightEndScript' in fightData)
+    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
         game.run([fightData.FightEndScript, 'fight end31'], -1, r, 1, teams, fightData);
 
 
@@ -1970,7 +1970,7 @@ let $fightButtons = [
 function *commonGetGoodsScript(goodsName) {
     //let game = this.game;
 
-    //yield game.msg('得到【%1】'.arg(game.$sys.getGoodsResource(goodsRId).$properties.$name), 100, true);
+    //yield game.msg('得到【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
     yield game.msg('得到【%1】'.arg(goodsName), 100, true);
 }
 
@@ -1981,7 +1981,7 @@ function *commonUseGoodsScript(goodsName, type) {
 
     switch(type) {
     case 0:
-        //yield game.msg('不能使用【%1】'.arg(game.$sys.getGoodsResource(goodsRId).$properties.$name), 100, true);
+        //yield game.msg('不能使用【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
         yield game.msg('得到【%1】'.arg(goodsName), 100, true);
         break;
     default:
@@ -2854,8 +2854,8 @@ function getCombatantSkills(combatant, types=[0, 1], flags=0b11) {
                         GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill).$properties);
                     }
                     else {
-                        skill = {$rid: tskill.RId};
-                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill.RId).$properties);
+                        skill = {$rid: tskill.RID};
+                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill.RID).$properties);
                         GlobalLibraryJS.copyPropertiesToObject(skill, tskill);
                     }*/
 

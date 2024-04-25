@@ -754,6 +754,29 @@ Item {
                     }
 
                     RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '额外属性:'
+                        }
+
+                        TextField {
+                            id: textExtraProperties
+
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                            text: ''
+                            placeholderText: '额外属性'
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+                        }
+                    }
+
+                    RowLayout {
                         id: layoutRequiredMP
 
                         Layout.fillWidth: true
@@ -782,35 +805,29 @@ Item {
                     }
 
                     ColumnLayout {
-                        id: layoutBuff
+                        //id: layoutBuff
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
 
-                        RowLayout {
-
+                        Button {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            Button {
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            text: '增加Buff效果'
 
-                                text: '增加Buff效果'
+                            onClicked: {
+                                let c = compBuff.createObject(layoutBuff);
+                                _private.arrCacheComponent.push(c);
 
-                                onClicked: {
-                                    let c = compBuff.createObject(layoutBuff);
-                                    _private.arrCacheComponent.push(c);
+                                GlobalLibraryJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
 
-                                    GlobalLibraryJS.setTimeout(function() {
-                                        if(flickable.contentHeight > flickable.height)
-                                            flickable.contentY = flickable.contentHeight - flickable.height;
-                                        }, 1, root, '');
-
-                                }
                             }
                         }
 
@@ -822,63 +839,70 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@Buff类型'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@Buff效果'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@持续回合数'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@概率'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                         }
 
+                        ColumnLayout {
+                            id: layoutBuff
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            spacing: 16
+                        }
                     }
 
+
                     ColumnLayout {
-                        id: layoutEffect
+                        id: layoutEffectRoot
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
 
-                        RowLayout {
-
+                        Button {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            Button {
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            text: '增加技能效果'
 
-                                text: '增加技能效果'
+                            onClicked: {
+                                let c = compEffect.createObject(layoutEffect);
+                                _private.arrCacheComponent.push(c);
 
-                                onClicked: {
-                                    let c = compEffect.createObject(layoutEffect);
-                                    _private.arrCacheComponent.push(c);
+                                GlobalLibraryJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
 
-                                    GlobalLibraryJS.setTimeout(function() {
-                                        if(flickable.contentHeight > flickable.height)
-                                            flickable.contentY = flickable.contentHeight - flickable.height;
-                                        }, 1, root, '');
-
-                                }
                             }
                         }
 
@@ -890,31 +914,43 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@影响属性'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@效果值'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@倍率参考对象'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '*@倍率参考属性'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                         }
 
+                        ColumnLayout {
+                            id: layoutEffect
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            spacing: 16
+                        }
                     }
 
                     /*RowLayout {
@@ -1259,6 +1295,13 @@ Item {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+
+        property int nLabelFontSize: 10
+    }
+
     QtObject {
         id: _private
 
@@ -1267,12 +1310,12 @@ Item {
             switch(comboType.currentIndex) {
             //普通技能
             case 0:
-                layoutEffect.visible = false;
+                layoutEffectRoot.visible = false;
                 layoutRequiredMP.visible = false;
                 break;
             //技能
             case 1:
-                layoutEffect.visible = true;
+                layoutEffectRoot.visible = true;
                 layoutRequiredMP.visible = true;
                 break;
             }
@@ -1705,6 +1748,7 @@ Item {
             data = GlobalLibraryJS.replaceAll(data, '$$type$$', type);
             data = GlobalLibraryJS.replaceAll(data, '$$targetFlag$$', targetFlag);
             data = GlobalLibraryJS.replaceAll(data, '$$targetCount$$', targetCount);
+            data = GlobalLibraryJS.replaceAll(data, '$$ExtraProperties$$', textExtraProperties.text.trim() || 'undefined');
             data = GlobalLibraryJS.replaceAll(data, '$$playScript$$', playScript);
             data = GlobalLibraryJS.replaceAll(data, '$$buffs$$', buffs);
             /*data = GlobalLibraryJS.replaceAll(data, '$$check$$', textLuck.text.trim());
@@ -1778,6 +1822,8 @@ let data = (function() {
             $targetFlag: $$targetFlag$$,
             //选择目标数；-1为全体；>0为个数；数组为范围；
             $targetCount: $$targetCount$$,
+
+            $$ExtraProperties$$,
             */
         };
     };
@@ -1797,6 +1843,8 @@ let data = (function() {
         $targetFlag: $$targetFlag$$,
         //选择目标数；-1为全体；>0为个数；数组为范围；
         $targetCount: $$targetCount$$,
+
+        $$ExtraProperties$$,
 
 
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
@@ -1882,7 +1930,7 @@ $$check$$
             //kill 动作特效，1次，等待播放结束
             yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant});
             //kill 特效，1次，等待播放结束，特效ID，对方和位置
-            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, RId: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
+            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, ID: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
             //效果，Skill：KillType：
             SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
             effect = SkillEffectResult.shift().HP;
@@ -1923,7 +1971,7 @@ $$check$$
                     continue;
 
                 //kill 特效，1次，同步播放，对方位置，特效ID
-                yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, RId: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
+                yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, ID: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
             }
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
@@ -1957,7 +2005,7 @@ $$check$$
             yield ({Type: 10, Name: 'Skill', Loops: 1, Interval: -1});
 
             //kill 特效，1次，等待播放结束，对方位置，特效ID
-            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: -1, RId: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
+            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: -1, ID: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
             //game.addprops(targetCombatant, {'$$property$$': $$effect$$});
 $$addprops$$
 
@@ -1978,7 +2026,7 @@ $$addprops$$
             //Skill 动作特效，1次，等待播放结束
             yield ({Type: 10, Name: 'Skill', Loops: 1, Interval: -1});
 
-            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: -1, RId: '$$skilleffect$$', Position: 2, Target: 1});
+            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: -1, ID: '$$skilleffect$$', Position: 2, Target: 1});
 
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
@@ -1986,7 +2034,7 @@ $$addprops$$
                 if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
                 //kill 特效，1次，等待播放结束，对方位置，特效ID
-                //yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 100, RId: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
+                //yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 100, ID: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
 $$addprops$$
             }
 

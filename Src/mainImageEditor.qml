@@ -82,10 +82,12 @@ Item {
 
             delegate: L_ListItem {
                 height: 6.9 * Screen.pixelDensity
+
                 colorText: Global.style.primaryTextColor
                 text: modelData
                 bSelected: index === listview.currentIndex
                 //removeButtonVisible: modelData !== "main.qml"
+                strPath: GameMakerGlobal.imageResourceURL()
 
                 onClicked: {
                     listview.currentIndex = index;
@@ -94,6 +96,11 @@ Item {
                     //textImageName.text = modelData;
 
                     console.debug(JSON.stringify(modelData));
+                }
+
+                onDoubleClicked: {
+                    imageReview.source = GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]);
+                    imageReview.visible = true;
                 }
 
                 onRemoveClicked: {

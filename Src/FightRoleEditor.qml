@@ -59,10 +59,10 @@ let data = (function() {
 
 
     //独立属性，用 combatant 来引用；会保存到存档中；
-    //params：使用对象{RId:xxx, Params: 。。。}创建时的对象参数。
+    //params：使用对象{RID:xxx, Params: 。。。}创建时的对象参数。
     let $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
         return {
-            $name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RId: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
+            $name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
         };
     };
 
@@ -70,7 +70,7 @@ let data = (function() {
     //公用属性，用 combatant.$commons 或 combatant 来引用；
     let $commons = {
 
-        //$name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RId: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
+        //$name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
 
 
         //动作包含的 精灵名
@@ -278,35 +278,82 @@ let data = (function() {
     QtObject {
         id: _private
 
+        //保存后的名字
         property string strSavedName: ''
 
 
         function save() {
-            let newName = textFightRoleName.text = textFightRoleName.text.trim();
+            textFightRoleName.text = textFightRoleName.text.trim();
 
-            if(newName.length === 0)
+            if(textFightRoleName.text.length === 0) {
+                dialogCommon.show({
+                    Msg: '名称不能为空',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        textFightRoleName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        textFightRoleName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
                 return false;
-
-
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
-
-
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), path + newName + GameMakerGlobal.separator + 'fight_role.js', 0);
-
-
-            //复制可视化
-            let oldName = _private.strSavedName.trim();
-            if(oldName) {
-                let oldFilePath = path + oldName + GameMakerGlobal.separator + 'fight_role.vjs';
-                if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                    ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + newName + GameMakerGlobal.separator + 'fight_role.vjs', true);
-                }
             }
 
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
-            _private.strSavedName = newName;
+            function fnSave() {
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadFightRoleProperty.textDocument), path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.js', 0);
 
-            return true;
+                //复制可视化
+                if(_private.strSavedName) {
+                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+                    if(textFightRoleName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
+                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.vjs', true);
+                    }
+                }
+
+                _private.strSavedName = textFightRoleName.text;
+
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            if(textFightRoleName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textFightRoleName.text)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textFightRoleName.text = _private.strSavedName;
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+
+                return false;
+            }
+            else {
+                fnSave();
+
+                return true;
+            }
         }
 
         function close() {

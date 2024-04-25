@@ -97,17 +97,17 @@ Item {
 
     signal s_close()
     onS_close: {
-        cleanMap();
+        _private.cleanMap();
     }
 
 
 
     //创建新地图
-    function createNewMap(cfg) {
+    function newMap(cfg) {
         _private.readConfig(cfg);
 
 
-        console.debug("[MapEditor]createNewMap：", cfg.MapBlockImage[0], imageMapBlock1.source, imageMapBlock1.sourceSize.width, imageMapBlock1.sourceSize.height);
+        console.debug("[MapEditor]newMap：", cfg.MapBlockImage[0], imageMapBlock1.source, imageMapBlock1.sourceSize.width, imageMapBlock1.sourceSize.height);
 
         ////0层、1层和2层
         ////_private.createCanvasMap(-1);
@@ -115,11 +115,7 @@ Item {
         _private.createCanvasMap(_private.initMapData([], [-1,-1,-1]));
 
 
-
-        textCode.setPlainText('function *$start(){ //地图载入事件 \r\n}');
-        textCode.toBegin();
-        //textCode.text = ;
-
+        _private.loadScript();
     }
 
     //打开地图
@@ -254,171 +250,7 @@ Item {
         listviewCanvasMap.currentIndex = listmodelCanvasMap.count - 1;
 
 
-
-        _private.loadScript();
-
-        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + "map";
-        loaderVisualScript.item.loadData(filePath);
-    }
-
-
-    //清空地图
-    function cleanMap() {
-
-        //listmodelCanvasMap.clear();
-        listmodelEventsData.clear();
-
-        //循环删除所有图层
-        while(canvasMapContainer.arrCanvasMap.length > 0) {
-
-            //console.debug("ClearMap" + i);
-            /*if(i === 0) {
-                _private.removeCanvasMap();
-            }
-            else if(i === 1) {
-                _private.removeCanvasMap();
-            }
-            else {
-                _private.removeCanvasMap();
-            }*/
-
-            _private.removeCanvasMap();
-        }
-
-        canvasMapContainer.width = 0;
-        canvasMapContainer.height = 0;
-
-
-
-        canvasMapBlock1.unloadImage(imageMapBlock1.source);
-
-        _private.clearCanvas(canvasMapBlock1);
-        _private.clearCanvas(canvasEvent);
-        _private.clearCanvas(canvasBlockSpecial);
-        canvasMapBlock1.requestPaint();
-        canvasEvent.requestPaint();
-        canvasBlockSpecial.requestPaint();
-
-
-
-        //删除多张 地图块图片
-        //for(i = 0; i < cfg.MapBlockImageCount; ++i) {
-        //    let mapBlock = itemMapBlockContainer.pop(mapBlock);
-        //    mapBlock.destroy();
-        //}
-        //删除一张
-        imageMapBlock1.source = "";
-        //canvasMapBlock1.markDirty(Qt.rect(0,0,canvasMapBlock1.width,canvasMapBlock1.height));
-
-        //createNewMap({MapBlockSize: [cfg.MapBlockSize[0], cfg.MapBlockSize[1]], MapSize: [cfg.MapSize[0], cfg.MapSize[1]]});
-
-
-        objMapBlockSpecialData = {};
-        objMapEventsData = {};
-        //objEventsData = {};
-        //objSystemEventsData = {};
-
-
-        root.arrMapBlockImageURL = [];
-
-
-        console.debug("[MapEditor]cleanMap OK");
-    }
-
-    //导出地图
-    function exportMap() {
-        let newName = textMapName.text = textMapName.text.trim();
-
-        if(newName.length === 0) {
-            Platform.showToast("地图名不能为空");
-            open();
-            return;
-        }
-
-
-        let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + newName;
-
-        //if(!FrameManager.sl_qml_DirExists(newPath))
-            FrameManager.sl_qml_CreateFolder(newPath);
-
-
-        //绘制所有 0层及以上 canvas
-        canvasExport.bExport = true;
-        canvasExport.requestPaint();
-
-        //canvasMapContainer.arrCanvasMap[0].save(newPath + "/output_0.png");
-        //canvasMapContainer.arrCanvasMap[1].save(newPath + "/output_1.png");
-
-
-        let i = 0;
-
-        let tmpEventList = []; //保存所有事件名 对应的 显示关键字
-        for(i = 0; i < listmodelEventsData.count; ++i) {
-            tmpEventList.push(listmodelEventsData.get(i)["EventName"]);
-        }
-
-        let outputData = {};
-        outputData.Version = "0.6";
-        outputData.MapName = newName;
-        outputData.MapType = 1; //地图类型
-        outputData.MapScale = parseFloat(textMapScale.text) > 0 ? parseFloat(textMapScale.text) : 1;
-        outputData.MapSize = [_config.sizeMapSize.width, _config.sizeMapSize.height];
-        outputData.MapBlockSize = [_config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height];
-        outputData.MapCount = canvasMapContainer.arrCanvasMap.length;
-        outputData.MapData = [];
-        outputData.MapBlockImageCount = 1;
-        outputData.MapBlockImage = [root.arrMapBlockImageURL[0]];
-        outputData.MapEventData = objMapEventsData;
-        outputData.MapBlockSpecialData = objMapBlockSpecialData;
-        outputData.MapOfRole = parseInt(textMapOfRole.text) > 0 ? parseInt(textMapOfRole.text) : 1;
-        outputData.MapEventList = tmpEventList;
-        //outputData.EventData = {};
-        /*for(i = 0; i < listmodelEventsData.count; ++i) {
-            outputData.EventData[listmodelEventsData.get(i)["EventName"]] = (listmodelEventsData.get(i)["EventCode"]);
-        }*/
-        //outputData.EventData = objEventsData;
-        //outputData.SystemEventData = objSystemEventsData;
-
-
-        for(i = 0; i < canvasMapContainer.arrCanvasMap.length; ++i) {
-            //之前3层的算法
-            /*if(i === 0) {
-                outputData.Obstacles = arrMapData[0];
-            }
-            else if(i === 1) {
-                outputData.Events = arrMapData[1];
-            }
-            else {
-                outputData.MapData[i-2] = arrMapData[i];
-            }*/
-
-            outputData.MapData[i] = arrMapData[i];
-        }
-        //!!!导出为文件
-        //console.debug(JSON.stringify(outputData));
-        //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-        let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
-        //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
-
-        console.debug("[MapEditor]exportMap ret:", ret, newPath + GameMakerGlobal.separator + 'map.json');
-        console.debug("[MapEditor]exportMap:", JSON.stringify(outputData));
-        //console.debug("[MapEditor]exportMap objEventsData:", JSON.stringify(objEventsData));
-
-
-        ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), newPath + GameMakerGlobal.separator + 'map.js', 0);
-
-
-        //复制可视化
-        let oldName = _private.strMapName.trim();
-        if(oldName) {
-            let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + oldName + GameMakerGlobal.separator + 'map.vjs';
-            if(newName !== oldName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                ret = FrameManager.sl_qml_CopyFile(oldFilePath, newPath + GameMakerGlobal.separator + 'map.vjs', true);
-            }
-        }
-
-
-        _private.strMapName = newName;
+        _private.loadScript(_private.strMapName);
     }
 
 
@@ -463,6 +295,7 @@ Item {
             Layout.preferredHeight: 42
             Layout.minimumHeight: 0
             Layout.maximumHeight: 42
+            Layout.alignment: Qt.AlignTop
 
 
             Button {
@@ -606,6 +439,9 @@ Item {
 
                         return;
                     }
+
+
+                    //_private.loadScript(_private.strMapName);
 
 
                     dialogScript.open();
@@ -759,6 +595,7 @@ Item {
             Layout.preferredHeight: 42
             Layout.minimumHeight: 0
             Layout.maximumHeight: 42
+            Layout.alignment: Qt.AlignTop
 
 
             visible: itemToolbar.nBar !== 0
@@ -2648,11 +2485,11 @@ Item {
 
 
 
-    //导出地图对话框
+    //导出对话框
     Dialog {
         id: dialogSave
-        title: "请输入地图名称"
-        width: 360
+        title: "请输入名称"
+        width: parent.width * 0.9
         //height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
@@ -2660,17 +2497,67 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
-            //root.focus = true;
-            root.forceActiveFocus();
+            textMapName.text = textMapName.text.trim();
+            if(textMapName.text.length === 0) {
+                //Platform.showToast("名称不能为空");
+                textDialogMsg.text = "名称不能为空";
+                open();
+                return;
+            }
 
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
 
-            exportMap();
+            function fnSave() {
+                if(_private.exportMap()) {
+                    //第一次保存，重新刷新
+                    //if(_private.strMapName === '')
+                    //    _private.refreshMap();
+
+                    _private.strMapName = textMapName.text;
+
+                    textDialogMsg.text = '';
+
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                }
+                else {
+                    open();
+                }
+            }
+
+            if(textMapName.text !== _private.strMapName && FrameManager.sl_qml_DirExists(path)) {
+                dialogCommon.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textMapName.text = _private.strMapName;
+
+                        textDialogMsg.text = '';
+
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+
+                        root.forceActiveFocus();
+                    },*/
+                });
+            }
+            else
+                fnSave();
 
         }
         onRejected: {
+            textMapName.text = _private.strMapName;
+
+            textDialogMsg.text = '';
+
+
             //root.focus = true;
             root.forceActiveFocus();
-
 
             //console.log("Cancel clicked");
         }
@@ -2723,6 +2610,11 @@ Item {
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
                 }
+            }
+
+            Label {
+                id: textDialogMsg
+                color: 'red'
             }
         }
     }
@@ -2791,7 +2683,7 @@ Item {
                 //_private.createEvent(textEventName.text, textCode.text);
                 _private.createEvent(textEventName.text);
                 //textCode.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
-                textCode.setPlainText(FrameManager.toPlainText(textCode.textDocument) + '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                textCode.setPlainText(FrameManager.toPlainText(textCode.textDocument) + '\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 textCode.toBegin();
             }
             //else if(nEventIndex === -2) {  //新建系统事件
@@ -2883,7 +2775,7 @@ Item {
                     }
                     */
 
-                    loaderVisualScript.show();
+                    gameVisualScript.show();
 
                     dialogScript.visible = false;
                 }
@@ -2921,7 +2813,7 @@ Item {
 
 
         onAccepted: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName.trim();
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName;
             let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
 
 
@@ -2956,7 +2848,7 @@ Item {
 
 
             //console.debug("You chose: " + fileUrl, fileUrls);
-            exportMap(fileUrl);
+            _private.exportMap(fileUrl);
         }
         onRejected: {
             root.forceActiveFocus();
@@ -3055,6 +2947,61 @@ Item {
 
 
 
+    //可视化
+    //Loader {
+    GameVisualScript {
+        id: gameVisualScript
+        //id: loaderVisualScript
+
+
+        function show() {
+            visible = true;
+            forceActiveFocus();
+            //item.forceActiveFocus();
+            //focus = true;
+            //item.focus = true;
+        }
+
+
+        anchors.fill: parent
+
+        visible: false
+        //focus: true
+
+
+        //source: "./GameVisualScript.qml"
+        //asynchronous: false
+
+
+        /*onLoaded: {
+            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + "map.vjs";
+            //item.loadData(filePath);
+
+            console.debug("[MapEditor]loaderVisualScript onLoaded");
+        }
+        */
+
+        //Connections {
+        //    target: loaderVisualScript.item
+            onS_close: function() {
+                //_private.loadScript();
+                dialogScript.visible = true;
+
+
+                gameVisualScript.visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
+            }
+
+            onS_Compile: function(code) {
+                textCode.setPlainText(code);
+                textCode.toBegin();
+            }
+        //}
+    }
+
+
+
     //测试脚本对话框
     Dialog {
         id: dialogRunScript
@@ -3088,58 +3035,6 @@ Item {
             //gameMap.focus = true;
             root.forceActiveFocus();
             //console.log("Cancel clicked");
-        }
-    }
-
-
-
-    Loader {
-        id: loaderVisualScript
-
-
-        function show() {
-            visible = true;
-            forceActiveFocus();
-            //item.forceActiveFocus();
-            //focus = true;
-            //item.focus = true;
-        }
-
-
-        anchors.fill: parent
-
-        visible: false
-        focus: true
-
-
-        source: "./GameVisualScript.qml"
-        asynchronous: false
-
-
-        onLoaded: {
-            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + "map";
-
-            //item.loadData(filePath);
-
-            console.debug("[MapEditor]loaderVisualScript onLoaded");
-        }
-
-        Connections {
-            target: loaderVisualScript.item
-            function onS_close() {
-                //_private.loadScript();
-                dialogScript.visible = true;
-
-
-                loaderVisualScript.visible = false;
-                //root.focus = true;
-                root.forceActiveFocus();
-            }
-
-            function onS_Compile(code) {
-                textCode.setPlainText(code);
-                textCode.toBegin();
-            }
         }
     }
 
@@ -3260,7 +3155,7 @@ Item {
 
 
         function readConfig(cfg) {
-            //cleanMap();
+            //_private.cleanMap();
 
             //console.debug("init:", cfg.MapBlockSize, cfg.MapSize)
 
@@ -3325,18 +3220,195 @@ Item {
             rectPaste.visible = false;
         }
 
-        function loadScript() {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + "map.js";
-            //let data = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(filePath);
-            console.debug("[MapEditor]filePath：", filePath);
-            if(data) {
-                textCode.setPlainText(data);
-                textCode.toBegin();
-            }
-            else
-                textCode.text = '';
 
+        function loadScript(mapName) {
+            if(!mapName) {
+                textCode.text = ('function *$start(){ //地图载入事件 \r\n}');
+                gameVisualScript.loadData(null);
+                return;
+            }
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator;
+            //if(FrameManager.sl_qml_FileExists(path + 'map.js')) {
+            //File.read(path + 'map.js');
+            textCode.text = FrameManager.sl_qml_ReadFile(path + 'map.js') || ('function *$start(){ //地图载入事件 \r\n}');
+            //textCode.setPlainText(data);
+            //textCode.toBegin();
+            gameVisualScript.loadData(path + 'map.vjs');
+
+            //console.debug("[MapEditor]filePath：", path + 'map.js');
+        }
+
+
+        //清空地图
+        function cleanMap() {
+
+            //listmodelCanvasMap.clear();
+            listmodelEventsData.clear();
+
+            //循环删除所有图层
+            while(canvasMapContainer.arrCanvasMap.length > 0) {
+
+                //console.debug("ClearMap" + i);
+                /*if(i === 0) {
+                    _private.removeCanvasMap();
+                }
+                else if(i === 1) {
+                    _private.removeCanvasMap();
+                }
+                else {
+                    _private.removeCanvasMap();
+                }*/
+
+                _private.removeCanvasMap();
+            }
+
+            canvasMapContainer.width = 0;
+            canvasMapContainer.height = 0;
+
+
+
+            canvasMapBlock1.unloadImage(imageMapBlock1.source);
+
+            _private.clearCanvas(canvasMapBlock1);
+            _private.clearCanvas(canvasEvent);
+            _private.clearCanvas(canvasBlockSpecial);
+            canvasMapBlock1.requestPaint();
+            canvasEvent.requestPaint();
+            canvasBlockSpecial.requestPaint();
+
+
+
+            //删除多张 地图块图片
+            //for(i = 0; i < cfg.MapBlockImageCount; ++i) {
+            //    let mapBlock = itemMapBlockContainer.pop(mapBlock);
+            //    mapBlock.destroy();
+            //}
+            //删除一张
+            imageMapBlock1.source = "";
+            //canvasMapBlock1.markDirty(Qt.rect(0,0,canvasMapBlock1.width,canvasMapBlock1.height));
+
+            //newMap({MapBlockSize: [cfg.MapBlockSize[0], cfg.MapBlockSize[1]], MapSize: [cfg.MapSize[0], cfg.MapSize[1]]});
+
+
+            objMapBlockSpecialData = {};
+            objMapEventsData = {};
+            //objEventsData = {};
+            //objSystemEventsData = {};
+
+
+            root.arrMapBlockImageURL = [];
+
+
+            console.debug("[MapEditor]cleanMap OK");
+        }
+
+
+        //保存js文件
+        function saveJS() {
+            /*/第一次保存，重新刷新
+            if(_private.strRoleName === '') {
+                if(comboType.currentIndex === 1)
+                    textCode.text = _private.strTemplateCode0;
+                else
+                    textCode.text = '';
+            }*/
+
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
+        }
+        //复制可视化
+        function copyVJS() {
+            //如果路径不为空，且是另存为，则赋值vjs文件
+            if(_private.strMapName !== '' && textMapName.text !== '' && _private.strMapName !== textMapName.text) {
+                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + 'map.vjs';
+                if(FrameManager.sl_qml_FileExists(oldFilePath)) {
+                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text + GameMakerGlobal.separator + 'map.vjs';
+                    let ret = FrameManager.sl_qml_CopyFile(oldFilePath, newFilePath, true);
+                }
+            }
+        }
+
+        //导出地图
+        function exportMap() {
+
+            let newName = textMapName.text;
+            let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + newName;
+
+            //if(!FrameManager.sl_qml_DirExists(newPath))
+                FrameManager.sl_qml_CreateFolder(newPath);
+
+
+            //绘制所有 0层及以上 canvas
+            canvasExport.bExport = true;
+            canvasExport.requestPaint();
+
+            //canvasMapContainer.arrCanvasMap[0].save(newPath + "/output_0.png");
+            //canvasMapContainer.arrCanvasMap[1].save(newPath + "/output_1.png");
+
+
+            let i = 0;
+
+            let tmpEventList = []; //保存所有事件名 对应的 显示关键字
+            for(i = 0; i < listmodelEventsData.count; ++i) {
+                tmpEventList.push(listmodelEventsData.get(i)["EventName"]);
+            }
+
+            let outputData = {};
+            outputData.Version = "0.6";
+            outputData.MapName = newName;
+            outputData.MapType = 1; //地图类型
+            outputData.MapScale = parseFloat(textMapScale.text) > 0 ? parseFloat(textMapScale.text) : 1;
+            outputData.MapSize = [_config.sizeMapSize.width, _config.sizeMapSize.height];
+            outputData.MapBlockSize = [_config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height];
+            outputData.MapCount = canvasMapContainer.arrCanvasMap.length;
+            outputData.MapData = [];
+            outputData.MapBlockImageCount = 1;
+            outputData.MapBlockImage = [root.arrMapBlockImageURL[0]];
+            outputData.MapEventData = objMapEventsData;
+            outputData.MapBlockSpecialData = objMapBlockSpecialData;
+            outputData.MapOfRole = parseInt(textMapOfRole.text) > 0 ? parseInt(textMapOfRole.text) : 1;
+            outputData.MapEventList = tmpEventList;
+            //outputData.EventData = {};
+            /*for(i = 0; i < listmodelEventsData.count; ++i) {
+                outputData.EventData[listmodelEventsData.get(i)["EventName"]] = (listmodelEventsData.get(i)["EventCode"]);
+            }*/
+            //outputData.EventData = objEventsData;
+            //outputData.SystemEventData = objSystemEventsData;
+
+
+            for(i = 0; i < canvasMapContainer.arrCanvasMap.length; ++i) {
+                //之前3层的算法
+                /*if(i === 0) {
+                    outputData.Obstacles = arrMapData[0];
+                }
+                else if(i === 1) {
+                    outputData.Events = arrMapData[1];
+                }
+                else {
+                    outputData.MapData[i-2] = arrMapData[i];
+                }*/
+
+                outputData.MapData[i] = arrMapData[i];
+            }
+            //!!!导出为文件
+            //console.debug(JSON.stringify(outputData));
+            //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
+            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
+            //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
+
+
+            saveJS();
+
+            copyVJS();
+
+
+            console.debug("[MapEditor]exportMap ret:", ret, newPath + GameMakerGlobal.separator + 'map.json');
+            console.debug("[MapEditor]exportMap:", JSON.stringify(outputData));
+            //console.debug("[MapEditor]exportMap objEventsData:", JSON.stringify(objEventsData));
+
+
+            return true;
         }
 
 
@@ -3474,14 +3546,19 @@ Item {
 
         function close() {
             dialogCommon.show({
-                Msg: '退出地图编辑器？',
-                Buttons: Dialog.Yes | Dialog.No,
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    s_close();
+                    if(exportMap())
+                        s_close();
+                    else {
+                        dialogSave.open();
+                    }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    s_close();
+                    //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();
@@ -3564,7 +3641,7 @@ Item {
 
         //!!!导入图块图片
         //imageMapBlock1.source = "./1.png";
-        //createNewMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
+        //newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
         console.debug("[MapEditor]Component.onCompleted");
     }
 

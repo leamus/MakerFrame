@@ -390,18 +390,41 @@ Item {
                         }
                     }
 
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '额外属性:'
+                        }
+
+                        TextField {
+                            id: textExtraProperties
+
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                            text: ''
+                            placeholderText: '额外属性'
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+                        }
+                    }
+
                     ColumnLayout {
-                        id: layoutEnemyLayout
+                        //id: layoutEnemyLayout
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
                         Button {
                             Layout.fillWidth: true
 
-                            text: '增加'
+                            text: '增加敌人'
 
                             onClicked: {
                                 let c = comp.createObject(layoutEnemyLayout);
@@ -423,74 +446,89 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@敌人角色'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                             Label {
                                 Layout.preferredWidth: 1
                                 Layout.fillWidth: true
 
                                 text: '参数（可省略）'
-                                //font.pointSize: _config.nTextFontSize
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Yellow)
                             }
                         }
 
-                        RowLayout {
-                            id: layoutFirstEnemy
+                        ColumnLayout {
+                            id: layoutEnemyLayout
 
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.fillHeight: true
 
-                            Label {
-                                visible: false
-                                text: '*@敌人：'
-                            }
+                            spacing: 16
 
-                            TextField {
-                                //id: textDefense
-                                objectName: 'enemy'
 
+                            Item {
                                 Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredHeight: 30
 
-                                text: ''
-                                placeholderText: '*@敌人角色'
+                                RowLayout {
+                                    id: layoutFirstEnemy
 
-                                //selectByKeyboard: true
-                                selectByMouse: true
-                                //wrapMode: TextEdit.Wrap
+                                    anchors.fill: parent
 
-                                onPressAndHold: {
-                                    let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+                                    Label {
+                                        visible: false
+                                        text: '*@敌人：'
+                                    }
 
-                                    l_list.open({
-                                        Data: path,
-                                        OnClicked: (index, item)=>{
-                                            text = item;
+                                    TextField {
+                                        //id: textDefense
+                                        objectName: 'enemy'
 
-                                            l_list.visible = false;
-                                            root.forceActiveFocus();
-                                        },
-                                        OnCanceled: ()=>{
-                                            l_list.visible = false;
-                                            root.forceActiveFocus();
-                                        },
-                                    });
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                                        text: ''
+                                        placeholderText: '*@敌人角色'
+
+                                        //selectByKeyboard: true
+                                        selectByMouse: true
+                                        //wrapMode: TextEdit.Wrap
+
+                                        onPressAndHold: {
+                                            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+
+                                            l_list.open({
+                                                Data: path,
+                                                OnClicked: (index, item)=>{
+                                                    text = item;
+
+                                                    l_list.visible = false;
+                                                    root.forceActiveFocus();
+                                                },
+                                                OnCanceled: ()=>{
+                                                    l_list.visible = false;
+                                                    root.forceActiveFocus();
+                                                },
+                                            });
+                                        }
+                                    }
+                                    TextField {
+                                        objectName: 'enemyParams'
+
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                                        text: ''
+                                        placeholderText: '参数（可省略）'
+
+                                        //selectByKeyboard: true
+                                        selectByMouse: true
+                                        //wrapMode: TextEdit.Wrap
+                                    }
                                 }
                             }
-                            TextField {
-                                objectName: 'enemyParams'
-
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                                text: ''
-                                placeholderText: '参数（可省略）'
-
-                                //selectByKeyboard: true
-                                selectByMouse: true
-                                //wrapMode: TextEdit.Wrap
-                            }
-
                         }
                     }
                 }
@@ -569,6 +607,13 @@ Item {
     }
 
 
+
+    //配置
+    QtObject {
+        id: _config
+
+        property int nLabelFontSize: 10
+    }
 
     QtObject {
         id: _private
@@ -700,7 +745,7 @@ Item {
             //console.debug(enemyTextFields);
             for(let tt in enemyTextFields) {
                 //console.debug(tt.text.trim());
-                strEnemies += "{RId: '%1', %2}, ".arg(enemyTextFields[tt].text.trim()).arg(enemyParamsTextFields[tt].text.trim());
+                strEnemies += "{RID: '%1', %2}, ".arg(enemyTextFields[tt].text.trim()).arg(enemyParamsTextFields[tt].text.trim());
             }
 
             /*console.debug('------------', layoutEnemyLayout.children);
@@ -733,7 +778,8 @@ Item {
                 replace(/\$\$runAway\$\$/g, textRunAway.text.trim()).
                 replace(/\$\$enemyCount\$\$/g, enemyCount).
                 replace(/\$\$music\$\$/g, textMusic.text.trim()).
-                replace(/\$\$enemiesData\$\$/g, strEnemies)
+                replace(/\$\$enemiesData\$\$/g, strEnemies).
+                replace(/\$\$ExtraProperties\$\$/g, textExtraProperties.text.trim() || 'undefined')
             ;
 
             console.debug('data:', data);
@@ -792,10 +838,12 @@ let data = (function() {
             //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
             $runAway: $$runAway$$,
             $enemyCount: $$enemyCount$$,	//为数组（m-n）的随机排列，为数字则依次按顺序排列，如果为true则表示按顺序排列
-            //RId是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
+            //RID是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
             $enemiesData: [
 $$enemiesData$$
             ],
+
+            $$ExtraProperties$$,
         }*/
     };
 
@@ -809,10 +857,12 @@ $$enemiesData$$
         //是否可以逃跑；true则调用 通用逃跑算法；0~1则为概率逃跑；false为不能逃跑
         $runAway: $$runAway$$,
         $enemyCount: $$enemyCount$$,	//为数组（m-n）的随机排列，为数字则依次按顺序排列，如果为true则表示按顺序排列
-        //RId是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
+        //RID是战斗角色资源名（必写），$goods是携带道具（可掉落），其他属性会覆盖战斗角色属性
         $enemiesData: [
 $$enemiesData$$
         ],
+
+        $$ExtraProperties$$,
 
 
         $fightInitScript: function *(teams, fightData) {

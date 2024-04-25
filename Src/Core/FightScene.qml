@@ -203,7 +203,7 @@ Item {
             button.clicked.connect(function() {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
-                fight.run(tb.$action(button));
+                fight.run(tb.$action(button) ?? null);
             });
         }
 
@@ -401,7 +401,7 @@ Item {
 
         //初始化脚本
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
-            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript), 'fight_init_script'], -2, );
+            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight_init_script'], -2, );
         }
 
 
@@ -464,7 +464,7 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript), 'fight start1'], -2);
+        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight start1'], -2);
 
 
         //GlobalLibraryJS.setTimeout(function() {
@@ -567,7 +567,7 @@ Item {
 
 
         //同 game.msg
-        readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}, buttonNum=0, callback=true) {
+        readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}/*, buttonNum=0*/, callback=true) {
 
             //调用回调函数 或 不调用回调函数
             if(GlobalLibraryJS.isFunction(callback) || !callback) {
@@ -594,7 +594,7 @@ Item {
             }
 
 
-            return game.msg(msg, interval, pretext, keeptime, style, false, 0, callback);
+            return game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback);
         }
 
         //同 game.menu
@@ -649,7 +649,7 @@ Item {
 
 
         //载入 fightScript 脚本 并进入战斗；
-        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
         //params是给战斗脚本$createData的参数。
         readonly property var fighting: function(fightScript) {
 
@@ -680,7 +680,7 @@ Item {
         }
 
         //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
-        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RId、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
         //flag：0b1为行动时遇敌，0b10为静止时遇敌；
         //params是给战斗脚本$createData的参数；
         //会覆盖之前的fighton；
@@ -832,6 +832,11 @@ Item {
                 spriteEffectMyCombatants: repeaterMyCombatants,
                 spriteEffectEnemies: repeaterEnemies,
             },
+            caches: {
+                asyncScript: _private.asyncScript,
+            },
+
+
 
             //上场
             insertFightRole: function(index, fightrole, teamID) {
@@ -922,9 +927,6 @@ Item {
         })
     }
 
-
-
-    property alias asyncScript: _private.asyncScript
 
 
     //property var arrFightGenerators: []
@@ -1212,9 +1214,12 @@ Item {
                     SpriteEffect {
                         id: tSpriteEffectMyCombatant
 
+                        property var $info: null
+                        property var $script: null
+
                         anchors.centerIn: parent
-                        width: strSource ? implicitWidth : 60
-                        height: strSource ? implicitHeight : 60
+                        //width: strSource ? implicitWidth : 60
+                        //height: strSource ? implicitHeight : 60
 
                         //bTest: false
 
@@ -1454,9 +1459,12 @@ Item {
                     SpriteEffect {
                         id: tSpriteEffectEnemy
 
+                        property var $info: null
+                        property var $script: null
+
                         anchors.centerIn: parent
-                        width: strSource ? implicitWidth : 60
-                        height: strSource ? implicitHeight : 60
+                        //width: strSource ? implicitWidth : 60
+                        //height: strSource ? implicitHeight : 60
 
                         //bTest: false
 
@@ -1953,12 +1961,16 @@ Item {
         ColorButton {
             text: "退出战斗"
             onButtonClicked: {
+                timerRoleSprite.stop();
+                _private.genFighting.clear(3);
+                _private.asyncScript.clear(3);
                 FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2});
-                rootFightScene.visible = false;
-                rootGameScene.forceActiveFocus();
+
+                //rootFightScene.visible = false;
+                //rootGameScene.forceActiveFocus();
 
                 //强制退出后，由于执行逻辑变化（没有按正常逻辑走），导致多次执行game.msg，返回地图模式会被暂停，所以加一个正常继续
-                game.run(() => {game.goon(true);})
+                //game.run(() => {game.goon(true);})
             }
         }
     }

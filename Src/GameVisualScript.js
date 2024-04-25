@@ -63,7 +63,7 @@ let data = (function() {
                                 '说话': {
                                     command: ['说话', 'game.say(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
                                     params: [
-                                        ['角色名', 'string', undefined, 0, '', 'darkgreen'],
+                                        ['*角色名', 'string', true, 0, '', 'darkgreen'],
                                         ['*@信息', 'string', true, 2, [['文字', '变量', '地图变量', '全局变量', '引擎变量'], ['', '${变量1}', '${game.d["变量1"]}', '${game.gd["变量1"]}', 'game.cd["变量1"]']], 'green'],
                                         ['文字间隔', 'number', '60', 0, '', 'blue'],
                                         ['预定义文字', 'string', '``', 0, '', 'lightblue'],
@@ -87,7 +87,7 @@ let data = (function() {
                                     ],
                                 },
                                 '创建主角': {
-                                    command: ['创建主角', 'game.createhero({RId:%1, $name:%2});', '创建主角', 0, true, 'red', 'white'],
+                                    command: ['创建主角', 'game.createhero({RID:%1, $name:%2});', '创建主角', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                                         ['主角名', 'string', undefined, 0, '', 'darkgreen'],
@@ -120,7 +120,7 @@ let data = (function() {
                                     ],
                                 },
                                 '创建NPC': {
-                                    command: ['创建NPC', 'game.createrole({RId: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5});', '', 0, true, 'red', 'white'],
+                                    command: ['创建NPC', 'game.createrole({RID: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5});', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                                         ['NPC名', 'string', undefined, 0, '', 'darkgreen'],
@@ -181,7 +181,7 @@ let data = (function() {
                                 },
 
                                 '播放视频': {
-                                    command: ['播放视频', 'yield game.playvideo(Object.assign({RId: %1}, %2));', '播放视频', 0, true, 'red', 'white'],
+                                    command: ['播放视频', 'yield game.playvideo(Object.assign({RID: %1}, %2));', '播放视频', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@视频名', 'string', true, 1, GameMakerGlobal.videoResourcePath(), 'green'],
                                         ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
@@ -192,14 +192,19 @@ let data = (function() {
                                    command: ['停止视频', 'game.stopvideo();', '停止视频', 0, true, 'red', 'white'],
                                    params: [
                                    ],
-                               },
+                                },
 
                                 '显示图片': {
-                                    command: ['显示图片', 'game.showimage(Object.assign({RId: %1}, %2), %3);', '', 0, true, 'red', 'white'],
+                                    command: ['显示图片', 'game.showimage(Object.assign({RID: %1, $id: %2, $x: %4, $y: %5, $width: %6, $height: %7, $parent: %3}, %8));', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@图片名', 'string', true, 1, GameMakerGlobal.imageResourcePath(), 'green'],
-                                        ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                         ['id', 'string', undefined, 0, '', 'green'],
+                                        ['目标组件', 'string|number', undefined, 0, '', 'green'],
+                                        ['x', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['y', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['宽', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['高', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['其他属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                     ],
                                 },
 
@@ -207,16 +212,22 @@ let data = (function() {
                                     command: ['删除图片', 'game.delimage({$id: %1, $parent: %2});', '删除图片', 0, true, 'red', 'white'],
                                     params: [
                                         ['*id', 'string', true, 0, '', 'green'],
-                                        ['父组件', 'string|number', undefined, 0, '', 'green'],
+                                        ['目标组件', 'string|number', undefined, 0, '', 'green'],
                                     ],
                                 },
 
                                 '显示特效': {
-                                    command: ['显示特效', 'game.showsprite(Object.assign({RId: %1}, %2), %3);', '显示特效', 0, true, 'red', 'white'],
+                                    command: ['显示特效', 'game.showsprite(Object.assign({RID: %1, $id: %2, $x: %4, $y: %5, $width: %6, $height: %7, $parent: %3, $loops: %8}, %9));', '显示特效', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@特效名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, 'green'],
-                                        ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                         ['id', 'string', undefined, 0, '', 'green'],
+                                        ['目标组件', 'string|number', undefined, 0, '', 'green'],
+                                        ['x', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['y', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['宽', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['高', 'unformatted', '-1', 0, '', 'darkgreen'],
+                                        ['循环次数', 'number', '-1', 0, '', 'darkgreen'],
+                                        ['其他属性', 'json', '{}', 0, '{}', 'darkgreen'],
                                     ],
                                 },
 
@@ -224,7 +235,7 @@ let data = (function() {
                                     command: ['删除特效', 'game.delsprite({$id: %1, $parent: %2});', '删除特效', 0, true, 'red', 'white'],
                                     params: [
                                         ['*id', 'string', true, 0, '', 'green'],
-                                        ['父组件', 'string|number', undefined, 0, '', 'green'],
+                                        ['目标组件', 'string|number', undefined, 0, '', 'green'],
                                     ],
                                 },
 
@@ -420,14 +431,14 @@ let data = (function() {
                                 },
 
                                 '进入战斗': {
-                                    command: ['进入战斗', 'game.fighting({RId: %1, %2});', '进入战斗', 0, true, 'red', 'white'],
+                                    command: ['进入战斗', 'fight.fighting({RID: %1, %2});', '进入战斗', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@战斗脚本', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                                         ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                                     ],
                                 },
                                 '开启随机战斗': {
-                                    command: ['开启随机战斗', 'game.fighton({RId: %1, %2},%3,%4);', '开启随机战斗', 0, true, 'red', 'white'],
+                                    command: ['开启随机战斗', 'fight.fighton({RID: %1, %2},%3,%4);', '开启随机战斗', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@战斗脚本', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                                         ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
@@ -436,7 +447,7 @@ let data = (function() {
                                     ],
                                 },
                                 '关闭随机战斗': {
-                                    command: ['关闭随机战斗', 'game.fightoff();', '关闭随机战斗', 0, true, 'red', 'white'],
+                                    command: ['关闭随机战斗', 'fight.fightoff();', '关闭随机战斗', 0, true, 'red', 'white'],
                                     params: [
                                     ],
                                 },

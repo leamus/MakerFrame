@@ -130,6 +130,14 @@ Item {
         refresh();
     }
 
+    function status() {
+        return _private.nState;
+    }
+
+    function currentFrame() {
+        return nCurrentFrame;
+    }
+
 
     function colorOverlayStart(colors=undefined, index=1) {
         colorOverlay.start(colors=undefined, index=1);
@@ -221,106 +229,177 @@ Item {
     property bool bTest: false
 
 
-    //width: 0
-    //height: 0
+    width: implicitWidth
+    height: implicitHeight
 
-    implicitWidth: imageAnimate.implicitWidth
-    implicitHeight: imageAnimate.implicitHeight
+    //方案1/2：受root大小影响
+    //implicitWidth: imageAnimate.implicitWidth
+    //implicitHeight: imageAnimate.implicitHeight
+    //方案2/2：不受root的大小影响（建议，因为root大小设置后会导致动画抖动，需要设置大小用缩放）
+    implicitWidth: imageAnimate.sourceSize.width * Math.abs(root.rXScale)
+    implicitHeight: imageAnimate.sourceSize.height * Math.abs(root.rYScale)
 
     smooth: false
 
 
+    onNCurrentFrameChanged: {
+        if(root.nCurrentFrame < 0)
+            return;
 
-    Image {
-        id: imageAnimate
-
-
-        //总偏移
-        property real rXOffset
-        property real rYOffset
-
-        x: rXOffset * root.rXScale
-        y: rYOffset * root.rYScale
-        //width: root.width; height: root.height     //一个帧的大小，会缩放
-        width: sourceSize.width * Math.abs(root.rXScale)
-        height: sourceSize.height * Math.abs(root.rYScale)
-
-        //鹰：使用中央偏移，会导致图片抖动（可能是因为anchors擅自调整了坐标）
-        //anchors.centerIn: parent
-        //anchors.horizontalCenterOffset: rXOffset
-        //anchors.verticalCenterOffset: rYOffset
-        //anchors.horizontalCenter: parent.horizontalCenter
-        //anchors.verticalCenter: parent.verticalCenter
-
-        smooth: false
-
-        //鹰：!!!光使用 Scale 缩放，也会导致抖动；所以只能用这种方式（x、y、width、height 乘以比例，加上镜像来实现）
-        //transformOrigin: Item.BottomRight
-        transform: Scale {
-            //x方向镜像
-            xScale: root.rXScale > 0 ? 1 : -1
-            //origin.x: imageAnimate.width / 2
-
-            //y方向镜像
-            yScale: root.rYScale > 0 ? 1 : -1
-            //origin.y: imageAnimate.height / 2
-        }
-    }
-
-    //闪烁（颜色）
-    ColorOverlay {
-        id: colorOverlay
-
-        property var arrColors: ["#00000000", "#7FFF0000", "#7F00FF00", '#7F0000FF']
-        property int nStep: 0
-        property int nInterval: 500
-
-        function start(colors=undefined, index=1) {
-            if(colors)
-                arrColors = colors;
-
-            nStep = index;
-            color = arrColors[nStep];
-        }
-
-        function stop() {
-            nStep = 0;
-            color = arrColors[nStep];
-        }
-
-        anchors.fill: imageAnimate
-        source: imageAnimate
-        color: "#00000000"
-        visible: color.a !== 0
-
-        Behavior on color {
-            ColorAnimation {
-                duration: colorOverlay.nInterval
-                onRunningChanged: {
-                    if(!running) {
-                        if(colorOverlay.nStep === 0) {
-                            colorOverlay.color = colorOverlay.arrColors[0];
-                        }
-                        else {
-                            if(++colorOverlay.nStep === colorOverlay.arrColors.length)
-                                colorOverlay.nStep = 1;
-                            colorOverlay.color = colorOverlay.arrColors[colorOverlay.nStep];
-                        }
-                    }
-
-                }
+        if(root.nCurrentFrame === root.nFrameCount) {
+            ++_private.nLoopedCount;
+            if(_private.nLoopedCount === root.nLoops) {
+                root.stop(false);
+                root.s_looped();
+                root.s_finished();
+                return;
+            }
+            else {
+                root.s_looped();
+                root.nCurrentFrame = 0;
             }
         }
 
-        //transformOrigin: Item.BottomRight
+        if(root.nCurrentFrame === 0) {
+            root.s_started();
+
+            if(strSoundeffectName)
+                timerSound.restart();
+        }
+
+        root.s_refreshed(root.nCurrentFrame);
+
+        refresh();
+    }
+
+
+
+    Item {
+        id: itemAnimate
+
+        width: root.width
+        height: root.height
+
         transform: Scale {
             //x方向镜像
-            xScale: root.rXScale > 0 ? 1 : -1
+            xScale: root.rXScale
             //origin.x: imageAnimate.width / 2
 
             //y方向镜像
-            yScale: root.rYScale > 0 ? 1 : -1
+            yScale: root.rYScale
             //origin.y: imageAnimate.height / 2
+        }
+
+
+        Image {
+            id: imageAnimate
+
+            //总偏移
+            property real rXOffset
+            property real rYOffset
+            //property alias rXOffset: itemAnimate.rXOffset
+            //property alias rYOffset: itemAnimate.rYOffset
+
+            property alias rXScale: root.rXScale
+            property alias rYScale: root.rYScale
+
+
+            x: rXOffset
+            y: rYOffset
+
+            //方案1/2：受root大小影响
+            //width: root.width
+            //height: root.height
+            //方案2/2：不受root的大小影响（建议，因为root大小设置后会导致动画抖动，需要设置大小用缩放）
+            width: sourceSize.width
+            height: sourceSize.height
+
+            //anchors.fill: parent
+            //x: rXOffset * root.rXScale
+            //y: rYOffset * root.rYScale
+            //width: root.width; height: root.height     //一个帧的大小，会缩放
+            //width: sourceSize.width * Math.abs(root.rXScale)
+            //height: sourceSize.height * Math.abs(root.rYScale)
+
+            //鹰：使用中央偏移，会导致图片抖动（可能是因为anchors擅自调整了坐标）
+            //anchors.centerIn: parent
+            //anchors.horizontalCenterOffset: rXOffset
+            //anchors.verticalCenterOffset: rYOffset
+            //anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.verticalCenter: parent.verticalCenter
+
+            smooth: false
+
+            //鹰：!!!光使用 Scale 缩放，也会导致抖动；所以只能用这种方式（x、y、width、height 乘以比例，加上镜像来实现）
+            //transformOrigin: Item.BottomRight
+            /*transform: Scale {
+                //x方向镜像
+                xScale: root.rXScale > 0 ? 1 : -1
+                //origin.x: imageAnimate.width / 2
+
+                //y方向镜像
+                yScale: root.rYScale > 0 ? 1 : -1
+                //origin.y: imageAnimate.height / 2
+            }
+            */
+        }
+
+        //闪烁（颜色）
+        ColorOverlay {
+            id: colorOverlay
+
+            property var arrColors: ["#00000000", "#7FFF0000", "#7F00FF00", '#7F0000FF']
+            property int nStep: 0
+            property int nInterval: 500
+
+            function start(colors=undefined, index=1) {
+                if(colors)
+                    arrColors = colors;
+
+                nStep = index;
+                color = arrColors[nStep];
+            }
+
+            function stop() {
+                nStep = 0;
+                color = arrColors[nStep];
+            }
+
+            anchors.fill: imageAnimate
+            source: imageAnimate
+            color: "#00000000"
+            visible: color.a !== 0
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: colorOverlay.nInterval
+                    onRunningChanged: {
+                        if(!running) {
+                            if(colorOverlay.nStep === 0) {
+                                colorOverlay.color = colorOverlay.arrColors[0];
+                            }
+                            else {
+                                if(++colorOverlay.nStep === colorOverlay.arrColors.length)
+                                    colorOverlay.nStep = 1;
+                                colorOverlay.color = colorOverlay.arrColors[colorOverlay.nStep];
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            //transformOrigin: Item.BottomRight
+            /*transform: Scale {
+                //x方向镜像
+                xScale: root.rXScale > 0 ? 1 : -1
+                //origin.x: imageAnimate.width / 2
+
+                //y方向镜像
+                yScale: root.rYScale > 0 ? 1 : -1
+                //origin.y: imageAnimate.height / 2
+            }
+            */
         }
     }
 
@@ -366,36 +445,12 @@ Item {
         repeat: true
 
         onTriggered: {
-            //console.debug('timerInterval Triggerd:', strSource);
-            if(bTest)
-                console.debug('!!!timerInterval onTriggered', interval);
-
             ++root.nCurrentFrame;
 
-            if(root.nCurrentFrame === root.nFrameCount) {
-                ++_private.nLoopedCount;
-                if(_private.nLoopedCount === root.nLoops) {
-                    root.stop(false);
-                    root.s_looped();
-                    root.s_finished();
-                    return;
-                }
-                else {
-                    root.s_looped();
-                    root.nCurrentFrame = 0;
-                }
-            }
+            //console.debug('timerInterval Triggerd:', strSource);
+            if(bTest)
+                console.debug('!!!timerInterval onTriggered', interval, root.nCurrentFrame);
 
-            if(root.nCurrentFrame === 0) {
-                root.s_started();
-
-                if(strSoundeffectName)
-                    timerSound.restart();
-            }
-
-            root.s_refreshed(root.nCurrentFrame);
-
-            refresh();
         }
 
         onRunningChanged: {
@@ -442,7 +497,7 @@ Item {
                 root.restart();
             //s_clicked();
 
-            //console.debug('!!!start')
+            //console.debug('[DirSpriteEffect]start')
         }
     }
 
@@ -492,12 +547,13 @@ Item {
         property int nState: 0
 
 
-        //
+        //播放循环次数
         property int nLoopedCount;
 
-        property var arrFixPositionsData: null
+        //property var arrFixPositionsData: null
 
 
+        //第一次播放前初始化
         function init() {
             root.nCurrentFrame = -1;
             _private.nLoopedCount = 0;
