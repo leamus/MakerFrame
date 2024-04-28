@@ -26,11 +26,14 @@ Item {
         arrSaleGoods = [];
 
         for(let g of goods) {
+            if(GlobalLibraryJS.isString(g))
+                g = {RID: g, $count: -1};
             let tgoods = game.$sys.getGoodsObject(g, true);
             if(!tgoods)
-                console.warn('没有道具：', g)
-            else
+                console.warn('没有道具：', g);
+            else {
                 arrSaleGoods.push(tgoods);
+            }
         }
 
         root.mygoodsinclude = mygoodsinclude;
@@ -49,7 +52,13 @@ Item {
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
             let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: (g.$count >= 0 ? true : false)}));
-            arrShowSaleGoods.push(tgoodsName + ' ￥' + g.$price[0]);
+            if(g.$price) {
+                if(GlobalLibraryJS.isNumber(g.$price))
+                    g.$price = [g.$price, parseInt(g.$price / 2)];
+                arrShowSaleGoods.push(tgoodsName + ' ￥' + g.$price[0]);
+            }
+            else
+                arrShowSaleGoods.push(tgoodsName);
         }
 
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
@@ -183,19 +192,28 @@ Item {
                     goodsDetail.text = description;
                 }
                 onS_DoubleChoice: {
-                    itemCountBox.tradeData.type = 1;
-                    itemCountBox.tradeData.goods = arrData[index];
+                    if(arrData[index].$price) {
+                        itemCountBox.tradeData.type = 1;
+                        itemCountBox.tradeData.goods = arrData[index];
 
-                    textCountBoxCount.text = 1;
-                    sliderCount.value = 1;
-                    sliderCount.from = 1;
-                    sliderCount.to = arrData[index].$count > 0 ? arrData[index].$count : 99;
+                        textCountBoxCount.text = 1;
+                        sliderCount.value = 1;
+                        sliderCount.from = 1;
+                        sliderCount.to = arrData[index].$count >= 0 ? arrData[index].$count : 99;
 
-                    _private.refreshTradeInfo();
+                        _private.refreshTradeInfoBox();
 
 
-                    itemCountBox.visible = true;
-                    sliderCount.forceActiveFocus();
+                        itemCountBox.visible = true;
+                        sliderCount.forceActiveFocus();
+                    }
+                    else
+                        //game.run(function() {
+                            game.msg('此物品不能买', 20, '', 0, {Type: 0b10}, false);
+                            //return false;
+                        //});
+
+                    return;
 
 
                     ////let goodsInfo = _private.goodsResource[arrData[index]];
@@ -249,7 +267,7 @@ Item {
                         sliderCount.from = 1;
                         sliderCount.to = arrData[index].$count;
 
-                        _private.refreshTradeInfo();
+                        _private.refreshTradeInfoBox();
 
 
                         itemCountBox.visible = true;
@@ -410,7 +428,7 @@ Item {
 
 
                 onTextChanged: {
-                    _private.refreshTradeInfo();
+                    _private.refreshTradeInfoBox();
                 }
             }
 
@@ -467,7 +485,7 @@ Item {
                                 return;
                             }
 
-                            if(goods.$count <= 0 || count > goods.$count) {
+                            if(goods.$count === 0 || (goods.$count > 0 && count > goods.$count)) {
                                 //game.run(function() {
                                     game.msg('出售道具不够', 20, '', 0, {Type: 0b10}, false);
                                 //    return false;
@@ -475,7 +493,8 @@ Item {
                                 return;
                             }
 
-                            goods.$count -= count;
+                            if(goods.$count > 0)
+                                goods.$count -= count;
                             game.gd["$sys_money"] -= (goods.$price[0] * count);
                             game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, goods), count);
                             root.refresh();
@@ -526,8 +545,8 @@ Item {
     QtObject {  //私有数据,函数,对象等
         id: _private
 
-        //刷新交易数据
-        function refreshTradeInfo() {
+        //刷新 交易数据框
+        function refreshTradeInfoBox() {
 
             let goods = itemCountBox.tradeData.goods;
             let count = parseInt(textCountBoxCount.text);

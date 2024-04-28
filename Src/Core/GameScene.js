@@ -1807,21 +1807,28 @@ function buttonAClicked() {
             console.debug("[GameScene]触发NPC事件：", role.$data.$id);
 
             //获得脚本（地图脚本优先级 > game.f定义的）
-            let tScript = itemViewPort.mapScript['$' + role.$data.$id];
-            if(!tScript)    //!!!兼容旧的
-                tScript = itemViewPort.mapScript[role.$data.$id];
-            if(!tScript)
-                tScript = game.f['$' + role.$data.$id];
-            if(!tScript)    //!!!兼容旧的
-                tScript = game.f[role.$data.$id];
-            if(!tScript)
-                tScript = game.gf['$' + role.$data.$id];
-            if(!tScript)    //!!!兼容旧的
-                tScript = game.gf[role.$data.$id];
-            if(!tScript && role.$script)
-                tScript = role.$script['$interactive'];
+            let tScript;
+            do {
+                if(itemViewPort.mapScript) {
+                    if(tScript = itemViewPort.mapScript['$' + role.$data.$id])
+                        break;
+                    if(tScript = itemViewPort.mapScript[role.$data.$id])
+                        break;
+                }
+                if(tScript = game.f['$' + role.$data.$id])
+                    break;
+                if(tScript = game.f[role.$data.$id])    //!!!兼容旧的
+                    break;
+                if(tScript = game.gf['$' + role.$data.$id])
+                    break;
+                if(tScript = game.gf[role.$data.$id])    //!!!兼容旧的
+                    break;
+                if(role.$script && (tScript = role.$script['$interactive']))
+                    break;
+            } while(0);
+
             if(tScript) {
-                game.run([tScript.call(role, role) ?? null, role.$data.$id]);
+                game.run([tScript.call(role, role) ?? null, '$interactive:' + role.$data.$id]);
                 //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(role.$data.$id));
 
                 return; //!!只执行一次事件
@@ -1837,21 +1844,26 @@ function mapEvent(eventName, role) {
 
 
     //主角和NPC的事件名不同
-    if(role.$$type === 1)
-        tScript = itemViewPort.mapScript['$' + eventName];
-    else
-        tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map'];
-    if(!tScript && role.$$type === 1)    //!!兼容旧的
-        tScript = itemViewPort.mapScript[eventName];
-    if(!tScript)
+    do {
         if(role.$$type === 1)
-            tScript = game.f['$' + eventName];
+            if(tScript = itemViewPort.mapScript['$' + eventName])
+                break;
         else
-            tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'];
-    if(!tScript && role.$$type === 1)    //!!兼容旧的
-        tScript = game.f[eventName];
-    if(!tScript && role.$script)
-        tScript = role.$script['$' + eventName + '_map'];
+            if(tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map'])
+                break;
+        if(role.$$type === 1 && (tScript = itemViewPort.mapScript[eventName]))    //!!兼容旧的
+            break;
+        if(role.$$type === 1)
+            if(tScript = game.f['$' + eventName])
+                break;
+        else
+            if(tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map'])
+                break;
+        if(role.$$type === 1 && (tScript = game.f[eventName]))    //!!兼容旧的
+            break;
+        if(role.$script && (tScript = role.$script['$' + eventName + '_map']))
+            break;
+    } while(0);
 
     if(tScript)
         GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
@@ -1874,17 +1886,22 @@ function mapEventCanceled(eventName, role) {
 
 
     //主角和NPC的事件名不同
-    if(role.$$type === 1)
-        tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'];
-    else
-        tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-    if(!tScript)
+    do {
         if(role.$$type === 1)
-            tScript = game.f['$' + eventName + '_map_leave'];
+            if(tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'])
+                break;
         else
-            tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'];
-    if(!tScript && role.$script)
-        tScript = role.$script['$' + eventName + '_map_leave'];
+            if(tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'])
+                break;
+        if(role.$$type === 1)
+            if(tScript = game.f['$' + eventName + '_map_leave'])
+                break;
+        else
+            if(tScript = game.f['$' + role.$data.$id + '_' + eventName + '_map_leave'])
+                break;
+        if(role.$script && (tScript = role.$script['$' + eventName + '_map_leave']))
+            break;
+    } while(0);
 
     if(tScript)
         GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
@@ -1906,11 +1923,16 @@ function mapEventCanceled(eventName, role) {
 function mapClickEvent(x, y) {
 
     let eventName = '$map_click';
-    let tScript = itemViewPort.mapScript[eventName];
-    if(!tScript)
-        tScript = game.f[eventName];
-    if(!tScript)
-        tScript = game.gf[eventName];
+    let tScript;
+    do {
+        if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+            break;
+        if(tScript = game.f[eventName])
+            break;
+        if(tScript = game.gf[eventName])
+            break;
+    } while(0);
+
     if(tScript)
         game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y) ?? null, eventName], -1, );
 
@@ -1925,15 +1947,20 @@ function roleClickEvent(role, dx, dy) {
 
     let eventName = `$${role.$data.$id}_click`;
     //获得脚本（地图脚本优先级 > game.f定义的）
-    let tScript = itemViewPort.mapScript[eventName];
-    if(!tScript)
-        tScript = game.f[eventName];
-    if(!tScript)
-        tScript = game.gf[eventName];
-    if(!tScript && role.$script)
-        tScript = role.$script['$click'];
+    let tScript;
+    do {
+        if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+            break;
+        if(tScript = game.f[eventName])
+            break;
+        if(tScript = game.gf[eventName])
+            break;
+        if(tScript = role.$script['$click'])
+            break;
+    } while(0);
+
     if(tScript) {
-        game.run([tScript.call(role, role) ?? null, role.$data.$id], );
+        game.run([tScript.call(role, role) ?? null, eventName], );
         //GlobalJS.runScript(_private.asyncScript, 0, "game.f['%1']()".arg(_private.objRoles[r].$name));
 
         return; //!!只执行一次事件
@@ -1990,12 +2017,14 @@ function onTriggered() {
 
 
             let tScript;
-            if(itemViewPort.mapScript)
-                tScript = itemViewPort.mapScript[tt];
-            if(!tScript)
-                tScript = game.f[tt];
-            if(!tScript)
-                tScript = game.gf[tt];
+            do {
+                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
+                    break;
+                if(tScript = game.f[tt])
+                    break;
+                if(tScript = game.gf[tt])
+                    break;
+            } while(0);
 
             GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][3], _private.objGlobalTimers[tt][1], realinterval) ?? null, Tips: '全局定时器事件:' + tt});
             //game.run([game.gf[tt], tt]);
@@ -2026,12 +2055,14 @@ function onTriggered() {
 
 
             let tScript;
-            if(itemViewPort.mapScript)
-                tScript = itemViewPort.mapScript[tt];
-            if(!tScript)
-                tScript = game.f[tt];
-            if(!tScript)
-                tScript = game.gf[tt];
+            do {
+                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
+                    break;
+                if(tScript = game.f[tt])
+                    break;
+                if(tScript = game.gf[tt])
+                    break;
+            } while(0);
 
             GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][3], _private.objTimers[tt][1], realinterval) ?? null, Tips: '定时器事件:' + tt}, );
             //game.run([tScript, tt]);
@@ -2090,15 +2121,20 @@ function onTriggered() {
 
 
                         let eventName = `$${role.$data.$id}_arrive`;
-                        let tScript = itemViewPort.mapScript[eventName];
-                        if(!tScript)
-                            tScript = game.f[eventName];
-                        if(!tScript)
-                            tScript = game.gf[eventName];
-                        if(!tScript && role.$script)
-                            tScript = role.$script['$arrive'];
+                        let tScript;
+                        do {
+                            if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                                break;
+                            if(tScript = game.f[eventName])
+                                break;
+                            if(tScript = game.gf[eventName])
+                                break;
+                            if(role.$script && (tScript = role.$script['$arrive']))
+                                break;
+                        } while(0);
+
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '角色Arrive事件:' + role.$data.$id}, );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: eventName}, );
                             //game.run([tScript, role.$name]);
                     }
                     else
@@ -2232,13 +2268,17 @@ function onTriggered() {
 
             let key = '$role_' + _private.objRoles[r].$data.$id;
             let eventName = `$${role.$data.$id}_collide`;
-            let tScript = itemViewPort.mapScript[eventName];
-            if(!tScript)
-                tScript = game.f[eventName];
-            if(!tScript)
-                tScript = game.gf[eventName];
-            if(!tScript && role.$script)
-                tScript = role.$script['$collide'];
+            let tScript;
+            do {
+                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    break;
+                if(tScript = game.f[eventName])
+                    break;
+                if(tScript = game.gf[eventName])
+                    break;
+                if(role.$script && (tScript = role.$script['$collide']))
+                    break;
+            } while(0);
 
             //如果有碰撞
             if(
@@ -2257,13 +2297,13 @@ function onTriggered() {
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, Tips: '角色碰撞角色事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: '角色碰撞角色离开事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
         }
@@ -2279,13 +2319,17 @@ function onTriggered() {
 
             let key = '$hero_' + _private.arrMainRoles[r].$data.$id;
             let eventName = `$${role.$data.$id}_collide`;
-            let tScript = itemViewPort.mapScript[eventName];
-            if(!tScript)
-                tScript = game.f[eventName];
-            if(!tScript)
-                tScript = game.gf[eventName];
-            if(!tScript && role.$script)
-                tScript = role.$script['$collide'];
+            let tScript;
+            do {
+                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    break;
+                if(tScript = game.f[eventName])
+                    break;
+                if(tScript = game.gf[eventName])
+                    break;
+                if(role.$script && (tScript = role.$script['$collide']))
+                    break;
+            } while(0);
 
             if(
                 //(role.$data.$penetrate === 0 && _private.arrMainRoles[r].$data.$penetrate === 0) &&
@@ -2302,7 +2346,7 @@ function onTriggered() {
                     }
                     else
                         collideRoles[key] = realinterval;
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, Tips: '角色碰撞主角事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
 
@@ -2310,20 +2354,20 @@ function onTriggered() {
                 if(_private.arrMainRoles[r].$script) {
                     tScript = _private.arrMainRoles[r].$script['$collide'];
                     if(tScript) {
-                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: '主角碰撞事件0:' + role.$data.$id}, );
+                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                     }
                 }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: '主角碰撞事件1:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: '角色碰撞主角离开事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
 
@@ -2331,14 +2375,14 @@ function onTriggered() {
                 if(_private.arrMainRoles[r].$script) {
                     tScript = _private.arrMainRoles[r].$script['$collide'];
                     if(tScript) {
-                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: '主角碰撞离开事件0:' + role.$data.$id}, );
+                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                     }
                 }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: '主角碰撞离开事件1:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
         }
@@ -2437,15 +2481,20 @@ function onTriggered() {
 
 
                         let eventName = `$${mainRole.$data.$id}_arrive`;
-                        let tScript = itemViewPort.mapScript[eventName];
-                        if(!tScript)
-                            tScript = game.f[eventName];
-                        if(!tScript)
-                            tScript = game.gf[eventName];
-                        if(!tScript && mainRole.$script)
-                            tScript = mainRole.$script['$arrive'];
+                        let tScript;
+                        do {
+                            if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                                break;
+                            if(tScript = game.f[eventName])
+                                break;
+                            if(tScript = game.gf[eventName])
+                                break;
+                            if(mainRole.$script && (tScript = mainRole.$script['$arrive']))
+                                break;
+                        } while(0);
+
                         if(tScript)
-                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: '主角Arrive事件:' + mainRole.$data.$id}, );
+                            GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: eventName}, );
                             //game.run([tScript, mainRole.$name]);
                     }
                     else
@@ -2775,15 +2824,20 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
         //碰撞障碍
         //if(collideObstacle !== 0) {
             let eventName = `$${role.$data.$id}_collide_obstacle`;
-            let tScript = itemViewPort.mapScript[eventName];
-            if(!tScript)
-                tScript = game.f[eventName];
-            if(!tScript)
-                tScript = game.gf[eventName];
-            if(!tScript && role.$script)
-                tScript = role.$script['$collide_obstacle'];
+            let tScript;
+            do {
+                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    break;
+                if(tScript = game.f[eventName])
+                    break;
+                if(tScript = game.gf[eventName])
+                    break;
+                if(role.$script && (tScript = role.$script['$collide_obstacle']))
+                    break;
+            } while(0);
+
             if(tScript) {
-                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: '角色碰撞障碍事件:' + role.$data.$id}, );
+                GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: eventName}, );
             }
 
 
@@ -2791,7 +2845,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: '主角碰撞障碍事件:' + role.$data.$id}, );
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: eventName}, );
                 }
             }
         //}

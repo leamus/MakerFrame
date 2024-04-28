@@ -34,14 +34,16 @@ Item {
 
 
     function init() {
-        let filePath;
-        if(FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'main.js')) {
-            filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'main.js';
+        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+        if(FrameManager.sl_qml_FileExists(filePath + 'main.js')) {
+            gameVisualScript.loadData(filePath + 'main.vjs');
+            filePath = filePath + 'main.js';
             _private.strMainJSName = 'main.js';
         }
         //!!!兼容旧代码
-        else if(FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js')) {
-            filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.js';
+        else if(FrameManager.sl_qml_FileExists(filePath + 'start.js')) {
+            gameVisualScript.loadData(filePath + 'start.vjs');
+            filePath = filePath + 'start.js';
             _private.strMainJSName = 'start.js';
         }
         //let data = File.read(filePath);
@@ -317,7 +319,6 @@ game.goon();
 
         /*onLoaded: {
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'start.vjs';
-
             item.loadData(filePath);
 
             console.debug('[GameStart]loaderVisualScript onLoaded');

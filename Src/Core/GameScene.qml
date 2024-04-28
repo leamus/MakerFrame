@@ -1239,8 +1239,18 @@ Item {
                 }
 
 
-                if(props.$start === true)
+                if(props.$start === true) {
+                    /*
+                    GlobalLibraryJS.setTimeout(function() {
+                        roleComp.start();
+                    }, 1, rootGameScene, 'fight.continueFight');
+
+                    GlobalLibraryJS.runNextEventLoop(function() {
+                        roleComp.start();
+                        }, 'game.run1');
+                    */
                     roleComp.start();
+                }
                 else if(props.$start === false)
                     roleComp.stop();
 
@@ -3706,7 +3716,7 @@ Item {
             for(let th of game.gd['$sys_main_roles']) {
                 let mainRole = game.createhero(th.$rid);
                 mainRole.$$nActionType = 0;
-                mainRole.$$arrMoveDirection = [];
+                mainRole.$$arrMoveDirection = [0, 0];
                 //game.hero(mainRole, th);
             }
 
@@ -5306,6 +5316,22 @@ Item {
             onStopped: {
                 game.stopvideo();
             }
+
+            onPlaybackStateChanged: {
+                let eventName = `$video_state`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                } while(0);
+
+                if(tScript)
+                    game.run([tScript.call(mediaPlayer, playbackState, mediaPlayer, videoOutput) ?? null, eventName]);
+            }
         }
 
         //渲染视频
@@ -5440,6 +5466,19 @@ Item {
             loops: Audio.Infinite
 
             onPlaybackStateChanged: {
+                let eventName = `$music_state`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                } while(0);
+
+                if(tScript)
+                    game.run([tScript.call(audioBackgroundMusic, playbackState, audioBackgroundMusic) ?? null, eventName]);
             }
         }
     }
@@ -6654,7 +6693,7 @@ Item {
             //0为停止；1为正常行走；2为定向移动；10为摇杆行走；-1为禁止操作
             property int $$nActionType: 0
 
-            property var $$arrMoveDirection: []   //移动方向的速率（横方向、竖方向的2各数组，-1~1）
+            property var $$arrMoveDirection: [0, 0]   //移动方向的速率（横方向、竖方向的2各数组，-1~1）
             //property int stopDirection: moveDirection === -1 ? stopDirection : moveDirection    //停止方向
 
             //目标坐标
@@ -6696,19 +6735,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_started`;
+                    eventName = `$hero_${$data.$id}_action_start`;
                 else
-                    eventName = `$role_${$data.$id}_action_started`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_started'];
+                    eventName = `$role_${$data.$id}_action_start`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_start']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, '$action_started:' + $data.$id]);
+                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
             }
 
             sprite.onS_refreshed: {
@@ -6716,19 +6759,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_refreshed`;
+                    eventName = `$hero_${$data.$id}_action_refresh`;
                 else
-                    eventName = `$role_${$data.$id}_action_refreshed`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_refreshed'];
+                    eventName = `$role_${$data.$id}_action_refresh`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_refresh']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, '$action_refreshed:' + $data.$id]);
+                    game.run([tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, eventName]);
             }
 
             sprite.onS_looped: {
@@ -6736,19 +6783,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_looped`;
+                    eventName = `$hero_${$data.$id}_action_loop`;
                 else
-                    eventName = `$role_${$data.$id}_action_looped`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_looped'];
+                    eventName = `$role_${$data.$id}_action_loop`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_loop']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, '$action_looped:' + $data.$id]);
+                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
             }
 
             sprite.onS_finished: {
@@ -6756,19 +6807,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_finished`;
+                    eventName = `$hero_${$data.$id}_action_finish`;
                 else
-                    eventName = `$role_${$data.$id}_action_finished`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_finished'];
+                    eventName = `$role_${$data.$id}_action_finish`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_finish']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, '$action_finished:' + $data.$id]);
+                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
             }
 
             sprite.onS_paused: {
@@ -6776,19 +6831,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_paused`;
+                    eventName = `$hero_${$data.$id}_action_pause`;
                 else
-                    eventName = `$role_${$data.$id}_action_paused`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_paused'];
+                    eventName = `$role_${$data.$id}_action_pause`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_pause']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, '$action_paused:' + $data.$id]);
+                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
             }
 
             sprite.onS_stoped: {
@@ -6796,19 +6855,23 @@ Item {
                     return;
                 let eventName;
                 if($$type === 1)
-                    eventName = `$hero_${$data.$id}_action_stoped`;
+                    eventName = `$hero_${$data.$id}_action_stop`;
                 else
-                    eventName = `$role_${$data.$id}_action_stoped`;
-                let tScript = itemViewPort.mapScript[eventName];
-                if(!tScript)
-                    tScript = game.f[eventName];
-                if(!tScript)
-                    tScript = game.gf[eventName];
-                if(!tScript && $script)
-                    tScript = $script['$action_stoped'];
+                    eventName = `$role_${$data.$id}_action_stop`;
+                let tScript;
+                do {
+                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    if(tScript = game.f[eventName])
+                        break;
+                    if(tScript = game.gf[eventName])
+                        break;
+                    if($script && (tScript = $script['$action_stop']))
+                        break;
+                } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, '$action_stoped:' + $data.$id]);
+                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
             }
 
 
@@ -6837,6 +6900,8 @@ Item {
             onStopped: {
             }
             onPaused: {
+            }
+            onPlaybackStateChanged: {
             }
         }
     }

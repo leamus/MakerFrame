@@ -41,17 +41,16 @@ Item {
     }
 
     //开始播放动画（和方向有关）
-    //running为 boolean 为是否运行，为其他值保持不变
-    function start(taction, loops) {
+    function start(taction, loops=AnimatedSprite.Infinite) {
         //if(root.sprite === undefined)
         //    return;
         //root.changeAction(d);
 
-        taction = taction ?? '$Down';
-
         let tstrActionName = strActionName;
 
-        if(!root.changeAction(taction)) {
+        //taction = taction ?? '$Down';
+
+        if(taction !== undefined && !root.changeAction(taction)) {
             spriteEffect.stop();
             return;
         }
