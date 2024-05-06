@@ -105,15 +105,15 @@ Item {
 
 
 
+    //配置
     QtObject {
-        id: _private
-
+        id: _config
     }
 
 
-    //配置
     QtObject {
-        id: config
+        id: _private
+
     }
 
 
@@ -136,6 +136,7 @@ Item {
     Keys.onPressed: {
         console.debug("[mainAgreement]key:", event, event.key, event.text)
     }
+
 
 
     Component.onCompleted: {
@@ -184,5 +185,10 @@ Item {
 
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
+
+        console.debug("[mainAgreement]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainAgreement]Component.onDestruction");
     }
 }

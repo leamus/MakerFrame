@@ -1286,12 +1286,14 @@ Item {
 
 
             l_listParam.visible = false;
+
             //root.focus = true;
             root.forceActiveFocus();
         }
 
         onCanceled: {
             l_listParam.visible = false;
+
             //root.focus = true;
             root.forceActiveFocus();
         }
@@ -1349,6 +1351,7 @@ Item {
 
         onCanceled: {
             l_listCommands.visible = false;
+
             //root.focus = true;
             root.forceActiveFocus();
         }

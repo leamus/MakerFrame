@@ -257,14 +257,15 @@ Rectangle {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
+
     QtObject {
         id: _private
 
-    }
-
-    //配置
-    QtObject {
-        id: config
     }
 
 }

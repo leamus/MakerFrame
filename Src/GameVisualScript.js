@@ -113,7 +113,7 @@ let data = (function() {
                                     ],
                                 },
                                 '移动主角': {
-                                    command: ['移动主角', 'game.movehero(%1,%2);', '移动主角', 0, true, 'red', 'white'],
+                                    command: ['移动主角', 'game.hero(0, {$bx: %1, $by: %2,});', '移动主角', 0, true, 'red', 'white'],
                                     params: [
                                         ['*地图块x', 'number', true, 0, '0', 'green'],
                                         ['*地图块y', 'number', true, 0, '0', 'green'],
@@ -130,7 +130,7 @@ let data = (function() {
                                     ],
                                 },
                                 '移动NPC': {
-                                    command: ['移动NPC', 'game.moverole(%1,%2,%3);', '', 0, true, 'red', 'white'],
+                                    command: ['移动NPC', 'game.role(%1, {$bx: %2, $by: %3,});', '', 0, true, 'red', 'white'],
                                     params: [
                                         ['*NPC名', 'string', true, 0, '', 'green'],
                                         ['地图块x', 'number', undefined, 0, '', 'blue'],
@@ -239,10 +239,20 @@ let data = (function() {
                                     ],
                                 },
 
-                                '挂载特效': {
-                                    command: ['挂载特效', 'Qt.createQmlObject(\'import QtQuick 2.14;PropertyAnimation {property: "opacity";from: 0; to: 1; duration: 1000; running: true; target: %1}; onStopped: this.destroy();\', %1);', '挂载特效', 0, true, 'red', 'white'],
+                                '挂载动画': {
+                                    command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14;PropertyAnimation {property: "%2";from: %3; to: %4; duration: %5; running: true; targets: %1; easing {type: %6; period: %7; amplitude:%8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
                                     params: [
-                                        ['*父组件', 'string', true, 0, '', 'green'],
+                                        ['*父组件', 'name', true, 0, '', 'green'],
+                                        ['*@动画属性', 'unformatted', true, 2, [['x', 'y', '宽', '高', '透明度', '缩放', '角度', '颜色',], ['x', 'y', 'width', 'height', 'opacity', 'scale', 'rotation', 'color',], ''], ''],
+                                        ['*开始值', 'unformatted', true, 0, '', 'green'],
+                                        ['*结束值', 'unformatted', true, 0, '', 'green'],
+                                        ['*总时长', 'number', true, 0, '', 'green'],
+                                        ['easing.type', 'unformatted', 'easing.type', 0, '', 'green'],
+                                        ['easing.period', 'unformatted', 'easing.period', 0, '', 'green'],
+                                        ['easing.amplitude', 'unformatted', 'easing.amplitude', 0, '', 'green'],
+                                        ['easing.overshoot', 'unformatted', 'easing.overshoot', 0, '', 'green'],
+                                        ['easing.bezierCurve', 'json', '[]', 0, '[]', 'green'],
+                                        ['其他参数', 'code', '', 0, '', 'green'],
                                     ],
                                 },
 
@@ -656,7 +666,7 @@ let data = (function() {
         ['交互', '#FF7DF3AA', ['信息', '多行普通信息', '菜单', '输入文本', '对话', '说话', ]],
         ['地图角色', 'yellowgreen', ['创建主角', '移动主角', '主角信息', '修改主角', '删除主角', '创建NPC', '移动NPC', 'NPC信息', '修改NPC', '删除NPC', ]],
         ['战斗相关', 'yellow', ['创建战斗主角', '删除战斗主角', '战斗主角信息', '获得技能', '移除技能', '技能信息', '修改战斗角色属性', '升级', '进入战斗', '开启随机战斗', '关闭随机战斗', ]],
-        ['媒体播放', '#FFFA98DA', ['播放音乐', '停止音乐', '暂停音乐', '继续播放音乐', '播放视频', '停止视频', '显示图片', '删除图片', '显示特效', '删除特效', ]],
+        ['媒体播放', '#FFFA98DA', ['播放音乐', '停止音乐', '暂停音乐', '继续播放音乐', '播放视频', '停止视频', '显示图片', '删除图片', '显示特效', '删除特效', '挂载动画', ]],
         ['道具装备', 'lightgreen', ['获得金钱', '获得道具', '移除道具', '道具信息', '使用道具', '装备道具', '卸下装备', '交易', ]],
         ['定时器', 'wheat', ['添加地图定时器', '删除地图定时器', '添加全局定时器', '删除全局定时器']],
         ['运算', 'lightpink', ['运算', '判断', '与或非', '运算符', '随机数']],

@@ -121,8 +121,10 @@ Item {
         imageAnimate.rXOffset = root.rXOffset;    // + parseInt(tx);
         imageAnimate.rYOffset = root.rYOffset;      // + parseInt(ty);
 
-        if(fnRefresh)
+        if(GlobalLibraryJS.isFunction(fnRefresh))
             fnRefresh(root.nCurrentFrame + root.nFrameStartIndex, imageAnimate, strSource);
+        else if(GlobalLibraryJS.isGenerator(genRefresh))
+            genRefresh.next(root.nCurrentFrame + root.nFrameStartIndex);
     }
 
     function reset() {
@@ -155,6 +157,15 @@ Item {
         root.stop();
 
         //currentFrame = 0;   //初始载入时 帧号为0（因为如果设置finishBehavior为FinishAtFinalFrame，则帧是最后一帧）
+
+
+        if(strSource === '')
+            return;
+
+        if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
+            fnRefresh = fnRefresh(imageAnimate, strSource);
+        else
+            genRefresh = null;
     }
 
     property int nFrameCount: 3 //一个方向有几张图片
@@ -203,6 +214,14 @@ Item {
     */
     //外部读取的刷新函数
     property var fnRefresh
+    onFnRefreshChanged: {
+        if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
+            fnRefresh = fnRefresh(imageAnimate, strSource);
+        else
+            genRefresh = null;
+    }
+    //如果 fnRefresh 是生成器，则这是生成器对象
+    property var genRefresh
 
 
     property alias mouseArea: mouseArea

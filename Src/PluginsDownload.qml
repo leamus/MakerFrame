@@ -139,6 +139,12 @@ Item {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
+
     QtObject {
         id: _private
         property var jsEngine: new GlobalJS.JSEngine(root)
@@ -281,12 +287,6 @@ Item {
     }
 
 
-    //配置
-    QtObject {
-        id: config
-    }
-
-
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
@@ -312,5 +312,11 @@ Item {
 
     Component.onCompleted: {
         _private.refresh();
+
+        console.debug("[PluginsDownload]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[PluginsDownload]Component.onDestruction");
     }
 }

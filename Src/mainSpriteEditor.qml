@@ -62,11 +62,12 @@ Item {
 
 
         onCanceled: {
+            //visible = false;
             //loader.visible = true;
             //root.focus = true;
             //root.forceActiveFocus();
             //loader.item.focus = true;
-            //visible = false;
+
             s_close();
         }
 
@@ -79,20 +80,20 @@ Item {
             //    return;
             //}
 
+
+            //visible = false;
             loader.visible = true;
             loader.focus = true;
 
             loader.item.forceActiveFocus();
             //loader.item.focus = true;
 
+
             if(index === 0) {
                 loader.item.newSprite();
 
                 return;
             }
-
-
-            //visible = false;
 
 
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json";
@@ -142,7 +143,7 @@ Item {
 
 
         source: "./SpriteEditor.qml"
-        asynchronous: false
+        asynchronous: true
 
 
         onLoaded: {
@@ -163,7 +164,7 @@ Item {
 
                 loader.visible = false;
                 //root.focus = true;
-                l_listSprite.forceActiveFocus();
+                //l_listSprite.forceActiveFocus();
             }
         }
     }

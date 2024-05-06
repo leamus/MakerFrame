@@ -3078,8 +3078,9 @@ Item {
         id: hotLoader
 
 
-        property string textMapName
-        property string textRoleName
+        property string strMapName
+        property string strRoleName
+        property var arrPosition
 
         visible: false
         anchors.fill: parent
@@ -3087,7 +3088,7 @@ Item {
         color: 'transparent'
 
         pinchHandler {
-            target: mask    //连同按钮一起缩放
+            target: mask    //连同按钮一起缩放，否则只缩放界面
             ////pinch.dragAxis: Pinch.XAndYAxis
             //禁止旋转
             maximumRotation: 0
@@ -3101,18 +3102,19 @@ Item {
         }
 
         onS_release: function(qmlObject) {
-            hotLoader.textMapName = qmlObject.textMapName;
-            hotLoader.textRoleName = qmlObject.textRoleName;
+            hotLoader.strMapName = qmlObject.textMapName;
+            hotLoader.strRoleName = qmlObject.textRoleName;
+            arrPosition = [qmlObject.textMapBlockX, qmlObject.textMapBlockY];
 
             root.forceActiveFocus();
         }
 
-        onS_reloaded: function(code) {
+        onS_reloaded: function(code, data) {
             if(code === 1) {
-                qmlObject.init({Map: _private.strMapName});
+                qmlObject.init({Map: _private.strMapName, Role: strRoleName, Position: arrPosition});
             }
             else if(code === 2) {
-                qmlObject.init({Map: _private.strMapName, Role: textRoleName});
+                qmlObject.init({Map: strMapName, Role: strRoleName, Position: arrPosition});
                 qmlObject.start();
             }
             else {
@@ -3642,6 +3644,7 @@ Item {
         //!!!导入图块图片
         //imageMapBlock1.source = "./1.png";
         //newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
+
         console.debug("[MapEditor]Component.onCompleted");
     }
 

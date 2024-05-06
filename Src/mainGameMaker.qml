@@ -136,6 +136,7 @@ Item {
                         rootGameMaker.forceActiveFocus();
                     };
                     dialogCommon.open();
+                    textinputDialogCommonInput.forceActiveFocus();
                 }
             }
 
@@ -153,7 +154,7 @@ Item {
                     l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, "*", 0x001 | 0x2000, 0x00);
                     l_listProjects.visible = true;
                     //l_listProjects.focus = true;
-                    l_listProjects.forceActiveFocus();
+                    //l_listProjects.forceActiveFocus();
                 }
             }
 
@@ -185,6 +186,7 @@ Item {
                         rootGameMaker.forceActiveFocus();
                     };
                     dialogCommon.open();
+                    textinputDialogCommonInput.forceActiveFocus();
                 }
             }
         }
@@ -659,37 +661,34 @@ Item {
                                     },
                                 });
 
+                                showBusyIndicator(true);
 
                                 GlobalLibraryJS.setTimeout(function() {
+                                    FrameManager.sl_qml_RemoveRecursively(outputDir);
 
-                                    showBusyIndicator(true, function() {
-                                        FrameManager.sl_qml_RemoveRecursively(outputDir);
-
-                                        let ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[0], outputDir);
-                                        ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[1], outputDir);
-                                        ret = FrameManager.sl_qml_CopyFolder(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, outputDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
+                                    let ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[0], outputDir);
+                                    ret = FrameManager.sl_qml_ExtractDir(path + GameMakerGlobal.separator + jsFiles[1], outputDir);
+                                    ret = FrameManager.sl_qml_CopyFolder(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, outputDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
 
 
-                                        showBusyIndicator(false);
+                                    showBusyIndicator(false);
 
-                                        dialogCommon.close();
+                                    dialogCommon.close();
 
-                                        dialogCommon.show({
-                                            Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
-                                            Buttons: Dialog.Yes,
-                                            OnAccepted: function() {
-                                                rootGameMaker.forceActiveFocus();
-                                            },
-                                            OnRejected: ()=>{
-                                                rootGameMaker.forceActiveFocus();
-                                            },
-                                        });
+                                    dialogCommon.show({
+                                        Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            rootGameMaker.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            rootGameMaker.forceActiveFocus();
+                                        },
                                     });
-
                                 },100,rootGameMaker);
 
 
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.forceActiveFocus();
                             },
                             OnRejected: ()=>{
                                 rootGameMaker.forceActiveFocus();
@@ -1118,11 +1117,11 @@ Item {
 
 
         onCanceled: {
+            visible = false;
             //loader.visible = true;
             //rootGameMaker.focus = true;
             rootGameMaker.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
         }
 
         onClicked: {
@@ -1131,17 +1130,17 @@ Item {
                 return;
             }
 
+
             _private.loadModule("");
             _private.changeProject(item);
 
 
+            visible = false;
             //loader.visible = true;
             //loader.focus = true;
             //loader.item.focus = true;
             //rootGameMaker.focus = true;
             rootGameMaker.forceActiveFocus();
-            visible = false;
-
         }
 
         onRemoveClicked: {
@@ -1264,14 +1263,33 @@ Item {
 
 
         source: ""
-        asynchronous: false
+        asynchronous: true
 
+
+        onStatusChanged: {
+            console.debug('[mainGameMaker]loader.status：', status);
+
+            if (status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+        }
 
         onLoaded: {
-            if(loader.item.init)
-                loader.item.init();
-            //item.testFresh();
             console.debug("[mainGameMaker]loader onLoaded");
+            //item.testFresh();
+
+            try {
+                if(loader.item.init)
+                    loader.item.init();
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
+            }
         }
 
         Connections {
@@ -1677,6 +1695,12 @@ Item {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
+
     QtObject {
         id: _private
 
@@ -1687,6 +1711,8 @@ Item {
             loader.forceActiveFocus();
 
             loader.setSource(modulePath);
+            if(loader.status === Loader.Loading)
+                showBusyIndicator(true);
 
             /*if(loader.status === Loader.Ready) {
                 if(loader.item.init)
@@ -1769,12 +1795,6 @@ Item {
     }
 
 
-    //配置
-    QtObject {
-        id: config
-    }
-
-
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
@@ -1797,6 +1817,7 @@ Item {
     Keys.onReleased: {
         console.debug("[mainGameMaker]Keys.onReleased:", event.key)
     }
+
 
 
     Component.onCompleted: {

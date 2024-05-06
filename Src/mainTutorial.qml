@@ -331,6 +331,12 @@ Item {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
+
     QtObject {
         id: _private
 
@@ -339,11 +345,6 @@ Item {
             loader.visible = true;
             loader.forceActiveFocus();
         }
-    }
-
-    //配置
-    QtObject {
-        id: config
     }
 
 
@@ -370,5 +371,9 @@ Item {
 
 
     Component.onCompleted: {
+        console.debug("[mainTutorial]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainTutorial]Component.onDestruction");
     }
 }

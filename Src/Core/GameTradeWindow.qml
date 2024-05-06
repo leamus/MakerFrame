@@ -54,27 +54,34 @@ Item {
             let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: (g.$count >= 0 ? true : false)}));
             if(g.$price) {
                 if(GlobalLibraryJS.isNumber(g.$price))
-                    g.$price = [g.$price, parseInt(g.$price / 2)];
+                    g.$price = [g.$price, parseInt(g.$price / 2)];  //默认5折卖
                 arrShowSaleGoods.push(tgoodsName + ' ￥' + g.$price[0]);
             }
             else
                 arrShowSaleGoods.push(tgoodsName);
         }
-
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
 
 
         let arrShowMyGoods = [];  //显示的名称
         let arrMyGoods = [];    //道具名
         for(let g of game.gd["$sys_goods"]) {
-            //let goodsInfo = _private.goodsResource[g.$rid];
-            let price = '?';
-            if(g.$price && g.$price[1] !== undefined && (mygoodsinclude === true || mygoodsinclude.indexOf(g.$rid) >= 0))
-                price = g.$price[1];
+            if(mygoodsinclude === true ||
+                    (GlobalLibraryJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
 
-            let tgoods = game.$sys.getGoodsObject(g, false);
-            arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: true})) + ' ￥' + price);
-            arrMyGoods.push(g);
+                //let goodsInfo = _private.goodsResource[g.$rid];
+                let price = '?';
+                if(g.$price) {
+                    if(GlobalLibraryJS.isNumber(g.$price))
+                        price = parseInt(g.$price / 2);  //默认5折卖
+                    else if(GlobalLibraryJS.isArray(g.$price))
+                        price = g.$price[1];
+                }
+
+                let tgoods = game.$sys.getGoodsObject(g, false);
+                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: true})) + ' ￥' + price);
+                arrMyGoods.push(g);
+            }
         }
         gamemenuMyGoods.show(arrShowMyGoods, arrMyGoods);
     }

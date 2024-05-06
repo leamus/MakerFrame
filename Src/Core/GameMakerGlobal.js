@@ -1698,6 +1698,7 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 }
 
 //战斗结束通用脚本；
+//r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
 function *$commonFightEndScript(r, teams, fightData) {
     //这里的r，可能会被 战斗脚本修改
     //r中包含：result（战斗结果）、money和exp
@@ -1769,6 +1770,10 @@ function *$commonFightEndScript(r, teams, fightData) {
 
 
 
+    fight.over();
+
+
+
     //战斗结束脚本2
     if(fightEndScript)
         game.run([fightEndScript, 'fight end21'], -1, r, 1, teams, fightData);
@@ -1779,9 +1784,7 @@ function *$commonFightEndScript(r, teams, fightData) {
         game.run([fightData.FightEndScript, 'fight end31'], -1, r, 1, teams, fightData);
 
 
-
-    fight.run(function() {
-        fight.over();
+    game.run(function() {
 
         if(r.result === -1)
             game.gameover(-1);
@@ -1805,7 +1808,7 @@ function *$commonFightEndScript(r, teams, fightData) {
 //获取 某战斗角色 中心位置
 //teamID、index是战斗角色的；
 function $fightCombatantPositionAlgorithm(teamID, index) {
-    //let teamID = combatant.$$fightData.$info.$teamID[0];
+    //let teamID = combatant.$$fightData.$info.$teamsID[0];
     //let index = combatant.$$fightData.$info.$index;
 
     //cols表示有几列（战场分布）；

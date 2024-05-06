@@ -324,7 +324,7 @@ Item {
 
 
     //设置角色坐标（块坐标）
-    function setRolePos(role, bx, by) {
+    function setRolePos(bx, by, role) {
 
         let targetX;
         let targetY;
@@ -356,7 +356,7 @@ Item {
         if(mainRole === undefined)
             return false;
 
-        setRolePos(mainRole, bx, by);
+        setRolePos(bx, by, mainRole);
         //setSceneToRole(_private.sceneRole);
         if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
@@ -393,7 +393,7 @@ Item {
     //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
-        //载入地图并执行地图载入事件；成功返回 地图信息。
+        //载入地图并执行地图载入事件；成功返回 地图信息数据。
         //userData是用户传入数据，后期调用的钩子函数会传入；
         //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
         readonly property var loadmap: function(mapRID, userData, forceRepaint=false) {
@@ -470,15 +470,18 @@ Item {
 
         //在屏幕中间显示提示信息。
         //interval为文字显示间隔，为0则不使用；
-        //pretext为已显示的文字；
+        //pretext为预显示的文字；
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
         //style为样式；
-        //  （如果为数字，则表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
+        //  如果为数字，则含义为Type，表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
         //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
-        //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
+        //    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
         //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
         //callback是结束时回调函数，默认为true（系统自动处理）；
+        //  如果是普通函数且返回不为true，则仍然调用系统定义的回调函数；
+        //  如果是生成器（函数），则先调用系统定义的回调函数，再将生成器（函数）放入事件队列中运行；
         //buttonNum为按钮数量（0-2，目前没用）。
+        //返回组件对象；
         readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true/*, buttonNum=0*/, callback=true) {
 
             let itemGameMsg = compGameMsg.createObject(itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
@@ -510,14 +513,15 @@ Item {
             return itemGameMsg;
         }
 
-        //在屏幕下方显示信息。
+        //在屏幕下方显示对话信息。
         //interval为文字显示间隔，为0则不使用；
-        //pretext为已显示的文字（role为空的情况下）；
+        //pretext为预显示的文字；
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
-        //style为样式；
-        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
-        //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
+        //style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
+        //  分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
+        //pauseGame同msg的参数；
+        //callback同msg的参数；
+        //返回组件对象；
         readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true) {
 
             if(role !== true)
@@ -527,13 +531,14 @@ Item {
             return itemRootRoleMsg;
         }
 
-        //人物头顶显示信息。
+        //角色头顶显示文字信息。
         //interval为文字显示间隔，为0则不使用；
-        //pretext为已显示的文字（role为空的情况下）；
+        //pretext为预显示的文字；
         //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
         //style为样式；
-        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor）；
-        //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
+        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor）；
+        //      分别表示 背景色、边框色、字体颜色、字体大小；
+        //返回角色组件对象；
         readonly property var say: function(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
             if(!role)
                 return false;
@@ -574,10 +579,11 @@ Item {
         //显示一个菜单；
         //title为显示文字；
         //items为选项数组；
-        //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
-        //返回值为选择的下标（0开始）；
-        //注意：该脚本必须用yield才能暂停并接受返回值。
+        //style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
+        //pauseGame同msg的参数；
+        //callback同msg的参数；
+        //返回组件对象；
+        //注意：该脚本必须用yield才能暂停并接受返回值；返回值为选择的下标（0开始）。
         readonly property var menu: function(title='', items=[], style={}, pauseGame=true, callback=true) {
 
             let itemMenu = compGameMenu.createObject(itemGameMenus, {nIndex: itemGameMenus.nIndex});
@@ -600,9 +606,10 @@ Item {
         //title为显示文字；
         //pretext为预设文字；
         //style为自定义样式；
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
-        //返回值为输入值；
-        //注意：该脚本必须用yield才能暂停并接受返回值。
+        //pauseGame同msg的参数；
+        //callback同msg的参数；
+        //返回组件对象；
+        //注意：该脚本必须用yield才能暂停并接受返回值；返回值为输入值。
         readonly property var input: function(title='', pretext='', style={}, pauseGame=true, callback=true) {
 
             if(title !== true)
@@ -726,8 +733,8 @@ Item {
             return roleComp;
         }
 
-        //返回 主角；
-        //hero可以是下标，或主角的$id，或主角对象，-1表示返回所有主角；
+        //返回/修改 主角对象；
+        //hero可以是下标，或字符串（主角的$id），或主角对象，-1表示返回所有主角；
         //props：非返回所有主角时，为修改的 单个主角属性，同 createhero 的第二个参数；
         //返回经过props修改的 主角 或 所有主角的列表；如果没有则返回null；
         readonly property var hero: function(hero=-1, props={}) {
@@ -1002,7 +1009,7 @@ Item {
             return true;
         }
 
-        //将主角移动到地图 x、y 位置。
+        //将主角移动到地图 bx、by 位置。
         readonly property var movehero: setMainRolePos
 
         /*readonly property var movehero: function(bx, by, index=0) {
@@ -1012,7 +1019,7 @@ Item {
 
             let role = _private.arrMainRoles[index];
 
-            setRolePos(role, bx, by);
+            setRolePos(bx, by, role);
 
             return true;
         }*/
@@ -1092,9 +1099,9 @@ Item {
 
         }
 
-        //返回 角色；
-        //role可以是下标，或角色的$id，或角色对象，-1表示返回所有角色；
-        //props：非返回所有角色时，为修改的 单个角色属性，同 createhero 的第二个参数；
+        //返回/修改 角色对象；
+        //role可以是下标，或字符串（角色的$id），或角色对象，-1表示返回所有角色；
+        //props：非返回所有角色时，为修改的 单个角色属性，同 createrole 的第二个参数；
         //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
         readonly property var role: function(role=-1, props={}) {
             if(role === -1/* || role === undefined || role === null*/)
@@ -1205,8 +1212,8 @@ Item {
                     if(roleComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
                 if(props.$bx !== undefined || props.$by !== undefined)
-                    setRolePos(roleComp, props.$bx, props.$by);
-                    //moverole(roleComp, bx, by);
+                    setRolePos(props.$bx, props.$by, roleComp);
+                    //moverole(bx, by, roleComp);
 
 
                 if(props.$direction !== undefined)
@@ -1261,7 +1268,7 @@ Item {
         }
 
         //移动角色到bx，by。
-        readonly property var moverole: function(role, bx, by) {
+        readonly property var moverole: function(bx, by, role) {
 
             if(GlobalLibraryJS.isString(role)) {
                 role = _private.objRoles[role];
@@ -1270,7 +1277,7 @@ Item {
             }
 
 
-            setRolePos(role, bx, by);
+            setRolePos(bx, by, role);
 
             /*
             if(bx !== undefined && by !== undefined) {
@@ -1360,10 +1367,11 @@ Item {
 
 
 
-        //角色的影子中心所在的各种坐标；
-        //role为角色组件（可用heros和roles命令返回的组件）；
+        //角色的各种坐标；
+        //参数role为角色组件（可用hero和role命令返回的组件）；
         //  如果为数字或空，则是主角；如果是字符串，则在主角和NPC中查找；
         //pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
+        //  如果返回是坐标，则包括x、y（实际坐标）、bx、by（地图块坐标）、cx、cy（中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；
         readonly property var rolepos: function(role, pos=null) {
             if(GlobalLibraryJS.isValidNumber(role)) {
                 role = mainRole;
@@ -1560,7 +1568,7 @@ Item {
         //skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
         //skillIndex为替换到第几个（如果为-1或大于已有技能数，则追加）；
         //copyedNewProps是 从skills复制的创建的新技能的属性（skills为技能对象才有效，复制一个新技能同时再复制copyedNewProps属性）；
-        //成功返回true。
+        //成功返回true；
         readonly property var getskill: function(fighthero, skill, skillIndex=-1, copyedNewProps={}) {
             if(skillIndex === undefined || skillIndex === null)
                 skillIndex = -1;
@@ -1595,7 +1603,7 @@ Item {
         //fighthero为下标，或战斗角色的name，或战斗角色对象；
         //skill：技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；
         //filters：技能条件筛选；
-        //成功返回skill对象的数组；失败返回false。
+        //成功返回skill对象的数组；失败返回false；
         readonly property var removeskill: function(fighthero, skill=-1, filters={}) {
             if(skill === undefined || skill === null)
                 skill = -1;
@@ -1672,7 +1680,7 @@ Item {
         //fighthero为下标，或战斗角色的name，或战斗角色对象；
         //skill：技能下标（-1为所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；
         //filters：技能条件筛选；
-        //成功返回 技能数组。
+        //成功返回 技能数组；
         readonly property var skill: function(fighthero, skill=-1, filters={}) {
             if(skill === undefined || skill === null)
                 skill = -1;
@@ -1760,8 +1768,9 @@ Item {
         //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
         //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
         //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties，1为propertiesWithExtra）；
+        //  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
         //  成功返回战斗角色对象；失败返回false；
-        readonly property var addprops: function(fighthero, props={}, type=[1,1], checkLevelUp=true) {
+        readonly property var addprops: function(fighthero, props={}, type=[1,1], flags=0b11) {
 
             if(fighthero < 0)
                 return false;
@@ -1772,7 +1781,8 @@ Item {
                 return false;
 
 
-            //if(refresh)
+            //先刷新一次（主要是$$propertiesWithExtra）
+            if(flags & 0b1)
                 _private.objCommonScripts['refresh_combatant'](fighthero, false);
 
             //参考属性（乘以比例时的参考属性）
@@ -1791,7 +1801,6 @@ Item {
 
             GameMakerGlobalJS.addProps(fighthero.$properties, props, type, properties2);
 
-
             /*if(fighthero.$properties.healthHP > fighthero.$$propertiesWithExtra.HP)
                 fighthero.$properties.healthHP = fighthero.$$propertiesWithExtra.HP;
             if(fighthero.$properties.healthHP < 0)
@@ -1806,8 +1815,10 @@ Item {
                     fighthero.$properties.remainMP = fighthero.$$propertiesWithExtra.MP;
             */
 
-            //if(refresh)
-                _private.objCommonScripts['refresh_combatant'](fighthero, checkLevelUp);
+            //再刷新一次
+            if(flags & 0b1)
+                _private.objCommonScripts['refresh_combatant'](fighthero, !!(flags & 0b10));
+
 
             return fighthero;
         }
@@ -1903,8 +1914,9 @@ Item {
 
         //背包内 减去count个道具，返回背包中 改变后 道具个数；
         //goods可以为 道具资源名、道具对象 和 下标；
+        //count为个数，如果为true则表示道具的所有；
         //如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
-        //返回 false 表示错误。
+        //返回 false 表示错误；
         readonly property var removegoods: function(goods, count=1) {
             if(!GlobalLibraryJS.isValidNumber(count) || count < 0)   //如果直接是数字
                 return false;
@@ -2000,7 +2012,7 @@ Item {
         //goods为-1表示返回所有道具的数组（此时filters是道具属性的过滤条件）；
         //goods为数字（下标），则返回单个道具信息的数组；
         //goods为字符串（道具资源名），返回所有符合道具信息的数组（此时filters是道具属性的过滤条件）；
-        //返回格式：道具数组。
+        //返回格式：道具数组；
         readonly property var goods: function(goods=-1, filters={}) {
             if(GlobalLibraryJS.isObject(goods)) {
                 for(let tg of game.gd['$sys_goods']) {
@@ -2056,7 +2068,7 @@ Item {
 
         //使用道具（会执行道具use脚本）；
         //fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；
-        //goods可以为 道具资源名、道具对象 和 下标。
+        //goods可以为 道具资源名、道具对象 和 下标；
         readonly property var usegoods: function(fighthero, goods) {
             let goodsInfo = null;
             if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
@@ -2124,7 +2136,7 @@ Item {
         //newPosition：如果为空，则使用 goods 的 position 属性来装备；
         //copyedNewProps是 从goods复制的创建的新道具的属性（goods为道具对象才有效，复制一个新道具同时再复制（覆盖）copyedNewProps属性，比如$count、$position）；
         //返回null表示错误；
-        //注意：会将目标装备移除，需要保存则先unload到getgoods。
+        //注意：会将目标装备移除，需要保存则先unload到getgoods；
         readonly property var equip: function(fighthero, goods, newPosition=undefined, copyedNewProps={$count: 1}) {
 
             if(fighthero < 0)
@@ -2267,7 +2279,7 @@ Item {
         //goods为买的物品rid列表；
         //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
         //callback为交易结束后的脚本。
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
+        //pauseGame同msg的参数；
         readonly property var trade: function(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
             if(goods !== true)
@@ -2303,9 +2315,9 @@ Item {
         }
 
 
-        //加入定时器；
+        //创建定时器；
         //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；params为自定义参数（回调时传入）；
-        //成功返回true。
+        //成功返回true；
         readonly property var addtimer: function(timerName, interval, times=1, bGlobal=false, params=null) {
             let objTimer;
             if(bGlobal)
@@ -2322,7 +2334,7 @@ Item {
             return true;
         }
 
-        //删除定时器。
+        //删除定时器；
         readonly property var deltimer: function(timerName, bGlobal=false) {
             let objTimer;
             if(bGlobal)
@@ -2335,12 +2347,27 @@ Item {
 
 
         //播放音乐；
-        //music为音乐名；
-        //params为参数；
-        //  $loops为循环次数，空或0表示无限循环；
-        //成功返回true。
-        readonly property var playmusic: function(music, params={}) {
-            let fileURL = GameMakerGlobal.musicResourceURL(music);
+        //musicParams是音乐名或对象（包含RID）；为空表示开始播放之前停止的；
+        //  musicParams为对象包含两个属性：
+        //    $loops为循环次数，空或0表示无限循环；
+        //    $callback为状态回调函数；
+        //成功返回true；
+        readonly property var playmusic: function(musicParams) {
+            if(GlobalLibraryJS.isString(musicParams)) {
+                musicParams = {RID: musicParams};
+            }
+            else if(GlobalLibraryJS.isObject(musicParams)) {
+
+            }
+            else {
+                itemBackgroundMusic.play();
+                return true;
+            }
+
+            musicParams.$rid = musicParams.RID ?? musicParams.RId;
+
+
+            let fileURL = GameMakerGlobal.musicResourceURL(musicParams.$rid);
             //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', video, fileURL)
             //    return false;
@@ -2349,14 +2376,12 @@ Item {
             //if(_private.objMusic[musicRID] === undefined)
             //    return false;
 
-            if(!params.$loops)
-                params.$loops = Audio.Infinite;
-
             audioBackgroundMusic.source = fileURL;
-            audioBackgroundMusic.loops = params.$loops;
+            audioBackgroundMusic.loops = musicParams.$loops || Audio.Infinite;
+            itemBackgroundMusic.fStateCallback = musicParams.$callback;
             itemBackgroundMusic.play();
 
-            game.gd['$sys_music'] = music;
+            game.gd['$sys_music'] = musicParams.$rid;
 
             //console.debug('~~~playmusic:', _private.objMusic[musicRID], GameMakerGlobal.musicResourceURL(_private.objMusic[musicRID]));
             //console.debug('~~~playmusic:', audioBackgroundMusic.source, audioBackgroundMusic.source.toString());
@@ -2364,26 +2389,28 @@ Item {
             return true;
         }
 
-        //停止音乐。
+        //停止音乐；
         readonly property var stopmusic: function() {
             itemBackgroundMusic.stop();
         }
 
-        //暂停音乐。
+        //暂停音乐；
+        //参数name为暂停名称；
         readonly property var pausemusic: function(name='$user') {
             itemBackgroundMusic.pause(name);
         }
 
-        //继续播放音乐。
+        //继续播放音乐；
+        //参数name为暂停名称；
         readonly property var resumemusic: function(name='$user') {
             itemBackgroundMusic.resume(name);
         }
-        //将音乐暂停并存栈。一般用在需要播放战斗音乐前。
+        //将音乐暂停并存栈；一般用在需要播放战斗音乐前；
         readonly property var pushmusic: function() {
             itemBackgroundMusic.arrMusicStack.push([game.gd['$sys_music'], audioBackgroundMusic.position]);
             itemBackgroundMusic.stop();
         }
-        //播放上一次存栈的音乐。一般用在战斗结束后（$commonFightEndScript已调用，不用写在战斗结束脚本中）。
+        //播放上一次存栈的音乐；一般用在战斗结束后（$commonFightEndScript已调用，不用写在战斗结束脚本中）；
         readonly property var popmusic: function() {
             if(itemBackgroundMusic.arrMusicStack.length === 0)
                 return;
@@ -2396,10 +2423,12 @@ Item {
             //else
             //    itemBackgroundMusic.stop();
         }
+        //跳到播放进度（毫秒）；
         readonly property var seekmusic: function(offset=0) {
             audioBackgroundMusic.seek(offset);
         }
 
+        //状态；
         readonly property var musicplaying: function() {
             return itemBackgroundMusic.isPlaying();
         }
@@ -2429,9 +2458,10 @@ Item {
 
 
         //播放视频；
-        //videoParams是视频名称或对象（包含RID）；videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
-        //  也可以 $x、$y、$width、$height。
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
+        //videoParams是视频名或对象（包含RID）；
+        //  videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
+        //  也可以修改 $x、$y、$width、$height。
+        //pauseGame同msg的参数；
         readonly property var playvideo: function(videoParams, pauseGame=true) {
             if(GlobalLibraryJS.isString(videoParams)) {
                 videoParams = {RID: videoParams};
@@ -2443,6 +2473,8 @@ Item {
                 return false;
 
             videoParams.$rid = videoParams.RID ?? videoParams.RId;
+
+            itemVideo.fStateCallback = videoParams.$callback;
 
 
             let fileURL = GameMakerGlobal.videoResourceURL(videoParams.$rid);
@@ -3540,10 +3572,10 @@ Item {
         //显示窗口；
         //params：
         //  $id：0b1为主菜单；0b10为战斗人物信息；0b100为道具信息；0b1000为系统菜单；
-        //  $value：战斗人物信息时为下标；
         //  $visible：为false表示关闭窗口；
+        //  $value：战斗人物信息（0b10）时为下标；
         //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
+        //pauseGame同msg的参数；
         readonly property var window: function(params=null, style={}, pauseGame=true, callback=true) {
             if(GlobalLibraryJS.isValidNumber(params))
                 params = {$id: params, $visible: true};
@@ -5298,6 +5330,7 @@ Item {
 
         property var pauseGame
         //property var fCallback
+        property var fStateCallback
 
 
         visible: false
@@ -5321,8 +5354,11 @@ Item {
                 let eventName = `$video_state`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    if(tScript = itemVideo.fStateCallback)
                         break;
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -5374,6 +5410,8 @@ Item {
         property var arrMusicStack: []  //播放音乐栈
 
         property var objMusicPause: ({})    //暂停类型
+
+        property var fStateCallback
 
 
         function isPlaying() {
@@ -5463,14 +5501,19 @@ Item {
 
         Audio {
             id: audioBackgroundMusic
+
             loops: Audio.Infinite
+
 
             onPlaybackStateChanged: {
                 let eventName = `$music_state`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    if(tScript = itemBackgroundMusic.fStateCallback)
                         break;
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                        break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6740,8 +6783,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_start`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6764,8 +6808,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_refresh`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6788,8 +6833,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_loop`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6812,8 +6858,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_finish`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6836,8 +6883,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_pause`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])
@@ -6860,8 +6908,9 @@ Item {
                     eventName = `$role_${$data.$id}_action_stop`;
                 let tScript;
                 do {
-                    if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                         break;
+                    */
                     if(tScript = game.f[eventName])
                         break;
                     if(tScript = game.gf[eventName])

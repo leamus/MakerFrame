@@ -125,8 +125,8 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
 
 //显示技能选择框
-//type：0为普通攻击；1为技能
-//value：直接使用第n个技能/道具，-1为最后一个，-2为随机
+//type：0为普通攻击；1为技能；
+//value：直接使用第n个技能/道具，-1为最后一个，-2为随机；其他类型的值为弹出选择框；
 function showSkillsOrGoods(type, value) {
 
     let arrNames = [];

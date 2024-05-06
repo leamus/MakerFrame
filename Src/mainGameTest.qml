@@ -39,6 +39,10 @@ Item {
             textMapName.text = cfg.Map;
         if(cfg && cfg.Role)
             textRoleName.text = cfg.Role;
+        if(cfg && cfg.Position) {
+            textMapBlockX.text = cfg.Position[0];
+            textMapBlockY.text = cfg.Position[1];
+        }
     }
     function start() {
         _private.start();
@@ -48,6 +52,8 @@ Item {
 
     property alias textMapName: textMapName.text
     property alias textRoleName: textRoleName.text
+    property alias textMapBlockX: textMapBlockX.text
+    property alias textMapBlockY: textMapBlockY.text
 
 
     //width: 600
@@ -166,6 +172,8 @@ Item {
         }
 
         Button {
+            id: buttonStart
+
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -228,8 +236,10 @@ Item {
 
 
 
+    //游戏场景
+    //关闭时会释放，这样如果有资源释放失败（GameScene的ReleaseResource）也没问题；
     Loader {
-        id: loader
+        id: loaderGameScene
 
         anchors.fill: parent
 
@@ -237,36 +247,79 @@ Item {
         focus: true
 
 
-        source: "./Core/GameScene.qml"
-        asynchronous: false
+        source: ''
+        asynchronous: true
 
 
 
         onStatusChanged: {
-            console.log('[mainGameTest]loader.status：', status);
+            console.log('[mainGameTest]loaderGameScene.status：', status);
 
-            if (status === Loader.Ready) {
+            if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                _private.gameSceneClose();
+
                 showBusyIndicator(false);
-                source = '';
             }
         }
 
         onLoaded: {
-            console.debug("[mainGameTest]Loader onLoaded");
+            console.debug("[mainGameTest]loaderGameScene onLoaded");
+
+
+            /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
+            //let cfg = File.read(filePath);
+            let cfg = FrameManager.sl_qml_ReadFile(filePath);
+            //console.debug("cfg", cfg, filePath);
+
+            if(!cfg)
+                return false;
+            cfg = JSON.parse(cfg);
+            //console.debug("cfg", cfg);
+            //loaderGameScene.setSource("./MapEditor_1.qml", {});
+            loaderGameScene.item.openMap(cfg);
+            */
+
+            loaderGameScene.visible = true;
+            loaderGameScene.focus = true;
+            //loaderGameScene.item.focus = true;
+            loaderGameScene.item.forceActiveFocus();
+
+
             //item.testFresh();
-            item.bTest = true;
+            loaderGameScene.item.bTest = true;
+            //loaderGameScene.item.openMap(item);
+            let tScript = function*() {
+                game.loadmap(textMapName.text);
+                game.createhero(textRoleName.text);
+                game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                game.interval(16);
+                game.goon();
+                yield game.msg('欢迎来到鹰歌Maker世界！');
+            }
+
+            try {
+                loaderGameScene.item.init(tScript, true);
+            }
+            catch(e) {
+                _private.gameSceneClose();
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
+            }
         }
 
 
 
         Connections {
-            target: loader.item
+            target: loaderGameScene.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
             function onS_close() {
-                loader.visible = false;
-                //root.focus = true;
-                root.forceActiveFocus();
+                _private.gameSceneClose();
             }
         }
     }
@@ -275,6 +328,8 @@ Item {
     L_List {
         id: l_listChoice
 
+
+        //要改变的控件
         property var choicedComponent
 
 
@@ -287,25 +342,33 @@ Item {
 
 
         onClicked: {
-            visible = false;
-
             if(item === "..") {
                 return;
             }
 
             choicedComponent.text = item;
+
+
+            visible = false;
+            root.forceActiveFocus();
         }
 
         onCanceled: {
+            visible = false;
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
         }
 
     }
 
+
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
 
     QtObject {
@@ -315,41 +378,26 @@ Item {
             if(textMapName.text === "" || textRoleName.text === "")
                 return;
 
-            /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
-            //let cfg = File.read(filePath);
-            let cfg = FrameManager.sl_qml_ReadFile(filePath);
-            //console.debug("cfg", cfg, filePath);
 
-            if(!cfg)
-                return false;
-            cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor_1.qml", {});
-            loader.item.openMap(cfg);
-            */
+            buttonStart.enabled = false;
 
-            loader.visible = true;
-            loader.focus = true;
-            loader.item.focus = true;
-
-
-            //loader.item.openMap(item);
-            let tScript = function*() {
-                game.loadmap(textMapName.text);
-                game.createhero(textRoleName.text);
-                game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
-                game.interval(16);
-                game.goon();
-                yield game.msg('欢迎来到鹰歌Maker世界！');
-            }
-            loader.item.init(tScript, true);
+            loaderGameScene.source = './Core/GameScene.qml';
+            if(loaderGameScene.status === Loader.Loading)
+                showBusyIndicator(true);
         }
-    }
 
 
-    //配置
-    QtObject {
-        id: config
+        function gameSceneClose() {
+            loaderGameScene.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+
+
+            loaderGameScene.source = '';
+
+
+            buttonStart.enabled = true;
+        }
     }
 
 
@@ -370,11 +418,19 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameTest]key:", event, event.key, event.text)
+        console.debug("[mainGameTest]Keys.onPressed:", event, event.key, event.text)
+    }
+    Keys.onReleased: {
+        console.debug('[mainGameTest]Keys.onReleased:', event, event.key, event.text);
     }
 
 
-    Component.onCompleted: {
 
+    Component.onCompleted: {
+        console.debug("[mainGameTest]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[mainGameTest]Component.onDestruction");
     }
 }

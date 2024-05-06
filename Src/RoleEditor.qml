@@ -2151,7 +2151,7 @@ Item {
                             l_listRoleResource.show(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listRoleResource.visible = true;
                         //l_listRoleResource.focus = true;
-                        l_listRoleResource.forceActiveFocus();
+                        //l_listRoleResource.forceActiveFocus();
 
                         dialogRoleData.visible = false;
                     }
@@ -2322,7 +2322,6 @@ Item {
         onClicked: {
             textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(item);
             textRoleImageResourceName.text = item;
-            console.debug("[RoleEditor]List Clicked:", textRoleImageURL.text)
 
             textRoleImageURL.enabled = false;
             textRoleImageResourceName.enabled = true;
@@ -2335,24 +2334,25 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            //root.focus = true;
-            root.forceActiveFocus();
-            visible = false;
-
-
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
+
+
+            visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+
             console.debug("[RoleEditor]fileURL", textRoleImageURL.text);
         }
 
         onCanceled: {
             dialogRoleData.visible = true;
 
+            visible = false;
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
         }
 
         onRemoveClicked: {

@@ -597,6 +597,37 @@ Item {
             return game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback);
         }
 
+        //同 game.talk
+        readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, callback=true) {
+
+            //调用回调函数 或 不调用回调函数
+            if(GlobalLibraryJS.isFunction(callback) || !callback) {
+            }
+            //设置默认回调函数
+            else {
+                callback = function(code, itemMsg) {
+                    itemMsg.visible = false;
+
+                    //if(_private.config.objPauseNames['$fight_msg'] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run()
+                        //game.goon('$fight_msg');
+                        run(true);
+                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    //}
+
+                    //itemMsg.destroy();
+
+                    //rootFightScene.forceActiveFocus();
+
+                    //不再执行默认的回调函数
+                    return true;
+                }
+            }
+
+
+            return game.talk(role, msg, interval, pretext, keeptime, style, false, callback);
+        }
+
         //同 game.menu
         readonly property var menu: function(title, items, style={}, callback=true) {
 
@@ -838,7 +869,9 @@ Item {
 
 
 
-            //上场
+            //上场一个战斗人物
+            //index表示第几个位置（0开始，负数为追加）；fightrole是战斗人物；teamID为0表示我方，为1表示敌方；
+            //如果需要永久加入我方，先使用 game.createfighthero()，再把返回值给第二个参数；或者先调用这个函数，再把返回值给 game.createfighthero() 也行；
             insertFightRole: function(index, fightrole, teamID) {
                 fightrole = game.$sys.getFightRoleObject(fightrole, false);
                 if(!fightrole)
@@ -1573,10 +1606,7 @@ Item {
 
 
 
-
-
-
-    //战场的消息框
+    /*/战场的消息框
     Loader {
         id: dialogFightMsg
 
@@ -1595,7 +1625,7 @@ Item {
 
             function onRejected() {
             }
-            */
+            * /
         }
 
         onLoaded: {
@@ -1621,12 +1651,13 @@ Item {
             function onS_Choice(index) {
             }
         }
-        */
+        * /
 
         onLoaded: {
             //改变回调函数
         }
     }
+    */
 
 
 

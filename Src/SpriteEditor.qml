@@ -1150,7 +1150,7 @@ Item {
                             l_listSpriteImageResource.show(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listSpriteImageResource.visible = true;
                         //l_listSpriteImageResource.focus = true;
-                        l_listSpriteImageResource.forceActiveFocus();
+                        //l_listSpriteImageResource.forceActiveFocus();
 
                         dialogSpriteImageData.visible = false;
                     }
@@ -1318,8 +1318,7 @@ Item {
         onClicked: {
             textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(item);
             textSpriteImageResourceName.text = item;
-            console.debug("[SpriteEditor]List Clicked:", textSpriteImageURL.text)
-
+            
             textSpriteImageURL.enabled = false;
             textSpriteImageResourceName.enabled = true;
 
@@ -1331,24 +1330,25 @@ Item {
             checkboxSaveSpriteImageResource.enabled = false;
 
 
-            //root.focus = true;
-            root.forceActiveFocus();
-            visible = false;
-
-
             //let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
+
+
+            visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+
             console.debug("[SpriteEditor]fileURL", textSpriteImageURL.text);
         }
 
         onCanceled: {
             dialogSpriteImageData.visible = true;
 
+            visible = false;
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
         }
 
         onRemoveClicked: {
@@ -1518,7 +1518,7 @@ Item {
                         l_listSpriteSoundResource.show(path, "*", 0x002, 0x00);
                         l_listSpriteSoundResource.visible = true;
                         //l_listSpriteSoundResource.focus = true;
-                        l_listSpriteSoundResource.forceActiveFocus();
+                        //l_listSpriteSoundResource.forceActiveFocus();
 
                         dialogSpriteSoundData.visible = false;
                     }
@@ -1708,13 +1708,14 @@ Item {
             checkboxSaveSpriteSoundResource.enabled = false;
 
 
+            //let cfg = File.read(fileUrl);
+            //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
+
+
             //root.focus = true;
             root.forceActiveFocus();
             visible = false;
 
-
-            //let cfg = File.read(fileUrl);
-            //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
             console.debug("[SpriteEditor]fileURL", textSpriteSoundURL.text);
         }
 

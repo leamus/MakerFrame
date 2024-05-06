@@ -62,11 +62,11 @@ Item {
 
 
         onCanceled: {
+            //visible = false;
             //loader.visible = true;
             //root.focus = true;
             //root.forceActiveFocus();
             //loader.item.focus = true;
-            //visible = false;
             s_close();
         }
 
@@ -79,11 +79,14 @@ Item {
             //    return;
             //}
 
+
+            //visible = false;
             loader.visible = true;
             loader.focus = true;
 
             loader.item.forceActiveFocus();
             //loader.item.focus = true;
+
 
             if(index === 0) {
                 loader.item.init();
@@ -91,8 +94,6 @@ Item {
                 return;
             }
 
-
-            //visible = false;
 
             /*
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_skill.json";
@@ -144,7 +145,7 @@ Item {
 
 
         source: "./FightSkillEditor.qml"
-        asynchronous: false
+        asynchronous: true
 
 
         onLoaded: {
@@ -165,7 +166,7 @@ Item {
 
                 loader.visible = false;
                 //root.focus = true;
-                l_listFightSkill.forceActiveFocus();
+                //l_listFightSkill.forceActiveFocus();
             }
         }
     }

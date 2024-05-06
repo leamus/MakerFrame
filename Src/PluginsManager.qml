@@ -125,7 +125,7 @@ Item {
 
 
         source: ""
-        asynchronous: false
+        asynchronous: true
 
 
         Connections {
@@ -136,6 +136,39 @@ Item {
 
             function onS_close() {
                 loaderExtends.close();
+            }
+        }
+
+
+        onStatusChanged: {
+            console.log('[PluginsManager]loaderExtends.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+        }
+
+        onLoaded: {
+            console.debug("[PluginsManager]loader onLoaded");
+
+            loaderExtends.visible = true;
+            loaderExtends.focus = true;
+            //loaderExtends.item.focus = true;
+            if(loaderExtends.item.forceActiveFocus)
+                loaderExtends.item.forceActiveFocus();
+
+
+            try {
+                //loaderGameScene.item.init(true, true);
+                l_list.visible = false;
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
             }
         }
 
@@ -154,15 +187,14 @@ Item {
             event.accepted = true;
             //Qt.quit();
         }
-
-        onLoaded: {
-            //if(loaderExtends.item.init)
-            //    loaderExtends.item.init();
-            //item.testFresh();
-            console.debug("[PluginsManager]loader onLoaded");
-        }
     }
 
+
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
 
     QtObject {
@@ -261,11 +293,8 @@ Item {
                     }
                     else if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.qml'))) {
                         loaderExtends.source = GlobalJS.toURL(jsPath + GameMakerGlobal.separator + 'main.qml');
-
-                        if(loaderExtends.item.forceActiveFocus)
-                            loaderExtends.item.forceActiveFocus();
-
-                        l_list.visible = false;
+                        if(loaderExtends.status === Loader.Loading)
+                            showBusyIndicator(true);
 
                         return 2;
                     }
@@ -351,12 +380,6 @@ Item {
     }
 
 
-    //配置
-    QtObject {
-        id: config
-    }
-
-
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
@@ -382,5 +405,11 @@ Item {
 
     Component.onCompleted: {
         _private.refresh();
+
+        console.debug("[PluginsManager]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[PluginsManager]Component.onDestruction");
     }
 }

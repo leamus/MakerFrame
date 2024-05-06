@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.10.2.240427'
+    property string version: '1.10.3.240504'
 
 
     //配置
@@ -318,8 +318,20 @@ QtObject {
         //!!解决 assets BUG
         if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
             return;
-        //if(FrameManager.globalObject().GameMakerGlobal)
-        //    return;
+
+        if(FrameManager.globalObject().GameMakerGlobal && FrameManager.globalObject().GameMakerGlobal !== GameMakerGlobal) {
+            console.warn('[!GameMakerGlobal]已经存在单例类，请重启框架或返回原引擎');
+
+            Global.window.aliasComponents.dialogCommon.show({
+                Msg: '已经存在单例类，请重启框架或返回原引擎，否则数据出错',
+                //Buttons: 0,
+                OnAccepted: function() {
+                },
+                OnRejected: ()=>{
+                },
+            });
+            return;
+        }
 
         FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
 
@@ -359,14 +371,17 @@ QtObject {
         FrameManager.addImportPath(urlRPGCorePath);
 
 
-        console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobalJS);
+        console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobal, GameMakerGlobalJS, Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
         //!!解决 assets BUG
         if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
             return;
-        //if(!FrameManager.globalObject().GameMakerGlobal)
-        //    return;
+
+        if(FrameManager.globalObject().GameMakerGlobal && FrameManager.globalObject().GameMakerGlobal !== GameMakerGlobal) {
+            console.warn('[!GameMakerGlobal]已经存在单例类');
+            return;
+        }
 
         delete FrameManager.globalObject().GameMakerGlobal;
 

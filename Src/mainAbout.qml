@@ -106,15 +106,15 @@ Item {
 
 
 
+    //配置
     QtObject {
-        id: _private
-
+        id: _config
     }
 
 
-    //配置
     QtObject {
-        id: config
+        id: _private
+
     }
 
 
@@ -262,5 +262,11 @@ Item {
     读写Excel；
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
+
+        console.debug("[mainAbout]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[mainAbout]Component.onDestruction");
     }
 }

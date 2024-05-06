@@ -105,15 +105,15 @@ Item {
 
 
 
+    //配置
     QtObject {
-        id: _private
-
+        id: _config
     }
 
 
-    //配置
     QtObject {
-        id: config
+        id: _private
+
     }
 
 
@@ -136,6 +136,7 @@ Item {
     Keys.onPressed: {
         console.debug("[mainEasyTutorial]key:", event, event.key, event.text)
     }
+
 
 
     Component.onCompleted: {
@@ -256,7 +257,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
 <font color='yellow'>game.role(role, props={});</font>
 
-<font color='yellow'>game.moverole(role, bx, by)</font>：移动角色到x，y。
+<font color='yellow'>game.moverole(bx, by, role)</font>：移动角色到x，y。
 
 //删除角色；
 //role可以是 角色对象、角色名或-1（表示删除所有）；
@@ -887,5 +888,11 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
 
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
+
+        console.debug("[mainEasyTutorial]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[mainEasyTutorial]Component.onDestruction");
     }
 }

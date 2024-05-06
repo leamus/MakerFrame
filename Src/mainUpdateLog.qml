@@ -105,14 +105,15 @@ Item {
 
 
 
+    //配置
+    QtObject {
+        id: _config
+    }
+
+
     QtObject {
         id: _private
 
-    }
-
-    //配置
-    QtObject {
-        id: config
     }
 
 
@@ -137,6 +138,7 @@ Item {
     }
 
 
+
     Component.onCompleted: {
         let t = `
 <CENTER><B>更新日志</B></CENTER>
@@ -147,6 +149,24 @@ Item {
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽力去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
+    2024/5/X：发布 1.10.4.2405XX 版本（框架 1.3.29.240505版本）
+    1、qml支持载入外部动态链接库，并载入特定参数的函数；
+    2、qml支持载入外部Dex库（安卓），并载入特定参数的函数；
+    3、调整 game.moverole 参数，使之和 game.movehero 一致（这两个函数废弃，可以用game.role 和 game.hero代替）；
+
+2024/5/4：发布 1.10.3.240504 版本
+1、修复getgoods个数总是多1的Bug；
+2、增加fight.talk指令；
+3、优化 在线版 测试时Loader容易出现的报错；
+4、优化地图编辑器测试时保留默认值；
+5、热重载加入是否启用热重载选项；
+6、将 地图脚本 复制到 game.f 中，优化各个事件的实现方式（删除了 地图脚本 的判断）；
+*7、调整 game.playmusic 的参数，使之风格一致；
+8、修复 在线版 地图编辑器 快速退出时闪退问题（还是QML的Loader Bug）；
+9、修复 game.trade 命令卖物品参数无效问题；
+10、将所有 Loader 改为异步加载，配合 等待控件，杜绝了所有因 Loader 的Bug引起的闪退；
+*11、增加 GameMakerGlobal 单例引起的数据错误 的警告提示；
+
 2024/4/27：发布 1.10.2.240427 版本
 1、更改交易时买的道具默认数量为无限；
 2、修复交易时不能卖的物品价格为undefined，购买后金钱为NaN的Bug；
@@ -155,6 +175,9 @@ Item {
 5、增加 音乐播放状态（$music_state） 和 视频播放状态（$video_state） 回调函数；
 6、优化所有事件代码；
 *7、调整角色动作回调函数名（去掉ed，统一风格）；
+8、忙碌标记加入屏蔽鼠标；
+*9、调整game.addprops第4个参数；
+10、其他优化；
 
 2024/4/22：发布 1.10.1.240422 版本
 1、修复game.equip装备位置的一个Bug；
@@ -1405,5 +1428,11 @@ Item {
 
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
+
+        console.debug("[mainUpdateLog]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[mainUpdateLog]Component.onDestruction");
     }
 }

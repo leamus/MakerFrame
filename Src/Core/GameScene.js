@@ -1170,7 +1170,7 @@ function getGoodsObject(goods, forceNew=true) {
                 else
                     retGoods = {};
                 */
-                retGoods = {$count: 1};
+                retGoods = {};
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
@@ -1188,7 +1188,7 @@ function getGoodsObject(goods, forceNew=true) {
                 return null;
             }
 
-            retGoods = {$rid: goods.RID, $count: 1};
+            retGoods = {$rid: goods.RID, $count: 0};
             if(resGoods.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, resGoods.$createData(goods.Params));
             //delete goods.RID;
@@ -1718,6 +1718,8 @@ function openMap(mapName, forceRepaint=false) {
     let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(mapPath));
     itemViewPort.mapScript = ts;
 
+    GlobalLibraryJS.copyPropertiesToObject(game.f, ts/*, true*/);
+
 
 
     //test();
@@ -1809,12 +1811,13 @@ function buttonAClicked() {
             //获得脚本（地图脚本优先级 > game.f定义的）
             let tScript;
             do {
-                if(itemViewPort.mapScript) {
+                /*if(itemViewPort.mapScript) {
                     if(tScript = itemViewPort.mapScript['$' + role.$data.$id])
                         break;
                     if(tScript = itemViewPort.mapScript[role.$data.$id])
                         break;
                 }
+                */
                 if(tScript = game.f['$' + role.$data.$id])
                     break;
                 if(tScript = game.f[role.$data.$id])    //!!!兼容旧的
@@ -1845,7 +1848,7 @@ function mapEvent(eventName, role) {
 
     //主角和NPC的事件名不同
     do {
-        if(role.$$type === 1)
+        /*if(role.$$type === 1)
             if(tScript = itemViewPort.mapScript['$' + eventName])
                 break;
         else
@@ -1853,6 +1856,7 @@ function mapEvent(eventName, role) {
                 break;
         if(role.$$type === 1 && (tScript = itemViewPort.mapScript[eventName]))    //!!兼容旧的
             break;
+        */
         if(role.$$type === 1)
             if(tScript = game.f['$' + eventName])
                 break;
@@ -1887,12 +1891,13 @@ function mapEventCanceled(eventName, role) {
 
     //主角和NPC的事件名不同
     do {
-        if(role.$$type === 1)
+        /*if(role.$$type === 1)
             if(tScript = itemViewPort.mapScript['$' + eventName + '_map_leave'])
                 break;
         else
             if(tScript = itemViewPort.mapScript['$' + role.$data.$id + '_' + eventName + '_map_leave'])
                 break;
+        */
         if(role.$$type === 1)
             if(tScript = game.f['$' + eventName + '_map_leave'])
                 break;
@@ -1925,8 +1930,9 @@ function mapClickEvent(x, y) {
     let eventName = '$map_click';
     let tScript;
     do {
-        if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+        /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
             break;
+        */
         if(tScript = game.f[eventName])
             break;
         if(tScript = game.gf[eventName])
@@ -1949,8 +1955,9 @@ function roleClickEvent(role, dx, dy) {
     //获得脚本（地图脚本优先级 > game.f定义的）
     let tScript;
     do {
-        if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+        /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
             break;
+        */
         if(tScript = game.f[eventName])
             break;
         if(tScript = game.gf[eventName])
@@ -2018,8 +2025,9 @@ function onTriggered() {
 
             let tScript;
             do {
-                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
+                /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
                     break;
+                */
                 if(tScript = game.f[tt])
                     break;
                 if(tScript = game.gf[tt])
@@ -2056,8 +2064,9 @@ function onTriggered() {
 
             let tScript;
             do {
-                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
+                /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
                     break;
+                */
                 if(tScript = game.f[tt])
                     break;
                 if(tScript = game.gf[tt])
@@ -2123,8 +2132,9 @@ function onTriggered() {
                         let eventName = `$${role.$data.$id}_arrive`;
                         let tScript;
                         do {
-                            if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                            /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                                 break;
+                            */
                             if(tScript = game.f[eventName])
                                 break;
                             if(tScript = game.gf[eventName])
@@ -2270,8 +2280,9 @@ function onTriggered() {
             let eventName = `$${role.$data.$id}_collide`;
             let tScript;
             do {
-                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                     break;
+                */
                 if(tScript = game.f[eventName])
                     break;
                 if(tScript = game.gf[eventName])
@@ -2321,8 +2332,9 @@ function onTriggered() {
             let eventName = `$${role.$data.$id}_collide`;
             let tScript;
             do {
-                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                     break;
+                */
                 if(tScript = game.f[eventName])
                     break;
                 if(tScript = game.gf[eventName])
@@ -2483,8 +2495,9 @@ function onTriggered() {
                         let eventName = `$${mainRole.$data.$id}_arrive`;
                         let tScript;
                         do {
-                            if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                            /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                                 break;
+                            */
                             if(tScript = game.f[eventName])
                                 break;
                             if(tScript = game.gf[eventName])
@@ -2826,8 +2839,9 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             let eventName = `$${role.$data.$id}_collide_obstacle`;
             let tScript;
             do {
-                if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
                     break;
+                */
                 if(tScript = game.f[eventName])
                     break;
                 if(tScript = game.gf[eventName])

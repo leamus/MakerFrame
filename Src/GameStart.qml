@@ -34,22 +34,26 @@ Item {
 
 
     function init() {
+        let data;
+        //let data = File.read(filePath);
+
         let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
         if(FrameManager.sl_qml_FileExists(filePath + 'main.js')) {
             gameVisualScript.loadData(filePath + 'main.vjs');
             filePath = filePath + 'main.js';
             _private.strMainJSName = 'main.js';
+
+            data = FrameManager.sl_qml_ReadFile(filePath);
         }
         //!!!兼容旧代码
         else if(FrameManager.sl_qml_FileExists(filePath + 'start.js')) {
             gameVisualScript.loadData(filePath + 'start.vjs');
             filePath = filePath + 'start.js';
             _private.strMainJSName = 'start.js';
+
+            data = FrameManager.sl_qml_ReadFile(filePath);
         }
-        //let data = File.read(filePath);
-        let data = FrameManager.sl_qml_ReadFile(filePath);
         console.debug('[GameStart]filePath：', filePath);
-        //console.exception('????')
 
         if(data) {
 
@@ -82,8 +86,17 @@ game.goon();
 
             return false;
         }
-
     }
+
+    function start() {
+        textGameStartScript.enabled = false;
+        buttonStartGame.enabled = false;
+
+        loaderGameScene.source = './Core/GameScene.qml';
+        if(loaderGameScene.status === Loader.Loading)
+            showBusyIndicator(true);
+    }
+
 
 
     //width: 600
@@ -222,12 +235,7 @@ game.goon();
                 text: '开始游戏'
 
                 onClicked: {
-                    //enabled = false;
-
-                    showBusyIndicator(true, function() {
-                        loaderGameScene.source = './Core/GameScene.qml';
-                    });
-
+                    start();
                 }
             }
 
@@ -363,18 +371,19 @@ game.goon();
 
 
         source: ''
-        asynchronous: false
+        asynchronous: true
 
 
 
         onStatusChanged: {
             console.log('[GameStart]loaderGameScene.status：', status);
 
-            if (status === Loader.Ready) {
+            if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                _private.gameSceneClose();
+
                 showBusyIndicator(false);
-                source = '';
             }
         }
 
@@ -390,10 +399,12 @@ game.goon();
             //loaderGameScene.item.focus = true;
             loaderGameScene.item.forceActiveFocus();
 
+
             try {
                 loaderGameScene.item.init(true, true);
             }
             catch(e) {
+                _private.gameSceneClose();
                 throw e;
             }
             finally {
@@ -409,14 +420,7 @@ game.goon();
             ignoreUnknownSignals: true
 
             function onS_close() {
-
-                loaderGameScene.visible = false;
-                //root.focus = true;
-                root.forceActiveFocus();
-
-                loaderGameScene.source = '';
-
-                //buttonStartGame.enabled = true;
+                _private.gameSceneClose();
             }
         }
     }
@@ -430,6 +434,7 @@ game.goon();
 
     QtObject {
         id: _private
+
 
         //js名
         property string strMainJSName: 'main.js'
@@ -501,8 +506,20 @@ function *$start() {
         break;
     }
 }
-
         `
+
+        function gameSceneClose() {
+            loaderGameScene.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+
+
+            loaderGameScene.source = '';
+
+
+            textGameStartScript.enabled = true;
+            buttonStartGame.enabled = true;
+        }
     }
 
 
@@ -523,11 +540,12 @@ function *$start() {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameStart]Keys.onPressed:', event.key);
+        console.debug('[GameStart]Keys.onPressed:', event, event.key, event.text);
     }
     Keys.onReleased: {
-        console.debug('[GameStart]Keys.onReleased:', event.key);
+        console.debug('[GameStart]Keys.onReleased:', event, event.key, event.text);
     }
+
 
 
     Component.onCompleted: {

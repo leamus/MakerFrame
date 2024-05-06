@@ -128,7 +128,7 @@ let data = (function() {
 
         $fightEndScript: function *(r, step, teams, fightData) {
             //step：为0是战斗结束时调用；为1时返回地图时调用
-            //r中包含：result（战斗结果）、money和exp
+            //r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
             //  这里可以修改r，然后会传递给 通用战斗结束函数
             //console.debug(JSON.stringify(r));
             //r.result = 666;

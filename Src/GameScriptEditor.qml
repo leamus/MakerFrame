@@ -253,12 +253,15 @@ Item {
 
 
         source: './GameVisualScript.qml'
-        asynchronous: false
+        asynchronous: true
 
 
         onLoaded: {
+            showBusyIndicator(false);
+
             console.debug('[GameStart]loaderVisualScript onLoaded');
         }
+
 
         Connections {
             target: loaderVisualScript.item
@@ -296,6 +299,7 @@ Item {
             //    l_list.visible = false;
             //    return;
             //}
+
 
             if(_private.strTmpPath.indexOf('/') < 0)
                 _private.strTmpPath = '';
@@ -343,16 +347,12 @@ Item {
                 textFilePath.text =  _private.strTmpPath;
             }
 
-
-            //visible = false;
-
             console.debug("[mainScriptEditor]path：", path);
 
             if(FrameManager.sl_qml_DirExists(path)) {
                 _private.showList();
                 return;
             }
-
 
 
             //let cfg = File.read(filePath);
@@ -366,6 +366,8 @@ Item {
 
 
             l_listExplorer.visible = false;
+
+            //visible = false;
             root.forceActiveFocus();
         }
 
@@ -395,15 +397,21 @@ Item {
         }
 
         onCanceled: {
+            visible = false;
             //loader.visible = true;
             //root.focus = true;
             //loader.item.focus = true;
             root.forceActiveFocus();
-            visible = false;
         }
 
     }
 
+
+
+    //配置
+    QtObject {
+        id: _config
+    }
 
 
     QtObject {
@@ -477,11 +485,6 @@ Item {
         }
     }
 
-    //配置
-    QtObject {
-        id: config
-    }
-
 
 
     //Keys.forwardTo: []
@@ -509,6 +512,13 @@ Item {
 
 
     Component.onCompleted: {
+        if(loaderVisualScript.status === Loader.Loading)
+            showBusyIndicator(true);
 
+        console.debug("[mainScriptEditor]Component.onCompleted");
+    }
+
+    Component.onDestruction: {
+        console.debug("[mainScriptEditor]Component.onDestruction");
     }
 }
