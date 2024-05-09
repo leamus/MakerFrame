@@ -464,7 +464,7 @@ function $Combatant(fightRoleRID, showName) {
     this.$$fightData = {
         //这个info不要用，系统会战斗时自动初始化
         $info: {
-            $index: -1,              //所在队伍下标
+            $index: -1,              //所在队伍下标；-1为没上场；
             $teamsID: [0, 1],         //0：我方；1：敌方；2：友军。下标：己方、对方、友方
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
 

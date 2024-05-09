@@ -185,7 +185,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建技能】');
             l_listFightSkill.removeButtonVisible = {0: false, '-1': true};
-            l_listFightSkill.showList(list);
+            l_listFightSkill.show(list);
 
         }
     }

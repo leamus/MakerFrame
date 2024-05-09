@@ -97,11 +97,7 @@ Item {
                 }
 
                 onDoubleClicked: {
-                    mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
-                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                        mediaPlayer.pause();
-                    else
-                        mediaPlayer.play();
+                    _private.playOrPause();
                 }
 
                 onRemoveClicked: {
@@ -152,6 +148,37 @@ Item {
                 //wrapMode: TextEdit.Wrap
             }
         }*/
+
+
+        Slider {
+            id: sliderMusic
+
+            Layout.fillWidth: true
+            //Layout.preferredHeight: 36
+
+            enabled: mediaPlayer.playbackState !== MediaPlayer.StoppedState
+
+            from: 0
+            to: mediaPlayer.duration
+            stepSize: 5000
+            value: mediaPlayer.position
+
+
+            onMoved: {
+                //if(mediaPlayer.seekable)
+                //    mediaPlayer.position = value;
+                mediaPlayer.seek(value);
+
+                //console.debug(value, position);
+            }
+            /*onValueChanged: {
+                if(mediaPlayer.seekable)
+                    mediaPlayer.position = value;
+
+            }
+            */
+        }
+
 
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
@@ -222,14 +249,7 @@ Item {
                     if(listview.currentIndex < 0)
                         return;
 
-                    mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
-                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                        mediaPlayer.pause();
-                    else
-                        mediaPlayer.play();
-                    //console.debug("mediaPlayer:", textMusicName.text, mediaPlayer.source);
-                    //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
-                    //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
+                    _private.playOrPause();
                 }
             }
 
@@ -249,6 +269,11 @@ Item {
 
     MediaPlayer {
         id: mediaPlayer
+
+        //source: ''
+        loops: MediaPlayer.Infinite
+        notifyInterval: 200
+        //playbackRate: 0.1
     }
 
 
@@ -359,7 +384,20 @@ Item {
                 listview.currentIndex = index;
                 //textMusicName.text = _private.arrMusic[listview.currentIndex];
             }
+        }
 
+        function playOrPause() {
+            mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
+            if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                mediaPlayer.pause();
+            else
+                mediaPlayer.play();
+
+            sliderMusic.forceActiveFocus();
+
+            //console.debug("mediaPlayer:", textMusicName.text, mediaPlayer.source);
+            //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
+            //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
     }
 

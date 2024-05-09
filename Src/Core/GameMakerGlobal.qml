@@ -24,7 +24,7 @@ QtObject {
         //fileName: 'RPGMaker.ini'
 
         //当前工程
-        property string $strCurrentProjectName: 'Project'
+        property string $strCurrentProjectName: ''  //'Project'
         property int $RunTimes: 0
         property int $RunDuration: 0
     }
@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.10.3.240504'
+    property string version: '1.10.4.240509'
 
 
     //配置

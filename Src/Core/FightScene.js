@@ -1,10 +1,10 @@
 ﻿
 //保存上次
 function saveLast(combatant=true) {
-    if(combatant === true)
+    if(combatant === true) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(tc.$$propertiesWithExtra.HP[0] > 0) {
+            if(game.$sys.resources.commonScripts["combatant_is_valid"](tc)) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 tc.$$fightData.$lastChoice = {};
                 GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$lastChoice, tc.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
@@ -13,6 +13,7 @@ function saveLast(combatant=true) {
                 //tc.$$fightData.$lastChoiceType = tc.$$fightData.$choiceType;
             }
         }
+    }
     else {
         combatant.$$fightData.$lastChoice = {};
         GlobalLibraryJS.copyPropertiesToObject(combatant.$$fightData.$lastChoice, combatant.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
@@ -24,11 +25,11 @@ function saveLast(combatant=true) {
 
 //type：0表示完全载入上次；1表示载入没有选择的
 function loadLast(combatant=true, type=0) {
-    if(combatant === true)
+    if(combatant === true) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            if(tc.$$propertiesWithExtra.HP[0] > 0) {
+            if(game.$sys.resources.commonScripts["combatant_is_valid"](tc)) {
                 if(type === 1 && tc.$$fightData.$choice.$type !== -1) {   //已经有选择
                     continue;
                 }
@@ -40,6 +41,7 @@ function loadLast(combatant=true, type=0) {
                 }
             }
         }
+    }
     else {
         if(type === 1 && combatant.$$fightData.$choice.$type !== -1) {   //已经有选择
             //continue;
@@ -339,12 +341,12 @@ function choicedSkillOrGoods(used, type) {
     if(!_private.genFightChoice) {
         //单人技能 且 目标敌方
         if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}});
         }
 
         //目标己方
         else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}});
         }
 
         //不选（全体）
@@ -497,7 +499,7 @@ function skillStepGetReadyToChoice(params, combatant) {
 //combatant：正在进行选择的战斗人物，有可能为null
 function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
     if(!filter)
-        filter = function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}
+        filter = function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}
 
     if(enabled) {
         if(teamFlags & 0b1) {
@@ -528,7 +530,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
                 //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+                if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
                     repeaterMyCombatants.itemAt(i).setEnable(false);
                 }
             }
@@ -537,7 +539,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
                 //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                if(fight.enemies[i].$$propertiesWithExtra.HP[0] > 0) {
+                if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.enemies[i])) {
                     repeaterEnemies.itemAt(i).setEnable(false);
                 }
             }
@@ -554,7 +556,7 @@ function checkToFight() {
 
     //遍历，判断target
     for(let i = 0; i < fight.myCombatants.length; ++i) {
-        if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+        if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
         //if(repeaterEnemies.itemAt(i).opacity !== 0) {
             //如果 没选择 且 有技能
             if(fight.myCombatants[i].$$fightData.$choice.$type === -1 && fight.myCombatants[i].$skills.length > 0) {
@@ -1575,7 +1577,7 @@ function runAway() {
 
         //全部设置为 休息
         for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(fight.myCombatants[i].$$propertiesWithExtra.HP[0] > 0) {
+            if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
                 game.$sys.resources.commonScripts["fight_combatant_set_choice"](fight.myCombatants[i], 1, false);

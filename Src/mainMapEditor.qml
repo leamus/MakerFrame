@@ -298,7 +298,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: "选择图片"
+                    text: "选择Tile文件"
                     Layout.fillWidth: true
                     onClicked: {
                         //dialogMapData.nChoiceType = 1;
@@ -833,7 +833,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建地图】');
             l_listMaps.removeButtonVisible = {0: false, '-1': true};
-            l_listMaps.showList(list);
+            l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 

@@ -178,9 +178,7 @@ Item {
                     let virtualScriptPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator + '$Leamus' + GameMakerGlobal.separator + '$VisualScripts' + GameMakerGlobal.separator;
                     let list = FrameManager.sl_qml_listDir(virtualScriptPath, "*", 0x001 | 0x2000 | 0x4000, 0x00)
                     list.unshift('【系统】');
-                    l_listCommands.showList(list);
-                    l_listCommands.visible = true;
-                    l_listCommands.focus = true;
+                    l_listCommands.show(list);
                 }
             }
         }
@@ -1531,14 +1529,10 @@ Item {
             //如果选择类型是1，则显示 某目录
             if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 1) {
                 l_listParam.show(sysCommands[_private.strCurrentCommand].params[paramID][4]);
-                l_listParam.visible = true;
-                l_listParam.focus = true;
             }
             //如果选择类型是2，则显示 预定义值
             else if(sysCommands[_private.strCurrentCommand].params[paramID][3] === 2) {
-                l_listParam.showList(sysCommands[_private.strCurrentCommand].params[paramID][4][0]);
-                l_listParam.visible = true;
-                l_listParam.focus = true;
+                l_listParam.show(sysCommands[_private.strCurrentCommand].params[paramID][4][0]);
             }
         }
 

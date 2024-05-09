@@ -401,7 +401,7 @@ function $createCombatant(fightRoleRID, showName) {
         //战斗属性，不会保存
         //注意：这里只是显示需要用到的字段，实际会在fight前重新初始化!!!
         $$fightData: {
-            $index: -1,              //所在队伍下标
+            $index: -1,              //所在队伍下标；-1为没上场；
             $teamsID: 0,              //0：我方；1：敌人；2：友军
             $teams: null,             //保存队伍对象
 
@@ -810,6 +810,13 @@ function computeCombatantPropertiesWithExtra(combatant) {
     //console.debug('combatant.$$propertiesWithExtra', combatant, combatant.$$fightData, combatant.$$propertiesWithExtra);
 
     return combatant.$$propertiesWithExtra;
+}
+
+//战斗人物是否可用（上场且活着）
+function $combatantIsValid(combatant) {
+    if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0)
+        return true;
+    return false;
 }
 
 

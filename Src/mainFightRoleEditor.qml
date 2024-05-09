@@ -185,7 +185,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建战斗角色】');
             l_listFightRole.removeButtonVisible = {0: false, '-1': true};
-            l_listFightRole.showList(list);
+            l_listFightRole.show(list);
 
         }
     }

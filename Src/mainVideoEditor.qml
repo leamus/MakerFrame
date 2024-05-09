@@ -33,8 +33,7 @@ Item {
 
     signal s_close();
     onS_close: {
-        mediaPlayer.stop();
-        itemVideo.visible = false;
+        _private.stop();
     }
 
 
@@ -98,11 +97,7 @@ Item {
                 }
 
                 onDoubleClicked: {
-                    mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
-                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                        mediaPlayer.pause();
-                    else
-                        mediaPlayer.play();
+                    _private.playOrPause();
                 }
 
                 onRemoveClicked: {
@@ -223,67 +218,115 @@ Item {
                     if(listview.currentIndex < 0)
                         return;
 
-                    itemVideo.visible = true;
-                    mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
-                    if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                        mediaPlayer.pause();
-                    else
-                        mediaPlayer.play();
-
-                    //console.debug("video:", textVideoName.text, mediaPlayer.source);
-                    //console.debug("resolve:", Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
-                    //console.debug("file:", GameMakerGlobal.videoResourceURL(textVideoName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
+                    _private.playOrPause();
                 }
             }
 
             Button {
                 id: buttonStopVideo
 
+                visible: false
+
                 //Layout.preferredWidth: 60
 
                 text: "停止"
                 onClicked: {
-                    mediaPlayer.stop();
-                    itemVideo.visible = false;
-                    //mediaPlayer.source = GameMakerGlobal.videoResourceURL(textVideoResourceName.text);
+                    _private.stop();
                 }
             }
         }
     }
 
 
-    Item {
+    Mask {
         id: itemVideo
+
         anchors.fill: parent
         visible: false
 
-        MediaPlayer {
-            id: mediaPlayer
+        color: Global.style.backgroundColor
 
-            source: ""
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            //渲染视频
+            VideoOutput{
+                id: videoOutput
+
+                //anchors.fill: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                source: MediaPlayer {
+                    id: mediaPlayer
+
+                    //source: ''
+                    //loops: MediaPlayer.Infinite
+                    notifyInterval: 200
+                    //playbackRate: 0.1
+
+                    onStatusChanged: {
+                        if (status === MediaPlayer.EndOfMedia) {
+                            // 播放结束时的处理逻辑
+                        }
+                    }
+                }
+
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                        if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                            mediaPlayer.pause();
+                        else
+                            mediaPlayer.play();
+                    }
+                    onDoubleClicked: {
+                        _private.stop();
+                    }
+                }
+            }
+
+            Slider {
+                id: sliderMovie
+                Layout.fillWidth: true
+                //Layout.preferredHeight: 36
+
+
+                from: 0
+                to: mediaPlayer.duration
+                stepSize: 5000
+                value: mediaPlayer.position
+
+
+                onMoved: {
+                    //if(mediaPlayer.seekable)
+                    //    mediaPlayer.position = value;
+                    mediaPlayer.seek(value);
+
+                    //console.debug(value, mediaPlayer.position, mediaPlayer.duration);
+                }
+                /*onValueChanged: {
+                    if(mediaPlayer.seekable)
+                        mediaPlayer.position = value;
+
+                }
+                */
+            }
         }
 
-        //渲染视频
-        VideoOutput{
-            id: videoOutput
 
-            anchors.fill: parent
-            source: mediaPlayer
+        Keys.onEscapePressed: {
+            _private.stop();
+            event.accepted = true;
+            //Qt.quit();
         }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                    mediaPlayer.pause();
-                else
-                    mediaPlayer.play();
-            }
-            onDoubleClicked: {
-                itemVideo.visible = false;
-                mediaPlayer.stop();
-                mediaPlayer.source = '';
-            }
+        Keys.onBackPressed: {
+            _private.stop();
+            event.accepted = true;
+            //Qt.quit();
         }
     }
 
@@ -395,7 +438,30 @@ Item {
                 listview.currentIndex = index;
                 //textVideoName.text = _private.arrVideos[listview.currentIndex];
             }
+        }
 
+        function stop() {
+            mediaPlayer.stop();
+            itemVideo.visible = false;
+            mediaPlayer.source = '';
+            //mediaPlayer.source = GameMakerGlobal.videoResourceURL(textVideoResourceName.text);
+
+            root.forceActiveFocus();
+        }
+
+        function playOrPause() {
+            mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
+            if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                mediaPlayer.pause();
+            else
+                mediaPlayer.play();
+
+            itemVideo.visible = true;
+            sliderMovie.forceActiveFocus();
+
+            //console.debug("video:", textVideoName.text, mediaPlayer.source);
+            //console.debug("resolve:", Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
+            //console.debug("file:", GameMakerGlobal.videoResourceURL(textVideoName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
         }
     }
 

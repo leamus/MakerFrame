@@ -432,11 +432,9 @@ Item {
 
             let list = FrameManager.sl_qml_listDir(path, "*.qml|*.js|*.vjs|*.json|*.txt", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建文件】', '..');
-            l_listExplorer.showList(list);
             //console.warn(l_listExplorer.listview.itemAtIndex(0)); //null，还没创建
             l_listExplorer.removeButtonVisible = {0: false, 1: false, '-1': true};
-            l_listExplorer.visible = true;
-            l_listExplorer.forceActiveFocus();
+            l_listExplorer.show(list);
         }
 
 

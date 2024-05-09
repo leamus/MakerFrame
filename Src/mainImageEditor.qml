@@ -33,7 +33,7 @@ Item {
 
     signal s_close();
     onS_close: {
-        imageReview.visible = false;
+        _private.setImageVisible(false);
     }
 
 
@@ -100,7 +100,8 @@ Item {
 
                 onDoubleClicked: {
                     imageReview.source = GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]);
-                    imageReview.visible = true;
+
+                    _private.setImageVisible(true);
                 }
 
                 onRemoveClicked: {
@@ -222,7 +223,8 @@ Item {
                         return;
 
                     imageReview.source = GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]);
-                    imageReview.visible = true;
+
+                    _private.setImageVisible(true);
 
                     //console.debug("image:", textImageName.text, imageReview.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
@@ -233,19 +235,85 @@ Item {
         }
     }
 
+    
+    Mask {
+        id: maskImage
 
-    Image {
-        id: imageReview
-        anchors.fill: parent
         visible: false
+        //anchors.fill: parent
+        width: parent.width
+        height: parent.height
+
+        //color: 'transparent'
+        color: Global.style.backgroundColor
+
+
+
+        //因为使用了Mask，Mask的MouseArea会屏蔽PinchHandler，所以必须再定义一个组件MultiPointTouchArea，否则PinchHandler不起作用
+        MultiPointTouchArea {
+            anchors.fill: parent
+            maximumTouchPoints: 1
+            onPressed: {
+                console.log('press', touchPoints);
+            }
+            onUpdated: {
+                console.log('onupdated', touchPoints);
+            }
+            onTouchUpdated: {
+                console.log('ontouchupdated', touchPoints);
+            }
+
+
+            //!!!不知为何，多次旋转移动后，就点不到itemTest了（点的是MultiPointTouchArea），应该是Qt的Bug，怎么改都无效（替换Mask、移动组件位置、修改z值等等）
+            PinchHandler {
+                id: pinchHandler
+
+                target: imageReview
+                ////pinch.dragAxis: Pinch.XAndYAxis
+                //禁止旋转
+                //maximumRotation: 0
+                //minimumRotation: 0
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                imageReview.visible = false;
+                _private.setImageVisible(false);
+            }
+            onWheel: {
+                if(wheel.angleDelta.y > 0) {
+                    imageReview.scale *= 1.2;
+                }
+                else {
+                    imageReview.scale *= 0.8;
+                }
             }
         }
+
+        Image {
+            id: imageReview
+
+            //anchors.fill: parent
+
+            //anchors.centerIn: parent
+            transformOrigin: Item.Center
+
+
+            Keys.onEscapePressed: {
+                _private.setImageVisible(false);
+                event.accepted = true;
+                //Qt.quit();
+            }
+            Keys.onBackPressed: {
+                _private.setImageVisible(false);
+                event.accepted = true;
+                //Qt.quit();
+            }
+        }
+
     }
+
 
 
     Dialog1.FileDialog {
@@ -355,7 +423,28 @@ Item {
                 listview.currentIndex = index;
                 //textImageName.text = _private.arrImages[listview.currentIndex];
             }
+        }
 
+        function setImageVisible(visible) {
+            maskImage.visible = visible;
+            if(visible) {
+                imageReview.forceActiveFocus();
+
+                let rX = root.width / imageReview.sourceSize.width;
+                let rY = root.height / imageReview.sourceSize.height;
+
+                if(Math.min(rX, rY) < 1)
+                    imageReview.scale = Math.min(rX, rY);
+                imageReview.anchors.centerIn = imageReview.parent;
+                imageReview.anchors.centerIn = null;
+                //imageReview.transform = 0;
+                imageReview.rotation = 0;
+            }
+            else {
+                //imageReview.scale = 1;
+
+                root.forceActiveFocus();
+            }
         }
     }
 

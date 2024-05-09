@@ -24,6 +24,7 @@ function loadResources() {
         _private.objCommonScripts["show_goods_name"] = tCommoncript.$showGoodsName;
         _private.objCommonScripts["show_combatant_name"] = tCommoncript.$showCombatantName;
         _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
+        _private.objCommonScripts['combatant_is_valid'] = tCommoncript.$combatantIsValid;
         _private.objCommonScripts["game_over_script"] = tCommoncript.$gameOverScript;
         //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
         //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
@@ -107,6 +108,13 @@ function loadResources() {
     }
     else
         console.debug("[GameScene]载入计算属性脚本OK");
+
+    if(!_private.objCommonScripts["combatant_is_valid"]) {
+        _private.objCommonScripts["combatant_is_valid"] = GameMakerGlobalJS.$combatantIsValid;
+        console.debug("[!GameScene]载入系统战斗人物可用脚本");
+    }
+    else
+        console.debug("[GameScene]载入战斗人物可用脚本OK");
 
     if(!_private.objCommonScripts["game_over_script"]) {
         _private.objCommonScripts["game_over_script"] = GameMakerGlobalJS.$gameOverScript;
@@ -1962,7 +1970,7 @@ function roleClickEvent(role, dx, dy) {
             break;
         if(tScript = game.gf[eventName])
             break;
-        if(tScript = role.$script['$click'])
+        if(role.$script && (tScript = role.$script['$click']))
             break;
     } while(0);
 
@@ -2363,11 +2371,8 @@ function onTriggered() {
 
 
                 //主角脚本
-                if(_private.arrMainRoles[r].$script) {
-                    tScript = _private.arrMainRoles[r].$script['$collide'];
-                    if(tScript) {
-                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
-                    }
+                if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
                 //调用总事件处理
@@ -2384,11 +2389,8 @@ function onTriggered() {
 
 
                 //主角脚本
-                if(_private.arrMainRoles[r].$script) {
-                    tScript = _private.arrMainRoles[r].$script['$collide'];
-                    if(tScript) {
-                        GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
-                    }
+                if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {
+                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
                 //调用总事件处理

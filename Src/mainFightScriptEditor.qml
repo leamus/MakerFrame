@@ -185,7 +185,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建战斗脚本】');
             l_listFightScript.removeButtonVisible = {0: false, '-1': true};
-            l_listFightScript.showList(list);
+            l_listFightScript.show(list);
 
         }
     }

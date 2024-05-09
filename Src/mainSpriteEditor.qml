@@ -183,7 +183,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建特效】');
             l_listSprite.removeButtonVisible = {0: false, '-1': true};
-            l_listSprite.showList(list);
+            l_listSprite.show(list);
 
         }
     }

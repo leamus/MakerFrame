@@ -183,7 +183,7 @@ Item {
             let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建角色】');
             l_listRole.removeButtonVisible = {0: false, '-1': true};
-            l_listRole.showList(list);
+            l_listRole.show(list);
 
         }
     }

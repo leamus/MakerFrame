@@ -75,6 +75,7 @@ import 'GameScene.js' as GameSceneJS
     _private.objCommonScripts['after_load'] = tCommoncript.$afterLoad;
     _private.objCommonScripts['combatant_class'] = tCommoncript.$Combatant;
     _private.objCommonScripts['refresh_combatant'] = tCommoncript.$refreshCombatant;
+    _private.objCommonScripts['combatant_is_valid'] = tCommoncript.$combatantIsValid;
     _private.objCommonScripts['check_all_combatants'] = tCommoncript.$checkAllCombatants;
     _private.objCommonScripts['fight_skill_algorithm']：战斗算法
     _private.objCommonScripts['fight_role_choice_skills_or_goods_algorithm']：战斗人物选择技能或物品算法
@@ -1010,7 +1011,12 @@ Item {
         }
 
         //将主角移动到地图 bx、by 位置。
-        readonly property var movehero: setMainRolePos
+        readonly property var movehero: function(...args) {
+            if(args.length === 3)
+                setMainRolePos(args[1], args[2], args[0]);
+            else if(args.length === 2)
+                setMainRolePos(args[0], args[1]);
+        }
 
         /*readonly property var movehero: function(bx, by, index=0) {
 
@@ -1213,7 +1219,7 @@ Item {
 
                 if(props.$bx !== undefined || props.$by !== undefined)
                     setRolePos(props.$bx, props.$by, roleComp);
-                    //moverole(bx, by, roleComp);
+                    //moverole(roleComp, bx, by);
 
 
                 if(props.$direction !== undefined)
@@ -1268,7 +1274,7 @@ Item {
         }
 
         //移动角色到bx，by。
-        readonly property var moverole: function(bx, by, role) {
+        readonly property var moverole: function(role, bx, by) {
 
             if(GlobalLibraryJS.isString(role)) {
                 role = _private.objRoles[role];
@@ -2511,8 +2517,8 @@ Item {
 
             mediaPlayer.source = fileURL;
 
-            GlobalLibraryJS.copyvideoParamsToObject(videoOutput, videoParams.$videoOutput, {onlyCopyExists: true});
-            GlobalLibraryJS.copyvideoParamsToObject(mediaPlayer, videoParams.$mediaPlayer, {onlyCopyExists: true});
+            GlobalLibraryJS.copyPropertiesToObject(videoOutput, videoParams.$videoOutput, {onlyCopyExists: true});
+            GlobalLibraryJS.copyPropertiesToObject(mediaPlayer, videoParams.$mediaPlayer, {onlyCopyExists: true});
             /*
             let tKeys = Object.keys(videoOutput);
             for(let tp in videoParams)
@@ -3801,8 +3807,6 @@ Item {
                 plugin.$autoLoad = true;
                 game.run([plugin.$load() ?? null, 'plugin_load:' + params[0] + params[1]]);
                 game.run([plugin.$init() ?? null, 'plugin_init:' + params[0] + params[1]]);
-                //plugin.$load();
-                //plugin.$init();
             }
 
             return plugin;
@@ -4059,7 +4063,7 @@ Item {
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
-            //重新创建（修复继承链），并计算新属性
+            //重新创建战斗人物（修复继承链），并计算新属性
             reloadFightRoles: function() {
 
                 let tFightHeros = game.gd['$sys_fight_heros'];
@@ -4088,7 +4092,7 @@ Item {
                 }
             },
 
-            //重新创建（修复继承链）
+            //重新创建背包（修复继承链）
             reloadGoods: function() {
 
                 let tGoods = game.gd['$sys_goods'];
@@ -5288,7 +5292,7 @@ Item {
     }
 
     //视频播放
-    Item {
+    Mask {
         id: itemVideo
 
 
@@ -5306,10 +5310,17 @@ Item {
             else {
             }
 
+            playOrPause();
+        }
+
+        function playOrPause() {
+            if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                mediaPlayer.pause();
+            else
+                mediaPlayer.play();
 
             visible = true;
-
-            mediaPlayer.play();
+            sliderMovie.forceActiveFocus();
         }
 
         function stop() {
@@ -5325,6 +5336,8 @@ Item {
                 game.run(true);
                 //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
             }
+
+            rootGameScene.forceActiveFocus();
         }
 
 
@@ -5339,64 +5352,113 @@ Item {
         height: parent.height
         z: 9
 
+        color: Global.style.backgroundColor
 
 
-        MediaPlayer {
-            id: mediaPlayer
 
-            source: ''
-
-            onStopped: {
-                game.stopvideo();
-            }
-
-            onPlaybackStateChanged: {
-                let eventName = `$video_state`;
-                let tScript;
-                do {
-                    if(tScript = itemVideo.fStateCallback)
-                        break;
-                    /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
-                        break;
-                    */
-                    if(tScript = game.f[eventName])
-                        break;
-                    if(tScript = game.gf[eventName])
-                        break;
-                } while(0);
-
-                if(tScript)
-                    game.run([tScript.call(mediaPlayer, playbackState, mediaPlayer, videoOutput) ?? null, eventName]);
-            }
-        }
-
-        //渲染视频
-        VideoOutput{
-            id: videoOutput
-
-            anchors.centerIn: parent
-            source: mediaPlayer
-            //fillMode: VideoOutput.Stretch
-            //x: 0
-            //y: 0
-
-            //width: rootGameScene.width
-            //height: rootGameScene.height
-        }
-
-        MouseArea {
+        ColumnLayout {
             anchors.fill: parent
-            acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
 
-            onClicked: {
-                if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                    mediaPlayer.pause();
-                else
-                    mediaPlayer.play();
+            //渲染视频
+            VideoOutput{
+                id: videoOutput
+
+                //anchors.centerIn: parent
+                //anchors.fill: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                source: MediaPlayer {
+                    id: mediaPlayer
+
+                    //source: ''
+                    //loops: MediaPlayer.Infinite
+                    notifyInterval: 200
+                    //playbackRate: 0.1
+
+                    onStopped: {
+                        game.stopvideo();
+                    }
+
+                    onPlaybackStateChanged: {
+                        let eventName = `$video_state`;
+                        let tScript;
+                        do {
+                            if(tScript = itemVideo.fStateCallback)
+                                break;
+                            /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[eventName]))
+                                break;
+                            */
+                            if(tScript = game.f[eventName])
+                                break;
+                            if(tScript = game.gf[eventName])
+                                break;
+                        } while(0);
+
+                        if(tScript)
+                            game.run([tScript.call(mediaPlayer, playbackState, mediaPlayer, videoOutput) ?? null, eventName]);
+                    }
+                }
+
+                //fillMode: VideoOutput.Stretch
+                //x: 0
+                //y: 0
+
+                //width: rootGameScene.width
+                //height: rootGameScene.height
+
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
+
+                    onClicked: {
+                        itemVideo.playOrPause();
+                    }
+                    onDoubleClicked: {
+                        game.stopvideo();
+                    }
+                }
             }
-            onDoubleClicked: {
-                game.stopvideo();
+
+            Slider {
+                id: sliderMovie
+
+                Layout.fillWidth: true
+                //Layout.preferredHeight: 36
+
+
+                from: 0
+                to: mediaPlayer.duration
+                stepSize: 5000
+                value: mediaPlayer.position
+
+
+                onMoved: {
+                    //if(mediaPlayer.seekable)
+                    //    mediaPlayer.position = value;
+                    mediaPlayer.seek(value);
+
+                    //console.debug(value, position);
+                }
+                /*onValueChanged: {
+                    if(mediaPlayer.seekable)
+                        mediaPlayer.position = value;
+
+                }
+                */
             }
+        }
+
+        Keys.onEscapePressed: {
+            game.stopvideo();
+            event.accepted = true;
+            //Qt.quit();
+        }
+        Keys.onBackPressed: {
+            game.stopvideo();
+            event.accepted = true;
+            //Qt.quit();
         }
     }
 

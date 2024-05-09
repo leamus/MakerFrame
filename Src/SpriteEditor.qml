@@ -1382,7 +1382,8 @@ Item {
 
         title: "选择音效"
         //folder: shortcuts.home
-        nameFilters: [ "Sound files (*.wav)", "All files (*)" ]
+        //nameFilters: [ "Sound files (*.wav)", "All files (*)" ]
+        nameFilters: [ "Music files (*.wav *.mp3 *.wma *.ogg *.mid)", "All files (*)" ]
 
         selectMultiple: false
         selectExisting: true
@@ -1524,7 +1525,7 @@ Item {
                     }
                 }
                 Button {
-                    text: "不用音效"
+                    text: "无音效"
                     //Layout.fillWidth: true
                     onClicked: {
                         textSpriteSoundURL.text = "";

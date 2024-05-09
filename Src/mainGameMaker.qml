@@ -125,10 +125,124 @@ Item {
                     textinputDialogCommonInput.visible = true;
                     dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
                     dialogCommon.fOnAccepted = ()=>{
+                        if(FrameManager.sl_qml_DirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
+                            dialogCommon.show({
+                                Msg: '工程已存在',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            return;
+                        }
+
                         _private.changeProject(dialogCommon.input);
 
                         let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
                         FrameManager.sl_qml_CreateFolder(projectPath);
+
+
+                        dialogCommon.show({
+                            Msg: '是否复制素材资源？\r\n（注意：素材资源均来自互联网，仅供测试使用，侵删）',
+                            Buttons: Dialog.Yes | Dialog.No,
+                            OnAccepted: function() {
+                                /*dialogCommon.show({
+                                    Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
+                                    Buttons: Dialog.Yes | Dialog.No,
+                                    OnAccepted: function() {
+                                */
+
+
+                                let resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + "$资源模板.zip";
+
+                                function _continue() {
+                                    //FrameManager.sl_qml_CreateFolder(projectPath);
+                                    let ret = FrameManager.sl_qml_ExtractDir(resTemplate, projectPath);
+
+                                    if(ret.length > 0) {
+                                        //_private.changeProject('Leamus');
+
+                                        //console.debug(ret, projectPath, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
+                                        dialogCommon.msg = "成功";
+                                    }
+                                    else
+                                        dialogCommon.msg = "失败";
+
+                                    textinputDialogCommonInput.visible = false;
+                                    dialogCommon.standardButtons = Dialog.Ok;
+                                    dialogCommon.fOnAccepted = ()=>{
+                                        rootGameMaker.forceActiveFocus();
+                                    };
+                                    dialogCommon.fOnRejected = ()=>{
+                                        rootGameMaker.forceActiveFocus();
+                                    };
+                                    dialogCommon.open();
+                                }
+
+                                //enabled = false;
+
+                                if(!FrameManager.sl_qml_FileExists(resTemplate)) {
+                                    //https://qiniu.leamus.cn/$资源模板.zip
+                                    let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip", resTemplate);
+                                    nr.finished.connect(function() {
+                                        //FrameManager.sl_qml_Property("属性", nr);  //TimeStamp、Data、SaveType、Code
+                                        console.debug("下载完毕", nr, FrameManager.sl_qml_Property("Data", nr), FrameManager.sl_qml_Property("Code", nr));
+
+                                        FrameManager.sl_qml_DeleteLater(nr);
+
+
+                                        dialogCommon.close();
+                                        //enabled = true;
+
+                                        if(FrameManager.sl_qml_Property("Code", nr) < 0) {
+                                            dialogCommon.show({
+                                                Msg: '下载失败：%1'.arg(FrameManager.sl_qml_Property("Code", nr)),
+                                                Buttons: Dialog.Yes,
+                                                OnAccepted: function() {
+                                                    rootGameMaker.forceActiveFocus();
+                                                },
+                                                OnRejected: ()=>{
+                                                    rootGameMaker.forceActiveFocus();
+                                                },
+                                            });
+                                            return;
+                                        }
+
+                                        _continue();
+                                    });
+
+
+                                    textinputDialogCommonInput.visible = false;
+                                    dialogCommon.msg = "正在下载，请等待（请勿进行其他操作）";
+                                    dialogCommon.standardButtons = Dialog.NoButton;
+                                    dialogCommon.fOnAccepted = ()=>{
+                                        dialogCommon.open();
+                                    };
+                                    dialogCommon.fOnRejected = ()=>{
+                                        dialogCommon.open();
+                                    };
+                                    dialogCommon.open();
+                                }
+                                else
+                                    _continue();
+
+                                /*
+                                    },
+                                    OnRejected: ()=>{
+                                        rootGameMaker.forceActiveFocus();
+                                    },
+                                });
+                                */
+
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
 
                         rootGameMaker.forceActiveFocus();
                     };
@@ -173,10 +287,37 @@ Item {
                     dialogCommon.input = GameMakerGlobal.config.strCurrentProjectName;
                     dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
                     dialogCommon.fOnAccepted = ()=>{
+                        if(FrameManager.sl_qml_DirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
+                            dialogCommon.show({
+                                Msg: '工程已存在',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            return;
+                        }
+
                         if(FrameManager.sl_qml_RenameFile(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input) > 0) {
                             _private.changeProject(dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
                         }
                         else {
+                            if(FrameManager.sl_qml_DirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
+                                dialogCommon.show({
+                                    Msg: '重命名失败，请检查名称',
+                                    Buttons: Dialog.Yes,
+                                    OnAccepted: function() {
+                                        rootGameMaker.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        rootGameMaker.forceActiveFocus();
+                                    },
+                                });
+                                return;
+                            }
                             console.warn("重命名失败：", GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input);
                         }
 
@@ -605,6 +746,21 @@ Item {
                 onClicked: {
                     if(Qt.platform.os === "android") {
 
+                        if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
+                            dialogCommon.show({
+                                Msg: '请先新建一个工程',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            return;
+                        }
+
+
                         let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
 
                         let jsFiles = FrameManager.sl_qml_listDir(path, '*', 0x002 | 0x2000 | 0x4000, 0);
@@ -775,6 +931,21 @@ Item {
 
                 text: "导出工程"
                 onClicked: {
+                    if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
+                        dialogCommon.show({
+                            Msg: '请先新建一个工程',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+
+
                     let ret = FrameManager.sl_qml_CompressDir(
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + ".zip",
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
@@ -828,9 +999,10 @@ Item {
 
                             enabled = false;
 
-                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + "Leamus";
+                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + "$Leamus";
 
-                            //let nr = FrameManager.sl_qml_DownloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectPath + ".zip");
+                            //https://qiniu.leamus.cn/Project.zip
+                            //https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip
                             let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/Project.zip", projectPath + ".zip");
                             nr.finished.connect(function() {
                                 //FrameManager.sl_qml_Property("属性", nr);  //TimeStamp、Data、SaveType、Code
@@ -840,6 +1012,7 @@ Item {
 
 
                                 dialogCommon.close();
+                                enabled = true;
 
                                 if(FrameManager.sl_qml_Property("Code", nr) < 0) {
                                     dialogCommon.show({
@@ -862,7 +1035,7 @@ Item {
                                 let ret = FrameManager.sl_qml_ExtractDir(projectPath + ".zip", projectPath);
 
                                 if(ret.length > 0) {
-                                    _private.changeProject('Leamus');
+                                    _private.changeProject('$Leamus');
 
                                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
                                     dialogCommon.msg = "成功";
@@ -880,12 +1053,11 @@ Item {
                                 };
                                 dialogCommon.open();
 
-                                enabled = true;
                             });
 
 
                             textinputDialogCommonInput.visible = false;
-                            dialogCommon.msg = "正在下载工程，请等待（请勿进行其他操作）";
+                            dialogCommon.msg = "正在下载，请等待（请勿进行其他操作）";
                             dialogCommon.standardButtons = Dialog.NoButton;
                             dialogCommon.fOnAccepted = ()=>{
                                 dialogCommon.open();
@@ -1706,6 +1878,21 @@ Item {
 
         //载入模块
         function loadModule(modulePath) {
+            if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
+                dialogCommon.show({
+                    Msg: '请先新建一个工程',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        rootGameMaker.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        rootGameMaker.forceActiveFocus();
+                    },
+                });
+                return;
+            }
+
+
             loader.visible = true;
             //loader.focus = true;
             loader.forceActiveFocus();

@@ -1268,7 +1268,7 @@ Item {
                                 //if(_private.nStep === 1) {
 
                                     //没血的跳过
-                                    if(fight.myCombatants[modelData].$$propertiesWithExtra.HP[0] <= 0)
+                                    if(!game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[modelData]))
                                         return;
 
 
