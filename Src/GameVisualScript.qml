@@ -2017,19 +2017,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualScript]Keys.onPressed:", event.key);
+        console.debug("[GameVisualScript]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualScript]Keys.onReleased:", event.key);
+        console.debug("[GameVisualScript]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-
+        console.debug("[GameVisualScript]Component.onCompleted");
     }
-
     Component.onDestruction: {
-
+        console.debug("[GameVisualScript]Component.onDestruction");
     }
 }
-

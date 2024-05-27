@@ -85,8 +85,8 @@ Item {
                 color: "#80000000"
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
-                border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                border.width: msgBox.textArea.focus ? 2 : 1
+                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
 
@@ -134,9 +134,11 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainAgreement]key:", event, event.key, event.text)
+        console.debug('[mainAgreement]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-
+    Keys.onReleased: {
+        console.debug('[mainAgreement]Keys.onReleased:', event.key, event.isAutoRepeat);
+    }
 
 
     Component.onCompleted: {

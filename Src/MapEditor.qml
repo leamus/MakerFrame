@@ -1217,6 +1217,20 @@ Item {
 
                             }
 
+                        /* /!!!不知为何，多次旋转移动后，就点不到itemTest了（点的是MultiPointTouchArea），应该是Qt的Bug，怎么改都无效（替换Mask、移动组件位置、修改z值等等）
+                        PinchHandler {
+                            id: pinchHandler
+
+                            target: itemMapBlockContainer
+                            ////pinch.dragAxis: Pinch.XAndYAxis
+                            //禁止旋转
+                            maximumRotation: 0
+                            minimumRotation: 0
+
+                        }
+                        */
+
+
                             //选择图块
                             MouseArea {
                                 anchors.fill: parent
@@ -1256,8 +1270,8 @@ Item {
 
                                 }
                             }
-
                         }
+
 
                         //选择框
                         Rectangle {
@@ -1416,6 +1430,9 @@ Item {
                     id: canvasMapContainer
 
                     property real rLastScale: 1  //保存的是上次缩放比例，再次缩放时计算新的缩放比例
+                    property point pointLastPos
+                    property point pointScaleCenterPos: Qt.point(0, 0)
+
                     property int nCurrentCanvasMap: 0   //当前图层id
                     property var arrCanvasMap: []       //图层列表
 
@@ -1423,6 +1440,29 @@ Item {
                     transformOrigin: Item.TopLeft   //!!必须加这句才可以在flickable中缩放到正常位置
                     //anchors.centerIn: parent
 
+                    transform: [
+                        Rotation {  //旋转
+
+                        },
+
+                        Translate { //平移
+
+                        },
+
+                        Scale {         //缩放，如果为负则是镜像
+                            origin {    //缩放围绕的 原点坐标
+                                //x: canvasMapContainer.pointScaleCenterPos.x
+                                //y: canvasMapContainer.pointScaleCenterPos.y
+                            }
+                            /*xScale:
+                                rootWindow.width / Global.frameConfig.$sys.sizeWindowVirtualSize.width
+                            yScale:
+                                rootWindow.height / Global.frameConfig.$sys.sizeWindowVirtualSize.height
+                            */
+                        }
+
+
+                    ]
 
 
                     Component {
@@ -1779,6 +1819,7 @@ Item {
                     onPinchStarted: {
                         pinch.accepted = true;
 
+                        canvasMapContainer.pointScaleCenterPos = canvasMapContainer.pointLastPos = Qt.point(pinch.center.x, pinch.center.y);
                         //flickable.pointLastContent.x = pinch.center.x;
                         //flickable.pointLastContent.y = pinch.center.y;
                     }
@@ -1787,6 +1828,28 @@ Item {
                     onPinchUpdated: {
                         canvasMapContainer.scale = canvasMapContainer.rLastScale * pinch.scale;
                         //console.debug("onPinchUpdated", pinch.scale);
+
+                        if(flickable.width < flickable.contentWidth) {
+                            let resultX = parseInt(flickable.contentX + (canvasMapContainer.pointLastPos.x - pinch.center.x));
+                            if(resultX < 0)
+                                flickable.contentX = 0;
+                            else if(resultX > flickable.contentWidth - flickable.width)
+                                flickable.contentX = flickable.contentWidth - flickable.width;
+                            else
+                                flickable.contentX = resultX;
+                            //flickable.contentX += (canvasMapContainer.pointLastPos.x - pinch.center.x);
+                        }
+                        if(flickable.height < flickable.contentHeight) {
+                            let resultY = parseInt(flickable.contentY + (canvasMapContainer.pointLastPos.y - pinch.center.y));
+                            if(resultY < 0)
+                                flickable.contentY = 0;
+                            else if(resultY > flickable.contentHeight - flickable.height)
+                                flickable.contentY = flickable.contentHeight - flickable.height;
+                            else
+                                flickable.contentY = resultY;
+                            //flickable.contentY += (canvasMapContainer.pointLastPos.y - pinch.center.y);
+                        }
+                        //canvasMapContainer.pointLastPos = Qt.point(pinch.center.x, pinch.center.y);
 
 
                         /*if(pinch.scale > 1) {
@@ -1869,6 +1932,19 @@ Item {
                         console.debug("!!!pinch2", flickable.width, flickable.height, flickable.contentWidth, flickable.contentHeight, flickable.contentX, flickable.contentY, pinch.center.x, pinch.center.y)
                         */
                     }
+
+
+                /*/!!!不知为何，多次旋转移动后，就点不到itemTest了（点的是MultiPointTouchArea），应该是Qt的Bug，怎么改都无效（替换Mask、移动组件位置、修改z值等等）
+                PinchHandler {
+                    id: pinchHandler
+
+                    target: parent
+                    ////pinch.dragAxis: Pinch.XAndYAxis
+                    //禁止旋转
+                    maximumRotation: 0
+                    minimumRotation: 0
+
+                }*/
 
                     //!!这个鼠标事件貌似必须放在Pinch中，否则不能响应Pinch
                     MouseArea {  //可以处理滚轮缩放（如果处理绘制，则会和Flickable的拖动冲突）
@@ -2510,8 +2586,8 @@ Item {
             function fnSave() {
                 if(_private.exportMap()) {
                     //第一次保存，重新刷新
-                    //if(_private.strMapName === '')
-                    //    _private.refreshMap();
+                    if(_private.strMapName === '')
+                        _private.loadScript(textMapName.text);
 
                     _private.strMapName = textMapName.text;
 
@@ -2803,8 +2879,8 @@ Item {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: textCode.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -2956,10 +3032,10 @@ Item {
 
         function show() {
             visible = true;
-            forceActiveFocus();
-            //item.forceActiveFocus();
             //focus = true;
+            forceActiveFocus();
             //item.focus = true;
+            //item.forceActiveFocus();
         }
 
 
@@ -3046,10 +3122,10 @@ Item {
 
         function show() {
             visible = true;
-            //forceActiveFocus();
-            //item.forceActiveFocus();
             focus = true;
+            //forceActiveFocus();
             item.focus = true;
+            //item.forceActiveFocus();
         }
 
 
@@ -3310,10 +3386,6 @@ Item {
         function saveJS() {
             /*/第一次保存，重新刷新
             if(_private.strRoleName === '') {
-                if(comboType.currentIndex === 1)
-                    textCode.text = _private.strTemplateCode0;
-                else
-                    textCode.text = '';
             }*/
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
@@ -3632,7 +3704,10 @@ Item {
         console.debug("[MapEditor]Back Key");
     }
     Keys.onPressed: {
-        console.debug("[MapEditor]key:", event, event.key, event.text);
+        console.debug("[MapEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[MapEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
@@ -3647,7 +3722,6 @@ Item {
 
         console.debug("[MapEditor]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[MapEditor]Component.onDestruction");
     }

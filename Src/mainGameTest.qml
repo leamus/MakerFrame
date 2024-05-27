@@ -102,7 +102,8 @@ Item {
             onClicked: {
 
                 l_listChoice.visible = true;
-                l_listChoice.focus = true;
+                //l_listChoice.focus = true;
+                //l_listChoice.forceActiveFocus();
                 l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, "*", 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textMapName;
@@ -132,7 +133,8 @@ Item {
             onClicked: {
 
                 l_listChoice.visible = true;
-                l_listChoice.focus = true;
+                //l_listChoice.focus = true;
+                //l_listChoice.forceActiveFocus();
                 l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, "*", 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textRoleName;
@@ -252,8 +254,19 @@ Item {
 
 
 
+        Connections {
+            target: loaderGameScene.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
+            function onS_close() {
+                _private.gameSceneClose();
+            }
+        }
+
+
         onStatusChanged: {
-            console.log('[mainGameTest]loaderGameScene.status：', status);
+            console.debug('[mainGameTest]loaderGameScene.status：', status);
 
             if(status === Loader.Ready) {
             }
@@ -262,45 +275,56 @@ Item {
 
                 showBusyIndicator(false);
             }
+            else if(status === Loader.Null) {
+
+            }
         }
 
         onLoaded: {
             console.debug("[mainGameTest]loaderGameScene onLoaded");
 
-
-            /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
-            //let cfg = File.read(filePath);
-            let cfg = FrameManager.sl_qml_ReadFile(filePath);
-            //console.debug("cfg", cfg, filePath);
-
-            if(!cfg)
-                return false;
-            cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            //loaderGameScene.setSource("./MapEditor_1.qml", {});
-            loaderGameScene.item.openMap(cfg);
-            */
-
-            loaderGameScene.visible = true;
-            loaderGameScene.focus = true;
-            //loaderGameScene.item.focus = true;
-            loaderGameScene.item.forceActiveFocus();
-
-
-            //item.testFresh();
-            loaderGameScene.item.bTest = true;
-            //loaderGameScene.item.openMap(item);
-            let tScript = function*() {
-                game.loadmap(textMapName.text);
-                game.createhero(textRoleName.text);
-                game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
-                game.interval(16);
-                game.goon();
-                yield game.msg('欢迎来到鹰歌Maker世界！');
-            }
-
             try {
-                loaderGameScene.item.init(tScript, true);
+                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
+                //let cfg = File.read(filePath);
+                let cfg = FrameManager.sl_qml_ReadFile(filePath);
+                //console.debug("cfg", cfg, filePath);
+
+                if(!cfg)
+                    return false;
+                cfg = JSON.parse(cfg);
+                //console.debug("cfg", cfg);
+                //loaderGameScene.setSource("./MapEditor_1.qml", {});
+                loaderGameScene.item.openMap(cfg);
+                */
+
+
+
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //loaderGameScene.focus = true;
+                loaderGameScene.forceActiveFocus();
+
+                //loaderGameScene.item.focus = true;
+                if(loaderGameScene.item.forceActiveFocus)
+                    loaderGameScene.item.forceActiveFocus();
+
+
+                //item.testFresh();
+                loaderGameScene.item.bTest = true;
+                //loaderGameScene.item.openMap(item);
+                let tScript = function*() {
+                    game.loadmap(textMapName.text);
+                    game.createhero(textRoleName.text);
+                    game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                    game.interval(16);
+                    game.goon();
+                    yield game.msg('欢迎来到鹰歌Maker世界！');
+                }
+
+                if(loaderGameScene.item.init)
+                    loaderGameScene.item.init(tScript, true);
+
+
+                loaderGameScene.visible = true;
             }
             catch(e) {
                 _private.gameSceneClose();
@@ -308,18 +332,6 @@ Item {
             }
             finally {
                 showBusyIndicator(false);
-            }
-        }
-
-
-
-        Connections {
-            target: loaderGameScene.item
-            //忽略没有的信号
-            ignoreUnknownSignals: true
-
-            function onS_close() {
-                _private.gameSceneClose();
             }
         }
     }
@@ -418,18 +430,16 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameTest]Keys.onPressed:", event, event.key, event.text)
+        console.debug("[mainGameTest]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[mainGameTest]Keys.onReleased:', event, event.key, event.text);
+        console.debug("[mainGameTest]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
-
 
 
     Component.onCompleted: {
         console.debug("[mainGameTest]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[mainGameTest]Component.onDestruction");
     }

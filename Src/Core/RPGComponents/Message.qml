@@ -153,8 +153,8 @@ Notepad {
     textArea.background: Rectangle {
         color: 'transparent'
         //color: Global.style.backgroundColor
-        //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-        //border.width: debugMsg.textArea.focus ? 2 : 1
+        //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+        //border.width: parent.parent.textArea.activeFocus ? 2 : 1
     }
 
     /*textArea.onReleased: {

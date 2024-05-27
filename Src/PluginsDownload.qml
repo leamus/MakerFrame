@@ -306,7 +306,10 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[PluginsDownload]key:", event, event.key, event.text)
+        console.debug("[PluginsDownload]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[PluginsDownload]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
@@ -315,7 +318,6 @@ Item {
 
         console.debug("[PluginsDownload]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[PluginsDownload]Component.onDestruction");
     }

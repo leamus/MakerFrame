@@ -9,6 +9,7 @@ Rectangle {
 
 
     signal s_pressed();
+    signal s_released();
 
 
     width: 6 * Screen.pixelDensity
@@ -27,12 +28,10 @@ Rectangle {
         }
         */
         onPressed: {
-            parent.scale = 0.9;
-
             s_pressed();
         }
         onReleased: {
-            parent.scale = 1;
+            s_released();
         }
     }
 }

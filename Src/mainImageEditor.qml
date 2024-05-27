@@ -472,11 +472,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainImageEditor]key:", event, event.key, event.text);
+        console.debug("[mainImageEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[mainImageEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-
+        console.debug("[mainImageEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainImageEditor]Component.onDestruction");
     }
 }

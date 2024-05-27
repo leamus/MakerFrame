@@ -488,11 +488,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainVideoEditor]key:", event, event.key, event.text);
+        console.debug("[mainVideoEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[mainVideoEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-
+        console.debug("[mainVideoEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainVideoEditor]Component.onDestruction");
     }
 }

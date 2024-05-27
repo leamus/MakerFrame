@@ -34,6 +34,15 @@ Item {
 
 
 
+    function init() {
+        if(loader.status === Loader.Loading)
+            showBusyIndicator(true);
+
+        _private.refresh();
+    }
+
+
+
     //width: 600
     //height: 800
     anchors.fill: parent
@@ -83,10 +92,10 @@ Item {
 
             //visible = false;
             loader.visible = true;
-            loader.focus = true;
-
-            loader.item.forceActiveFocus();
+            //loader.focus = true;
+            loader.forceActiveFocus();
             //loader.item.focus = true;
+            loader.item.forceActiveFocus();
 
 
             if(index === 0) {
@@ -146,13 +155,6 @@ Item {
         asynchronous: true
 
 
-        onLoaded: {
-            showBusyIndicator(false);
-
-            //_private.refresh();
-
-            console.debug("[mainRoleEditor]Loader onLoaded");
-        }
 
         Connections {
             target: loader.item
@@ -165,6 +167,34 @@ Item {
                 loader.visible = false;
                 //root.focus = true;
                 //l_listRole.forceActiveFocus();
+            }
+        }
+
+
+        onStatusChanged: {
+            console.debug('[mainRoleEditor]loader.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+            else if(status === Loader.Null) {
+
+            }
+        }
+
+        onLoaded: {
+            console.debug("[mainRoleEditor]loader onLoaded");
+
+            try {
+                //_private.refresh();
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
             }
         }
     }
@@ -206,16 +236,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainRoleEditor]key:", event, event.key, event.text)
+        console.debug("[mainRoleEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[mainRoleEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        if(loader.status === Loader.Loading)
-            showBusyIndicator(true);
-
-        _private.refresh();
-
         console.debug("[mainRoleEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainRoleEditor]Component.onDestruction");
     }
 }

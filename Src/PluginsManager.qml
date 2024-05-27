@@ -107,14 +107,6 @@ Item {
 
         function close() {
             loaderExtends.source = '';
-
-            //l_list.visible = true;
-            //l_list.forceActiveFocus();
-            _private.refresh();
-
-
-            FrameManager.sl_qml_clearComponentCache();
-            FrameManager.sl_qml_trimComponentCache();
         }
 
 
@@ -126,6 +118,7 @@ Item {
 
         source: ""
         asynchronous: true
+
 
 
         Connections {
@@ -141,27 +134,42 @@ Item {
 
 
         onStatusChanged: {
-            console.log('[PluginsManager]loaderExtends.status：', status);
+            console.debug('[PluginsManager]loaderExtends.status：', status);
 
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
                 showBusyIndicator(false);
             }
+            else if(status === Loader.Null) {
+                //l_list.visible = true;
+                //l_list.forceActiveFocus();
+                _private.refresh();
+
+
+                FrameManager.sl_qml_clearComponentCache();
+                FrameManager.sl_qml_trimComponentCache();
+            }
         }
 
         onLoaded: {
-            console.debug("[PluginsManager]loader onLoaded");
-
-            loaderExtends.visible = true;
-            loaderExtends.focus = true;
-            //loaderExtends.item.focus = true;
-            if(loaderExtends.item.forceActiveFocus)
-                loaderExtends.item.forceActiveFocus();
-
+            console.debug("[PluginsManager]loaderExtends onLoaded");
 
             try {
-                //loaderGameScene.item.init(true, true);
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //loaderExtends.focus = true;
+                loaderExtends.forceActiveFocus();
+
+                //loader.item.focus = true;
+                if(loaderExtends.item.forceActiveFocus)
+                    loaderExtends.item.forceActiveFocus();
+
+                if(loaderExtends.item.init)
+                    loaderExtends.item.init();
+
+                loaderExtends.visible = true;
+
+
                 l_list.visible = false;
             }
             catch(e) {
@@ -301,7 +309,7 @@ Item {
 
 
                     dialogCommon.show({
-                        Msg: '不能运行扩展',
+                        Msg: '扩展不能运行',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
                             l_list.forceActiveFocus();
@@ -399,7 +407,10 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[PluginsManager]key:", event, event.key, event.text)
+        console.debug("[PluginsManager]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[PluginsManager]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
@@ -408,7 +419,6 @@ Item {
 
         console.debug("[PluginsManager]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[PluginsManager]Component.onDestruction");
     }

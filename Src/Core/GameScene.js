@@ -333,10 +333,25 @@ function loadResources() {
                     button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
                 button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
-                button.s_pressed.connect(function() {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                    //    return;
-                    game.run(tConfig.$clicked() ?? null);
+
+                if(tConfig.$pressed)
+                    button.s_pressed.connect(function() {
+                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                        //    return;
+                        game.run(tConfig.$pressed.call(button) ?? null);
+                });
+                //！！！兼容旧代码
+                else if(tConfig.$clicked)
+                    button.s_pressed.connect(function() {
+                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                        //    return;
+                        game.run(tConfig.$clicked.call(button) ?? null);
+                });
+                if(tConfig.$released)
+                    button.s_released.connect(function() {
+                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                        //    return;
+                        game.run(tConfig.$released.call(button) ?? null);
                 });
             }
 

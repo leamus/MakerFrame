@@ -315,16 +315,44 @@ Item {
 
         anchors.fill: parent
 
-        onLoaded: {
-            //item.testFresh();
-            console.debug("[mainTutorial]Loader onLoaded");
-        }
+
 
         Connections {
             target: loader.item
+
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
+
             function onS_close() {
-                loader.visible = false;
                 root.forceActiveFocus();
+
+                loader.visible = false;
+            }
+        }
+
+
+        onStatusChanged: {
+            console.debug('[mainTutorial]loader.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+        }
+
+        onLoaded: {
+            console.debug("[mainTutorial]loader onLoaded");
+
+            try {
+                //item.testFresh();
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
             }
         }
     }
@@ -365,9 +393,11 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainTutorial]key:", event, event.key, event.text)
+        console.debug("[mainTutorial]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
-
+    Keys.onReleased: {
+        console.debug("[mainTutorial]Keys.onReleased:", event.key, event.isAutoRepeat);
+    }
 
 
     Component.onCompleted: {

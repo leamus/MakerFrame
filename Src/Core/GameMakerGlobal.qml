@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.10.4.240509'
+    property string version: '1.10.6.240527'
 
 
     //配置
@@ -349,11 +349,13 @@ QtObject {
             let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
             let xhr = new XMLHttpRequest;
             xhr.open('POST', url, true);  //建立间接，要求异步响应
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');  //设置为表单方式提交
+            xhr.setRequestHeader('Content-type', 'application/json');  //'application/json'（格式为json字符串）, 'application/x-www-form-urlencoded'（表单方式提交，注意需要将value转换为url格式）, 'multipart/form-data'
+            //xhr.setRequestHeader('Content-Encoding', 'gzip');
+            //xhr.setRequestHeader('Accept-Encoding', 'gzip');
             xhr.onreadystatechange = function() {  //绑定响应状态事件监听函数
                 if (xhr.readyState == 4) {  //监听readyState状态
                     if (xhr.status == 200) {  //监听HTTP状态码
-                        //console.log('XMLHttpRequest:', xhr.responseText);  //接收数据
+                        //console.debug('XMLHttpRequest:', xhr.responseText);  //接收数据
                     }
                     else
                         //0, '', '网页内容', object, null, '',
@@ -363,7 +365,18 @@ QtObject {
                 //else
                 //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
             }
-            xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`);  //发送请求
+            xhr.send(   //发送请求
+                //FrameManager.sl_qml_gzipCompress(
+                    JSON.stringify({
+                        client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})`,
+                        product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
+                        serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}`,
+                        timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
+                        times: settings.$RunTimes, duration: settings.$RunDuration,
+                    })
+                //, -1, 0)
+            );
+            //xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`);  //发送请求
             //xhr.send();
         }
 

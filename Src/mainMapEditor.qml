@@ -34,6 +34,15 @@ Item {
 
 
 
+    function init() {
+        if(loader.status === Loader.Loading)
+            showBusyIndicator(true);
+
+        _private.refresh();
+    }
+
+
+
     //width: 600
     //height: 800
     anchors.fill: parent
@@ -67,7 +76,6 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
             //loader.item.focus = true;
-
             s_close();
         }
 
@@ -452,9 +460,9 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            //root.focus = true;
             //loader.focus = true;
             //loader.forceActiveFocus();
+            //root.focus = true;
             //root.forceActiveFocus();
 
             console.debug("[mainMapEditor]You chose: " + fileUrl, fileUrls);
@@ -735,56 +743,6 @@ Item {
         asynchronous: true
 
 
-        onLoaded: {
-            //创建地图工作
-
-            if(dialogMapData.nCreateMapType === 1) {
-                //loader.setSource("./MapEditor.qml", {});
-                //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
-                loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
-                                             MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
-                                             MapBlockImage: [textMapBlockResourceName.text]
-                                         });
-
-                //loader.item.testFresh();
-
-            }
-            else if(dialogMapData.nCreateMapType === 2) {
-
-                dialogMapData.mapData.MapSize[0] = textMapWidth.text;
-                dialogMapData.mapData.MapSize[1] = textMapHeight.text;
-                dialogMapData.mapData.MapBlockSize[0] = textBlockWidth.text;
-                dialogMapData.mapData.MapBlockSize[1] = textBlockHeight.text;
-                dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
-
-                loader.item.openMap(dialogMapData.mapData);
-
-            }
-
-            textMapBlockImageURL.text = "";
-            textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.text = "";
-            textMapBlockResourceName.enabled = true;
-
-            labelDialogTips.text = "";
-
-
-            //visible = false;
-            //dialogMapData.focus = false;
-            loader.visible = true;
-            //loader.focus = true;
-            //loader.item.focus = true;
-            loader.item.forceActiveFocus();
-
-            //console.log("Ok clicked");
-
-
-            showBusyIndicator(false);
-
-            //_private.refresh();
-
-            console.debug("[mainMapEditor]loader onLoaded");
-        }
 
         Connections {
             target: loader.item
@@ -792,17 +750,85 @@ Item {
             ignoreUnknownSignals: true
 
             function onS_close() {
-                _private.refresh();
-
-                loader.visible = false;
                 //!!!!!!作用：绕过 多次载入地图编辑器时黑屏 的问题
                 //  经详细排查，貌似是内存不足（创建新图层引起的），但奇怪的是，即使destroy成功，内存也不会释放，但这个Loader释放后就正常了。
                 //  游戏中因为没有创建新图层所以不会有问题。
                 loader.source = '';
+            }
+        }
+
+
+        onStatusChanged: {
+            console.debug('[mainMapEditor]loader.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+            else if(status === Loader.Null) {
+                _private.refresh();
+
+                loader.visible = false;
                 //root.focus = true;
-
-
                 //l_listMaps.forceActiveFocus();
+            }
+        }
+
+        onLoaded: {
+            console.debug("[mainMapEditor]loader onLoaded");
+
+            try {
+                //_private.refresh();
+
+                //创建地图工作
+
+                if(dialogMapData.nCreateMapType === 1) {
+                    //loader.setSource("./MapEditor.qml", {});
+                    //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
+                    loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
+                                                 MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
+                                                 MapBlockImage: [textMapBlockResourceName.text]
+                                             });
+
+                    //loader.item.testFresh();
+
+                }
+                else if(dialogMapData.nCreateMapType === 2) {
+
+                    dialogMapData.mapData.MapSize[0] = textMapWidth.text;
+                    dialogMapData.mapData.MapSize[1] = textMapHeight.text;
+                    dialogMapData.mapData.MapBlockSize[0] = textBlockWidth.text;
+                    dialogMapData.mapData.MapBlockSize[1] = textBlockHeight.text;
+                    dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
+
+                    loader.item.openMap(dialogMapData.mapData);
+
+                }
+
+                textMapBlockImageURL.text = "";
+                textMapBlockImageURL.enabled = false;
+                textMapBlockResourceName.text = "";
+                textMapBlockResourceName.enabled = true;
+
+                labelDialogTips.text = "";
+
+
+                //visible = false;
+                //dialogMapData.focus = false;
+                loader.visible = true;
+                //loader.focus = true;
+                //loader.item.focus = true;
+                loader.item.forceActiveFocus();
+
+                //console.log("Ok clicked");
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                //busyIndicator.running = false;
+                showBusyIndicator(false);
             }
         }
     }
@@ -861,16 +887,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainMapEditor]key:", event, event.key, event.text)
+        console.debug("[mainMapEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[mainMapEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        if(loader.status === Loader.Loading)
-            showBusyIndicator(true);
-
-        _private.refresh();
-
         console.debug("[mainMapEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainMapEditor]Component.onDestruction");
     }
 }

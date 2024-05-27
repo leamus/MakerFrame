@@ -2017,9 +2017,9 @@ Item {
         visible: false
         onAccepted: {
             //root.focus = true;
+            //root.forceActiveFocus();
             //loader.focus = true;
             //loader.forceActiveFocus();
-            //root.forceActiveFocus();
 
 
             console.debug("[RoleEditor]You chose: " + fileUrl, fileUrls);
@@ -2449,8 +2449,8 @@ Item {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: textCode.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -2502,8 +2502,10 @@ Item {
             function fnSave() {
                 if(_private.exportRole()) {
                     //第一次保存，重新刷新
-                    if(_private.strRoleName === '')
+                    if(_private.strRoleName === '') {
+                        _private.loadScript(textRoleName.text);
                         _private.refreshRole();
+                    }
 
                     _private.strRoleName = textRoleName.text;
 
@@ -2678,10 +2680,10 @@ Item {
 
         function show() {
             visible = true;
-            forceActiveFocus();
-            //item.forceActiveFocus();
             //focus = true;
+            forceActiveFocus();
             //item.focus = true;
+            //item.forceActiveFocus();
         }
 
 
@@ -2935,7 +2937,7 @@ function $refresh(index, imageAnimate, path) {
         function saveJS() {
             //第一次保存，重新刷新
             if(_private.strRoleName === '') {
-                if(comboType.currentIndex === 1)
+                if(comboType.currentIndex === 1)    //序列图片文件
                     textCode.text = _private.strTemplateCode0;
                 else
                     textCode.text = '';
@@ -3236,24 +3238,26 @@ function $refresh(index, imageAnimate, path) {
         event.accepted = true;
     }
     Keys.onPressed: {
+        event.accepted = true;
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
 
         _private.doAction(1, event.key);
 
-        event.accepted = true;
 
-
-        console.debug("[RoleEditor]key:", event, event.key, event.text)
+        console.debug("[RoleEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
+        event.accepted = true;
+
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
 
         _private.stopAction(1, event.key);
 
-        console.debug("[RoleEditor]Keys.onReleased", event.isAutoRepeat);
+
+        console.debug("[RoleEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
 
         //console.debug(role.arrActionsData);
         //console.debug(textRoleFangXiangIndex.text.split(','));
@@ -3271,5 +3275,11 @@ function $refresh(index, imageAnimate, path) {
         layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Right', bActionReadOnly: true, bActionColor: 'red'}));
         layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Down', bActionReadOnly: true, bActionColor: 'red'}));
         layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Left', bActionReadOnly: true, bActionColor: 'red'}));
+
+
+        console.debug("[RoleEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[RoleEditor]Component.onDestruction");
     }
 }

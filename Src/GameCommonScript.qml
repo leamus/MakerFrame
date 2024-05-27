@@ -95,7 +95,9 @@ let $config = {
             $color: 'red',
             $opacity: 0.6,
             $image: '',
-            $clicked: function() {
+            $pressed: function() {
+                this.scale = 0.9;
+
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
@@ -103,6 +105,9 @@ let $config = {
 
                 game.$sys.interact();
                 return null;
+            },
+            $released: function() {
+                this.scale = 1;
             },
         },
         {
@@ -112,7 +117,9 @@ let $config = {
             $color: 'blue',
             $opacity: 0.6,
             $image: '',
-            $clicked: function() {
+            $pressed: function() {
+                this.scale = 0.9;
+
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
@@ -122,6 +129,9 @@ let $config = {
                 //game.window(1, {MaskColor: 'transparent'});
                 return null;
             },
+            $released: function() {
+                this.scale = 1;
+            },
         },
         {
             $right: 10,
@@ -130,11 +140,16 @@ let $config = {
             $color: 'green',
 
             //按下事件
-            $clicked: function*() {
+            $pressed: function*() {
+                this.scale = 0.9;
+
                 if(game.pause(null))
                     return;
 
                 yield game.msg('自定义按键');
+            },
+            $released: function() {
+                this.scale = 1;
             },
         },
     ],
@@ -2031,8 +2046,8 @@ function $readSavesInfo(count=3) {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: notepadGameFightScriptScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: notepadGameFightScriptScript.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -2154,18 +2169,16 @@ function $readSavesInfo(count=3) {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameCommonScript]Keys.onPressed:", event.key);
+        console.debug("[GameCommonScript]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameCommonScript]Keys.onReleased:", event.key);
+        console.debug("[GameCommonScript]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
-
 
 
     Component.onCompleted: {
         console.debug("[GameCommonScript]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[GameCommonScript]Component.onDestruction");
     }

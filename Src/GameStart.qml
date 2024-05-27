@@ -40,20 +40,25 @@ Item {
         let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
         if(FrameManager.sl_qml_FileExists(filePath + 'main.js')) {
             gameVisualScript.loadData(filePath + 'main.vjs');
-            filePath = filePath + 'main.js';
             _private.strMainJSName = 'main.js';
 
-            data = FrameManager.sl_qml_ReadFile(filePath);
+            data = FrameManager.sl_qml_ReadFile(filePath + 'main.js');
         }
         //!!!兼容旧代码
         else if(FrameManager.sl_qml_FileExists(filePath + 'start.js')) {
             gameVisualScript.loadData(filePath + 'start.vjs');
-            filePath = filePath + 'start.js';
             _private.strMainJSName = 'start.js';
 
-            data = FrameManager.sl_qml_ReadFile(filePath);
+            data = FrameManager.sl_qml_ReadFile(filePath + 'start.js');
         }
-        console.debug('[GameStart]filePath：', filePath);
+        else {
+            gameVisualScript.loadData(filePath + 'main.vjs');
+            _private.strMainJSName = 'main.js';
+
+            data = FrameManager.sl_qml_ReadFile(filePath + 'main.js');
+        }
+        console.debug('[GameStart]filePath：', filePath + _private.strMainJSName);
+
 
         if(data) {
 
@@ -176,8 +181,8 @@ game.goon();
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: textGameStartScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: textGameStartScript.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -308,10 +313,10 @@ game.goon();
 
         function show() {
             visible = true;
-            //forceActiveFocus();
-            //item.forceActiveFocus();
-            focus = true;
+            //focus = true;
+            forceActiveFocus();
             //item.focus = true;
+            //item.forceActiveFocus();
         }
 
 
@@ -343,8 +348,8 @@ game.goon();
 
 
                 gameVisualScript.visible = false;
-                root.forceActiveFocus();
                 //root.focus = true;
+                root.forceActiveFocus();
             }
 
             onS_Compile: function(code) {
@@ -375,8 +380,19 @@ game.goon();
 
 
 
+        Connections {
+            target: loaderGameScene.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
+            function onS_close() {
+                _private.gameSceneClose();
+            }
+        }
+
+
         onStatusChanged: {
-            console.log('[GameStart]loaderGameScene.status：', status);
+            console.debug('[GameStart]loaderGameScene.status：', status);
 
             if(status === Loader.Ready) {
             }
@@ -385,23 +401,29 @@ game.goon();
 
                 showBusyIndicator(false);
             }
+            else if(status === Loader.Null) {
+
+            }
         }
 
         onLoaded: {
             console.debug('[GameStart]loaderGameScene onLoaded');
-            //buttonStartGame.enabled = true;
-            //item.testFresh();
-
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
-
-            loaderGameScene.visible = true;
-            loaderGameScene.focus = true;
-            //loaderGameScene.item.focus = true;
-            loaderGameScene.item.forceActiveFocus();
-
 
             try {
-                loaderGameScene.item.init(true, true);
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
+
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //loaderGameScene.focus = true;
+                loaderGameScene.forceActiveFocus();
+
+                //loaderGameScene.item.focus = true;
+                if(loaderGameScene.item.forceActiveFocus)
+                    loaderGameScene.item.forceActiveFocus();
+
+                if(loaderGameScene.item.init)
+                    loaderGameScene.item.init(true, true);
+
+                loaderGameScene.visible = true;
             }
             catch(e) {
                 _private.gameSceneClose();
@@ -409,18 +431,6 @@ game.goon();
             }
             finally {
                 showBusyIndicator(false);
-            }
-        }
-
-
-
-        Connections {
-            target: loaderGameScene.item
-            //忽略没有的信号
-            ignoreUnknownSignals: true
-
-            function onS_close() {
-                _private.gameSceneClose();
             }
         }
     }
@@ -540,18 +550,16 @@ function *$start() {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameStart]Keys.onPressed:', event, event.key, event.text);
+        console.debug('[GameStart]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameStart]Keys.onReleased:', event, event.key, event.text);
+        console.debug('[GameStart]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
-
 
 
     Component.onCompleted: {
         console.debug("[GameStart]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[GameStart]Component.onDestruction");
     }

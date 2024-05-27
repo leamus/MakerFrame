@@ -425,11 +425,17 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainMusicEditor]key:", event, event.key, event.text);
+        console.debug("[mainMusicEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug("[mainMusicEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-
+        console.debug("[mainMusicEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[mainMusicEditor]Component.onDestruction");
     }
 }

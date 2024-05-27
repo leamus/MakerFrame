@@ -265,8 +265,8 @@ let data = (function() {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: notepadGoodsScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: notepadGoodsScript.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -485,14 +485,17 @@ let data = (function() {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GoodsEditor]Keys.onPressed:', event.key);
+        console.debug('[GoodsEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GoodsEditor]Keys.onReleased:', event.key);
+        console.debug('[GoodsEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-
+        console.debug("[GoodsEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[GoodsEditor]Component.onDestruction");
     }
 }

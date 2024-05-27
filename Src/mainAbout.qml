@@ -85,8 +85,8 @@ Item {
                 color: "#80000000"
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
-                border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                border.width: msgBox.textArea.focus ? 2 : 1
+                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
 
         }
@@ -135,7 +135,10 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainAbout]key:", event, event.key, event.text)
+        console.debug('[mainAbout]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        console.debug('[mainAbout]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
@@ -175,7 +178,7 @@ Item {
   采用最流行的 javascript语言 来开发 编辑器、游戏脚本和扩展；js引擎是谷歌v8（非H5），运行效率高；
   能用c++、java（安卓）等本地语言来封装接口给js调用（比如 震动、gps等功能）；
   后端是C++和IOCP高并发模型的服务，已封装常用功能（登录、聊天、群组、帧同步等），可万人同时在线；
-  通信协议可支持TCP、UDP和HTTP三种常用协议，可选Websocket等其他扩展协议；
+  通信协议可支持TCP（Qt）、UDP（Qt）、HTTP（XmlHttpRequest，QML自带）、Websocket（QML自带）三种常用协议；
   支持主流的图片、音乐和视频播放；
   安卓内置一个Webview浏览器内核；
   存储/数据库 可采用远程mysql和本地sqlite（提供加密和未加密两种）；
@@ -190,7 +193,7 @@ Item {
     已集成SCodes/QZXing库（生成、扫描一维码和二维码）；
     已集成Quazip库（压缩、解压zip文件）；
     已集成SQLITECIPHER库（加密Sqlite）；
-    已集成libhv库（非常不错的网络库，可以使用tcp、udp、http、websocket等网络功能和服务；
+    已集成libhv库（非常不错的网络库，可以使用tcp、udp、http、websocket等开发网络服务和其他功能；
   以上功能大都已封装为js扩展来进行调用，也可以使用QML插件机制来编写和扩展；
 
 
@@ -265,7 +268,6 @@ Item {
 
         console.debug("[mainAbout]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[mainAbout]Component.onDestruction");
     }

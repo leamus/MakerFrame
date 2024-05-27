@@ -85,8 +85,8 @@ Item {
                 color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
-                border.color: msgBox.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                border.width: msgBox.textArea.focus ? 2 : 1
+                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
 
@@ -134,9 +134,11 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[mainUpdateLog]key:', event, event.key, event.text);
+        console.debug('[mainUpdateLog]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-
+    Keys.onReleased: {
+        console.debug("[mainUpdateLog]Keys.onReleased:", event.key, event.isAutoRepeat);
+    }
 
 
     Component.onCompleted: {
@@ -149,7 +151,28 @@ Item {
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽力去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
+2024/5/27：发布 1.10.6.240527 版本（Updater 1.5.14.240527版本，框架 1.3.31.240527版本）
+1、qml内核增加 Cycle 库，用来处理和打印循环引用的对象，方便调试（对象和数组用 xxx.toJson 函数，或 toJson(xxx)）；
+2、修复安卓下 Qt5的3D提示Found no suitable importer plugin for QUrl错误（Qt5.15.2的so文件丢失Bug）；
+*3、按钮增加 $pressed和$released（$clicked过时）；
+4、game.showimage 和 game.showsprite 命令增加参数 $pressed、$released、$pressAndHold 3个事件函数；
+5、修复 游戏开始 没有保存脚本的Bug（感谢网友：小哈）；
+6、修复所有可视化第一次进入时无法保存的Bug；
+
+2024/5/19：发布 1.10.5.240519 版本（框架 1.3.30.240519版本）
 1、修复点击角色但没有脚本时报错问题；
+2、4个编辑器加入脚本错误检测；
+3、修复应用不活动时，焦点设置无效问题（貌似是QML Bug，改为forceActiveFocus()就好了）；
+4、解决战斗载入脚本报错时无法操作和退出战斗场面问题；
+*5、将 objTmpSprites 和 objTmpImage 合并为 objTmpComponents（注意showsprite和showimage的id不能混淆）；
+6、优化 delimage和delsprite；
+*7、修改加密方式（移位和异或都与key长度有关了，这样会更乱一些）；
+8、修改HTTP通信请求格式为Json方式；
+9、内核增加sl_qml_gzipCompress、sl_qml_gzipUncompress、sl_qml_fromHex、sl_qml_toHex函数；
+*10、压缩函数的type默认值调整为0；
+11、http request支持gzip压缩；
+*12、默认加密方式加入压缩和Base64编码；
+*13、大幅优化细节；
 
 2024/5/9：发布 1.10.4.240509 版本（框架 1.3.29.240505版本）
 1、qml支持载入外部动态链接库，并载入特定参数的函数；
@@ -1439,7 +1462,6 @@ Item {
 
         console.debug("[mainUpdateLog]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[mainUpdateLog]Component.onDestruction");
     }

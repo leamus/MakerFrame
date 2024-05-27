@@ -226,8 +226,8 @@ let data = (function() {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: notepadGameFightScriptScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: notepadGameFightScriptScript.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -446,15 +446,17 @@ let data = (function() {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameFightScript]Keys.onPressed:', event.key);
+        console.debug('[GameFightScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameFightScript]Keys.onReleased:', event.key);
+        console.debug('[GameFightScript]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
-
 
 
     Component.onCompleted: {
-
+        console.debug('[GameFightScript]Component.onCompleted');
+    }
+    Component.onDestruction: {
+        console.debug("[GameFightScript]Component.onDestruction");
     }
 }

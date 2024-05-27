@@ -795,6 +795,10 @@ Item {
             saveLast: FightSceneJS.saveLast,
             loadLast: FightSceneJS.loadLast,
             resetFightScene: FightSceneJS.resetFightScene,
+            resetFightRole: FightSceneJS.resetFightRole,
+            actionSpritePlay: FightSceneJS.actionSpritePlay,
+            refreshFightRoleAction: FightSceneJS.refreshFightRoleAction,
+            resetRolesPosition: FightSceneJS.resetRolesPosition,
 
             continueFight: function(type=0, delay=0) {
                 if(type === 1)
@@ -1209,11 +1213,13 @@ Item {
                     //设置为可点或不可点
                     function setEnable(enable=true) {
                         if(enable) {
-                            tSpriteEffectMyCombatant.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            if(tSpriteEffectMyCombatant.sprite)
+                                tSpriteEffectMyCombatant.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
                             tRootMyCombatantComp.bCanClick = true;
                         }
                         else {
-                            tSpriteEffectMyCombatant.sprite.colorOverlayStop();
+                            if(tSpriteEffectMyCombatant.sprite)
+                                tSpriteEffectMyCombatant.sprite.colorOverlayStop();
                             tRootMyCombatantComp.bCanClick = false;
                         }
                     }
@@ -1454,11 +1460,13 @@ Item {
                     //设置为可点或不可点
                     function setEnable(enable=true) {
                         if(enable) {
-                            tSpriteEffectEnemy.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
+                            if(tSpriteEffectEnemy.sprite)
+                                tSpriteEffectEnemy.sprite.colorOverlayStart(["#00000000", "#7FFFFFFF", "#00000000"]);
                             tRootEnemyComp.bCanClick = true;
                         }
                         else {
-                            tSpriteEffectEnemy.sprite.colorOverlayStop();
+                            if(tSpriteEffectEnemy.sprite)
+                                tSpriteEffectEnemy.sprite.colorOverlayStop();
                             tRootEnemyComp.bCanClick = false;
                         }
                     }

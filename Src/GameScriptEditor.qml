@@ -126,8 +126,8 @@ Item {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: notepadScript.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: notepadScript.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -152,7 +152,6 @@ Item {
 
                 text: 'V'
                 onClicked: {
-
                     loaderVisualScript.show();
                 }
             }
@@ -239,10 +238,10 @@ Item {
 
 
             visible = true;
-            //forceActiveFocus();
-            //item.forceActiveFocus();
-            focus = true;
-            item.focus = true;
+            //focus = true;
+            forceActiveFocus();
+            //item.focus = true;
+            item.forceActiveFocus();
         }
 
 
@@ -256,22 +255,21 @@ Item {
         asynchronous: true
 
 
-        onLoaded: {
-            showBusyIndicator(false);
-
-            console.debug('[GameStart]loaderVisualScript onLoaded');
-        }
-
 
         Connections {
             target: loaderVisualScript.item
+
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
+
             function onS_close() {
                 //init();
 
 
                 loaderVisualScript.visible = false;
-                root.forceActiveFocus();
                 //root.focus = true;
+                root.forceActiveFocus();
             }
 
             function onS_Compile(code) {
@@ -279,6 +277,33 @@ Item {
 
                 notepadScript.setPlainText(code);
                 notepadScript.toBegin();
+            }
+        }
+
+
+        onStatusChanged: {
+            console.debug('[GameScriptEditor]loaderVisualScript.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+            else if(status === Loader.Null) {
+
+            }
+        }
+
+        onLoaded: {
+            console.debug('[GameScriptEditor]loaderVisualScript onLoaded');
+
+            try {
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
             }
         }
     }
@@ -400,8 +425,8 @@ Item {
             visible = false;
             //loader.visible = true;
             //root.focus = true;
-            //loader.item.focus = true;
             root.forceActiveFocus();
+            //loader.item.focus = true;
         }
 
     }
@@ -501,10 +526,10 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[mainScriptEditor]Keys.onPressed:', event.key);
+        console.debug('[mainScriptEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[mainScriptEditor]Keys.onReleased:', event.key);
+        console.debug('[mainScriptEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
@@ -515,7 +540,6 @@ Item {
 
         console.debug("[mainScriptEditor]Component.onCompleted");
     }
-
     Component.onDestruction: {
         console.debug("[mainScriptEditor]Component.onDestruction");
     }

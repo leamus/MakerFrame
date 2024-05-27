@@ -265,7 +265,7 @@ Item {
 
                 text: "打开工程"
                 onClicked: {
-                    l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, "*", 0x001 | 0x2000, 0x00);
+                    l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, "*", 0x001 | 0x2000, 0x03);
                     l_listProjects.visible = true;
                     //l_listProjects.focus = true;
                     //l_listProjects.forceActiveFocus();
@@ -1352,9 +1352,9 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            //rootGameMaker.focus = true;
             //loader.focus = true;
             //loader.forceActiveFocus();
+            //rootGameMaker.focus = true;
             //rootGameMaker.forceActiveFocus();
 
             console.debug("[mainGameMaker]You chose: " + fileUrl, fileUrls);
@@ -1438,31 +1438,6 @@ Item {
         asynchronous: true
 
 
-        onStatusChanged: {
-            console.debug('[mainGameMaker]loader.status：', status);
-
-            if (status === Loader.Ready) {
-            }
-            else if(status === Loader.Error) {
-                showBusyIndicator(false);
-            }
-        }
-
-        onLoaded: {
-            console.debug("[mainGameMaker]loader onLoaded");
-            //item.testFresh();
-
-            try {
-                if(loader.item.init)
-                    loader.item.init();
-            }
-            catch(e) {
-                throw e;
-            }
-            finally {
-                showBusyIndicator(false);
-            }
-        }
 
         Connections {
             target: loader.item
@@ -1472,6 +1447,19 @@ Item {
 
             function onS_close() {
                 loader.source = '';
+            }
+        }
+
+
+        onStatusChanged: {
+            console.debug('[mainGameMaker]loader.status：', status);
+
+            if(status === Loader.Ready) {
+            }
+            else if(status === Loader.Error) {
+                showBusyIndicator(false);
+            }
+            else if(status === Loader.Null) {
                 loader.visible = false;
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
@@ -1479,7 +1467,31 @@ Item {
 
                 FrameManager.sl_qml_clearComponentCache();
                 FrameManager.sl_qml_trimComponentCache();
+            }
+        }
 
+        onLoaded: {
+            console.debug("[mainGameMaker]loader onLoaded");
+
+            try {
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //loader.focus = true;
+                loader.forceActiveFocus();
+
+                //loader.item.focus = true;
+                if(loader.item.forceActiveFocus)
+                    loader.item.forceActiveFocus();
+
+                if(loader.item.init)
+                    loader.item.init();
+
+                loader.visible = true;
+            }
+            catch(e) {
+                throw e;
+            }
+            finally {
+                showBusyIndicator(false);
             }
         }
     }
@@ -1580,8 +1592,8 @@ Item {
                         color: 'black'
                         //color: 'transparent'
                         //color: Global.style.backgroundColor
-                        border.color: textHelpInfo.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                        border.width: textHelpInfo.textArea.focus ? 2 : 1
+                        border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                        border.width: parent.parent.textArea.activeFocus ? 2 : 1
                     }
                 }
             }
@@ -1739,8 +1751,8 @@ Item {
                         color: 'black'
                         //color: 'transparent'
                         //color: Global.style.backgroundColor
-                        border.color: textDebugInfo.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                        border.width: textDebugInfo.textArea.focus ? 2 : 1
+                        border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                        border.width: parent.parent.textArea.activeFocus ? 2 : 1
                     }
                 }
 
@@ -1893,9 +1905,9 @@ Item {
             }
 
 
-            loader.visible = true;
+            //loader.visible = true;
             //loader.focus = true;
-            loader.forceActiveFocus();
+            //loader.forceActiveFocus();
 
             loader.setSource(modulePath);
             if(loader.status === Loader.Loading)
@@ -1999,12 +2011,11 @@ Item {
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameMaker]Keys.onPressed:", event.key)
+        console.debug("[mainGameMaker]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainGameMaker]Keys.onReleased:", event.key)
+        console.debug("[mainGameMaker]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
-
 
 
     Component.onCompleted: {
@@ -2036,7 +2047,6 @@ Item {
 
         console.debug("[mainGameMaker]Component.onCompleted");
     }
-
     Component.onDestruction: {
         rootWindow.s_MessageHandler.disconnect(_private.appendDebugMessage);
 

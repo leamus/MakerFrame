@@ -289,7 +289,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'attack：'
+                            text: '攻击'
                         }
 
                         TextField {
@@ -299,7 +299,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '6'
-                            placeholderText: 'attack'
+                            placeholderText: '攻击'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -312,7 +312,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'defense：'
+                            text: '防御：'
                         }
 
                         TextField {
@@ -322,7 +322,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '6'
-                            placeholderText: 'defense'
+                            placeholderText: '防御'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -335,7 +335,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'power：'
+                            text: '灵力：'
                         }
 
                         TextField {
@@ -345,7 +345,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '6'
-                            placeholderText: 'Power'
+                            placeholderText: '灵力'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -358,7 +358,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'speed'
+                            text: '速度：'
                         }
 
                         TextField {
@@ -368,7 +368,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '6'
-                            placeholderText: 'speed'
+                            placeholderText: '速度'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -381,7 +381,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'luck：'
+                            text: '幸运：'
                         }
 
                         TextField {
@@ -391,7 +391,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '6'
-                            placeholderText: 'luck'
+                            placeholderText: '幸运'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -835,7 +835,7 @@ Item {
                         return;
 
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript);
+                    root.s_Compile(jsScript[1]);
 
                     console.debug("[GameVisualFightRole]compile:", _private.filepath, jsScript);
                 }
@@ -1062,9 +1062,33 @@ Item {
                 replace(/\$\$ExtraProperties\$\$/g, textExtraProperties.text.trim()/* || 'undefined'*/)
             ;
 
+
             console.debug(data);
 
-            return data;
+
+
+            try {
+                eval(data);
+            }
+            catch(e) {
+                dialogCommon.show({
+                    Msg: '错误：' + e.toString() + '<BR>请检查各参数',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+                        root.forceActiveFocus();
+                    },*/
+                });
+                return [false, data];
+            }
+
+            return [true, data];
         }
 
         function close() {
@@ -1077,11 +1101,13 @@ Item {
                         return;
 
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript);
+                    root.s_Compile(jsScript[1]);
 
                     saveData();
 
-                    s_close();
+                    if(jsScript[0])
+                        s_close();
+
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
@@ -1168,30 +1194,29 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualScript]Escape Key");
+        console.debug("[GameVisualFightRole]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualScript]Back Key");
+        console.debug("[GameVisualFightRole]Back Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualScript]Keys.onPressed:", event.key);
+        console.debug("[GameVisualFightRole]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualScript]Keys.onReleased:", event.key);
+        console.debug("[GameVisualFightRole]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
+        console.debug("[GameVisualFightRole]Component.onCompleted");
     }
-
     Component.onDestruction: {
+        console.debug("[GameVisualFightRole]Component.onDestruction");
     }
-
 }
-

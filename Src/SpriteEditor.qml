@@ -1016,9 +1016,9 @@ Item {
 
         onAccepted: {
             //root.focus = true;
+            //root.forceActiveFocus();
             //loader.focus = true;
             //loader.forceActiveFocus();
-            //root.forceActiveFocus();
 
 
             console.debug("[SpriteEditor]You chose: " + fileUrl, fileUrls);
@@ -1391,9 +1391,9 @@ Item {
 
         onAccepted: {
             //root.focus = true;
+            //root.forceActiveFocus();
             //loader.focus = true;
             //loader.forceActiveFocus();
-            //root.forceActiveFocus();
 
 
             console.debug("[SpriteEditor]You chose: " + fileUrl, fileUrls);
@@ -1822,8 +1822,8 @@ Item {
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor
-                    border.color: textCode.textArea.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: textCode.textArea.focus ? 2 : 1
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
                 bCode: true
@@ -1875,8 +1875,10 @@ Item {
             function fnSave() {
                 if(_private.exportSprite()) {
                     //第一次保存，重新刷新
-                    if(_private.strSpriteName === '')
+                    if(_private.strSpriteName === '') {
+                        _private.loadScript(textSpriteName.text);
                         _private.refreshSprite();
+                    }
 
                     _private.strSpriteName = textSpriteName.text;
 
@@ -2051,10 +2053,10 @@ Item {
 
         function show() {
             visible = true;
-            forceActiveFocus();
-            //item.forceActiveFocus();
             //focus = true;
+            forceActiveFocus();
             //item.focus = true;
+            //item.forceActiveFocus();
         }
 
 
@@ -2262,7 +2264,7 @@ function $refresh(index, imageAnimate, path) {
         function saveJS() {
             //第一次保存，重新刷新
             if(_private.strSpriteName === '') {
-                if(comboType.currentIndex === 1)
+                if(comboType.currentIndex === 1)    //序列图片文件
                     textCode.text = _private.strTemplateCode0;
                 else
                     textCode.text = '';
@@ -2392,20 +2394,22 @@ function $refresh(index, imageAnimate, path) {
         event.accepted = true;
     }
     Keys.onPressed: {
-
-        if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
-            return;
-
         event.accepted = true;
 
-
-        console.debug("[SpriteEditor]key:", event, event.key, event.text)
-    }
-    Keys.onReleased: {
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
 
-        console.debug("[SpriteEditor]Keys.onReleased", event.isAutoRepeat);
+
+        console.debug("[SpriteEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+    }
+    Keys.onReleased: {
+        event.accepted = true;
+
+        if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
+            return;
+
+
+        console.debug("[SpriteEditor]Keys.onReleased", event.key, event.isAutoRepeat);
 
         //console.debug(arrActionsData);
         //console.debug(textSpriteFangXiangIndex.text.split(','));
@@ -2413,6 +2417,9 @@ function $refresh(index, imageAnimate, path) {
 
 
     Component.onCompleted: {
-
+        console.debug("[SpriteEditor]Component.onCompleted");
+    }
+    Component.onDestruction: {
+        console.debug("[SpriteEditor]Component.onDestruction");
     }
 }

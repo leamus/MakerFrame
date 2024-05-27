@@ -820,7 +820,7 @@ Item {
                         return;
 
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript);
+                    root.s_Compile(jsScript[1]);
 
                     console.debug("[GameVisualGoods]compile:", _private.filepath, jsScript);
                 }
@@ -1146,9 +1146,33 @@ Item {
                 replace(/\$\$fightScript\$\$/g, fightSkillScript)
             ;
 
+
             console.debug(data);
 
-            return data;
+
+
+            try {
+                eval(data);
+            }
+            catch(e) {
+                dialogCommon.show({
+                    Msg: '错误：' + e.toString() + '<BR>请检查各参数',
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        dialogCommon.close();
+                        root.forceActiveFocus();
+                    },*/
+                });
+                return [false, data];
+            }
+
+            return [true, data];
         }
 
         function close() {
@@ -1161,11 +1185,13 @@ Item {
                         return;
 
                     //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript);
+                    root.s_Compile(jsScript[1]);
 
                     saveData();
 
-                    s_close();
+                    if(jsScript[0])
+                        s_close();
+
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
@@ -1347,30 +1373,29 @@ $$useEffect$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualScript]Escape Key");
+        console.debug("[GameVisualGoods]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualScript]Back Key");
+        console.debug("[GameVisualGoods]Back Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualScript]Keys.onPressed:", event.key);
+        console.debug("[GameVisualGoods]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualScript]Keys.onReleased:", event.key);
+        console.debug("[GameVisualGoods]Keys.onReleased:", event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
+        console.debug("[GameVisualGoods]Component.onCompleted");
     }
-
     Component.onDestruction: {
+        console.debug("[GameVisualGoods]Component.onDestruction");
     }
-
 }
-
