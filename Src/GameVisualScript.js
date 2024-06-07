@@ -21,7 +21,7 @@ let data = (function() {
     //  [命令Key名, 额外设置（enabled为是否注释）, 参数值1, ...]
     let sysCommands = ({
                                 '载入地图': {
-                                    command: ['载入地图', 'game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
+                                    command: ['载入地图', 'yield game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
                                     params: [
                                         ['*@地图名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
                                         ['载入一张地图', 'label'],

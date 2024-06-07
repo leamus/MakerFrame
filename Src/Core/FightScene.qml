@@ -200,11 +200,24 @@ Item {
             //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
             let button = compButtons.createObject(rowlayoutButtons);
             button.text = tb.$text;
-            button.clicked.connect(function() {
-                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                //    return;
-                fight.run(tb.$action(button) ?? null);
-            });
+            if(tb.$colors) {
+                button.colors = tb.$colors;
+                //button.color = tb.$colors[0];
+            }
+            if(tb.$clicked)
+                button.clicked.connect(function() {
+                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //    return;
+                    fight.run(tb.$clicked(button) ?? null);
+                });
+            //！！！兼容旧代码
+            else if(tb.$action)
+                button.clicked.connect(function() {
+                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //    return;
+                    fight.run(tb.$action(button) ?? null);
+                });
+            GlobalLibraryJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
         }
 
 
@@ -753,13 +766,17 @@ Item {
         }
 
 
-        //result：为undefined 发送fightOver信号（关闭战斗画面并清理）；为null则判断战斗是否结束；为其他值（0平1胜-1败-2逃跑）执行事件（事件中调用结束信号）；
+        //result：为undefined 发送fightOver信号（关闭战斗画面并清理）；为null则判断战斗是否结束；为true或对象则强制战斗结束；为其他值（0平1胜-1败-2逃跑）执行事件（事件中调用结束信号）；
         //流程：手动或自动 游戏结束，调用依次FightSceneJS.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
         readonly property var over: function(result) {
             if(result === undefined) {
                 s_FightOver();
                 return;
             }
+            else if(result === true)
+                FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2}, true);
+            else if(GlobalLibraryJS.isObject(result))
+                FightSceneJS.fightOver(result, true);
             else {
                 let fightResult = game.$sys.resources.commonScripts["check_all_combatants"](fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
                 if(result !== null) {
@@ -969,7 +986,9 @@ Item {
     //property var arrFightGenerators: []
 
 
-    anchors.fill: parent
+    //anchors.fill: parent
+    width: parent.width
+    height: parent.height
 
     focus: true
     clip: true
@@ -1176,7 +1195,7 @@ Item {
                             //文本
                             if(bar.$type === 1) {
                                 let obj = compText.createObject(tMyCombatantColumnLayout);
-                                //obj.
+                                obj.Layout.bottomMargin = bar.$spacing;
                                 cacheComponents.push(obj);
                             }
                             //状态条
@@ -1186,6 +1205,7 @@ Item {
                                 obj.bar1.color = bar.$colors[1] || 'white';
                                 obj.bar2.color = bar.$colors[0] || 'black';
                                 obj.height = bar.$height;
+                                obj.Layout.bottomMargin = bar.$spacing;
                                 cacheComponents.push(obj);
                             }
                         }
@@ -1336,6 +1356,9 @@ Item {
                         //anchors.bottomMargin: 10
                         width: tRootMyCombatantComp.width
 
+                        spacing: 0
+
+
                         /*Text {
                             id: textMyCombatantName
 
@@ -1423,7 +1446,7 @@ Item {
                             //文本
                             if(bar.$type === 1) {
                                 let obj = compText.createObject(tEnemyColumnLayout);
-                                //obj.
+                                obj.Layout.bottomMargin = bar.$spacing;
                                 cacheComponents.push(obj);
                             }
                             //状态条
@@ -1433,6 +1456,7 @@ Item {
                                 obj.bar1.color = bar.$colors[1] || 'black';
                                 obj.bar2.color = bar.$colors[0] || 'white';
                                 obj.height = bar.$height;
+                                obj.Layout.bottomMargin = bar.$spacing;
                                 cacheComponents.push(obj);
                             }
                         }
@@ -1539,6 +1563,9 @@ Item {
                         anchors.bottom: tRootEnemyComp.top
                         //anchors.bottomMargin: 10
                         width: tRootEnemyComp.width
+
+                        spacing: 0
+
 
                         /*Text {
                             id: textEnemyName
@@ -2000,10 +2027,7 @@ Item {
         ColorButton {
             text: "退出战斗"
             onButtonClicked: {
-                timerRoleSprite.stop();
-                _private.genFighting.clear(3);
-                _private.asyncScript.clear(3);
-                FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2});
+                fight.over(true);
 
                 //rootFightScene.visible = false;
                 //rootGameScene.forceActiveFocus();

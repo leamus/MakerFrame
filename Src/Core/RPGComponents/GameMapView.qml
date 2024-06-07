@@ -165,6 +165,8 @@ Item {
     //块坐标对应的真实坐标
     //bx、by为块坐标；dx、dy为偏移坐标（为小数则偏移多少个块，为整数则偏移多少坐标）
     function getMapBlockPos(bx, by, dx=0.5, dy=0.5) {
+        if(!mapInfo)
+            return false;
 
         //边界检测
 

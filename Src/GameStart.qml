@@ -79,7 +79,7 @@ Item {
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
 game.interval(16);
-//game.loadmap('鹰歌地图');
+//yield game.loadmap('鹰歌地图');
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);
 //game.playmusic('音乐1mp3');

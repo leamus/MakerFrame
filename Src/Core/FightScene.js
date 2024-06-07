@@ -1599,7 +1599,12 @@ function runAway() {
 
 
 //调用脚本
-function fightOver(result) {
+function fightOver(result, force=false) {
+    if(force) {
+        timerRoleSprite.stop();
+        _private.genFighting.clear(3);
+        _private.asyncScript.clear(3);
+    }
 
     //if(result !== undefined && result !== null) {
         //战斗结束脚本

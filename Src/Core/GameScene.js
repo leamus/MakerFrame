@@ -14,7 +14,7 @@ function loadResources() {
         tCommoncript = _private.jsEngine.load('common_script.js', GlobalJS.toURL(game.$projectpath));
     if(tCommoncript) {
         _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
-        _private.objCommonScripts['game_exit'] = tCommoncript.$gameExit;
+        _private.objCommonScripts['game_release'] = tCommoncript.$gameRelease;
         _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
         _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
         _private.objCommonScripts["after_save"] = tCommoncript.$afterSave;
@@ -59,8 +59,8 @@ function loadResources() {
     else
         console.debug("[GameScene]载入游戏初始化脚本OK");
 
-    if(!_private.objCommonScripts["game_exit"]) {
-        _private.objCommonScripts["game_exit"] = GameMakerGlobalJS.$gameExit;
+    if(!_private.objCommonScripts["game_release"]) {
+        _private.objCommonScripts["game_release"] = GameMakerGlobalJS.$gameRelease;
         console.debug("[!GameScene]载入系统游戏结束脚本");
     }
     else
@@ -757,7 +757,7 @@ function unloadResources() {
         for(let tp in _private.objPlugins[tc])
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false)
                 //_private.objPlugins[tc][tp].$unload();
-                game.run([_private.objPlugins[tc][tp].$load() ?? null, 'plugin_load:' + tc + tp]);
+                game.run([_private.objPlugins[tc][tp].$unload() ?? null, 'plugin_unload:' + tc + tp]);
 
 
     loaderFightScene.unload();
@@ -770,7 +770,8 @@ function unloadResources() {
 
 
     for(let i in _private.spritesResource) {
-        _private.spritesResource[i].$$cache.image.destroy();
+        if(_private.spritesResource[i].$$cache.image)
+            _private.spritesResource[i].$$cache.image.destroy();
         if(_private.spritesResource[i].$$cache.audio)
             _private.spritesResource[i].$$cache.audio.destroy();
     }
@@ -989,7 +990,6 @@ function getSpriteResource(item, forceLoad=false) {
         _private.spritesResource[item].$rid = item;
         //_private.spritesResource[item].__proto__ = _private.spritesResource[item].$commons;
 
-        //let cacheImage = Qt.createQmlObject("import QtQuick 2.14;import QtMultimedia 5.14; Audio {}", parent);
         let cacheSoundEffect;
         if(data.Sound) {
             if(rootSoundEffect.objCacheSoundEffects[data.Sound])
@@ -999,7 +999,10 @@ function getSpriteResource(item, forceLoad=false) {
                 rootSoundEffect.objCacheSoundEffects[data.Sound] = cacheSoundEffect;
             }
         }
-        let cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
+        //let cacheImage = Qt.createQmlObject("import QtQuick 2.14;import QtMultimedia 5.14; Audio {}", parent);
+        let cacheImage;
+        if(FrameManager.sl_qml_IsFile(GameMakerGlobal.spriteResourceURL(data.Image)))
+            cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
 
@@ -1545,6 +1548,9 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=
 
         return spriteEffectComp;
     }
+    else {
+        console.warn('[!GameScene]loadSpriteEffect Fail:', spriteEffectParams);
+    }
 
     //console.warn("[!GameScene]载入特效失败：" + spriteEffectParams);
     return null;
@@ -1564,7 +1570,7 @@ function unloadSpriteEffect(spriteEffectComp) {
 //roleParams是角色的资源名（会读取对应角色的信息）或角色的信息（不会再次读取）；
 //如果 roleComp 为null，则 创建1个 roleComp 组件并返回；
 function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
-    console.debug('[GameScene]loadRole:', roleParams);
+    //console.debug('[GameScene]loadRole:', roleParams);
 
     /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + "role.json";
     //console.debug("[FightScene]filePath2：", filePath);
@@ -1659,6 +1665,9 @@ function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
 
 
         return roleComp;
+    }
+    else {
+        console.warn('[!GameScene]loadRole Fail:', roleParams);
     }
 
     //console.warn("[!GameScene]载入角色失败：" + roleParams);

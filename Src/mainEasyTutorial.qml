@@ -173,7 +173,7 @@ Item {
 //载入地图并执行地图载入事件；成功返回 地图信息。
 //userData是用户传入数据，后期调用的钩子函数会传入；
 //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
-<font color='yellow'>game.loadmap(mapRID, userData, forceRepait=false)</font>
+<font color='yellow'>yield game.loadmap(mapRID, userData, forceRepait=false)</font>
 
 //在屏幕中间显示提示信息。
 //interval为文字显示间隔，为0则不使用；

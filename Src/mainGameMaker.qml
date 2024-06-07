@@ -865,15 +865,6 @@ Item {
                     dialogCommon.msg = "敬请期待~";
                     dialogCommon.open();
                     return;
-
-                    if(Platform.compileType() === "debug") {
-                        _private.loadModule("mainGameMakeProgram.qml");
-                        //userMainProject.source = "mainGameTest.qml";
-                    }
-                    else {
-                        _private.loadModule("mainGameMakeProgram.qml");
-                        //userMainProject.source = "mainGameTest.qml";
-                    }
                 }
             }
 
@@ -901,14 +892,6 @@ Item {
                     dialogCommon.open();
                     return;
 
-                    if(Platform.compileType() === "debug") {
-                        _private.loadModule("mainGameDistribute.qml");
-                        //userMainProject.source = "mainGameTest.qml";
-                    }
-                    else {
-                        _private.loadModule("mainGameDistribute.qml");
-                        //userMainProject.source = "mainGameTest.qml";
-                    }
                 }
             }
         }
@@ -1001,9 +984,9 @@ Item {
 
                             let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + "$Leamus";
 
-                            //https://qiniu.leamus.cn/Project.zip
-                            //https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip
-                            let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/Project.zip", projectPath + ".zip");
+                            //https://qiniu.leamus.cn/$Leamus.zip
+                            //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
+                            let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip", projectPath + ".zip");
                             nr.finished.connect(function() {
                                 //FrameManager.sl_qml_Property("属性", nr);  //TimeStamp、Data、SaveType、Code
                                 console.debug("下载完毕", nr, FrameManager.sl_qml_Property("Data", nr), FrameManager.sl_qml_Property("Code", nr));
@@ -1299,6 +1282,7 @@ Item {
         onClicked: {
             if(item === "..") {
                 visible = false;
+                rootGameMaker.forceActiveFocus();
                 return;
             }
 

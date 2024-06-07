@@ -2121,7 +2121,7 @@ function $refresh(index, imageAnimate, path) {
         //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
-            imageFixPositions = imageFixPositions.split('\\r\\n');
+            imageFixPositions = GlobalLibraryJS.replaceAll(imageFixPositions, '\\r', '').split('\\n');
         else
             imageFixPositions = null;
     }

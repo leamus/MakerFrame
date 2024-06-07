@@ -276,9 +276,9 @@ let $config = {
 
         //战斗人物额外组件条
         $combatant_bars: [
-            {$type: 1, $property: ['$name']}, //显示文字，属性为姓名
-            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
-            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
+            {$type: 1, $property: ['$name'], $spacing: 6, }, //显示文字，属性为姓名
+            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $spacing: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
+            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $spacing: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
         ],
     },
     //安卓配置
@@ -360,8 +360,9 @@ function *$gameInit(newGame) {
 }
 
 //游戏退出
-function $gameExit() {
-    game.save();  //存档
+function $gameRelease(gameExit) {
+    if(gameExit)
+        game.save();  //自动存档
 
     return null;
 }

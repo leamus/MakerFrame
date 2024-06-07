@@ -68,7 +68,7 @@ import 'GameScene.js' as GameSceneJS
 
     _private.objCommonScripts['game_start'] = *$start;
     _private.objCommonScripts['game_init'] = tCommoncript.$gameInit;
-    _private.objCommonScripts['game_exit'] = tCommoncript.$gameExit;
+    _private.objCommonScripts['game_release'] = tCommoncript.$gameRelease;
     _private.objCommonScripts['before_save'] = tCommoncript.$beforeSave;
     _private.objCommonScripts['before_load'] = tCommoncript.$beforeLoad;
     _private.objCommonScripts['after_save'] = tCommoncript.$afterSave;
@@ -224,6 +224,12 @@ Item {
 
 
 
+        //钩子函数调用
+        for(let vfRelease in game.$sys.hooks.release) {
+            game.run([game.$sys.hooks.release[vfRelease](bUnloadResources) ?? null, 'hook_release:' + vfRelease]);
+        }
+
+
         //所有插件释放
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc])
@@ -232,10 +238,8 @@ Item {
                     game.run([_private.objPlugins[tc][tp].$release() ?? null, 'plugin_release:' + tc + tp]);
 
 
-        //钩子函数调用
-        for(let vfRelease in game.$sys.hooks.release) {
-            game.run([game.$sys.hooks.release[vfRelease](bUnloadResources) ?? null, 'hook_release:' + vfRelease]);
-        }
+        if(_private.objCommonScripts['game_release'])
+            _private.objCommonScripts['game_release'](bUnloadResources);
 
 
         game.scale(1);
@@ -325,6 +329,9 @@ Item {
 
     //设置角色坐标（块坐标）
     function setRolePos(bx, by, role) {
+        if(!itemViewPort.mapInfo)
+            return false;
+
 
         let targetX;
         let targetY;
@@ -347,6 +354,9 @@ Item {
         //role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
 
         if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
+
+
+        return true;
     }
 
     //设置主角坐标（块坐标）
@@ -393,76 +403,94 @@ Item {
     //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
-        //载入地图并执行地图载入事件；成功返回 地图信息数据。
+        //载入地图并执行地图载入事件；成功返回 true。
         //userData是用户传入数据，后期调用的钩子函数会传入；
         //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
         readonly property var loadmap: function(mapRID, userData, forceRepaint=false) {
             if(!mapRID)
                 return false;
 
-            //载入beforeLoadmap脚本
-            let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
-            if(beforeLoadmap)
-                game.run([beforeLoadmap(mapRID, userData) ?? null, 'beforeLoadmap'], {Priority: -3, Type: 0, Running: 1});
+
+            //！！！鹰：注意：loadmap是异步调用；且将 Priority 设置为顺序的（保证 game.loadmap 的所有异步脚本执行完毕 再执行 game.loadmap 的下一个命令）
+            let priority = 0;
 
 
             //执行之前地图的 $end 函数
             if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
                 let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
                 if(ts.$end)
-                    game.run([ts.$end(userData) ?? null, 'map $end'], {Priority: -3, Type: 0, Running: 1});
+                    game.run([ts.$end(userData) ?? null, 'map $end'], {Priority: priority++, Type: 0, Running: 1});
             }
 
 
-            timer.running = false;
+            //清理工作
+            game.run([function() {
+                timer.running = false;
 
 
-            for(let tc in _private.objTmpMapComponents) {
-                let c = _private.objTmpMapComponents[tc];
-                if(GlobalLibraryJS.isComponent(c)) {
-                    if(c.Destroy)
-                        c.Destroy();
-                    else if(c.destroy)
-                        c.destroy();
+                for(let tc in _private.objTmpMapComponents) {
+                    let c = _private.objTmpMapComponents[tc];
+                    if(GlobalLibraryJS.isComponent(c)) {
+                        if(c.Destroy)
+                            c.Destroy();
+                        else if(c.destroy)
+                            c.destroy();
+                    }
                 }
-            }
-            _private.objTmpMapComponents = [];
+                _private.objTmpMapComponents = [];
 
-            game.delrole(-1);
+                game.delrole(-1);
 
-            _private.objTimers = {};
+                _private.objTimers = {};
 
-            mainRole.$$collideRoles = {};
-            mainRole.$$mapEventsTriggering = {};
-            _private.stopMove(0);
+                mainRole.$$collideRoles = {};
+                mainRole.$$mapEventsTriggering = {};
+                _private.stopMove(0);
 
-            game.d = {};
-            game.f = {};
+                game.d = {};
+                game.f = {};
 
-
-            let mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
+            }, 'map clear'], {Priority: priority++, Type: 0, Running: 1});
 
 
-            //载入地图会卡顿，重新开始计时会顺滑一点
-            timer.running = true;
-            timer.nLastTime = 0;
+            //载入beforeLoadmap脚本
+            let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
+            if(beforeLoadmap)
+                game.run([beforeLoadmap(mapRID, userData) ?? null, 'beforeLoadmap'], {Priority: priority++, Type: 0, Running: 1});
 
 
+            game.run([function() {
+                let mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
 
-            if(itemViewPort.mapScript.$start)
-                game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start']);
-            else if(itemViewPort.mapScript.start)
-                game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start']);
-
+                setSceneToRole(_private.sceneRole);
 
 
-            //载入after_loadmap脚本
-            let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
-            if(afterLoadmap)
-                game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: -1, Type: 0, Running: 1});
+                //载入地图会卡顿，重新开始计时会顺滑一点
+                timer.running = true;
+                timer.nLastTime = 0;
 
 
-            return mapInfo;
+                let priority = 0;
+
+
+                if(itemViewPort.mapScript.$start)
+                    game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
+                else if(itemViewPort.mapScript.start)
+                    game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
+
+
+                //载入after_loadmap脚本
+                let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
+                if(afterLoadmap)
+                    game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
+
+            }, 'map load'], {Priority: priority++, Type: 0, Running: 1});
+
+
+            asyncScript.runNextEventLoop('loadmap');
+
+
+            return true;
         }
 
         /*readonly property var map: {
@@ -2639,6 +2667,9 @@ Item {
             }
             else if(GlobalLibraryJS.isObject(imageParams.$parent)) {
                 parentComp = imageParams.$parent;
+
+                //不一定存在
+                objTmpComponents = parentComp.$tmpComponents;
             }
             //固定屏幕上
             else {
@@ -2939,6 +2970,9 @@ Item {
                     return false;
             }
             else if(GlobalLibraryJS.isObject(idParams.$parent)) {
+                //不一定存在
+                objTmpComponents = idParams.$parent.$tmpComponents;
+
                 tmpImage = idParams;
             }
             //固定屏幕上
@@ -2951,7 +2985,7 @@ Item {
 
 
             if(idParams['$id'] === -1) {
-                for(let ti in objTmpComponents) {
+                for(let ti in objTmpComponents && objTmpComponents) {
                     if(objTmpComponents[ti].Destroy)
                         objTmpComponents[ti].Destroy();
                     else if(objTmpComponents[ti].destroy)
@@ -3075,6 +3109,9 @@ Item {
             }
             else if(GlobalLibraryJS.isObject(spriteParams.$parent)) {
                 parentComp = spriteParams.$parent;
+
+                //不一定存在
+                objTmpComponents = parentComp.$tmpComponents;
             }
             //固定屏幕上
             else {
@@ -3118,12 +3155,11 @@ Item {
             //改变大小
             //默认原宽
             if(spriteParams.$width  === undefined && spriteParams.width === undefined)
-                //sprite.width = spriteData.SpriteSize[0]/*sprite.implicitWidth*/;
-                ;
+                sprite.width = spriteData.SpriteSize[0]/*sprite.implicitWidth*/;
             //组件宽
             else if(spriteParams.$width === -1)
-                //sprite.width = Qt.binding(function(){return parentComp.width});
-                sprite.width = spriteData.SpriteSize[0];
+                sprite.width = Qt.binding(function(){return parentComp.width});
+                //sprite.width = spriteData.SpriteSize[0];
             else if(GlobalLibraryJS.isArray(spriteParams.$width)) {
                 switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
@@ -3157,12 +3193,11 @@ Item {
 
             //默认原高
             if(spriteParams.$height === undefined && spriteParams.height === undefined)
-                //sprite.height = spriteData.SpriteSize[1]/*sprite.implicitHeight*/;
-                ;
+                sprite.height = spriteData.SpriteSize[1]/*sprite.implicitHeight*/;
             //组件高
             else if(spriteParams.$height === -1)
-                //sprite.height = Qt.binding(function(){return parentComp.height});
-                sprite.height = spriteData.SpriteSize[1];
+                sprite.height = Qt.binding(function(){return parentComp.height});
+                //sprite.height = spriteData.SpriteSize[1];
             else if(GlobalLibraryJS.isArray(spriteParams.$height)) {
                 switch(spriteParams.$height[1]) {
                 //如果是 固定高度
@@ -3396,6 +3431,9 @@ Item {
 
             }
             else if(GlobalLibraryJS.isObject(idParams.$parent)) {
+                //不一定存在
+                objTmpComponents = idParams.$parent.$tmpComponents;
+
                 tmpSprites = idParams;
             }
             //固定屏幕上
@@ -3407,7 +3445,7 @@ Item {
             }
 
 
-            if(idParams['$id'] === -1) {
+            if(idParams['$id'] === -1 && objTmpComponents) {
                 for(let ti in objTmpComponents) {
                     if(objTmpComponents[ti].Destroy)
                         objTmpComponents[ti].Destroy();
@@ -3723,19 +3761,10 @@ Item {
 
 
             return ret;
-
         }
 
         //读档（读取数据到 game.gd），成功返回true，失败返回false。
         readonly property var load: function(fileName='autosave') {
-
-            //载入after_load脚本
-            if(_private.objCommonScripts['before_load'])
-                game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: -3, Type: 0, Running: 1});
-
-
-
-            //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
             fileName = fileName.trim();
             if(!fileName)
@@ -3746,54 +3775,64 @@ Item {
                 return false;
 
 
-            release(false);
-            init(false, false, ret['Data']);
+            //载入after_load脚本
+            if(_private.objCommonScripts['before_load'])
+                game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: -1, Type: 0, Running: 1});
 
 
-            //game.gd = ret['Data'];
-            //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
+            game.run([function*() {
+                //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
 
-            game.$sys.reloadFightRoles();
-
-            //刷新战斗时人物数据
-            //fight.$sys.refreshCombatant(-1);
-
-            game.$sys.reloadGoods();
+                release(false);
+                init(false, false, ret['Data']);
 
 
-            //地图
-            game.loadmap(game.gd['$sys_map'].$name, null, true);
-
-            //读取主角
-            for(let th of game.gd['$sys_main_roles']) {
-                let mainRole = game.createhero(th.$rid);
-                mainRole.$$nActionType = 0;
-                mainRole.$$arrMoveDirection = [0, 0];
-                //game.hero(mainRole, th);
-            }
-
-            //开始移动地图
-            //setSceneToRole(_private.sceneRole);
-
-            //其他
-            game.interval(game.gd['$sys_fps']);
-            game.scale(game.gd['$sys_scale']);
-
-            game.playmusic(game.gd['$sys_music']);
-
-            /*if(game.gd['$sys_sound'] & 0b10)
-                _private.config.nSoundConfig = 0;
-            else
-                _private.config.nSoundConfig = 1;
-            */
+                //game.gd = ret['Data'];
+                //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
 
 
-            /*/写在钩子函数里了
-            if(game.gd['$sys_random_fight']) {
-                game.fighton(...game.gd['$sys_random_fight']);
-            }
-            */
+                game.$sys.reloadFightRoles();
+
+                //刷新战斗时人物数据
+                //fight.$sys.refreshCombatant(-1);
+
+                game.$sys.reloadGoods();
+
+
+                //读取主角
+                for(let th of game.gd['$sys_main_roles']) {
+                    let mainRole = game.createhero(th.$rid);
+                    mainRole.$$nActionType = 0;
+                    mainRole.$$arrMoveDirection = [0, 0];
+                    //game.hero(mainRole, th);
+                }
+
+                //开始移动地图
+                //setSceneToRole(_private.sceneRole);
+
+                //其他
+                game.interval(game.gd['$sys_fps']);
+                game.scale(game.gd['$sys_scale']);
+
+                game.playmusic(game.gd['$sys_music']);
+
+                /*if(game.gd['$sys_sound'] & 0b10)
+                    _private.config.nSoundConfig = 0;
+                else
+                    _private.config.nSoundConfig = 1;
+                */
+
+
+                /*/写在钩子函数里了
+                if(game.gd['$sys_random_fight']) {
+                    game.fighton(...game.gd['$sys_random_fight']);
+                }
+                */
+
+                //地图
+                yield game.loadmap(game.gd['$sys_map'].$name, null, true);
+            }, 'load'], {Priority: -1, Type: 0, Running: 1});
 
 
             //载入after_load脚本
@@ -3866,7 +3905,7 @@ Item {
         //    如果为数字，表示优先级Priority；
         //      Type默认为0，Running默认为1，Value默认为无；
         //    如果为对象，则有以下参数：
-        //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
+        //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾（默认）；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
         //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
         //      Running为1或2，表示如果队列里如果为空则：1（默认）是发送一个JS事件在下一个JS事件循环里执行，2是立即执行；为0时不处理；
         //      Value：传递给事件队列的值，无则默认上一次的；
@@ -4069,6 +4108,7 @@ Item {
         readonly property var $sys: ({
             release: release,
             init: init,
+            exit: _private.exitGame,
 
             screen: rootGameScene,          //屏幕（组件位置和大小固定）（所有，包含战斗场景）
             viewport: itemViewPort,         //游戏视窗，组件位置和大小固定
@@ -4272,7 +4312,7 @@ Item {
 
 
 
-    //是否是测试模式（不会存档）
+    //是否是测试模式（不会调用 游戏开始、初始化、结束脚本）
     property bool bTest: false
 
 
@@ -5532,7 +5572,7 @@ Item {
                 return;
 
 
-            //if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
+            if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
                 audioBackgroundMusic.pause();
 
 
@@ -5570,7 +5610,8 @@ Item {
                 return;
 
 
-            itemBackgroundMusic.play();
+            if(audioBackgroundMusic.playbackState === Audio.PausedState)
+                itemBackgroundMusic.play();
 
             //console.debug('!!!resume', nPauseTimes, bPlay)
 
@@ -6193,36 +6234,13 @@ Item {
 
 
         //退出游戏
-        function exitGame() {
+        function showExitDialog(test) {
 
             dialogCommon.show({
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if(!bTest) {
-                        if(_private.objCommonScripts['game_exit'])
-                            _private.objCommonScripts['game_exit']();
-                    }
-
-                    let err;
-                    try {
-                        release();
-                    }
-                    catch(e) {
-                        err = e;
-                    }
-
-                    s_close();
-
-                    FrameManager.sl_qml_clearComponentCache();
-                    //FrameManager.sl_qml_trimComponentCache();
-
-                    console.debug('[GameScene]Close');
-
-                    if(err) {
-                        console.warn('游戏没有正常退出，但并不碍事：', err);
-                        throw err;
-                    }
+                    exitGame(test);
                 },
                 OnRejected: ()=>{
                     if(rootGameScene)rootGameScene.forceActiveFocus();
@@ -6230,6 +6248,27 @@ Item {
             });
         }
 
+        function exitGame(test=bTest) {
+            let err;
+            try {
+                release();
+            }
+            catch(e) {
+                err = e;
+            }
+
+            FrameManager.sl_qml_clearComponentCache();
+            //FrameManager.sl_qml_trimComponentCache();
+
+            console.debug('[GameScene]Close');
+
+            if(err) {
+                console.warn('游戏没有正常退出，但并不碍事：', err);
+                //throw err;
+            }
+
+            s_close();
+        }
     }
 
 
@@ -7234,13 +7273,13 @@ Item {
     //Keys.forwardTo: [itemViewPort.itemContainer]
 
     Keys.onEscapePressed: {
-        _private.exitGame();
+        _private.showExitDialog();
         event.accepted = true;
 
         console.debug('[GameScene]Escape Key');
     }
     Keys.onBackPressed: {
-        _private.exitGame();
+        _private.showExitDialog();
         event.accepted = true;
 
         console.debug('[GameScene]Back Key');

@@ -221,9 +221,9 @@ let $config = {
 
         //战斗人物额外组件条
         $combatant_bars: [
-            {$type: 1, $property: ['$name']}, //显示文字，属性为姓名
-            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
-            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
+            {$type: 1, $property: ['$name'], $spacing: 6, }, //显示文字，属性为姓名
+            {$type: 2, $property: ['$$propertiesWithExtra', 'HP'], $height: 6, $spacing: 6, $colors: ['yellow', 'red', '#800080']}, //显示数据条，属性为HP
+            {$type: 2, $property: ['$$propertiesWithExtra', 'MP'], $height: 6, $spacing: 6, $colors: ['blue', 'black']}, //显示数据条，属性为HP
         ],
     },
     //安卓配置
@@ -305,8 +305,9 @@ function *$gameInit(newGame) {
 }
 
 //游戏退出
-function $gameExit() {
-    game.save();  //存档
+function $gameRelease(gameExit) {
+    if(gameExit)
+        game.save();  //自动存档
 
     return null;
 }
@@ -1943,6 +1944,7 @@ let $fightMenus = {
 let $fightButtons = [
     {
         $text: '重复上次',
+        $colors: ["lightgreen", "lightblue", "lightsteelblue"],
         $action: function*(button) {
             //rowlayoutButtons.enabled = false;
 
@@ -1955,16 +1957,24 @@ let $fightButtons = [
             else if(fight.$sys.stage() === 2)
                 return null;
         },
+        //其他属性
+        $properties: {
+        },
     },
     {
         $text: '逃跑',
+        $colors: ["lightyellow", "lightblue", "lightsteelblue"],
         $action: function*(button) {
             fight.$sys.runAway();
             return null;
         },
+        //其他属性
+        $properties: {
+        },
     },
     {
         $text: '手动攻击',
+        $colors: ["lightgreen", "lightblue", "lightsteelblue"],
         $action: function(button) {
             if(fight.$sys.autoAttack() === 0) {
                 button.text = '自动攻击';
@@ -1985,6 +1995,9 @@ let $fightButtons = [
                 fight.$sys.autoAttack(0);
             }
             return null;
+        },
+        //其他属性
+        $properties: {
         },
     },
 ];
