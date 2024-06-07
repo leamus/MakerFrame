@@ -6234,13 +6234,13 @@ Item {
 
 
         //退出游戏
-        function showExitDialog(test) {
+        function showExitDialog() {
 
             dialogCommon.show({
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    exitGame(test);
+                    exitGame();
                 },
                 OnRejected: ()=>{
                     if(rootGameScene)rootGameScene.forceActiveFocus();
@@ -6248,7 +6248,7 @@ Item {
             });
         }
 
-        function exitGame(test=bTest) {
+        function exitGame() {
             let err;
             try {
                 release();

@@ -299,26 +299,30 @@ let $config = {
 
 //游戏初始化（游戏开始和载入存档时调用）
 function *$gameInit(newGame) {
+    game.gf.$plugins = {};
 
-    //读取init.js文件（包括插件的）的所有变量和函数，并复制给game.gf
-    if(FrameManager.sl_qml_FileExists(game.$projectpath + game.$gameMakerGlobal.separator + 'init.js')) {
-        let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(game.$projectpath));
-        if(initJS) {
-            Object.assign(game.gf, initJS);
-            if(initJS.$init)
-                game.run(initJS.$init(newGame));
+    //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
+    if(FrameManager.sl_qml_FileExists(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js')) {
+        let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(game.$projectpath));
+        if(gameJS) {
+            Object.assign(game.gf, gameJS);
+            if(gameJS.$init)
+                game.run(gameJS.$init(newGame));
         }
     }
+    //载入所有插件的 game.js 的所有变量和函数复制给 game.gf.$plugins[tp0][tp1]，并调用其 $init
     let plugins = game.plugin();
     for(let tp0 in plugins) {
+        game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
-            let initJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
-            if(FrameManager.sl_qml_FileExists(initJSPath + game.$gameMakerGlobal.separator + 'init.js')) {
-                let initJS = game.$sys.caches.jsEngine.load('init.js', game.$globalJS.toURL(initJSPath));
-                if(initJS) {
-                    Object.assign(game.gf, initJS);
-                    if(initJS.$init)
-                        game.run(initJS.$init(newGame));
+            game.gf.$plugins[tp0][tp1] = {};
+            let gameJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
+            if(FrameManager.sl_qml_FileExists(gameJSPath + game.$gameMakerGlobal.separator + 'game.js')) {
+                let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(gameJSPath));
+                if(gameJS) {
+                    Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
+                    if(gameJS.$init)
+                        game.run(gameJS.$init(newGame));
                 }
             }
         }
@@ -361,6 +365,20 @@ function *$gameInit(newGame) {
 
 //游戏退出
 function $gameRelease(gameExit) {
+    //调用项目的 game.js 的 $release
+    if(game.gf.$release)
+        game.run(game.gf.$release(gameExit));
+
+    //载入所有插件的 game.js 的 $release
+    let plugins = game.plugin();
+    for(let tp0 in game.gf.$plugins) {
+        for(let tp1 in game.gf.$plugins[tp0]) {
+            if(game.gf.$plugins[tp0][tp1].$release)
+                game.run(game.gf.$plugins[tp0][tp1].$release(gameExit));
+        }
+    }
+
+
     if(gameExit)
         game.save();  //自动存档
 
