@@ -435,13 +435,15 @@ Item {
 
                 if(Math.min(rX, rY) < 1)
                     imageReview.scale = Math.min(rX, rY);
+
                 imageReview.anchors.centerIn = imageReview.parent;
                 imageReview.anchors.centerIn = null;
-                //imageReview.transform = 0;
-                imageReview.rotation = 0;
             }
             else {
-                //imageReview.scale = 1;
+                imageReview.scale = 1;
+                //imageReview.transform = 0;
+                imageReview.rotation = 0;
+
 
                 root.forceActiveFocus();
             }

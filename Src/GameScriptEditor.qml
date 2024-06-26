@@ -22,6 +22,7 @@ import 'qrc:/QML'
 //import './Core'
 
 
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -233,7 +234,7 @@ Item {
             if(textFilePath.text.indexOf('.qml') >= 0)
                 fileName += '.vqml';
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + fileName;
-            item.loadData(filePath);
+            loaderVisualScript.item.loadData(filePath);
 
 
 
@@ -251,7 +252,15 @@ Item {
         focus: true
 
 
-        source: './GameVisualScript.qml'
+        //source: './GameVisualScript.qml'
+        sourceComponent: Component {
+            VisualScript {
+                defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+                defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+                defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+            }
+        }
+
         asynchronous: true
 
 

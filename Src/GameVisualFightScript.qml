@@ -447,7 +447,7 @@ Item {
 
                                 text: '*@敌人角色'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -455,7 +455,7 @@ Item {
 
                                 text: '参数（可省略）'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 

@@ -22,6 +22,7 @@ import 'qrc:/QML'
 import './Core'
 
 
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -1557,7 +1558,7 @@ Item {
 
                                 text: '*动作名'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1565,7 +1566,7 @@ Item {
 
                                 text: '*@特效名'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 
@@ -1669,7 +1670,7 @@ Item {
 
                                 text: '*动作名'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1677,7 +1678,7 @@ Item {
 
                                 text: '*起始序号'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1685,7 +1686,7 @@ Item {
 
                                 text: '*帧数'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1693,7 +1694,7 @@ Item {
 
                                 text: '*帧速度'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 
@@ -2673,7 +2674,7 @@ Item {
 
     //可视化
     //Loader {
-    GameVisualScript {
+    VisualScript {
         id: gameVisualScript
         //id: loaderVisualScript
 
@@ -2693,8 +2694,20 @@ Item {
         //focus: true
 
 
-        //source: "./.qml"
+        //source: './GameVisualScript.qml'
+        /*sourceComponent: Component {
+            VisualScript {
+
+            }
+        }
+        */
         //asynchronous: false
+
+
+        defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+
 
 
         /*onLoaded: {
@@ -2748,7 +2761,7 @@ function $refresh(index, imageAnimate, path) {
         //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
-            imageFixPositions = GlobalLibraryJS.replaceAll(imageFixPositions, '\\r', '').split('\\n');
+            imageFixPositions = imageFixPositions.split(/\r?\n/);
         else
             imageFixPositions = null;
     }
@@ -3245,6 +3258,7 @@ function $refresh(index, imageAnimate, path) {
             return;
 
         _private.doAction(1, event.key);
+
 
 
         console.debug("[RoleEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);

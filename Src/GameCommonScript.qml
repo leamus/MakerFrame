@@ -95,7 +95,7 @@ let $config = {
             $color: 'red',
             $opacity: 0.6,
             $image: '',
-            $pressed: function() {
+            $pressed: function*() {
                 this.scale = 0.9;
 
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
@@ -106,7 +106,7 @@ let $config = {
                 game.$sys.interact();
                 return null;
             },
-            $released: function() {
+            $released: function*() {
                 this.scale = 1;
             },
         },
@@ -117,7 +117,7 @@ let $config = {
             $color: 'blue',
             $opacity: 0.6,
             $image: '',
-            $pressed: function() {
+            $pressed: function*() {
                 this.scale = 0.9;
 
                 //if(!game.$globalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
@@ -129,7 +129,7 @@ let $config = {
                 //game.window(1, {MaskColor: 'transparent'});
                 return null;
             },
-            $released: function() {
+            $released: function*() {
                 this.scale = 1;
             },
         },
@@ -144,11 +144,11 @@ let $config = {
                 this.scale = 0.9;
 
                 if(game.pause(null))
-                    return;
+                    return null;
 
                 yield game.msg('自定义按键');
             },
-            $released: function() {
+            $released: function*() {
                 this.scale = 1;
             },
         },
@@ -302,27 +302,33 @@ function *$gameInit(newGame) {
     game.gf.$plugins = {};
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
-    if(FrameManager.sl_qml_FileExists(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js')) {
+    if(FrameManager.sl_qml_FileExists(game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js'))) {
         let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(game.$projectpath));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
-            if(gameJS.$init)
-                game.run(gameJS.$init(newGame));
+            if(gameJS.$init) {
+                let r = gameJS.$init(newGame);
+                if(game.$globalLibraryJS.isGenerator(r))yield *r;
+                //game.run(gameJS.$init(newGame));
+            }
         }
     }
     //载入所有插件的 game.js 的所有变量和函数复制给 game.gf.$plugins[tp0][tp1]，并调用其 $init
-    let plugins = game.plugin();
+    let plugins = yield game.plugin();
     for(let tp0 in plugins) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
             game.gf.$plugins[tp0][tp1] = {};
             let gameJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
-            if(FrameManager.sl_qml_FileExists(gameJSPath + game.$gameMakerGlobal.separator + 'game.js')) {
+            if(FrameManager.sl_qml_FileExists(game.$globalJS.toPath(gameJSPath + game.$gameMakerGlobal.separator + 'game.js'))) {
                 let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(gameJSPath));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
-                    if(gameJS.$init)
-                        game.run(gameJS.$init(newGame));
+                    if(gameJS.$init) {
+                        let r = gameJS.$init(newGame);
+                        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+                        //game.run(gameJS.$init(newGame));
+                    }
                 }
             }
         }
@@ -364,23 +370,29 @@ function *$gameInit(newGame) {
 }
 
 //游戏退出
-function $gameRelease(gameExit) {
+function *$gameRelease(gameExit) {
     //调用项目的 game.js 的 $release
-    if(game.gf.$release)
-        game.run(game.gf.$release(gameExit));
+    if(game.gf.$release) {
+        let r = game.gf.$release(gameExit);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //game.run(game.gf.$release(gameExit));
+    }
 
     //载入所有插件的 game.js 的 $release
-    let plugins = game.plugin();
+    let plugins = yield game.plugin();
     for(let tp0 in game.gf.$plugins) {
         for(let tp1 in game.gf.$plugins[tp0]) {
-            if(game.gf.$plugins[tp0][tp1].$release)
-                game.run(game.gf.$plugins[tp0][tp1].$release(gameExit));
+            if(game.gf.$plugins[tp0][tp1].$release) {
+                let r = game.gf.$plugins[tp0][tp1].$release(gameExit);
+                if(game.$globalLibraryJS.isGenerator(r))yield *r;
+                //game.run(game.gf.$plugins[tp0][tp1].$release(gameExit));
+            }
         }
     }
 
 
     if(gameExit)
-        game.save();  //自动存档
+        yield game.save();  //自动存档
 
     return null;
 }
@@ -621,7 +633,7 @@ let $showGoodsName = function(goods, flags=null) {
         flags = {image: true, color: true, count: true};
 
     if(flags['image'] && goods.$image) {
-        //let goodsPath = game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strGoodsDirName + game.$gameMakerGlobal.separator;
+        //let goodsPath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strGoodsDirName) + game.$gameMakerGlobal.separator;
 
         //game.$globalLibraryJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
@@ -649,7 +661,7 @@ let $showGoodsName = function(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 let $showCombatantName = function(combatant, flags=null) {
     let name = '';
-    let fightRolePath = game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strFightRoleDirName + game.$gameMakerGlobal.separator;
+    //let fightRolePath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strFightRoleDirName) + game.$gameMakerGlobal.separator;
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -816,6 +828,13 @@ function computeCombatantPropertiesWithExtra(combatant) {
     //console.debug('combatant.$$propertiesWithExtra', combatant, combatant.$$fightData, combatant.$$propertiesWithExtra);
 
     return combatant.$$propertiesWithExtra;
+}
+
+//战斗人物是否可用（上场且活着）
+function $combatantIsValid(combatant) {
+    if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0)
+        return true;
+    return false;
 }
 
 
@@ -1610,12 +1629,18 @@ function *$commonFightInitScript(teams, fightData) {
 
 
     let fightInitScript = fightData.$commons.$fightInitScript/* || fightData.$commons.FightInitScript*/;
-    if(fightInitScript)
-        yield fight.run([fightInitScript, 'fight init2'], -2, teams, fightData);
+    if(fightInitScript) {
+        let r = fightInitScript(teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightInitScript, 'fight init2'], -2, teams, fightData);
+    }
 
     //if('FightInitScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightInitScript') >= 0)
-        yield fight.run([fightData.FightInitScript, 'fight init3'], -2, teams, fightData);
+    if(Object.keys(fightData).indexOf('FightInitScript') >= 0) {
+        let r = fightData.FightInitScript(teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightData.FightInitScript, 'fight init3'], -2, teams, fightData);
+    }
 
 
     return null;
@@ -1632,13 +1657,19 @@ function *$commonFightStartScript(teams, fightData) {
 
     //战斗开始脚本
     let fightStartScript = fightData.$commons.$fightStartScript/* || fightData.$commons.FightStartScript*/;
-    if(fightStartScript)
-        yield fight.run([fightStartScript, 'fight start2'], -2, teams, fightData);
+    if(fightStartScript) {
+        let r = fightStartScript(teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightStartScript, 'fight start2'], -2, teams, fightData);
+    }
 
     //fighting战斗的回调函数
     //if('FightStartScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightStartScript') >= 0)
-        yield fight.run([fightData.FightStartScript, 'fight start3'], -2, teams, fightData);
+    if(Object.keys(fightData).indexOf('FightStartScript') >= 0) {
+        let r = fightData.FightStartScript(teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightData.FightStartScript, 'fight start3'], -2, teams, fightData);
+    }
 
 
     return null;
@@ -1654,13 +1685,19 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 
     /*/战斗回合脚本
     let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript* /;
-    if(fightRoundScript)
-        yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
+    if(fightRoundScript) {
+        let r = fightRoundScript(round, step, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
+    }
 
     //fighting战斗的回调函数
     //if('FightRoundScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
-        yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
+    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
+        let r = fightData.FightRoundScript(round, step, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
+    }
     */
 
 
@@ -1691,23 +1728,29 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 
     //战斗回合脚本
     let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript*/;
-    if(fightRoundScript)
-        yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
+    if(fightRoundScript) {
+        let r = fightRoundScript(round, step, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightRoundScript, 'fight round2' + step], -2, round, step, teams, fightData);
+    }
 
     //fighting战斗的回调函数
     //if('FightRoundScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0)
-        yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
+    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
+        let r = fightData.FightRoundScript(round, step, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightData.FightRoundScript, 'fight round3' + step], -2, round, step, teams, fightData);
+    }
 
 
     return null;
 }
 
 //战斗结束通用脚本；
-//r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
-function *$commonFightEndScript(r, teams, fightData) {
-    //这里的r，可能会被 战斗脚本修改
-    //r中包含：result（战斗结果）、money和exp
+//res中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
+function *$commonFightEndScript(res, teams, fightData) {
+    //这里的res，可能会被 战斗脚本修改
+    //res中包含：result（战斗结果）、money和exp
 
     //let game = this.game;
     //let fight = this.fight;
@@ -1715,19 +1758,25 @@ function *$commonFightEndScript(r, teams, fightData) {
 
     //战斗结束脚本1
     let fightEndScript = fightData.$commons.$fightEndScript/* || fightData.$commons.FightEndScript*/;
-    if(fightEndScript)
-        yield fight.run([fightEndScript, 'fight end20'], -2, r, 0, teams, fightData);
+    if(fightEndScript) {
+        let r = fightEndScript(res, 0, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightEndScript, 'fight end20'], -2, res, 0, teams, fightData);
+    }
 
     //fighting战斗的回调函数
     //if('FightEndScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
-        yield fight.run([fightData.FightEndScript, 'fight end30'], -2, r, 0, teams, fightData);
+    if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
+        let r = fightData.FightEndScript(res, 0, teams, fightData);
+        if(game.$globalLibraryJS.isGenerator(r))yield *r;
+        //yield fight.run([fightData.FightEndScript, 'fight end30'], -2, res, 0, teams, fightData);
+    }
 
 
 
     for(let tc of fight.myCombatants) {
-        //fight.myCombatants[t].$properties.EXP += r.exp;
-        game.addprops(tc, {'EXP': r.exp});
+        //fight.myCombatants[t].$properties.EXP += res.exp;
+        game.addprops(tc, {'EXP': res.exp});
 
         /*/将血量设置为1
         if(tc.$properties.HP[1] <= 0)
@@ -1742,7 +1791,7 @@ function *$commonFightEndScript(r, teams, fightData) {
 
     let bGetGoods = false;
     let msgGoods = '获得道具：';
-    for(let t of r.goods) {
+    for(let t of res.goods) {
         if(game.rnd(0,100) < 60) {
             msgGoods += ('<BR>' + t.$name);
             game.getgoods(t, 1);
@@ -1750,16 +1799,16 @@ function *$commonFightEndScript(r, teams, fightData) {
         }
     }
 
-    game.money(r.money);
+    game.money(res.money);
 
 
-    if(r.result === 1) {
-        yield fight.msg('战斗胜利<BR>获得  %1经验，%2金钱'.arg(r.exp).arg(r.money));
+    if(res.result === 1) {
+        yield fight.msg('战斗胜利<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
         //fight.run('');
     }
-    else if(r.result === -1) {
-        yield fight.msg('战斗失败<BR>获得  %1经验，%2金钱'.arg(r.exp).arg(r.money));
-        //fight.run('fight.popmusic();s_FightOver();'.arg(r.exp).arg(r.money));
+    else if(res.result === -1) {
+        yield fight.msg('战斗失败<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
+        //fight.run('fight.popmusic();s_FightOver();'.arg(res.exp).arg(res.money));
     }
     if(bGetGoods)
         yield fight.msg(msgGoods);
@@ -1782,17 +1831,17 @@ function *$commonFightEndScript(r, teams, fightData) {
 
     //战斗结束脚本2
     if(fightEndScript)
-        game.run([fightEndScript, 'fight end21'], -1, r, 1, teams, fightData);
+        game.run([fightEndScript, 'fight end21'], -1, res, 1, teams, fightData);
 
     //fighting战斗的回调函数
     //if('FightEndScript' in fightData)
     if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
-        game.run([fightData.FightEndScript, 'fight end31'], -1, r, 1, teams, fightData);
+        game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
 
 
     game.run(function() {
 
-        if(r.result === -1)
+        if(res.result === -1)
             game.gameover(-1);
 
 
@@ -1803,7 +1852,7 @@ function *$commonFightEndScript(r, teams, fightData) {
         return null;
     });
 
-    //console.debug(JSON.stringify(r), r.exp, r.money);
+    //console.debug(JSON.stringify(res), res.exp, res.money);
 
 
     return null;
@@ -1927,7 +1976,7 @@ let $fightMenus = {
 let $fightButtons = [
     {
         $text: '重复上次',
-        $action: function*(button) {
+        $clicked: function*(button) {
             //rowlayoutButtons.enabled = false;
 
             fight.$sys.resetFightScene();
@@ -1942,14 +1991,14 @@ let $fightButtons = [
     },
     {
         $text: '逃跑',
-        $action: function*(button) {
+        $clicked: function*(button) {
             fight.$sys.runAway();
             return null;
         },
     },
     {
         $text: '手动攻击',
-        $action: function(button) {
+        $clicked: function(button) {
             if(fight.$sys.autoAttack() === 0) {
                 button.text = '自动攻击';
 

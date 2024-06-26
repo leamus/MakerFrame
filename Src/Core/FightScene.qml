@@ -324,7 +324,7 @@ Item {
         let data;
         if(fightScriptData) {
 
-            let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + "fight_script.json";
+            let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + "fight_script.json");
             //let data = File.read(filePath);
             //console.debug("[GameFightScript]filePath：", filePath);
 

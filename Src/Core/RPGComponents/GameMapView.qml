@@ -137,7 +137,7 @@ Item {
         console.debug('[GameMapView]openMap', mapPath, itemViewPort.itemContainer.width, itemViewPort.itemContainer.height);
         //console.debug("mapEventBlocks,mapSpecialBlocks", JSON.stringify(mapEventBlocks), JSON.stringify(mapSpecialBlocks));
 
-        return tmapInfo;
+        return mapInfo;
     }
 
     //释放

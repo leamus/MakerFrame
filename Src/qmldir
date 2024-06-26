@@ -6,7 +6,6 @@ ColorPicker 1.0 ColorPicker.qml
 
 GameCommonScript 1.0 GameCommonScript.qml
 
-GameVisualScript 1.0 GameVisualScript.qml
 GameVisualGoods 1.0 GameVisualGoods.qml
 GameVisualFightSkill 1.0 GameVisualFightSkill.qml
 GameVisualFightScript 1.0 GameVisualFightScript.qml

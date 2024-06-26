@@ -21,7 +21,7 @@ Item {
     function init() {
 
         //let fightheros = game.fighthero(-1, 1);
-        let fightRolePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator;
+        //let fightRolePath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
         let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
@@ -49,7 +49,7 @@ Item {
     //按类型 显示道具
     //type：-1，所有；1，可用；2，可装；3，战时；4，可卖；5，剧情类
     function showGoods(type=undefined) {
-        //let goodsPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator;
+        //let goodsPath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
 
         if(type === undefined || type === null)
             type = nlastShowType;

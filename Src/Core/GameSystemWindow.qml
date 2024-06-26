@@ -80,7 +80,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        game.save('存档' + c, game.gd['$sys_map'].$name, 1);
+                        yield game.save('存档' + c, game.gd['$sys_map'].$name, 1);
                         yield game.msg('存档成功');
                         break;
                     default:
@@ -101,8 +101,9 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.setTimeout(function() {game.load('存档' + c)}, 0, game);
-                        if(game.load('存档' + c)) {
+                        ////game.$globalLibraryJS.setTimeout(function() {game.load('存档' + c)}, 0, game);
+                        let ret = yield game.load('存档' + c);
+                        if(ret) {
                             yield game.msg('读档成功');
                         }
                         else {

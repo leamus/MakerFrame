@@ -22,6 +22,7 @@ import 'qrc:/QML'
 import './Core'
 
 
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -2046,7 +2047,7 @@ Item {
 
     //可视化
     //Loader {
-    GameVisualScript {
+   VisualScript {
         id: gameVisualScript
         //id: loaderVisualScript
 
@@ -2066,8 +2067,20 @@ Item {
         //focus: true
 
 
-        //source: "./GameVisualScript.qml"
+        //source: './GameVisualScript.qml'
+        /*sourceComponent: Component {
+            VisualScript {
+
+            }
+        }
+        */
         //asynchronous: false
+
+
+        defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+
 
 
         /*onLoaded: {
@@ -2121,7 +2134,7 @@ function $refresh(index, imageAnimate, path) {
         //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
-            imageFixPositions = GlobalLibraryJS.replaceAll(imageFixPositions, '\\r', '').split('\\n');
+            imageFixPositions = imageFixPositions.split(/\r?\n/);
         else
             imageFixPositions = null;
     }

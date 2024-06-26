@@ -1287,7 +1287,7 @@ Item {
             }
 
 
-            _private.loadModule("");
+            //_private.loadModule("");
             _private.changeProject(item);
 
 
@@ -1308,7 +1308,7 @@ Item {
             dialogCommon.fOnAccepted = ()=>{
                 console.debug("[mainGameMaker]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
                 removeItem(index);
-                _private.loadModule("");
+                //_private.loadModule("");
 
                 l_listProjects.forceActiveFocus();
             };
@@ -1430,7 +1430,8 @@ Item {
 
 
             function onS_close() {
-                loader.source = '';
+                //loader.source = '';
+                _private.loadModule('');
             }
         }
 
@@ -1874,7 +1875,7 @@ Item {
 
         //载入模块
         function loadModule(modulePath) {
-            if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
+            if(modulePath.length !== 0 && GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
                 dialogCommon.show({
                     Msg: '请先新建一个工程',
                     Buttons: Dialog.Yes,

@@ -707,7 +707,7 @@ Item {
 
                                 text: '*动作名'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -715,7 +715,7 @@ Item {
 
                                 text: '@特效名'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 

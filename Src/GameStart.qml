@@ -22,6 +22,7 @@ import 'qrc:/QML'
 //import './Core'
 
 
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -305,7 +306,7 @@ game.goon();
     }
 
     //Loader {
-    GameVisualScript {
+    VisualScript {
         id: gameVisualScript
         //id: loaderVisualScript
 
@@ -327,7 +328,19 @@ game.goon();
 
 
         //source: './GameVisualScript.qml'
+        /*sourceComponent: Component {
+            VisualScript {
+
+            }
+        }
+        */
         //asynchronous: false
+
+
+        defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+
 
 
         /*onLoaded: {

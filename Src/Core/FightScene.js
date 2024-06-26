@@ -1675,7 +1675,7 @@ function readFightRole(role) {
         console.warn("[!FightScene]载入战斗精灵失败：" + role.$rid);
 
 
-    /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + role.$rid + GameMakerGlobal.separator + "fight_role.json";
+    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + role.$rid + GameMakerGlobal.separator + "fight_role.json");
 
     //console.debug("[FightScene]filePath：", filePath);
 
@@ -1709,7 +1709,7 @@ function loadFightSkillInfo(fightSkillName) {
 
     /*if(fightSkillName) {
 
-        /*let filePath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + "fight_skill.json";
+        /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + "fight_skill.json");
         //let data = File.read(filePath);
         //console.debug("[GameFightSkill]filePath：", filePath);
 

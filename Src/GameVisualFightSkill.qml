@@ -840,7 +840,7 @@ Item {
 
                                 text: '*@Buff类型'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -848,7 +848,7 @@ Item {
 
                                 text: '*@Buff效果'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -856,7 +856,7 @@ Item {
 
                                 text: '*@持续回合数'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -864,7 +864,7 @@ Item {
 
                                 text: '*@概率'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 
@@ -915,7 +915,7 @@ Item {
 
                                 text: '*@影响属性'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -923,7 +923,7 @@ Item {
 
                                 text: '*@效果值'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -931,7 +931,7 @@ Item {
 
                                 text: '*@倍率参考对象'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -939,7 +939,7 @@ Item {
 
                                 text: '*@倍率参考属性'
                                 font.pointSize: _config.nLabelFontSize
-                                color: Global.style.color(Global.style.Yellow)
+                                color: Global.style.color(Global.style.Orange)
                             }
                         }
 

@@ -273,6 +273,25 @@ Item {
 
 
                     font.pointSize: 12
+                    text: qsTr("<a href='#'>封魔传记(Tap)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.taptap.cn/app/683317');
+                    }
+                }
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
                     text: qsTr("<a href='#'>英语杀(Tap)</a>")
 
                     horizontalAlignment: Label.AlignHCenter

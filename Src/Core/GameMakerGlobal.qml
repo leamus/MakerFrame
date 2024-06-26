@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.11.1.240607'
+    property string version: '1.11.5.240624'
 
 
     //配置
@@ -57,7 +57,7 @@ QtObject {
             switch(Qt.platform.os) {
             case 'android':
                 return Platform.externalDataPath + separator + 'RPGMaker';
-                //return 'assets:';   //'.'  //'qrc:'
+                //return 'assets:';   //'.'  //':'
             case 'windows':
                 if(Platform.compileType() === 'release')
                     return 'RPGMaker';

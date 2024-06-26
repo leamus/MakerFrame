@@ -765,7 +765,7 @@ Item {
 
                             text: '*@属性'
                             font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Yellow)
+                            color: Global.style.color(Global.style.Orange)
                         }
                         Label {
                             Layout.preferredWidth: 1
@@ -773,7 +773,7 @@ Item {
 
                             text: '*@效果值'
                             font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Yellow)
+                            color: Global.style.color(Global.style.Orange)
                         }
                     }
 
