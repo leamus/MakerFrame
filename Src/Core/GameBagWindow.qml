@@ -479,12 +479,14 @@ Item {
 
                     //_private.close();
 
-                    let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    game.usegoods(gameFightRoleMenu.nChoiceIndex, goods);
-
+                    let index = gameFightRoleMenu.nChoiceIndex;
+                    let goods = gameGoodsMenu.arrGoods[index];
 
                     //脚本执行完毕后刷新背包
-                    game.run(function(){root.showGoods(root.nlastShowType);});
+                    game.run(function*(){
+                        yield *game.usegoods(index, goods);
+                        root.showGoods(root.nlastShowType);
+                    });
                 }
             }
 

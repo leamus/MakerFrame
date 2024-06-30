@@ -732,7 +732,7 @@ function *loadResources() {
                 if(ts.$load && ts.$autoLoad !== false) {
                     //ts.$load();
                     //game.run([ts.$load() ?? null, 'plugin_load:' + tc0 + tc1]);
-                    let r = ts.$load();
+                    let r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
                     if(GlobalLibraryJS.isGenerator(r))yield *r;
                 }
             }

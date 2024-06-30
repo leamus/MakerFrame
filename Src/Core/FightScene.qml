@@ -32,6 +32,12 @@ import "FightScene.js" as FightSceneJS
 /*
     鹰：fight.myCombatants 和 fight.enemies 是 我方和敌方 的数据（$Combatant()返回的对象）
       repeaterMyCombatants 和 repeaterEnemies 是 我方和敌方 的精灵组件，和上面一一对应，用itemAt()来获取
+
+
+    设计思路：
+      1、3个生成器：
+        genFightChoice是选择系统使用；genFighting是主回合战斗循环使用；asyncScript是各种事件、特效使用；
+          genFighting生成各种脚本给asyncScript运行，分开的好处是随时可以插入用户定义的脚本去运行；
 */
 
 
@@ -208,14 +214,14 @@ Item {
                 button.clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    fight.run(tb.$clicked(button) ?? null);
+                    fight.run(tb.$clicked.call(button, button) ?? null, {Tips: 'FightScene button clicked'});
                 });
             //！！！兼容旧代码
             else if(tb.$action)
                 button.clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    fight.run(tb.$action(button) ?? null);
+                    fight.run(tb.$action.call(button, button) ?? null);
                 });
             GlobalLibraryJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
         }
@@ -292,7 +298,8 @@ Item {
 
         fight.d = {};
 
-        _private.genFighting.clear();
+        _private.genFighting.clear(3);
+        //_private.asyncScript.clear(1);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
@@ -303,7 +310,7 @@ Item {
         ////_private.arrTempLoopedAllFightRoles = [];
         _private.nRound = 0;
         //_private.nStep = 0;
-        _private.nStage = 0;
+        _private.nStage = 1;
 
         //rowlayoutButtons.enabled = true;
         msgbox.textArea.text = '';
@@ -414,7 +421,9 @@ Item {
 
         //初始化脚本
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
-            yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight_init_script'], -2, );
+            let r = game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))yield *r;
+            //yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight_init_script'], -2, );
         }
 
 
@@ -477,7 +486,11 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight start1'], -2);
+        if(game.$sys.resources.commonScripts["fight_start_script"]) {
+            let r = game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))yield *r;
+            //yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight start1'], -2);
+        }
 
 
         //GlobalLibraryJS.setTimeout(function() {
@@ -505,8 +518,8 @@ Item {
 
         fight.d = {};
 
-        _private.asyncScript.clear(1);
-        _private.genFighting.clear();
+        //_private.asyncScript.clear(1);
+        _private.genFighting.clear(3);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
@@ -545,7 +558,7 @@ Item {
                 game.$resources.commonScripts['refresh_combatant'](tfh);
             //刷新战斗时人物数据
             //fight.$sys.refreshCombatant(-1);
-        }, {Running: 0});
+        }, {Running: 1, Tips: 'FightScene release refresh_combatant'});
 
 
         rootFightScene.visible = false;
@@ -557,7 +570,7 @@ Item {
         //_private.nStage = 0;
         game.goon('$fight');
 
-        game.run(true);
+        //game.run(true);
     }
 
 
@@ -607,7 +620,9 @@ Item {
             }
 
 
-            return game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback);
+            const itemGameMsg = game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback);
+            itemGameMsg.parent = itemFightViewPort;
+            return itemGameMsg;
         }
 
         //同 game.talk
@@ -696,8 +711,17 @@ Item {
         //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
         //params是给战斗脚本$createData的参数。
         readonly property var fighting: function(fightScript) {
+            fightScript = game.$sys.getFightScriptObject(fightScript);
+            if(!fightScript) {
+                //console.warn('[!FightScene]没有战斗脚本:', fightScript);
+                return false;
+            }
 
             game.run(function*() {
+                if(game.stage() !== 0)
+                    return false;
+
+
                 let fightHeros = game.fighthero();
                 if(fightHeros.length === 0) {
                     //game.run(function *(){yield game.msg('没有战斗人物', 10);});
@@ -712,15 +736,17 @@ Item {
 
                 //loaderFightScene.test();
                 //loaderFightScene.init(GameSceneJS.getFightScriptObject(fightScript));
-                fight.run(init, -1, game.$sys.getFightScriptObject(fightScript));
+                fight.run(init, {Tips: 'FightScene fighting'}, fightScript);
 
 
                 //暂停脚本，直到stage为0
                 // 鹰：必须写在这里，因为如果有多个fighting同时运行，则会出错（因为Timer会一直game.run）
-                while(game.stage() !== 0)
-                    yield null;
+                //while(game.stage() !== 0)
+                //    yield null;
 
-            });
+            }, {Tips: 'FightScene fighting'});
+
+            return true;
         }
 
         //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
@@ -863,6 +889,11 @@ Item {
                 }
             },
 
+            runAwayFlag: function(value) {
+                if(value !== undefined)
+                    _private.nRunAwayFlag = value;
+                return _private.nRunAwayFlag;
+            },
             runAway: FightSceneJS.runAway,
 
             stage: function(value) {
@@ -886,6 +917,8 @@ Item {
             },
             caches: {
                 asyncScript: _private.asyncScript,
+                genFighting: _private.genFighting,
+                genFightChoice: _private.genFightChoice,
             },
 
 
@@ -2120,22 +2153,25 @@ Item {
 
         //战斗步骤：1为我方装备中；2为选择我方人物中；3为选择敌人中；1x为友军选人
         //property int nStep: 0
-        property int nStage: 0  //1：准备中；2：战斗中
+        property int nStage: 0  //0：停止中；1：开始战斗前；2：准备战斗；3：战斗中；-1：逃跑处理中；
 
 
         //我方按钮
         //property var arrMenu: ["普通攻击", "技能", "物品", '信息', "休息"]
 
 
-        //逃跑
+        //逃跑概率
         property var runAway
+        //逃跑标记（0为没有，n为n次逃跑，-1为一直逃跑）
+        property int nRunAwayFlag: 0
 
 
         //战斗脚本（也可以直接用Generator对象）
         property var genFighting: new GlobalLibraryJS.Async(rootFightScene)
 
         //异步脚本（播放特效、事件等）
-        property var asyncScript: new GlobalLibraryJS.Async(rootFightScene)
+        //property var asyncScript: new GlobalLibraryJS.Async(rootFightScene)
+        property var asyncScript: game.$caches.asyncScript
 
         //战斗选择 异步脚本
         property var genFightChoice: null

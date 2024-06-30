@@ -932,7 +932,7 @@ Item {
                     let ret = FrameManager.sl_qml_CompressDir(
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + ".zip",
                                 GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
-                                                  );
+                    );
 
                     textinputDialogCommonInput.visible = false;
                     dialogCommon.standardButtons = Dialog.Ok;
@@ -1397,7 +1397,7 @@ Item {
 
 
             //s_close();
-            console.debug("[mainGameMaker]onRejected")
+            console.debug("[mainGameMaker]onRejected");
             //Qt.quit()
 
         }
@@ -1858,7 +1858,6 @@ Item {
                     }
                 }
             }
-
         }
     }
 

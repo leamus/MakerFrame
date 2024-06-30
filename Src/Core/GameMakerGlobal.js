@@ -258,8 +258,8 @@ function *$gameInit(newGame) {
             }
         }
     }
-    //载入所有插件的 game.js 的所有变量和函数复制给 game.gf.$plugins[tp0][tp1]，并调用其 $init
-    let plugins = yield game.plugin();
+    /*/载入所有插件的 game.js 的所有变量和函数复制给 game.gf.$plugins[tp0][tp1]，并调用其 $init
+    let plugins = yield *game.plugin();
     for(let tp0 in plugins) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
@@ -278,6 +278,7 @@ function *$gameInit(newGame) {
             }
         }
     }
+    */
 
 
     //每秒恢复事件
@@ -323,8 +324,8 @@ function *$gameRelease(gameExit) {
         //game.run(game.gf.$release(gameExit));
     }
 
-    //载入所有插件的 game.js 的 $release
-    let plugins = yield game.plugin();
+    /*/载入所有插件的 game.js 的 $release
+    let plugins = yield *game.plugin();
     for(let tp0 in game.gf.$plugins) {
         for(let tp1 in game.gf.$plugins[tp0]) {
             if(game.gf.$plugins[tp0][tp1].$release) {
@@ -334,10 +335,11 @@ function *$gameRelease(gameExit) {
             }
         }
     }
+    */
 
 
     if(gameExit)
-        yield game.save();  //自动存档
+        yield *game.save();  //自动存档
 
     return null;
 }
@@ -860,7 +862,7 @@ function computeCombatantPropertiesWithExtra(combatant) {
 
 //战斗人物是否可用（上场且活着）
 function $combatantIsValid(combatant) {
-    if(combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0)
+    if(combatant.$$fightData.$info && combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0)
         return true;
     return false;
 }
@@ -871,8 +873,8 @@ function $combatantIsValid(combatant) {
 function *$gameOverScript(params) {
     if(params === -1) {
         yield game.msg('游戏结束', 60, '', 0, 0b11);
-        game.$sys.release(false);
-        game.$sys.init(true, false);
+        yield *game.$sys.release(false);
+        yield *game.$sys.init(true, false);
     }
 
     return null;
@@ -1867,10 +1869,10 @@ function *$commonFightEndScript(res, teams, fightData) {
         game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
 
 
-    game.run(function() {
+    game.run(function*() {
 
         if(res.result === -1)
-            game.gameover(-1);
+            yield *game.gameover(-1);
 
 
         //返回地图代码
@@ -2004,18 +2006,24 @@ let $fightMenus = {
 let $fightButtons = [
     {
         $text: '重复上次',
-        $colors: ["lightgreen", "lightblue", "lightsteelblue"],
-        $clicked: function*(button) {
-            //rowlayoutButtons.enabled = false;
+        $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],
+        $clicked: function(button) {
+            button.enabled = false;
 
-            fight.$sys.resetFightScene();
+            return function*() {
+                fight.$sys.resetFightScene();
 
-            if(fight.$sys.stage() === 1) {
-                fight.$sys.loadLast(true, 0);
-                fight.$sys.continueFight();
-            }
-            else if(fight.$sys.stage() === 2)
+                if(fight.$sys.stage() === 2) {
+                    fight.$sys.loadLast(true, 0);
+                    fight.$sys.continueFight();
+                }
+                else if(fight.$sys.stage() === 3) {
+                    //return null;
+                }
+
+                button.enabled = true;
                 return null;
+            };
         },
         //其他属性
         $properties: {
@@ -2023,10 +2031,28 @@ let $fightButtons = [
     },
     {
         $text: '逃跑',
-        $colors: ["lightyellow", "lightblue", "lightsteelblue"],
-        $clicked: function*(button) {
-            fight.$sys.runAway();
-            return null;
+        $colors: ['lightyellow', 'lightblue', 'lightsteelblue'],
+        $clicked: function(button) {
+            button.enabled = false;
+            //逃跑次数，0为不逃跑，-1为一直逃跑
+            if(fight.$sys.runAwayFlag() === -1) {
+                button.text = '逃跑';
+                fight.$sys.runAwayFlag(0);
+            }
+            else {
+                button.text = '持续逃跑';
+                fight.$sys.runAwayFlag(-1);
+            }
+
+            return function*() {
+                if(fight.$sys.runAwayFlag() !== 0) {
+                    fight.$sys.runAway();
+                }
+                else {
+                }
+                button.enabled = true;
+                return null;
+            };
         },
         //其他属性
         $properties: {
@@ -2034,27 +2060,33 @@ let $fightButtons = [
     },
     {
         $text: '手动攻击',
-        $colors: ["lightgreen", "lightblue", "lightsteelblue"],
+        $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],
         $clicked: function(button) {
+            button.enabled = false;
             if(fight.$sys.autoAttack() === 0) {
                 button.text = '自动攻击';
-
                 fight.$sys.autoAttack(1);
-
-
-                if(fight.$sys.stage() === 1) {
-                    fight.$sys.loadLast(true, 1);
-                    fight.$sys.continueFight();
-                }
-                else
-                    return null;
             }
             else {
                 button.text = '手动攻击';
-
                 fight.$sys.autoAttack(0);
             }
-            return null;
+
+            return function*() {
+                if(fight.$sys.autoAttack() === 1) {
+                    if(fight.$sys.stage() === 2) {
+                        fight.$sys.loadLast(true, 1);
+                        fight.$sys.continueFight();
+                    }
+                    else {
+                        //return null;
+                    }
+                }
+                else {
+                }
+                button.enabled = true;
+                return null;
+            };
         },
         //其他属性
         $properties: {

@@ -807,11 +807,14 @@ Item {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.maximumWidth: parent.width
+            Layout.maximumHeight: parent.height / 2
 
             Rectangle {
                 id: rectSprite
-                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+                Layout.alignment: Qt.AlignCenter
 
                 Layout.preferredWidth: parseInt(textSpriteWidth.text)
                 Layout.preferredHeight: parseInt(textSpriteHeight.text)

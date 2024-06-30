@@ -80,7 +80,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        yield game.save('存档' + c, game.gd['$sys_map'].$name, 1);
+                        yield *game.save('存档' + c, game.gd['$sys_map'].$name, 1);
                         yield game.msg('存档成功');
                         break;
                     default:
@@ -101,8 +101,8 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        ////game.$globalLibraryJS.setTimeout(function() {game.load('存档' + c)}, 0, game);
-                        let ret = yield game.load('存档' + c);
+                        ////game.$globalLibraryJS.setTimeout(function() {yield *game.load('存档' + c)}, 0, game);
+                        let ret = yield *game.load('存档' + c);
                         if(ret) {
                             yield game.msg('读档成功');
                         }
@@ -131,22 +131,26 @@ Item {
                     case 0:
                         //存档音乐
                         if(game.gd["$sys_sound"] & 0b1) {
-                            itemBackgroundMusic.pause(false);
+                            //itemBackgroundMusic.pause(false);
+                            game.pausemusic(false);
                             yield game.msg('关闭音乐');
                         }
                         else {
-                            itemBackgroundMusic.resume(false);
+                            //itemBackgroundMusic.resume(false);
+                            game.resumemusic(false);
                             yield game.msg("打开音乐");
                         }
                         /*
                         //全局音乐
                         //if(GameMakerGlobal.settings.value('$PauseMusic')) {
                         if(game.cd['$PauseMusic']) {
-                            itemBackgroundMusic.resume(true);
+                            //itemBackgroundMusic.resume(true);
+                            game.resumemusic(true);
                             yield game.msg("打开音乐");
                         }
                         else {
-                            itemBackgroundMusic.pause(true);
+                            //itemBackgroundMusic.pause(true);
+                            game.pausemusic(true);
                             yield game.msg('关闭音乐');
                         }
                         */
@@ -154,22 +158,26 @@ Item {
                     case 1:
                         //存档音效
                         if(game.gd["$sys_sound"] & 0b10) {
-                            rootSoundEffect.pause(false);
+                            //rootSoundEffect.pause(false);
+                            game.pausesoundeffect(false);
                             yield game.msg('关闭音效');
                         }
                         else {
-                            rootSoundEffect.resume(false);
+                            //rootSoundEffect.resume(false);
+                            game.resumesoundeffect(false);
                             yield game.msg("打开音效");
                         }
                         /*
                         //全局音效
                         //if(GameMakerGlobal.settings.value('$PauseSound')) {
                         if(game.cd['$PauseSound']) {
-                            rootSoundEffect.resume(true);
+                            //rootSoundEffect.resume(true);
+                            game.resumesoundeffect(true);
                             yield game.msg("打开音效");
                         }
                         else {
-                            rootSoundEffect.pause(true);
+                            //rootSoundEffect.pause(true);
+                            game.pausesoundeffect(true);
                             yield game.msg('关闭音效');
                         }
                         */

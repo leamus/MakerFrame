@@ -312,7 +312,7 @@ Item {
                 loaderGameScene.item.bTest = true;
                 //loaderGameScene.item.openMap(item);
                 let tScript = function*() {
-                    yield game.loadmap(textMapName.text);
+                    yield *game.loadmap(textMapName.text);
                     game.createhero(textRoleName.text);
                     game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
                     game.interval(16);

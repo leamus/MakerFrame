@@ -410,7 +410,7 @@ function skillStepChoiced(type, value) {
 
 
             //检查是否可以开始回合
-            if(_private.nStage === 1)
+            if(_private.nStage === 2)
                 checkToFight();
             return;
         }
@@ -551,7 +551,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
 
 //判断是否可以开始回合
 function checkToFight() {
-    if(_private.nStage === 2)
+    if(_private.nStage === 3)
         return false;
 
     //遍历，判断target
@@ -1160,25 +1160,19 @@ function *fnRound() {
                     //console.debug("!!!", SkillEffects);
 
                     //得到技能生成器函数
-                    //let genActionAndSprite = fightSkillInfo.$commons.$playScript(combatant);
+                    let genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
                     //_private.asyncScript.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
-                    GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
+                    //GlobalJS.createScript(_private.asyncScript, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
 
                     //循环 技能（或者 道具技能）包含的特效
-                    while(1) {
+                    while(GlobalLibraryJS.isGenerator(genActionAndSprite)) {
 
-                        //一个特效
+                        //一个技能生成器
+                        let tCombatantActionSpriteData;
+
+                        /*/方案1：
                         let [tCombatantActionSpriteData] = _private.asyncScript.run(SkillEffectResult);
-                        //console.debug("~~~~~", JSON.stringify(tCombatantActionSpriteData));
-
-                        //方案2：新的 Generator来执行
-                        /*let tCombatantActionSpriteData = genActionAndSprite.next(SkillEffectResult);
-                        if(tCombatantActionSpriteData.done === true)
-                            break;
-                        else
-                            tCombatantActionSpriteData = tCombatantActionSpriteData.value;
-                        */
 
                         //如果动画结束
                         if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
@@ -1186,6 +1180,19 @@ function *fnRound() {
                         }
                         else
                             tCombatantActionSpriteData = tCombatantActionSpriteData.value;
+                        */
+
+
+                        //方案2：新的 Generator来执行
+                        tCombatantActionSpriteData = genActionAndSprite.next(SkillEffectResult);
+                        if(tCombatantActionSpriteData.done === true)
+                            break;
+                        else
+                            tCombatantActionSpriteData = tCombatantActionSpriteData.value;
+
+
+
+                        //console.debug("!!!1", tCombatantActionSpriteData);
                         if(!tCombatantActionSpriteData)  //如果是其他yield（比如msg）
                             continue;
 
@@ -1382,15 +1389,17 @@ function *gfFighting() {
 
 
         //_private.nStep = 1;
-        _private.nStage = 1;
+        _private.nStage = 2;
 
-
+        if(_private.nRunAwayFlag !== 0) {
+            fight.run(runAway, {Tips: 'runAway'});
+        }
         //战斗准备中（选择技能）
-        if(_private.nAutoAttack === 0)
+        if(_private.nRunAwayFlag !== 0 || _private.nAutoAttack === 0)
             yield 11;
 
 
-        _private.nStage = 2;
+        _private.nStage = 3;
         //rowlayoutButtons.enabled = false;
         //menuFightRoleChoice.hide();
         menuFightRoleChoice.visible = false;
@@ -1545,13 +1554,33 @@ function *runCombatantRoundScript(combatant, stage) {
 
 //逃跑处理
 function runAway() {
+    //if(flag === null)
+    //    return _private.nRunAwayFlag;
+
+
+    if(_private.nStage < 2)
+        return false;
+
 
     //rowlayoutButtons.enabled = false;
 
     FightSceneJS.resetFightScene();
 
-    if(_private.nStage === 2)
-        return;
+    //战斗阶段不可以逃跑，标记flag
+    if(_private.nStage === 3) {
+        //_private.nRunAwayFlag = flag;
+        return null;
+    }
+    //if(flag !== true)    //次数
+    //    _private.nRunAwayFlag = flag;
+    if(_private.nRunAwayFlag === 0)
+        return false;
+    else if(_private.nRunAwayFlag > 0)
+        --_private.nRunAwayFlag;
+
+
+    //设置标记不可重入
+    _private.nStage = -1;
 
 
     //逃跑计算
@@ -1560,14 +1589,14 @@ function runAway() {
     if(_private.runAway === true) {
         if(game.$sys.resources.commonScripts["common_run_away_algorithm"](fight.myCombatants, -1)) {
             fight.over(-2);
-            return;
+            return true;
         }
     }
     //如果是数字（0~1之间），则概率逃跑
     else if(GlobalLibraryJS.isValidNumber(_private.runAway)) {
         if(Math.random() < _private.runAway) {
             fight.over(-2);
-            return;
+            return true;
         }
     }
 
@@ -1587,13 +1616,16 @@ function runAway() {
             }
         }
         //!!这里使用事件的形式执行genFighting，因为genFighting中也有 fight 脚本，貌似对之后的脚本造成了影响!!
-        GlobalLibraryJS.runNextEventLoop(function() {
-            let ret = _private.genFighting.run();
-        }/*,0,rootFightScene*/,'fight runaway');
+        //if(flag !== true)
+        //GlobalLibraryJS.runNextEventLoop(function() {
+        //    let ret = _private.genFighting.run();
+        //}/*,0,rootFightScene*/,'fight runaway');
+        fight.$sys.continueFight(1);
     }
 
     fight.run([continueScript, '逃跑失败脚本']);
 
+    return false;
 }
 
 

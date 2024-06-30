@@ -122,108 +122,123 @@ Item {
     //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）
     //必须用yield标记来让它运行完毕（第一次使用则不必）
     function init(startScript=true, bLoadResources=true, gameData=null) {
-        //asyncScript.runNextEventLoop('init');
 
         //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
         _private.asyncScript.clear(0);
         //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
 
 
+        //asyncScript.runNextEventLoop('init');
+
+
         //！！！鹰：注意：load是异步调用；且将 Priority 设置为顺序的（保证 game.load 的所有异步脚本执行完毕 再执行 game.load 的下一个命令）
         //let priority = 0;
 
 
-        game.run(function*() {
+        game.run(_init);
+    }
 
-            game.gd['$sys_fight_heros'] = [];
-            //game.gd['$sys_hidden_fight_heros'] = [];
-            game.gd['$sys_money'] = 0;
-            game.gd['$sys_goods'] = [];
-            game.gd['$sys_map'] = {};
-            game.gd['$sys_fps'] = 16;
-            game.gd['$sys_main_roles'] = [];
-            game.gd['$sys_sound'] = 0b11;
-            game.gd['$sys_music'] = '';
-            game.gd['$sys_scale'] = 1;
+    function *_init(startScript=true, bLoadResources=true, gameData=null) {
 
+        //game.run(function*() {
 
-            if(bLoadResources)
-                yield *GameSceneJS.loadResources();
-
-
-            //game.gf['$sys'] = _private.objCommonScripts;
+        game.gd['$sys_fight_heros'] = [];
+        //game.gd['$sys_hidden_fight_heros'] = [];
+        game.gd['$sys_money'] = 0;
+        game.gd['$sys_goods'] = [];
+        game.gd['$sys_map'] = {};
+        game.gd['$sys_fps'] = 16;
+        game.gd['$sys_main_roles'] = [];
+        game.gd['$sys_sound'] = 0b11;
+        game.gd['$sys_music'] = '';
+        game.gd['$sys_scale'] = 1;
 
 
-            //恢复游戏数据
-            if(gameData)
-                GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+        if(bLoadResources)
+            yield *GameSceneJS.loadResources();
 
 
-            //计算新属性
-            for(let tfh of game.gd['$sys_fight_heros'])
-                _private.objCommonScripts['refresh_combatant'](tfh);
-            //刷新战斗时人物数据
-            //fight.$sys.refreshCombatant(-1);
+        //game.gf['$sys'] = _private.objCommonScripts;
+
+
+        //恢复游戏数据
+        if(gameData)
+            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+
+
+        //计算新属性
+        for(let tfh of game.gd['$sys_fight_heros'])
+            _private.objCommonScripts['refresh_combatant'](tfh);
+        //刷新战斗时人物数据
+        //fight.$sys.refreshCombatant(-1);
 
 
 
-            if(_private.objCommonScripts['game_init']) {
-                //game.run([_private.objCommonScripts['game_init'](bLoadResources) ?? null, 'game_init'],
-                //    {Priority: priority++, Type: 0, Running: 1});
-                let r = _private.objCommonScripts['game_init'](bLoadResources);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
-            }
+        if(_private.objCommonScripts['game_init']) {
+            //game.run([_private.objCommonScripts['game_init'](bLoadResources) ?? null, 'game_init'],
+            //    {Priority: priority++, Type: 0, Running: 1});
+            let r = _private.objCommonScripts['game_init'](bLoadResources);
+            if(GlobalLibraryJS.isGenerator(r))yield *r;
+        }
 
 
-            //所有插件初始化
-            for(let tc in _private.objPlugins)
-                for(let tp in _private.objPlugins[tc])
-                    if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false) {
-                        //console.warn(_private.objPlugins[tc][tp].$init)
-                        //_private.objPlugins[tc][tp].$init();
-                        let r = _private.objPlugins[tc][tp].$init();
-                        if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    }
-
-
-            //钩子函数调用
-            for(let vfInit in game.$sys.hooks.init) {
-                let r = game.$sys.hooks.init[vfInit](bLoadResources);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
-            }
-
-
-            //读取 start.js 脚本
-            if(startScript === true) {
-                /*
-                let filePath = game.$projectpath + GameMakerGlobal.separator + 'start.js';
-                //let cfg = File.read(filePath);
-                let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
-                //if(!data)
-                //    return false;
-                if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
-                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                */
-
-                if(_private.objCommonScripts['game_start']) {
-                    let r = _private.objCommonScripts['game_start']();
+        //所有插件初始化
+        for(let tc in _private.objPlugins)
+            for(let tp in _private.objPlugins[tc])
+                if(_private.objPlugins[tc][tp].$init && _private.objPlugins[tc][tp].$autoLoad !== false) {
+                    //console.warn(_private.objPlugins[tc][tp].$init)
+                    //_private.objPlugins[tc][tp].$init();
+                    let r = _private.objPlugins[tc][tp].$init();
                     if(GlobalLibraryJS.isGenerator(r))yield *r;
                 }
+
+
+        //钩子函数调用
+        for(let vfInit in game.$sys.hooks.init) {
+            let r = game.$sys.hooks.init[vfInit](bLoadResources);
+            if(GlobalLibraryJS.isGenerator(r))yield *r;
+        }
+
+
+        //game.pause();
+        game.goon('$release');
+
+
+        //game.run(function*() {
+        //读取 start.js 脚本
+        if(startScript === true) {
+            /*
+            let filePath = game.$projectpath + GameMakerGlobal.separator + 'start.js';
+            //let cfg = File.read(filePath);
+            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+            //if(!data)
+            //    return false;
+            if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
+                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            */
+
+            if(_private.objCommonScripts['game_start']) {
+                game.run(function*() {
+                    let r = _private.objCommonScripts['game_start']();
+                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                }, {Tips: 'start'});
             }
-            else if(startScript === false) {
-            }
-            else if(startScript === null) {
-            }
-            else {  //是脚本
+        }
+        else if(startScript === false) {
+        }
+        else if(startScript === null) {
+        }
+        else {  //是脚本
+            game.run(function*() {
                 let r = startScript();
                 if(GlobalLibraryJS.isGenerator(r))yield *r;
-            }
+            }, {Tips: 'start'});
+        }
+
+        //}, {Tips: 'start'});
 
 
-            //game.pause();
-            game.goon('$release');
-
-        }, {Priority: -2, Type: 0, Running: 1, Tips: 'init'});
+        //}, {Priority: -2, Type: 0, Running: 1, Tips: 'init'});
 
 
 
@@ -448,10 +463,10 @@ Item {
         //载入地图并执行地图载入事件；成功返回 true（生成器返回 地图信息）。
         //userData是用户传入数据，后期调用的钩子函数会传入；
         //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
-        readonly property var loadmap: function(mapRID, userData, forceRepaint=false) {
+        readonly property var loadmap: function*(mapRID, userData, forceRepaint=false) {
 
             if(!mapRID) {
-                asyncScript.runNextEventLoop('loadmap');
+                //asyncScript.runNextEventLoop('loadmap');
                 console.exception('[!GameScene]loadmap Fail:', mapRID);
                 return false;
             }
@@ -461,96 +476,94 @@ Item {
             //let priority = 0;
 
 
-            game.run(function*() {
+            //game.run(function*() {
 
-                //执行之前地图的 $end 函数
-                if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
-                    let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
-                    if(ts.$end) {
-                        let r = ts.$end(userData);
-                        if(GlobalLibraryJS.isGenerator(r))yield *r;
-                        //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
-                    }
-                }
-
-
-                //清理工作
-
-                timer.running = false;
-
-
-                for(let tc in _private.objTmpMapComponents) {
-                    let c = _private.objTmpMapComponents[tc];
-                    if(GlobalLibraryJS.isComponent(c)) {
-                        if(c.Destroy)
-                            c.Destroy();
-                        else if(c.destroy)
-                            c.destroy();
-                    }
-                }
-                _private.objTmpMapComponents = [];
-
-                game.delrole(-1);
-
-                _private.objTimers = {};
-
-                mainRole.$$collideRoles = {};
-                mainRole.$$mapEventsTriggering = {};
-                _private.stopMove(0);
-
-                game.d = {};
-                game.f = {};
-
-
-                //载入beforeLoadmap脚本
-                let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
-                if(beforeLoadmap) {
-                    let r = beforeLoadmap(mapRID, userData);
+            //执行之前地图的 $end 函数
+            if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
+                let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
+                if(ts.$end) {
+                    let r = ts.$end(userData);
                     if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
+                    //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
                 }
+            }
 
 
-                let mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
+            //清理工作
 
-                setSceneToRole(_private.sceneRole);
-
-
-                //载入地图会卡顿，重新开始计时会顺滑一点
-                timer.running = true;
-                timer.nLastTime = 0;
+            timer.running = false;
 
 
-                let priority = 0;
-
-
-                if(itemViewPort.mapScript.$start) {
-                    let r = itemViewPort.mapScript.$start(userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
+            for(let tc in _private.objTmpMapComponents) {
+                let c = _private.objTmpMapComponents[tc];
+                if(GlobalLibraryJS.isComponent(c)) {
+                    if(c.Destroy)
+                        c.Destroy();
+                    else if(c.destroy)
+                        c.destroy();
                 }
-                else if(itemViewPort.mapScript.start) {
-                    let r = itemViewPort.mapScript.start(userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
-                }
+            }
+            _private.objTmpMapComponents = [];
+
+            game.delrole(-1);
+
+            _private.objTimers = {};
+
+            mainRole.$$collideRoles = {};
+            mainRole.$$mapEventsTriggering = {};
+            _private.stopMove(0);
+
+            game.d = {};
+            game.f = {};
 
 
-                //载入after_loadmap脚本
-                let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
-                if(afterLoadmap) {
-                    let r = afterLoadmap(mapRID, userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
-                }
+            //载入beforeLoadmap脚本
+            let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
+            if(beforeLoadmap) {
+                let r = beforeLoadmap(mapRID, userData);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
+            }
 
 
-                return mapInfo;
+            let mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
 
-            }, {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
+            setSceneToRole(_private.sceneRole);
 
 
-            return true;
+            //载入地图会卡顿，重新开始计时会顺滑一点
+            timer.running = true;
+            timer.nLastTime = 0;
+
+
+            let priority = 0;
+
+
+            if(itemViewPort.mapScript.$start) {
+                let r = itemViewPort.mapScript.$start(userData);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
+            }
+            else if(itemViewPort.mapScript.start) {
+                let r = itemViewPort.mapScript.start(userData);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
+            }
+
+
+            //载入after_loadmap脚本
+            let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
+            if(afterLoadmap) {
+                let r = afterLoadmap(mapRID, userData);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
+            }
+
+
+            return mapInfo;
+
+            //}, {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
+            //return true;
         }
 
         /*readonly property var map: {
@@ -2167,7 +2180,7 @@ Item {
         //使用道具（会执行道具use脚本）；
         //fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；
         //goods可以为 道具资源名、道具对象 和 下标；
-        readonly property var usegoods: function(fighthero, goods) {
+        readonly property var usegoods: function*(fighthero, goods) {
 
             let goodsInfo = null;
             if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
@@ -2175,7 +2188,7 @@ Item {
             }
             else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd['$sys_goods'].length) {
-                    asyncScript.runNextEventLoop('usegoods');
+                    //asyncScript.runNextEventLoop('usegoods');
                     return false;
                 }
 
@@ -2187,12 +2200,12 @@ Item {
                 goods = GameSceneJS.getGoodsObject(goods);
             }
             else {
-                asyncScript.runNextEventLoop('usegoods');
+                //asyncScript.runNextEventLoop('usegoods');
                 return false;
             }
 
             if(!goodsInfo || !goods) {
-                asyncScript.runNextEventLoop('usegoods');
+                //asyncScript.runNextEventLoop('usegoods');
                 return false;
             }
 
@@ -2217,29 +2230,27 @@ Item {
             //    return false;
 
 
-            game.run(function*(){
-                if(goodsInfo.$commons.$useScript) {
-                    let r = goodsInfo.$commons.$useScript(goods, fighthero);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                }
+            //game.run(function*(){
+            if(goodsInfo.$commons.$useScript) {
+                let r = goodsInfo.$commons.$useScript(goods, fighthero);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+            }
 
 
-                //计算新属性
-                _private.objCommonScripts['refresh_combatant'](fighthero);
+            //计算新属性
+            _private.objCommonScripts['refresh_combatant'](fighthero);
 
-                //for(let tfh of game.gd['$sys_fight_heros'])
-                //    _private.objCommonScripts['refresh_combatant'](tfh);
+            //for(let tfh of game.gd['$sys_fight_heros'])
+            //    _private.objCommonScripts['refresh_combatant'](tfh);
 
-                //刷新战斗时人物数据
-                //fight.$sys.refreshCombatant(-1);
-
-
-                return true;
-
-            }, {Priority: -2, Type: 0, Running: 1, Tips: 'usegoods'});
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(-1);
 
 
             return true;
+
+            //}, {Priority: -2, Type: 0, Running: 1, Tips: 'usegoods'});
+            //return true;
         }
 
         //直接装备一个道具（不是从背包中）；
@@ -2517,13 +2528,13 @@ Item {
         }
 
         //暂停音乐；
-        //参数name为暂停名称；
+        //参数name为暂停名称；如果为true，表示引擎级关闭音乐；如果为false，表示存档级关闭音乐；
         readonly property var pausemusic: function(name='$user') {
             itemBackgroundMusic.pause(name);
         }
 
-        //继续播放音乐；
-        //参数name为暂停名称；
+        //恢复播放音乐；
+        //参数name为恢复名称；如果为true，表示引擎级恢复播放音乐；如果为false，表示存档级恢复播放音乐；如果为-1，打开全部强制恢复；
         readonly property var resumemusic: function(name='$user') {
             itemBackgroundMusic.resume(name);
         }
@@ -2566,6 +2577,18 @@ Item {
             return true;
         }
 
+
+        //暂停音效；
+        //参数name为暂停名称；如果为true，表示引擎级关闭音效；如果为false，表示存档级关闭音效；
+        readonly property var pausesoundeffect: function(name='$user') {
+            rootSoundEffect.pause(name);
+        }
+
+        //恢复播放音效；
+        //参数name为恢复名称；如果为true，表示引擎级恢复播放音效；如果为false，表示存档级恢复播放音效；如果为-1，打开全部强制恢复；
+        readonly property var resumesoundeffect: function(name='$user') {
+            rootSoundEffect.resume(name);
+        }
 
         readonly property var soundeffectpausing: function() {
             //return _private.config.nSoundConfig !== 0;
@@ -3815,7 +3838,7 @@ Item {
         //showName为显示名；
         //type为0普通保存，为1启用压缩；compressionLevel为压缩级别（1-9，-1为默认）；
         //成功返回true（生成器返回 写入字节数）
-        readonly property var save: function(fileName='autosave', showName='', type=1, compressionLevel=-1) {
+        readonly property var save: function*(fileName='autosave', showName='', type=1, compressionLevel=-1) {
             //asyncScript.runNextEventLoop('save');
 
 
@@ -3825,77 +3848,76 @@ Item {
 
 
 
-            game.run(function*(){
-                //载入before_save脚本
-                if(_private.objCommonScripts['before_save']) {
-                    let r = _private.objCommonScripts['before_save']();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([_private.objCommonScripts['before_save']() ?? null, 'before_save'], {Priority: -3, Type: 0, Running: 1});
-                }
+            //game.run(function*(){
+            //载入before_save脚本
+            if(_private.objCommonScripts['before_save']) {
+                let r = _private.objCommonScripts['before_save']();
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([_private.objCommonScripts['before_save']() ?? null, 'before_save'], {Priority: -3, Type: 0, Running: 1});
+            }
 
 
 
-                let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
+            let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
-                let outputData = {};
-                let fileData;
+            let outputData = {};
+            let fileData;
 
-                //过滤掉 $$ 开头的所有键
-                let fSaveFilter = function(k, v) {
-                    if(k.indexOf('$$') === 0)
-                        return undefined;
-                    return v;
-                }
+            //过滤掉 $$ 开头的所有键
+            let fSaveFilter = function(k, v) {
+                if(k.indexOf('$$') === 0)
+                    return undefined;
+                return v;
+            }
 
-                outputData.Version = '0.6';
-                outputData.Name = showName;
-                outputData.Type = type;
-                outputData.Time = GlobalLibraryJS.formatDate();
-                if(type === 1) {    //压缩
-                    let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
-                    outputData.Data = FrameManager.sl_qml_Compress(GlobalDataString, compressionLevel, 1).toString();
-                    outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + outputData.Data);
-                    fileData = JSON.stringify(outputData, fSaveFilter);
-                }
-                else {
-                    let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
-                    outputData.Data = game.gd;
-                    outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + GlobalDataString);
-                    fileData = JSON.stringify(outputData, fSaveFilter);
-                }
-
-
-
-                //!!!导出为文件
-                //console.debug(JSON.stringify(outputData));
-                //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-                let ret = FrameManager.sl_qml_WriteFile(fileData, GlobalJS.toPath(filePath), 0);
-                //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
-
-
-                //写入引擎变量
-                GameMakerGlobal.settings.setValue("$RPG/" + GameMakerGlobal.config.strCurrentProjectName, game.cd);
+            outputData.Version = '0.6';
+            outputData.Name = showName;
+            outputData.Type = type;
+            outputData.Time = GlobalLibraryJS.formatDate();
+            if(type === 1) {    //压缩
+                let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
+                outputData.Data = FrameManager.sl_qml_Compress(GlobalDataString, compressionLevel, 1).toString();
+                outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + outputData.Data);
+                fileData = JSON.stringify(outputData, fSaveFilter);
+            }
+            else {
+                let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
+                outputData.Data = game.gd;
+                outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + GlobalDataString);
+                fileData = JSON.stringify(outputData, fSaveFilter);
+            }
 
 
 
-                //载入after_save脚本
-                if(_private.objCommonScripts['after_save']) {
-                    let r = _private.objCommonScripts['after_save'](ret);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([_private.objCommonScripts['after_save']() ?? null, 'after_save'], {Priority: -1, Type: 0, Running: 1});
-                }
+            //!!!导出为文件
+            //console.debug(JSON.stringify(outputData));
+            //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
+            let ret = FrameManager.sl_qml_WriteFile(fileData, GlobalJS.toPath(filePath), 0);
+            //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
 
 
-                return ret;
+            //写入引擎变量
+            GameMakerGlobal.settings.setValue("$RPG/" + GameMakerGlobal.config.strCurrentProjectName, game.cd);
 
-            }, {Priority: -2, Type: 0, Running: 1, Tips: 'save'});
 
 
-            return true;
+            //载入after_save脚本
+            if(_private.objCommonScripts['after_save']) {
+                let r = _private.objCommonScripts['after_save'](ret);
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([_private.objCommonScripts['after_save']() ?? null, 'after_save'], {Priority: -1, Type: 0, Running: 1});
+            }
+
+
+            return ret;
+
+
+            //}, {Priority: -2, Type: 0, Running: 1, Tips: 'save'});
+            //return true;
         }
 
         //读档（读取数据到 game.gd），成功返回true（生成器返回true），失败返回false。
-        readonly property var load: function(fileName='autosave') {
+        readonly property var load: function*(fileName='autosave') {
 
             fileName = fileName.trim();
             if(!fileName)
@@ -3903,7 +3925,7 @@ Item {
 
             let ret = checksave(fileName)
             if(!ret) {
-                asyncScript.runNextEventLoop('game.load');
+                //asyncScript.runNextEventLoop('game.load');
                 return false;
             }
 
@@ -3912,102 +3934,104 @@ Item {
             //let priority = 0;
 
 
-            game.run(function*() {
+            //game.run(function*() {
 
-                //载入after_load脚本
-                if(_private.objCommonScripts['before_load']) {
-                    let r = _private.objCommonScripts['before_load']();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: priority++, Type: 0, Running: 1});
-                }
-
-
-                //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
+            //载入after_load脚本
+            if(_private.objCommonScripts['before_load']) {
+                let r = _private.objCommonScripts['before_load']();
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: priority++, Type: 0, Running: 1});
+            }
 
 
-                yield *release(false);
-                yield init(false, false, ret['Data']);
+            //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
 
-                //game.gd = ret['Data'];
-                //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
+            yield *release(false);
+            yield *_init(false, false, ret['Data']);
 
 
-                game.$sys.reloadFightRoles();
-
-                //刷新战斗时人物数据
-                //fight.$sys.refreshCombatant(-1);
-
-                game.$sys.reloadGoods();
+            //game.gd = ret['Data'];
+            //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
 
 
-                //读取主角
-                for(let th of game.gd['$sys_main_roles']) {
-                    let mainRole = game.createhero(th.$rid);
-                    mainRole.$$nActionType = 0;
-                    mainRole.$$arrMoveDirection = [0, 0];
-                    //game.hero(mainRole, th);
-                }
+            game.$sys.reloadFightRoles();
 
-                //开始移动地图
-                //setSceneToRole(_private.sceneRole);
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(-1);
 
-                //其他
-                game.interval(game.gd['$sys_fps']);
-                game.scale(game.gd['$sys_scale']);
-
-                game.playmusic(game.gd['$sys_music']);
-
-                /*if(game.gd['$sys_sound'] & 0b10)
-                    _private.config.nSoundConfig = 0;
-                else
-                    _private.config.nSoundConfig = 1;
-                */
+            game.$sys.reloadGoods();
 
 
-                /*/写在钩子函数里了
-                if(game.gd['$sys_random_fight']) {
-                    game.fighton(...game.gd['$sys_random_fight']);
-                }
-                */
+            //读取主角
+            for(let th of game.gd['$sys_main_roles']) {
+                let mainRole = game.createhero(th.$rid);
+                mainRole.$$nActionType = 0;
+                mainRole.$$arrMoveDirection = [0, 0];
+                //game.hero(mainRole, th);
+            }
 
-                //地图
-                if(game.gd['$sys_map'].$name)
-                    yield game.loadmap(game.gd['$sys_map'].$name, null, true);
+            //开始移动地图
+            //setSceneToRole(_private.sceneRole);
+
+            //其他
+            game.interval(game.gd['$sys_fps']);
+            game.scale(game.gd['$sys_scale']);
+
+            game.playmusic(game.gd['$sys_music']);
+
+            /*if(game.gd['$sys_sound'] & 0b10)
+                _private.config.nSoundConfig = 0;
+            else
+                _private.config.nSoundConfig = 1;
+            */
 
 
-                //载入after_load脚本
-                if(_private.objCommonScripts['after_load']) {
-                    let r = _private.objCommonScripts['after_load']();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    //game.run([_private.objCommonScripts['after_load']() ?? null, 'after_load'], {Priority: priority++, Type: 0, Running: 1});
-                }
+            /*/写在钩子函数里了
+            if(game.gd['$sys_random_fight']) {
+                game.fighton(...game.gd['$sys_random_fight']);
+            }
+            */
+
+            //地图
+            if(game.gd['$sys_map'].$name)
+                yield *game.loadmap(game.gd['$sys_map'].$name, null, true);
 
 
-                return true;
-
-            }, {Priority: -2, Type: 0, Running: 1, Tips: 'load'});
+            //载入after_load脚本
+            if(_private.objCommonScripts['after_load']) {
+                let r = _private.objCommonScripts['after_load']();
+                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                //game.run([_private.objCommonScripts['after_load']() ?? null, 'after_load'], {Priority: priority++, Type: 0, Running: 1});
+            }
 
 
             return true;
+
+
+            //}, {Priority: -2, Type: 0, Running: 1, Tips: 'load'});
+            //return true;
         }
 
         //游戏结束（调用游戏结束脚本）；
-        readonly property var gameover: function(params) {
+        readonly property var gameover: function*(params) {
             //asyncScript.runNextEventLoop('gameover');
 
 
-            game.run(_private.objCommonScripts['game_over_script'](params) ?? null,
-                {Priority: -2, Type: 0, Running: 1, Tips: 'gameover'});
+            //game.run(_private.objCommonScripts['game_over_script'](params) ?? null,
+            //    {Priority: -1, Type: 0, Running: 1, Tips: 'gameover'});
+
+            let r = _private.objCommonScripts['game_over_script'](params);
+            if(GlobalLibraryJS.isGenerator(r))yield *r;
         }
 
 
         //返回插件
         //参数0是组织/开发者名，参数1是插件名
-        readonly property var plugin: function(...params) {
+        readonly property var plugin: function*(...params) {
 
             if(params.length < 2) {
-                asyncScript.runNextEventLoop('plugin');
+                //asyncScript.runNextEventLoop('plugin');
                 return _private.objPlugins;
             }
 
@@ -4017,25 +4041,28 @@ Item {
             if(plugin && plugin.$autoLoad === false) {
                 plugin.$autoLoad = true;
 
-                game.run(function*(){
-                    if(plugin.$load) {
-                        let r = plugin.$load();
-                        if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    }
-                    if(plugin.$init) {
-                        let r = plugin.$init();
-                        if(GlobalLibraryJS.isGenerator(r))yield *r;
-                    }
+                //game.run(function*(){
+                if(plugin.$load) {
+                    let r = plugin.$load(params[0] + GameMakerGlobal.separator + params[1]);
+                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                }
+                if(plugin.$init) {
+                    let r = plugin.$init();
+                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                }
 
-                    return plugin;
+                return plugin;
 
-                }, {Priority: -2, Type: 0, Running: 1, Tips: 'plugin'});
+                //}, {Priority: -2, Type: 0, Running: 1, Tips: 'plugin'});
 
                 //game.run([plugin.$load() ?? null, 'plugin_load:' + params[0] + params[1]]);
                 //game.run([plugin.$init() ?? null, 'plugin_init:' + params[0] + params[1]]);
             }
-            else
-                asyncScript.runNextEventLoop('plugin');
+            else {
+                if(!plugin)
+                    console.warn('[!GameScene]No Plugin:', params[0], params[1], Object.keys(_private.objPlugins));
+                //asyncScript.runNextEventLoop('plugin');
+            }
 
 
             return plugin;
@@ -4156,7 +4183,8 @@ Item {
             }
 
             //可以立刻执行
-            if(GlobalJS.createScript(asyncScript, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params) === 0) {
+            let ret = GlobalJS.createScript(asyncScript, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params);
+            if(ret === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
 
@@ -4283,7 +4311,7 @@ Item {
         //系统 数据 和 函数（一般特殊需求）
         readonly property var $sys: ({
             release: release,
-            init: init,
+            init: _init,
             exit: _private.exitGame,
 
             screen: rootGameScene,          //屏幕（组件位置和大小固定）（所有，包含战斗场景）
@@ -5731,7 +5759,7 @@ Item {
         }
 
         function pause(name='$user') {
-            if(name === true) { //全局
+            if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseMusic', 1);
                 game.cd['$PauseMusic'] = 1;
             }
@@ -5756,7 +5784,7 @@ Item {
         }
 
         function resume(name='$user') {
-            if(name === true) { //全局
+            if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseMusic', 0);
                 game.cd['$PauseMusic'] = 0;
             }
@@ -5831,7 +5859,7 @@ Item {
 
 
         function pause(name='$user') {
-            if(name === true) { //全局
+            if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseSound', 1);
                 game.cd['$PauseSound'] = 1;
             }
@@ -5851,7 +5879,7 @@ Item {
         }
 
         function resume(name='$user') {
-            if(name === true) { //全局
+            if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseSound', 0);
                 game.cd['$PauseSound'] = 0;
             }
@@ -6425,37 +6453,37 @@ Item {
         }
 
         function exitGame() {
-            game.run([function*() {
+            //！！放在下一次执行（必须跳出事件队列，因为 _private.asyncScript.clear(6); 会导致生成器重入）
+            GlobalLibraryJS.runNextEventLoop(function() {
+                game.run([function*() {
 
-                let err;
-                try {
-                    yield *release();
-                }
-                catch(e) {
-                    err = e;
-                }
+                    let err;
+                    try {
+                        yield *release();
+                    }
+                    catch(e) {
+                        err = e;
+                    }
 
-                FrameManager.sl_qml_clearComponentCache();
-                FrameManager.sl_qml_trimComponentCache();
+                    console.debug('[GameScene]Close');
 
-                console.debug('[GameScene]Close');
+                    if(err) {
+                        console.warn('[!GameScene]游戏没有正常退出，但并不碍事：', err);
+                        //throw err;
+                    }
 
-                if(err) {
-                    console.warn('[!GameScene]游戏没有正常退出，但并不碍事：', err);
-                    //throw err;
-                }
-
-                //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
-                _private.asyncScript.clear(0);
-                //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
-
-
-                s_close();
+                    //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
+                    _private.asyncScript.clear(0);
+                    //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
 
 
-            }, 'exitGame']);
+                    s_close();
 
-            _private.asyncScript.clear(6);
+
+                }, 'exitGame']);
+
+                _private.asyncScript.clear(6);
+            }, 'exitGame');
         }
     }
 

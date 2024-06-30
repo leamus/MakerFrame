@@ -1719,6 +1719,8 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.maximumWidth: parent.width
+            Layout.maximumHeight: parent.height / 2
 
 
             Item {

@@ -371,7 +371,7 @@ Item {
 
 
                     let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
-                    game.usegoods(goods.$rid);
+                    yield *game.usegoods(goods.$rid);
                 }
             }
             ColorButton {

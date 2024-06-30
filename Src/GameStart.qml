@@ -80,7 +80,7 @@ Item {
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
 game.interval(16);
-//yield game.loadmap('鹰歌地图');
+//yield *game.loadmap('鹰歌地图');
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);
 //game.playmusic('音乐1mp3');
@@ -501,15 +501,15 @@ function *$start() {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {game.load('存档' + c)},);
-                        if(game.load('存档' + c))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield *game.load('存档' + c)},);
+                        if(yield *game.load('存档' + c))
                             break;
                         else
                             yield game.msg("读取失败");
                         continue;
                     case 3:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {game.load('autosave')},);
-                        if(game.load('autosave'))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield *game.load('autosave')},);
+                        if(yield *game.load('autosave'))
                             break;
                         else
                             yield game.msg("读取失败");
@@ -532,16 +532,20 @@ function *$start() {
         `
 
         function gameSceneClose() {
-            loaderGameScene.visible = false;
-            //root.focus = true;
-            root.forceActiveFocus();
+            FrameManager.sl_qml_clearComponentCache();
+            FrameManager.sl_qml_trimComponentCache();
 
 
             loaderGameScene.source = '';
+            loaderGameScene.visible = false;
 
 
             textGameStartScript.enabled = true;
             buttonStartGame.enabled = true;
+
+
+            //root.focus = true;
+            root.forceActiveFocus();
         }
     }
 

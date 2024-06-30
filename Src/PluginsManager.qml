@@ -64,6 +64,7 @@ Item {
 
 
 
+    //js创建组件的根组件
     Item {
         id: itemExtendsRoot
 
@@ -101,12 +102,21 @@ Item {
             //Qt.quit();
         }
     }
+    //用来载入main.qml
     Loader {
         id: loaderExtends
 
 
         function close() {
             loaderExtends.source = '';
+
+            //l_list.visible = true;
+            //l_list.forceActiveFocus();
+            _private.refresh();
+
+
+            FrameManager.sl_qml_clearComponentCache();
+            FrameManager.sl_qml_trimComponentCache();
         }
 
 
@@ -184,14 +194,14 @@ Item {
         Keys.onEscapePressed: {
             close();
 
-            console.debug("[PluginsManager1]Escape Key");
+            console.debug("[PluginsManager2]Escape Key");
             event.accepted = true;
             //Qt.quit();
         }
         Keys.onBackPressed: {
             close();
 
-            console.debug("[PluginsManager1]Back Key");
+            console.debug("[PluginsManager2]Back Key");
             event.accepted = true;
             //Qt.quit();
         }
