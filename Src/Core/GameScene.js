@@ -737,7 +737,8 @@ function *loadResources() {
                 }
             }
             catch(e) {
-                console.error('[!GameScene]', e);
+                //console.error('[!GameScene]加载插件错误：', e);
+                GlobalLibraryJS.printException(e, jsPath + GameMakerGlobal.separator + 'main.js');
                 continue;
             }
         }
@@ -1702,6 +1703,7 @@ function openMap(mapName, forceRepaint=false) {
             game.d['$sys_map'].$name = null;
             game.d['$sys_map'].$columns = 0;
             game.d['$sys_map'].$rows = 0;
+            game.d['$sys_map'].$specials = {};
             game.d['$sys_map'].$obstacles = [];
 
 

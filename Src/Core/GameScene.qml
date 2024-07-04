@@ -2769,7 +2769,7 @@ Item {
                 else {
                     console.warn('[!GameScene]找不到：', imageParams.$parent);
                     //delimage(id);
-                    return;
+                    return false;
                 }
             }
             else if(GlobalLibraryJS.isObject(imageParams.$parent)) {
@@ -2791,6 +2791,11 @@ Item {
 
 
             let tmp = imageParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheImage.createObject(null);
+            if(tmp && tmp.$componentType !== 1) {
+                console.exception('[!GameScene]组件类型错误：', tmp.$componentType);
+                return false;
+            }
+
             //如果缓存中没有，则创建
             //if(!tmp) {
                 //let image = Qt.createQmlObject('import QtQuick 2.14; Image {}', rootGameScene);
@@ -3227,7 +3232,7 @@ Item {
                 else {
                     console.warn('[!GameScene]找不到：', spriteParams.$parent);
                     //delsprite(id);
-                    return;
+                    return false;
                 }
             }
             else if(GlobalLibraryJS.isObject(spriteParams.$parent)) {
@@ -3254,6 +3259,10 @@ Item {
 
             let spriteData = GameSceneJS.getSpriteResource(spriteParams.$rid);
             let sprite = spriteParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheSpriteEffect.createObject(null);
+            if(sprite && sprite.$componentType !== 2) {
+                console.exception('[!GameScene]组件类型错误：', sprite.$componentType);
+                return false;
+            }
             //刷新特效属性
             sprite = GameSceneJS.loadSpriteEffect(spriteParams.$rid, sprite, spriteParams.$loops, null);
             if(sprite === null)
@@ -4059,8 +4068,10 @@ Item {
                 //game.run([plugin.$init() ?? null, 'plugin_init:' + params[0] + params[1]]);
             }
             else {
-                if(!plugin)
+                if(!plugin) {
                     console.warn('[!GameScene]No Plugin:', params[0], params[1], Object.keys(_private.objPlugins));
+                    return;
+                }
                 //asyncScript.runNextEventLoop('plugin');
             }
 
@@ -4427,7 +4438,7 @@ Item {
         })
 
 
-        //注意：除了通用脚本，其他资源有可能还没有载入，所以应该使用getXxx来返回；
+        //注意：除了通用脚本，其他资源有可能还没有载入，所以应该使用 getXxx 函数来返回；
         readonly property QtObject $resources: QtObject {
             readonly property alias goods: _private.goodsResource
             readonly property alias fightRoles: _private.fightRolesResource
@@ -4436,6 +4447,7 @@ Item {
             readonly property alias sprites: _private.spritesResource
             readonly property alias roles: _private.rolesResource
             readonly property alias maps: _private.mapsResource
+
             readonly property alias plugins: _private.objPlugins
 
             readonly property alias commonScripts: _private.objCommonScripts
@@ -7295,6 +7307,7 @@ Item {
             //id号 和 父组件代号
             property var $id
             property var $parent
+            //组件类型（用来识别）
             readonly property int $componentType: 1
 
             //回调函数
@@ -7351,6 +7364,7 @@ Item {
             //id号 和 父组件代号
             property var $id
             property var $parent
+            //组件类型（用来识别）
             readonly property int $componentType: 2
 
             property var $info: null
