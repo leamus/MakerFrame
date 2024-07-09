@@ -19,7 +19,7 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-//import './Core'
+import './Core'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -131,6 +131,46 @@ game.goon();
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
+
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(textGameStartScript.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -143,7 +183,7 @@ game.goon();
             }
 
             Button {
-                text: 'v'
+                text: 'V'
                 onClicked: {
                     gameVisualScript.show();
                 }
@@ -336,6 +376,8 @@ game.goon();
         */
         //asynchronous: false
 
+
+        strTitle: '游戏开始脚本'
 
         defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo

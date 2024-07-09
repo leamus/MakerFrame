@@ -4399,6 +4399,10 @@ Item {
             unloadSpriteEffect: GameSceneJS.unloadSpriteEffect,
             loadRole: GameSceneJS.loadRole,
 
+            delay: GlobalLibraryJS.runNextEventLoop,
+            timeout: GlobalLibraryJS.setTimeout,
+
+
             //组件 和 组件模板
             components: {
                 joystick: joystick,

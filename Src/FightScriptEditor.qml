@@ -45,16 +45,15 @@ Item {
             if(data) {
                 _private.strSavedName = textFightScriptName.text = fightScriptName;
 
-                notepadGameFightScriptScript.setPlainText(data);
-                notepadGameFightScriptScript.toBegin();
+                notepadScript.setPlainText(data);
+                notepadScript.toBegin();
 
                 return;
             }
         }
 
         _private.strSavedName = textFightScriptName.text = '';
-        notepadGameFightScriptScript.setPlainText("
-
+        notepadScript.setPlainText("
 //闭包写法
 let data = (function() {
 
@@ -152,7 +151,7 @@ let data = (function() {
 
 "
         );
-        notepadGameFightScriptScript.toBegin();
+        notepadScript.toBegin();
 
         //console.debug('data', data);
     }
@@ -184,6 +183,46 @@ let data = (function() {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
+
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadScript.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -194,52 +233,6 @@ let data = (function() {
                 verticalAlignment: Label.AlignVCenter
                 horizontalAlignment: Label.AlignHCenter
             }
-        }
-
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
-            Layout.fillHeight: true
-
-
-            Notepad {
-                id: notepadGameFightScriptScript
-
-                Layout.preferredWidth: parent.width
-
-                Layout.preferredHeight: textArea.contentHeight
-                Layout.maximumHeight: parent.height
-                Layout.minimumHeight: 50
-                Layout.fillHeight: true
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                //textArea.enabled: false
-                //textArea.readOnly: true
-                textArea.textFormat: TextArea.PlainText
-                textArea.text: ''
-                textArea.placeholderText: '请输入战斗脚本'
-
-                textArea.background: Rectangle {
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                }
-
-                bCode: true
-            }
-
-        }
-
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.bottomMargin: 10
 
             Button {
                 id: buttonVisual
@@ -269,17 +262,58 @@ let data = (function() {
                     gameVisualFightScript.init(filePath);
                 }
             }
-            Button {
-                id: buttonSave
+        }
 
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 50
+        RowLayout {
+            Layout.maximumWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            //Layout.preferredHeight: 50
+            Layout.maximumHeight: parent.height
+            Layout.fillHeight: true
 
-                text: '保存'
-                onClicked: {
-                    _private.save();
+
+            Notepad {
+                id: notepadScript
+
+                Layout.preferredWidth: parent.width
+
+                Layout.preferredHeight: textArea.contentHeight
+                Layout.maximumHeight: parent.height
+                Layout.minimumHeight: 50
+                Layout.fillHeight: true
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+
+                //textArea.enabled: false
+                //textArea.readOnly: true
+                textArea.textFormat: TextArea.PlainText
+                textArea.text: ''
+                textArea.placeholderText: '请输入脚本代码'
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
+
+                bCode: true
             }
+
+        }
+
+        RowLayout {
+            Layout.maximumWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
+            Layout.bottomMargin: 10
+
+
+            Label {
+                text: '资源名：'
+            }
+
             TextField {
                 id: textFightScriptName
 
@@ -292,6 +326,18 @@ let data = (function() {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
+            }
+
+            Button {
+                id: buttonSave
+
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 50
+
+                text: '保存'
+                onClicked: {
+                    _private.save();
+                }
             }
         }
     }
@@ -314,8 +360,8 @@ let data = (function() {
             }
 
             function onS_Compile(code) {
-                notepadGameFightScriptScript.setPlainText(code);
-                notepadGameFightScriptScript.toBegin();
+                notepadScript.setPlainText(code);
+                notepadScript.toBegin();
             }
         }
     }
@@ -359,7 +405,7 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
+                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {

@@ -1760,7 +1760,7 @@ Item {
         id: dialogScript
 
         visible: false
-        title: "请输入脚本"
+        title: "特效脚本"
         width: parent.width * 0.9
         //height: parent.height * 0.9
         anchors.centerIn: parent
@@ -1775,32 +1775,76 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            Button {
+
+            RowLayout {
                 Layout.fillWidth: true
-                //Layout.preferredHeight: 70
 
-                text: 'V'
+                Button {
+                    Layout.fillWidth: true
+                    //Layout.preferredHeight: 70
 
-                onClicked: {
-                    /*if(!_private.strMapName) {
+                    text: '查'
+
+                    onClicked: {
+                        let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(textCode.textDocument));
+
+                        if(e) {
+                            dialogCommon.show({
+                                Msg: e,
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    root.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    root.forceActiveFocus();
+                                },
+                            });
+
+                            return;
+                        }
+
                         dialogCommon.show({
-                              Msg: '请先保存地图',
-                              Buttons: Dialog.Yes,
-                              OnAccepted: function() {
-                                  root.forceActiveFocus();
-                              },
-                              OnRejected: ()=>{
-                                  root.forceActiveFocus();
-                              },
-                          });
+                            Msg: '恭喜，没有语法错误',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
 
                         return;
                     }
-                    */
+                }
 
-                    gameVisualScript.show();
+                Button {
+                    Layout.fillWidth: true
+                    //Layout.preferredHeight: 70
 
-                    dialogScript.visible = false;
+                    text: 'V'
+
+                    onClicked: {
+                        /*if(!_private.strMapName) {
+                            dialogCommon.show({
+                                  Msg: '请先保存地图',
+                                  Buttons: Dialog.Yes,
+                                  OnAccepted: function() {
+                                      root.forceActiveFocus();
+                                  },
+                                  OnRejected: ()=>{
+                                      root.forceActiveFocus();
+                                  },
+                              });
+
+                            return;
+                        }
+                        */
+
+                        gameVisualScript.show();
+
+                        dialogScript.visible = false;
+                    }
                 }
             }
 
@@ -1821,7 +1865,7 @@ Item {
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: "请输入脚本"
+                textArea.placeholderText: "请输入脚本代码"
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -2080,6 +2124,8 @@ Item {
         //asynchronous: false
 
 
+        strTitle: `${_private.strSpriteName}(特效脚本)`
+
         defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
         defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
@@ -2137,7 +2183,7 @@ function $refresh(index, imageAnimate, path) {
         //读取坐标偏移文件并保存
         imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
-            imageFixPositions = imageFixPositions.split(/\r?\n/);
+            imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
             imageFixPositions = null;
     }

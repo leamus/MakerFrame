@@ -1859,17 +1859,22 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
 
-    //战斗结束脚本2
-    if(fightEndScript)
-        game.run([fightEndScript, 'fight end21'], -1, res, 1, teams, fightData);
-
-    //fighting战斗的回调函数
-    //if('FightEndScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
-        game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
-
-
     game.run(function*() {
+        //战斗结束脚本2
+        if(fightEndScript) {
+            let r = fightEndScript(res, 1, teams, fightData);
+            if(game.$globalLibraryJS.isGenerator(r))yield *r;
+            //game.run([fightEndScript, 'fight end21'], -1, res, 1, teams, fightData);
+        }
+
+        //fighting战斗的回调函数
+        //if('FightEndScript' in fightData)
+        if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
+            let r = fightData.FightEndScript(res, 1, teams, fightData);
+            if(game.$globalLibraryJS.isGenerator(r))yield *r;
+            //game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
+        }
+
 
         if(res.result === -1)
             yield *game.gameover(-1);
@@ -3104,3 +3109,67 @@ function skillEffectAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect
     return [{property: 'remainHP', value: harm, target: team2[roleIndex2]}];
 }
 */
+
+
+
+
+
+
+
+function checkJSCode(code, type=1) {
+    try {
+        code = code.replaceAll('.import', '//.import');
+        eval('()=>{%1}'.arg(code));
+    }
+    catch(e) {
+        return '第<font color="red">%1</font>行语法错误：<font color="red">%2</font>'.
+            arg(e.lineNumber).arg(GlobalLibraryJS.convertToHTML(e.toString(), ['<', '>', ' ']));
+    }
+
+    let errorString = '';
+    if(type === 1) {
+        let res;
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.loadmap\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.loadmap前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.usegoods\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.usegoods前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.load\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.load前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.gameover\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.gameover前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.plugin\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.plugin前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.save\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.save前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.$sys.init\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.$sys.init前需要加yield*<br>';
+        }
+
+        res = GlobalLibraryJS.keyStringHasPrefixInText(code, 'game.$sys.release\\(', 'yield\\s*\\*');
+        if(res.length !== 0) {
+            errorString += '第<font color="red">' + res.join(',') + '</font>行的game.$sys.release前需要加yield*<br>';
+        }
+    }
+
+    return errorString;
+}

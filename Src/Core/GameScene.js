@@ -1764,7 +1764,8 @@ function openMap(mapName, forceRepaint=false) {
     //itemViewPort.mapScript = ts;
     itemViewPort.mapScript = _private.mapsResource[mapName].$script;
 
-    GlobalLibraryJS.copyPropertiesToObject(game.f, itemViewPort.mapScript/*, true*/);
+    //GlobalLibraryJS.copyPropertiesToObject(game.f, itemViewPort.mapScript/*, true*/);
+    Object.assign(game.f, itemViewPort.mapScript);
 
 
 

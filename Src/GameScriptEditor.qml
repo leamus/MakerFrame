@@ -19,7 +19,7 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-//import './Core'
+import './Core'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -85,6 +85,46 @@ Item {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
+
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadScript.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -94,6 +134,20 @@ Item {
                 wrapMode: Label.WordWrap
                 verticalAlignment: Label.AlignVCenter
                 horizontalAlignment: Label.AlignHCenter
+            }
+
+            Button {
+                id: buttonVisual
+
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredWidth: 30
+                //Layout.preferredHeight: 50
+                //Layout.bottomMargin: 10
+
+                text: 'V'
+                onClicked: {
+                    loaderVisualScript.show();
+                }
             }
         }
 
@@ -122,7 +176,7 @@ Item {
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: '请输入算法脚本'
+                textArea.placeholderText: '请输入脚本代码'
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -143,33 +197,6 @@ Item {
             //Layout.maximumHeight: parent.height
             //Layout.fillHeight: true
 
-            Button {
-                id: buttonVisual
-
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredWidth: 30
-                //Layout.preferredHeight: 50
-                Layout.bottomMargin: 10
-
-                text: 'V'
-                onClicked: {
-                    loaderVisualScript.show();
-                }
-            }
-
-            Button {
-                id: buttonSave
-
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                Layout.bottomMargin: 10
-
-                text: '保存'
-                onClicked: {
-                    _private.save();
-                }
-            }
-
 
             Button {
                 id: buttonChoiceFile
@@ -185,8 +212,6 @@ Item {
                 }
             }
 
-
-
             TextField {
                 id: textFilePath
 
@@ -199,6 +224,19 @@ Item {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
+            }
+
+            Button {
+                id: buttonSave
+
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 50
+                Layout.bottomMargin: 10
+
+                text: '保存'
+                onClicked: {
+                    _private.save();
+                }
             }
         }
     }
@@ -255,6 +293,7 @@ Item {
         //source: './GameVisualScript.qml'
         sourceComponent: Component {
             VisualScript {
+                strTitle: '游戏脚本'
                 defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
                 defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
                 defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]

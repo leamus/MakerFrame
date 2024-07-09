@@ -607,13 +607,13 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 30
+                        //Layout.preferredHeight: 30
 
                         Label {
                             text: '技能描述：'
                         }
 
-                        TextField {
+                        TextArea {
                             id: textDescription
 
                             Layout.fillWidth: true
@@ -1352,8 +1352,8 @@ Item {
             let data = {};
 
             data.SkillType = comboType.currentIndex;
-            data.Name = textName.text.trim();
-            data.Description = textDescription.text.trim();
+            data.Name = textName.text;
+            data.Description = textDescription.text;
             data.Animations = textSkillEffect.text.trim();
             data.Target = textTarget.text.trim();
             data.Count = textCount.text.trim();
@@ -1743,8 +1743,8 @@ Item {
 
 
             let data = strTemplate;
-            data = GlobalLibraryJS.replaceAll(data, '$$name$$', textName.text.trim());
-            data = GlobalLibraryJS.replaceAll(data, '$$description$$', textDescription.text.trim());
+            data = GlobalLibraryJS.replaceAll(data, '$$name$$', textName.text);
+            data = GlobalLibraryJS.replaceAll(data, '$$description$$', GlobalLibraryJS.convertToHTML(textDescription.text));
             data = GlobalLibraryJS.replaceAll(data, '$$type$$', type);
             data = GlobalLibraryJS.replaceAll(data, '$$targetFlag$$', targetFlag);
             data = GlobalLibraryJS.replaceAll(data, '$$targetCount$$', targetCount);

@@ -294,13 +294,13 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 30
+                        //Layout.preferredHeight: 30
 
                         Label {
                             text: '描述：'
                         }
 
-                        TextField {
+                        TextArea {
                             id: textDescription
 
                             Layout.fillWidth: true
@@ -901,8 +901,8 @@ Item {
 
             let data = {};
 
-            data.Name = textName.text.trim();
-            data.Description = textDescription.text.trim();
+            data.Name = textName.text;
+            data.Description = textDescription.text;
             data.Price = textPrice.text.trim();
             data.Type = comboType.currentIndex;
             data.Position = textPosition.text.trim();
@@ -1129,8 +1129,8 @@ Item {
 
 
             let data = strTemplate.
-                replace(/\$\$name\$\$/g, textName.text.trim()).
-                replace(/\$\$description\$\$/g, textDescription.text.trim()).
+                replace(/\$\$name\$\$/g, textName.text).
+                replace(/\$\$description\$\$/g, GlobalLibraryJS.convertToHTML(textDescription.text)).
                 replace(/\$\$price\$\$/g, price).
                 replace(/\$\$type\$\$/g, type).
                 replace(/\$\$color\$\$/g, textColor.text.trim()).

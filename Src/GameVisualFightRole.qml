@@ -901,7 +901,7 @@ Item {
 
             let data = {};
 
-            data.Name = textName.text.trim();
+            data.Name = textName.text;
             data.HP = textHP.text.trim();
             data.MP = textMP.text.trim();
             data.Attack = textAttack.text.trim();
@@ -1043,7 +1043,7 @@ Item {
 
 
             let data = strTemplate.
-                replace(/\$\$name\$\$/g, textName.text.trim()).
+                replace(/\$\$name\$\$/g, textName.text).
                 replace(/\$\$actions\$\$/g, strActions).
                 replace(/\$\$avatar\$\$/g, textAvatar.text.trim()).
                 replace(/\$\$size\$\$/g, textAvatarWidth.text.trim() + ',' + textAvatarHeight.text.trim()).

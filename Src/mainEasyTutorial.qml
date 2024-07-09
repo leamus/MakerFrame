@@ -185,7 +185,7 @@ Item {
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
 //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
 //callback是结束时回调函数，默认为true（系统自动处理）；
-<font color='yellow'>game.msg(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, callback=true);</font>
+<font color='yellow'>[yield] game.msg(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, callback=true);</font>
 
 //在屏幕下方显示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -195,7 +195,7 @@ Item {
 //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
 //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
 //pauseGame为是否暂停游戏（建议true），如果为false，尽量不要用yield关键字；
-<font color='yellow'>game.talk(role, msg, interval=20, pretext='', keeptime=0, style={}, pauseGame=true);</font>
+<font color='yellow'>[yield] game.talk(role, msg, interval=20, pretext='', keeptime=0, style={}, pauseGame=true);</font>
 
 //人物头顶显示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -214,7 +214,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //pauseGame是否暂停游戏；
 //返回值为选择的下标（0开始）；
 //注意：该脚本必须用yield才能暂停并接受返回值。
-<font color='yellow'>game.menu(title, items[, pauseGame=true]);</font>
+<font color='yellow'>[yield] game.menu(title, items[, pauseGame=true]);</font>
 
 //显示一个输入框；
 //title为显示文字；
@@ -223,7 +223,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 //pauseGame是否暂停游戏；
 //返回值为输入值；
 //注意：该脚本必须用yield才能暂停并接受返回值。
-<font color='yellow'>game.input(title='', pretext='', pauseGame=true);</font>
+<font color='yellow'>[yield] game.input(title='', pretext='', pauseGame=true);</font>
 
 //创建主角；
 //role：角色资源名 或 标准创建格式的对象（RID为角色资源名）。
@@ -323,7 +323,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
 <font color='yellow'>game.equipment(fighthero, positionName=null)</font>：返回某 fighthero 的装备；如果positionName为null，则返回所有装备；fighthero为下标，或战斗角色的name，或战斗角色对象；返回格式：单个：装备对象，多个：单个的数组；错误返回null。
 
-<font color='yellow'>game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品RID列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
+<font color='yellow'>[yield] game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品RID列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
 <font color='yellow'>game.money(m=0)</font>：获得金钱；返回金钱数目；
 
 //载入 fightScript 脚本 并进入战斗；
@@ -412,7 +412,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.goon()</font>：继续游戏。
 <font color='yellow'>game.interval(interval)</font>：设置游戏刷新率（interval毫秒）。
 
-<font color='yellow'>game.wait(time)</font>：暂停time毫秒。
+<font color='yellow'>[yield] game.wait(time)</font>：暂停time毫秒。
 <font color='yellow'>game.rnd(start, end)</font>：返回start~end之间的随机整数（包含start，不包含end）。
 <font color='yellow'>game.toast(msg)</font>：显示msg提示。
 
@@ -448,7 +448,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 
 战斗脚本（战斗脚本可以使用game属性）：
 <font color='yellow'>fight.over(r=0)</font>：结束战斗；-1为失败并调用战斗结束脚本，1为胜利并调用战斗结束脚本，0为平局并调用战斗结束脚本。
-<font color='yellow'>fight.msg(msg, interval=60, pretext='', type=2, pauseGame=true)</font>：弹出提示框（同game.msg）。
+<font color='yellow'>[yield] fight.msg(msg, interval=60, pretext='', type=2, pauseGame=true)</font>：弹出提示框（同game.msg）。
 
 //combatant获得Buff；
 ////buffCode：12345分别表示 毒乱封眠 属性，params是参数，override表示是否覆盖（如果不覆盖，则属性名后加时间戳来防止重复）；
@@ -478,16 +478,18 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 脚本变量：
 
   game.d：用户自定义地图变量集合（切换地图后清空）。
-  game.f：用户自定义地图函数集合（切换地图后清空）。
+  game.f：用户自定义地图函数集合（切换地图后清空），地图脚本也会拷贝在内。
   game.gd：用户自定义全局变量集合（整个游戏可用，会写入存档）。
-  game.gf：用户自定义全局函数集合（整个游戏可用）。
-    支持用 let、var、const定义局部变量。
+  game.gf：用户自定义全局函数集合（整个游戏可用），game.js脚本也会拷贝在内。
+    支持JS的 let、var、const定义变量。
   game.math 或 Math：JS 的 Math对象。
 
   game.d["$sys_map"]：当前地图信息
     .$name：当前地图名
     .$columns：列数
     .$rows：行数
+    .$obstacles：障碍信息
+    .$specials：块信息
     .$info：地图信息
 
 

@@ -52,7 +52,6 @@ Item {
 
         _private.strSavedName = textFightRoleName.text = '';
         notepadFightRoleProperty.setPlainText("
-
 //闭包写法
 let data = (function() {
 
@@ -142,15 +141,88 @@ let data = (function() {
         anchors.fill: parent
 
 
-        Label {
-            //Layout.preferredWidth: 80
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-            Layout.fillWidth: true
-            text: '战斗角色脚本'
-            font.pointSize: 16
-            wrapMode: Label.WordWrap
-            verticalAlignment: Label.AlignVCenter
-            horizontalAlignment: Label.AlignHCenter
+        RowLayout {
+            Layout.maximumWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+
+
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadFightRoleProperty.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
+            Label {
+                //Layout.preferredWidth: 80
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.fillWidth: true
+                text: '战斗角色脚本'
+                font.pointSize: 16
+                wrapMode: Label.WordWrap
+                verticalAlignment: Label.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+            }
+
+            Button {
+                id: buttonVisual
+
+                //Layout.preferredWidth: 60
+
+                text: 'V'
+                onClicked: {
+                    if(!_private.strSavedName) {
+                        dialogCommon.show({
+                            Msg: '请先保存',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+
+                    gameVisualFightRole.forceActiveFocus();
+                    gameVisualFightRole.visible = true;
+                    gameVisualFightRole.init(filePath);
+                }
+            }
         }
 
         Notepad {
@@ -188,44 +260,9 @@ let data = (function() {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
             Layout.bottomMargin: 10
-
-            Button {
-                id: buttonVisual
-
-                //Layout.preferredWidth: 60
-
-                text: 'V'
-                onClicked: {
-                    if(!_private.strSavedName) {
-                        dialogCommon.show({
-                            Msg: '请先保存',
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-                        return;
-                    }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
-
-                    gameVisualFightRole.forceActiveFocus();
-                    gameVisualFightRole.visible = true;
-                    gameVisualFightRole.init(filePath);
-                }
-            }
-
-            Button {
-                id: buttonSave
-
-                //Layout.preferredWidth: 60
-
-                text: '保存'
-                onClicked: {
-                    _private.save();
-                }
+            
+            Label {
+                text: '资源名：'
             }
 
             TextField {
@@ -240,6 +277,17 @@ let data = (function() {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
+            }
+
+            Button {
+                id: buttonSave
+
+                //Layout.preferredWidth: 60
+
+                text: '保存'
+                onClicked: {
+                    _private.save();
+                }
             }
         }
     }

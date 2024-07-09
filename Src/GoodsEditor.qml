@@ -56,8 +56,6 @@ Item {
         _private.strSavedName = textGoodsName.text = '';
 
         notepadGoodsScript.setPlainText("
-
-
 //闭包写法
 let data = (function() {
 
@@ -223,6 +221,45 @@ let data = (function() {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadGoodsScript.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -233,52 +270,6 @@ let data = (function() {
                 verticalAlignment: Label.AlignVCenter
                 horizontalAlignment: Label.AlignHCenter
             }
-        }
-
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
-            Layout.fillHeight: true
-
-
-            Notepad {
-                id: notepadGoodsScript
-
-                Layout.preferredWidth: parent.width
-
-                Layout.preferredHeight: textArea.contentHeight
-                Layout.maximumHeight: parent.height
-                Layout.minimumHeight: 50
-                Layout.fillHeight: true
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                //textArea.enabled: false
-                //textArea.readOnly: true
-                textArea.textFormat: TextArea.PlainText
-                textArea.text: ''
-                textArea.placeholderText: '请输入道具脚本'
-
-                textArea.background: Rectangle {
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                }
-
-                bCode: true
-            }
-
-        }
-
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.bottomMargin: 10
 
             Button {
                 id: buttonVisual
@@ -308,17 +299,59 @@ let data = (function() {
                     gameVisualGoods.init(filePath);
                 }
             }
-            Button {
-                id: buttonSave
 
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 50
+        }
 
-                text: '保存'
-                onClicked: {
-                    _private.save();
+        RowLayout {
+            Layout.maximumWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            //Layout.preferredHeight: 50
+            Layout.maximumHeight: parent.height
+            Layout.fillHeight: true
+
+
+            Notepad {
+                id: notepadGoodsScript
+
+                Layout.preferredWidth: parent.width
+
+                Layout.preferredHeight: textArea.contentHeight
+                Layout.maximumHeight: parent.height
+                Layout.minimumHeight: 50
+                Layout.fillHeight: true
+
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+
+                //textArea.enabled: false
+                //textArea.readOnly: true
+                textArea.textFormat: TextArea.PlainText
+                textArea.text: ''
+                textArea.placeholderText: '请输入脚本代码'
+
+                textArea.background: Rectangle {
+                    //color: 'transparent'
+                    color: Global.style.backgroundColor
+                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
+
+                bCode: true
             }
+
+        }
+
+        RowLayout {
+            Layout.maximumWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
+            Layout.bottomMargin: 10
+
+
+            Label {
+                text: '资源名：'
+            }
+
             TextField {
                 id: textGoodsName
 
@@ -331,6 +364,18 @@ let data = (function() {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextEdit.Wrap
+            }
+
+            Button {
+                id: buttonSave
+
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 50
+
+                text: '保存'
+                onClicked: {
+                    _private.save();
+                }
             }
         }
     }

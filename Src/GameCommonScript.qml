@@ -19,7 +19,7 @@ import _Global.Button 1.0
 import "qrc:/QML"
 
 
-//import './Core'
+import './Core'
 
 
 //import "File.js" as File
@@ -45,11 +45,10 @@ Item {
         //data = JSON.parse(data)["FightAlgorithm"];
 
         if(data) {
-            notepadGameFightScriptScript.setPlainText(data);
+            notepadScript.setPlainText(data);
         }
         else {
-            notepadGameFightScriptScript.setPlainText("
-
+            notepadScript.setPlainText("
 //注意：game.$globalLibraryJS
 
 //.import 'level_chain.js' as JSLevelChain       //导入另一个js文件
@@ -1831,17 +1830,22 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
 
-    //战斗结束脚本2
-    if(fightEndScript)
-        game.run([fightEndScript, 'fight end21'], -1, res, 1, teams, fightData);
-
-    //fighting战斗的回调函数
-    //if('FightEndScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0)
-        game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
-
-
     game.run(function*() {
+        //战斗结束脚本2
+        if(fightEndScript) {
+            let r = fightEndScript(res, 1, teams, fightData);
+            if(game.$globalLibraryJS.isGenerator(r))yield *r;
+            //game.run([fightEndScript, 'fight end21'], -1, res, 1, teams, fightData);
+        }
+
+        //fighting战斗的回调函数
+        //if('FightEndScript' in fightData)
+        if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
+            let r = fightData.FightEndScript(res, 1, teams, fightData);
+            if(game.$globalLibraryJS.isGenerator(r))yield *r;
+            //game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
+        }
+
 
         if(res.result === -1)
             yield *game.gameover(-1);
@@ -2086,7 +2090,7 @@ function $readSavesInfo(count=3) {
             );
         }
 
-        notepadGameFightScriptScript.toBegin();
+        notepadScript.toBegin();
     }
 
 
@@ -2116,6 +2120,46 @@ function $readSavesInfo(count=3) {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
+
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredHeight: 70
+
+                text: '查'
+
+                onClicked: {
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadScript.textDocument));
+
+                    if(e) {
+                        dialogCommon.show({
+                            Msg: e,
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+
+                        return;
+                    }
+
+                    dialogCommon.show({
+                        Msg: '恭喜，没有语法错误',
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+
+                    return;
+                }
+            }
+
             Label {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -2126,6 +2170,36 @@ function $readSavesInfo(count=3) {
                 verticalAlignment: Label.AlignVCenter
                 horizontalAlignment: Label.AlignHCenter
             }
+
+            /*Button {
+                id: buttonVisual
+
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                //Layout.preferredHeight: 50
+
+                text: 'V'
+                onClicked: {
+                    if(!_private.strSavedName) {
+                        dialogCommon.show({
+                            Msg: '请先保存',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                root.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
+
+                    gameVisualFightScript.forceActiveFocus();
+                    gameVisualFightScript.visible = true;
+                    gameVisualFightScript.init(filePath);
+                }
+            }
+            */
         }
 
         RowLayout {
@@ -2137,7 +2211,7 @@ function $readSavesInfo(count=3) {
 
 
             Notepad {
-                id: notepadGameFightScriptScript
+                id: notepadScript
 
                 Layout.preferredWidth: parent.width
 
@@ -2153,7 +2227,7 @@ function $readSavesInfo(count=3) {
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: "请输入脚本"
+                textArea.placeholderText: "请输入脚本代码"
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -2238,7 +2312,7 @@ function $readSavesInfo(count=3) {
 
 
         function save() {
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightScriptScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "common_script.js", 0);
+            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "common_script.js", 0);
 
             return true;
         }

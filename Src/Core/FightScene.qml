@@ -299,7 +299,7 @@ Item {
         fight.d = {};
 
         _private.genFighting.clear(3);
-        //_private.asyncScript.clear(1);
+        ////_private.asyncScript.clear(1);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
@@ -518,7 +518,7 @@ Item {
 
         fight.d = {};
 
-        //_private.asyncScript.clear(1);
+        _private.asyncScript.clear(1);
         _private.genFighting.clear(3);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
@@ -2170,8 +2170,8 @@ Item {
         property var genFighting: new GlobalLibraryJS.Async(rootFightScene)
 
         //异步脚本（播放特效、事件等）
-        //property var asyncScript: new GlobalLibraryJS.Async(rootFightScene)
-        property var asyncScript: game.$caches.asyncScript
+        property var asyncScript: new GlobalLibraryJS.Async(rootFightScene)
+        //property var asyncScript: game.$caches.asyncScript
 
         //战斗选择 异步脚本
         property var genFightChoice: null
