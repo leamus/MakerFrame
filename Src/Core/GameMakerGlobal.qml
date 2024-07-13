@@ -336,6 +336,7 @@ QtObject {
         FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
 
 
+
         if(Platform.compileType() === 'release') {
             let userID = '', account = '', nickname = '';
             if(Global.frameSettings.$userData) {
@@ -346,42 +347,28 @@ QtObject {
             }
 
             //提交访问信息
-            let url = 'http://MakerFrame.Leamus.cn/api/v1/client/usage';
-            let xhr = new XMLHttpRequest;
-            xhr.open('POST', url, true);  //建立间接，要求异步响应
-            xhr.setRequestHeader('Content-type', 'application/json');  //'application/json'（格式为json字符串）, 'application/x-www-form-urlencoded'（表单方式提交，注意需要将value转换为url格式）, 'multipart/form-data'
-            //xhr.setRequestHeader('Content-Encoding', 'gzip');
-            //xhr.setRequestHeader('Accept-Encoding', 'gzip');
-            xhr.onreadystatechange = function() {  //绑定响应状态事件监听函数
-                if (xhr.readyState == 4) {  //监听readyState状态
-                    if (xhr.status == 200) {  //监听HTTP状态码
-                        //console.debug('XMLHttpRequest:', xhr.responseText);  //接收数据
-                    }
-                    else
-                        //0, '', '网页内容', object, null, '',
-                        console.warn('Request ERROR:', xhr.status, xhr.statusText/*, xhr.responseText*/, xhr, xhr.responseXML, xhr.responseType, url);
-                    //infoCallback(JSON.parse(xhr.responseText));
-                }
-                //else
-                //    console.warn('!!!error readyState:', xhr.readyState, FrameManager.configValue('InfoJsonURL'))
-            }
-            xhr.send(   //发送请求
-                //FrameManager.sl_qml_gzipCompress(
-                    JSON.stringify({
-                        client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})`,
-                        product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
-                        serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}`,
-                        timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
-                        times: settings.$RunTimes, duration: settings.$RunDuration,
-                    })
-                //, -1, 0)
-            );
-            //xhr.send(`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`);  //发送请求
-            //xhr.send();
+            GlobalLibraryJS.request({
+                Url: 'http://MakerFrame.Leamus.cn/api/v1/client/usage',
+                Method: 'POST',
+                Data: {
+                    client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})`,
+                    product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
+                    serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}`,
+                    timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
+                    times: settings.$RunTimes, duration: settings.$RunDuration,
+                },
+                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
+                Gzip: [1, 1024],
+                //Headers: {},
+            }).then((xhr)=>{
+            }).catch((xhr)=>{
+            });
         }
 
 
+
         FrameManager.addImportPath(urlRPGCorePath);
+
 
 
         console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobal, GameMakerGlobalJS, Qt.resolvedUrl('.'));

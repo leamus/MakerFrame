@@ -745,7 +745,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         break;
 
     case 20: {   //Sprite
-            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, null, combatantActionSpriteData.Loops, fightScene);
+            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, null, {Loops: combatantActionSpriteData.Loops}, fightScene);
 
             if(spriteEffect === null)
                 break;
@@ -1037,7 +1037,7 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 
     let spriteEffect = fightrole.$$fightData.$info.$spriteEffect;
 
-    if(!game.$sys.loadSpriteEffect(actions[action], spriteEffect, loop)) {
+    if(!game.$sys.loadSpriteEffect(actions[action], spriteEffect, {Loops: loop})) {
         console.warn("[!FightScene]载入战斗精灵动作失败：" + action);
         return false;
     }

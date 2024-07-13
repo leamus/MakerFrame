@@ -151,19 +151,20 @@ Item {
             spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
 
             if(spriteEffect.nSpriteType === 1) {
-                spriteEffect.nFrameCount = (data.FrameCount);
-                spriteEffect.nInterval = (data.FrameInterval);
+                spriteEffect.nFrameCount = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameCount') ?? data.FrameCount;
+                spriteEffect.nInterval = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameInterval') ?? data.FrameInterval;
 
                 //注意这个放在 spriteEffect.sprite.width 和 spriteEffect.sprite.height 之前
-                spriteEffect.sprite.sizeFrame = Qt.size((data.FrameSize[0]), (data.FrameSize[1]));
+                let t = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameSize') ?? data.FrameSize;
+                spriteEffect.sprite.sizeFrame = Qt.size(t[0], t[1]);
 
-                spriteEffect.sprite.pointOffsetIndex = Qt.point((data.OffsetIndex[0]), (data.OffsetIndex[1]));
+                t = GlobalLibraryJS.getObjectValue(data.FrameData, 'OffsetIndex') ?? data.OffsetIndex;
+                spriteEffect.sprite.pointOffsetIndex = Qt.point(t[0], t[1]);
             }
             else if(spriteEffect.nSpriteType === 2) {
-                spriteEffect.nFrameCount = data.FrameData[1];
-                spriteEffect.nInterval = data.FrameData[2];
-
-                spriteEffect.sprite.nFrameStartIndex = data.FrameData[0];
+                spriteEffect.nFrameCount = data.FrameData.FrameCount ?? data.FrameData[1];
+                spriteEffect.nInterval = data.FrameData.FrameInterval ?? data.FrameData[2];
+                spriteEffect.sprite.nFrameStartIndex = data.FrameData.FrameStartIndex ?? data.FrameData[0];
 
 
                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;

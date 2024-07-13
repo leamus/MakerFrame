@@ -116,19 +116,21 @@ Item {
         comboType.currentIndex = (cfg.SpriteType ?? 1) - 1;
 
         if(comboType.currentIndex === 0) {
-            textSpriteFrameWidth.text = cfg.FrameSize[0].toString();
-            textSpriteFrameHeight.text = cfg.FrameSize[1].toString();
+            let t = GlobalLibraryJS.getObjectValue(cfg.FrameData, 'FrameSize') ?? cfg.FrameSize;
+            textSpriteFrameWidth.text = t[0].toString();
+            textSpriteFrameHeight.text = t[1].toString();
 
-            textSpriteFrameOffsetColumn.text = cfg.OffsetIndex[0].toString();
-            textSpriteFrameOffsetRow.text = cfg.OffsetIndex[1].toString();
-            textSpriteFrameCount.text = cfg.FrameCount.toString();
-            textSpriteFrameInterval.text = cfg.FrameInterval.toString();
+            t = GlobalLibraryJS.getObjectValue(cfg.FrameData, 'OffsetIndex') ?? cfg.OffsetIndex;
+            textSpriteFrameOffsetColumn.text = t[0].toString();
+            textSpriteFrameOffsetRow.text = t[1].toString();
+
+            textSpriteFrameCount.text = (GlobalLibraryJS.getObjectValue(cfg.FrameData, 'FrameCount') ?? cfg.FrameCount).toString();
+            textSpriteFrameInterval.text = (GlobalLibraryJS.getObjectValue(cfg.FrameData, 'FrameInterval') ?? cfg.FrameInterval).toString();
         }
         else if(comboType.currentIndex === 1) {
-            textFrameStartIndex.text = cfg.FrameData[0].toString();
-            textSpriteFrameCount.text = cfg.FrameData[1].toString();
-            textSpriteFrameInterval.text = cfg.FrameData[2].toString();
-
+            textSpriteFrameStartIndex.text = (cfg.FrameData.FrameStartIndex ?? cfg.FrameData[0]).toString();
+            textSpriteFrameCount.text = (cfg.FrameData.FrameCount ?? cfg.FrameData[1]).toString();
+            textSpriteFrameInterval.text = (cfg.FrameData.FrameInterval ?? cfg.FrameData[2]).toString();
         }
 
         _private.refreshSprite();
@@ -721,7 +723,7 @@ Item {
                         }
 
                         TextField {
-                            id: textFrameStartIndex
+                            id: textSpriteFrameStartIndex
 
                             Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -2263,7 +2265,7 @@ function $refresh(index, imageAnimate, path) {
             else if(comboType.currentIndex === 1) {
                 //loaderSprite.sourceComponent = compFileSpriteEffect;
 
-                spriteEffect.sprite.nFrameStartIndex = parseInt(textFrameStartIndex.text);
+                spriteEffect.sprite.nFrameStartIndex = parseInt(textSpriteFrameStartIndex.text);
 
                 //spriteEffect.sprite.width = parseInt(textSpriteWidth.text);
                 //spriteEffect.sprite.height = parseInt(textSpriteHeight.text);
@@ -2375,18 +2377,20 @@ function $refresh(index, imageAnimate, path) {
             outputData.SoundDelay = parseInt(textSoundDelay.text);
 
             if(comboType.currentIndex === 0) {
-                outputData.FrameSize = [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)];
-                outputData.FrameCount = parseInt(textSpriteFrameCount.text);
-                outputData.FrameInterval = parseInt(textSpriteFrameInterval.text);
+                outputData.FrameData = {
+                    FrameSize: [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)],
+                    FrameCount: parseInt(textSpriteFrameCount.text),
+                    FrameInterval: parseInt(textSpriteFrameInterval.text),
 
-                outputData.OffsetIndex = [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)];
+                    OffsetIndex: [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)],
+                };
             }
             else if(comboType.currentIndex === 1) {
-                outputData.FrameData = [
-                    parseInt(textFrameStartIndex.text),
-                    parseInt(textSpriteFrameCount.text),
-                    parseInt(textSpriteFrameInterval.text),
-                ];
+                outputData.FrameData = {
+                    FrameStartIndex: parseInt(textSpriteFrameStartIndex.text),
+                    FrameCount: parseInt(textSpriteFrameCount.text),
+                    FrameInterval: parseInt(textSpriteFrameInterval.text),
+                };
             }
 
 

@@ -54,42 +54,42 @@ function *loadResources() {
     }*/
     if(!_private.objCommonScripts["game_init"]) {
         _private.objCommonScripts["game_init"] = GameMakerGlobalJS.$gameInit;
-        console.debug("[!GameScene]载入系统游戏初始化脚本");
+        console.debug("[GameScene]!载入系统游戏初始化脚本");
     }
     else
         console.debug("[GameScene]载入游戏初始化脚本OK");
 
     if(!_private.objCommonScripts["game_release"]) {
         _private.objCommonScripts["game_release"] = GameMakerGlobalJS.$gameRelease;
-        console.debug("[!GameScene]载入系统游戏结束脚本");
+        console.debug("[GameScene]!载入系统游戏结束脚本");
     }
     else
         console.debug("[GameScene]载入游戏结束脚本OK");
 
     if(!_private.objCommonScripts["before_save"]) {
         _private.objCommonScripts["before_save"] = GameMakerGlobalJS.$beforeSave;
-        console.debug("[!GameScene]载入系统存档前脚本");
+        console.debug("[GameScene]!载入系统存档前脚本");
     }
     else
         console.debug("[GameScene]载入存档前脚本OK");
 
     if(!_private.objCommonScripts["before_load"]) {
         _private.objCommonScripts["before_load"] = GameMakerGlobalJS.$beforeLoad;
-        console.debug("[!GameScene]载入系统读档前脚本");
+        console.debug("[GameScene]!载入系统读档前脚本");
     }
     else
         console.debug("[GameScene]载入读档前脚本OK");
 
     if(!_private.objCommonScripts["after_save"]) {
         _private.objCommonScripts["after_save"] = GameMakerGlobalJS.$afterSave;
-        console.debug("[!GameScene]载入系统存档后脚本");
+        console.debug("[GameScene]!载入系统存档后脚本");
     }
     else
         console.debug("[GameScene]载入存档后脚本OK");
 
     if(!_private.objCommonScripts["after_load"]) {
         _private.objCommonScripts["after_load"] = GameMakerGlobalJS.$afterLoad;
-        console.debug("[!GameScene]载入系统读档后脚本");
+        console.debug("[GameScene]!载入系统读档后脚本");
     }
     else
         console.debug("[GameScene]载入读档后脚本OK");
@@ -97,35 +97,35 @@ function *loadResources() {
 
     if(!_private.objCommonScripts["combatant_class"]) {
         _private.objCommonScripts["combatant_class"] = GameMakerGlobalJS.$Combatant;
-        console.debug("[!GameScene]载入系统创建战斗角色脚本");
+        console.debug("[GameScene]!载入系统创建战斗角色脚本");
     }
     else
         console.debug("[GameScene]载入创建战斗角色脚本OK");
 
     if(!_private.objCommonScripts["refresh_combatant"]) {
         _private.objCommonScripts["refresh_combatant"] = GameMakerGlobalJS.$refreshCombatant;
-        console.debug("[!GameScene]载入系统计算属性脚本");
+        console.debug("[GameScene]!载入系统计算属性脚本");
     }
     else
         console.debug("[GameScene]载入计算属性脚本OK");
 
     if(!_private.objCommonScripts["combatant_is_valid"]) {
         _private.objCommonScripts["combatant_is_valid"] = GameMakerGlobalJS.$combatantIsValid;
-        console.debug("[!GameScene]载入系统战斗人物可用脚本");
+        console.debug("[GameScene]!载入系统战斗人物可用脚本");
     }
     else
         console.debug("[GameScene]载入战斗人物可用脚本OK");
 
     if(!_private.objCommonScripts["game_over_script"]) {
         _private.objCommonScripts["game_over_script"] = GameMakerGlobalJS.$gameOverScript;
-        console.debug("[!GameScene]载入系统游戏结束脚本");
+        console.debug("[GameScene]!载入系统游戏结束脚本");
     }
     else
         console.debug("[GameScene]载入游戏结束脚本OK");
 
     /*if(!_private.objCommonScripts["resume_event_script"]) {
         _private.objCommonScripts["resume_event_script"] = GameMakerGlobalJS.$resumeEventScript;
-        console.debug("[!GameScene]载入系统恢复脚本");
+        console.debug("[GameScene]!载入系统恢复脚本");
     }
     else
         console.debug("[GameScene]载入恢复算法脚本OK");  //, _private.objCommonScripts["resume_timer"], data, eval("()=>{}"));
@@ -133,13 +133,13 @@ function *loadResources() {
 
     /*if(!_private.objCommonScripts["get_goods_script"]) {
         _private.objCommonScripts["get_goods_script"] = GameMakerGlobalJS.commonGetGoodsScript;
-        console.debug("[!GameScene]载入系统通用获得道具脚本");
+        console.debug("[GameScene]!载入系统通用获得道具脚本");
     }
     else
         console.debug("[GameScene]载入通用获得道具脚本OK");
     if(!_private.objCommonScripts["use_goods_script"]) {
         _private.objCommonScripts["use_goods_script"] = GameMakerGlobalJS.commonUseGoodsScript;
-        console.debug("[!GameScene]载入系统通用使用道具脚本");
+        console.debug("[GameScene]!载入系统通用使用道具脚本");
     }
     else
         console.debug("[GameScene]载入通用使用道具脚本OK");
@@ -147,21 +147,21 @@ function *loadResources() {
 
     if(!_private.objCommonScripts["combatant_info"]) {
         _private.objCommonScripts["combatant_info"] = GameMakerGlobalJS.$combatantInfo;
-        console.debug("[!GameScene]载入系统战斗人物信息");
+        console.debug("[GameScene]!载入系统战斗人物信息");
     }
     else
         console.debug("[GameScene]载入战斗人物信息OK");
 
     if(!_private.objCommonScripts["show_goods_name"]) {
         _private.objCommonScripts["show_goods_name"] = GameMakerGlobalJS.$showGoodsName;
-        console.debug("[!GameScene]载入系统显示道具名称信息");
+        console.debug("[GameScene]!载入系统显示道具名称信息");
     }
     else
         console.debug("[GameScene]载入显示道具名称信息OK");
 
     if(!_private.objCommonScripts["show_combatant_name"]) {
         _private.objCommonScripts["show_combatant_name"] = GameMakerGlobalJS.$showCombatantName;
-        console.debug("[!GameScene]载入系统显示战斗人物名称信息");
+        console.debug("[GameScene]!载入系统显示战斗人物名称信息");
     }
     else
         console.debug("[GameScene]载入显示战斗人物名称信息OK");
@@ -169,7 +169,7 @@ function *loadResources() {
     /*
     if(!_private.objCommonScripts["events"]) {
         _private.objCommonScripts["events"] = GameMakerGlobalJS.$events;
-        console.debug("[!GameScene]载入系统通用events");
+        console.debug("[GameScene]!载入系统通用events");
     }
     else
         console.debug("[GameScene]载入通用eventsOK");
@@ -425,8 +425,8 @@ function *loadResources() {
         items = FrameManager.sl_qml_listDir(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
-            let data = getGoodsResource(item, true);
-            if(data) {
+            let info = getGoodsResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入Goods", item);
             }
             else {
@@ -436,18 +436,18 @@ function *loadResources() {
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "goods.json";
             //console.debug(path, items, item, filePath)
-            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+            let info = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
-            if(data) {
-                data = JSON.parse(data);
-                let t = GlobalJS._eval(data["Goods"]);
+            if(info) {
+                info = JSON.parse(info);
+                let t = GlobalJS._eval(info["Goods"]);
                 if(t) {
                     _private.goodsResource[item] = t;
                     _private.goodsResource[item].$rid = item;
                     console.debug("[GameScene]载入Goods", item);
                 }
             }
-            if(!data)
+            if(!info)
                 console.warn("[!GameScene]载入Goods ERROR", item);
             */
         }
@@ -460,8 +460,8 @@ function *loadResources() {
         items = FrameManager.sl_qml_listDir(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
-            let data = getSkillResource(item, true);
-            if(data) {
+            let info = getSkillResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入FightSkill", item);
             }
             else {
@@ -471,18 +471,18 @@ function *loadResources() {
 
             /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_skill.json";
             //console.debug(path, items, item, filePath)
-            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+            let info = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
 
-            if(data) {
-                data = JSON.parse(data);
-                let t = GlobalJS._eval(data["FightSkill"]);
+            if(info) {
+                info = JSON.parse(info);
+                let t = GlobalJS._eval(info["FightSkill"]);
                 if(t) {
                     _private.skillsResource[item] = t;
                     _private.skillsResource[item].$rid = item;
                     console.debug("[GameScene]载入FightSkill", item);
                 }
             }
-            if(!data)
+            if(!info)
                 console.warn("[!GameScene]载入FightSkill ERROR", item);
             */
         }
@@ -495,8 +495,8 @@ function *loadResources() {
         items = FrameManager.sl_qml_listDir(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
-            let data = getFightScriptResource(item, true);
-            if(data) {
+            let info = getFightScriptResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入FightScript", item);
             }
             else {
@@ -514,8 +514,8 @@ function *loadResources() {
         items = FrameManager.sl_qml_listDir(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
-            let data = getFightRoleResource(item, true);
-            if(data) {
+            let info = getFightRoleResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入FightRole Script", item);
             }
             else {
@@ -524,14 +524,14 @@ function *loadResources() {
 
 
 
-            //let data = File.read(filePath);
-            /*let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json"));
+            //let info = File.read(filePath);
+            /*let info = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json"));
 
-            if(data) {
-                data = JSON.parse(data);
+            if(info) {
+                info = JSON.parse(info);
 
-                //_private.fightRolesResource[item] = data;
-                _private.fightRolesResource[item].ActionData = data.ActionData;
+                //_private.fightRolesResource[item] = info;
+                _private.fightRolesResource[item].ActionData = info.ActionData;
                 console.debug("[GameScene]载入FightRole", item);
             }
             else {
@@ -552,8 +552,8 @@ function *loadResources() {
 
         for(let item of items) {
             //console.debug(path, items, item)
-            let data = getSpriteResource(item, true);
-            if(data) {
+            let info = getSpriteResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入Sprite", item);
             }
             else {
@@ -569,8 +569,8 @@ function *loadResources() {
 
         for(let item of items) {
             //console.debug(path, items, item)
-            let data = getRoleResource(item, true);
-            if(data) {
+            let info = getRoleResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入Role", item);
             }
             else {
@@ -586,8 +586,8 @@ function *loadResources() {
 
         for(let item of items) {
             //console.debug(path, items, item)
-            let data = getMapResource(item, true);
-            if(data) {
+            let info = getMapResource(item, true);
+            if(info) {
                 //console.debug("[GameScene]载入Map", item);
             }
             else {
@@ -598,19 +598,19 @@ function *loadResources() {
 
 
 
-    //let data;
+    //let info;
 
     /*/读图片信息
     filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "images.json");
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(filePath);
-    //console.debug("data", filePath, data)
+    info = FrameManager.sl_qml_ReadFile(filePath);
+    //console.debug("info", filePath, info)
     //console.debug("cfg", cfg, filePath);
 
-    if(data) {
-        data = JSON.parse(data)["List"];
-        for(let m in data) {
-            _private.objImages[data[m]["Name"]] = data[m]["URL"];
+    if(info) {
+        info = JSON.parse(info)["List"];
+        for(let m in info) {
+            _private.objImages[info[m]["Name"]] = info[m]["URL"];
         }
         console.debug("[GameScene]载入图片OK");
     }
@@ -618,14 +618,14 @@ function *loadResources() {
     //读音乐信息
     filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "music.json");
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(filePath);
-    //console.debug("data", filePath, data)
+    info = FrameManager.sl_qml_ReadFile(filePath);
+    //console.debug("info", filePath, info)
     //console.debug("cfg", cfg, filePath);
 
-    if(data) {
-        data = JSON.parse(data)["List"];
-        for(let m in data) {
-            _private.objMusic[data[m]["Name"]] = data[m]["URL"];
+    if(info) {
+        info = JSON.parse(info)["List"];
+        for(let m in info) {
+            _private.objMusic[info[m]["Name"]] = info[m]["URL"];
         }
         console.debug("[GameScene]载入音乐OK");
     }
@@ -633,14 +633,14 @@ function *loadResources() {
     //读视频信息
     filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "videos.json");
     //let cfg = File.read(filePath);
-    data = FrameManager.sl_qml_ReadFile(filePath);
-    //console.debug("data", filePath, data)
+    info = FrameManager.sl_qml_ReadFile(filePath);
+    //console.debug("info", filePath, info)
     //console.debug("cfg", cfg, filePath);
 
-    if(data) {
-        data = JSON.parse(data)["List"];
-        for(let m in data) {
-            _private.objVideos[data[m]["Name"]] = data[m]["URL"];
+    if(info) {
+        info = JSON.parse(info)["List"];
+        for(let m in info) {
+            _private.objVideos[info[m]["Name"]] = info[m]["URL"];
         }
         console.debug("[GameScene]载入视频OK");
     }
@@ -651,7 +651,7 @@ function *loadResources() {
 
     /*if(!_private.objCommonScripts["get_buff"]) {
         _private.objCommonScripts["get_buff"] = GameMakerGlobalJS.$getBuff;
-        console.debug("[!GameScene]载入系统通用获得Buff脚本");
+        console.debug("[GameScene]!载入系统通用获得Buff脚本");
     }
     else
         console.debug("[GameScene]载入通用获得Buff脚本OK");
@@ -669,27 +669,27 @@ function *loadResources() {
         _private.objCommonScripts["level_Algorithm"] = tlevelChainScript.$commonLevelAlgorithm;
     }*/
 
-    /*data = game.loadjson("level_chain.json");
-    if(data) {
-        let ret = GlobalJS._eval(data["LevelChainScript"]);
+    /*info = game.loadjson("level_chain.json");
+    if(info) {
+        let ret = GlobalJS._eval(info["LevelChainScript"]);
         _private.objCommonScripts["levelup_script"] = ret.$commonLevelUpScript;
         _private.objCommonScripts["level_Algorithm"] = ret.$commonLevelAlgorithm;
     }
 
     if(!_private.objCommonScripts["levelup_script"]) {
         _private.objCommonScripts["levelup_script"] = GameMakerGlobalJS.$commonLevelUpScript;
-        console.debug("[!GameScene]载入系统升级脚本");
+        console.debug("[GameScene]!载入系统升级脚本");
     }
     else
-        console.debug("[GameScene]载入升级脚本OK");  //, _private.objCommonScripts["levelup_script"], data, eval("()=>{}"));
+        console.debug("[GameScene]载入升级脚本OK");  //, _private.objCommonScripts["levelup_script"], info, eval("()=>{}"));
 
 
     if(!_private.objCommonScripts["level_Algorithm"]) {
         _private.objCommonScripts["level_Algorithm"] = GameMakerGlobalJS.$commonLevelAlgorithm;
-        console.debug("[!GameScene]载入系统升级算法");
+        console.debug("[GameScene]!载入系统升级算法");
     }
     else
-        console.debug("[GameScene]载入升级算法OK");  //, _private.objCommonScripts["level_Algorithm"], data, eval("()=>{}"));
+        console.debug("[GameScene]载入升级算法OK");  //, _private.objCommonScripts["level_Algorithm"], info, eval("()=>{}"));
     */
 
 
@@ -819,8 +819,9 @@ function *unloadResources() {
 
 
 //返回 通用脚本中的某个函数或变量，如果没有则返回系统的
-function getCommonScriptResource(flags=0b1, defaultValue, ...names) {
-    return GlobalLibraryJS.shortCircuit(flags, GlobalLibraryJS.getObjectValue(game, '$userscripts', ...names), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', ...names), defaultValue);
+function getCommonScriptResource(...names) {
+    let flags = 0b1;
+    return GlobalLibraryJS.shortCircuit(flags, GlobalLibraryJS.getObjectValue(game, '$userscripts', ...names), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', ...names));
 }
 
 
@@ -838,10 +839,10 @@ function getGoodsResource(item, forceLoad=false) {
     let path = GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName);
 
     let ts = _private.jsEngine.load('goods.js', path + GameMakerGlobal.separator + item);
-    let data = ts.data;
+    let info = ts.data;
 
     //写入
-    if(data) {
+    if(info) {
         _private.goodsResource[item] = ts.data;
         _private.goodsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.goods;
@@ -852,11 +853,11 @@ function getGoodsResource(item, forceLoad=false) {
         else
             _private.goodsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]载入Goods", item);
-        return data;
+        console.debug("[GameScene]getGoodsResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入Goods ERROR", item);
+    console.warn("[!GameScene]getGoodsResource ERROR:", item);
     return null;
 }
 
@@ -874,10 +875,10 @@ function getSkillResource(item, forceLoad=false) {
     let path = GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName);
 
     let ts = _private.jsEngine.load('fight_skill.js', path + GameMakerGlobal.separator + item);
-    let data = ts.data;
+    let info = ts.data;
 
     //写入
-    if(data) {
+    if(info) {
         _private.skillsResource[item] = ts.data;
         _private.skillsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.skill;
@@ -888,11 +889,11 @@ function getSkillResource(item, forceLoad=false) {
         else
             _private.skillsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]载入FightSkill", item);
-        return data;
+        console.debug("[GameScene]getSkillResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入FightSkill ERROR", item);
+    console.warn("[!GameScene]getSkillResource ERROR:", item);
     return null;
 }
 
@@ -910,10 +911,10 @@ function getFightScriptResource(item, forceLoad=false) {
     let path = GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName);
 
     let ts = _private.jsEngine.load('fight_script.js', path + GameMakerGlobal.separator + item);
-    let data = ts.data;
+    let info = ts.data;
 
     //写入
-    if(data) {
+    if(info) {
         _private.fightScriptsResource[item] = ts.data;
         _private.fightScriptsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.fightScript;
@@ -924,11 +925,11 @@ function getFightScriptResource(item, forceLoad=false) {
         else
             _private.fightScriptsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]载入FightScript", item);
-        return data;
+        console.debug("[GameScene]getFightScriptResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入FightScript ERROR", item);
+    console.warn("[!GameScene]getFightScriptResource ERROR:", item);
     return null;
 }
 
@@ -946,10 +947,10 @@ function getFightRoleResource(item, forceLoad=false) {
     let path = GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName);
 
     let ts = _private.jsEngine.load('fight_role.js', path + GameMakerGlobal.separator + item);
-    let data = ts.data;
+    let info = ts.data;
 
     //写入
-    if(data) {
+    if(info) {
         //_private.fightRolesResource[item].$createData = ts.$createData;
         //_private.fightRolesResource[item].$commons = ts.$commons;
 
@@ -964,11 +965,11 @@ function getFightRoleResource(item, forceLoad=false) {
             _private.fightRolesResource[item].__proto__ = _proto_;
         }
 
-        console.debug("[GameScene]载入FightRole Script", item);
-        return data;
+        console.debug("[GameScene]getFightRoleResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入FightRole Script ERROR", item);
+    console.warn("[!GameScene]getFightRoleResource ERROR:", item);
     return null;
 }
 
@@ -987,29 +988,29 @@ function getSpriteResource(item, forceLoad=false) {
     //读特效信息
     let path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item);
 
-    let data = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "sprite.json");
-    if(data)
-        data = JSON.parse(data);
+    let info = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "sprite.json");
+    if(info)
+        info = JSON.parse(info);
 
     //写入
-    if(data) {
-        _private.spritesResource[item] = data;
+    if(info) {
+        _private.spritesResource[item] = info;
         _private.spritesResource[item].$rid = item;
         //_private.spritesResource[item].__proto__ = _private.spritesResource[item].$commons;
 
         let cacheSoundEffect;
-        if(data.Sound) {
-            if(rootSoundEffect.objCacheSoundEffects[data.Sound])
-                cacheSoundEffect = rootSoundEffect.objCacheSoundEffects[data.Sound];
+        if(info.Sound) {
+            if(rootSoundEffect.objCacheSoundEffects[info.Sound])
+                cacheSoundEffect = rootSoundEffect.objCacheSoundEffects[info.Sound];
             else {
-                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(data.Sound)});
-                rootSoundEffect.objCacheSoundEffects[data.Sound] = cacheSoundEffect;
+                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(info.Sound)});
+                rootSoundEffect.objCacheSoundEffects[info.Sound] = cacheSoundEffect;
             }
         }
         //let cacheImage = Qt.createQmlObject("import QtQuick 2.14;import QtMultimedia 5.14; Audio {}", parent);
         let cacheImage;
-        if(FrameManager.sl_qml_IsFile(GameMakerGlobal.spriteResourceURL(data.Image)))
-            cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(data.Image)});
+        if(FrameManager.sl_qml_IsFile(GameMakerGlobal.spriteResourceURL(info.Image)))
+            cacheImage = compCacheImage.createObject(rootGameScene, {source: GameMakerGlobal.spriteResourceURL(info.Image)});
         _private.spritesResource[item].$$cache = {image: cacheImage, audio: cacheSoundEffect};
 
 
@@ -1018,11 +1019,11 @@ function getSpriteResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]载入Sprite", item);
-        return data;
+        console.debug("[GameScene]getSpriteResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入Sprite ERROR", item);
+    console.warn("[!GameScene]getSpriteResource ERROR:", item);
     return null;
 }
 
@@ -1039,13 +1040,12 @@ function getRoleResource(item, forceLoad=false) {
     //读角色信息
     let path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item);
 
-    let data = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "role.json");
-    if(data)
-        data = JSON.parse(data);
+    let info = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "role.json");
+    if(info)
+        info = JSON.parse(info);
 
-    //写入
-    if(data) {
-        _private.rolesResource[item] = data;
+    if(info) {
+        _private.rolesResource[item] = info;
         _private.rolesResource[item].$rid = item;
         //_private.rolesResource[item].__proto__ = _private.rolesResource[item].$commons;
 
@@ -1055,11 +1055,11 @@ function getRoleResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]载入Role", item);
-        return data;
+        console.debug("[GameScene]getRoleResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入Role ERROR", item);
+    console.warn("[!GameScene]getRoleResource ERROR:", item);
     return null;
 }
 
@@ -1076,13 +1076,12 @@ function getMapResource(item, forceLoad=false) {
     //读特效信息
     let path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item);
 
-    let data = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "map.json");
-    if(data)
-        data = JSON.parse(data);
+    let info = FrameManager.sl_qml_ReadFile(path + GameMakerGlobal.separator + "map.json");
+    if(info)
+        info = JSON.parse(info);
 
-    //写入
-    if(data) {
-        _private.mapsResource[item] = data;
+    if(info) {
+        _private.mapsResource[item] = info;
         _private.mapsResource[item].$rid = item;
         //_private.mapsResource[item].__proto__ = _private.mapsResource[item].$commons;
 
@@ -1092,11 +1091,11 @@ function getMapResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]载入Map", item);
-        return data;
+        console.debug("[GameScene]getMapResource:", item);
+        return info;
     }
 
-    console.warn("[!GameScene]载入Map ERROR", item);
+    console.warn("[!GameScene]getMapResource ERROR:", item);
     return null;
 }
 
@@ -1455,9 +1454,9 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 
 //载入特效，返回特效对象
-//spriteEffectParams是特效的资源名（会读取对应特效的信息）或特效的信息（不会再次读取）；
+//spriteEffectParams是 特效的资源名（会读取对应特效的信息）或 特效的信息（不会再次读取）；
 //如果 spriteEffectComp 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
-function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=itemViewPort.itemRoleContainer) {
+function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
     //console.debug("[FightScene]loadSpriteEffect0");
 
     /*if(GlobalLibraryJS.isString(spriteEffectParams))
@@ -1466,37 +1465,35 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=
 
     /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectParams + GameMakerGlobal.separator + "sprite.json");
     //console.debug("[FightScene]filePath2：", filePath);
-    let data = FrameManager.sl_qml_ReadFile(filePath);
+    let spriteResourceInfo = FrameManager.sl_qml_ReadFile(filePath);
     * /
-    let data = GameSceneJS.getSpriteResource(spriteEffectParams.RID);
-    GlobalLibraryJS.copyPropertiesToObject(data, spriteEffectParams, {onlyCopyExists: true});
+    let spriteResourceInfo = GameSceneJS.getSpriteResource(spriteEffectParams.RID);
+    GlobalLibraryJS.copyPropertiesToObject(spriteResourceInfo, spriteEffectParams, {onlyCopyExists: true});
     */
 
-    let data;
+    let spriteResourceInfo;
     if(GlobalLibraryJS.isString(spriteEffectParams))
-        data = GameSceneJS.getSpriteResource(spriteEffectParams);
+        spriteResourceInfo = GameSceneJS.getSpriteResource(spriteEffectParams);
     else
-        data = spriteEffectParams;
+        spriteResourceInfo = spriteEffectParams;
 
-    if(data) {
+    if(spriteResourceInfo) {
         if(!spriteEffectComp) {
             //spriteEffectComp = compCacheSpriteEffect.createObject(parent);
             spriteEffectComp = _private.cacheSprites.create(parent);
-            spriteEffectComp.nSpriteType = data.SpriteType;
+            spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
         }
         else {//if(spriteEffectComp.bRunning === true)
-            spriteEffectComp.nSpriteType = data.SpriteType;
+            spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
             spriteEffectComp.sprite.stop();
         }
 
 
-        spriteEffectComp.$info = data;
-        if(data.$script) {
-            spriteEffectComp.$script = data.$script;
-        }
+        spriteEffectComp.$info = spriteResourceInfo;
+        spriteEffectComp.$script = newParams.$script ?? spriteResourceInfo.$script;
 
 
-        /*switch(data.SpriteType) {
+        /*switch(spriteResourceInfo.SpriteType) {
         case 1:
             spriteEffectComp.sourceComponent = compSpriteEffect;
             break;
@@ -1507,49 +1504,82 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=
         */
 
 
-        spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+        spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(newParams.Image ?? spriteResourceInfo.Image);
 
-        //spriteEffectComp.sprite.width = parseInt(data.SpriteSize[0]);
-        //spriteEffectComp.sprite.height = parseInt(data.SpriteSize[1]);
-        spriteEffectComp.rXOffset = data.XOffset !== undefined ? (data.XOffset) : 0;
-        spriteEffectComp.rYOffset = data.YOffset !== undefined ? (data.YOffset) : 0;
-        spriteEffectComp.opacity = (data.Opacity);
-        spriteEffectComp.rXScale = (data.XScale);
-        spriteEffectComp.rYScale = (data.YScale);
+        //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
+        //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
+        spriteEffectComp.rXOffset = newParams.XOffset ?? spriteResourceInfo.XOffset ?? 0;
+        spriteEffectComp.rYOffset = newParams.YOffset ?? spriteResourceInfo.YOffset ?? 0;
+        spriteEffectComp.opacity = newParams.Opacity ?? spriteResourceInfo.Opacity ?? 1;
+        spriteEffectComp.rXScale = newParams.XScale ?? spriteResourceInfo.XScale ?? 1;
+        spriteEffectComp.rYScale = newParams.YScale ?? spriteResourceInfo.YScale ?? 1;
 
-        if(data.Sound) {
-            spriteEffectComp.strSoundeffectName = data.Sound;
-        }
-        else {
-            spriteEffectComp.strSoundeffectName = "";
-        }
-        //console.debug("!!!", data.Sound, spriteEffectComp.strSoundeffectName)
-        spriteEffectComp.nSoundeffectDelay = (data.SoundDelay);
+        spriteEffectComp.strSoundeffectName = newParams.Sound ?? spriteResourceInfo.Sound ?? '';
 
-        spriteEffectComp.nLoops = loops || 1;
+        spriteEffectComp.nSoundeffectDelay = newParams.SoundDelay ?? spriteResourceInfo.SoundDelay ?? 0;
+
+        spriteEffectComp.nLoops = newParams.Loops ?? newParams.$loops/* ?? spriteResourceInfo.Loops*/ ?? 1;
         //spriteEffectComp.restart();
 
+        let t = newParams.SpriteSize ?? spriteResourceInfo.SpriteSize;
+        spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
+        spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
 
+
+        //！！！兼容旧代码
         if(spriteEffectComp.nSpriteType === 1) {
-            spriteEffectComp.nFrameCount = (data.FrameCount);
-            spriteEffectComp.nInterval = (data.FrameInterval);
+            spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
+            0);
+            spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
+            0);
 
             //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
-            spriteEffectComp.sprite.sizeFrame = Qt.size((data.FrameSize[0]), (data.FrameSize[1]));
+            let t = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameSize'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameSize'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
+            );
+            spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
 
-            spriteEffectComp.width = parseInt(data.SpriteSize[0]);
-            spriteEffectComp.height = parseInt(data.SpriteSize[1]);
-
-            spriteEffectComp.sprite.pointOffsetIndex = Qt.point((data.OffsetIndex[0]), (data.OffsetIndex[1]));
+            t = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'OffsetIndex'),
+                GlobalLibraryJS.getObjectValue(newParams, 'OffsetIndex'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
+            );
+            spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
         }
         else if(spriteEffectComp.nSpriteType === 2) {
-            spriteEffectComp.nFrameCount = data.FrameData[1];
-            spriteEffectComp.nInterval = data.FrameData[2];
+            let t = newParams.FrameData ?? spriteResourceInfo.FrameData;
 
-            spriteEffectComp.sprite.nFrameStartIndex = data.FrameData[0];
-
-            spriteEffectComp.width = parseInt(data.SpriteSize[0]);
-            spriteEffectComp.height = parseInt(data.SpriteSize[1]);
+            //！！！兼容旧代码
+            spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
+            0);
+            spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
+            0);
+            spriteEffectComp.sprite.nFrameStartIndex = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(newParams.FrameData, 'FrameStartIndex'),
+                GlobalLibraryJS.getObjectValue(newParams, 'FrameStartIndex'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
+                GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
+            0);
 
 
             if(spriteEffectComp.$script)
@@ -1560,17 +1590,16 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, loops=1, parent=
         return spriteEffectComp;
     }
     else {
-        console.warn('[!GameScene]loadSpriteEffect Fail:', spriteEffectParams);
+        console.exception('[!GameScene]loadSpriteEffect Fail:', spriteEffectParams);
     }
 
-    //console.warn("[!GameScene]载入特效失败：" + spriteEffectParams);
     return null;
 }
 
 function unloadSpriteEffect(spriteEffectComp) {
     //spriteEffectComp.destroy();
     if(!spriteEffectComp) {
-        console.warn('[!GameScene]缓存释放失败:', spriteEffectComp);
+        console.warn('[!GameScene]unloadSpriteEffect Fail:', spriteEffectComp);
         return;
     }
     _private.cacheSprites.release(spriteEffectComp);
@@ -1578,23 +1607,23 @@ function unloadSpriteEffect(spriteEffectComp) {
 
 
 //载入角色，返回角色对象；
-//roleParams是角色的资源名（会读取对应角色的信息）或角色的信息（不会再次读取）；
+//roleParams是 角色的资源名（会读取对应角色的信息）或 角色的信息（不会再次读取）；
 //如果 roleComp 为null，则 创建1个 roleComp 组件并返回；
-function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
+function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
     //console.debug('[GameScene]loadRole:', roleParams);
 
     /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + "role.json");
     //console.debug("[FightScene]filePath2：", filePath);
-    let data = FrameManager.sl_qml_ReadFile(filePath);
+    let roleResourceInfo = FrameManager.sl_qml_ReadFile(filePath);
     */
 
-    let data;
+    let roleResourceInfo;
     if(GlobalLibraryJS.isString(roleParams))
-        data = GameSceneJS.getRoleResource(roleParams);
+        roleResourceInfo = GameSceneJS.getRoleResource(roleParams);
     else
-        data = roleParams;
+        roleResourceInfo = roleParams;
 
-    if(data) {
+    if(roleResourceInfo) {
         if(!roleComp) {
             roleComp = compRole.createObject(parent);
             roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
@@ -1602,58 +1631,64 @@ function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
         }
 
 
-        roleComp.$info = data;
-        if(data.$script) {
-            roleComp.$script = data.$script;
-        }
+        roleComp.$info = roleResourceInfo;
+        roleComp.$script = newParams.$script ?? roleResourceInfo.$script;
 
 
-        roleComp.nSpriteType = data.SpriteType ?? 1;
+        roleComp.nSpriteType = newParams.SpriteType ?? roleResourceInfo.SpriteType ?? 1;
         if(roleComp.nSpriteType === 0) {
-            for(let ta in data.FrameIndex) {
-                roleComp.arrActionsData[ta] = getSpriteResource(data.FrameIndex[ta][0]);
+            let t = newParams.FrameIndex ?? roleResourceInfo.FrameIndex;
+            for(let ta in t) {
+                roleComp.arrActionsData[ta] = getSpriteResource(t[ta][0]);
             }
         }
         else if(roleComp.nSpriteType === 1) {
-            roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+            roleComp.strSource = GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
 
-            roleComp.nFrameCount = data.FrameCount;
-            roleComp.nInterval = data.FrameInterval;
+            roleComp.nFrameCount = newParams.FrameCount ?? roleResourceInfo.FrameCount;
+            roleComp.nInterval = newParams.FrameInterval ?? roleResourceInfo.FrameInterval;
 
             //注意这个放在 roleComp.sprite.sprite.width 和 roleComp.sprite.sprite.height 之前
-            roleComp.sprite.sprite.sizeFrame = Qt.size(data.FrameSize[0], data.FrameSize[1]);
+            let t = newParams.FrameSize ?? roleResourceInfo.FrameSize;
+            roleComp.sprite.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
 
-            //roleComp.implicitWidth = data.RoleSize[0];
-            //roleComp.implicitHeight = data.RoleSize[1];
-            //roleComp.width = data.RoleSize[0];
-            //roleComp.height = data.RoleSize[1];
-            roleComp.width = data.RoleSize[0];
-            roleComp.height = data.RoleSize[1];
-            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
-            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
-            roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
-            roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
+            //roleComp.implicitWidth = roleResourceInfo.RoleSize[0];
+            //roleComp.implicitHeight = roleResourceInfo.RoleSize[1];
+            //roleComp.width = roleResourceInfo.RoleSize[0];
+            //roleComp.height = roleResourceInfo.RoleSize[1];
+            t = newParams.RoleSize ?? roleResourceInfo.RoleSize;
+            roleComp.width = (t && t[0]) ? t[0] : 0;
+            roleComp.height = (t && t[1]) ? t[1] : 0;
+            t = newParams.RoleOffset ?? roleResourceInfo.RoleOffset;
+            roleComp.rXOffset = (t && t[0]) ? t[0] : 0;
+            roleComp.rYOffset = (t && t[1]) ? t[1] : 0;
+            t = newParams.Scale ?? roleResourceInfo.Scale;
+            roleComp.rXScale = (t && t[0]) ? t[0] : 1;
+            roleComp.rYScale = (t && t[1]) ? t[1] : 1;
 
-            roleComp.arrActionsData = data.FrameIndex;
+            roleComp.arrActionsData = newParams.FrameIndex ?? roleResourceInfo.FrameIndex;
 
         }
         else if(roleComp.nSpriteType === 2) {
-            roleComp.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+            roleComp.strSource = GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
 
-            //roleComp.implicitWidth = data.RoleSize[0];
-            //roleComp.implicitHeight = data.RoleSize[1];
-            //roleComp.width = data.RoleSize[0];
-            //roleComp.height = data.RoleSize[1];
-            roleComp.width = data.RoleSize[0];
-            roleComp.height = data.RoleSize[1];
-            roleComp.rXOffset = data.RoleOffset ? data.RoleOffset[0] : 0;
-            roleComp.rYOffset = data.RoleOffset ? data.RoleOffset[1] : 0;
-            roleComp.rXScale = data.Scale ? data.Scale[0] : 1;
-            roleComp.rYScale = data.Scale ? data.Scale[1] : 1;
+            //roleComp.implicitWidth = roleResourceInfo.RoleSize[0];
+            //roleComp.implicitHeight = roleResourceInfo.RoleSize[1];
+            //roleComp.width = roleResourceInfo.RoleSize[0];
+            //roleComp.height = roleResourceInfo.RoleSize[1];
+            let t = newParams.RoleSize ?? roleResourceInfo.RoleSize;
+            roleComp.width = (t && t[0]) ? t[0] : 0;
+            roleComp.height = (t && t[1]) ? t[1] : 0;
+            t = newParams.RoleOffset ?? roleResourceInfo.RoleOffset;
+            roleComp.rXOffset = (t && t[0]) ? t[0] : 0;
+            roleComp.rYOffset = (t && t[1]) ? t[1] : 0;
+            t = newParams.Scale ?? roleResourceInfo.Scale;
+            roleComp.rXScale = (t && t[0]) ? t[0] : 1;
+            roleComp.rYScale = (t && t[1]) ? t[1] : 1;
 
 
-            //roleComp.sprite.strOffsetPositionsFile = GameMakerGlobal.spriteResourcePath(data.Image + GameMakerGlobal.separator + data.OffsetPositionsFile);
-            roleComp.arrActionsData = data.FrameIndex;
+            //roleComp.sprite.strOffsetPositionsFile = GameMakerGlobal.spriteResourcePath(roleResourceInfo.Image + GameMakerGlobal.separator + roleResourceInfo.OffsetPositionsFile);
+            roleComp.arrActionsData = newParams.FrameIndex ?? roleResourceInfo.FrameIndex;
             /*nFrameStartIndex = ;
             fGetImageName = ;
             fGetImageFixPosition = ;
@@ -1664,11 +1699,13 @@ function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
             if(roleComp.$script)
                 roleComp.sprite.sprite.fnRefresh = roleComp.$script.$refresh;
         }
-        roleComp.x1 = data.RealOffset[0];
-        roleComp.y1 = data.RealOffset[1];
-        roleComp.width1 = data.RealSize[0];
-        roleComp.height1 = data.RealSize[1];
-        roleComp.rectShadow.opacity = isNaN((data.ShadowOpacity)) ? 0.3 : (data.ShadowOpacity);
+        let t = newParams.RealOffset ?? roleResourceInfo.RealOffset;
+        roleComp.x1 = (t && t[0]) ? t[0] : 0;
+        roleComp.y1 = (t && t[1]) ? t[1] : 0;
+        t = newParams.RealSize ?? roleResourceInfo.RealSize;
+        roleComp.width1 = (t && t[0]) ? t[0] : 0;
+        roleComp.height1 = (t && t[1]) ? t[1] : 0;
+        roleComp.rectShadow.opacity = newParams.ShadowOpacity ?? roleResourceInfo.ShadowOpacity ?? 0.3;
 
         //roleComp.bTest = true;
 
@@ -1681,7 +1718,6 @@ function loadRole(roleParams, roleComp, parent=itemViewPort.itemRoleContainer) {
         console.exception('[!GameScene]loadRole Fail:', roleParams);
     }
 
-    //console.warn("[!GameScene]载入角色失败：" + roleParams);
     return null;
 }
 

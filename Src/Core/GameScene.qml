@@ -766,7 +766,7 @@ Item {
             }
 
 
-            let roleComp = GameSceneJS.loadRole(role.$rid, mainRole);
+            let roleComp = GameSceneJS.loadRole(role.$rid, mainRole, role, itemViewPort.itemRoleContainer);
             if(!roleComp) {
                 return false;
             }
@@ -1172,7 +1172,7 @@ Item {
                 return false;
 
 
-            let roleComp = GameSceneJS.loadRole(role.$rid, null, itemViewPort.itemRoleContainer);
+            let roleComp = GameSceneJS.loadRole(role.$rid, null, role, itemViewPort.itemRoleContainer);
             if(!roleComp) {
                 return false;
             }
@@ -3249,22 +3249,18 @@ Item {
             }
 
 
-            if(spriteParams.$loops === undefined)
-                spriteParams.$loops = 1;
-
-
             //if(id === undefined || id === null)
             id = id ?? spriteParams.$id ?? spriteParams.$rid;
 
 
-            let spriteData = GameSceneJS.getSpriteResource(spriteParams.$rid);
+            let spriteInfo = GameSceneJS.getSpriteResource(spriteParams.$rid);
             let sprite = spriteParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheSpriteEffect.createObject(null);
             if(sprite && sprite.$componentType !== 2) {
                 console.exception('[!GameScene]组件类型错误：', sprite.$componentType);
                 return false;
             }
             //刷新特效属性
-            sprite = GameSceneJS.loadSpriteEffect(spriteParams.$rid, sprite, spriteParams.$loops, null);
+            sprite = GameSceneJS.loadSpriteEffect(spriteInfo, sprite, spriteParams, null);
             if(sprite === null)
                 return false;
 
@@ -3287,11 +3283,11 @@ Item {
             //改变大小
             //默认原宽
             if(spriteParams.$width  === undefined && spriteParams.width === undefined)
-                sprite.width = spriteData.SpriteSize[0]/*sprite.implicitWidth*/;
+                sprite.width = spriteInfo.SpriteSize[0]/*sprite.implicitWidth*/;
             //组件宽
             else if(spriteParams.$width === -1)
                 sprite.width = Qt.binding(function(){return parentComp.width});
-                //sprite.width = spriteData.SpriteSize[0];
+                //sprite.width = spriteInfo.SpriteSize[0];
             else if(GlobalLibraryJS.isArray(spriteParams.$width)) {
                 switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
@@ -3304,7 +3300,7 @@ Item {
                     break;
                 //如果是 自身百分比
                 case 3:
-                    sprite.width = spriteParams.$width[0] * spriteData.SpriteSize[0]/*sprite.implicitWidth*/;
+                    sprite.width = spriteParams.$width[0] * spriteInfo.SpriteSize[0]/*sprite.implicitWidth*/;
                     break;
                 //宽度适应高度
                 case 4:
@@ -3325,11 +3321,11 @@ Item {
 
             //默认原高
             if(spriteParams.$height === undefined && spriteParams.height === undefined)
-                sprite.height = spriteData.SpriteSize[1]/*sprite.implicitHeight*/;
+                sprite.height = spriteInfo.SpriteSize[1]/*sprite.implicitHeight*/;
             //组件高
             else if(spriteParams.$height === -1)
                 sprite.height = Qt.binding(function(){return parentComp.height});
-                //sprite.height = spriteData.SpriteSize[1];
+                //sprite.height = spriteInfo.SpriteSize[1];
             else if(GlobalLibraryJS.isArray(spriteParams.$height)) {
                 switch(spriteParams.$height[1]) {
                 //如果是 固定高度
@@ -3342,7 +3338,7 @@ Item {
                     break;
                 //如果是 自身百分比
                 case 3:
-                    sprite.height = spriteParams.$height[0] * spriteData.SpriteSize[1]/*sprite.implicitHeight*/;
+                    sprite.height = spriteParams.$height[0] * spriteInfo.SpriteSize[1]/*sprite.implicitHeight*/;
                     break;
                 //高度适应宽度
                 case 4:
@@ -3363,9 +3359,9 @@ Item {
 
             //宽度适应高度、高度适应宽度（乘以倍率）
             if(widthOrHeightAdaption === 1)
-                sprite.width = sprite.height / spriteData.SpriteSize[1] * spriteData.SpriteSize[0]/*sprite.implicitHeight * sprite.implicitWidth*/ * spriteParams.$width[0];
+                sprite.width = sprite.height / spriteInfo.SpriteSize[1] * spriteInfo.SpriteSize[0]/*sprite.implicitHeight * sprite.implicitWidth*/ * spriteParams.$width[0];
             else if(widthOrHeightAdaption === 2)
-                sprite.height = sprite.width / spriteData.SpriteSize[0] * spriteData.SpriteSize[1]/*sprite.implicitWidth * sprite.implicitHeight*/ * spriteParams.$height[0];
+                sprite.height = sprite.width / spriteInfo.SpriteSize[0] * spriteInfo.SpriteSize[1]/*sprite.implicitWidth * sprite.implicitHeight*/ * spriteParams.$height[0];
 
 
             //默认
@@ -4387,6 +4383,7 @@ Item {
             getFightRoleObject: GameSceneJS.getFightRoleObject,
             getFightScriptObject: GameSceneJS.getFightScriptObject,
 
+            getCommonScriptResource: GameSceneJS.getCommonScriptResource,
             getSkillResource: GameSceneJS.getSkillResource,
             getGoodsResource: GameSceneJS.getGoodsResource,
             getFightRoleResource: GameSceneJS.getFightRoleResource,
@@ -4500,6 +4497,7 @@ Item {
 
         readonly property var date: ()=>{return new Date();}
         readonly property var math: Math
+        readonly property var request: GlobalLibraryJS.request
         readonly property var http: XMLHttpRequest
 
 
@@ -6968,7 +6966,7 @@ Item {
                 if(GlobalLibraryJS.isString(data))
                     data = {RID: data};
 
-                GameSceneJS.loadSpriteEffect(data, rootRole.customSprite, data.$loops ?? 1);
+                GameSceneJS.loadSpriteEffect(data, rootRole.customSprite, {Loops: data.$loops ?? 1});
 
                 if(GlobalLibraryJS.isValidNumber(data.$width))
                     rootRole.customSprite.width = data.$width;
@@ -6995,7 +6993,7 @@ Item {
                 rootRole.sprite.visible = false;
                 game.showsprite(data, '$Sprite');
                 //let sprite = compCacheSpriteEffect.createObject(null);
-                //GameSceneJS.loadSpriteEffect(data, sprite, data.$loops ?? 1);
+                //GameSceneJS.loadSpriteEffect(data, sprite, {Loops: data.$loops ?? 1});
             }
 
             function startAction(actionName, loops) {
