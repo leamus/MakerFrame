@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        _private.arrImages = FrameManager.sl_qml_listDir(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        _private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug("[mainImageEditor]_private.arrImages", JSON.stringify(_private.arrImages))
     }
 
@@ -116,7 +116,7 @@ Item {
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
-                            FrameManager.sl_qml_DeleteFile(GameMakerGlobal.imageResourcePath(modelData));
+                            FrameManager.sl_fileDelete(GameMakerGlobal.imageResourcePath(modelData));
                             _private.refresh();
                         },
                         OnRejected: ()=>{
@@ -196,9 +196,9 @@ Item {
                                 dialogCommon.open();
                             }
                             else {
-                                let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.imageResourcePath(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.imageResourcePath(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
+                                    Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
                                     console.error("[mainImageEditor]RenameFile ERROR:", GameMakerGlobal.imageResourcePath(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
@@ -228,7 +228,7 @@ Item {
 
                     //console.debug("image:", textImageName.text, imageReview.source);
                     //console.debug("resolve:", Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
-                    //console.debug("file:", GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
+                    //console.debug("file:", GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
                 }
             }
 
@@ -350,9 +350,9 @@ Item {
 
             let path;
             if(Qt.platform.os === "android")
-                path = Platform.getRealPathFromURI(fileUrl);
+                path = Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_qml_UrlDecode(fileUrl);
+                path = FrameManager.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf("/");
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
@@ -373,9 +373,9 @@ Item {
                         dialogCommon.open();
                     }
                     else {
-                        let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
+                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
+                            Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
                             console.error("[mainImageEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
                             return;
                         }
@@ -411,7 +411,7 @@ Item {
         function refresh() {
             let index = listview.currentIndex;
 
-            _private.arrImages = FrameManager.sl_qml_listDir(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            _private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
 
             if(_private.arrImages.length === 0)
                 listview.currentIndex = -1;

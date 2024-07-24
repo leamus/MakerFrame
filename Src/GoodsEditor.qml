@@ -40,7 +40,7 @@ Item {
             //let data = File.read(filePath);
             //console.debug('[GoodsEditor]filePath：', filePath);
 
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
 
             if(data) {
                 //data = JSON.parse(data);
@@ -154,10 +154,10 @@ let data = (function() {
             /*$choiceScript: function *(goods, combatant) {
                 //调用技能的
                 let skill = goods.$fight[0];
-                yield *skill.$choiceScript(skill, combatant);
+                yield* skill.$choiceScript(skill, combatant);
 
                 //选择敌方
-                //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+                //let r = yield* fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
                 //return r;
             },
             */
@@ -228,7 +228,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadGoodsScript.textDocument));
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument));
 
                     if(e) {
                         dialogCommon.show({
@@ -391,13 +391,13 @@ let data = (function() {
 
         Connections {
             target: gameVisualGoods
-            function onS_close() {
+            function onSg_close() {
                 gameVisualGoods.visible = false;
 
                 root.forceActiveFocus();
             }
 
-            function onS_Compile(code) {
+            function onSg_compile(code) {
                 notepadGoodsScript.setPlainText(code);
                 notepadGoodsScript.toBegin();
             }
@@ -448,13 +448,13 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
-                    if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
+                    if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_fileExists(oldFilePath)) {
+                        ret = FrameManager.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
                     }
                 }
 
@@ -464,7 +464,7 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
+            if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_dirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
                 dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

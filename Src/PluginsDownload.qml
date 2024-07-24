@@ -81,25 +81,25 @@ Item {
             dialogCommon.fOnAccepted = ()=>{
                 let fUrl;
                 if(Qt.platform.os === "android")
-                    fUrl = Platform.getRealPathFromURI(fileUrl.toString());
+                    fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
                 else
-                    fUrl = FrameManager.sl_qml_UrlDecode(fileUrl.toString());
+                    fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
 
                 //console.error("!!!", fUrl, fileUrl)
 
-                //FrameManager.sl_qml_RemoveRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+                //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_qml_BaseName(fUrl);
+                //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_baseName(fUrl);
                 let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                 //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
 
-                //FrameManager.sl_qml_CreateFolder(projectPath);
-                let ret = FrameManager.sl_qml_ExtractDir(GlobalJS.toPath(fUrl), projectUrl);
+                //FrameManager.sl_dirCreate(projectPath);
+                let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectUrl);
 
 
                 if(ret.length > 0) {
-                    //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_qml_BaseName(fUrl);
-                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
+                    //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_baseName(fUrl);
+                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                     dialogCommon.msg = "成功";
                 }
                 else
@@ -182,20 +182,20 @@ Item {
                             let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                             let zipPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
-                            //let nr = FrameManager.sl_qml_DownloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
-                            let nr = FrameManager.sl_qml_DownloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
+                            //let nr = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
+                            let nr = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
                             nr.finished.connect(function() {
-                                //FrameManager.sl_qml_Property("属性", nr);  //TimeStamp、Data、SaveType、Code
-                                console.debug("下载完毕", nr, FrameManager.sl_qml_Property("Data", nr), FrameManager.sl_qml_Property("Code", nr));
+                                //FrameManager.sl_objectProperty("属性", nr);  //TimeStamp、Data、SaveType、Code
+                                console.debug("下载完毕", nr, FrameManager.sl_objectProperty("Data", nr), FrameManager.sl_objectProperty("Code", nr));
 
-                                FrameManager.sl_qml_DeleteLater(nr);
+                                FrameManager.sl_deleteLater(nr);
 
 
                                 dialogCommon.close();
 
-                                if(FrameManager.sl_qml_Property("Code", nr) < 0) {
+                                if(FrameManager.sl_objectProperty("Code", nr) < 0) {
                                     dialogCommon.show({
-                                        Msg: '下载失败：%1'.arg(FrameManager.sl_qml_Property("Code", nr)),
+                                        Msg: '下载失败：%1'.arg(FrameManager.sl_objectProperty("Code", nr)),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
                                             root.forceActiveFocus();
@@ -211,16 +211,16 @@ Item {
 
                                 //let projectUrl = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
 
-                                let ret = FrameManager.sl_qml_ExtractDir(zipPath, projectUrl);
+                                let ret = FrameManager.sl_extractDir(zipPath, projectUrl);
 
                                 let msg;
                                 if(ret.length > 0) {
-                                    //console.debug(ret, projectUrl, fileUrl, FrameManager.sl_qml_AbsolutePath(fileUrl));
+                                    //console.debug(ret, projectUrl, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                                     msg = "安装成功";
 
 
                                     let jsPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'];
-                                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
                                         try {
                                             let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
 

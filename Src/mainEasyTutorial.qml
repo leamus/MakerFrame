@@ -173,7 +173,7 @@ Item {
 //载入地图并执行地图载入事件；成功返回 地图信息。
 //userData是用户传入数据，后期调用的钩子函数会传入；
 //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
-<font color='yellow'>yield *game.loadmap(mapRID, userData, forceRepait=false)</font>
+<font color='yellow'>yield* game.loadmap(mapRID, userData, forceRepait=false)</font>
 
 //在屏幕中间显示提示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -309,7 +309,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.removegoods(goods, count=1);</font>
 
 <font color='yellow'>game.goods(goods=-1, filterkey=null, filtervalue=null)</font>：获得道具列表中某项道具信息；goods为-1表示返回所有道具的数组（此时filters是道具属性的过滤条件）；goods为数字（下标），则返回单个道具信息的数组；goods为字符串（道具资源名），返回所有符合道具信息的数组（此时filters是道具属性的过滤条件）；返回格式：道具数组。
-<font color='yellow'>yield *game.usegoods(goods, fighthero)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
+<font color='yellow'>yield* game.usegoods(goods, fighthero)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
 
 //直接装备一个道具（不是从背包中）；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
@@ -427,9 +427,9 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.date()</font>：返回 JS 的 new Date()对象。
 
 <font color='yellow'>game.checksave("文件名")</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>yield *game.save("文件名", showName="", type=1, compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，type为0普通保存，为1弃用压缩；返回存档数据
-<font color='yellow'>yield *game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
-<font color='yellow'>yield *game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
+<font color='yellow'>yield* game.save("文件名", showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
+<font color='yellow'>yield* game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
+<font color='yellow'>yield* game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
 
@@ -541,7 +541,7 @@ NPC事件的四种写法（前两种支持同步调用）：
     game.talk("第1句")
     game.talk("第2句")
     game.talk("第3句")
-  默认是一瞬间执行到了第3句指令，第1句和第2句会一闪而过看不到，如果你想一句一句执行，等每一句彻底执行完毕再执行下一句，则应该这样：
+  默认是一瞬间执行到了第3句指令，第1句和第2句会一闪而过看不到（msg组件则是全部显示出来），如果你想一句一句执行，等每一句彻底执行完毕再执行下一句，则应该这样：
     yield game.talk("第1句")
     yield game.talk("第2句")
     yield game.talk("第3句")
@@ -549,16 +549,17 @@ NPC事件的四种写法（前两种支持同步调用）：
   目前所有指令都支持同步调用，但真正有意义的异步命令：
     game.msg
     game.talk
-    game.wait
     game.menu
     game.input
     game.trade
     game.window
+    game.wait
     注意，上面的指令如果用yield，pauseGame最好设置为true（暂停游戏），不用yield的话就将pauseGame设置为false（最好这样用，否则可能会出现意料之外的结果）。
   战斗：
     fight.msg
+    fight.talk
     fight.menu
-    注意，这两个指令没有pauseGame，直接使用yield；
+    注意，这些指令没有pauseGame，直接使用yield；
     技能脚本 也支持yield，它是yield一个固定的对象，用来完成不同的效果和功能。
 
 
@@ -709,9 +710,9 @@ NPC事件的四种写法（前两种支持同步调用）：
   适合高级玩家，包括：
     1、文件、文件夹操作；
     2、压缩解压（zip）操作；
-    3、下载文件（FrameManager.sl_qml_DownloadFile）；
-    4、剪切板操作（FrameManager.sl_qml_SetClipboardText）；
-    5、动态载入卸载QRC资源：FrameManager.registerResource、FrameManager.unRegisterResource；
+    3、下载文件（FrameManager.sl_downloadFile）；
+    4、剪切板操作（FrameManager.sl_setClipboardText）；
+    5、动态载入卸载QRC资源：FrameManager.sl_registerResource、FrameManager.sl_unRegisterResource；
     6、登录、联机、远程存档等；
     7、本地系统功能（二维码、摄像头、GPS、屏幕旋转、屏幕常量、请求权限等）；
     8、播放音频视频；

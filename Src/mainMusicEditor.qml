@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        _private.arrMusic = FrameManager.sl_qml_listDir(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        _private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug("[mainImageEditor]_private.arrImages", JSON.stringify(_private.arrImages))
     }
 
@@ -112,7 +112,7 @@ Item {
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
-                            FrameManager.sl_qml_DeleteFile(GameMakerGlobal.musicResourcePath(modelData));
+                            FrameManager.sl_fileDelete(GameMakerGlobal.musicResourcePath(modelData));
                             _private.refresh();
                         },
                         OnRejected: ()=>{
@@ -223,9 +223,9 @@ Item {
                                 dialogCommon.open();
                             }
                             else {
-                                let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.musicResourcePath(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.musicResourcePath(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
+                                    Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
                                     console.error("[mainMusicEditor]RenameFile ERROR:", GameMakerGlobal.musicResourcePath(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourcePath(newFileName));
                                     return;
                                 }
@@ -311,9 +311,9 @@ Item {
 
             let path;
             if(Qt.platform.os === "android")
-                path = Platform.getRealPathFromURI(fileUrl);
+                path = Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_qml_UrlDecode(fileUrl);
+                path = FrameManager.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf("/");
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
@@ -334,9 +334,9 @@ Item {
                         dialogCommon.open();
                     }
                     else {
-                        let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
+                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
+                            Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
                             console.error("[mainMusicEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
                             return;
                         }
@@ -372,7 +372,7 @@ Item {
         function refresh() {
             let index = listview.currentIndex;
 
-            _private.arrMusic = FrameManager.sl_qml_listDir(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            _private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
 
             if(_private.arrMusic.length === 0)
                 listview.currentIndex = -1;
@@ -397,7 +397,7 @@ Item {
 
             //console.debug("mediaPlayer:", textMusicName.text, mediaPlayer.source);
             //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
-            //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
+            //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
     }
 

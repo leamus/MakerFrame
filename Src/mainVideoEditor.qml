@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        _private.arrVideos = FrameManager.sl_qml_listDir(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        _private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug("[mainVideoEditor]_private.arrVideos", JSON.stringify(_private.arrVideos))
     }
 
@@ -112,7 +112,7 @@ Item {
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
-                            FrameManager.sl_qml_DeleteFile(GameMakerGlobal.videoResourcePath(modelData));
+                            FrameManager.sl_fileDelete(GameMakerGlobal.videoResourcePath(modelData));
                             _private.refresh();
                         },
                         OnRejected: ()=>{
@@ -192,9 +192,9 @@ Item {
                                 dialogCommon.open();
                             }
                             else {
-                                let ret = FrameManager.sl_qml_RenameFile(GameMakerGlobal.videoResourcePath(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.videoResourcePath(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
+                                    Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
                                     console.error("[mainVideoEditor]RenameFile ERROR:", GameMakerGlobal.videoResourcePath(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourcePath(newFileName));
                                     return;
                                 }
@@ -365,9 +365,9 @@ Item {
 
             let path;
             if(Qt.platform.os === "android")
-                path = Platform.getRealPathFromURI(fileUrl);
+                path = Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_qml_UrlDecode(fileUrl);
+                path = FrameManager.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf("/");
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
@@ -388,9 +388,9 @@ Item {
                         dialogCommon.open();
                     }
                     else {
-                        let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
+                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.showToast("拷贝资源失败，是否目录不可写？" + newFileName);
+                            Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
                             console.error("[mainVideoEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
                             return;
                         }
@@ -426,7 +426,7 @@ Item {
         function refresh() {
             let index = listview.currentIndex;
 
-            _private.arrVideos = FrameManager.sl_qml_listDir(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            _private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
 
             if(_private.arrVideos.length === 0)
                 listview.currentIndex = -1;
@@ -461,7 +461,7 @@ Item {
 
             //console.debug("video:", textVideoName.text, mediaPlayer.source);
             //console.debug("resolve:", Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
-            //console.debug("file:", GameMakerGlobal.videoResourceURL(textVideoName.text), FrameManager.sl_qml_FileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
+            //console.debug("file:", GameMakerGlobal.videoResourceURL(textVideoName.text), FrameManager.sl_fileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
         }
     }
 

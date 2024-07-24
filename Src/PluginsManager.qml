@@ -79,8 +79,8 @@ Item {
             _private.refresh();
 
 
-            FrameManager.sl_qml_clearComponentCache();
-            FrameManager.sl_qml_trimComponentCache();
+            FrameManager.sl_clearComponentCache();
+            FrameManager.sl_trimComponentCache();
         }
 
 
@@ -115,8 +115,8 @@ Item {
             _private.refresh();
 
 
-            FrameManager.sl_qml_clearComponentCache();
-            FrameManager.sl_qml_trimComponentCache();
+            FrameManager.sl_clearComponentCache();
+            FrameManager.sl_trimComponentCache();
         }
 
 
@@ -157,8 +157,8 @@ Item {
                 _private.refresh();
 
 
-                FrameManager.sl_qml_clearComponentCache();
-                FrameManager.sl_qml_trimComponentCache();
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 
@@ -236,17 +236,17 @@ Item {
             let pluginPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
 
             //循环三方根目录
-            for(let tc0 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+            for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
                 //if(tc0 === '$Leamus')
                 //    continue;
 
                 //循环三方插件目录
-                for(let tc1 of FrameManager.sl_qml_listDir(GlobalJS.toPath(pluginPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+                for(let tc1 of FrameManager.sl_dirList(GlobalJS.toPath(pluginPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
                     let showName = '';
 
                     let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
 
-                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
 
                         try {
                             let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
@@ -291,7 +291,7 @@ Item {
                     let tc1 = arrPluginsName[index][1];
                     let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends';
 
-                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
                         try {
                             let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
 
@@ -309,7 +309,7 @@ Item {
                             return -1;
                         }
                     }
-                    else if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.qml'))) {
+                    else if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.qml'))) {
                         loaderExtends.source = GlobalJS.toURL(jsPath + GameMakerGlobal.separator + 'main.qml');
                         if(loaderExtends.status === Loader.Loading)
                             showBusyIndicator(true);
@@ -344,7 +344,7 @@ Item {
                     let dirUrl = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
 
                     let description = '';
-                    if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(dirUrl + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(dirUrl + GameMakerGlobal.separator + 'main.js'))) {
                         try {
                             let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(dirUrl));
 
@@ -363,7 +363,7 @@ Item {
                         OnAccepted: function() {
 
                             let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
-                            if(FrameManager.sl_qml_FileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                            if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
                                 try {
                                     let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
 
@@ -381,7 +381,7 @@ Item {
                                 }
                             }
 
-                            console.debug("[PluginsManager]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
+                            console.debug("[PluginsManager]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                             l_list.removeItem(index);
                             _private.refresh();
 

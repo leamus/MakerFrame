@@ -151,9 +151,32 @@ Item {
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽力去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
+2024/7/24：发布 1.13.1.240724 版本（框架 1.4.1.240724版本）
+1、调整 save、load、checksave 三个命令，以支持网络存档；
+2、修复：异步脚本的抛出异常问题；
+3、修复：载入存档后没有刷新人物速度问题；
+4、修改：将 6+1个带yield的命令（msg、talk、input、menu、window、trade、wait）修改为兼容新增加的异步脚本机制，同时兼容原来的脚本队列，不用再有特殊处理（修改了返回值为Promise，增加了最后一个参数p，注意下）；
+5、修改：将 原来的异步脚本队列 改为和 异步脚本 相似的机制（Promise方式处理），有效的解决了很多遗留问题，非常好用！
+6、修改：将 msg、talk、menu、input 4种组件，改为多次调用多次创建的方式，互不影响（以前只有msg和menu是这样）；
+7、修复：交易无法关闭菜单Bug、定时器事件触发时变量名写错Bug、GameMenu有个组件名写错Bug；
+8、增强：游戏 读档和退出 时资源释放机制（各游戏组件释放会调用回调函数、定时器释放后会停止并触发）；
+9、增加：引擎可以将qrc打包为rcc资源，也可以解包；
+**10、将底层提供的槽函数（sl_开头）和信号（sg_开头）全部严格按标准重命名了，使用FrameManager和Platform的系统函数要注意改一下了！
+11、优化：很多代码；
 
+2024/7/16：发布 1.12.4.240716 版本
 1、修改：增强 loadSpriteEffect和loadRole 函数功能；
 2、修改：调整 特效的 序列图片文件 和 经典行列图 的数据，且兼容了旧数据；
+3、增加：request函数来使用HTTP服务，自动识别Data，可根据数据大小来决定是否压缩；
+4、修改：将Async改名为AsyncScriptQueue；
+5、新增：重新设计了一套非常好用、类似await async语法和用法的机制，不用放在异步脚本队列里就直接可以运行的异步脚本（asyncScript）；
+6、修改：将 6+1个带yield的命令（msg、talk、input、menu、window、trade、wait）修改为兼容新增加的异步脚本机制，方法为：a、将这6+1个命令的最后一个参数callback设置为0即可；b、或者命令名+1（比如game.msg1），参数与原函数完全相同；
+7、新增：新异步脚本命令：game.async(生成器函数, tips, ...params)或GlobalLibraryJS.asyncScript(生成器函数, tips, ...params)，并增加对应可视化；
+8、修改：game.addtimer支持异步脚本（bGlobal参数改为flags，并兼容老工程）；
+9、修改：调整战斗结束后增加经验代码的顺序为返回地图后；
+10、修改：NPC速度为0，则不走动（以前至少走动1）；
+11、修复：一些细节和Bug；
+12、生快。
 
 2024/7/9：发布 1.12.3.240709 版本
 1、新增：可视化标题文字提示；
@@ -246,7 +269,7 @@ Item {
 6、优化 delimage和delsprite；
 *7、修改加密方式（移位和异或都与key长度有关了，这样会更乱一些）；
 8、修改HTTP通信请求格式为Json方式；
-9、内核增加sl_qml_gzipCompress、sl_qml_gzipUncompress、sl_qml_fromHex、sl_qml_toHex函数；
+9、内核增加sl_gzipCompress、sl_gzipUncompress、sl_fromHex、sl_toHex函数；
 *10、压缩函数的type默认值调整为0；
 11、http request支持gzip压缩；
 *12、默认加密方式加入压缩和Base64编码；

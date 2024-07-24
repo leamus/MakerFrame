@@ -224,7 +224,7 @@ Rectangle {
             root.forceActiveFocus();
             //GlobalJS.Eval(textScript.text);
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.asyncScript, 0, textScript.text);
+            //GlobalJS.runScript(_private.asyncScriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;

@@ -39,24 +39,24 @@ Item {
         //let data = File.read(filePath);
 
         let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-        if(FrameManager.sl_qml_FileExists(filePath + 'main.js')) {
+        if(FrameManager.sl_fileExists(filePath + 'main.js')) {
             gameVisualScript.loadData(filePath + 'main.vjs');
             _private.strMainJSName = 'main.js';
 
-            data = FrameManager.sl_qml_ReadFile(filePath + 'main.js');
+            data = FrameManager.sl_fileRead(filePath + 'main.js');
         }
         //!!!兼容旧代码
-        else if(FrameManager.sl_qml_FileExists(filePath + 'start.js')) {
+        else if(FrameManager.sl_fileExists(filePath + 'start.js')) {
             gameVisualScript.loadData(filePath + 'start.vjs');
             _private.strMainJSName = 'start.js';
 
-            data = FrameManager.sl_qml_ReadFile(filePath + 'start.js');
+            data = FrameManager.sl_fileRead(filePath + 'start.js');
         }
         else {
             gameVisualScript.loadData(filePath + 'main.vjs');
             _private.strMainJSName = 'main.js';
 
-            data = FrameManager.sl_qml_ReadFile(filePath + 'main.js');
+            data = FrameManager.sl_fileRead(filePath + 'main.js');
         }
         console.debug('[GameStart]filePath：', filePath + _private.strMainJSName);
 
@@ -80,7 +80,7 @@ Item {
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
 game.interval(16);
-//yield *game.loadmap('鹰歌地图');
+//yield* game.loadmap('鹰歌地图');
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);
 //game.playmusic('音乐1mp3');
@@ -139,7 +139,7 @@ game.goon();
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(textGameStartScript.textDocument));
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textGameStartScript.textDocument));
 
                     if(e) {
                         dialogCommon.show({
@@ -294,7 +294,7 @@ game.goon();
 
                 text: '删除自动存档'
                 onClicked: {
-                    FrameManager.sl_qml_DeleteFile(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + 'autosave.json');
+                    FrameManager.sl_fileDelete(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + 'autosave.json');
                 }
             }*/
         }
@@ -398,7 +398,7 @@ game.goon();
             //忽略没有的信号
             //ignoreUnknownSignals: true
 
-            onS_close: function() {
+            onSg_close: function() {
                 //init();
 
 
@@ -407,7 +407,7 @@ game.goon();
                 root.forceActiveFocus();
             }
 
-            onS_Compile: function(code) {
+            onSg_compile: function(code) {
                 //console.debug(code)
                 if(code.indexOf('function *$start() {') < 0 && code.indexOf('function *start() {') < 0) {
                     code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
@@ -465,7 +465,7 @@ game.goon();
             console.debug('[GameStart]loaderGameScene onLoaded');
 
             try {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
 
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
                 //loaderGameScene.focus = true;
@@ -543,15 +543,15 @@ function *$start() {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield *game.load('存档' + c)},);
-                        if(yield *game.load('存档' + c))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield* game.load('存档' + c)},);
+                        if(yield* game.load('存档' + c))
                             break;
                         else
                             yield game.msg("读取失败");
                         continue;
                     case 3:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield *game.load('autosave')},);
-                        if(yield *game.load('autosave'))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield* game.load('autosave')},);
+                        if(yield* game.load('autosave'))
                             break;
                         else
                             yield game.msg("读取失败");
@@ -574,8 +574,8 @@ function *$start() {
         `
 
         function gameSceneClose() {
-            FrameManager.sl_qml_clearComponentCache();
-            FrameManager.sl_qml_trimComponentCache();
+            FrameManager.sl_clearComponentCache();
+            FrameManager.sl_trimComponentCache();
 
 
             loaderGameScene.source = '';

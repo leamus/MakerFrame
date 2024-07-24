@@ -40,7 +40,7 @@ Item {
             //let data = File.read(filePath);
             //console.debug('[GameFightScript]filePath：', filePath);
 
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
 
             if(data) {
                 _private.strSavedName = textFightScriptName.text = fightScriptName;
@@ -191,7 +191,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadScript.textDocument));
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
                         dialogCommon.show({
@@ -353,13 +353,13 @@ let data = (function() {
 
         Connections {
             target: gameVisualFightScript
-            function onS_close() {
+            function onSg_close() {
                 gameVisualFightScript.visible = false;
 
                 root.forceActiveFocus();
             }
 
-            function onS_Compile(code) {
+            function onSg_compile(code) {
                 notepadScript.setPlainText(code);
                 notepadScript.toBegin();
             }
@@ -405,13 +405,13 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
-                    if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.vjs', true);
+                    if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_fileExists(oldFilePath)) {
+                        ret = FrameManager.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.vjs', true);
                     }
                 }
 
@@ -421,7 +421,7 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textFightScriptName.text)) {
+            if(textFightScriptName.text !== _private.strSavedName && FrameManager.sl_dirExists(path + GameMakerGlobal.separator + textFightScriptName.text)) {
                 dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

@@ -29,9 +29,9 @@ Item {
     id: root
 
 
-    signal s_Compile(string code);
-    signal s_close();
-    onS_close: {
+    signal sg_compile(string code);
+    signal sg_close();
+    onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
@@ -819,8 +819,8 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     console.debug("[GameVisualGoods]compile:", _private.filepath, jsScript);
                 }
@@ -890,8 +890,8 @@ Item {
         function saveData() {
             let properties = [];
 
-            let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffectsLayout, 'property');
-            let effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffectsLayout, 'effect');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'property');
+            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'effect');
 
             for(let tt in propertyTextFields) {
                 properties.push([propertyTextFields[tt].text.trim(), effectTextFields[tt].text.trim()]);
@@ -917,7 +917,7 @@ Item {
 
             data.Properties = properties;
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
 
         }
 
@@ -926,7 +926,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
             console.debug("[GameVisualGoods]filePath：", filePath);
             //console.exception("????")
 
@@ -950,8 +950,8 @@ Item {
                 effectComp = comp.createObject(layoutEffectsLayout);
                 _private.arrCacheComponent.push(effectComp);
 
-                let propertyTextFields = FrameManager.sl_qml_FindChild(effectComp, 'property');
-                let effectTextFields = FrameManager.sl_qml_FindChild(effectComp, 'effect');
+                let propertyTextFields = FrameManager.sl_findChild(effectComp, 'property');
+                let effectTextFields = FrameManager.sl_findChild(effectComp, 'effect');
 
                 propertyTextFields.text = data.Properties[tt][0];
                 effectTextFields.text = data.Properties[tt][1];
@@ -985,8 +985,8 @@ Item {
             let bCheck = true;
             do {
                 for(let effectComp of _private.arrCacheComponent) {
-                    let propertyTextFields = FrameManager.sl_qml_FindChild(effectComp, 'property');
-                    let effectTextFields = FrameManager.sl_qml_FindChild(effectComp, 'effect');
+                    let propertyTextFields = FrameManager.sl_findChild(effectComp, 'property');
+                    let effectTextFields = FrameManager.sl_findChild(effectComp, 'effect');
                     if(!propertyTextFields.text.trim() || !effectTextFields.text.trim()) {
                         bCheck = false;
                         break;
@@ -1037,8 +1037,8 @@ Item {
 
             //道具效果
             let strEffects = '';
-            let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffectsLayout, 'property');
-            let effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffectsLayout, 'effect');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'property');
+            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'effect');
 
 
             //类型
@@ -1184,18 +1184,18 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
                     if(jsScript[0])
-                        s_close();
+                        sg_close();
 
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();
@@ -1339,10 +1339,10 @@ $$useEffect$$
         /*$$choiceScript: function *(goods, combatant) {
             //调用技能的
             let skill = goods.$$fight[0];
-            yield *skill.$$choiceScript(skill, combatant);
+            yield* skill.$$choiceScript(skill, combatant);
 
             //选择敌方
-            //let r = yield *fight.$$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+            //let r = yield* fight.$$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
         },
         */

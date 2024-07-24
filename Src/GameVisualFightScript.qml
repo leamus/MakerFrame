@@ -29,9 +29,9 @@ Item {
     id: root
 
 
-    signal s_Compile(string code);
-    signal s_close();
-    onS_close: {
+    signal sg_compile(string code);
+    signal sg_close();
+    onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
@@ -232,7 +232,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "images.json";
                                 //let cfg = File.read(filePath);
-                                let cfg = FrameManager.sl_qml_ReadFile(filePath);
+                                let cfg = FrameManager.sl_fileRead(filePath);
                                 //console.debug("[mainImageEditor]filePath：", filePath);
 
                                 if(!cfg)
@@ -282,7 +282,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "music.json";
                                 //let cfg = File.read(filePath);
-                                let cfg = FrameManager.sl_qml_ReadFile(filePath);
+                                let cfg = FrameManager.sl_fileRead(filePath);
                                 //console.debug("[mainImageEditor]filePath：", filePath);
 
                                 if(!cfg)
@@ -568,8 +568,8 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     console.debug("[GameVisualFightScript]compile:", _private.filepath, jsScript);
                 }
@@ -622,8 +622,8 @@ Item {
         function saveData() {
             let enemies = [];
 
-            let enemyTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemy');
-            let enemyParamsTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemyParams');
+            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
+            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
 
             for(let tt in enemyTextFields) {
                 //console.debug(tt.text);
@@ -640,7 +640,7 @@ Item {
             //data.EnemiesParams = enemiesParams;
 
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
 
         }
 
@@ -649,7 +649,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
             console.debug("[GameVisualFightScript]filePath：", filePath);
             //console.exception("????")
 
@@ -677,8 +677,8 @@ Item {
                     enemyComp = comp.createObject(layoutEnemyLayout);
                     _private.arrCacheComponent.push(enemyComp);
                 }
-                let enemyTextField = FrameManager.sl_qml_FindChild(enemyComp, 'enemy');
-                let enemyParamsTextField = FrameManager.sl_qml_FindChild(enemyComp, 'enemyParams');
+                let enemyTextField = FrameManager.sl_findChild(enemyComp, 'enemy');
+                let enemyParamsTextField = FrameManager.sl_findChild(enemyComp, 'enemyParams');
 
                 enemyTextField.text = data.Enemies[tt][0];
                 enemyParamsTextField.text = data.Enemies[tt][1];
@@ -697,8 +697,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let enemyTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemy');
-                let enemyParamsTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemyParams');
+                let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
+                let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
 
                 //console.debug(actionTextFields);
                 for(let tt in enemyTextFields) {
@@ -739,8 +739,8 @@ Item {
 
 
             let strEnemies = '';
-            let enemyTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemy');
-            let enemyParamsTextFields = FrameManager.sl_qml_FindChildren(layoutEnemyLayout, 'enemyParams');
+            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
+            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
 
             //console.debug(enemyTextFields);
             for(let tt in enemyTextFields) {
@@ -764,7 +764,7 @@ Item {
             console.debug("data:", data);
             */
 
-            //let tpl = FrameManager.sl_qml_ReadFile(filePath);
+            //let tpl = FrameManager.sl_fileRead(filePath);
             //console.debug('tpl:', tpl);
 
             let enemyCount = textEnemyCount.text.trim().split(',');
@@ -820,18 +820,18 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
                     if(jsScript[0])
-                        s_close();
+                        sg_close();
 
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

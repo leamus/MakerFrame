@@ -1608,7 +1608,7 @@ Item {
 
                             //_private.loadScript(textRoleName.text);
                             if(!textCode.text &&
-                                    !FrameManager.sl_qml_FileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.js')) {
+                                    !FrameManager.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.js')) {
                                 if(comboType.currentIndex === 1)
                                     textCode.text = _private.strTemplateCode0;
                                 else
@@ -2029,9 +2029,9 @@ Item {
 
 
             if(Qt.platform.os === "android")
-                textRoleImageURL.text = Platform.getRealPathFromURI(fileUrl);
+                textRoleImageURL.text = Platform.sl_getRealPathFromURI(fileUrl);
             else
-                textRoleImageURL.text = FrameManager.sl_qml_UrlDecode(fileUrl);
+                textRoleImageURL.text = FrameManager.sl_urlDecode(fileUrl);
 
             textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
 
@@ -2184,24 +2184,24 @@ Item {
                 open();
                 //visible = true;
                 labelDialogTips.text = "路径不能为空";
-                Platform.showToast("路径不能为空");
+                Platform.sl_showToast("路径不能为空");
                 return;
             }*/
             if(textRoleImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = "资源名不能为空";
-                Platform.showToast("资源名不能为空");
+                Platform.sl_showToast("资源名不能为空");
                 return;
             }
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = FrameManager.sl_qml_CopyFile(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
+                let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = "拷贝资源失败，是否重名或目录不可写？";
-                    Platform.showToast("拷贝资源失败，是否重名或目录不可写？");
+                    Platform.sl_showToast("拷贝资源失败，是否重名或目录不可写？");
                     //console.debug("[RoleEditor]Copy ERROR:", textRoleImageURL.text);
 
                     //root.forceActiveFocus();
@@ -2221,20 +2221,20 @@ Item {
 
 
             if(comboType.currentIndex === 0) {
-                if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!FrameManager.sl_fileExists(GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
                     labelDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.showToast("路径错误或文件不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    Platform.sl_showToast("路径错误或文件不存在" + GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
             else if(comboType.currentIndex === 1) {
-                if(!FrameManager.sl_qml_DirExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!FrameManager.sl_dirExists(GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
                     labelDialogTips.text = "路径错误或文件夹不存在:" + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.showToast("路径错误或文件夹不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    Platform.sl_showToast("路径错误或文件夹不存在" + GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
@@ -2338,7 +2338,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl);
-            //let cfg = FrameManager.sl_qml_ReadFile(fileUrl);
+            //let cfg = FrameManager.sl_fileRead(fileUrl);
 
 
             visible = false;
@@ -2365,7 +2365,7 @@ Item {
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[RoleEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_qml_FileExists(filepath), FrameManager.sl_qml_DeleteFile(filepath));
+                    console.debug("[RoleEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listRoleResource.forceActiveFocus();
@@ -2412,7 +2412,7 @@ Item {
                     text: '查'
 
                     onClicked: {
-                        let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(textCode.textDocument));
+                        let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textCode.textDocument));
 
                         if(e) {
                             dialogCommon.show({
@@ -2538,7 +2538,7 @@ Item {
         onAccepted: {
             textRoleName.text = textRoleName.text.trim();
             if(textRoleName.text.length === 0) {
-                //Platform.showToast("名称不能为空");
+                //Platform.sl_showToast("名称不能为空");
                 textDialogMsg.text = "名称不能为空";
                 open();
                 return;
@@ -2566,7 +2566,7 @@ Item {
                 }
             }
 
-            if(textRoleName.text !== _private.strRoleName && FrameManager.sl_qml_DirExists(path)) {
+            if(textRoleName.text !== _private.strRoleName && FrameManager.sl_dirExists(path)) {
                 dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -2768,7 +2768,7 @@ Item {
 
         //Connections {
         //    target: loaderVisualScript.item
-            onS_close: function() {
+            onSg_close: function() {
                 //_private.loadScript();
                 dialogScript.visible = true;
 
@@ -2778,7 +2778,7 @@ Item {
                 root.forceActiveFocus();
             }
 
-            onS_Compile: function(code) {
+            onSg_compile: function(code) {
                 textCode.setPlainText(code);
                 textCode.toBegin();
             }
@@ -2807,7 +2807,7 @@ let imageFixPositions;
 function $refresh(index, imageAnimate, path) {
     if(imageFixPositions === undefined) {
         //读取坐标偏移文件并保存
-        imageFixPositions = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
+        imageFixPositions = FrameManager.sl_fileRead(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
@@ -2894,10 +2894,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 role.arrActionsData = {};
-                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameInterval');
+                let actionNames = FrameManager.sl_findChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = FrameManager.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = FrameManager.sl_findChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = FrameManager.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -2911,11 +2911,12 @@ function $refresh(index, imageAnimate, path) {
 
 
                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
-                if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'role.js')) {
+                if(FrameManager.sl_fileExists(path + GameMakerGlobal.separator + 'role.js')) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
                     role.sprite.sprite.fnRefresh = ts.$refresh;
-                    //FrameManager.sl_qml_clearComponentCache();
+                    //FrameManager.sl_clearComponentCache();
+                    //FrameManager.sl_trimComponentCache();
                 }
             }
             else if(comboType.currentIndex === 2) {
@@ -2923,8 +2924,8 @@ function $refresh(index, imageAnimate, path) {
                 //role.implicitHeight = parseInt(textRoleHeight.text);
 
                 role.arrActionsData = {};
-                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'ActionName');
-                let SpriteNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'SpriteName');
+                let actionNames = FrameManager.sl_findChildren(layoutAction2, 'ActionName');
+                let SpriteNames = FrameManager.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
@@ -2933,7 +2934,7 @@ function $refresh(index, imageAnimate, path) {
                         //];
 
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-                        let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + SpriteNames[tt].text.trim() + GameMakerGlobal.separator + "sprite.json"));
+                        let data = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + SpriteNames[tt].text.trim() + GameMakerGlobal.separator + "sprite.json"));
                         if(data)
                             data = JSON.parse(data);
                         //else
@@ -2987,9 +2988,9 @@ function $refresh(index, imageAnimate, path) {
             }
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator;
-            //if(FrameManager.sl_qml_FileExists(path + 'role.js')) {
+            //if(FrameManager.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
-            textCode.text = FrameManager.sl_qml_ReadFile(path + 'role.js') || '';
+            textCode.text = FrameManager.sl_fileRead(path + 'role.js') || '';
             //textCode.setPlainText(data);
             //textCode.toBegin();
             gameVisualScript.loadData(path + 'role.vjs');
@@ -3006,16 +3007,16 @@ function $refresh(index, imageAnimate, path) {
             }
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
         }
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
             if(_private.strRoleName !== '' && textRoleName.text !== '' && _private.strRoleName !== textRoleName.text) {
                 let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.vjs';
-                if(FrameManager.sl_qml_FileExists(oldFilePath)) {
+                if(FrameManager.sl_fileExists(oldFilePath)) {
                     let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text + GameMakerGlobal.separator + 'role.vjs';
-                    let ret = FrameManager.sl_qml_CopyFile(oldFilePath, newFilePath, true);
+                    let ret = FrameManager.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -3026,8 +3027,8 @@ function $refresh(index, imageAnimate, path) {
             let roleName = textRoleName.text;
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
 
-            /*//if(!FrameManager.sl_qml_DirExists(path))
-                FrameManager.sl_qml_CreateFolder(path);
+            /*//if(!FrameManager.sl_dirExists(path))
+                FrameManager.sl_dirCreate(path);
             */
 
             let outputData = {};
@@ -3095,10 +3096,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 outputData.FrameIndex = {};
-                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = FrameManager.sl_qml_FindChildren(layoutAction1, 'FrameInterval');
+                let actionNames = FrameManager.sl_findChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = FrameManager.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = FrameManager.sl_findChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = FrameManager.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -3118,8 +3119,8 @@ function $refresh(index, imageAnimate, path) {
             }
             else if(comboType.currentIndex === 2) {
                 outputData.FrameIndex = {};
-                let actionNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'ActionName');
-                let SpriteNames = FrameManager.sl_qml_FindChildren(layoutAction2, 'SpriteName');
+                let actionNames = FrameManager.sl_findChildren(layoutAction2, 'ActionName');
+                let SpriteNames = FrameManager.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim())
@@ -3137,7 +3138,7 @@ function $refresh(index, imageAnimate, path) {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(filepath, JSON.stringify(outputData));
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify(outputData), filepath, 0);
+            let ret = FrameManager.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

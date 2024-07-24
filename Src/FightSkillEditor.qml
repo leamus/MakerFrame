@@ -40,7 +40,7 @@ Item {
             //let data = File.read(filePath);
             //console.debug('[GameFightSkill]filePath：', filePath);
 
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
 
             if(data) {
                 //console.debug('data', data);
@@ -98,7 +98,7 @@ let data = (function() {
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
         /*$choiceScript: function *(skill, combatant) {
             //选择敌方
-            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+            //let r = yield* fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
         },
         */
@@ -235,7 +235,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument));
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGameFightSkillScript.textDocument));
 
                     if(e) {
                         dialogCommon.show({
@@ -397,13 +397,13 @@ let data = (function() {
 
         Connections {
             target: gameVisualFightSkill
-            function onS_close() {
+            function onSg_close() {
                 gameVisualFightSkill.visible = false;
 
                 root.forceActiveFocus();
             }
 
-            function onS_Compile(code) {
+            function onSg_compile(code) {
                 notepadGameFightSkillScript.setPlainText(code);
                 notepadGameFightSkillScript.toBegin();
             }
@@ -454,13 +454,13 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadGameFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadGameFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_skill.vjs';
-                    if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_qml_FileExists(oldFilePath)) {
-                        ret = FrameManager.sl_qml_CopyFile(oldFilePath, path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.vjs', true);
+                    if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_fileExists(oldFilePath)) {
+                        ret = FrameManager.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.vjs', true);
                     }
                 }
 
@@ -470,7 +470,7 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_qml_DirExists(path + GameMakerGlobal.separator + textFightSkillName.text)) {
+            if(textFightSkillName.text !== _private.strSavedName && FrameManager.sl_dirExists(path + GameMakerGlobal.separator + textFightSkillName.text)) {
                 dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

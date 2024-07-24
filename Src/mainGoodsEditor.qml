@@ -110,7 +110,7 @@ Item {
             console.debug("[mainGoodsEditor]filePath：", filePath);
 
             //let cfg = File.read(filePath);
-            let cfg = FrameManager.sl_qml_ReadFile(filePath);
+            let cfg = FrameManager.sl_fileRead(filePath);
 
             if(cfg) {
                 cfg = JSON.parse(cfg);
@@ -130,7 +130,7 @@ Item {
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainGoodsEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_qml_DirExists(dirUrl), FrameManager.sl_qml_RemoveRecursively(dirUrl));
+                    console.debug("[mainGoodsEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listGoods.forceActiveFocus();
@@ -212,7 +212,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_qml_listDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建道具】');
             l_listGoods.removeButtonVisible = {0: false, '-1': true};
             l_listGoods.show(list);

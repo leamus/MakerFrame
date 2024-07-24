@@ -42,7 +42,7 @@ Item {
         //let data = File.read(filePath);
         //console.debug('data', filePath, data)
 
-        let data = FrameManager.sl_qml_ReadFile(filePath);
+        let data = FrameManager.sl_fileRead(filePath);
 
         if(data) {
             //data = JSON.parse(data)['LevelChainScript'];
@@ -93,7 +93,7 @@ Item {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.toPlainText(notepadScript.textDocument));
+                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
                         dialogCommon.show({
@@ -311,7 +311,7 @@ Item {
             ignoreUnknownSignals: true
 
 
-            function onS_close() {
+            function onSg_close() {
                 //init();
 
 
@@ -320,7 +320,7 @@ Item {
                 root.forceActiveFocus();
             }
 
-            function onS_Compile(code) {
+            function onSg_compile(code) {
                 //console.debug(code)
 
                 notepadScript.setPlainText(code);
@@ -380,7 +380,7 @@ Item {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
 
             /*/设置为文件夹
-            if(!FrameManager.sl_qml_DirExists(path)) {
+            if(!FrameManager.sl_dirExists(path)) {
                 _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/'))
                 path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
             }*/
@@ -422,14 +422,14 @@ Item {
 
             console.debug("[mainScriptEditor]path：", path);
 
-            if(FrameManager.sl_qml_DirExists(path)) {
+            if(FrameManager.sl_dirExists(path)) {
                 _private.showList();
                 return;
             }
 
 
             //let cfg = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(path);
+            let data = FrameManager.sl_fileRead(path);
 
             if(data) {
                 notepadScript.setPlainText(data);
@@ -452,12 +452,12 @@ Item {
                 Msg: '确认删除：' + path,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if(FrameManager.sl_qml_DirExists(path)) {
-                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_RemoveRecursively(path));
+                    if(FrameManager.sl_dirExists(path)) {
+                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_removeRecursively(path));
                         removeItem(index);
                     }
-                    else if(FrameManager.sl_qml_FileExists(path)) {
-                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_qml_DeleteFile(path));
+                    else if(FrameManager.sl_fileExists(path)) {
+                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
                         removeItem(index);
                     }
 
@@ -498,12 +498,12 @@ Item {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
 
 
-            if(!FrameManager.sl_qml_DirExists(path)) {
+            if(!FrameManager.sl_dirExists(path)) {
                 _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/'))
                 path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
             }
 
-            let list = FrameManager.sl_qml_listDir(path, "*.qml|*.js|*.vjs|*.json|*.txt", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(path, "*.qml|*.js|*.vjs|*.json|*.txt", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建文件】', '..');
             //console.warn(l_listExplorer.listview.itemAtIndex(0)); //null，还没创建
             l_listExplorer.removeButtonVisible = {0: false, 1: false, '-1': true};
@@ -531,7 +531,7 @@ Item {
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + filePath;
 
-            let ret = FrameManager.sl_qml_WriteFile(FrameManager.toPlainText(notepadScript.textDocument), path, 0);
+            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), path, 0);
 
             return true;
         }

@@ -29,9 +29,9 @@ Item {
     id: root
 
 
-    signal s_Compile(string code);
-    signal s_close();
-    onS_close: {
+    signal sg_compile(string code);
+    signal sg_close();
+    onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
@@ -834,8 +834,8 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     console.debug("[GameVisualFightRole]compile:", _private.filepath, jsScript);
                 }
@@ -889,8 +889,8 @@ Item {
         function saveData() {
             let actions = [];
 
-            let actionTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'actionName');
-            let spriteTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'spriteName');
+            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
+            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
 
             for(let tt in actionTextFields) {
                 //console.debug(tt.text.trim());
@@ -921,7 +921,7 @@ Item {
             data.Actions = actions;
 
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
 
         }
 
@@ -930,7 +930,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
             console.debug("[GameVisualFightRole]filePath：", filePath);
             //console.exception("????")
 
@@ -959,8 +959,8 @@ Item {
                     actionComp = comp.createObject(layoutActionLayout);
                     _private.arrCacheComponent.push(actionComp);
                 }
-                let actionTextField = FrameManager.sl_qml_FindChild(actionComp, 'actionName');
-                let spriteTextField = FrameManager.sl_qml_FindChild(actionComp, 'spriteName');
+                let actionTextField = FrameManager.sl_findChild(actionComp, 'actionName');
+                let spriteTextField = FrameManager.sl_findChild(actionComp, 'spriteName');
 
                 actionTextField.text = data.Actions[tt][0];
                 spriteTextField.text = data.Actions[tt][1];
@@ -990,8 +990,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let actionTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'actionName');
-                let spriteTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'spriteName');
+                let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
+                let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
 
                 //console.debug(actionTextFields);
                 for(let tt in actionTextFields) {
@@ -1032,8 +1032,8 @@ Item {
 
 
             let strActions = '';
-            let actionTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'actionName');
-            let spriteTextFields = FrameManager.sl_qml_FindChildren(layoutActionLayout, 'spriteName');
+            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
+            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
 
             //console.debug(actionTextFields);
             for(let tt in actionTextFields) {
@@ -1100,18 +1100,18 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
                     if(jsScript[0])
-                        s_close();
+                        sg_close();
 
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

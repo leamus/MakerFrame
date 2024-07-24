@@ -29,9 +29,9 @@ Item {
     id: root
 
 
-    signal s_Compile(string code);
-    signal s_close();
-    onS_close: {
+    signal sg_compile(string code);
+    signal sg_close();
+    onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
@@ -1254,8 +1254,8 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     console.debug("[GameVisualFightSkill]compile:", _private.filepath, jsScript);
                 }
@@ -1325,10 +1325,10 @@ Item {
         function saveData() {
             let buffs = [];
 
-            let typeTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'type');
-            let effectTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'effect');
-            let roundTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'round');
-            let probabilityTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'probability');
+            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
+            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
+            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
+            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
 
             for(let tt in typeTextFields) {
                 buffs.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(), roundTextFields[tt].text.trim(), probabilityTextFields[tt].text.trim()])
@@ -1337,11 +1337,11 @@ Item {
 
             let effects = [];
 
-            typeTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'type');
-            //let requiredMPTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'requiredMP');
-            effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'effect');
-            let combatantTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'combatant');
-            let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'property');
+            typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
+            //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'requiredMP');
+            effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
+            let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
 
             for(let tt in typeTextFields) {
                 effects.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(),
@@ -1362,7 +1362,7 @@ Item {
             data.Effects = effects;
             //data.Attack = textAttack.text.trim();
 
-            let ret = FrameManager.sl_qml_WriteFile(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
+            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1371,7 +1371,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
             console.debug("[GameVisualFightSkill]filePath：", filePath);
             //console.exception("????")
 
@@ -1393,10 +1393,10 @@ Item {
                 let buff = compBuff.createObject(layoutBuff);
                 _private.arrCacheComponent.push(buff);
 
-                let typeTextFields = FrameManager.sl_qml_FindChild(buff, 'type');
-                let effectTextFields = FrameManager.sl_qml_FindChild(buff, 'effect');
-                let roundTextFields = FrameManager.sl_qml_FindChild(buff, 'round');
-                let probabilityTextFields = FrameManager.sl_qml_FindChild(buff, 'probability');
+                let typeTextFields = FrameManager.sl_findChild(buff, 'type');
+                let effectTextFields = FrameManager.sl_findChild(buff, 'effect');
+                let roundTextFields = FrameManager.sl_findChild(buff, 'round');
+                let probabilityTextFields = FrameManager.sl_findChild(buff, 'probability');
 
                 typeTextFields.text = data.Buffs[tt][0];
                 effectTextFields.text = data.Buffs[tt][1];
@@ -1420,11 +1420,11 @@ Item {
                 let effect = compEffect.createObject(layoutEffect);
                 _private.arrCacheComponent.push(effect);
 
-                let typeTextField = FrameManager.sl_qml_FindChild(effect, 'type');
-                //let requiredMPTextFields = FrameManager.sl_qml_FindChildren(effect, 'requiredMP');
-                let effectTextField = FrameManager.sl_qml_FindChild(effect, 'effect');
-                let combatantTextField = FrameManager.sl_qml_FindChild(effect, 'combatant');
-                let propertyTextField = FrameManager.sl_qml_FindChild(effect, 'property');
+                let typeTextField = FrameManager.sl_findChild(effect, 'type');
+                //let requiredMPTextFields = FrameManager.sl_findChildren(effect, 'requiredMP');
+                let effectTextField = FrameManager.sl_findChild(effect, 'effect');
+                let combatantTextField = FrameManager.sl_findChild(effect, 'combatant');
+                let propertyTextField = FrameManager.sl_findChild(effect, 'property');
 
                 typeTextField.text = data.Effects[tt][0] || '';
                 //requiredMPTextFields.text = data.Effects[tt][1];
@@ -1451,10 +1451,10 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let typeTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'type');
-                let effectTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'effect');
-                let roundTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'round');
-                let probabilityTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'probability');
+                let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
+                let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
+                let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
+                let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
 
                 //console.debug(actionTextFields);
                 for(let tt in typeTextFields) {
@@ -1482,10 +1482,10 @@ Item {
                     }
 
                     //技能效果
-                    let typeTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'type');
-                    let effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'effect');
-                    let combatantTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'combatant');
-                    let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'property');
+                    let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
+                    let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
+                    let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
+                    let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
 
                     for(let tt in typeTextFields) {
                         let typeTextField = typeTextFields[tt];
@@ -1577,11 +1577,11 @@ Item {
 
 
                 //技能效果
-                let typeTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'type');
-                //let requiredMPTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'requiredMP');
-                let effectTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'effect');
-                let combatantTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'combatant');
-                let propertyTextFields = FrameManager.sl_qml_FindChildren(layoutEffect, 'property');
+                let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
+                //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'requiredMP');
+                let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
+                let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
+                let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
 
                 let props = '';
                 for(let tt in typeTextFields) {
@@ -1647,10 +1647,10 @@ Item {
             let buffs = '';
 
 
-            let typeTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'type');
-            let effectTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'effect');
-            let roundTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'round');
-            let probabilityTextFields = FrameManager.sl_qml_FindChildren(layoutBuff, 'probability');
+            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
+            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
+            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
+            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
 
             for(let tt in typeTextFields) {
                 let tRound = roundTextFields[tt].text.trim().split(',');
@@ -1797,18 +1797,18 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_qml_WriteFile(jsScript, _private.filepath + '.js', 0);
-                    root.s_Compile(jsScript[1]);
+                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
                     if(jsScript[0])
-                        s_close();
+                        sg_close();
 
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();
@@ -1875,7 +1875,7 @@ let data = (function() {
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
         /*$choiceScript: function *(skill, combatant) {
             //选择敌方
-            //let r = yield *fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
+            //let r = yield* fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
         },
         */

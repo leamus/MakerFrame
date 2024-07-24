@@ -286,7 +286,7 @@ Item {
             try {
                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
                 //let cfg = File.read(filePath);
-                let cfg = FrameManager.sl_qml_ReadFile(filePath);
+                let cfg = FrameManager.sl_fileRead(filePath);
                 //console.debug("cfg", cfg, filePath);
 
                 if(!cfg)
@@ -312,7 +312,7 @@ Item {
                 loaderGameScene.item.bTest = true;
                 //loaderGameScene.item.openMap(item);
                 let tScript = function*() {
-                    yield *game.loadmap(textMapName.text);
+                    yield* game.loadmap(textMapName.text);
                     game.createhero(textRoleName.text);
                     game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
                     game.interval(16);
