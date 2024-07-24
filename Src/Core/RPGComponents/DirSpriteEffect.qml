@@ -206,7 +206,7 @@ Item {
         let data = request.responseText;
         * /
 
-        let data = FrameManager.sl_qml_ReadFile(path);
+        let data = FrameManager.sl_fileRead(path);
         if(data)
             return data.split('\r\n');
         return null;

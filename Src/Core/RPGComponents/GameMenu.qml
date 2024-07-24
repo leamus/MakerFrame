@@ -69,6 +69,7 @@ Rectangle {
         if(/*arguments.length === 1 && */Object.prototype.toString.call(arguments[0]) === '[object Array]') {
             arrList = arguments[0];
         }
+        //如果是字符串，则用 , 分割
         else if(Object.prototype.toString.call(arguments[0]) === '[object String]')
             arrList = arguments[0].split(',');
 
@@ -293,7 +294,7 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             Layout.preferredWidth: parent.width
             //Layout.preferredHeight: root.nTitleHeight
-            implicitHeight: Math.max(textGameInputTitle.implicitHeight, root.nTitleHeight)  //鹰：删除会导致 binding loop 错误
+            implicitHeight: Math.max(textMenuTitle.implicitHeight, root.nTitleHeight)  //鹰：删除会导致 binding loop 错误
 
             //visible: (root.strTitle !== false && root.strTitle !== null && root.strTitle !== undefined)
             visible: (root.strTitle)

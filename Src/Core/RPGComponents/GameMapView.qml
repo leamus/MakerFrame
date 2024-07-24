@@ -42,7 +42,7 @@ Item {
 
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            tmapInfo = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
+            tmapInfo = FrameManager.sl_fileRead(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
             //console.debug("cfg", cfg, mapPath);
 
             if(!tmapInfo) {

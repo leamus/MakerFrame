@@ -136,7 +136,7 @@ Item {
         if(root.nSpriteType === 0) {
             //读特效信息
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-            //let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(path + GameMakerGlobal.separator + arrActionsData[actionName] + GameMakerGlobal.separator + "sprite.json"));
+            //let data = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + arrActionsData[actionName] + GameMakerGlobal.separator + "sprite.json"));
             //if(data)
             //    data = JSON.parse(data);
             //else
@@ -168,11 +168,12 @@ Item {
 
 
                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
-                if(FrameManager.sl_qml_FileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
+                if(FrameManager.sl_fileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
                     //_private.jsEngine.clear();
                     let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
                     spriteEffect.sprite.fnRefresh = ts.$refresh;
-                    //FrameManager.sl_qml_clearComponentCache();
+                    //FrameManager.sl_clearComponentCache();
+                    //FrameManager.sl_trimComponentCache();
                 }
             }
 

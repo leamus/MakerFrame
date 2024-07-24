@@ -153,6 +153,9 @@ Item {
     }
 
     function closeWindow(flags=-1) {
+        if(nShowWindowFlags === 0)
+            return;
+
 
         let newFlags = 0;
 
@@ -371,7 +374,7 @@ Item {
 
 
                     let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
-                    yield *game.usegoods(goods.$rid);
+                    yield* game.usegoods(goods.$rid);
                 }
             }
             ColorButton {

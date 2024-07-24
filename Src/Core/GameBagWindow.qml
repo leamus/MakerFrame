@@ -484,7 +484,7 @@ Item {
 
                     //脚本执行完毕后刷新背包
                     game.run(function*(){
-                        yield *game.usegoods(index, goods);
+                        yield* game.usegoods(index, goods);
                         root.showGoods(root.nlastShowType);
                     });
                 }

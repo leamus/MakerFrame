@@ -123,19 +123,19 @@ Item {
     //必须用yield标记来让它运行完毕（第一次使用则不必）
     function init(startScript=true, bLoadResources=true, gameData=null) {
 
-        //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
-        _private.asyncScript.clear(0);
-        //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
+        //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
+        _private.asyncScriptQueue.clear(0);
+        //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
 
 
-        //asyncScript.runNextEventLoop('init');
+        //asyncScriptQueue.runNextEventLoop('init');
 
 
         //！！！鹰：注意：load是异步调用；且将 Priority 设置为顺序的（保证 game.load 的所有异步脚本执行完毕 再执行 game.load 的下一个命令）
         //let priority = 0;
 
 
-        game.run(_init);
+        game.run(_init(startScript, bLoadResources, gameData));
     }
 
     function *_init(startScript=true, bLoadResources=true, gameData=null) {
@@ -155,7 +155,7 @@ Item {
 
 
         if(bLoadResources)
-            yield *GameSceneJS.loadResources();
+            yield* GameSceneJS.loadResources();
 
 
         //game.gf['$sys'] = _private.objCommonScripts;
@@ -164,6 +164,18 @@ Item {
         //恢复游戏数据
         if(gameData)
             GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+        //game.gd = ret['Data'];
+
+
+        //读取主角
+        for(let th of game.gd['$sys_main_roles']) {
+            let mainRole = game.createhero(th.$rid);
+            mainRole.$$nActionType = 0;
+            mainRole.$$arrMoveDirection = [0, 0];
+            //game.hero(mainRole, th);
+        }
+        //开始移动地图
+        //setSceneToRole(_private.sceneRole);
 
 
         //计算新属性
@@ -172,13 +184,30 @@ Item {
         //刷新战斗时人物数据
         //fight.$sys.refreshCombatant(-1);
 
+        game.$sys.reloadFightRoles();
+
+        game.$sys.reloadGoods();
+
+        //其他
+        game.interval(game.gd['$sys_fps']);
+        game.scale(game.gd['$sys_scale']);
+
+        if(game.gd['$sys_music'])
+            game.playmusic(game.gd['$sys_music']);
+
+        /*if(game.gd['$sys_sound'] & 0b10)
+            _private.config.nSoundConfig = 0;
+        else
+            _private.config.nSoundConfig = 1;
+        */
+
 
 
         if(_private.objCommonScripts['game_init']) {
             //game.run([_private.objCommonScripts['game_init'](bLoadResources) ?? null, 'game_init'],
             //    {Priority: priority++, Type: 0, Running: 1});
             let r = _private.objCommonScripts['game_init'](bLoadResources);
-            if(GlobalLibraryJS.isGenerator(r))yield *r;
+            if(GlobalLibraryJS.isGenerator(r))yield* r;
         }
 
 
@@ -189,14 +218,14 @@ Item {
                     //console.warn(_private.objPlugins[tc][tp].$init)
                     //_private.objPlugins[tc][tp].$init();
                     let r = _private.objPlugins[tc][tp].$init();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                    if(GlobalLibraryJS.isGenerator(r))yield* r;
                 }
 
 
         //钩子函数调用
         for(let vfInit in game.$sys.hooks.init) {
             let r = game.$sys.hooks.init[vfInit](bLoadResources);
-            if(GlobalLibraryJS.isGenerator(r))yield *r;
+            if(GlobalLibraryJS.isGenerator(r))yield* r;
         }
 
 
@@ -210,17 +239,17 @@ Item {
             /*
             let filePath = game.$projectpath + GameMakerGlobal.separator + 'start.js';
             //let cfg = File.read(filePath);
-            let data = FrameManager.sl_qml_ReadFile(GlobalJS.toPath(filePath));
+            let data = FrameManager.sl_fileRead(GlobalJS.toPath(filePath));
             //if(!data)
             //    return false;
-            if(GlobalJS.createScript(_private.asyncScript, 0, 0, eval(data)) === 0)
-                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            if(GlobalJS.createScript(_private.asyncScriptQueue, 0, 0, eval(data)) === 0)
+                _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
             */
 
             if(_private.objCommonScripts['game_start']) {
                 game.run(function*() {
                     let r = _private.objCommonScripts['game_start']();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                    if(GlobalLibraryJS.isGenerator(r))yield* r;
                 }, {Tips: 'start'});
             }
         }
@@ -231,7 +260,7 @@ Item {
         else {  //是脚本
             game.run(function*() {
                 let r = startScript();
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
             }, {Tips: 'start'});
         }
 
@@ -255,7 +284,7 @@ Item {
     //释放所有资源
     //必须用yield标记来让它运行完毕
     function *release(bUnloadResources=true) {
-        //asyncScript.runNextEventLoop('release');
+        //asyncScriptQueue.runNextEventLoop('release');
 
 
         //！！！鹰：注意：load是异步调用；且将 Priority 设置为顺序的（保证 game.load 的所有异步脚本执行完毕 再执行 game.load 的下一个命令）
@@ -270,7 +299,7 @@ Item {
             //钩子函数调用
             for(let vfRelease in game.$sys.hooks.release) {
                 let r = game.$sys.hooks.release[vfRelease](bUnloadResources);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
             }
 
 
@@ -280,24 +309,24 @@ Item {
                     if(_private.objPlugins[tc][tp].$release && _private.objPlugins[tc][tp].$autoLoad !== false) {
                         //_private.objPlugins[tc][tp].$release();
                         let r = _private.objPlugins[tc][tp].$release();
-                        if(GlobalLibraryJS.isGenerator(r))yield *r;
+                        if(GlobalLibraryJS.isGenerator(r))yield* r;
                     }
 
 
             if(_private.objCommonScripts['game_release']) {
                 let r = _private.objCommonScripts['game_release'](bUnloadResources);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
             }
 
 
             game.scale(1);
 
             //！！不能清空事件队列，因为有可能 game.load() 调用后下面还有其他代码！！
-            //_private.asyncScript.clear(4);
-            //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            //_private.asyncScriptQueue.clear(4);
+            //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
 
             //loaderGameMsg.item.stop();
-            messageRole.stop();
+            //messageRole.stop();
 
             game.delrole(-1);
             game.delimage();
@@ -314,24 +343,36 @@ Item {
 
             gameMenuWindow.closeWindow(-1);
             //gameMenuWindow.visible = false;
-            dialogTrade.visible = false;
+            dialogTrade.close();
 
             //loaderGameMsg.item.visible = false;
-            itemGameMsgs.nIndex = 0;
-            for(let tim in itemGameMsgs.children) {
-                itemGameMsgs.children[tim].destroy();
-            }
-
-            itemRootRoleMsg.visible = false;
-            itemRootGameInput.visible = false;
-
-            itemGameMenus.nIndex = 0;
-            for(let tim in itemGameMenus.children) {
-                itemGameMenus.children[tim].destroy();
-            }
-
+            //itemRootRoleMsg.visible = false;
+            //itemRootGameInput.visible = false;
             //itemMenu.visible = false;
             //menuGame.hide();
+
+            itemGameMsgs.nIndex = 0;
+            for(let ti in itemGameMsgs.children) {
+                itemGameMsgs.children[ti].destroy();
+            }
+            itemRoleMsgs.nIndex = 0;
+            for(let ti in itemRoleMsgs.children) {
+                itemRoleMsgs.children[ti].destroy();
+            }
+            itemGameMenus.nIndex = 0;
+            for(let ti in itemGameMenus.children) {
+                itemGameMenus.children[ti].destroy();
+            }
+            itemGameInputs.nIndex = 0;
+            for(let ti in itemGameInputs.children) {
+                itemGameInputs.children[ti].destroy();
+            }
+            //停止并触发所有定时器，让异步脚本/队列继续运行不要等待；
+            for(let ti in itemTimers.children) {
+                //itemTimers.children[ti].destroy();
+                itemTimers.children[ti].stop();
+                itemTimers.children[ti].triggered();
+            }
 
 
             game.d = {};
@@ -366,15 +407,15 @@ Item {
 
 
             if(bUnloadResources)
-                yield *GameSceneJS.unloadResources();
+                yield* GameSceneJS.unloadResources();
         //}, {Priority: -2, Type: 0, Running: 1, Tips: 'release'});
 
 
 
-        //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
-        //_private.asyncScript.clear(0);
-        ///_private.asyncScript.clear(4);
-        //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
+        //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
+        //_private.asyncScriptQueue.clear(0);
+        ///_private.asyncScriptQueue.clear(4);
+        //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
     }
 
 
@@ -466,7 +507,7 @@ Item {
         readonly property var loadmap: function*(mapRID, userData, forceRepaint=false) {
 
             if(!mapRID) {
-                //asyncScript.runNextEventLoop('loadmap');
+                //asyncScriptQueue.runNextEventLoop('loadmap');
                 console.exception('[!GameScene]loadmap Fail:', mapRID);
                 return false;
             }
@@ -483,7 +524,7 @@ Item {
                 let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
                 if(ts.$end) {
                     let r = ts.$end(userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                    if(GlobalLibraryJS.isGenerator(r))yield* r;
                     //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
                 }
             }
@@ -521,7 +562,7 @@ Item {
             let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
             if(beforeLoadmap) {
                 let r = beforeLoadmap(mapRID, userData);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
             }
 
@@ -541,12 +582,12 @@ Item {
 
             if(itemViewPort.mapScript.$start) {
                 let r = itemViewPort.mapScript.$start(userData);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
             }
             else if(itemViewPort.mapScript.start) {
                 let r = itemViewPort.mapScript.start(userData);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
             }
 
@@ -555,7 +596,7 @@ Item {
             let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
             if(afterLoadmap) {
                 let r = afterLoadmap(mapRID, userData);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
             }
 
@@ -584,9 +625,11 @@ Item {
         //  如果是生成器（函数），则先调用系统定义的回调函数，再将生成器（函数）放入事件队列中运行；
         //buttonNum为按钮数量（0-2，目前没用）。
         //返回组件对象；
-        readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true/*, buttonNum=0*/, callback=true) {
+        readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
 
-            let itemGameMsg = compGameMsg.createObject(itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
+            let itemGameMsg = compGameMsg.createObject(p || itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
+
+            ++itemGameMsgs.nIndex;
 
 
             //按钮数
@@ -601,18 +644,35 @@ Item {
             */
 
 
-            ++itemGameMsgs.nIndex;
-
+            let ret = itemGameMsg;
 
             //如果为null，则返回 组件，用户自己配置并调用show
             if(msg !== true) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true);
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
                 itemGameMsg.show(msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
             }
             //loaderGameMsg.item.fCallback = callback;
             //loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
-            return itemGameMsg;
+            return ret;
         }
 
         //在屏幕下方显示对话信息。
@@ -624,13 +684,39 @@ Item {
         //pauseGame同msg的参数；
         //callback同msg的参数；
         //返回组件对象；
-        readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true) {
+        readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null) {
 
-            if(role !== true)
-                itemRootRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
+            let itemRoleMsg = compRoleMsg.createObject(p || itemRoleMsgs, {nIndex: itemRoleMsgs.nIndex});
+
+            ++itemRoleMsgs.nIndex;
 
 
-            return itemRootRoleMsg;
+            let ret = itemRoleMsg;
+
+            if(role !== true) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true);
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
+                itemRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
+            }
+
+
+            return ret;
         }
 
         //角色头顶显示文字信息。
@@ -686,22 +772,44 @@ Item {
         //callback同msg的参数；
         //返回组件对象；
         //注意：该脚本必须用yield才能暂停并接受返回值；返回值为选择的下标（0开始）。
-        readonly property var menu: function(title='', items=[], style={}, pauseGame=true, callback=true) {
+        readonly property var menu: function(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
 
-            let itemMenu = compGameMenu.createObject(itemGameMenus, {nIndex: itemGameMenus.nIndex});
+            let itemMenu = compGameMenu.createObject(p || itemGameMenus, {nIndex: itemGameMenus.nIndex});
             //let maskMenu = itemMenu.maskMenu;
             //let menuGame = itemMenu.menuGame;
 
             /*itemMenu.s_Choice.connect(function(index) {
             });*/
 
-
             ++itemGameMenus.nIndex;
 
-            if(title !== true)
-                itemMenu.show(title, items, style, pauseGame, callback);
 
-            return itemMenu;
+            let ret = itemMenu;
+
+            if(title !== true) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true, {Value: params[0]});
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
+                itemMenu.show(title, items, style, pauseGame, callback);
+            }
+
+
+            return ret;
         }
 
         //显示一个输入框；
@@ -712,13 +820,39 @@ Item {
         //callback同msg的参数；
         //返回组件对象；
         //注意：该脚本必须用yield才能暂停并接受返回值；返回值为输入值。
-        readonly property var input: function(title='', pretext='', style={}, pauseGame=true, callback=true) {
+        readonly property var input: function(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
 
-            if(title !== true)
-                itemRootGameInput.show(title, pretext, style, pauseGame, callback);
+            let itemGameInput = compGameInput.createObject(p || itemGameInputs, {nIndex: itemGameInputs.nIndex});
+
+            ++itemGameInputs.nIndex;
 
 
-            return itemRootGameInput;
+            let ret = itemGameInput;
+
+            if(title !== true) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true, {Value: params[0]});
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
+                itemGameInput.show(title, pretext, style, pauseGame, callback);
+            }
+
+
+            return ret;
         }
 
 
@@ -2188,7 +2322,7 @@ Item {
             }
             else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd['$sys_goods'].length) {
-                    //asyncScript.runNextEventLoop('usegoods');
+                    //asyncScriptQueue.runNextEventLoop('usegoods');
                     return false;
                 }
 
@@ -2200,12 +2334,12 @@ Item {
                 goods = GameSceneJS.getGoodsObject(goods);
             }
             else {
-                //asyncScript.runNextEventLoop('usegoods');
+                //asyncScriptQueue.runNextEventLoop('usegoods');
                 return false;
             }
 
             if(!goodsInfo || !goods) {
-                //asyncScript.runNextEventLoop('usegoods');
+                //asyncScriptQueue.runNextEventLoop('usegoods');
                 return false;
             }
 
@@ -2233,7 +2367,7 @@ Item {
             //game.run(function*(){
             if(goodsInfo.$commons.$useScript) {
                 let r = goodsInfo.$commons.$useScript(goods, fighthero);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
             }
 
 
@@ -2404,11 +2538,32 @@ Item {
         //pauseGame同msg的参数；
         readonly property var trade: function(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
-            if(goods !== true)
+            let ret = dialogTrade;
+
+            if(goods !== true) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true);
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
                 dialogTrade.show(goods, mygoodsinclude, pauseGame, callback);
+            }
 
 
-            return dialogTrade;
+            return ret;
         }
 
         //获得金钱；返回金钱数目；
@@ -2438,11 +2593,19 @@ Item {
 
 
         //创建定时器；
-        //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；params为自定义参数（回调时传入）；
+        //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；flags：从右到左，是否是全局定时器，是否在脚本队列里运行；params为自定义参数（回调时传入）；
         //成功返回true；如果已经有定时器则返回false；
-        readonly property var addtimer: function(timerName, interval, times=1, bGlobal=false, params=null) {
+        readonly property var addtimer: function(timerName, interval, times=1, flags=0b10, params=null) {
+            //！！兼容旧代码
+            if(flags === true)
+                flags = 0b11;
+            else if(flags === false)
+                flags = 0b10;
+
+
             let objTimer;
-            if(bGlobal)
+
+            if(flags & 0b1)
                 objTimer = _private.objGlobalTimers;
             else
                 objTimer = _private.objTimers;
@@ -2450,19 +2613,26 @@ Item {
             if(objTimer[timerName] !== undefined)
                 return false;
 
-            //0：剩余时长（每帧减）；1：剩余次数（每次减）；2：时长（备份）；3：回调参数；
-            objTimer[timerName] = [interval, times, interval, params];
+            //0：剩余时长（每帧减）；1：剩余次数（每次减）；2：flags；3：时长（备份）；4：回调参数；
+            objTimer[timerName] = [interval, times, flags, interval, params];
 
-            //game.gd['$sys_timer'][timerName] = {Name: timerName, Interval: interval, Times: times, Global: bGlobal, Params: params};
+            //game.gd['$sys_timer'][timerName] = {Name: timerName, Interval: interval, Times: times, Flags: flags, Params: params};
 
             return true;
         }
 
         //删除定时器；
         //成功返回true；如果没有则返回false；
-        readonly property var deltimer: function(timerName, bGlobal=false) {
+        readonly property var deltimer: function(timerName, flags=0b10) {
+            //！！兼容旧代码
+            if(flags === true)
+                flags = 0b11;
+            else if(flags === false)
+                flags = 0b10;
+
+
             let objTimer;
-            if(bGlobal)
+            if(flags & 0b1)
                 objTimer = _private.objGlobalTimers;
             else
                 objTimer = _private.objTimers;
@@ -2501,7 +2671,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.musicResourceURL(musicParams.$rid);
-            //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
+            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', video, fileURL)
             //    return false;
             //}
@@ -2623,7 +2793,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.videoResourceURL(videoParams.$rid);
-            //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
+            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', videoParams.$rid, fileURL)
             //    return false;
             //}
@@ -2704,7 +2874,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.imageResourceURL(imageParams.$rid);
-            //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
+            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]image no exist：', imageParams.$rid, fileURL)
             //    return false;
             //}
@@ -3166,7 +3336,7 @@ Item {
 
 
             //let fileURL = GameMakerGlobal.imageResourceURL(spriteParams.$rid);
-            //if(!FrameManager.sl_qml_FileExists(GlobalJS.toPath(fileURL))) {
+            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]sprite no exist：', spriteParams.$rid, fileURL)
             //    return false;
             //}
@@ -3759,8 +3929,14 @@ Item {
         }
 
         //暂停time毫秒。
-        readonly property var wait: function(ms) {
-            _private.asyncScript.wait(ms);
+        readonly property var wait: function(ms, callback=true) {
+
+            /*if(callback === true || callback === 1)
+                _private.asyncScriptQueue.wait(ms);
+            else if(callback === 0)
+                return GlobalLibraryJS.asyncWait(ms);
+            */
+            return GlobalLibraryJS.asyncWait(ms, itemTimers);
         }
 
         //返回start~end之间的随机整数（包含start，不包含end）。
@@ -3769,7 +3945,7 @@ Item {
         }
         //显示msg提示。
         readonly property var toast: function(msg) {
-            Platform.showToast(msg);
+            Platform.sl_showToast(msg);
         }
 
         //显示窗口；
@@ -3787,31 +3963,63 @@ Item {
             }
 
 
+            let ret = gameMenuWindow;
+
             //显示
             if(params.$visible !== false) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params){
+                        if(cb(...params)) {
+                            game.run(true);
+                        }
+                    }
+                */
+
+                if(callback === true)
+                    ret = new Promise(function(resolve, reject){
+                        callback = (cb, ...params)=>{
+                            cb(...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+
                 gameMenuWindow.show(params.$id, params.$value, style, pauseGame, callback);
             }
             else
                 gameMenuWindow.closeWindow(params.$id);
 
 
-            return gameMenuWindow;
+            return ret;
         }
 
-        //检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-        readonly property var checksave: function(fileName) {
-            fileName = fileName.trim();
-            let filePath = GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json');
-            if(!FrameManager.sl_qml_FileExists(filePath))
-                return false;
+        //检测存档是否存在且正确；
+        //data为字符串（本地存档文件路径）或对象；
+        //失败返回false，成功返回存档对象（包含Name和Data）。
+        readonly property var checksave: function(data) {
+            if(GlobalLibraryJS.isString(data)) {
+                data = data.trim();
+                let filePath = GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + data + '.json');
+                if(!FrameManager.sl_fileExists(filePath))
+                    return false;
 
-            let data = FrameManager.sl_qml_ReadFile(filePath);
-            //let cfg = File.read(filePath);
-            //console.debug('musicInfo', filePath, musicInfo)
-            //console.debug('cfg', cfg, filePath);
+                data = FrameManager.sl_fileRead(filePath);
+                //let cfg = File.read(filePath);
+                //console.debug('musicInfo', filePath, musicInfo)
+                //console.debug('cfg', cfg, filePath);
+
+                if(data) {
+                    data = JSON.parse(data);
+                }
+            }
+            else if(GlobalLibraryJS.isObject(data)) { //如果是参数对象
+            }
+            else {
+                return false;
+            }
 
             if(data) {
-                data = JSON.parse(data);
 
                 //压缩
                 if(data.Type === 1) {
@@ -3820,7 +4028,7 @@ Item {
                         return false;
                     }
                     try {
-                        data.Data = JSON.parse(FrameManager.sl_qml_Uncompress(data.Data, 1).toString());
+                        data.Data = JSON.parse(FrameManager.sl_uncompress(data.Data, 1).toString());
                     }
                     catch(e) {
                         return false;
@@ -3840,16 +4048,23 @@ Item {
         }
 
         //存档（将game.gd存为 文件，开头为 $$ 的键不会保存；同时保存 引擎变量）
+        //fileName为字符串（本地存档文件路径）或true（返回存档字符串数据）；
         //showName为显示名；
-        //type为0普通保存，为1启用压缩；compressionLevel为压缩级别（1-9，-1为默认）；
-        //成功返回true（生成器返回 写入字节数）
-        readonly property var save: function*(fileName='autosave', showName='', type=1, compressionLevel=-1) {
-            //asyncScript.runNextEventLoop('save');
+        //compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
+        //成功返回 存档序列化字符串，失败返回false；
+        readonly property var save: function*(fileName='autosave', showName='', compressionLevel=-1) {
+            //asyncScriptQueue.runNextEventLoop('save');
 
+            if(GlobalLibraryJS.isString(fileName)) {
+                fileName = fileName.trim();
+                if(!fileName)
+                    fileName = 'autosave';
+            }
+            else if(fileName === true) {
 
-            fileName = fileName.trim();
-            if(!fileName)
-                fileName = 'autosave';
+            }
+            else
+                return false;
 
 
 
@@ -3857,13 +4072,11 @@ Item {
             //载入before_save脚本
             if(_private.objCommonScripts['before_save']) {
                 let r = _private.objCommonScripts['before_save']();
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([_private.objCommonScripts['before_save']() ?? null, 'before_save'], {Priority: -3, Type: 0, Running: 1});
             }
 
 
-
-            let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
             let outputData = {};
             let fileData;
@@ -3877,11 +4090,11 @@ Item {
 
             outputData.Version = '0.6';
             outputData.Name = showName;
-            outputData.Type = type;
+            outputData.Type = compressionLevel === 0 ? 0 : 1;
             outputData.Time = GlobalLibraryJS.formatDate();
-            if(type === 1) {    //压缩
+            if(compressionLevel !== 0) {    //压缩
                 let GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
-                outputData.Data = FrameManager.sl_qml_Compress(GlobalDataString, compressionLevel, 1).toString();
+                outputData.Data = FrameManager.sl_compress(GlobalDataString, compressionLevel, 1).toString();
                 outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + outputData.Data);
                 fileData = JSON.stringify(outputData, fSaveFilter);
             }
@@ -3893,12 +4106,26 @@ Item {
             }
 
 
+            let ret;
+            if(GlobalLibraryJS.isString(fileName)) {
+                let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
-            //!!!导出为文件
-            //console.debug(JSON.stringify(outputData));
-            //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-            let ret = FrameManager.sl_qml_WriteFile(fileData, GlobalJS.toPath(filePath), 0);
-            //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
+                //!!!导出为文件
+                //console.debug(JSON.stringify(outputData));
+                //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
+                ret = FrameManager.sl_fileWrite(fileData, GlobalJS.toPath(filePath), 0);
+                //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
+                if(ret < 0) {
+                    console.warn('[!GameScene]save ERROR:', fileName, ret);
+                    return false;
+                }
+                ret = fileData;
+            }
+            else if(fileName === true) {
+                ret = fileData;
+            }
+            else
+                return false;
 
 
             //写入引擎变量
@@ -3909,7 +4136,7 @@ Item {
             //载入after_save脚本
             if(_private.objCommonScripts['after_save']) {
                 let r = _private.objCommonScripts['after_save'](ret);
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([_private.objCommonScripts['after_save']() ?? null, 'after_save'], {Priority: -1, Type: 0, Running: 1});
             }
 
@@ -3921,16 +4148,24 @@ Item {
             //return true;
         }
 
-        //读档（读取数据到 game.gd），成功返回true（生成器返回true），失败返回false。
-        readonly property var load: function*(fileName='autosave') {
+        //读档（读取数据到 game.gd）；
+        //data为字符串（本地存档文件路径）或对象；
+        //成功返回true（生成器返回true），失败返回false。
+        readonly property var load: function*(data='autosave') {
+            if(GlobalLibraryJS.isString(data)) {
+                data = data.trim();
+                if(!data)
+                    data = 'autosave';
+            }
+            else if(GlobalLibraryJS.isObject(data)) { //如果是参数对象
+            }
+            else
+                return false;
 
-            fileName = fileName.trim();
-            if(!fileName)
-                fileName = 'autosave';
 
-            let ret = checksave(fileName)
+            let ret = checksave(data);
             if(!ret) {
-                //asyncScript.runNextEventLoop('game.load');
+                //asyncScriptQueue.runNextEventLoop('game.load');
                 return false;
             }
 
@@ -3944,7 +4179,7 @@ Item {
             //载入after_load脚本
             if(_private.objCommonScripts['before_load']) {
                 let r = _private.objCommonScripts['before_load']();
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: priority++, Type: 0, Running: 1});
             }
 
@@ -3952,44 +4187,9 @@ Item {
             //let filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
 
-            yield *release(false);
-            yield *_init(false, false, ret['Data']);
+            yield* release(false);
+            yield* _init(false, false, ret['Data']);
 
-
-            //game.gd = ret['Data'];
-            //GlobalLibraryJS.copyPropertiesToObject(game.gd, ret['Data']);
-
-
-            game.$sys.reloadFightRoles();
-
-            //刷新战斗时人物数据
-            //fight.$sys.refreshCombatant(-1);
-
-            game.$sys.reloadGoods();
-
-
-            //读取主角
-            for(let th of game.gd['$sys_main_roles']) {
-                let mainRole = game.createhero(th.$rid);
-                mainRole.$$nActionType = 0;
-                mainRole.$$arrMoveDirection = [0, 0];
-                //game.hero(mainRole, th);
-            }
-
-            //开始移动地图
-            //setSceneToRole(_private.sceneRole);
-
-            //其他
-            game.interval(game.gd['$sys_fps']);
-            game.scale(game.gd['$sys_scale']);
-
-            game.playmusic(game.gd['$sys_music']);
-
-            /*if(game.gd['$sys_sound'] & 0b10)
-                _private.config.nSoundConfig = 0;
-            else
-                _private.config.nSoundConfig = 1;
-            */
 
 
             /*/写在钩子函数里了
@@ -4000,13 +4200,13 @@ Item {
 
             //地图
             if(game.gd['$sys_map'].$name)
-                yield *game.loadmap(game.gd['$sys_map'].$name, null, true);
+                yield* game.loadmap(game.gd['$sys_map'].$name, null, true);
 
 
             //载入after_load脚本
             if(_private.objCommonScripts['after_load']) {
                 let r = _private.objCommonScripts['after_load']();
-                if(GlobalLibraryJS.isGenerator(r))yield *r;
+                if(GlobalLibraryJS.isGenerator(r))yield* r;
                 //game.run([_private.objCommonScripts['after_load']() ?? null, 'after_load'], {Priority: priority++, Type: 0, Running: 1});
             }
 
@@ -4020,14 +4220,14 @@ Item {
 
         //游戏结束（调用游戏结束脚本）；
         readonly property var gameover: function*(params) {
-            //asyncScript.runNextEventLoop('gameover');
+            //asyncScriptQueue.runNextEventLoop('gameover');
 
 
             //game.run(_private.objCommonScripts['game_over_script'](params) ?? null,
             //    {Priority: -1, Type: 0, Running: 1, Tips: 'gameover'});
 
             let r = _private.objCommonScripts['game_over_script'](params);
-            if(GlobalLibraryJS.isGenerator(r))yield *r;
+            if(GlobalLibraryJS.isGenerator(r))yield* r;
         }
 
 
@@ -4036,7 +4236,7 @@ Item {
         readonly property var plugin: function*(...params) {
 
             if(params.length < 2) {
-                //asyncScript.runNextEventLoop('plugin');
+                //asyncScriptQueue.runNextEventLoop('plugin');
                 return _private.objPlugins;
             }
 
@@ -4049,11 +4249,11 @@ Item {
                 //game.run(function*(){
                 if(plugin.$load) {
                     let r = plugin.$load(params[0] + GameMakerGlobal.separator + params[1]);
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                    if(GlobalLibraryJS.isGenerator(r))yield* r;
                 }
                 if(plugin.$init) {
                     let r = plugin.$init();
-                    if(GlobalLibraryJS.isGenerator(r))yield *r;
+                    if(GlobalLibraryJS.isGenerator(r))yield* r;
                 }
 
                 return plugin;
@@ -4068,7 +4268,7 @@ Item {
                     console.warn('[!GameScene]No Plugin:', params[0], params[1], Object.keys(_private.objPlugins));
                     return;
                 }
-                //asyncScript.runNextEventLoop('plugin');
+                //asyncScriptQueue.runNextEventLoop('plugin');
             }
 
 
@@ -4097,7 +4297,7 @@ Item {
             else
                 filePath = GlobalJS.toPath(filePath + GameMakerGlobal.separator + fileName);
 
-            let data = FrameManager.sl_qml_ReadFile(filePath);
+            let data = FrameManager.sl_fileRead(filePath);
 
             if(!data) {
                 console.warn('[!GameScene]loadjson Fail:', filePath);
@@ -4107,9 +4307,13 @@ Item {
         }
 
 
-        //将代码放入 系统脚本引擎（asyncScript）中 等候执行；
+        //异步脚本
+        //  如果需要清空 异步脚本队列：game.$caches.asyncScriptQueue.clear(3);
+        readonly property var async: GlobalLibraryJS.asyncScript
+
+        //将代码放入 系统脚本引擎（asyncScriptQueue）中 等候执行；
         //  vScript 为执行脚本（字符串、函数、生成器函数、生成器对象都可以），如果为false则表示强制执行队列，为true表示下次js事件循环再运行，为null直接返回，为undefined报错后返回；
-        //    可以为数组（vScript是执行脚本时 为 第二个下标为tips，是null或true时为给_private.asyncScript.lastEscapeValue值）；
+        //    可以为数组（vScript是执行脚本时 为 第二个下标为tips，是null或true时为给_private.asyncScriptQueue.lastEscapeValue值）；
         //  scriptProps：
         //    如果为数字，表示优先级Priority；
         //      Type默认为0，Running默认为1，Value默认为无；
@@ -4118,7 +4322,7 @@ Item {
         //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
         //      Running为1或2，表示如果队列里如果为空则：1（默认）是发送一个JS事件在下一个JS事件循环里执行，2是立即执行；为0时不处理；
         //      Value：传递给事件队列的值，无则默认上一次的；
-        //      AsyncScript：脚本队列，无则默认 本脚本队列；
+        //      AsyncScriptQueue：脚本队列，无则默认 本脚本队列；
         //      Tips：
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
@@ -4134,16 +4338,16 @@ Item {
 
 
             //参数
-            let priority, runType = 0, running = 1, value, asyncScript, tips;
+            let priority, runType = 0, running = 1, value, asyncScriptQueue, tips;
             if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
                 scriptProps = {Priority: scriptProps};
             }
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
-                asyncScript = scriptProps.AsyncScript || _private.asyncScript;
+                asyncScriptQueue = scriptProps.AsyncScriptQueue || _private.asyncScriptQueue;
                 priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
                 runType = GlobalLibraryJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : 0;
                 running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : 1;
-                value = Object.keys(scriptProps).indexOf('Value') < 0 ? asyncScript.lastEscapeValue : scriptProps.Value;
+                value = Object.keys(scriptProps).indexOf('Value') < 0 ? asyncScriptQueue.lastEscapeValue : scriptProps.Value;
                 tips = scriptProps.Tips;
             }
             else {
@@ -4157,17 +4361,17 @@ Item {
             if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
-                        asyncScript.run(asyncScript.lastEscapeValue);
+                        asyncScriptQueue.run(asyncScriptQueue.lastEscapeValue);
                     }, 'game.run1');
                 */
-                asyncScript.lastEscapeValue = value;
-                asyncScript.runNextEventLoop('game.run1');
+                asyncScriptQueue.lastEscapeValue = value;
+                asyncScriptQueue.runNextEventLoop('game.run1');
 
                 return 1;
             }
             //直接运行
             else if(vScript === false) {
-                asyncScript.run(value);
+                asyncScriptQueue.run(value);
                 return 0;
             }
             else if(GlobalLibraryJS.isArray(vScript)) {
@@ -4190,7 +4394,7 @@ Item {
             }
 
             //可以立刻执行
-            let ret = GlobalJS.createScript(asyncScript, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params);
+            let ret = GlobalJS.createScript(asyncScriptQueue, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params);
             if(ret === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
@@ -4199,23 +4403,23 @@ Item {
                     //GlobalLibraryJS.setTimeout(function() {
                     /*GlobalLibraryJS.runNextEventLoop(function() {
                         //game.goon('$event');
-                            asyncScript.run(asyncScript.lastEscapeValue);
+                            asyncScriptQueue.run(asyncScriptQueue.lastEscapeValue);
                         }, 'game.run');
                     */
-                    asyncScript.lastEscapeValue = value;
-                    asyncScript.runNextEventLoop('game.run');
+                    asyncScriptQueue.lastEscapeValue = value;
+                    asyncScriptQueue.runNextEventLoop('game.run');
 
                     return 1;
                 }
                 else if(running === 2) {
-                    asyncScript.run(value);
+                    asyncScriptQueue.run(value);
                     return 0;
                 }
             }
         }
 
         //鹰：NO
-        //将脚本放入 系统脚本引擎（asyncScript）中 等候执行；一般用在编辑器中载入外部脚本文件
+        //将脚本放入 系统脚本引擎（asyncScriptQueue）中 等候执行；一般用在编辑器中载入外部脚本文件
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
         readonly property var script: function(fileName, priority, filePath) {
             fileName = fileName.trim();
@@ -4224,17 +4428,17 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            if(GlobalJS.createScript(_private.asyncScript, {Type: 1, Priority: priority, Script: filePath, Tips: filePath}, ) === 0)
-                return _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+            if(GlobalJS.createScript(_private.asyncScriptQueue, {Type: 1, Priority: priority, Script: filePath, Tips: filePath}, ) === 0)
+                return _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
         }
 
         //脚本上次返回的值
         readonly property var lastreturn: function() {
-            return _private.asyncScript.lastReturnedValue;
+            return _private.asyncScriptQueue.lastReturnedValue;
         }
         //脚本上次返回的值（return+yield）
         readonly property var lastvalue: function() {
-            return _private.asyncScript.lastEscapeValue;
+            return _private.asyncScriptQueue.lastEscapeValue;
         }
 
         //运行代码；
@@ -4256,20 +4460,20 @@ Item {
 
         //用C++执行脚本；已注入game和fight环境
         readonly property var evaluate: function(program, filePath='', lineNumber = 1) {
-            return FrameManager.evaluate(program, filePath, lineNumber);
+            return FrameManager.sl_evaluate(program, filePath, lineNumber);
         }
         readonly property var evaluateFile: function(file, path, lineNumber = 1) {
             if(path === undefined) {
-                if(FrameManager.globalObject().evaluateFilePath === undefined)
-                    FrameManager.globalObject().evaluateFilePath = game.$projectpath;
-                path = FrameManager.globalObject().evaluateFilePath;
+                if(FrameManager.sl_globalObject().evaluateFilePath === undefined)
+                    FrameManager.sl_globalObject().evaluateFilePath = game.$projectpath;
+                path = FrameManager.sl_globalObject().evaluateFilePath;
             }
             else
-                FrameManager.globalObject().evaluateFilePath = path;
-            return FrameManager.evaluateFile(path + GameMakerGlobal.separator + file, lineNumber);
+                FrameManager.sl_globalObject().evaluateFilePath = path;
+            return FrameManager.sl_evaluateFile(path + GameMakerGlobal.separator + file, lineNumber);
         }
         readonly property var importModule: function(filePath) {
-            return FrameManager.importModule(filePath);
+            return FrameManager.sl_importModule(filePath);
         }
 
 
@@ -4407,9 +4611,9 @@ Item {
                 fps: itemFPS,
                 map: [itemViewPort.canvasBackMap, itemViewPort.canvasFrontMap],
                 msgs: itemGameMsgs,
-                talk: itemRootRoleMsg,
+                talks: itemRoleMsgs,
                 menus: itemGameMenus,
-                input: itemRootGameInput,
+                inputs: itemGameInputs,
                 trade: dialogTrade,
                 window: gameMenuWindow,
                 video: itemVideo,
@@ -4417,7 +4621,9 @@ Item {
 
                 compSprite: compCacheSpriteEffect,
                 compMsg: compGameMsg,
+                compRoleMsg: compRoleMsg,
                 compMenu: compGameMenu,
+                compInput: compGameInput,
                 compRole: compRole,
                 compSound: compCacheSoundEffect,
                 compImage: compCacheImage,
@@ -4457,7 +4663,7 @@ Item {
         //缓存
         readonly property QtObject $caches: QtObject {
             readonly property alias jsEngine: _private.jsEngine
-            readonly property alias asyncScript: _private.asyncScript
+            readonly property alias asyncScriptQueue: _private.asyncScriptQueue
 
 
             readonly property alias mainRoles: _private.arrMainRoles
@@ -4497,7 +4703,22 @@ Item {
 
         readonly property var date: ()=>{return new Date();}
         readonly property var math: Math
-        readonly property var request: GlobalLibraryJS.request
+        readonly property var request: function(params, type=0) {
+            switch(type) {
+            case 1:
+                const timestamp = Number(new Date()).toString();
+                if(!GlobalLibraryJS.isString(params.Data))
+                    params.Data = JSON.stringify(params.Data);
+                params.Headers = Object.assign({}, params.Headers, {'LMS-Timestamp': timestamp, 'LMS-Verify-Type': 1,
+                    'LMS-Verify-Code': Qt.md5(GlobalLibraryJS.Crypto.shiftEncrypt(GlobalLibraryJS.Crypto.xorEncrypt(params.Data, timestamp), timestamp))
+                });
+                return GlobalLibraryJS.request(params);
+            case 0:
+            default:
+                return GlobalLibraryJS.request(params);
+            }
+
+        }
         readonly property var http: XMLHttpRequest
 
 
@@ -4526,7 +4747,7 @@ Item {
 
     property alias fightScene: loaderFightScene
 
-    property alias asyncScript: _private.asyncScript
+    property alias asyncScriptQueue: _private.asyncScriptQueue
 
 
 
@@ -4604,7 +4825,7 @@ Item {
 
         onTriggered: {
             GameSceneJS.onTriggered();
-            //使用脚本队列的话，人物移动就不能在asyncScript.wait下使用了
+            //使用脚本队列的话，人物移动就不能在asyncScriptQueue.wait下使用了
             //game.run(GameSceneJS.onTriggered);
             //game.run(true);
         }
@@ -4790,7 +5011,7 @@ Item {
         }
 
         Component.onCompleted: {
-            //loaderFightScene.asyncScript = _private.asyncScript;
+            //loaderFightScene.asyncScriptQueue = _private.asyncScriptQueue;
         }
     }
 
@@ -4845,33 +5066,28 @@ Item {
                 itemWindow.visible = false;
 
                 //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
+                if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                     //如果没有使用yield来中断代码，可以不要game.run(true)
                     game.goon(pauseGame);
-                    game.run(true);
-                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-
-
-                    //rootGameScene.forceActiveFocus();
+                    //game.run(true);
+                    //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                    return true;
                 }
+                //rootGameScene.forceActiveFocus();
+
+                return false;
             }
 
 
-            if(GlobalLibraryJS.isFunction(gameMenuWindow.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                if(gameMenuWindow.fCallback(gameMenuWindow) !== true)   //如果返回 非true，则继续调用默认回调函数
-                    callback(gameMenuWindow);
+            if(GlobalLibraryJS.isFunction(gameMenuWindow.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                game.run(gameMenuWindow.fCallback.call(gameMenuWindow, callback, gameMenuWindow) ?? null, -1);
             }
-            else if(gameMenuWindow.fCallback === true) {    //默认回调函数
+            else {   //默认回调函数
                 callback(gameMenuWindow);
-            }
-            else if(gameMenuWindow.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                callback(gameMenuWindow);
-                game.run(gameMenuWindow.fCallback, -1, gameMenuWindow);
-            }
-            else {   //不使用 回调函数
-                //gameMap.focus = true;
 
-                gameMenuWindow.visible = false;
+
+                //gameMenuWindow.visible = false;
+                //gameMenuWindow.destroy();
 
 
                 /* /*if(gameMenuWindow.bPauseGame && _private.config.bPauseGame) {
@@ -4881,12 +5097,10 @@ Item {
 
                 /*if(_private.config.objPauseNames['$msg'] !== undefined) {
                     game.goon('$msg');
-                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                    _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
                 }*/
 
 
-
-                //gameMenuWindow.destroy();
                 ////FrameManager.goon();
             }
         }
@@ -4932,6 +5146,60 @@ Item {
             visible = true;
         }
 
+        function close() {
+            if(!visible)
+                return;
+
+            rootGameScene.forceActiveFocus();
+
+
+            //默认回调函数
+            let callback = function(itemTrade) {
+
+                itemTrade.visible = false;
+                //itemTrade.destroy();
+
+                //game.pause(true)[pauseGame]
+                if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    //如果没有使用yield来中断代码，可以不要game.run(true)
+                    game.goon(pauseGame);
+                    //game.run(true);
+                    //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                    return true;
+                }
+                //rootGameScene.forceActiveFocus();
+
+                return false;
+            };
+
+
+            if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                game.run(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, -1);
+            }
+            else {   //默认回调函数
+                callback(dialogTrade);
+
+
+                //dialogTrade.visible = false;
+                //dialogTrade.destroy();
+
+
+                /* /*if(dialogTrade.bPauseGame && _private.config.bPauseGame) {
+                    game.goon();
+                    dialogTrade.bPauseGame = false;
+                }* /*/
+
+                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                    game.goon('$msg');
+                    _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                }*/
+
+
+                ////FrameManager.goon();
+            }
+        }
+
+
 
         property var pauseGame
         property var fCallback
@@ -4945,318 +5213,10 @@ Item {
 
 
         onS_close: {
-
-            //默认回调函数
-            let callback = function(itemTrade) {
-
-                itemTrade.visible = false;
-
-                //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
-                    //如果没有使用yield来中断代码，可以不要game.run(true)
-                    game.goon(pauseGame);
-                    game.run(true);
-                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                }
-
-
-                //itemTrade.destroy();
-
-
-                //rootGameScene.forceActiveFocus();
-            };
-
-
-            if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                if(dialogTrade.fCallback(dialogTrade) !== true)   //如果返回 非true，则继续调用默认回调函数
-                    callback(dialogTrade);
-            }
-            else if(dialogTrade.fCallback === true) {    //默认回调函数
-                callback(dialogTrade);
-            }
-            else if(dialogTrade.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                callback(dialogTrade);
-                game.run(dialogTrade.fCallback, -1, dialogTrade);
-            }
-            else {   //不使用 回调函数
-                //gameMap.focus = true;
-
-                dialogTrade.visible = false;
-
-
-                /* /*if(dialogTrade.bPauseGame && _private.config.bPauseGame) {
-                    game.goon();
-                    dialogTrade.bPauseGame = false;
-                }* /*/
-
-                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
-                    game.goon('$msg');
-                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                }*/
-
-
-
-                //dialogTrade.destroy();
-                ////FrameManager.goon();
-            }
+            close();
         }
     }
 
-
-
-    //角色对话框
-    Item {
-        id: itemRootRoleMsg
-
-
-        //显示完全后延时
-        property int nKeepTime: 0
-        //显示状态：-1：停止；0：显示完毕；1：正在显示
-        property int nShowStatus: -1
-
-        //是否暂停
-        property var pauseGame: true
-        //回调函数
-        property var fCallback
-
-
-        //signal accepted();
-        //signal rejected();
-
-
-        function over(code) {
-            itemRootRoleMsg.nShowStatus = -1;
-
-
-            //默认回调函数
-            let callback = function(code, itemMsg) {
-
-                itemMsg.visible = false;
-
-                //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
-                    //如果没有使用yield来中断代码，可以不要game.run(true)
-                    game.goon(pauseGame);
-                    game.run(true);
-                    //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                }
-
-
-                //itemMsg.destroy();
-
-
-                //rootGameScene.forceActiveFocus();
-            };
-
-
-            if(GlobalLibraryJS.isFunction(itemRootRoleMsg.fCallback)) {    //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                if(itemRootRoleMsg.fCallback(code, itemRootRoleMsg) !== true)   //如果返回 非true，则继续调用默认回调函数
-                    callback(code, itemRootRoleMsg);
-            }
-            else if(itemRootRoleMsg.fCallback === true) {    //默认回调函数
-                callback(code, itemRootRoleMsg);
-            }
-            else if(itemRootRoleMsg.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                callback(code, itemRootRoleMsg);
-                game.run(itemRootRoleMsg.fCallback, -1, code, itemRootRoleMsg);
-            }
-            else {   //不使用 回调函数
-                //gameMap.focus = true;
-
-                itemRootRoleMsg.visible = false;
-
-
-                /* /*if(itemRootRoleMsg.bPauseGame && _private.config.bPauseGame) {
-                    game.goon();
-                    itemRootRoleMsg.bPauseGame = false;
-                }* / */
-
-                /*if(_private.config.objPauseNames['$talk'] !== undefined) {
-                    game.goon('$talk');
-                    _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                }*/
-
-
-
-                //itemRootRoleMsg.destroy();
-                ////FrameManager.goon();
-            }
-        }
-
-        function stop(type=0) {
-            messageRole.stop(type);
-        }
-
-        function show(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, _pauseGame=true, callback=true) {
-
-            itemRootRoleMsg.pauseGame = _pauseGame;
-            itemRootRoleMsg.fCallback = callback;
-
-
-
-            let name = '', avatar = '', avatarSize = null;
-            if(role && GlobalLibraryJS.isString(role)) {
-                do {
-                    let roleName = role;
-                    role = game.hero(roleName);
-                    if(role !== null) {
-                        name = role.$data.$name;
-                        avatar = role.$data.$avatar;
-                        avatarSize = role.$data.$avatarSize;
-                        break;
-                    }
-                    role = game.role(roleName);
-                    if(role !== null) {
-                        name = role.$data.$name;
-                        avatar = role.$data.$avatar;
-                        avatarSize = role.$data.$avatarSize;
-                        break;
-                    }
-                    role = GameSceneJS.getRoleResource(roleName);
-                    if(role !== null) {
-                        name = roleName;
-                        avatar = role.Avatar;
-                        avatarSize = role.AvatarSize;
-                        break;
-                    }
-                    role = null;
-                }while(0);
-            }
-
-
-
-            if(pauseGame === true)
-                pauseGame = '$talk';
-            //是否暂停游戏
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-
-                //loaderGameMsg.focus = true;
-            }
-            else {
-            }
-
-
-
-            //样式
-            if(!style)
-                style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
-
-
-            let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
-            let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
-            //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
-            //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
-            if(name && bShowName)
-                pretext = name + '：' + pretext;
-            if(avatar && bShowAvatar)
-                pretext = GlobalLibraryJS.showRichTextImage(GameMakerGlobal.imageResourceURL(avatar), avatarSize[0], avatarSize[1]) + pretext;
-
-
-            messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-            maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-            //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
-
-            //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
-            itemRootRoleMsg.nKeepTime = keeptime || 0;
-
-            itemRootRoleMsg.nShowStatus = 1;
-
-
-
-            itemRootRoleMsg.visible = true;
-            //touchAreaRoleMsg.enabled = false;
-            messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
-            //FrameManager.wait(-1);
-        }
-
-        function clicked() {
-            //显示完毕，则关闭
-            if(itemRootRoleMsg.nShowStatus === 0)
-                itemRootRoleMsg.over(1);
-            //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
-            else if(itemRootRoleMsg.nShowStatus === 1 && itemRootRoleMsg.nKeepTime === -1) {
-                itemRootRoleMsg.nShowStatus = 0;
-                messageRole.stop(1);
-            }
-        }
-
-
-        visible: false
-        //anchors.fill: parent
-        width: parent.width
-        height: parent.height
-        z: 5
-
-
-        Mask {
-            id: maskMessageRole
-
-            anchors.fill: parent
-
-            visible: color.a !== 0
-
-            color: 'transparent'
-
-            mouseArea.onPressed: {
-                itemRootRoleMsg.clicked();
-            }
-        }
-
-
-        Message {
-            id: messageRole
-            width: parent.width
-            height: parent.height * 0.1
-            //height: 90
-            anchors.bottom: parent.bottom
-
-
-            nMaxWidth: parent.width
-            nMaxHeight: parent.height * 0.2
-            //nMaxHeight: 90
-
-
-            textArea.enabled: false
-            textArea.readOnly: true
-
-            textArea.onReleased: {
-                itemRootRoleMsg.clicked();
-                ////rootGameScene.forceActiveFocus();
-            }
-
-            onS_over: {
-                //自动关闭
-                if(itemRootRoleMsg.nKeepTime > 0)
-                    itemRootRoleMsg.over(2);
-                else
-                    itemRootRoleMsg.nShowStatus = 0;
-            }
-        }
-
-
-        /*MultiPointTouchArea {
-            id: touchAreaRoleMsg
-            anchors.fill: parent
-            enabled: false
-            //enabled: itemRootRoleMsg.standardButtons === Dialog.NoButton
-
-            //onPressed: {
-            onReleased: {
-                ////rootGameScene.forceActiveFocus();
-                //console.debug('MultiPointTouchArea1')
-                itemRootRoleMsg.over();
-                //console.debug('MultiPointTouchArea2')
-            }
-        }*/
-
-    }
 
 
     /*Loader {
@@ -5283,12 +5243,29 @@ Item {
         }
     }
     */
-    //临时存放创建的Menus
+
+    //临时存放创建的RoleMsgs
+    Item {
+        id: itemRoleMsgs
+
+
+        //创建的下标
+        property int nIndex: 0
+
+
+        //anchors.fill: parent
+        width: parent.width
+        height: parent.height
+        z: 5
+
+    }
+
+    //临时存放创建的Messages
     Item {
         id: itemGameMsgs
 
 
-        //创建一个自增1
+        //创建的下标
         property int nIndex: 0
 
 
@@ -5299,13 +5276,12 @@ Item {
 
     }
 
-
     //临时存放创建的Menus
     Item {
         id: itemGameMenus
 
 
-        //创建一个自增1
+        //创建的下标
         property int nIndex: 0
 
 
@@ -5316,253 +5292,29 @@ Item {
 
     }
 
-    //游戏 输入框
+    //临时存放创建的输入框
     Item {
-        id: itemRootGameInput
+        id: itemGameInputs
 
 
-        function show(title='', pretext='', style={}, _pauseGame=true, callback=true) {
-            itemRootGameInput.pauseGame = _pauseGame;
-            itemRootGameInput.fCallback = callback;
-
-            if(pauseGame === true)
-                pauseGame = '$input';
-            //是否暂停游戏
-            if(GlobalLibraryJS.isString(pauseGame)) {
-                //loaderGameMsg.bPauseGame = true;
-                game.pause(pauseGame);
-            }
-            else {
-            }
+        //创建的下标
+        property int nIndex: 0
 
 
-
-            //样式
-            if(style === undefined || style === null)
-                style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
-
-            rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
-            rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            textGameInput.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
-
-            rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
-            rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
-            textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-            textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
-
-            maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
-
-
-            textGameInputTitle.text = title;
-            textGameInput.text = pretext;
-
-            textGameInput.textArea.focus = true;
-
-
-            visible = true;
-        }
-
-
-
-        property var pauseGame
-        //回调函数
-        property var fCallback
-
-
-        visible: false
         //anchors.fill: parent
         width: parent.width
         height: parent.height
         z: 8
 
-
-
-        Mask {
-            id: maskGameInput
-
-            anchors.fill: parent
-
-            visible: color.a !== 0
-
-            color: '#7FFFFFFF'
-
-            mouseArea.onPressed: {
-                //itemRootGameInput.visible = false;
-                //game.goon('$input');
-                //_private.asyncScript.run(textGameInput.text);
-            }
-        }
-
-        Rectangle {
-            id: rectGameInputBack
-
-            anchors.centerIn: parent
-            width: parent.width * 0.8
-            height: gameinput_columnlayout.implicitHeight
-
-            clip: true
-
-
-            radius: 6
-            color: '#303030'
-
-
-            ColumnLayout {
-                id: gameinput_columnlayout
-                anchors.fill: parent
-                //height: parent.height * 0.6
-
-                Rectangle {
-                    id: rectGameInputTitle
-
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: parent.width
-                    //Layout.preferredHeight: 36
-                    implicitHeight: Math.max(textGameInputTitle.implicitHeight, 60)
-
-                    color: '#FF0035A8'
-                    //color: '#EE00CC99'
-                    //radius: itemMenu.radius
-
-                    Text {
-                        id: textGameInputTitle
-
-                        anchors.fill: parent
-
-                        color: 'white'
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        font.pointSize: 16
-                        font.bold: true
-
-                        wrapMode: Text.Wrap
-                    }
-
-                }
-
-
-                Rectangle {
-                    id: rectGameInput
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width
-                    Layout.preferredHeight: textGameInput.implicitHeight
-
-
-                    color: Global.style.backgroundColor
-
-                    border {
-                        color: '#60000000'
-                    }
-
-
-                    Notepad {
-                        id: textGameInput
-
-                        anchors.fill: parent
-
-
-                        //color: 'white'
-
-                        //horizontalAlignment: Text.AlignHCenter
-                        //verticalAlignment: Text.AlignVCenter
-
-                        //textArea.enabled: false
-                        //textArea.readOnly: true
-                        textArea.font.pointSize: 16
-                        textArea.font.bold: true
-                        textArea.textFormat: TextArea.PlainText
-
-                        /*placeholderTextColor: '#7F7F7F7F'
-
-                        selectByKeyboard: true
-                        selectByMouse: true
-                        wrapMode: Text.Wrap
-
-
-                        //padding : nPadding
-                        leftPadding : 6
-                        rightPadding : 6
-                        topPadding : 6
-                        bottomPadding: 6
-                        background: Item {
-                            //color: 'transparent'
-                            implicitHeight: 0
-                            //color: Global.style.backgroundColor
-                            //border.color: textGameInput.focus ? Global.style.accent : Global.style.hintTextColor
-                            //border.width: textGameInput.focus ? 2 : 1
-                        }
-                        */
-                    }
-                }
-
-                Button {
-
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-                    text: '确定'
-                    onClicked: {
-
-                        //默认回调函数
-                        let callback = function(itemInput) {
-
-                            itemInput.visible = false;
-
-                            //game.pause(true)[pauseGame]
-                            if(GlobalLibraryJS.isString(itemInput.pauseGame) && _private.config.objPauseNames[itemInput.pauseGame] !== undefined) {
-                                //如果没有使用yield来中断代码，可以不要game.run(true)
-                                game.goon(itemInput.pauseGame);
-                                game.run(true, {Value: textGameInput.text});
-                                //_private.asyncScript.run(textGameInput.text);
-                            }
-
-
-                            //rootGameScene.forceActiveFocus();
-                        }
-
-
-                        if(GlobalLibraryJS.isFunction(itemRootGameInput.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                            if(itemRootGameInput.fCallback(itemRootGameInput) !== true)
-                                callback(itemRootGameInput);
-                        }
-                        //默认回调函数
-                        else if(itemRootGameInput.fCallback === true) {
-                            callback(itemRootGameInput);
-                        }
-                        else if(itemRootGameInput.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                            callback(itemRootGameInput);
-                            game.run(itemRootGameInput.fCallback, -1, itemRootGameInput);
-                        }
-                        else {   //不使用 回调函数
-                            //gameMap.focus = true;
-
-                            itemRootGameInput.visible = false;
-
-
-                            /* /*if(itemRootGameInput.bPauseGame && _private.config.bPauseGame) {
-                                game.goon();
-                                itemRootGameInput.bPauseGame = false;
-                            }* /*/
-
-                            /*if(_private.config.objPauseNames['$input'] !== undefined) {
-                                game.goon('$input');
-                                _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                            }*/
-
-
-
-                            //itemRootGameInput.destroy();
-                            ////FrameManager.goon();
-                        }
-                    }
-                }
-            }
-        }
     }
+
+
+    //临时存放创建的定时器（wait命令创建的）
+    Item {
+        id: itemTimers
+
+    }
+
 
     //视频播放
     Mask {
@@ -5607,7 +5359,7 @@ Item {
                 //如果没有使用yield来中断代码，可以不要game.run(true)
                 game.goon(pauseGame);
                 game.run(true);
-                //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
             }
 
             rootGameScene.forceActiveFocus();
@@ -6029,7 +5781,7 @@ Item {
             //gameMap.focus = true;
             rootGameScene.forceActiveFocus();
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.asyncScript, 0, textScript.text);
+            //GlobalJS.runScript(_private.asyncScriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;
@@ -6151,7 +5903,7 @@ Item {
 
 
         //异步脚本（整个游戏的脚本队列系统）
-        property var asyncScript: new GlobalLibraryJS.Async(rootGameScene)
+        property var asyncScriptQueue: new GlobalLibraryJS.AsyncScriptQueue()
 
 
         //创建的 主角 和 角色NPC 组件容器
@@ -6467,13 +6219,13 @@ Item {
         }
 
         function exitGame() {
-            //！！放在下一次执行（必须跳出事件队列，因为 _private.asyncScript.clear(6); 会导致生成器重入）
+            //！！放在下一次执行（必须跳出事件队列，因为 _private.asyncScriptQueue.clear(6); 会导致生成器重入）
             GlobalLibraryJS.runNextEventLoop(function() {
                 game.run([function*() {
 
                     let err;
                     try {
-                        yield *release();
+                        yield* release();
                     }
                     catch(e) {
                         err = e;
@@ -6486,9 +6238,9 @@ Item {
                         //throw err;
                     }
 
-                    //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
-                    _private.asyncScript.clear(0);
-                    //console.debug(_private.asyncScript.getGeneratorScriptArray().toJson());
+                    //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
+                    _private.asyncScriptQueue.clear(0);
+                    //console.debug(_private.asyncScriptQueue.getGeneratorScriptArray().toJson());
 
 
                     s_close();
@@ -6496,30 +6248,191 @@ Item {
 
                 }, 'exitGame']);
 
-                _private.asyncScript.clear(6);
+                _private.asyncScriptQueue.clear(6);
             }, 'exitGame');
         }
     }
 
 
 
-    //游戏信息框
+    //角色对话框
     Component {
-        id: compGameMsg
+        id: compRoleMsg
 
-        //游戏对话框
         Item {
-            id: rootGameMsgDialog
+            id: rootRoleMsg
 
 
-            //是否暂停了游戏
-            //property bool bPauseGame: true
+
+            //signal accepted();
+            //signal rejected();
+
+
+            //code是关闭方式：1为点击关闭，2为自动关闭
+            function over(code) {
+                if(rootRoleMsg.nShowStatus === -1)
+                    return;
+
+                rootRoleMsg.nShowStatus = -1;
+
+
+                //默认回调函数
+                let callback = function(code, itemMsg) {
+
+                    itemMsg.visible = false;
+                    //itemMsg.destroy();
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true);
+                        //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                        return true;
+                    }
+                    //rootGameScene.forceActiveFocus();
+                    return false;
+                };
+
+
+                if(GlobalLibraryJS.isFunction(rootRoleMsg.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(rootRoleMsg.fCallback.call(rootRoleMsg, callback, code, rootRoleMsg) ?? null, -1);
+                }
+                else {   //默认回调函数
+                    callback(code, rootRoleMsg);
+
+
+                    //rootRoleMsg.visible = false;
+                    //rootRoleMsg.destroy();
+
+
+                    /* /*if(rootRoleMsg.bPauseGame && _private.config.bPauseGame) {
+                        game.goon();
+                        rootRoleMsg.bPauseGame = false;
+                    }* / */
+
+                    /*if(_private.config.objPauseNames['$talk'] !== undefined) {
+                        game.goon('$talk');
+                        _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                    }*/
+
+
+                    ////FrameManager.goon();
+                }
+            }
+
+            function stop(type=0) {
+                messageRole.stop(type);
+            }
+
+            function show(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, _pauseGame=true, callback=true) {
+
+                rootRoleMsg.pauseGame = _pauseGame;
+                rootRoleMsg.fCallback = callback;
+
+
+
+                let name = '', avatar = '', avatarSize = null;
+                if(role && GlobalLibraryJS.isString(role)) {
+                    do {
+                        let roleName = role;
+                        role = game.hero(roleName);
+                        if(role !== null) {
+                            name = role.$data.$name;
+                            avatar = role.$data.$avatar;
+                            avatarSize = role.$data.$avatarSize;
+                            break;
+                        }
+                        role = game.role(roleName);
+                        if(role !== null) {
+                            name = role.$data.$name;
+                            avatar = role.$data.$avatar;
+                            avatarSize = role.$data.$avatarSize;
+                            break;
+                        }
+                        role = GameSceneJS.getRoleResource(roleName);
+                        if(role !== null) {
+                            name = roleName;
+                            avatar = role.Avatar;
+                            avatarSize = role.AvatarSize;
+                            break;
+                        }
+                        role = null;
+                    }while(0);
+                }
+
+
+
+                if(pauseGame === true)
+                    pauseGame = '$talk';
+                //是否暂停游戏
+                if(GlobalLibraryJS.isString(pauseGame)) {
+                    //loaderGameMsg.bPauseGame = true;
+                    game.pause(pauseGame);
+
+                    //loaderGameMsg.focus = true;
+                }
+                else {
+                }
+
+
+
+                //样式
+                if(!style)
+                    style = {};
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
+
+
+                let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
+                let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
+                //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
+                //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
+                if(name && bShowName)
+                    pretext = name + '：' + pretext;
+                if(avatar && bShowAvatar)
+                    pretext = GlobalLibraryJS.showRichTextImage(GameMakerGlobal.imageResourceURL(avatar), avatarSize[0], avatarSize[1]) + pretext;
+
+
+                messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                messageRole.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+                messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+                maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+                //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
+
+                //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
+                rootRoleMsg.nKeepTime = keeptime || 0;
+
+
+                rootRoleMsg.nShowStatus = 1;
+
+                rootRoleMsg.visible = true;
+                //touchAreaRoleMsg.enabled = false;
+
+
+                messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b0);
+                //FrameManager.wait(-1);
+
+            }
+
+            function clicked() {
+                //显示完毕，则关闭
+                if(rootRoleMsg.nShowStatus === 0)
+                    rootRoleMsg.over(1);
+                //如果正在显示，且nKeepTime为-1（表示点击后显示全部）；
+                else if(rootRoleMsg.nShowStatus === 1 && rootRoleMsg.nKeepTime === -1) {
+                    rootRoleMsg.nShowStatus = 0;
+                    messageRole.stop(1);
+                }
+            }
+
+
+
             //显示完全后延时
             property int nKeepTime: 0
             //显示状态：-1：停止；0：显示完毕；1：正在显示
             property int nShowStatus: -1
-            //property alias textGameMsg: textGameMsg.text
-            //property int standardButtons: Dialog.Ok | Dialog.Cancel
 
             //是否暂停
             property var pauseGame: true
@@ -6527,11 +6440,100 @@ Item {
             property var fCallback
 
 
+            visible: false
+            //anchors.fill: parent
+            width: parent.width
+            height: parent.height
+            //z: 5
+
+
+            Mask {
+                id: maskMessageRole
+
+                anchors.fill: parent
+
+                visible: color.a !== 0
+
+                color: 'transparent'
+
+                mouseArea.onPressed: {
+                    rootRoleMsg.clicked();
+                }
+            }
+
+
+            Message {
+                id: messageRole
+                width: parent.width
+                height: parent.height * 0.1
+                //height: 90
+                anchors.bottom: parent.bottom
+
+
+                nMaxWidth: parent.width
+                nMaxHeight: parent.height * 0.2
+                //nMaxHeight: 90
+
+
+                textArea.enabled: false
+                textArea.readOnly: true
+
+                textArea.onReleased: {
+                    rootRoleMsg.clicked();
+                    ////rootGameScene.forceActiveFocus();
+                }
+
+                onS_over: {
+                    //自动关闭
+                    if(rootRoleMsg.nKeepTime > 0)
+                        rootRoleMsg.over(2);
+                    else
+                        rootRoleMsg.nShowStatus = 0;
+                }
+            }
+
+
+            /*MultiPointTouchArea {
+                id: touchAreaRoleMsg
+                anchors.fill: parent
+                enabled: false
+                //enabled: rootRoleMsg.standardButtons === Dialog.NoButton
+
+                //onPressed: {
+                onReleased: {
+                    ////rootGameScene.forceActiveFocus();
+                    //console.debug('MultiPointTouchArea1')
+                    rootRoleMsg.over();
+                    //console.debug('MultiPointTouchArea2')
+                }
+            }*/
+
+
+            Component.onCompleted: {
+            }
+            Component.onDestruction: {
+                over(-1);
+            }
+        }
+    }
+
+    //游戏信息框
+    Component {
+        id: compGameMsg
+
+        Item {
+            id: rootGameMsgDialog
+
+
             //signal accepted();
             //signal rejected();
 
 
+            //code是关闭方式：1为点击关闭，2为自动关闭
             function over(code) {
+                if(rootGameMsgDialog.nShowStatus === -1)
+                    return;
+
                 rootGameMsgDialog.nShowStatus = -1;
 
 
@@ -6539,38 +6541,31 @@ Item {
                 let callback = function(code, itemMsg) {
 
                     itemMsg.visible = false;
-
-                    //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && _private.config.objPauseNames[pauseGame] !== undefined) {
-                        //如果没有使用yield来中断代码，可以不要game.run(true)
-                        game.goon(pauseGame);
-                        game.run(true);
-                        //_private.asyncScript.run(_private.asyncScript.lastEscapeValue);
-                    }
-
-
                     itemMsg.destroy();
 
-
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true);
+                        //_private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                        return true;
+                    }
                     //rootGameScene.forceActiveFocus();
+
+                    return false;
                 };
 
 
-                if(GlobalLibraryJS.isFunction(rootGameMsgDialog.fCallback)) {  //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                    if(rootGameMsgDialog.fCallback(code, rootGameMsgDialog) !== true)   //如果返回 非true，则继续调用默认回调函数
-                        callback(code, rootGameMsgDialog);
+                if(GlobalLibraryJS.isFunction(rootGameMsgDialog.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(rootGameMsgDialog.fCallback.call(rootGameMsgDialog, callback, code, rootGameMsgDialog) ?? null, -1);
                 }
-                else if(rootGameMsgDialog.fCallback === true) {    //默认回调函数
+                else {   //默认回调函数
                     callback(code, rootGameMsgDialog);
-                }
-                else if(rootGameMsgDialog.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                    callback(code, rootGameMsgDialog);
-                    game.run(rootGameMsgDialog.fCallback, -1, code, rootGameMsgDialog);
-                }
-                else {   //不使用 回调函数
-                    //gameMap.focus = true;
 
-                    rootGameMsgDialog.visible = false;
+
+                    //rootGameMsgDialog.visible = false;
+                    //rootGameMsgDialog.destroy();
 
 
                     /* /*if(rootGameMsgDialog.bPauseGame && _private.config.bPauseGame) {
@@ -6580,12 +6575,10 @@ Item {
 
                     /*if(_private.config.objPauseNames['$msg'] !== undefined) {
                         game.goon('$msg');
-                        _private.asyncScript.run(_private.asyncScript.lastEscapeValue);
+                        _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
                     }*/
 
 
-
-                    rootGameMsgDialog.destroy();
                     ////FrameManager.goon();
                 }
             }
@@ -6612,6 +6605,7 @@ Item {
                 }
 
 
+
                 //样式
                 if(style === undefined || style === null)
                     style = {};
@@ -6632,14 +6626,16 @@ Item {
                 //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
                 rootGameMsgDialog.nKeepTime = keeptime || 0;
 
+
                 rootGameMsgDialog.nShowStatus = 1;
-
-
 
                 rootGameMsgDialog.visible = true;
                 //touchAreaGameMsg.enabled = false;
+
+
                 messageGame.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, rootGameMsgDialog.nKeepTime, type);
                 //FrameManager.wait(-1);
+
             }
 
             function clicked() {
@@ -6652,6 +6648,22 @@ Item {
                     messageGame.stop(1);
                 }
             }
+
+
+
+            //是否暂停了游戏
+            //property bool bPauseGame: true
+            //显示完全后延时
+            property int nKeepTime: 0
+            //显示状态：-1：停止；0：显示完毕；1：正在显示
+            property int nShowStatus: -1
+            //property alias textGameMsg: textGameMsg.text
+            //property int standardButtons: Dialog.Ok | Dialog.Cancel
+
+            //是否暂停
+            property var pauseGame: true
+            //回调函数
+            property var fCallback
 
 
             visible: false
@@ -6726,19 +6738,65 @@ Item {
                 }
             }*/
 
+
+            Component.onCompleted: {
+            }
+            Component.onDestruction: {
+                over(-1);
+            }
         }
 
     }
 
-
-    //游戏菜单
+    //游戏选择菜单
     Component {
         id: compGameMenu
 
-        //游戏 选择框
         Item {
             id: rootGameMenu
 
+
+            function over(index) {
+                if(rootGameMenu.nShowStatus === -1)
+                    return;
+
+                rootGameMenu.nShowStatus = -1;
+
+
+                //默认回调函数
+                let callback = function(index, itemMenu) {
+
+                    itemMenu.visible = false;
+                    itemMenu.destroy();
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true, {Value: index});
+                        //_private.asyncScriptQueue.run(index);
+                        return true;
+                    }
+                    //rootGameScene.forceActiveFocus();
+
+                    return false;
+                }
+
+
+                if(GlobalLibraryJS.isFunction(rootGameMenu.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(rootGameMenu.fCallback.call(rootGameMenu, callback, index, rootGameMenu) ?? null, -1);
+                }
+                else {  //默认回调函数
+                    callback(index, rootGameMenu);
+
+
+                    //rootGameMenu.visible = false;
+                    //rootGameMenu.destroy();
+
+
+                    ////FrameManager.goon();
+                }
+            }
 
             function show(title='', items=[], style={}, _pauseGame=true, callback=true) {
                 rootGameMenu.pauseGame = _pauseGame;
@@ -6775,10 +6833,16 @@ Item {
                 menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                 menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
 
-
-                visible = true;
                 menuGame.strTitle = title;
+
+
+                rootGameMenu.nShowStatus = 1;
+
+                rootGameMenu.visible = true;
+
+
                 menuGame.show(items);
+
             }
 
 
@@ -6786,7 +6850,9 @@ Item {
 
 
             //第几个Menu
-            property int nIndex
+            //property int nIndex
+            //显示状态：-1：停止；1：正在显示
+            property int nShowStatus: -1
 
             property var pauseGame: true
             property var fCallback   //点击后的回调函数，true为缺省
@@ -6839,60 +6905,276 @@ Item {
                     //height: parent.height / 2
                     //anchors.centerIn: parent
 
-                    onS_Choice: {
+                    onS_Choice: rootGameMenu.over(index);
+                }
+            }
 
-                        //默认回调函数
-                        let callback = function(index, itemMenu) {
-                            //gameMap.focus = true;
 
-                            itemMenu.visible = false;
-                            //menuGame.hide();
+            Component.onCompleted: {
+            }
+            Component.onDestruction: {
+                over(-1);
+            }
+        }
+    }
 
-                            //game.pause(true)[pauseGame]
-                            if(GlobalLibraryJS.isString(rootGameMenu.pauseGame) && _private.config.objPauseNames[rootGameMenu.pauseGame] !== undefined) {
-                                //如果没有使用yield来中断代码，可以不要game.run(true)
-                                game.goon(rootGameMenu.pauseGame);
-                                game.run(true, {Value: index});
-                                //_private.asyncScript.run(index);
+    //游戏 输入框
+    Component {
+        id: compGameInput
+
+        Item {
+            id: rootGameInput
+
+
+            function over(text) {
+                if(rootGameInput.nShowStatus === -1)
+                    return;
+
+                rootGameInput.nShowStatus = -1;
+
+
+                //默认回调函数
+                let callback = function(text, itemInput) {
+
+                    itemInput.visible = false;
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true, {Value: text});
+                        //_private.asyncScriptQueue.run(text);
+                        return true;
+                    }
+                    //rootGameScene.forceActiveFocus();
+
+                    return false;
+                }
+
+
+                if(GlobalLibraryJS.isFunction(rootGameInput.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(rootGameInput.fCallback.call(rootGameInput, callback, text, rootGameInput) ?? null, -1);
+                }
+                else {   //默认回调函数
+                    callback(text, rootGameInput);
+
+
+                    //rootGameInput.visible = false;
+                    //rootGameInput.destroy();
+
+
+                    /* /*if(rootGameInput.bPauseGame && _private.config.bPauseGame) {
+                        game.goon();
+                        rootGameInput.bPauseGame = false;
+                    }* /*/
+
+                    /*if(_private.config.objPauseNames['$input'] !== undefined) {
+                        game.goon('$input');
+                        _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+                    }*/
+
+
+                    ////FrameManager.goon();
+                }
+            }
+
+            function show(title='', pretext='', style={}, _pauseGame=true, callback=true) {
+                rootGameInput.pauseGame = _pauseGame;
+                rootGameInput.fCallback = callback;
+
+                if(pauseGame === true)
+                    pauseGame = '$input';
+                //是否暂停游戏
+                if(GlobalLibraryJS.isString(pauseGame)) {
+                    //loaderGameMsg.bPauseGame = true;
+                    game.pause(pauseGame);
+                }
+                else {
+                }
+
+
+
+                //样式
+                if(style === undefined || style === null)
+                    style = {};
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
+
+                rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
+                rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
+                textGameInput.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+                textGameInput.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
+
+                rectGameInputTitle.color = style.TitleBackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
+                rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
+                textGameInputTitle.font.pointSize = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
+
+                maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
+
+                textGameInputTitle.text = title;
+                textGameInput.text = pretext;
+
+                textGameInput.textArea.focus = true;
+
+
+                rootGameInput.nShowStatus = 1;
+
+                rootGameInput.visible = true;
+            }
+
+
+
+            //显示状态：-1：停止；1：正在显示
+            property int nShowStatus: -1
+
+            property var pauseGame
+            //回调函数
+            property var fCallback
+
+
+            visible: false
+            //anchors.fill: parent
+            width: parent.width
+            height: parent.height
+
+
+
+            Mask {
+                id: maskGameInput
+
+                anchors.fill: parent
+
+                visible: color.a !== 0
+
+                color: '#7FFFFFFF'
+
+                mouseArea.onPressed: {
+                    //rootGameInput.visible = false;
+                    //game.goon('$input');
+                    //_private.asyncScriptQueue.run(textGameInput.text);
+                }
+            }
+
+            Rectangle {
+                id: rectGameInputBack
+
+                anchors.centerIn: parent
+                width: parent.width * 0.8
+                height: gameinput_columnlayout.implicitHeight
+
+                clip: true
+
+
+                radius: 6
+                color: '#303030'
+
+
+                ColumnLayout {
+                    id: gameinput_columnlayout
+                    anchors.fill: parent
+                    //height: parent.height * 0.6
+
+                    Rectangle {
+                        id: rectGameInputTitle
+
+                        Layout.alignment: Qt.AlignCenter
+                        Layout.preferredWidth: parent.width
+                        //Layout.preferredHeight: 36
+                        implicitHeight: Math.max(textGameInputTitle.implicitHeight, 60)
+
+                        color: '#FF0035A8'
+                        //color: '#EE00CC99'
+                        //radius: itemMenu.radius
+
+                        Text {
+                            id: textGameInputTitle
+
+                            anchors.fill: parent
+
+                            color: 'white'
+
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            font.pointSize: 16
+                            font.bold: true
+
+                            wrapMode: Text.Wrap
+                        }
+
+                    }
+
+
+                    Rectangle {
+                        id: rectGameInput
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width
+                        Layout.preferredHeight: textGameInput.implicitHeight
+
+
+                        color: Global.style.backgroundColor
+
+                        border {
+                            color: '#60000000'
+                        }
+
+
+                        Notepad {
+                            id: textGameInput
+
+                            anchors.fill: parent
+
+
+                            //color: 'white'
+
+                            //horizontalAlignment: Text.AlignHCenter
+                            //verticalAlignment: Text.AlignVCenter
+
+                            //textArea.enabled: false
+                            //textArea.readOnly: true
+                            textArea.font.pointSize: 16
+                            textArea.font.bold: true
+                            textArea.textFormat: TextArea.PlainText
+
+                            /*placeholderTextColor: '#7F7F7F7F'
+
+                            selectByKeyboard: true
+                            selectByMouse: true
+                            wrapMode: Text.Wrap
+
+
+                            //padding : nPadding
+                            leftPadding : 6
+                            rightPadding : 6
+                            topPadding : 6
+                            bottomPadding: 6
+                            background: Item {
+                                //color: 'transparent'
+                                implicitHeight: 0
+                                //color: Global.style.backgroundColor
+                                //border.color: textGameInput.focus ? Global.style.accent : Global.style.hintTextColor
+                                //border.width: textGameInput.focus ? 2 : 1
                             }
-
-
-                            itemMenu.destroy();
-                            //FrameManager.goon();
-
-
-                            //rootGameScene.forceActiveFocus();
-
-                            //console.debug('!!!asyncScript.run', index);
-                        }
-
-
-                        if(GlobalLibraryJS.isFunction(rootGameMenu.fCallback)) {   //用户自定义回调函数（这个是高级函数，其他地方可以自定义它来实现新功能）
-                            if(rootGameMenu.fCallback(index, rootGameMenu) !== true)
-                                callback(index, rootGameMenu);
-                        }
-                        //默认回调函数
-                        else if(rootGameMenu.fCallback === true) {
-                            callback(index, rootGameMenu);
-                        }
-                        else if(rootGameMenu.fCallback) {   //其他类型的回调函数（比如生成器），因为游戏暂停中所以必须先调用默认回调函数（作为简单使用）；
-                            callback(index, rootGameMenu);
-                            game.run(rootGameMenu.fCallback, -1, index, rootGameMenu);
-                        }
-                        else {  //不使用 回调函数
-                            //gameMap.focus = true;
-
-                            rootGameMenu.visible = false;
-                            //menuGame.hide();
-
-
-
-                            rootGameMenu.destroy();
-                            //FrameManager.goon();
-                            //console.debug('!!!asyncScript.run', index);
+                            */
                         }
                     }
+
+                    Button {
+
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+                        text: '确定'
+                        onClicked: rootGameInput.over(textGameInput.text);
+                    }
                 }
+            }
+
+
+            Component.onCompleted: {
+            }
+            Component.onDestruction: {
+                over(-1);
             }
         }
     }
@@ -6901,7 +7183,6 @@ Item {
     //游戏按键
     Component {
         id: compButtons
-
 
         GameButton {
             id: tGameButton
@@ -7280,6 +7561,7 @@ Item {
         }
     }
 
+
     //音效
     Component {
         id: compCacheSoundEffect
@@ -7299,6 +7581,7 @@ Item {
             }
         }
     }
+
 
     //地图图片
     Component {
@@ -7442,6 +7725,7 @@ Item {
 
         }
     }
+
 
     //文字移动
     Component {
@@ -7638,13 +7922,11 @@ Item {
         //mainRole.customSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
 
 
-        //console.debug('[GameScene]globalObject：', FrameManager.globalObject().game);
+        FrameManager.sl_globalObject().game = game;
+        FrameManager.sl_globalObject().g = game;
+        //FrameManager.sl_globalObject().g = g;
 
-        FrameManager.globalObject().game = game;
-        FrameManager.globalObject().g = game;
-        //FrameManager.globalObject().g = g;
-
-        //console.debug('[GameScene]globalObject：', FrameManager.globalObject().game);
+        //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject().game);
 
         console.debug('[GameScene]Component.onCompleted');
     }
@@ -7652,13 +7934,13 @@ Item {
     Component.onDestruction: {
         //release();
         //console.warn('!!!', Object.keys(_private.config.objPauseNames));
-        //console.warn('!!!3', _private.asyncScript.getGeneratorScriptArray().toJson());
+        //console.warn('!!!3', _private.asyncScriptQueue.getGeneratorScriptArray().toJson());
 
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
-        if(FrameManager.globalObject().game === game) {
-            delete FrameManager.globalObject().game;
-            delete FrameManager.globalObject().g;
+        if(FrameManager.sl_globalObject().game === game) {
+            delete FrameManager.sl_globalObject().game;
+            delete FrameManager.sl_globalObject().g;
         }
 
         console.debug('[GameScene]Component.onDestruction');

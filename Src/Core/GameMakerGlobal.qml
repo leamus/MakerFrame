@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.12.3.240709'
+    property string version: '1.13.1.240724'
 
 
     //配置
@@ -45,7 +45,7 @@ QtObject {
         //调试（显示一些调试功能）
         //property bool debug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool debug: parseInt(FrameManager.config.Debug) === 0 ? false : true
-        //property bool debug: parseInt(FrameManager.configValue('Debug', 0)) === 0 ? false : true
+        //property bool debug: parseInt(FrameManager.sl_configValue('Debug', 0)) === 0 ? false : true
         property bool debug: true
 
 
@@ -80,7 +80,7 @@ QtObject {
             case 'android':
                 return strWorkPath + separator + 'SaveData' + separator + strCurrentProjectName;
                 //return Platform.externalDataPath + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
-                //return Platform.getSdcardPath() + separator + 'Leamus' + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
+                //return Platform.sl_getSdcardPath() + separator + 'Leamus' + separator + 'RPGGame' + separator + strCurrentProjectName + separator + 'SaveData';
             case 'windows':
             default:
                 return strWorkPath + separator + 'SaveData' + separator + strCurrentProjectName;
@@ -319,7 +319,7 @@ QtObject {
         if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
             return;
 
-        if(FrameManager.globalObject().GameMakerGlobal && FrameManager.globalObject().GameMakerGlobal !== GameMakerGlobal) {
+        if(FrameManager.sl_globalObject().GameMakerGlobal && FrameManager.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
             console.warn('[!GameMakerGlobal]已经存在单例类，请重启框架或返回原引擎');
 
             Global.window.aliasComponents.dialogCommon.show({
@@ -333,14 +333,14 @@ QtObject {
             return;
         }
 
-        FrameManager.globalObject().GameMakerGlobal = GameMakerGlobal;
+        FrameManager.sl_globalObject().GameMakerGlobal = GameMakerGlobal;
 
 
 
         if(Platform.compileType() === 'release') {
             let userID = '', account = '', nickname = '';
             if(Global.frameSettings.$userData) {
-                let userData = JSON.parse(FrameManager.sl_qml_Uncompress(Global.frameSettings.$userData, 1).toString());
+                let userData = JSON.parse(FrameManager.sl_uncompress(Global.frameSettings.$userData, 1).toString());
                 userID = userData.info.id;
                 account = userData.info.account;
                 nickname = userData.info.nickname;
@@ -353,21 +353,21 @@ QtObject {
                 Data: {
                     client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})`,
                     product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
-                    serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}`,
+                    serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}`,
                     timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
                     times: settings.$RunTimes, duration: settings.$RunDuration,
                 },
-                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
+                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
                 Gzip: [1, 1024],
                 //Headers: {},
-            }).then((xhr)=>{
-            }).catch((xhr)=>{
+            }).$then((xhr)=>{
+            }).$catch((xhr)=>{
             });
         }
 
 
 
-        FrameManager.addImportPath(urlRPGCorePath);
+        FrameManager.sl_addImportPath(urlRPGCorePath);
 
 
 
@@ -378,12 +378,12 @@ QtObject {
         if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
             return;
 
-        if(FrameManager.globalObject().GameMakerGlobal && FrameManager.globalObject().GameMakerGlobal !== GameMakerGlobal) {
+        if(FrameManager.sl_globalObject().GameMakerGlobal && FrameManager.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
             console.warn('[!GameMakerGlobal]已经存在单例类');
             return;
         }
 
-        delete FrameManager.globalObject().GameMakerGlobal;
+        delete FrameManager.sl_globalObject().GameMakerGlobal;
 
         console.debug('[GameMakerGlobal]Component.onDestruction');
     }
