@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -98,7 +98,7 @@ Item {
 
             text: "返　回"
             onClicked: {
-                s_close();
+                sg_close();
             }
         }
     }
@@ -120,14 +120,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainEasyTutorial]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainEasyTutorial]Back Key");
         event.accepted = true;
@@ -173,7 +173,7 @@ Item {
 //载入地图并执行地图载入事件；成功返回 地图信息。
 //userData是用户传入数据，后期调用的钩子函数会传入；
 //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
-<font color='yellow'>yield* game.loadmap(mapRID, userData, forceRepait=false)</font>
+<font color='yellow'>yield game.loadmap(mapRID, userData, forceRepait=false)</font>
 
 //在屏幕中间显示提示信息。
 //interval为文字显示间隔，为0则不使用；
@@ -309,7 +309,7 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.removegoods(goods, count=1);</font>
 
 <font color='yellow'>game.goods(goods=-1, filterkey=null, filtervalue=null)</font>：获得道具列表中某项道具信息；goods为-1表示返回所有道具的数组（此时filters是道具属性的过滤条件）；goods为数字（下标），则返回单个道具信息的数组；goods为字符串（道具资源名），返回所有符合道具信息的数组（此时filters是道具属性的过滤条件）；返回格式：道具数组。
-<font color='yellow'>yield* game.usegoods(goods, fighthero)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
+<font color='yellow'>yield game.usegoods(goods, fighthero)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
 
 //直接装备一个道具（不是从背包中）；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
@@ -427,9 +427,9 @@ readonly property var say: function(role, msg, interval=60, pretext='', keeptime
 <font color='yellow'>game.date()</font>：返回 JS 的 new Date()对象。
 
 <font color='yellow'>game.checksave("文件名")</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>yield* game.save("文件名", showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
-<font color='yellow'>yield* game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
-<font color='yellow'>yield* game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
+<font color='yellow'>yield game.save("文件名", showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
+<font color='yellow'>yield game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
+<font color='yellow'>yield game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
 

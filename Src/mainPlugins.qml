@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -120,7 +120,7 @@ Item {
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 _private.loadModule('');
             }
         }
@@ -177,14 +177,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainPlugins]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainPlugins]Back Key");
         event.accepted = true;

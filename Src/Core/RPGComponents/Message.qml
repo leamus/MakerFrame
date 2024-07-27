@@ -14,9 +14,9 @@ Notepad {
 
 
 
-    //signal s_mouseReleased();
+    //signal sg_mouseReleased();
     //显示完毕
-    signal s_over();
+    signal sg_over();
 
 
 
@@ -101,7 +101,7 @@ Notepad {
         timer.nStatus = -1;
         _private.textIndex = 0;
 
-        s_over();
+        sg_over();
     }
 
 
@@ -158,7 +158,7 @@ Notepad {
     }
 
     /*textArea.onReleased: {
-        root.s_mouseReleased();
+        root.sg_mouseReleased();
     }*/
 
 

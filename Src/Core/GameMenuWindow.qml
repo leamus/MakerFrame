@@ -22,11 +22,11 @@ Item {
 //    property alias gameGoodsMenu: gameGoodsMenu
 
     //
-    signal s_close();
+    signal sg_close();
 
     //显示或关闭
-    signal s_show(int newFlags, int windowFlags);
-    signal s_hide(int newFlags, int windowFlags);
+    signal sg_show(int newFlags, int windowFlags);
+    signal sg_hide(int newFlags, int windowFlags);
 
 
     function showWindow(flags=1, value=0, style={}) {
@@ -149,7 +149,7 @@ Item {
             visible = true;
 
 
-        s_show(newFlags, nShowWindowFlags);
+        sg_show(newFlags, nShowWindowFlags);
     }
 
     function closeWindow(flags=-1) {
@@ -188,11 +188,11 @@ Item {
         //rectEquipInfo.visible = false;
 
 
-        s_hide(newFlags, nShowWindowFlags);
+        sg_hide(newFlags, nShowWindowFlags);
 
 
         if(nShowWindowFlags === 0) {
-            s_close();
+            sg_close();
         }
     }
 
@@ -250,7 +250,7 @@ Item {
                 border.color: "white"
                 radius: height / 20
 
-                onS_Choice: function(index) {
+                onSg_choice: function(index) {
 
                     switch(index) {
                     case 0:
@@ -294,7 +294,7 @@ Item {
         visible: false
 
 
-        onS_refreshBagWindow: {
+        onSg_refreshBagWindow: {
             rectGoods.init();
             //rectGoods.visible = true;
         }
@@ -369,12 +369,12 @@ Item {
                 width: parent.width
 
                 text: "使用"
-                onButtonClicked: {
+                onSg_clicked: {
                     _private.close();
 
 
                     let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
-                    yield* game.usegoods(goods.$rid);
+                    yield game.usegoods(goods.$rid);
                 }
             }
             ColorButton {
@@ -383,7 +383,7 @@ Item {
                 width: parent.width
 
                 text: "装备"
-                onButtonClicked: {
+                onSg_clicked: {
                     _private.close();
 
 
@@ -479,7 +479,7 @@ Item {
             //nItemMaxHeight: 100
             //nItemMinHeight: 50
 
-            onS_Choice: function(index) {
+            onSg_choice: function(index) {
                 switch(index) {
                 case 0:
                     break;
@@ -526,7 +526,7 @@ Item {
             //nItemMaxHeight: 100
             //nItemMinHeight: 50
 
-            onS_Choice: function(index) {
+            onSg_choice: function(index) {
                 switch(index) {
                 case 0:
                     break;
@@ -574,7 +574,7 @@ Item {
                 width: parent.width
 
                 text: "脱下"
-                onButtonClicked: {
+                onSg_clicked: {
                     _private.close();
 
 

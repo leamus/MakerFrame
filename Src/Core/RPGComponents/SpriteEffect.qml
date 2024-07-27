@@ -80,14 +80,14 @@ Loader {
             bTest: root.bTest
 
 
-            onS_started: root.s_started()
-            onS_refreshed: root.s_refreshed(currentFrame)
-            onS_looped: root.s_looped()
-            onS_finished: root.s_finished()
-            onS_paused: root.s_paused()
-            onS_stoped: root.s_stoped()
+            onSg_started: root.sg_started()
+            onSg_refreshed: root.sg_refreshed(currentFrame)
+            onSg_looped: root.sg_looped()
+            onSg_finished: root.sg_finished()
+            onSg_paused: root.sg_paused()
+            onSg_stoped: root.sg_stoped()
 
-            onS_playEffect: root.s_playEffect(soundeffectSource)
+            onSg_playEffect: root.sg_playEffect(soundeffectSource)
         }
     }
 
@@ -142,14 +142,14 @@ Loader {
             bTest: root.bTest
 
 
-            onS_started: root.s_started()
-            onS_refreshed: root.s_refreshed(currentFrame)
-            onS_looped: root.s_looped()
-            onS_finished: root.s_finished()
-            onS_paused: root.s_paused()
-            onS_stoped: root.s_stoped()
+            onSg_started: root.sg_started()
+            onSg_refreshed: root.sg_refreshed(currentFrame)
+            onSg_looped: root.sg_looped()
+            onSg_finished: root.sg_finished()
+            onSg_paused: root.sg_paused()
+            onSg_stoped: root.sg_stoped()
 
-            onS_playEffect: root.s_playEffect(soundeffectSource)
+            onSg_playEffect: root.sg_playEffect(soundeffectSource)
         }
     }
 
@@ -190,17 +190,17 @@ Loader {
 
 
 
-    signal s_started();
-    signal s_refreshed(int currentFrame);
+    signal sg_started();
+    signal sg_refreshed(int currentFrame);
     //每次播放结束
-    signal s_looped();
+    signal sg_looped();
     //停止播放
-    signal s_finished();
-    signal s_paused();
-    signal s_stoped();
+    signal sg_finished();
+    signal sg_paused();
+    signal sg_stoped();
 
     //播放音效
-    signal s_playEffect(string soundeffectSource)
+    signal sg_playEffect(string soundeffectSource)
 
 
 

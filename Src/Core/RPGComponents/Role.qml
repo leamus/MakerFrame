@@ -18,7 +18,7 @@ Item {
     id: root
 
 
-    //signal s_clicked();
+    //signal sg_clicked();
 
 
 
@@ -532,11 +532,11 @@ Item {
         id: customSprite
 
 
-        onS_finished: {
+        onsg_finished: {
             visible = false;
             root.sprite.sprite.visible = true;
 
-            //s_ActionFinished();
+            //sg_actionFinished();
         }
 
 
@@ -583,7 +583,7 @@ Item {
                 fTestChangeDirection();
             }
 
-            //s_clicked();
+            //sg_clicked();
         }
     }
 

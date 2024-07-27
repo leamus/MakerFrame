@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -127,7 +127,7 @@ Item {
             //rootGameMaker.forceActiveFocus();
 
 
-            //s_close();
+            //sg_close();
             console.debug("[PluginsDownload]onRejected")
             //Qt.quit()
 
@@ -280,7 +280,7 @@ Item {
                 OnCanceled: ()=>{
                     l_list.visible = false;
                     //root.forceActiveFocus();
-                    s_close();
+                    sg_close();
                 },
             });
         }
@@ -291,7 +291,7 @@ Item {
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         l_list.visible = false;
-        s_close();
+        sg_close();
 
         console.debug("[PluginsDownload]Escape Key");
         event.accepted = true;
@@ -299,7 +299,7 @@ Item {
     }
     Keys.onBackPressed: {
         l_list.visible = false;
-        s_close();
+        sg_close();
 
         console.debug("[PluginsDownload]Back Key");
         event.accepted = true;

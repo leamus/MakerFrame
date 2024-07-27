@@ -344,7 +344,7 @@ Item {
 
             text: "地　图"
             onClicked: {
-                if(Platform.compileType() === "debug") {
+                if(Platform.compileType === "debug") {
                     _private.loadModule("mainMapEditor.qml");
                     //userMainProject.source = "mainMapEditor.qml";
                 }
@@ -373,7 +373,7 @@ Item {
 
                 text: "角　色"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainRoleEditor.qml");
                         //userMainProject.source = "eventMaker.qml";
                     }
@@ -395,7 +395,7 @@ Item {
 
                 text: "特　效"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainSpriteEditor.qml");
                         //userMainProject.source = "eventMaker.qml";
                     }
@@ -431,7 +431,7 @@ Item {
                     return;
                     */
 
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainGoodsEditor.qml");
                         //userMainProject.source = "mainGoodsEditor.qml";
                     }
@@ -464,7 +464,7 @@ Item {
                 //font.pointSize: 14
 
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainFightRoleEditor.qml");
                         //userMainProject.source = "mainFightRoleEditor.qml";
                     }
@@ -488,7 +488,7 @@ Item {
                 //font.pointSize: 14
 
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainFightSkillEditor.qml");
                         //userMainProject.source = "mainFightSkillEditor.qml";
                     }
@@ -526,7 +526,7 @@ Item {
                     return;
                     */
 
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainFightScriptEditor.qml");
                         //userMainProject.source = "mainFightScriptEditor.qml";
                     }
@@ -556,7 +556,7 @@ Item {
 
                 text: "通用脚本"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("GameCommonScript.qml");
                         //userMainProject.source = "GameCommonScript.qml";
                     }
@@ -578,7 +578,7 @@ Item {
 
                 text: "脚　本"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("GameScriptEditor.qml");
                         //userMainProject.source = "GameScriptEditor.qml";
                     }
@@ -600,7 +600,7 @@ Item {
 
                 text: "插　件"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainPlugins.qml");
                         //userMainProject.source = "GameScriptEditor.qml";
                     }
@@ -630,7 +630,7 @@ Item {
 
                 text: "图片管理"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainImageEditor.qml");
                         //userMainProject.source = "mainImageEditor.qml";
                     }
@@ -651,7 +651,7 @@ Item {
 
                 text: "音乐管理"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainMusicEditor.qml");
                         //userMainProject.source = "mainMusicEditor.qml";
                     }
@@ -672,7 +672,7 @@ Item {
 
                 text: "视频管理"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainVideoEditor.qml");
                         //userMainProject.source = "mainVideoEditor.qml";
                     }
@@ -694,7 +694,7 @@ Item {
 
             text: "开始游戏"
             onClicked: {
-                if(Platform.compileType() === "debug") {
+                if(Platform.compileType === "debug") {
                     _private.loadModule("GameStart.qml");
                     //userMainProject.source = "GameStart.qml";
                 }
@@ -723,7 +723,7 @@ Item {
 
                 text: "测　试"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainGameTest.qml");
                         //userMainProject.source = "mainGameTest.qml";
                     }
@@ -1061,7 +1061,7 @@ Item {
 
                 text: "教　程"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainTutorial.qml");
                         //userMainProject.source = "mainTutorial.qml";
                     }
@@ -1082,7 +1082,7 @@ Item {
 
                 text: "关于"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainAbout.qml");
                         //userMainProject.source = "mainAbout.qml";
                     }
@@ -1104,7 +1104,7 @@ Item {
 
                 text: "使用协议"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainAgreement.qml");
                         //userMainProject.source = "mainAgreement.qml";
                     }
@@ -1125,7 +1125,7 @@ Item {
 
                 text: "更新日志"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("mainUpdateLog.qml");
                         //userMainProject.source = "mainUpdateLog.qml";
                     }
@@ -1376,7 +1376,7 @@ Item {
             //rootGameMaker.forceActiveFocus();
 
 
-            //s_close();
+            //sg_close();
             console.debug("[mainGameMaker]onRejected");
             //Qt.quit()
 
@@ -1405,14 +1405,9 @@ Item {
 
         Connections {
             target: loader.item
-
+            //忽略没有的信号
             ignoreUnknownSignals: true
 
-
-            function onS_close() {
-                //loader.source = '';
-                _private.loadModule('');
-            }
             function onSg_close() {
                 //loader.source = '';
                 _private.loadModule('');
@@ -1954,7 +1949,7 @@ Item {
                 ++rectDebugButton.nCount;
                 break;
             case FrameManagerClass.QtDebugMsg:
-                if(Platform.compileType() === "debug") {
+                if(Platform.compileType === "debug") {
                 }
                 break;
 

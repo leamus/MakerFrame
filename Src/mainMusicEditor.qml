@@ -31,8 +31,8 @@ Item {
     id: root
 
 
-    signal s_close();
-    onS_close: {
+    signal sg_close();
+    onSg_close: {
         mediaPlayer.stop();
     }
 
@@ -411,14 +411,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainMusicEditor]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainMusicEditor]Back Key");
         event.accepted = true;

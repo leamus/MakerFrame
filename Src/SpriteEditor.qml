@@ -32,8 +32,8 @@ Item {
 
 
 
-    signal s_close();
-    onS_close: {
+    signal sg_close();
+    onSg_close: {
         //spriteEffect.unload();
         spriteEffect.nSpriteType = 0;
 
@@ -845,7 +845,7 @@ Item {
                     /*nFrameCount: 3;
                     interval: 100;*/
 
-                    /*onS_clicked: {
+                    /*onSg_clicked: {
                         root.forceActiveFocus();
                     }*/
 
@@ -977,7 +977,7 @@ Item {
             }
 
             Button {
-                visible: Platform.compileType() === "debug" ? true : false
+                visible: Platform.compileType === "debug" ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
@@ -2421,14 +2421,14 @@ function $refresh(index, imageAnimate, path) {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(exportSprite())
-                        s_close();
+                        sg_close();
                     else {
                         dialogSaveSprite.open();
                     }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

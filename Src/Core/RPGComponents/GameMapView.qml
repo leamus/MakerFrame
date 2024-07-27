@@ -718,7 +718,7 @@ Item {
 
                         nMaxHeight: 32
 
-                        onS_over: {
+                        onSg_over: {
                             visible = false;
                         }
                     }

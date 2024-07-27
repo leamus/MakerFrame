@@ -87,7 +87,7 @@ Item {
     }
 
 
-    signal s_close();
+    signal sg_close();
 
 
     //商店所列 道具名
@@ -165,8 +165,8 @@ Item {
                     border.color: 'white'
                     border.width: 1
 
-                    onButtonClicked: {
-                        s_close();
+                    onSg_clicked: {
+                        sg_close();
                     }
                 }
             }
@@ -190,7 +190,7 @@ Item {
                 //每页个数
                 nPageItemsCount: 20
 
-                onS_Choice: {
+                onSg_choice: {
                     //let goodsInfo = _private.goodsResource[arrData[index]];
 
                     let description = arrData[index].$description;
@@ -198,7 +198,7 @@ Item {
                         description = description(arrData[index]);
                     goodsDetail.text = description;
                 }
-                onS_DoubleChoice: {
+                onSg_doubleChoice: {
                     if(arrData[index].$price) {
                         itemCountBox.tradeData.type = 1;
                         itemCountBox.tradeData.goods = arrData[index];
@@ -257,14 +257,14 @@ Item {
                 //每页个数
                 nPageItemsCount: 20
 
-                onS_Choice: {
+                onSg_choice: {
                     //let goodsInfo = _private.goodsResource[game.gd["$sys_goods"][index].$rid];
                     let description = game.gd["$sys_goods"][index].$description;
                     if(GlobalLibraryJS.isFunction(description))
                         description = description(game.gd["$sys_goods"][index]);
                     goodsDetail.text = description;
                 }
-                onS_DoubleChoice: {
+                onSg_doubleChoice: {
                     if(arrData[index].$price && GlobalLibraryJS.isValidNumber(arrData[index].$price[1])) {
                         itemCountBox.tradeData.type = 2;
                         itemCountBox.tradeData.goods = arrData[index];
@@ -476,7 +476,7 @@ Item {
 
 
 
-                    onButtonClicked: {
+                    onSg_clicked: {
                         itemCountBox.visible = false;
 
                         let goods = itemCountBox.tradeData.goods;
@@ -536,7 +536,7 @@ Item {
 
 
 
-                    onButtonClicked: {
+                    onSg_clicked: {
                         itemCountBox.visible = false;
 
 

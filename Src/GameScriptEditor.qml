@@ -31,7 +31,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
     function init() {
@@ -248,6 +248,10 @@ Item {
 
 
         function show() {
+            const fileSuffixPosition = textFilePath.text.lastIndexOf('.');
+            let fileSuffix = '';
+            if(fileSuffixPosition >= 0)
+                fileSuffix = textFilePath.text.slice(fileSuffixPosition + 1);
 
             if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
 
@@ -306,10 +310,8 @@ Item {
 
         Connections {
             target: loaderVisualScript.item
-
             //忽略没有的信号
             ignoreUnknownSignals: true
-
 
             function onSg_close() {
                 //init();
@@ -542,11 +544,11 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(save())
-                        s_close();
+                        sg_close();
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

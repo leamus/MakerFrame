@@ -21,7 +21,7 @@ let data = (function() {
     //  [命令Key名, 额外设置（enabled为是否注释）, 参数值1, ...]
     let commandsInfo = ({
         '载入地图': {
-            command: ['载入地图', 'yield* game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
+            command: ['载入地图', 'yield game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
             params: [
                 ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
                 ['载入一张地图', 'label'],
@@ -324,20 +324,20 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '存档': {
-            command: ['存档', 'yield* game.save(%1,%2);', '', 0, true, 'red', 'white'],
+            command: ['存档', 'yield game.save(%1,%2);', '', 0, true, 'red', 'white'],
             params: [
                 ['文件名', 'string', '`autosave`', 0, '', 'green'],
                 ['显示文字', 'string', '`存档`', 0, '', 'blue'],
             ],
         },
         '读档': {
-            command: ['读档', 'yield* game.load(%1);', '', 0, true, 'red', 'white'],
+            command: ['读档', 'yield game.load(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['文件名', 'string', '`autosave`', 0, '', 'green'],
             ],
         },
         '游戏结束': {
-            command: ['游戏结束', 'yield* game.gameover(%1);', '', 0, true, 'red', 'white'],
+            command: ['游戏结束', 'yield game.gameover(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['参数', 'json', '{}', 0, '', 'green'],
             ],
@@ -437,7 +437,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '使用道具': {
-            command: ['使用道具', 'yield* game.usegoods(%1,%2);', '使用道具', 0, true, 'red', 'white'],
+            command: ['使用道具', 'yield game.usegoods(%1,%2);', '使用道具', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],

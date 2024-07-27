@@ -32,8 +32,8 @@ Item {
 
 
 
-    signal s_close();
-    onS_close: {
+    signal sg_close();
+    onSg_close: {
         role.unload();
 
         rectImage.visible = false;
@@ -1825,7 +1825,7 @@ Item {
                     //bTest: true
                     sprite.nType: 1
 
-                    /*onS_clicked: {
+                    /*onSg_clicked: {
                         root.forceActiveFocus();
                     }*/
 
@@ -1976,7 +1976,7 @@ Item {
             }
 
             Button {
-                visible: Platform.compileType() === "debug" ? true : false
+                visible: Platform.compileType === "debug" ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
@@ -3261,14 +3261,14 @@ function $refresh(index, imageAnimate, path) {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(exportRole())
-                        s_close();
+                        sg_close();
                     else {
                         dialogSaveRole.open();
                     }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

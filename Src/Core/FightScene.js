@@ -765,7 +765,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //保存到列表中，退出时会删除所有，防止删除错误
             _private.mapSpriteEffectsTemp[combatantActionSpriteDataID] = spriteEffect;
-            spriteEffect.s_finished.connect(function() {
+            spriteEffect.sg_finished.connect(function() {
                 if(GlobalLibraryJS.isComponent(spriteEffect)) {
                     game.$sys.unloadSpriteEffect(spriteEffect);
                     //spriteEffect.destroy();
@@ -1674,7 +1674,7 @@ function showFightRoleInfo(nIndex) {
     //gameMenuWindow.showFightRoleInfo(nIndex);
 }
 
-//function onS_ShowSystemWindow() {
+//function onSg_showSystemWindow() {
 //    gameMenuWindow.show();
 //}
 

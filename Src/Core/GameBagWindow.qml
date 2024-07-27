@@ -230,7 +230,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '全部'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(-1);
                     }
                 }
@@ -243,7 +243,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '使用'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(1);
                     }
                 }
@@ -256,7 +256,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '装备'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(2);
                     }
                 }
@@ -269,7 +269,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '战斗'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(3);
                     }
                 }
@@ -282,7 +282,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '剧情'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(5);
                     }
                 }
@@ -297,7 +297,7 @@ Item {
                     border.color: 'white'
                     border.width: 1
                     text: '卖'
-                    onButtonClicked: {
+                    onSg_clicked: {
                         root.showGoods(4);
                     }
                 }
@@ -380,7 +380,7 @@ Item {
                     //nItemMinHeight: 50
 
                     //双击后弹出信息
-                    onS_DoubleChoice: {
+                    onSg_doubleChoice: {
                         //root.showWindow(0b10, nChoiceIndex);
                         game.window({$id: 0b10, $value: nChoiceIndex});
                         //itemFightRoleInfo.init(nChoiceIndex);
@@ -413,7 +413,7 @@ Item {
 
 
                     //单击
-                    onS_Choice: function(index) {
+                    onSg_choice: function(index) {
 
                         /*switch(index) {
                         case 0:
@@ -473,7 +473,7 @@ Item {
                 textTips.font.pointSize: 12
 
                 //点击后操作
-                onButtonClicked: {
+                onSg_clicked: {
                     if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
                         return;
 
@@ -484,7 +484,7 @@ Item {
 
                     //脚本执行完毕后刷新背包
                     game.run(function*(){
-                        yield* game.usegoods(index, goods);
+                        yield game.usegoods(index, goods);
                         root.showGoods(root.nlastShowType);
                     });
                 }
@@ -499,7 +499,7 @@ Item {
 
                 text: "装备"
                 textTips.font.pointSize: 12
-                onButtonClicked: {
+                onSg_clicked: {
                     if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
                         return;
 
@@ -533,7 +533,7 @@ Item {
 
                 text: "丢弃"
                 textTips.font.pointSize: 12
-                onButtonClicked: {
+                onSg_clicked: {
                     if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
                         return;
 
@@ -553,7 +553,7 @@ Item {
 
                 text: "关闭"
                 textTips.font.pointSize: 12
-                onButtonClicked: {
+                onSg_clicked: {
                     root.hide();
                 }
             }

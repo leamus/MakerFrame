@@ -27,25 +27,25 @@ Item {
 
 
     //被点击
-    //signal s_clicked();
+    //signal sg_clicked();
 
-    signal s_started();
-    signal s_refreshed(int currentFrame);
+    signal sg_started();
+    signal sg_refreshed(int currentFrame);
     //每次播放结束
-    signal s_looped();
+    signal sg_looped();
     //停止播放
-    signal s_finished();
-    onS_finished: {
+    signal sg_finished();
+    onSg_finished: {
         //timerSound.stop();
-        //root.s_finished();
+        //root.sg_finished();
         if(bTest)
             console.debug('!!!onFinished:', soundeffect.source, strSource);
     }
-    signal s_paused();
-    signal s_stoped();
+    signal sg_paused();
+    signal sg_stoped();
 
     //播放音效
-    signal s_playEffect(string soundeffectSource)
+    signal sg_playEffect(string soundeffectSource)
 
 
 
@@ -92,7 +92,7 @@ Item {
 
         _private.nState = 2;
 
-        s_paused();
+        sg_paused();
     }
 
     //停止动画
@@ -109,7 +109,7 @@ Item {
 
         _private.nState = 0;
 
-        s_stoped();
+        sg_stoped();
     }
 
     function refresh() {
@@ -269,24 +269,24 @@ Item {
             ++_private.nLoopedCount;
             if(_private.nLoopedCount === root.nLoops) {
                 root.stop(false);
-                root.s_looped();
-                root.s_finished();
+                root.sg_looped();
+                root.sg_finished();
                 return;
             }
             else {
-                root.s_looped();
+                root.sg_looped();
                 root.nCurrentFrame = 0;
             }
         }
 
         if(root.nCurrentFrame === 0) {
-            root.s_started();
+            root.sg_started();
 
             if(strSoundeffectName)
                 timerSound.restart();
         }
 
-        root.s_refreshed(root.nCurrentFrame);
+        root.sg_refreshed(root.nCurrentFrame);
 
         refresh();
     }
@@ -495,7 +495,7 @@ Item {
                 soundeffect.play();
             }
             else
-                s_playEffect(root.strSoundeffectName);
+                sg_playEffect(root.strSoundeffectName);
         }
     }
 
@@ -514,7 +514,7 @@ Item {
                 root.stop();
             else
                 root.restart();
-            //s_clicked();
+            //sg_clicked();
 
             //console.debug('[DirSpriteEffect]start')
         }

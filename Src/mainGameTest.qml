@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -259,7 +259,7 @@ Item {
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 _private.gameSceneClose();
             }
         }
@@ -312,7 +312,7 @@ Item {
                 loaderGameScene.item.bTest = true;
                 //loaderGameScene.item.openMap(item);
                 let tScript = function*() {
-                    yield* game.loadmap(textMapName.text);
+                    yield game.loadmap(textMapName.text);
                     game.createhero(textRoleName.text);
                     game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
                     game.interval(16);
@@ -416,14 +416,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainGameTest]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainGameTest]Back Key");
         event.accepted = true;

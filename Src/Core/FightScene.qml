@@ -46,8 +46,8 @@ Item {
     id: rootFightScene
 
 
-    signal s_FightOver();
-    onS_FightOver: {
+    signal sg_fightOver();
+    onSg_fightOver: {
         release();
     }
 
@@ -211,14 +211,14 @@ Item {
                 //button.color = tb.$colors[0];
             }
             if(tb.$clicked)
-                button.clicked.connect(function() {
+                button.sg_clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     fight.run(tb.$clicked.call(button, button) ?? null, {Tips: 'FightScene button clicked'});
                 });
             //！！！兼容旧代码
             else if(tb.$action)
-                button.clicked.connect(function() {
+                button.sg_clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     fight.run(tb.$action.call(button, button) ?? null);
@@ -421,7 +421,7 @@ Item {
 
         //初始化脚本
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
-            let r = game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
+            const r = game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))yield* r;
             //yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight_init_script'], -2, );
         }
@@ -487,7 +487,7 @@ Item {
 
 
         if(game.$sys.resources.commonScripts["fight_start_script"]) {
-            let r = game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
+            const r = game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))yield* r;
             //yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight start1'], -2);
         }
@@ -768,7 +768,7 @@ Item {
         //流程：手动或自动 游戏结束，调用依次FightSceneJS.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
         readonly property var over: function(result) {
             if(result === undefined) {
-                s_FightOver();
+                sg_fightOver();
                 return;
             }
             else if(result === true)
@@ -1087,7 +1087,7 @@ Item {
         SpriteEffect {
             animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
 
-            onS_playEffect: {
+            onSg_playEffect: {
                 game.$sys.playSoundEffect(soundeffectSource);
             }
         }
@@ -1346,7 +1346,7 @@ Item {
                             }
                         }
 
-                        onS_playEffect: {
+                        onSg_playEffect: {
                             game.$sys.playSoundEffect(soundeffectSource);
                         }
                     }
@@ -1554,7 +1554,7 @@ Item {
                             }
                         }
 
-                        onS_playEffect: {
+                        onSg_playEffect: {
                             game.$sys.playSoundEffect(soundeffectSource);
                         }
                     }
@@ -1659,6 +1659,8 @@ Item {
 
         Connections {
             target: dialogFightMsg.item
+            //忽略没有的信号
+            ignoreUnknownSignals: true
 
             /*function onAccepted() {
             }
@@ -1687,8 +1689,10 @@ Item {
 
         /*Connections {
             target: loaderFightMenu.item
-
-            function onS_Choice(index) {
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+            
+            function onSg_choice(index) {
             }
         }
         * /
@@ -1710,7 +1714,7 @@ Item {
         height: implicitHeight
         anchors.centerIn: parent
 
-        onS_Choice: {
+        onSg_choice: {
             //hide();
             menuFightRoleChoice.visible = false;
 
@@ -1832,7 +1836,7 @@ Item {
 
             /*ColorButton {
                 text: "重复上次"
-                onButtonClicked: {
+                onSg_clicked: {
                     //rowlayoutButtons.enabled = false;
 
                     FightSceneJS.resetFightScene();
@@ -1850,7 +1854,7 @@ Item {
 
             /*ColorButton {
                 text: "随机普通攻击"
-                onButtonClicked: {
+                onSg_clicked: {
                     for(let i = 0; i < fight.myCombatants.length; ++i) {
                         if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                             //fight.myCombatants[i].$$fightData.$lastChoice.$targets = fight.myCombatants[i].$$fightData.$choice.$targets;
@@ -1862,14 +1866,14 @@ Item {
 
             ColorButton {
                 text: "逃跑"
-                onButtonClicked: {
+                onSg_clicked: {
                     FightSceneJS.runAway();
                 }
             }
 
             ColorButton {
                 text: _private.nAutoAttack === 0 ? "手动攻击" : '自动攻击'
-                onButtonClicked: {
+                onSg_clicked: {
                     if(_private.nAutoAttack === 0) {
                         _private.nAutoAttack = 1;
 
@@ -1898,7 +1902,7 @@ Item {
             //height: parent.height / 2
             //anchors.centerIn: parent
 
-            onS_Choice: {
+            onSg_choice: {
                 fight.myCombatants[0].$$fightData.defenseProp = fight.myCombatants[0].$$fightData.attackProp = index;
 
                 /*while(1) {
@@ -1922,10 +1926,10 @@ Item {
                         if(_private.fightEndScript)
                             GlobalJS.runScript(_private.asyncScriptQueue, 0, _private.fightEndScript, ret.value);
                         if(ret.value === 1) {
-                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, "", 100, 1);s_FightOver();');
+                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, "", 100, 1);sg_fightOver();');
                         }
                         else
-                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, "", 100, 1);s_FightOver();');
+                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, "", 100, 1);sg_fightOver();');
                     }
                     break;
                 }*/
@@ -2007,7 +2011,7 @@ Item {
                 //height: parent.height / 2
                 //anchors.centerIn: parent
 
-                onS_Choice: {
+                onSg_choice: {
                     rectSkills.visible = false;
                     //menuSkillsOrGoods.hide();
 
@@ -2025,13 +2029,13 @@ Item {
 
         ColorButton {
             text: "调试"
-            onButtonClicked: {
+            onSg_clicked: {
                 dialogScript.visible = true;
             }
         }
         ColorButton {
             text: "退出战斗"
-            onButtonClicked: {
+            onSg_clicked: {
                 fight.over(true);
 
                 //rootFightScene.visible = false;

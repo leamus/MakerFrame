@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
     function init() {
@@ -313,7 +313,7 @@ function *$gameInit(newGame) {
         }
     }
     /*/载入所有插件的 game.js 的所有变量和函数复制给 game.gf.$plugins[tp0][tp1]，并调用其 $init
-    let plugins = yield* game.plugin();
+    let plugins = yield game.plugin();
     for(let tp0 in plugins) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
@@ -379,7 +379,7 @@ function *$gameRelease(gameExit) {
     }
 
     /*/载入所有插件的 game.js 的 $release
-    let plugins = yield* game.plugin();
+    let plugins = yield game.plugin();
     for(let tp0 in game.gf.$plugins) {
         for(let tp1 in game.gf.$plugins[tp0]) {
             if(game.gf.$plugins[tp0][tp1].$release) {
@@ -393,7 +393,7 @@ function *$gameRelease(gameExit) {
 
 
     if(gameExit)
-        yield* game.save();  //自动存档
+        yield game.save();  //自动存档
 
     return null;
 }
@@ -1833,7 +1833,7 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
         if(res.result === -1)
-            yield* game.gameover(-1);
+            yield game.gameover(-1);
 
 
         //增加经验
@@ -2324,11 +2324,11 @@ function $readSavesInfo(count=3) {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(save())
-                        s_close();
+                        sg_close();
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();

@@ -17,7 +17,7 @@ Item {
     id: root
 
 
-    signal s_refreshBagWindow();
+    signal sg_refreshBagWindow();
 
 
 
@@ -190,7 +190,7 @@ Item {
                         border.color: 'white'
                         border.width: 1
 
-                        onButtonClicked: {
+                        onSg_clicked: {
                             if(root.nFightRoleIndex > 0) {
                                 --root.nFightRoleIndex;
                                 root.refresh();
@@ -206,7 +206,7 @@ Item {
                         border.color: 'white'
                         border.width: 1
 
-                        onButtonClicked: {
+                        onSg_clicked: {
                             if(game.gd[strTeamName].length - 1 > root.nFightRoleIndex) {
                                 ++root.nFightRoleIndex;
                                 root.refresh();
@@ -222,7 +222,7 @@ Item {
                         border.color: 'white'
                         border.width: 1
 
-                        onButtonClicked: {
+                        onSg_clicked: {
                             root.hide();
                         }
                     }
@@ -297,7 +297,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                onS_Choice: {
+                onSg_choice: {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
@@ -311,7 +311,7 @@ Item {
                     msgDetail.text = description;
                 }
 
-                onS_DoubleChoice: {
+                onSg_doubleChoice: {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
@@ -319,7 +319,7 @@ Item {
                     game.getgoods(game.unload(root.nFightRoleIndex, root.arrEquipmentPositions[index]));
 
                     root.refresh();
-                    s_refreshBagWindow();
+                    sg_refreshBagWindow();
 
                     //textGoodsInfo.text = textGoodsInfo.strPreText;
                     //rectGoods.showGoods(rectGoods.nlastShowType);
@@ -331,7 +331,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                onS_Choice: {
+                onSg_choice: {
                     let combatant = game.gd[strTeamName][root.nFightRoleIndex];
                     //msgDetail.text = game.$sys.getSkillResource(combatant.$skills[index].$rid).$properties.description;
 

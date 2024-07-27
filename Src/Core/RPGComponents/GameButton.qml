@@ -8,8 +8,8 @@ Rectangle {
     id: root
 
 
-    signal s_pressed();
-    signal s_released();
+    signal sg_pressed();
+    signal sg_released();
 
 
     width: 6 * Screen.pixelDensity
@@ -28,10 +28,10 @@ Rectangle {
         }
         */
         onPressed: {
-            s_pressed();
+            sg_pressed();
         }
         onReleased: {
-            s_released();
+            sg_released();
         }
     }
 }

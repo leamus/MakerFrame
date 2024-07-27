@@ -335,23 +335,23 @@ function *loadResources() {
                 button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
 
                 if(tConfig.$pressed)
-                    button.s_pressed.connect(function() {
+                    button.sg_pressed.connect(function() {
                         //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                         //    return;
-                        game.run(tConfig.$pressed.call(button) ?? null);
+                        game.async(tConfig.$pressed.call(button) ?? null);
                 });
                 //！！！兼容旧代码
                 else if(tConfig.$clicked)
-                    button.s_pressed.connect(function() {
+                    button.sg_pressed.connect(function() {
                         //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                         //    return;
-                        game.run(tConfig.$clicked.call(button) ?? null);
+                        game.async(tConfig.$clicked.call(button) ?? null);
                 });
                 if(tConfig.$released)
-                    button.s_released.connect(function() {
+                    button.sg_released.connect(function() {
                         //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                         //    return;
-                        game.run(tConfig.$released.call(button) ?? null);
+                        game.async(tConfig.$released.call(button) ?? null);
                 });
             }
 
@@ -732,7 +732,7 @@ function *loadResources() {
                 if(ts.$load && ts.$autoLoad !== false) {
                     //ts.$load();
                     //game.run([ts.$load() ?? null, 'plugin_load:' + tc0 + tc1]);
-                    let r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
+                    const r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
                     if(GlobalLibraryJS.isGenerator(r))yield* r;
                 }
             }
@@ -755,7 +755,7 @@ function *unloadResources() {
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false) {
                 //_private.objPlugins[tc][tp].$unload();
                 //game.run([_private.objPlugins[tc][tp].$unload() ?? null, 'plugin_unload:' + tc + tp]);
-                let r = _private.objPlugins[tc][tp].$unload();
+                const r = _private.objPlugins[tc][tp].$unload();
                 if(GlobalLibraryJS.isGenerator(r))yield* r;
             }
 
@@ -1620,8 +1620,8 @@ function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRo
     if(roleResourceInfo) {
         if(!roleComp) {
             roleComp = compRole.createObject(parent);
-            roleComp.sprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
-            //roleComp.customSprite.s_playEffect.connect(rootSoundEffect.playSoundEffect);
+            roleComp.sprite.sg_playEffect.connect(rootSoundEffect.playSoundEffect);
+            //roleComp.customSprite.sg_playEffect.connect(rootSoundEffect.playSoundEffect);
         }
 
 

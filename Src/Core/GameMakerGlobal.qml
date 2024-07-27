@@ -31,7 +31,7 @@ QtObject {
 
 
 
-    property string separator: Platform.separator(true)
+    property string separator: Platform.sl_separator(true)
 
     property url urlRPGCorePath: Qt.resolvedUrl('.')
 
@@ -59,7 +59,7 @@ QtObject {
                 return Platform.externalDataPath + separator + 'RPGMaker';
                 //return 'assets:';   //'.'  //':'
             case 'windows':
-                if(Platform.compileType() === 'release')
+                if(Platform.compileType === 'release')
                     return 'RPGMaker';
                 else
                     return 'F:/_Projects/Pets/MakerFrame/RPGMaker';
@@ -337,7 +337,7 @@ QtObject {
 
 
 
-        if(Platform.compileType() === 'release') {
+        if(Platform.compileType === 'release') {
             let userID = '', account = '', nickname = '';
             if(Global.frameSettings.$userData) {
                 let userData = JSON.parse(FrameManager.sl_uncompress(Global.frameSettings.$userData, 1).toString());
@@ -351,13 +351,13 @@ QtObject {
                 Url: 'http://MakerFrame.Leamus.cn/api/v1/client/usage',
                 Method: 'POST',
                 Data: {
-                    client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})`,
+                    client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType})`,
                     product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
                     serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}`,
                     timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
                     times: settings.$RunTimes, duration: settings.$RunDuration,
                 },
-                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType()})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
+                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
                 Gzip: [1, 1024],
                 //Headers: {},
             }).$then((xhr)=>{

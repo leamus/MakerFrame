@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -153,7 +153,7 @@ Item {
 
                 text: "简易画板"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("PaintView.qml");
                         //userMainProject.source = "mainMapEditor.qml";
                     }
@@ -175,7 +175,7 @@ Item {
 
                 text: "简易画板2"
                 onClicked: {
-                    if(Platform.compileType() === "debug") {
+                    if(Platform.compileType === "debug") {
                         _private.loadModule("NanoPaintView.qml");
                         //userMainProject.source = "mainMapEditor.qml";
                     }
@@ -338,12 +338,10 @@ Item {
 
         Connections {
             target: loader.item
-
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-
-            function onS_close() {
+            function onSg_close() {
                 root.forceActiveFocus();
 
                 loader.visible = false;
@@ -398,14 +396,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainTutorial]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainTutorial]Back Key");
         event.accepted = true;

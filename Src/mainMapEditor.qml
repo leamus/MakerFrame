@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -76,7 +76,7 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
             //loader.item.focus = true;
-            s_close();
+            sg_close();
         }
 
         onClicked: {
@@ -496,7 +496,7 @@ Item {
             //root.forceActiveFocus();
 
 
-            //s_close();
+            //sg_close();
             console.debug("[mainMapEditor]onRejected")
             //Qt.quit()
 
@@ -749,7 +749,7 @@ Item {
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 //!!!!!!作用：绕过 多次载入地图编辑器时黑屏 的问题
                 //  经详细排查，貌似是内存不足（创建新图层引起的），但奇怪的是，即使destroy成功，内存也不会释放，但这个Loader释放后就正常了。
                 //  游戏中因为没有创建新图层所以不会有问题。
@@ -873,14 +873,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainMapEditor]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainMapEditor]Back Key");
         event.accepted = true;

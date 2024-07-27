@@ -66,7 +66,7 @@ Item {
         //nItemMaxHeight: 100
         //nItemMinHeight: 50
 
-        onS_Choice: function(index) {
+        onSg_choice: function(index) {
             let continueScript;
             switch(index) {
             case 0:
@@ -80,7 +80,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        yield* game.save('存档' + c, game.gd['$sys_map'].$name, -1);
+                        yield game.save('存档' + c, game.gd['$sys_map'].$name, -1);
                         yield game.msg('存档成功');
                         break;
                     default:
@@ -101,8 +101,8 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        ////game.$globalLibraryJS.setTimeout(function() {yield* game.load('存档' + c)}, 0, game);
-                        let ret = yield* game.load('存档' + c);
+                        ////game.$globalLibraryJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
+                        let ret = yield game.load('存档' + c);
                         if(ret) {
                             yield game.msg('读档成功');
                         }

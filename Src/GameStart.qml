@@ -31,7 +31,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
     function init() {
@@ -80,7 +80,7 @@ Item {
                 _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
 game.scale(1);
 game.interval(16);
-//yield* game.loadmap('鹰歌地图');
+//yield game.loadmap('鹰歌地图');
 //game.createhero('深林孤鹰');
 //game.movehero(1,11);
 //game.playmusic('音乐1mp3');
@@ -440,7 +440,7 @@ game.goon();
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 _private.gameSceneClose();
             }
         }
@@ -543,15 +543,15 @@ function *$start() {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield* game.load('存档' + c)},);
-                        if(yield* game.load('存档' + c))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
+                        if(yield game.load('存档' + c))
                             break;
                         else
                             yield game.msg("读取失败");
                         continue;
                     case 3:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield* game.load('autosave')},);
-                        if(yield* game.load('autosave'))
+                        //game.$globalLibraryJS.runNextEventLoop(function() {yield game.load('autosave')},);
+                        if(yield game.load('autosave'))
                             break;
                         else
                             yield game.msg("读取失败");
@@ -595,14 +595,14 @@ function *$start() {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug('[GameStart]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug('[GameStart]Back Key');
         event.accepted = true;

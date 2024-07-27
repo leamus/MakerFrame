@@ -32,7 +32,7 @@ import 'qrc:/QML'
       缺省为按返回键；
       或者：
         js可以调用 parent.close();
-        qml可以定义一个 s_close() 信号，或调用 parent.close();
+        qml可以定义一个 sg_close() 信号，或调用 parent.close();
 */
 
 
@@ -41,7 +41,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -133,11 +133,10 @@ Item {
 
         Connections {
             target: loaderExtends.item
-
+            //忽略没有的信号
             ignoreUnknownSignals: true
 
-
-            function onS_close() {
+            function onSg_close() {
                 loaderExtends.close();
             }
         }
@@ -336,7 +335,7 @@ Item {
                 OnCanceled: ()=>{
                     l_list.visible = false;
                     //root.forceActiveFocus();
-                    s_close();
+                    sg_close();
                 },
                 OnRemoveClicked: (index, item)=>{
                     let tc0 = arrPluginsName[index][0];
@@ -402,7 +401,7 @@ Item {
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
         l_list.visible = false;
-        s_close();
+        sg_close();
 
         console.debug("[PluginsManager]Escape Key");
         event.accepted = true;
@@ -410,7 +409,7 @@ Item {
     }
     Keys.onBackPressed: {
         l_list.visible = false;
-        s_close();
+        sg_close();
 
         console.debug("[PluginsManager]Back Key");
         event.accepted = true;

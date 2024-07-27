@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -99,7 +99,7 @@ Item {
 
             text: "返　回"
             onClicked: {
-                s_close();
+                sg_close();
             }
         }
     }
@@ -121,14 +121,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainAbout]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainAbout]Back Key");
         event.accepted = true;

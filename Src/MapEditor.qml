@@ -96,8 +96,8 @@ Item {
 
 
 
-    signal s_close()
-    onS_close: {
+    signal sg_close()
+    onSg_close: {
         _private.cleanMap();
     }
 
@@ -545,7 +545,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                visible: Platform.compileType() === "debug"
+                visible: Platform.compileType === "debug"
 
                 font.pointSize: _config.nFontPointSize
                 text: "调试"
@@ -3195,10 +3195,10 @@ Item {
 
         Connections {
             target: loaderTestMap.item
-
+            //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 loaderTestMap.visible = false;
                 //root.focus = true;
                 root.forceActiveFocus();
@@ -3260,13 +3260,13 @@ Item {
             visible = true;
         }
 
-        /*//HotLoader可自动链接 s_close
+        /*//HotLoader可自动链接 sg_close
         Connections {
             target: hotLoader.qmlObject
-
+            //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 //hotLoader.close();
 
                 //hotLoader.visible = false;
@@ -3684,14 +3684,14 @@ Item {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(exportMap())
-                        s_close();
+                        sg_close();
                     else {
                         dialogSave.open();
                     }
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                     //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{

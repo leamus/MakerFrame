@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
 
@@ -77,7 +77,7 @@ Item {
             //root.forceActiveFocus();
             //loader.item.focus = true;
 
-            s_close();
+            sg_close();
         }
 
         onClicked: {
@@ -161,7 +161,7 @@ Item {
             //忽略没有的信号
             ignoreUnknownSignals: true
 
-            function onS_close() {
+            function onSg_close() {
                 _private.refresh();
 
                 loader.visible = false;
@@ -222,14 +222,14 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainRoleEditor]Escape Key");
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        s_close();
+        sg_close();
 
         console.debug("[mainRoleEditor]Back Key");
         event.accepted = true;

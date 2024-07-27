@@ -14,8 +14,8 @@ Rectangle {
 
 
     //选择事件
-    signal s_Choice(int index);
-    signal s_DoubleChoice(int index);
+    signal sg_choice(int index);
+    signal sg_doubleChoice(int index);
 
 
 
@@ -50,7 +50,7 @@ Rectangle {
         refresh();
 
         if(index >= 0)
-            s_Choice(index);
+            sg_choice(index);
     }
 
 
@@ -232,7 +232,7 @@ Rectangle {
                         else
                             nChoiceIndex = nPageItemsCount * nPageIndex + tRoot.nIndex;
                         nChoiceListIndex = tRoot.nIndex;
-                        root.s_Choice(nChoiceIndex);
+                        root.sg_choice(nChoiceIndex);
                         mouse.accepted = true;
                     }
                     onDoubleClicked: {
@@ -241,7 +241,7 @@ Rectangle {
                         else
                             nChoiceIndex = nPageItemsCount * nPageIndex + tRoot.nIndex;
                         nChoiceListIndex = tRoot.nIndex;
-                        root.s_DoubleChoice(nChoiceIndex);
+                        root.sg_doubleChoice(nChoiceIndex);
                         mouse.accepted = true;
                     }
                 }

@@ -30,7 +30,7 @@ Item {
     id: root
 
 
-    signal s_close();
+    signal sg_close();
 
 
     function init(fightSkillName) {
@@ -397,6 +397,9 @@ let data = (function() {
 
         Connections {
             target: gameVisualFightSkill
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+            
             function onSg_close() {
                 gameVisualFightSkill.visible = false;
 
@@ -504,11 +507,11 @@ let data = (function() {
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
                     if(save())
-                        s_close();
+                        sg_close();
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    s_close();
+                    sg_close();
                 },
                 OnDiscarded: ()=>{
                     dialogCommon.close();
