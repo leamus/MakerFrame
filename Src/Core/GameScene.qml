@@ -372,6 +372,7 @@ Item {
                 //itemTimers.children[ti].destroy();
                 itemTimers.children[ti].stop();
                 itemTimers.children[ti].triggered();
+                itemTimers.children[ti].destroy();
             }
 
 
@@ -501,115 +502,123 @@ Item {
     //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
-        //载入地图并执行地图载入事件；成功返回 true（生成器返回 地图信息）。
-        //userData是用户传入数据，后期调用的钩子函数会传入；
-        //forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
-        readonly property var loadmap: function(mapRID, userData, forceRepaint=false) {
+        //功能：载入地图资源名为mapRID的地图并执行地图载入事件$start。
+        //参数：userData是用户传入数据，后期调用的钩子函数会传入；
+        //  forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
+        //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
+        //示例：yield game.loadmap('地图资源名');
+        function loadmap(mapRID, userData, forceRepaint=false) {
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _loadmap = function(resolve, reject) {
                 game.async(function*(){
 
-                if(!mapRID) {
-                    //asyncScriptQueue.runNextEventLoop('loadmap');
-                    console.exception('[!GameScene]loadmap Fail:', mapRID);
-                    return reject('loadmap Fail');
-                }
+                    if(!mapRID) {
+                        //asyncScriptQueue.runNextEventLoop('loadmap');
+                        console.exception('[!GameScene]loadmap Fail:', mapRID);
+                        return reject('loadmap Fail');
+                    }
 
 
-                //！！！鹰：注意：loadmap是异步调用；且将 Priority 设置为顺序的（保证 game.loadmap 的所有异步脚本执行完毕 再执行 game.loadmap 的下一个命令）
-                //let priority = 0;
+                    //！！！鹰：注意：loadmap是异步调用；且将 Priority 设置为顺序的（保证 game.loadmap 的所有异步脚本执行完毕 再执行 game.loadmap 的下一个命令）
+                    //let priority = 0;
 
 
-                //game.run(function*() {
+                    //game.run(function*() {
 
-                //执行之前地图的 $end 函数
-                if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
-                    let ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
-                    if(ts.$end) {
-                        const r = ts.$end(userData);
+                    //执行之前地图的 $end 函数
+                    if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
+                        const ts = _private.jsEngine.load('map.js', GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name));
+                        if(ts.$end) {
+                            const r = ts.$end(userData);
+                            if(GlobalLibraryJS.isGenerator(r))yield* r;
+                            //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
+                        }
+                    }
+
+
+                    //清理工作
+
+                    timer.running = false;
+
+
+                    for(let tc in _private.objTmpMapComponents) {
+                        const c = _private.objTmpMapComponents[tc];
+                        if(GlobalLibraryJS.isComponent(c)) {
+                            if(c.$destroy)
+                                c.$destroy();
+                            else if(c.Destroy)
+                                c.Destroy();
+                            else if(c.destroy)
+                                c.destroy();
+                        }
+                    }
+                    _private.objTmpMapComponents = [];
+
+                    game.delrole(-1);
+
+                    _private.objTimers = {};
+
+                    mainRole.$$collideRoles = {};
+                    mainRole.$$mapEventsTriggering = {};
+                    if(GlobalLibraryJS.shortCircuit(0b1,
+                        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$changeMapStopAction'),
+                        GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$changeMapStopAction'), true)
+                    )
+                        _private.stopMove(0); //加上可以让主角停止，重新操作才可以移动
+
+                    game.d = {};
+                    game.f = {};
+
+
+                    //载入beforeLoadmap脚本
+                    const beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
+                    if(beforeLoadmap) {
+                        const r = beforeLoadmap(mapRID, userData);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
+                        //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
                     }
-                }
 
 
-                //清理工作
+                    //itemViewPort.itemRoleContainer.visible = false;
+                    const mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
+                    //itemViewPort.itemRoleContainer.visible = true;
 
-                timer.running = false;
+                    setSceneToRole(_private.sceneRole);
 
 
-                for(let tc in _private.objTmpMapComponents) {
-                    let c = _private.objTmpMapComponents[tc];
-                    if(GlobalLibraryJS.isComponent(c)) {
-                        if(c.$destroy)
-                            c.$destroy();
-                        else if(c.Destroy)
-                            c.Destroy();
-                        else if(c.destroy)
-                            c.destroy();
+                    //载入地图会卡顿，重新开始计时会顺滑一点
+                    timer.running = true;
+                    timer.nLastTime = 0;
+
+
+                    //let priority = 0;
+
+
+                    if(itemViewPort.mapScript.$start) {
+                        const r = itemViewPort.mapScript.$start(userData);
+                        if(GlobalLibraryJS.isGenerator(r))yield* r;
+                        //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
                     }
-                }
-                _private.objTmpMapComponents = [];
-
-                game.delrole(-1);
-
-                _private.objTimers = {};
-
-                mainRole.$$collideRoles = {};
-                mainRole.$$mapEventsTriggering = {};
-                _private.stopMove(0);
-
-                game.d = {};
-                game.f = {};
+                    else if(itemViewPort.mapScript.start) {
+                        const r = itemViewPort.mapScript.start(userData);
+                        if(GlobalLibraryJS.isGenerator(r))yield* r;
+                        //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
+                    }
 
 
-                //载入beforeLoadmap脚本
-                let beforeLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$beforeLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$beforeLoadmap'));
-                if(beforeLoadmap) {
-                    const r = beforeLoadmap(mapRID, userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield* r;
-                    //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
-                }
+                    //载入after_loadmap脚本
+                    const afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
+                    if(afterLoadmap) {
+                        const r = afterLoadmap(mapRID, userData);
+                        if(GlobalLibraryJS.isGenerator(r))yield* r;
+                        //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
+                    }
 
 
-                let mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
+                    return resolve(mapInfo);
 
-                setSceneToRole(_private.sceneRole);
-
-
-                //载入地图会卡顿，重新开始计时会顺滑一点
-                timer.running = true;
-                timer.nLastTime = 0;
-
-
-                let priority = 0;
-
-
-                if(itemViewPort.mapScript.$start) {
-                    const r = itemViewPort.mapScript.$start(userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield* r;
-                    //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
-                }
-                else if(itemViewPort.mapScript.start) {
-                    const r = itemViewPort.mapScript.start(userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield* r;
-                    //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
-                }
-
-
-                //载入after_loadmap脚本
-                let afterLoadmap = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$afterLoadmap'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$afterLoadmap'));
-                if(afterLoadmap) {
-                    const r = afterLoadmap(mapRID, userData);
-                    if(GlobalLibraryJS.isGenerator(r))yield* r;
-                    //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
-                }
-
-
-                return resolve(mapInfo);
-
-                //}, {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
-                //return true;
+                    //}, {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
+                    //return true;
 
                 });
             };
@@ -621,23 +630,24 @@ Item {
             name: ''
         }*/
 
-        //在屏幕中间显示提示信息。
-        //interval为文字显示间隔，为0则不使用；
-        //pretext为预显示的文字；
-        //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
-        //style为样式；
-        //  如果为数字，则含义为Type，表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
-        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type）；
-        //    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
-        //pauseGame为是否暂停游戏；值为true、false或字符串。如果为true或字符串则表示需要暂停等待结束，命令建议用yield关键字修饰；如果为false，则尽量不要用yield关键字；
-        //callback是结束时回调函数，默认为true（系统自动处理）；
-        //  如果是普通函数且返回不为true，则仍然调用系统定义的回调函数；
-        //  如果是生成器（函数），则先调用系统定义的回调函数，再将生成器（函数）放入事件队列中运行；
-        //buttonNum为按钮数量（0-2，目前没用）。
-        //返回组件对象；
-        readonly property var msg: function(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
+        //功能：在屏幕中间显示提示信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
+        //参数：msg为提示文字，支持HTML标签；
+        //  interval为文字显示间隔，为0则不使用；
+        //  pretext为预显示的文字；
+        //  keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
+        //  style为样式；
+        //    如果为数字，则含义为Type，表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
+        //    如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type；
+        //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
+        //  pauseGame为显示时是否暂停游戏（游戏主循环暂停，并暂停产生游戏事件）；值为true、false或字符串。如果为true或字符串则游戏会暂停（字符串表示暂停值，不同的暂停值互不影响，只要有暂停值游戏就会暂停；true表示给个随机暂停值）；
+        //  callback是结束时回调函数，如果为非函数则表示让系统自动处理（销毁组件并继续游戏）；
+        //    如果是自定义函数，参数为cb, ...params，cb表示系统处理（销毁组件并继续游戏），请在合适的地方调用 cb(...params)；
+        //  buttonNum为按钮数量（0-2，目前没用）。
+        //返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //示例：yield game.msg('你好，鹰歌')；
+        function msg(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
 
-            let itemGameMsg = compGameMsg.createObject(p || itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
+            const itemGameMsg = compGameMsg.createObject(p || itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
 
             ++itemGameMsgs.nIndex;
 
@@ -656,7 +666,7 @@ Item {
 
             let ret = itemGameMsg;
 
-            //如果为null，则返回 组件，用户自己配置并调用show
+            //如果为true，则返回 组件，用户自己配置并调用show
             if(msg !== true) {
                 /*if(callback === true || callback === 1)
                     //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
@@ -667,7 +677,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -675,6 +696,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = itemGameMsg;
 
                 itemGameMsg.show(msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
             }
@@ -688,24 +711,28 @@ Item {
             //return yield ret;
         }
 
-        //在屏幕下方显示对话信息。
-        //interval为文字显示间隔，为0则不使用；
-        //pretext为预显示的文字；
-        //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
-        //style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar）；
-        //  分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
-        //pauseGame同msg的参数；
-        //callback同msg的参数；
-        //返回组件对象；
-        readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null) {
+        //功能：在屏幕下方显示对话信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
+        //参数：role为角色名或角色对象（会显示名字和头像），可以为null（不显示名字和头像）；
+        //  msg同命令msg的参数；
+        //  interval同命令msg的参数；
+        //  pretext同命令msg的参数；
+        //  keeptime同命令msg的参数；
+        //  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar；
+        //    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
+        //  pauseGame同命令msg的参数；
+        //  callback同命令msg的参数；
+        //返回：同命令msg的返回值；
+        //示例：yield game.talk('你好，鹰歌')；
+        function talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null) {
 
-            let itemRoleMsg = compRoleMsg.createObject(p || itemRoleMsgs, {nIndex: itemRoleMsgs.nIndex});
+            const itemRoleMsg = compRoleMsg.createObject(p || itemRoleMsgs, {nIndex: itemRoleMsgs.nIndex});
 
             ++itemRoleMsgs.nIndex;
 
 
             let ret = itemRoleMsg;
 
+            //如果为true，则返回 组件，用户自己配置并调用show
             if(role !== true) {
                 /*if(callback === true || callback === 1)
                     //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
@@ -716,7 +743,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -724,6 +762,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = itemRoleMsg;
 
                 itemRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
             }
@@ -735,15 +775,17 @@ Item {
             //return yield ret;
         }
 
-        //角色头顶显示文字信息。
-        //interval为文字显示间隔，为0则不使用；
-        //pretext为预显示的文字；
-        //keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime然后自动消失；
-        //style为样式；
-        //  如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor）；
-        //      分别表示 背景色、边框色、字体颜色、字体大小；
-        //返回角色组件对象；
-        readonly property var say: function(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
+        //功能：角色头顶显示文字信息。
+        //参数：role为角色名或角色对象；
+        //  msg同命令msg的参数；
+        //  interval同命令msg的参数；
+        //  pretext同命令msg的参数；
+        //  keeptime：同命令msg的参数；
+        //  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor；
+        //    分别表示 背景色、边框色、字体颜色、字体大小；
+        //返回：角色组件对象；
+        //示例：game.say('角色名', '你好')；
+        function say(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
             if(!role)
                 return false;
 
@@ -764,8 +806,8 @@ Item {
             //样式
             if(!style)
                 style = {};
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$say') || {};
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$say;
+            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$say') || {};
+            const styleSystem = game.$gameMakerGlobalJS.$config.$styles.$say;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -780,17 +822,17 @@ Item {
         }
 
 
-        //显示一个菜单；
-        //title为显示文字；
-        //items为选项数组；
-        //style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
-        //pauseGame同msg的参数；
-        //callback同msg的参数；
-        //返回组件对象；
-        //注意：该脚本必须用yield才能暂停并接受返回值；返回值为选择的下标（0开始）。
-        readonly property var menu: function(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
+        //功能：显示一个菜单；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
+        //参数：title为显示文字；
+        //  items为选项数组；
+        //  style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
+        //  pauseGame同命令msg的参数；
+        //  callback同命令msg的参数；
+        //返回：Promise对象（完全运行完毕后状态改变；携带值为选择的下标，0起始；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])；
+        function menu(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
 
-            let itemMenu = compGameMenu.createObject(p || itemGameMenus, {nIndex: itemGameMenus.nIndex});
+            const itemMenu = compGameMenu.createObject(p || itemGameMenus, {nIndex: itemGameMenus.nIndex});
             //let maskMenu = itemMenu.maskMenu;
             //let menuGame = itemMenu.menuGame;
 
@@ -802,6 +844,7 @@ Item {
 
             let ret = itemMenu;
 
+            //如果为true，则返回 组件，用户自己配置并调用show
             if(title !== true) {
                 /*if(callback === true || callback === 1)
                     //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
@@ -812,7 +855,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -820,6 +874,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = itemMenu;
 
                 itemMenu.show(title, items, style, pauseGame, callback);
             }
@@ -831,23 +887,24 @@ Item {
             //return yield ret;
         }
 
-        //显示一个输入框；
-        //title为显示文字；
-        //pretext为预设文字；
-        //style为自定义样式；
-        //pauseGame同msg的参数；
-        //callback同msg的参数；
-        //返回组件对象；
-        //注意：该脚本必须用yield才能暂停并接受返回值；返回值为输入值。
-        readonly property var input: function(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
+        //功能：显示一个输入框；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
+        //参数：title为显示文字；
+        //  pretext为预设文字；
+        //  style为自定义样式；
+        //  pauseGame同msg的参数；
+        //  callback同msg的参数；
+        //返回：Promise对象（完全运行完毕后状态改变；携带值为输入的字符串；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //示例：let inputText = yield game.input('标题')；
+        function input(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
 
-            let itemGameInput = compGameInput.createObject(p || itemGameInputs, {nIndex: itemGameInputs.nIndex});
+            const itemGameInput = compGameInput.createObject(p || itemGameInputs, {nIndex: itemGameInputs.nIndex});
 
             ++itemGameInputs.nIndex;
 
 
             let ret = itemGameInput;
 
+            //如果为true，则返回 组件，用户自己配置并调用show
             if(title !== true) {
                 /*if(callback === true || callback === 1)
                     //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
@@ -858,7 +915,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -866,6 +934,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = itemGameInput;
 
                 itemGameInput.show(title, pretext, style, pauseGame, callback);
             }
@@ -878,21 +948,28 @@ Item {
         }
 
 
-        //创建主角；
-        //role：角色资源名 或 标准创建格式的对象（RID为角色资源名）。
-        //  其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto；
-        //  $name为游戏显示名；
-        //  $action：
-        //    为0表示静止；为1表示随机移动；为-1表示禁止操作；
-        //    为2表示定向移动；此时（用其中一个即可）：
-        //      $targetBx、$targetBy为定向的地图块坐标
-        //      $targetX、$targetY为定向的像素坐标；
-        //      $targetBlocks：为定向的地图块坐标数组;
-        //      $targetPositions为定向的像素坐标数组;
-        //      $targetBlockAuto为定向的地图块自动寻路坐标数组；
-        //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
-        //成功返回 组件对象。
-        readonly property var createhero: function(role={}) {
+        //功能：创建地图主角。
+        //参数：
+        //  role为 角色资源名 或 标准创建格式的对象。
+        //    参数对象属性：$id、$name、$showName、$scale、$speed、$penetrate、$realSize、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto；
+        //    RID为要创建的角色资源名；
+        //    $id为角色对象id（默认为$name值），id存在则会复用组件；$name为游戏显示名（默认为RID值）；
+        //    $showName为是否头顶显示名字；$scale为缩放倍率数组（横竖坐标轴方向）；$speed为移动速度；$penetrate为是否可穿透；$realSize为影子大小；$avatar为头像文件名；$avatarSize为头像大小；这几个属性会替换已设置好的角色资源的属性；
+        //    $x、$y是像素坐标；$bx、$by是地图块坐标（像素坐标和块坐标设置二选一）；
+        //    $direction表示面向方向（0、1、2、3分别表示上右下左）；
+        //    $action：
+        //      为0表示暂时静止；为1表示随机移动；为-1表示禁止移动和操作；
+        //      为2表示定向移动；此时（用其中一个即可）：
+        //        $targetBx、$targetBy为定向的地图块坐标
+        //        $targetX、$targetY为定向的像素坐标；
+        //        $targetBlocks为定向的地图块坐标数组;
+        //        $targetPositions为定向的像素坐标数组;
+        //        $targetBlockAuto为定向的地图块自动寻路坐标数组；
+        //    $start表示角色是否自动动作（true或false)；
+        //返回：成功为组件对象，失败为false。
+        //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性});
+        //  let h = game.createhero('角色资源名');   //全部使用默认属性；
+        function createhero(role={}) {
             if(GlobalLibraryJS.isString(role)) {
                 role = {RID: role, $id: role, $name: role};
             }
@@ -922,7 +999,7 @@ Item {
             }
 
 
-            let roleComp = GameSceneJS.loadRole(role.$rid, mainRole, role, itemViewPort.itemRoleContainer);
+            const roleComp = GameSceneJS.loadRole(role.$rid, mainRole, role, itemViewPort.itemRoleContainer);
             if(!roleComp) {
                 return false;
             }
@@ -991,11 +1068,13 @@ Item {
             return roleComp;
         }
 
-        //返回/修改 主角对象；
-        //hero可以是下标，或字符串（主角的$id），或主角对象，-1表示返回所有主角；
-        //props：非返回所有主角时，为修改的 单个主角属性，同 createhero 的第二个参数；
-        //返回经过props修改的 主角 或 所有主角的列表；如果没有则返回null；
-        readonly property var hero: function(hero=-1, props={}) {
+        //功能：返回/修改 地图主角组件对象。
+        //参数：hero可以是下标，或字符串（主角的$id），或主角组件对象，-1表示返回所有主角组件对象数组；
+        //  props：hero不是-1时，为修改单个主角的属性，同 createhero 的第二个参数对象；
+        //返回：经过props修改的 主角 或 所有主角的列表；如果没有则返回null；出错返回false；
+        //示例：let h = game.hero('主角名');
+        //  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
+        function hero(hero=-1, props={}) {
             if(hero === -1)
                 return _private.arrMainRoles;
 
@@ -1031,7 +1110,7 @@ Item {
 
 
             hero = game.gd['$sys_main_roles'][index];
-            let heroComp = _private.arrMainRoles[index];
+            const heroComp = _private.arrMainRoles[index];
 
             if(!GlobalLibraryJS.objectIsEmpty(props)) {
                 //修改属性
@@ -1122,19 +1201,6 @@ Item {
                     setMainRolePos(parseInt(props.$bx), parseInt(props.$by), hero.$index);
 
 
-                //如果不是从 createhero 过来的（createhero过来的，hero和props是一个对象）
-                if(props !== hero) {
-                    //其他属性直接赋值
-                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
-                    //for(let tp in props) {
-                    for(let tp of Object.keys(props)) {
-                        if(usedProps.indexOf(tp) >= 0)
-                            continue;
-                        hero[tp] = props[tp];
-                    }
-                }
-
-
                 if(props.$direction !== undefined)
                     heroComp.changeAction(props.$direction);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
@@ -1149,16 +1215,48 @@ Item {
                     heroComp.height1 = props.$realSize[1];
                     //console.debug('!!!', props.$realSize)
                 }
+
+
+                //如果不是从 createhero 过来的（createhero过来的，hero和props是一个对象）
+                if(props !== hero) {
+                    //其他属性直接赋值
+                    let usedProps = ['RID', '$id', '$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                    //for(let tp in props) {
+                    for(let tp of Object.keys(props)) {
+                        if(usedProps.indexOf(tp) >= 0)
+                            continue;
+                        hero[tp] = props[tp];
+                    }
+                }
+
+
+                if(props.$start === true) {
+                    /*
+                    GlobalLibraryJS.setTimeout(function() {
+                        roleComp.start();
+                    }, 1, rootGameScene, 'fight.continueFight');
+
+                    GlobalLibraryJS.runNextEventLoop(function() {
+                        roleComp.start();
+                        }, 'game.run1');
+                    */
+                    heroComp.start();
+                }
+                else if(props.$start === false)
+                    heroComp.stop();
+
             }
 
             return heroComp;
         }
 
-        //删除主角；
-        //hero可以是下标，或主角的$id，或主角对象，-1表示所有主角；
-        readonly property var delhero: function(hero=-1) {
+        //功能：删除地图主角；
+        //参数：hero可以是下标，或主角的$id，或主角组件对象，-1表示所有主角；
+        //返回：删除成功返回true；没有或错误返回false；
+        //示例：game.delhero('地图主角名');
+        function delhero(hero=-1) {
 
-            let tmpDelHero = function(mainRole) {
+            const tmpDelHero = function(mainRole) {
                 mainRole.strSource = '';
                 mainRole.nFrameCount = 0;
                 mainRole.width = 0;
@@ -1241,7 +1339,7 @@ Item {
 
             _private.arrMainRoles[index].visible = false;
             for(let tc in _private.arrMainRoles[index].$tmpComponents) {
-                let c = _private.arrMainRoles[index].$tmpComponents[tc];
+                const c = _private.arrMainRoles[index].$tmpComponents[tc];
                 if(GlobalLibraryJS.isComponent(c)) {
                     if(c.$destroy)
                         c.$destroy();
@@ -1273,8 +1371,10 @@ Item {
             return true;
         }
 
-        //将主角移动到地图 bx、by 位置。
-        readonly property var movehero: function(...args) {
+        //功能：将主角移动到地图 bx、by 位置。
+        //参数：bx、by为目标地图块；如果超出地图，则自动调整；
+        //示例：game.movehero(6,6);
+        function movehero(...args) {
             if(args.length === 3)
                 setMainRolePos(args[1], args[2], args[0]);
             else if(args.length === 2)
@@ -1294,23 +1394,11 @@ Item {
         }*/
 
 
-        //创建NPC；
-        //role：角色资源名 或 标准创建格式的对象（RID为角色资源名）。
-        //其他参数：$id、$name、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto、$start；
-        //  $name为游戏显示名；
-        //  $action：
-        //    为0表示静止；为1表示随机移动；为-1表示禁止操作；
-        //    为2表示定向移动；此时（用其中一个即可）：
-        //      $targetBx、$targetBy为定向的地图块坐标
-        //      $targetX、$targetY为定向的像素坐标；
-        //      $targetBlocks：为定向的地图块坐标数组;
-        //      $targetPositions为定向的像素坐标数组;
-        //      $targetBlockAuto为定向的地图块自动寻路坐标数组；
-        //    为-1表示禁止操作；
-        //  $direction表示静止方向（0、1、2、3分别表示上右下左）；
-        //  $start表示角色是否自动动作（true或false)；
-        //成功返回 组件对象。
-        readonly property var createrole: function(role={}) {
+        //功能：创建地图NPC。
+        //参数：role为 角色资源名 或 标准创建格式的对象（RID为角色资源名）；
+        //  参数对象属性：同createhero参数；
+        //成功为组件对象，失败为false。
+        function createrole(role={}) {
 
             if(GlobalLibraryJS.isString(role)) {
                 role = {RID: role, $id: role, $name: role};
@@ -1368,11 +1456,13 @@ Item {
 
         }
 
-        //返回/修改 角色对象；
-        //role可以是下标，或字符串（角色的$id），或角色对象，-1表示返回所有角色；
-        //props：非返回所有角色时，为修改的 单个角色属性，同 createrole 的第二个参数；
-        //返回经过props修改的 角色 或 所有角色的列表；如果没有则返回null；
-        readonly property var role: function(role=-1, props={}) {
+        //功能：返回/修改 地图NPC组件对象。
+        //参数：role可以是字符串（NPC的$id），或NPC组件对象，-1表示返回所有NPC组件对象数组；
+        //  props：role不是-1时，为修改单个NPC的属性，同 createhero 的第二个参数对象；
+        //返回：经过props修改的 NPC 或 所有NPC的列表；如果没有则返回null；出错返回false；
+        //示例：let h = game.role('NPC的$id');
+        //  let h = game.role('NPC的$id', {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
+        function role(role=-1, props={}) {
             if(role === -1/* || role === undefined || role === null*/)
                 return _private.objRoles;
 
@@ -1505,7 +1595,7 @@ Item {
                 //如果不是从 createrole 过来的（createrole过来的，role和props是一个对象）
                 if(props !== hero) {
                     //其他属性直接赋值
-                    let usedProps = ['$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
+                    let usedProps = ['RID', '$id', '$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
                     //for(let tp in props) {
                     for(let tp of Object.keys(props)) {
                         if(usedProps.indexOf(tp) >= 0)
@@ -1536,60 +1626,11 @@ Item {
             return roleComp;
         }
 
-        //移动角色到bx，by。
-        readonly property var moverole: function(role, bx, by) {
-
-            if(GlobalLibraryJS.isString(role)) {
-                role = _private.objRoles[role];
-                if(role === undefined)
-                    return false;
-            }
-
-
-            setRolePos(bx, by, role);
-
-            /*
-            if(bx !== undefined && by !== undefined) {
-                //边界检测
-
-                if(bx < 0)
-                    bx = 0;
-                else if(bx >= itemViewPort.mapInfo.MapSize[0])
-                    bx = itemViewPort.mapInfo.MapSize[0] - 1;
-
-                if(by < 0)
-                    by = 0;
-                else if(by >= itemViewPort.mapInfo.MapSize[1])
-                    by = itemViewPort.mapInfo.MapSize[1] - 1;
-
-
-                //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
-                //if(bx === itemViewPort.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockScaledSize.width)
-                //    role.x = itemViewPort.itemContainer.width - role.x2 - 1;
-                //else
-                //    role.x = roleCenterX - role.x1 - role.width1 / 2;
-                role.x = bx * itemViewPort.sizeMapBlockScaledSize.width - role.x1;
-
-
-                //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
-                //if(by === itemViewPort.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockScaledSize.height)
-                //    role.y = itemViewPort.itemContainer.height - role.y2 - 1;
-                //else
-                //    role.y = roleCenterY - role.y1 - role.height1 / 2;
-                role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
-
-            }
-            */
-
-
-            return true;
-        }
-
-
-        //删除角色；
-        //role可以是 角色对象、角色名或-1（表示删除所有）；
-        //成功返回true。
-        readonly property var delrole: function(role=-1) {
+        //功能：删除地图NPC；
+        //参数：role可以是NPC的$id，或NPC组件对象，-1表示当前地图所有NPC；
+        //返回：删除成功返回true；没有或错误返回false；
+        //示例：game.delhero('地图NPC的$id');
+        function delrole(role=-1) {
             if(role === -1) {
                 for(let r in _private.objRoles) {
                     for(let tc in _private.objRoles[r].$tmpComponents) {
@@ -1640,14 +1681,65 @@ Item {
             return true;
         }
 
+        //功能：将NPC移动到地图 bx、by 位置。
+        //参数：bx、by为目标地图块；如果超出地图，则自动调整；
+        //示例：game.moverole('NPC的$id',6,6);
+        function moverole(role, bx, by) {
+
+            if(GlobalLibraryJS.isString(role)) {
+                role = _private.objRoles[role];
+                if(role === undefined)
+                    return false;
+            }
 
 
-        //角色的各种坐标；
-        //参数role为角色组件（可用hero和role命令返回的组件）；
-        //  如果为数字或空，则是主角；如果是字符串，则在主角和NPC中查找；
-        //pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
-        //  如果返回是坐标，则包括x、y（实际坐标）、bx、by（地图块坐标）、cx、cy（中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；
-        readonly property var rolepos: function(role, pos=null) {
+            setRolePos(bx, by, role);
+
+            /*
+            if(bx !== undefined && by !== undefined) {
+                //边界检测
+
+                if(bx < 0)
+                    bx = 0;
+                else if(bx >= itemViewPort.mapInfo.MapSize[0])
+                    bx = itemViewPort.mapInfo.MapSize[0] - 1;
+
+                if(by < 0)
+                    by = 0;
+                else if(by >= itemViewPort.mapInfo.MapSize[1])
+                    by = itemViewPort.mapInfo.MapSize[1] - 1;
+
+
+                //如果在最右边的图块，且人物宽度超过图块，则会超出地图边界
+                //if(bx === itemViewPort.mapInfo.MapSize[0] - 1 && role.width1 > itemViewPort.sizeMapBlockScaledSize.width)
+                //    role.x = itemViewPort.itemContainer.width - role.x2 - 1;
+                //else
+                //    role.x = roleCenterX - role.x1 - role.width1 / 2;
+                role.x = bx * itemViewPort.sizeMapBlockScaledSize.width - role.x1;
+
+
+                //如果在最下边的图块，且人物高度超过图块，则会超出地图边界
+                //if(by === itemViewPort.mapInfo.MapSize[1] - 1 && role.height1 > itemViewPort.sizeMapBlockScaledSize.height)
+                //    role.y = itemViewPort.itemContainer.height - role.y2 - 1;
+                //else
+                //    role.y = roleCenterY - role.y1 - role.height1 / 2;
+                role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
+
+            }
+            */
+
+
+            return true;
+        }
+
+
+        //功能：返回角色的各种坐标，或判断是否在某个地图块坐标上；
+        //参数：
+        //  role为角色组件（可用hero和role命令返回的组件）；
+        //    如果为数字或空，则是主角；如果是字符串表示$id，会在 主角和NPC 中查找；
+        //  pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
+        //返回：如果是判断，返回true或false；如果返回是坐标，则包括x、y（实际坐标）、bx、by（地图块坐标）、cx、cy（中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
+        function rolepos(role, pos=null) {
             if(GlobalLibraryJS.isValidNumber(role)) {
                 role = mainRole;
             }
@@ -1724,9 +1816,11 @@ Item {
 
 
 
-        //创建一个战斗主角；返回这个战斗主角对象；
-        //fightrole为战斗主角资源名 或 标准创建格式的对象（带有RID、Params和其他属性）。
-        readonly property var createfighthero: function(fightrole) {
+        //功能：创建一个战斗主角，并放入我方战斗队伍。
+        //参数：fightrole为战斗主角资源名 或 标准创建格式的参数对象（具有RID、Params和其他属性）。
+        //返回：战斗主角对象。
+        //示例：game.createfighthero('战斗角色1'); game.createfighthero({RID: '战斗角色2', Params: {级别: 6}, $name: '鹰战士'});
+        function createfighthero(fightrole) {
             if(game.gd['$sys_fight_heros'] === undefined)
                 game.gd['$sys_fight_heros'] = [];
 
@@ -1742,9 +1836,11 @@ Item {
             return newFightRole;
         }
 
-        //删除一个战斗主角；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（删除所有战斗主角）。
-        readonly property var delfighthero: function(fighthero) {
+        //功能：删除我方战斗队伍中的一个战斗主角。
+        //参数：fighthero为下标，或战斗角色的$name，或战斗角色对象，或-1（删除所有战斗主角）。
+        //返回：成功返回true；错误或没找到返回false。
+        //示例：game.delfighthero(0); game.delfighthero('鹰战士');
+        function delfighthero(fighthero) {
 
             if(fighthero === -1) {
                 game.gd['$sys_fight_heros'] = [];
@@ -1781,10 +1877,13 @@ Item {
 
         }*/
 
-        //返回战斗主角；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（返回所有战斗主角）；
-        //type为0表示返回 对象，为1表示只返回名字（选择框用）；
-        //返回null表示没有，false错误；
+        //功能：返回我方战斗队伍中的战斗主角；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（返回所有战斗主角）；
+        //  type为0表示返回 对象，为1表示只返回名字（可用作选择组件）；
+        //返回：战斗角色对象、名字字符串或数组；false表示没找到或出错；
+        //示例：let h = game.fighthero('鹰战士');
+        //  let h = game.fighthero(0);
+        //  let arrNames = game.fighthero(-1, 1);
         readonly property var fighthero: function(fighthero=-1, type=0) {
             if(game.gd['$sys_fight_heros'] === undefined || game.gd['$sys_fight_heros'] === null)
                 return false;
@@ -1818,7 +1917,7 @@ Item {
             }
             else if(GlobalLibraryJS.isValidNumber(fighthero)) {
                 if(fighthero >= game.gd['$sys_fight_heros'].length)
-                    return null;
+                    return false;
                 else if(fighthero < 0)
                     return false;
 
@@ -2580,6 +2679,7 @@ Item {
 
             let ret = dialogTrade;
 
+            //如果为true，则返回 组件，用户自己配置并调用show
             if(goods !== true) {
                 /*if(callback === true || callback === 1)
                     //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
@@ -2590,7 +2690,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -2598,6 +2709,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = dialogTrade;
 
                 dialogTrade.show(goods, mygoodsinclude, pauseGame, callback);
             }
@@ -2627,7 +2740,7 @@ Item {
         }
 
         readonly property var fighton: function(fightScript, probability=5, flag=3, interval=1000) {
-            fight.fighton(fightScript, probability, flag, interval);
+            fight.fighton(fightScript, probability, interval, flag);
         }
 
         readonly property var fightoff: function() {
@@ -2886,7 +2999,18 @@ Item {
 
 
 
-            if(videoParams.$callback === true || videoParams.$callback === undefined)
+            //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+            if(GlobalLibraryJS.isFunction(callback)) {
+                ret = new Promise(function(resolve, reject){
+                    const fcallback = callback;
+                    callback = (cb, ...params)=>{
+                        fcallback(cb, ...params);
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    }
+                });
+            }
+            else {// if(videoParams.$callback === true || videoParams.$callback === undefined) {
                 ret = new Promise(function(resolve, reject){
                     itemVideo.fCallback = (cb, ...params)=>{
                         cb(...params);
@@ -2894,6 +3018,8 @@ Item {
                         //reject(params[0]);
                     }
                 });
+            }
+            ret.$params = itemVideo;
 
 
             return ret;
@@ -4008,7 +4134,7 @@ Item {
             else if(callback === 0)
                 return GlobalLibraryJS.asyncWait(ms);
             */
-            return GlobalLibraryJS.asyncWait(ms, itemTimers);
+            return GlobalLibraryJS.asyncSleep(ms, itemTimers);
 
             //！如果定义为生成器的写法：
             //return yield ret;
@@ -4051,7 +4177,18 @@ Item {
                     }
                 */
 
-                if(callback === true)
+                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
+                if(GlobalLibraryJS.isFunction(callback)) {
+                    ret = new Promise(function(resolve, reject){
+                        const fcallback = callback;
+                        callback = (cb, ...params)=>{
+                            fcallback(cb, ...params);
+                            resolve(params[0]);
+                            //reject(params[0]);
+                        }
+                    });
+                }
+                else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject){
                         callback = (cb, ...params)=>{
                             cb(...params);
@@ -4059,6 +4196,8 @@ Item {
                             //reject(params[0]);
                         }
                     });
+                }
+                ret.$params = gameMenuWindow;
 
                 gameMenuWindow.show(params.$id, params.$value, style, pauseGame, callback);
             }
@@ -4386,7 +4525,7 @@ Item {
         }
 
 
-        //设置游戏阶段（战斗、平时），内部使用
+        //设置游戏阶段（地图0、战斗1），内部使用
         readonly property var stage: function(nStage=null) {
             if(nStage === undefined || nStage === null)
                 return _private.nStage;
@@ -4813,21 +4952,12 @@ Item {
 
         readonly property var date: ()=>{return new Date();}
         readonly property var math: Math
-        readonly property var request: function(params, type=0) {
-            switch(type) {
-            case 1:
-                const timestamp = Number(new Date()).toString();
-                if(!GlobalLibraryJS.isString(params.Data))
-                    params.Data = JSON.stringify(params.Data);
-                params.Headers = Object.assign({}, params.Headers, {'LMS-Timestamp': timestamp, 'LMS-Verify-Type': 1,
-                    'LMS-Verify-Code': Qt.md5(GlobalLibraryJS.Crypto.shiftEncrypt(GlobalLibraryJS.Crypto.xorEncrypt(params.Data, timestamp), timestamp))
-                });
-                return GlobalLibraryJS.request(params);
-            case 0:
-            default:
-                return GlobalLibraryJS.request(params);
-            }
-
+        function request(params={}, verifyType=0, type=1) {
+            return GlobalLibraryJS.requestEx(params, verifyType, type).catch((e)=>{
+                //throw e;
+                GlobalLibraryJS.printException(e);
+                return e.$data;
+            });
         }
         readonly property var http: XMLHttpRequest
 
@@ -7925,6 +8055,22 @@ Item {
 
                 break;
             }
+        }
+    }
+
+    Connections {
+        target: rootWindow
+        //忽略没有的信号
+        ignoreUnknownSignals: true
+
+        function onSg_signalHandler() {
+        }
+        function onSg_messageHandler() {
+        }
+        function onRAspectRatioChanged() {
+            if(_private.sceneRole)
+                //开始移动地图
+                setSceneToRole(_private.sceneRole);
         }
     }
 

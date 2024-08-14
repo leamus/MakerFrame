@@ -151,8 +151,27 @@ Item {
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽力去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
-1、将game.playvideo也改为可异步；
-2、将 game.loadmap、game.usegoods、game.load、game.gameover、game.plugin、game.save 修改为 yield 即可（统一用法），剩下的init和release不常用就不改了；
+2024/8/13：发布 1.13.3.240813 版本（框架 1.4.3.240813版本）
+1、修改：将 异步的7个函数的回调函数修改了下，之前有点问题（其实这个回调应该很少被用到）；
+2、修改：安卓打包时，支持只替换工程了；
+3、新增：做了几个插件（网络、加密、打包）；
+4、新增：安卓打包配置；
+5、新增：Notepad组件增加了翻页查看；
+6、优化：脚本队列的一些属性命名；
+7、新增：切换地图后停止主角动作 配置；
+8、修改：异步脚本队列，脚本出错时改为继续下一个脚本（之前是暂停，会误以为卡死）；
+9、修改：将game.request改的更简单（出错也会返回而不是抛出异常）；
+10、修改：增加和修改了底层的Request的一些配置和实现；
+11、修改：game.request的出错返回值（以前是抛出错误）；
+12、修复：脚本队列的一些Bugs和其他Bugs；
+
+2024/7/29：发布 1.13.2.240729 版本（框架 1.4.2.240729版本）
+1、*修改：将game.playvideo也改为可异步；
+2、**修改：将 game.loadmap、game.usegoods、game.load、game.gameover、game.plugin、game.save 修改为 yield 即可（统一用法），剩下的init和release不常用就不改了；
+3、增加：由于XMLHttpRequest不能设置Cookies、User-Agent等头，所以用Qt的QNetworkAccessManager、QNetworkRequest、QNetworkReply封装了一个网络访问函数request，用法和之前的一样；
+4、修改：角色编辑器 中头像，宽高如果或为0，则隐藏；
+5、修改：插件管理 和 插件下载，返回主插件页面时刷新；
+6、其他：修复和优化很多代码；
 
 2024/7/24：发布 1.13.1.240724 版本（框架 1.4.1.240724版本）
 1、调整 save、load、checksave 三个命令，以支持网络存档；

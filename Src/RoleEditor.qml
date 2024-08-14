@@ -1867,6 +1867,10 @@ Item {
             }
 
             Image {
+                id: imageAvatar
+
+                visible: !(parseInt(textAvatarWidth.text) === 0 || parseInt(textAvatarHeight.text) === 0)
+
                 Layout.preferredWidth: parseInt(textAvatarWidth.text)
                 Layout.preferredHeight: parseInt(textAvatarHeight.text)
 

@@ -78,7 +78,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr("鹰歌 RPG Maker 引擎")
+            text: qsTr("鹰歌游戏引擎")
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -186,20 +186,20 @@ Item {
 
                                 if(!FrameManager.sl_fileExists(resTemplate)) {
                                     //https://qiniu.leamus.cn/$资源模板.zip
-                                    let nr = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip", resTemplate);
-                                    nr.finished.connect(function() {
-                                        //FrameManager.sl_objectProperty("属性", nr);  //TimeStamp、Data、SaveType、Code
-                                        console.debug("下载完毕", nr, FrameManager.sl_objectProperty("Data", nr), FrameManager.sl_objectProperty("Code", nr));
+                                    const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip", resTemplate);
+                                    httpReply.sg_finished.connect(function(networkReply) {
+                                        const code = FrameManager.sl_objectProperty("Code", networkReply);
+                                        console.debug("[mainGameMaker]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
-                                        FrameManager.sl_deleteLater(nr);
+                                        FrameManager.sl_deleteLater(httpReply);
 
 
                                         dialogCommon.close();
                                         //enabled = true;
 
-                                        if(FrameManager.sl_objectProperty("Code", nr) < 0) {
+                                        if(code !== 0) {
                                             dialogCommon.show({
-                                                Msg: '下载失败：%1'.arg(FrameManager.sl_objectProperty("Code", nr)),
+                                                Msg: '下载失败：%1'.arg(code),
                                                 Buttons: Dialog.Yes,
                                                 OnAccepted: function() {
                                                     rootGameMaker.forceActiveFocus();
@@ -745,101 +745,15 @@ Item {
                 text: "打包项目"
                 onClicked: {
                     if(Qt.platform.os === "android") {
-
-                        if(!_private.checkCurrentProjectName()) {
-                            return;
+                        if(Platform.compileType === "debug") {
+                            _private.loadModule("PackageAndroid.qml");
+                            //userMainProject.source = "PackageAndroid.qml";
+                        }
+                        else {
+                            _private.loadModule("PackageAndroid.qml");
+                            //userMainProject.source = "PackageAndroid.qml";
                         }
 
-
-                        let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
-
-                        let jsFiles = FrameManager.sl_dirList(path, '*', 0x002 | 0x2000 | 0x4000, 0);
-                        jsFiles.sort();
-
-                        /*let needFilesName = ['Android_Package_', 'Android_MakerFrame_RPGRuntime_'];
-                        let needFilesIndex = [];
-                        for(let fileName in jsFiles) {
-                            for(let needFileName in needFilesName) {
-                                if(jsFiles[fileName].indexOf(needFilesName[needFileName]) >= 0) {
-                                    needFilesIndex[needFileName] = fileName;
-                                    break;
-                                }
-                            }
-                        }
-                        */
-
-                        let missingFiles = '';
-                        if(!jsFiles[0] || jsFiles[0].indexOf('MakerFrame_Package_Android_') < 0)
-                            missingFiles += 'MakerFrame_Package_Android_xxx.zip ';
-                        if(!jsFiles[1] || jsFiles[1].indexOf('MakerFrame_RPGRuntime_Android_') < 0)
-                            missingFiles += 'MakerFrame_RPGRuntime_Android_xxx.zip ';
-
-                        if(missingFiles !== '') {
-                            dialogCommon.show({
-                                Msg: '请将 %1 文件下载并放入%2文件夹下'.arg(missingFiles).arg(path),
-                                Buttons: Dialog.Yes,
-                                OnAccepted: function() {
-                                    rootGameMaker.forceActiveFocus();
-                                },
-                                OnRejected: ()=>{
-                                    rootGameMaker.forceActiveFocus();
-                                },
-                            });
-                            return;
-                        }
-
-
-                        let outputDir = path + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-
-                        dialogCommon.show({
-                            Msg: '打包会删除原来打包的目录 %1，确定吗？'.arg(outputDir),
-                            Buttons: Dialog.Yes | Dialog.No,
-                            OnAccepted: function() {
-
-                                dialogCommon.close();
-
-                                dialogCommon.show({
-                                    Msg: '请等待。。。',
-                                    Buttons: Dialog.NoButton,
-                                    OnRejected: ()=>{
-                                        dialogCommon.open();
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                });
-
-                                showBusyIndicator(true);
-
-                                GlobalLibraryJS.setTimeout(function() {
-                                    FrameManager.sl_removeRecursively(outputDir);
-
-                                    let ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[0], outputDir);
-                                    ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[1], outputDir);
-                                    ret = FrameManager.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, outputDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
-
-
-                                    showBusyIndicator(false);
-
-                                    dialogCommon.close();
-
-                                    dialogCommon.show({
-                                        Msg: '成功，请用 APKtool 打包 %1'.arg(outputDir),
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                    });
-                                },100,rootGameMaker);
-
-
-                                //rootGameMaker.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                rootGameMaker.forceActiveFocus();
-                            },
-                        });
                         return;
                     }
 
@@ -966,20 +880,20 @@ Item {
 
                             //https://qiniu.leamus.cn/$Leamus.zip
                             //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
-                            let nr = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip", projectPath + ".zip");
-                            nr.finished.connect(function() {
-                                //FrameManager.sl_objectProperty("属性", nr);  //TimeStamp、Data、SaveType、Code
-                                console.debug("下载完毕", nr, FrameManager.sl_objectProperty("Data", nr), FrameManager.sl_objectProperty("Code", nr));
+                            const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip", projectPath + ".zip");
+                            httpReply.sg_finished.connect(function(networkReply) {
+                                const code = FrameManager.sl_objectProperty("Code", networkReply);
+                                console.debug("下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
-                                FrameManager.sl_deleteLater(nr);
+                                FrameManager.sl_deleteLater(httpReply);
 
 
                                 dialogCommon.close();
                                 enabled = true;
 
-                                if(FrameManager.sl_objectProperty("Code", nr) < 0) {
+                                if(code !== 0) {
                                     dialogCommon.show({
-                                        Msg: '下载失败：%1'.arg(FrameManager.sl_objectProperty("Code", nr)),
+                                        Msg: '下载失败：%1'.arg(code),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
                                             rootGameMaker.forceActiveFocus();
@@ -1585,263 +1499,6 @@ Item {
 
 
 
-    //错误提示 按钮
-    Rectangle {
-        id: rectDebugButton
-
-        property int nCount: 0
-
-        //anchors.right: parent.right
-        //anchors.bottom: parent.bottom
-        x: parent.width - width
-        y: parent.height - height
-        width: 60
-        height: 36
-
-
-        radius: 10
-        color: '#30000000'
-
-
-
-        Label {
-            id: textDebugButton
-            anchors.fill: parent
-            //anchors.horizontalCenter: parent.horizontalCenter
-            //anchors.verticalCenter: parent.verticalCenter
-            //width: parent.width
-
-            color: 'red'
-            font.pointSize: 16
-            font.bold: true
-            text: rectDebugButton.nCount === 0 ? '' : rectDebugButton.nCount
-
-            horizontalAlignment: Label.AlignHCenter
-            verticalAlignment: Label.AlignVCenter
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                rectDebugWindow.visible = true;
-                rectDebugWindow.forceActiveFocus();
-            }
-
-            drag.target: parent
-        }
-    }
-
-    //调试 界面
-    Rectangle {
-        id: rectDebugWindow
-
-
-        function close() {
-            rectDebugButton.nCount = 0;
-
-            rectDebugWindow.visible = false;
-            //loader.focus = true;
-            loader.forceActiveFocus();
-        }
-
-
-        anchors.centerIn: parent
-        width: parent.width * 0.9
-        height: parent.height * 0.9
-        visible: false
-
-        color: Global.style.backgroundColor
-
-        Keys.onEscapePressed: {
-            close();
-
-            event.accepted = true;
-            //Qt.quit();
-        }
-        Keys.onBackPressed: {
-            close();
-
-            event.accepted = true;
-            //Qt.quit();
-        }
-
-
-        Mask {
-            anchors.fill: parent
-            opacity: 0
-        }
-
-
-        ColumnLayout {
-            anchors.fill: parent
-
-            RowLayout {
-                Layout.fillWidth: true
-                //Layout.preferredWidth: parent.width * 0.4
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                Layout.maximumHeight: parent.height
-                Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                Notepad {
-                    id: textDebugInfo
-
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-
-                    //Layout.preferredHeight: parent.height
-                    //Layout.maximumHeight: parent.height
-                    //Layout.minimumHeight: 50
-                    Layout.fillHeight: true
-
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                    nMaximumBlockCount: 0
-
-                    //textArea.enabled: false
-                    //textArea.readOnly: true
-                    //textArea.selectByKeyboard: true
-                    //textArea.selectByMouse: true
-                    textArea.color: 'white'
-
-                    textArea.text: ''
-                    textArea.placeholderText: ""
-
-                    textArea.background: Rectangle {
-                        //implicitWidth: 200
-                        //implicitHeight: 40
-                        color: 'black'
-                        //color: 'transparent'
-                        //color: Global.style.backgroundColor
-                        border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                        border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                    }
-                }
-
-                /*ScrollView {
-                    id: scrollView
-                    anchors.fill: parent
-                    anchors.margins: 9
-                    ListView {
-                        id: resultView
-                        model: ListModel {
-                            id: outputModel
-                        }
-                        delegate: ColumnLayout {
-                            width: ListView.view.width
-                            Label {
-                                Layout.fillWidth: true
-                                color: 'green'
-                                text: "> " + model.expression
-                            }
-                            Label {
-                                Layout.fillWidth: true
-                                color: 'blue'
-                                text: "" + model.result
-                            }
-                            Rectangle {
-                                height: 1
-                                Layout.fillWidth: true
-                                color: '#333'
-                                opacity: 0.2
-                            }
-                        }
-                    }
-                }
-                */
-            }
-
-            TextField {
-                id: textCommand
-
-                readonly property int nPadding: 6
-
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-
-                leftPadding : nPadding
-                rightPadding : nPadding
-                topPadding : nPadding
-                bottomPadding: nPadding
-
-                placeholderText: '输入命令'
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextField.Wrap
-
-                background: Rectangle {
-                    //implicitWidth: 200
-                    //implicitHeight: 40
-                    //color: 'black'
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: textCommand.focus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: textCommand.focus ? 2 : 1
-                }
-
-
-                onAccepted: {
-                    selectAll();
-
-                    let t = text;
-                    //text = '';
-                    //console.info(GlobalLibraryJS.safeEval(t).result);
-                    console.info(eval(t));
-                }
-                /*Keys.onEnterPressed: {
-                    selectAll();
-
-                    let t = text;
-                    //text = '';
-                    console.info(eval(t));
-                }
-                Keys.onReturnPressed: {
-                    selectAll();
-
-                    let t = text;
-                    //text = '';
-                    console.info(eval(t));
-                }*/
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                //Layout.preferredWidth: parent.width * 0.4
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.preferredHeight: 50
-                Layout.minimumHeight: 20
-                Layout.maximumHeight: 50
-                //Layout.fillHeight: true
-
-                Button {
-                    text: '复制'
-                    onClicked: {
-                        FrameManager.sl_setClipboardText(FrameManager.sl_toPlainText(textDebugInfo.textDocument));
-                    }
-                }
-
-                Button {
-                    text: '清空'
-                    onClicked: {
-                        textDebugInfo.text = '';
-                    }
-                }
-
-                Button {
-                    text: '关闭'
-                    onClicked: {
-                        rectDebugWindow.close();
-                    }
-                }
-            }
-        }
-    }
-
-
-
     //配置
     QtObject {
         id: _config
@@ -1907,62 +1564,6 @@ Item {
             GameMakerGlobal.config.strCurrentProjectName = newProject;
         }
 
-
-        //显示调试窗口
-        function appendDebugMessage(msgType, msg) {
-
-            if(Global.filterMessage(msgType, msg))
-                return;
-
-            //消息类型
-            switch(msgType) {
-                //跳过一部分 无关紧要 的 警告
-            case FrameManagerClass.QtWarningMsg:
-                textDebugInfo.textArea.append("<font color='yellow'>【Warning】" + msg + "</font>");
-                textDebugInfo.toEnd();
-
-                //rectDebugWindow.visible = true;
-                //rectDebugWindow.forceActiveFocus();
-                ++rectDebugButton.nCount;
-                break;
-            case FrameManagerClass.QtCriticalMsg:
-                textDebugInfo.textArea.append("<font color='red'>【Critical】" + msg + "</font>");
-                textDebugInfo.toEnd();
-
-                //rectDebugWindow.visible = true;
-                //rectDebugWindow.forceActiveFocus();
-                ++rectDebugButton.nCount;
-                break;
-            case FrameManagerClass.QtFatalMsg:
-                textDebugInfo.textArea.append("<font color='red'>【Fatal】" + msg + "</font>");
-                textDebugInfo.toEnd();
-
-                //rectDebugWindow.visible = true;
-                //rectDebugWindow.forceActiveFocus();
-                ++rectDebugButton.nCount;
-                break;
-
-            case FrameManagerClass.QtInfoMsg:
-                textDebugInfo.textArea.append("<font color='white'>【Info】" + msg + "</font>");
-                textDebugInfo.toEnd();
-
-                ++rectDebugButton.nCount;
-                break;
-            case FrameManagerClass.QtDebugMsg:
-                if(Platform.compileType === "debug") {
-                }
-                break;
-
-            default:
-                textDebugInfo.textArea.append(msgType + msg);
-                textDebugInfo.toEnd();
-
-                //rectDebugWindow.visible = true;
-                //rectDebugWindow.forceActiveFocus();
-                ++rectDebugButton.nCount;
-                break;
-            }
-        }
     }
 
 
@@ -1991,9 +1592,6 @@ Item {
 
 
     Component.onCompleted: {
-        rootWindow.sg_messageHandler.connect(_private.appendDebugMessage);
-
-
         //if(!GameMakerGlobal.settings.$RunTimes) {
         if(GameMakerGlobal.settings.value('$RunTimes') === 0) {
             rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
@@ -2020,8 +1618,6 @@ Item {
         console.debug("[mainGameMaker]Component.onCompleted");
     }
     Component.onDestruction: {
-        rootWindow.sg_messageHandler.disconnect(_private.appendDebugMessage);
-
         //delete FrameManager.sl_globalObject().GameMakerGlobal;
 
         console.debug("[mainGameMaker]Component.onDestruction");

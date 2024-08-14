@@ -79,21 +79,21 @@ Item {
 
         if(!objCommonScripts["common_run_away_algorithm"]) {
             objCommonScripts["common_run_away_algorithm"] = game.$gameMakerGlobalJS.$commonRunAwayAlgorithm;
-            console.debug("[!FightScene]载入系统逃跑算法");
+            console.debug("[FightScene]!载入系统逃跑算法");
         }
         else
             console.debug("[FightScene]载入逃跑算法OK");
 
         if(!objCommonScripts["fight_skill_algorithm"]) {
             objCommonScripts["fight_skill_algorithm"] = game.$gameMakerGlobalJS.$fightSkillAlgorithm;
-            console.debug("[!FightScene]载入系统战斗算法");
+            console.debug("[FightScene]!载入系统战斗算法");
         }
         else
             console.debug("[FightScene]载入战斗算法OK");  //, objCommonScripts["fight_skill_algorithm"], data, eval("()=>{}"));
 
         if(!objCommonScripts["fight_role_choice_skills_or_goods_algorithm"]) {
             objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = game.$gameMakerGlobalJS.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-            console.debug("[!FightScene]载入战斗人物选择技能或物品算法");
+            console.debug("[FightScene]!载入系统战斗人物选择技能或物品算法");
         }
         else
             console.debug("[FightScene]载入战斗人物选择技能或物品算法OK");
@@ -101,95 +101,95 @@ Item {
 
         if(!objCommonScripts["fight_init_script"]) {
             objCommonScripts["fight_init_script"] = game.$gameMakerGlobalJS.$commonFightInitScript;
-            console.debug("[!FightScene]载入系统战斗初始化脚本");
+            console.debug("[FightScene]!载入系统战斗初始化脚本");
         }
         else
             console.debug("[FightScene]载入战斗初始化脚本OK");
         if(!objCommonScripts["fight_start_script"]) {
             objCommonScripts["fight_start_script"] = game.$gameMakerGlobalJS.$commonFightStartScript;
-            console.debug("[!FightScene]载入系统战斗开始脚本");
+            console.debug("[FightScene]!载入系统战斗开始脚本");
         }
         else
             console.debug("[FightScene]载入战斗开始脚本OK");
         if(!objCommonScripts["fight_round_script"]) {
             objCommonScripts["fight_round_script"] = game.$gameMakerGlobalJS.$commonFightRoundScript;
-            console.debug("[!FightScene]载入系统战斗回合脚本");
+            console.debug("[FightScene]!载入系统战斗回合脚本");
         }
         else
             console.debug("[FightScene]载入战斗回合脚本OK");
         if(!objCommonScripts["fight_end_script"]) {
             objCommonScripts["fight_end_script"] = game.$gameMakerGlobalJS.$commonFightEndScript;
-            console.debug("[!FightScene]载入系统战斗结束脚本");
+            console.debug("[FightScene]!载入系统战斗结束脚本");
         }
         else
             console.debug("[FightScene]载入战斗结束脚本OK");
 
         if(!objCommonScripts["fight_combatant_position_algorithm"]) {
             objCommonScripts["fight_combatant_position_algorithm"] = game.$gameMakerGlobalJS.$fightCombatantPositionAlgorithm;
-            console.debug("[!FightScene]载入系统战斗坐标算法");
+            console.debug("[FightScene]!载入系统战斗坐标算法");
         }
         else
             console.debug("[FightScene]载入战斗坐标算法OK");
 
         if(!objCommonScripts["fight_combatant_melee_position_algorithm"]) {
             objCommonScripts["fight_combatant_melee_position_algorithm"] = game.$gameMakerGlobalJS.$fightCombatantMeleePositionAlgorithm;
-            console.debug("[!FightScene]载入系统战斗近战坐标算法");
+            console.debug("[FightScene]!载入系统战斗近战坐标算法");
         }
         else
             console.debug("[FightScene]载入战斗近战坐标算法OK");
 
         if(!objCommonScripts["fight_skill_melee_position_algorithm"]) {
             objCommonScripts["fight_skill_melee_position_algorithm"] = game.$gameMakerGlobalJS.$fightSkillMeleePositionAlgorithm;
-            console.debug("[!FightScene]载入系统战斗特效坐标算法");
+            console.debug("[FightScene]!载入系统战斗特效坐标算法");
         }
         else
             console.debug("[FightScene]载入战斗特效坐标算法OK");
 
         if(!objCommonScripts["fight_combatant_set_choice"]) {
             objCommonScripts["fight_combatant_set_choice"] = game.$gameMakerGlobalJS.$fightCombatantSetChoice;
-            console.debug("[!FightScene]载入系统设置 战斗人物的 初始化 或 休息");
+            console.debug("[FightScene]!载入系统设置 战斗人物的 初始化 或 休息");
         }
         else
             console.debug("[FightScene]载入设置 战斗人物的 初始化 或 休息OK");
 
         if(!objCommonScripts["fight_menus"]) {
             objCommonScripts["fight_menus"] = game.$gameMakerGlobalJS.$fightMenus;
-            console.debug("[!FightScene]载入系统战斗菜单");
+            console.debug("[FightScene]!载入系统战斗菜单");
         }
         else
             console.debug("[FightScene]载入战斗菜单OK");
 
         if(!objCommonScripts["fight_buttons"]) {
             objCommonScripts["fight_buttons"] = game.$gameMakerGlobalJS.$fightButtons;
-            console.debug("[!FightScene]载入系统战斗按钮");
+            console.debug("[FightScene]!载入系统战斗按钮");
         }
         else
             console.debug("[FightScene]载入战斗按钮OK");
 
         if(!objCommonScripts["fight_roles_round"]) {
             objCommonScripts["fight_roles_round"] = game.$gameMakerGlobalJS.$fightRolesRound;
-            console.debug("[!FightScene]载入系统战斗人物回合顺序");
+            console.debug("[FightScene]!载入系统战斗人物回合顺序");
         }
         else
             console.debug("[FightScene]载入战斗人物回合顺序OK");
 
         if(!objCommonScripts["combatant_round_script"]) {
             objCommonScripts["combatant_round_script"] = game.$gameMakerGlobalJS.$combatantRoundScript;
-            console.debug("[!FightScene]载入系统通用Buff脚本");
+            console.debug("[FightScene]!载入系统通用Buff脚本");
         }
         else
             console.debug("[FightScene]载入通用Buff脚本OK");
 
         if(!objCommonScripts["check_all_combatants"]) {
             objCommonScripts["check_all_combatants"] = game.$gameMakerGlobalJS.$checkAllCombatants;
-            console.debug("[!FightScene]载入系统计算属性脚本");
+            console.debug("[FightScene]!载入系统计算属性脚本");
         }
         else
             console.debug("[FightScene]载入计算属性脚本OK");
 
         if(!objCommonScripts["common_check_skill"]) {
             objCommonScripts["common_check_skill"] = game.$gameMakerGlobalJS.$commonCheckSkill;
-            console.debug("[!FightScene]载入系统通用检查技能脚本");
+            console.debug("[FightScene]!载入系统通用检查技能脚本");
         }
         else
             console.debug("[FightScene]载入通用检查技能脚本OK");
@@ -363,7 +363,7 @@ Item {
             data = GlobalJS._eval(data.FightScript);
         }
         catch(e) {
-            GlobalJS.printException(e);
+            GlobalLibraryJS.printException(e);
             return false;
         }*/
 
@@ -726,7 +726,7 @@ Item {
         //flag：0b1为行动时遇敌，0b10为静止时遇敌；
         //params是给战斗脚本$createData的参数；
         //会覆盖之前的fighton；
-        readonly property var fighton: function(fightScript, probability=5, flag=3, interval=1000) {
+        function fighton(fightScript, probability=5, interval=1000, flag=3) {
             game.gd['$sys_random_fight'] = [fightScript, probability, flag, interval];
 
             game.deltimer('$sys_random_fight_timer', true);
@@ -2158,9 +2158,42 @@ Item {
 
         ////property var arrTempLoopedAllFightRoles: [] //每次战斗循环的所有临时战斗人物
 
+    }
 
 
 
+    //应用程序信号
+    Connections {
+        target: Qt.application
+        //忽略没有的信号
+        ignoreUnknownSignals: true
+
+        function onStateChanged() {
+            switch(Qt.application.state) {
+            case Qt.ApplicationActive:   //每次窗口激活时触发
+                break;
+            case Qt.ApplicationInactive:    //每次窗口非激活时触发
+                break;
+            case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
+                break;
+            case Qt.ApplicationHidden:
+                break;
+            }
+        }
+    }
+
+    Connections {
+        target: rootWindow
+        //忽略没有的信号
+        ignoreUnknownSignals: true
+
+        function onSg_signalHandler() {
+        }
+        function onSg_messageHandler() {
+        }
+        function onRAspectRatioChanged() {
+            FightSceneJS.resetRolesPosition();
+        }
     }
 
 

@@ -74,7 +74,7 @@ Item {
                 TextField {
                     id: ttextproperty
 
-                    objectName: 'property'
+                    objectName: 'Property'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -109,7 +109,7 @@ Item {
                 TextField {
                     id: ttextParams
 
-                    objectName: 'effect'
+                    objectName: 'Effect'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -890,8 +890,8 @@ Item {
         function saveData() {
             let properties = [];
 
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'property');
-            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'effect');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Property');
+            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Effect');
 
             for(let tt in propertyTextFields) {
                 properties.push([propertyTextFields[tt].text.trim(), effectTextFields[tt].text.trim()]);
@@ -950,8 +950,8 @@ Item {
                 effectComp = comp.createObject(layoutEffectsLayout);
                 _private.arrCacheComponent.push(effectComp);
 
-                let propertyTextFields = FrameManager.sl_findChild(effectComp, 'property');
-                let effectTextFields = FrameManager.sl_findChild(effectComp, 'effect');
+                let propertyTextFields = FrameManager.sl_findChild(effectComp, 'Property');
+                let effectTextFields = FrameManager.sl_findChild(effectComp, 'Effect');
 
                 propertyTextFields.text = data.Properties[tt][0];
                 effectTextFields.text = data.Properties[tt][1];
@@ -985,8 +985,8 @@ Item {
             let bCheck = true;
             do {
                 for(let effectComp of _private.arrCacheComponent) {
-                    let propertyTextFields = FrameManager.sl_findChild(effectComp, 'property');
-                    let effectTextFields = FrameManager.sl_findChild(effectComp, 'effect');
+                    let propertyTextFields = FrameManager.sl_findChild(effectComp, 'Property');
+                    let effectTextFields = FrameManager.sl_findChild(effectComp, 'Effect');
                     if(!propertyTextFields.text.trim() || !effectTextFields.text.trim()) {
                         bCheck = false;
                         break;
@@ -1037,8 +1037,8 @@ Item {
 
             //道具效果
             let strEffects = '';
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'property');
-            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'effect');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Property');
+            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Effect');
 
 
             //类型

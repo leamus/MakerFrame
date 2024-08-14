@@ -17,5 +17,7 @@ SpriteEditor 1.0 SpriteEditor.qml
 
 MapEditor 1.0 MapEditor.qml
 
+PackageAndroid 1.0 PackageAndroid.qml
+
 PluginsManager 1.0 PluginsManager.qml
 PluginsDownload 1.0 PluginsDownload.qml

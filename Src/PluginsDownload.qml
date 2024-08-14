@@ -182,20 +182,20 @@ Item {
                             let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                             let zipPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
-                            //let nr = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
-                            let nr = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
-                            nr.finished.connect(function() {
-                                //FrameManager.sl_objectProperty("属性", nr);  //TimeStamp、Data、SaveType、Code
-                                console.debug("下载完毕", nr, FrameManager.sl_objectProperty("Data", nr), FrameManager.sl_objectProperty("Code", nr));
+                            //const httpReply = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
+                            const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
+                            httpReply.sg_finished.connect(function(networkReply) {
+                                const code = FrameManager.sl_objectProperty("Code", networkReply);
+                                console.debug("[PluginsDownload]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
-                                FrameManager.sl_deleteLater(nr);
+                                FrameManager.sl_deleteLater(httpReply);
 
 
                                 dialogCommon.close();
 
-                                if(FrameManager.sl_objectProperty("Code", nr) < 0) {
+                                if(code !== 0) {
                                     dialogCommon.show({
-                                        Msg: '下载失败：%1'.arg(FrameManager.sl_objectProperty("Code", nr)),
+                                        Msg: '下载失败：%1'.arg(code),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
                                             root.forceActiveFocus();

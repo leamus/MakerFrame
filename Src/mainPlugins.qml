@@ -122,6 +122,9 @@ Item {
 
             function onSg_close() {
                 _private.loadModule('');
+
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 

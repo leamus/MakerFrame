@@ -82,7 +82,7 @@ Item {
                 /*ComboBox {
                     id: tcomboType
 
-                    objectName: 'type'
+                    objectName: 'Type'
 
                     Layout.fillWidth: true
 
@@ -120,7 +120,7 @@ Item {
                 TextField {
                     id: ttextType
 
-                    objectName: 'type'
+                    objectName: 'Type'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -166,7 +166,7 @@ Item {
                 TextField {
                     id: ttextEffect
 
-                    objectName: 'effect'
+                    objectName: 'Effect'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -201,7 +201,7 @@ Item {
                 TextField {
                     id: ttextRound
 
-                    objectName: 'round'
+                    objectName: 'Round'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -236,7 +236,7 @@ Item {
                 TextField {
                     id: ttextProbability
 
-                    objectName: 'probability'
+                    objectName: 'Probability'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -317,7 +317,7 @@ Item {
                 TextField {
                     id: ttextType
 
-                    objectName: 'type'
+                    objectName: 'Type'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -352,7 +352,7 @@ Item {
                 TextField {
                     id: ttextEffect
 
-                    objectName: 'effect'
+                    objectName: 'Effect'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -387,7 +387,7 @@ Item {
                 TextField {
                     id: ttextCombatant
 
-                    objectName: 'combatant'
+                    objectName: 'Combatant'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -422,7 +422,7 @@ Item {
                 TextField {
                     id: ttextproperty
 
-                    objectName: 'property'
+                    objectName: 'Property'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -766,7 +766,7 @@ Item {
                         TextField {
                             id: textRequiredMP
 
-                            //objectName: 'requiredMP'
+                            //objectName: 'RequiredMP'
 
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -1325,10 +1325,10 @@ Item {
         function saveData() {
             let buffs = [];
 
-            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
-            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
-            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
-            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
+            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
+            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
+            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
+            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
 
             for(let tt in typeTextFields) {
                 buffs.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(), roundTextFields[tt].text.trim(), probabilityTextFields[tt].text.trim()])
@@ -1337,11 +1337,11 @@ Item {
 
             let effects = [];
 
-            typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
-            //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'requiredMP');
-            effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
-            let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
+            typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
+            //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'RequiredMP');
+            effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
+            let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
+            let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
 
             for(let tt in typeTextFields) {
                 effects.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(),
@@ -1393,10 +1393,10 @@ Item {
                 let buff = compBuff.createObject(layoutBuff);
                 _private.arrCacheComponent.push(buff);
 
-                let typeTextFields = FrameManager.sl_findChild(buff, 'type');
-                let effectTextFields = FrameManager.sl_findChild(buff, 'effect');
-                let roundTextFields = FrameManager.sl_findChild(buff, 'round');
-                let probabilityTextFields = FrameManager.sl_findChild(buff, 'probability');
+                let typeTextFields = FrameManager.sl_findChild(buff, 'Type');
+                let effectTextFields = FrameManager.sl_findChild(buff, 'Effect');
+                let roundTextFields = FrameManager.sl_findChild(buff, 'Round');
+                let probabilityTextFields = FrameManager.sl_findChild(buff, 'Probability');
 
                 typeTextFields.text = data.Buffs[tt][0];
                 effectTextFields.text = data.Buffs[tt][1];
@@ -1420,11 +1420,11 @@ Item {
                 let effect = compEffect.createObject(layoutEffect);
                 _private.arrCacheComponent.push(effect);
 
-                let typeTextField = FrameManager.sl_findChild(effect, 'type');
-                //let requiredMPTextFields = FrameManager.sl_findChildren(effect, 'requiredMP');
-                let effectTextField = FrameManager.sl_findChild(effect, 'effect');
-                let combatantTextField = FrameManager.sl_findChild(effect, 'combatant');
-                let propertyTextField = FrameManager.sl_findChild(effect, 'property');
+                let typeTextField = FrameManager.sl_findChild(effect, 'Type');
+                //let requiredMPTextFields = FrameManager.sl_findChildren(effect, 'RequiredMP');
+                let effectTextField = FrameManager.sl_findChild(effect, 'Effect');
+                let combatantTextField = FrameManager.sl_findChild(effect, 'Combatant');
+                let propertyTextField = FrameManager.sl_findChild(effect, 'Property');
 
                 typeTextField.text = data.Effects[tt][0] || '';
                 //requiredMPTextFields.text = data.Effects[tt][1];
@@ -1451,10 +1451,10 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
-                let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
-                let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
-                let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
+                let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
+                let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
+                let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
+                let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
 
                 //console.debug(actionTextFields);
                 for(let tt in typeTextFields) {
@@ -1482,10 +1482,10 @@ Item {
                     }
 
                     //技能效果
-                    let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
-                    let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
-                    let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
-                    let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
+                    let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
+                    let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
+                    let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
+                    let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
 
                     for(let tt in typeTextFields) {
                         let typeTextField = typeTextFields[tt];
@@ -1577,11 +1577,11 @@ Item {
 
 
                 //技能效果
-                let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'type');
-                //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'requiredMP');
-                let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'effect');
-                let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'combatant');
-                let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'property');
+                let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
+                //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'RequiredMP');
+                let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
+                let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
+                let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
 
                 let props = '';
                 for(let tt in typeTextFields) {
@@ -1647,10 +1647,10 @@ Item {
             let buffs = '';
 
 
-            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'type');
-            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'effect');
-            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'round');
-            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'probability');
+            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
+            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
+            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
+            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
 
             for(let tt in typeTextFields) {
                 let tRound = roundTextFields[tt].text.trim().split(',');
@@ -1758,7 +1758,6 @@ Item {
             data = GlobalLibraryJS.replaceAll(data, '$$goods$$', GlobalLibraryJS.array2string(textGoods.text.trim().split(',')));
             */
             data = GlobalLibraryJS.replaceAll(data, '$$check$$', check);
-
 
             console.debug(data);
 

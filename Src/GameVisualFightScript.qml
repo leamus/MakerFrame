@@ -80,7 +80,7 @@ Item {
                 TextField {
                     id: ttext
 
-                    objectName: 'enemy'
+                    objectName: 'Enemy'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -113,7 +113,7 @@ Item {
                 TextField {
                     id: ttextParams
 
-                    objectName: 'enemyParams'
+                    objectName: 'EnemyParams'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -484,7 +484,7 @@ Item {
 
                                     TextField {
                                         //id: textDefense
-                                        objectName: 'enemy'
+                                        objectName: 'Enemy'
 
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -515,7 +515,7 @@ Item {
                                         }
                                     }
                                     TextField {
-                                        objectName: 'enemyParams'
+                                        objectName: 'EnemyParams'
 
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -622,8 +622,8 @@ Item {
         function saveData() {
             let enemies = [];
 
-            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
-            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
+            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
+            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
             for(let tt in enemyTextFields) {
                 //console.debug(tt.text);
@@ -677,8 +677,8 @@ Item {
                     enemyComp = comp.createObject(layoutEnemyLayout);
                     _private.arrCacheComponent.push(enemyComp);
                 }
-                let enemyTextField = FrameManager.sl_findChild(enemyComp, 'enemy');
-                let enemyParamsTextField = FrameManager.sl_findChild(enemyComp, 'enemyParams');
+                let enemyTextField = FrameManager.sl_findChild(enemyComp, 'Enemy');
+                let enemyParamsTextField = FrameManager.sl_findChild(enemyComp, 'EnemyParams');
 
                 enemyTextField.text = data.Enemies[tt][0];
                 enemyParamsTextField.text = data.Enemies[tt][1];
@@ -697,8 +697,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
-                let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
+                let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
+                let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
                 //console.debug(actionTextFields);
                 for(let tt in enemyTextFields) {
@@ -739,8 +739,8 @@ Item {
 
 
             let strEnemies = '';
-            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemy');
-            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'enemyParams');
+            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
+            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
             //console.debug(enemyTextFields);
             for(let tt in enemyTextFields) {
@@ -753,7 +753,7 @@ Item {
                 console.debug(tc);
             }*/
 
-            //layoutEnemyLayout.findChildren('enemy');
+            //layoutEnemyLayout.findChildren('Enemy');
 
 
 

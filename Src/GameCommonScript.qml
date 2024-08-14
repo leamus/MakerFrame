@@ -62,6 +62,7 @@ let $config = {
     $game: {
         $loadAllResources: 0,   //提前载入所有资源
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
+        $changeMapStopAction: true,   //切换地图后停止主角动作
     },
     //地图
     $map: {
@@ -1815,6 +1816,7 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
 
+    //返回地图代码
     game.run(function*() {
         //战斗结束脚本2
         if(fightEndScript) {
@@ -1830,10 +1832,6 @@ function *$commonFightEndScript(res, teams, fightData) {
             if(game.$globalLibraryJS.isGenerator(r))yield* r;
             //game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
         }
-
-
-        if(res.result === -1)
-            yield game.gameover(-1);
 
 
         //增加经验
@@ -1852,7 +1850,10 @@ function *$commonFightEndScript(res, teams, fightData) {
             //tc.$$fightData.$buffs = {};
         }
 
-        //返回地图代码
+
+        if(res.result === -1)
+            yield game.gameover(-1);
+
         //game.stage(0);
         //game.goon('$fight');
 

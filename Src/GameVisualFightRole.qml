@@ -80,7 +80,7 @@ Item {
                 TextField {
                     id: ttext
 
-                    objectName: 'actionName'
+                    objectName: 'ActionName'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -102,7 +102,7 @@ Item {
                 TextField {
                     id: ttextParams
 
-                    objectName: 'spriteName'
+                    objectName: 'SpriteName'
 
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -742,7 +742,7 @@ Item {
                                     }
 
                                     TextField {
-                                        objectName: 'actionName'
+                                        objectName: 'ActionName'
 
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -767,7 +767,7 @@ Item {
                                     }
 
                                     TextField {
-                                        objectName: 'spriteName'
+                                        objectName: 'SpriteName'
 
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
@@ -889,8 +889,8 @@ Item {
         function saveData() {
             let actions = [];
 
-            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
-            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
+            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
+            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
 
             for(let tt in actionTextFields) {
                 //console.debug(tt.text.trim());
@@ -959,8 +959,8 @@ Item {
                     actionComp = comp.createObject(layoutActionLayout);
                     _private.arrCacheComponent.push(actionComp);
                 }
-                let actionTextField = FrameManager.sl_findChild(actionComp, 'actionName');
-                let spriteTextField = FrameManager.sl_findChild(actionComp, 'spriteName');
+                let actionTextField = FrameManager.sl_findChild(actionComp, 'ActionName');
+                let spriteTextField = FrameManager.sl_findChild(actionComp, 'SpriteName');
 
                 actionTextField.text = data.Actions[tt][0];
                 spriteTextField.text = data.Actions[tt][1];
@@ -990,8 +990,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
-                let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
+                let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
+                let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
 
                 //console.debug(actionTextFields);
                 for(let tt in actionTextFields) {
@@ -1032,8 +1032,8 @@ Item {
 
 
             let strActions = '';
-            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'actionName');
-            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'spriteName');
+            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
+            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
 
             //console.debug(actionTextFields);
             for(let tt in actionTextFields) {

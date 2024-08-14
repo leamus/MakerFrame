@@ -8,6 +8,7 @@ let $config = {
     $game: {
         $loadAllResources: 0,   //提前载入所有资源
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
+        $changeMapStopAction: true,   //切换地图后停止主角动作
     },
     //地图
     $map: {
@@ -1844,6 +1845,7 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
 
+    //返回地图代码
     game.run(function*() {
         //战斗结束脚本2
         if(fightEndScript) {
@@ -1859,10 +1861,6 @@ function *$commonFightEndScript(res, teams, fightData) {
             if(game.$globalLibraryJS.isGenerator(r))yield* r;
             //game.run([fightData.FightEndScript, 'fight end31'], -1, res, 1, teams, fightData);
         }
-
-
-        if(res.result === -1)
-            yield game.gameover(-1);
 
 
         //增加经验
@@ -1881,7 +1879,10 @@ function *$commonFightEndScript(res, teams, fightData) {
             //tc.$$fightData.$buffs = {};
         }
 
-        //返回地图代码
+
+        if(res.result === -1)
+            yield game.gameover(-1);
+
         //game.stage(0);
         //game.goon('$fight');
 
@@ -2464,7 +2465,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 //计算行走路径
 function computePath(blockPos, targetBlockPos) {
 
-    var aPlus = game.$globalLibraryJS.APlus.create({
+    const aPlus = game.$globalLibraryJS.APlus.create({
         screenSize: [game.d["$sys_map"].$columns, game.d["$sys_map"].$rows],
         obstacles: game.d["$sys_map"].$obstacles,
         // true使用穷举法。默认为false贪心算法不一定是最优解。
@@ -2475,12 +2476,12 @@ function computePath(blockPos, targetBlockPos) {
     })
 
     try {
-        let ret = aPlus.getPath(blockPos, targetBlockPos);
+        const ret = aPlus.getPath(blockPos, targetBlockPos);
         ret.shift();    //去掉自身的坐标
         return ret;
     }
     catch(e) {
-        console.debug(e);
+        console.debug('[!GameMakerGlobalJS]', e);
 
         return [];
     }
@@ -2951,7 +2952,7 @@ function skillStepCanSelecting(params, combatant) {
     }
 
     else {
-        console.warn('[!FightScene]没有这种选择');
+        console.warn('[!GameMakerGlobalJS]没有这种选择');
         return false;
     }
 
@@ -3121,7 +3122,7 @@ function skillEffectAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect
 function checkJSCode(code, type=1) {
     try {
         //替换 .import
-        code = code.replaceAll('.import', '//.import');
+        code = code.$replaceAll('.import', '//.import');
         eval('()=>{%1}'.arg(code));
     }
     catch(e) {
