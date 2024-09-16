@@ -146,7 +146,7 @@ Item {
         let t = `
 <CENTER><B>关　于</B></CENTER>
 
-  鹰歌MakerFrame框架 是一款由 Qt（C++）、QML（JavaScript）、JAVA（Android） 构建，供二次开发软件和游戏的开放式跨平台框架，它可以运行在Windows、Android、iOS、macOS、Linux（Debian、Ubuntu以及国产化的Openkylin、UOS）等主流平台上，并提供了上架应用商店、广告、屏幕自适应、网络、热更新、数据库、文件管理、脚本引擎、异步脚本和队列、媒体播放器、浏览器内核、以及各种三方库和SDK等众多底层功能和扩展，能满足多种类型的引擎、游戏及各种软件开发的一款超级APP；
+  鹰歌MakerFrame框架 是一款由 Qt（C++）、QML（JavaScript）、JAVA（Android） 构建，供二次开发软件和游戏的开放式跨平台框架，它可以运行在Windows、Android、iOS、macOS、Linux（Debian、Ubuntu以及国产化的Openkylin、UOS）等主流平台上，并提供了上架应用商店、广告接口、网络、资源整合打包、屏幕自适应、热更新、压缩解压、文件下载、数据库、文件管理、线程池、脚本引擎、异步脚本（协程）、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、以及各种三方库和SDK等丰富的底层功能和扩展，能满足多种类型的引擎、游戏及各种软件开发的一款超级APP；
   鹰歌游戏引擎 是基于 鹰歌MakerFrame框架 开发的一套开放式（支持RPG、ARPG、策略与战旗、文字AVG、放置类等几乎所有2D类型）游戏开发引擎和运行环境，主要由QML（JavaScript）编写，支持图形化编辑器（如 地图编辑器、角色编辑器、特效编辑器、道具编辑器、技能编辑器、战斗人物编辑器、战斗脚本编辑器、升级链编辑器、图片音乐视频管理、图形化脚本编程等）、代码或两者结合的方式来设计游戏和插件；
 
   QQ群：654876441
@@ -177,13 +177,14 @@ Item {
 7.多层次的架构设计，能满足从小白到大神不同技术层次的玩家（见 架构设计）；
 8.简便易用的接口/API：用极少的JS代码就能调用各接口API和功能（比如Request网络、访问服务器、实名认证、接入穿山甲和Tap广告和扫描/生成二维码等）；
 9.能动态载入 C++编写的动态链接库、Java编写的安卓Dex库、QML资源RCC库，所以支持用Qt（C++）、QML（JavaScript）和Java（安卓）等语言来开发 动态链接库、Dex和组件/插件，封装接口给JavaScript，然后用鹰歌框架来载入和调用（比如 引擎里的震动、GPS等功能）；
-10.已封装 JS脚本引擎、异步脚本AsyncScript、异步脚本队列AsyncScriptQueue 来解决JavaScript脚本文件的载入和运行（QML的JavaScript版本是ECMA6，不支持async/await写法，但我已经封装了一种类似async/await的同步脚本写法，非常简单好用；QML本身对外部JavaScript的载入和运行机制也不太友好方便，但我解决了这个问题）；
-11.存储/数据库/缓存：可采用远程Redis、Mysql和本地的Sqlite（未加密）、SQLITECIPHER（加密）、JSON、XML及QML的LocalStorage等；
-12、引入了QML/JavaScript语言和所有基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
+10.已封装3种线程（池），提供线程控制和并行运算；
+11.已封装 JS脚本引擎、异步脚本 AsyncScript（协程）、脚本/事件队列 ScriptQueue 来解决JavaScript脚本文件的载入和运行（QML的JavaScript版本是ECMA6，不支持async/await写法，但我已经封装了一种类似async/await的同步脚本写法，非常简单好用；QML本身对外部JavaScript的载入和运行机制也不太友好方便，但我解决了这个问题）；
+12.存储/数据库/缓存：可采用远程Redis、Mysql和本地的Sqlite（未加密）、SQLITECIPHER（加密）、JSON、XML及QML的LocalStorage等；
+13、引入了QML/JavaScript语言和所有基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
   a.采用最流行的 JavaScript脚本语言（和QML）开发的 游戏各编辑器、扩展和游戏脚本；JavaScript是优化过的谷歌v8（非H5）引擎，开发和运行效率都非常高；
   b.主流的图片、音乐和视频播放器；
   c.安卓内置一个Webview浏览器内核，桌面端可以选带一个Webkit浏览器内核；
-13.集成其他库和SDK：
+14.集成其他库和SDK：
   已集成QML的QRC打包为RCC功能，支持解包；
   已集成Box2D-qml和Bacon2D库，QML可使用物理引擎来做插件、游戏等；
   已集成qnanopainter库，基于opengl的QPaint方式绘图，绘图效率非常高，QML哪个组件效率低完全可以用它来替换；
@@ -196,7 +197,7 @@ Item {
   已集成SQLITECIPHER库（加密Sqlite）；
   已集成libhv库（非常不错的一个网络库，支持使用TCP、UDP、HTTP、WebSocket等开发网络服务和其他功能）；
   以上功能大都已封装完成并提供给QML或JavaScript来使用；
-14.可开发类型：
+15.可开发类型：
   游戏：理论上几乎支持所有2D游戏类型(比如已有的RPG和放置、ARPG、AVG、即时战略、战棋、棋牌等等)的网络/单机游戏，3D的可用QML3D或opengl来自行学习和设计（但我对3D不熟悉）；
   引擎：鹰歌游戏引擎和编辑器，就是基于鹰歌框架完成的，采用QML/JS和一些系统函数编写，所以也能开发其他类型的引擎；
   软件：鹰歌框架封装了很多基础和底层的功能（文件、网络等等），加上QML的易用性，所以也很适合开发各种行业应用软件、系统软件、甚至包括爬虫；
@@ -208,7 +209,7 @@ Item {
   a.上层（纯图形化编辑开发）：道具、战斗人物、技能、战斗脚本使用图形化编辑生成，脚本使用纯图形化编程来制作，只需设计 剧情、道具、地图、人物、战斗 等等就可以做出游戏，后期还可能做Excel、Json等来设计游戏内容，用框架引擎导入来生成游戏；
   b.中层（图形化编辑+JavaScript代码）：用JavaScript来扩展图形化编辑的生成结果，可以开发和设计更多的内容，比如游戏的算法、界面效果、升级链、道具、人物、登录、联网功能、图形化命令 等等；
   c.底层（QML+JavaScript）：用来扩展界面和功能，也可使用框架提供的Box2D和qnanopainter库，比如制作插件、扩展图形化命令、修改引擎和编辑器、甚至可以做其他类型的游戏引擎、编辑器和游戏，还可以做各种类型的软件APP（系统软件、行业业务软件、播放器、浏览器、爬虫等）；
-  d.内核/扩展层（框架层）：一般作者我来维护，包括跨平台、网络、资源整合与打包、屏幕自适应、热更新、压缩解压、文件下载、项目打包生成、平台分发、脚本引擎、异步脚本和队列、三方库（Bacon2D、Box2D-qml、qnanopainter、SCodes/QZXing、Quazip、SDL3、libhv、SQLITECIPHER等）、三方SDK（Tap、广告SDK、微信相关、支付宝等）等系统功能；
+  d.内核/扩展层（框架层）：一般作者我来维护，包括跨平台、网络、资源整合打包、屏幕自适应、热更新、压缩解压、文件下载、数据库、文件管理、线程池、脚本引擎、异步脚本（协程）、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、三方库（Bacon2D、Box2D-qml、qnanopainter、SCodes/QZXing、Quazip、SDL3、libhv、SQLITECIPHER等）、三方SDK（Tap实名、广告SDK、微信相关、支付宝等）等系统功能；
 2.此框架适合：
   a.非专业人士；想在任意端编写、任意端运行，能简单高效便捷的开发，且能快速发布在Steam、Tap、应用商店等平台的软件和游戏；
   b.学习Javascript、QML或游戏引擎开发的：鹰歌是个不错的宿主环境，可以任意在几个功能层面上进行编写运行；

@@ -255,6 +255,25 @@ Item {
                     }
                 }
 
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>猎魔人(快爆)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.3839.com/a/172193.htm');
+                    }
+                }
+
             }
 
             RowLayout {
@@ -263,6 +282,25 @@ Item {
                 Layout.fillHeight: false
                 //Layout.preferredHeight: 1
                 Layout.minimumHeight: 0
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr("<a href='#'>BOSS凶猛(Tap)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.taptap.cn/app/721920');
+                    }
+                }
 
                 Label {
                     Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter

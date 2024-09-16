@@ -204,9 +204,10 @@ Loader {
 
 
 
-    property int nSpriteType: 0
+    //1：经典行列图；2：序列图片文件；
+    property int nSpriteType: -1
 
-    property string strSource: ""   //精灵图片路径
+    property string strSource: ''   //精灵图片路径
     onStrSourceChanged: {
         if(item)
             item.strSource = this.strSource;

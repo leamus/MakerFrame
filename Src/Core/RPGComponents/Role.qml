@@ -116,243 +116,118 @@ Item {
         switch(actionName) {
         case 0:
         case Qt.Key_Up:
+        case '$Up':
             actionName = '$Up';
+            nDirection = 0;
             break;
         case 1:
         case Qt.Key_Right:
+        case '$Right':
             actionName = '$Right';
+            nDirection = 1;
             break;
         case 2:
         case Qt.Key_Down:
+        case '$Down':
             actionName = '$Down';
+            nDirection = 2;
             break;
-        case Qt.Key_Left:
         case 3:
+        case Qt.Key_Left:
+        case '$Left':
             actionName = '$Left';
+            nDirection = 3;
             break;
         }
+
+
+        if(!objActionsData[actionName])
+            return false;
 
 
         if(root.nSpriteType === 0) {
             //读特效信息
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-            //let data = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + arrActionsData[actionName] + GameMakerGlobal.separator + "sprite.json"));
-            //if(data)
-            //    data = JSON.parse(data);
+            //let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + "sprite.json"));
+            //if(info)
+            //    info = JSON.parse(info);
             //else
             //    return false;
 
-            let data = arrActionsData[actionName];
-            if(!data)
+            const info = objActionsData[actionName].Info;
+            if(!info)
                 return false;
+            const script = info.Script;
 
-            spriteEffect.nSpriteType = data.SpriteType ?? 1;
+            spriteEffect.nSpriteType = info.SpriteType ?? 1;
 
-            spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(data.Image);
+            spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(info.Image);
 
             if(spriteEffect.nSpriteType === 1) {
-                spriteEffect.nFrameCount = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameCount') ?? data.FrameCount;
-                spriteEffect.nInterval = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameInterval') ?? data.FrameInterval;
+                spriteEffect.nFrameCount = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameCount') ?? info.FrameCount;
+                spriteEffect.nInterval = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameInterval') ?? info.FrameInterval;
 
                 //注意这个放在 spriteEffect.sprite.width 和 spriteEffect.sprite.height 之前
-                let t = GlobalLibraryJS.getObjectValue(data.FrameData, 'FrameSize') ?? data.FrameSize;
+                let t = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameSize') ?? info.FrameSize;
                 spriteEffect.sprite.sizeFrame = Qt.size(t[0], t[1]);
 
-                t = GlobalLibraryJS.getObjectValue(data.FrameData, 'OffsetIndex') ?? data.OffsetIndex;
+                t = GlobalLibraryJS.getObjectValue(info.FrameData, 'OffsetIndex') ?? info.OffsetIndex;
                 spriteEffect.sprite.pointOffsetIndex = Qt.point(t[0], t[1]);
             }
             else if(spriteEffect.nSpriteType === 2) {
-                spriteEffect.nFrameCount = data.FrameData.FrameCount ?? data.FrameData[1];
-                spriteEffect.nInterval = data.FrameData.FrameInterval ?? data.FrameData[2];
-                spriteEffect.sprite.nFrameStartIndex = data.FrameData.FrameStartIndex ?? data.FrameData[0];
+                spriteEffect.nFrameCount = info.FrameData.FrameCount ?? info.FrameData[1];
+                spriteEffect.nInterval = info.FrameData.FrameInterval ?? info.FrameData[2];
+                spriteEffect.sprite.nFrameStartIndex = info.FrameData.FrameStartIndex ?? info.FrameData[0];
 
-
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
-                if(FrameManager.sl_fileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
-                    //_private.jsEngine.clear();
-                    let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
-                    spriteEffect.sprite.fnRefresh = ts.$refresh;
-                    //FrameManager.sl_clearComponentCache();
-                    //FrameManager.sl_trimComponentCache();
-                }
+                spriteEffect.sprite.fnRefresh = script ? script.$refresh : null;
             }
 
             //!只有这个类型是从 特效配置中读取大小并设置，其他类型是从 角色中读取大小并设置
             //root.width = Qt.binding(()=>spriteEffect.width);
             //root.height = Qt.binding(()=>spriteEffect.height);
-            root.width = parseInt(data.SpriteSize[0]);
-            root.height = parseInt(data.SpriteSize[1]);
-            //spriteEffect.implicitWidth = (data.SpriteSize[0]);
-            //spriteEffect.implicitHeight = (data.SpriteSize[1]);
-            spriteEffect.rXOffset = data.XOffset !== undefined ? (data.XOffset) : 0;
-            spriteEffect.rYOffset = data.YOffset !== undefined ? (data.YOffset) : 0;
-            spriteEffect.opacity = (data.Opacity);
-            spriteEffect.rXScale = (data.XScale);
-            spriteEffect.rYScale = (data.YScale);
+            root.width = parseInt(info.SpriteSize[0]);
+            root.height = parseInt(info.SpriteSize[1]);
+            //spriteEffect.implicitWidth = (info.SpriteSize[0]);
+            //spriteEffect.implicitHeight = (info.SpriteSize[1]);
+            spriteEffect.rXOffset = info.XOffset !== undefined ? (info.XOffset) : 0;
+            spriteEffect.rYOffset = info.YOffset !== undefined ? (info.YOffset) : 0;
+            spriteEffect.opacity = (info.Opacity);
+            spriteEffect.rXScale = (info.XScale);
+            spriteEffect.rYScale = (info.YScale);
 
-            if(data.Sound) {
-                spriteEffect.strSoundeffectName = data.Sound;
+            if(info.Sound) {
+                spriteEffect.strSoundeffectName = info.Sound;
             }
             else {
-                spriteEffect.strSoundeffectName = "";
+                spriteEffect.strSoundeffectName = '';
             }
-            //console.warn("!!!", data.Sound, strSoundeffectName)
-            spriteEffect.nSoundeffectDelay = (data.SoundDelay);
+            //console.warn("!!!", info.Sound, strSoundeffectName)
+            spriteEffect.nSoundeffectDelay = (info.SoundDelay);
 
 
             //nLoops = loops;
             //restart();
-
-
-            if(actionName === '$Up') {
-                nDirection = 0;
-            }
-            else if(actionName === '$Right') {
-                nDirection = 1;
-            }
-            else if(actionName === '$Down') {
-                nDirection = 2;
-            }
-            else if(actionName === '$Left') {
-                nDirection = 3;
-            }
         }
         else if(root.nSpriteType === 1) {
-            if(actionName === '$Up') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[0][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[0][1] * root.sizeFrame.height;     //起始位置
-                spriteEffect.sprite.pointOffsetIndex = Qt.point(arrActionsData[0][0], arrActionsData[0][1]);
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                //spriteEffect.nCurrentFrame = 0;
-
-                nDirection = 0;
-            }
-            else if(actionName === '$Right') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[1][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[1][1] * root.sizeFrame.height;     //起始位置
-                spriteEffect.sprite.pointOffsetIndex = Qt.point(arrActionsData[1][0], arrActionsData[1][1]);
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                //spriteEffect.nCurrentFrame = 0;
-
-                nDirection = 1;
-            }
-            else if(actionName === '$Down') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[2][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[2][1] * root.sizeFrame.height;     //起始位置
-                spriteEffect.sprite.pointOffsetIndex = Qt.point(arrActionsData[2][0], arrActionsData[2][1]);
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                //spriteEffect.nCurrentFrame = 0;
-
-                nDirection = 2;
-            }
-            else if(actionName === '$Left') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[3][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[3][1] * root.sizeFrame.height;     //起始位置
-                spriteEffect.sprite.pointOffsetIndex = Qt.point(arrActionsData[3][0], arrActionsData[3][1]);
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-                //spriteEffect.nCurrentFrame = 0;
-
-                nDirection = 3;
-            }
-
+            //width = root.width;
+            //height = root.height;
+            //walkSprite.animatedsprite.frameX = objActionsData[actionName][0] * root.sizeFrame.width;
+            //walkSprite.animatedsprite.frameY = objActionsData[actionName][1] * root.sizeFrame.height;     //起始位置
+            spriteEffect.sprite.pointOffsetIndex = Qt.point(objActionsData[actionName][0], objActionsData[actionName][1]);
+            //walkSprite.strSource = root.strSource;
+            //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
+            //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
+            //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
+            //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
+            //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
+            //spriteEffect.nCurrentFrame = 0;
         }
         else if(root.nSpriteType === 2) {
-            if(!arrActionsData[actionName])
-                return;
+            spriteEffect.sprite.nFrameStartIndex = objActionsData[actionName][0];
+            spriteEffect.nFrameCount = objActionsData[actionName][1];
+            spriteEffect.nInterval = objActionsData[actionName][2];
 
-            spriteEffect.sprite.nFrameStartIndex = arrActionsData[actionName][0];
-            spriteEffect.nFrameCount = arrActionsData[actionName][1];
-            spriteEffect.nInterval = arrActionsData[actionName][2];
-
-            if(actionName === '$Up') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[0][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[0][1] * root.sizeFrame.height;     //起始位置
-                //changeAction('$Up');
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-
-                nDirection = 0;
-            }
-            else if(actionName === '$Right') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[1][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[1][1] * root.sizeFrame.height;     //起始位置
-                //changeAction('$Right');
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-
-                nDirection = 1;
-            }
-            else if(actionName === '$Down') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[2][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[2][1] * root.sizeFrame.height;     //起始位置
-                //changeAction('$Down');
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-
-                nDirection = 2;
-            }
-            else if(actionName === '$Left') {
-                //width = root.width;
-                //height = root.height;
-                //walkSprite.animatedsprite.frameX = arrActionsData[3][0] * root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameY = arrActionsData[3][1] * root.sizeFrame.height;     //起始位置
-                //changeAction('$Left');
-                //walkSprite.strSource = root.strSource;
-                //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
-                //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
-                //walkSprite.animatedsprite.frameHeight = root.sizeFrame.height; //帧的宽高
-                //walkSprite.animatedsprite.frameDuration = root.interval;     //切换速度
-                //walkSprite.animatedsprite.loops = AnimatedSprite.Infinite;
-
-                nDirection = 3;
-            }
-
+            //changeAction(actionName);
         }
         else
             return false;
@@ -420,7 +295,8 @@ Item {
 
 
 
-    property int nSpriteType: 0
+    //0：从特效选择；1：经典行列图；2：序列图片文件；
+    property int nSpriteType: -1
     onNSpriteTypeChanged: {
         switch(nSpriteType) {
         case 1:
@@ -445,7 +321,7 @@ Item {
 
         //spriteEffect.bSmooth = false;
 
-        arrActionsData = [];
+        objActionsData = {};
         //spriteEffect.bTest = false;
     }
 
@@ -466,11 +342,11 @@ Item {
 
 
     property alias sprite: spriteEffect
-    //帧数据
-    //  nSpriteType为0时，{'动作名': 特效名}
-    //  nSpriteType为1时，[[0,0],[0,1],[0,2],[0,3]]  //上右下左 的 行、列 偏移
-    //  nSpriteType为2时，{'动作名': [帧起始号, 帧数, 帧速度]}
-    property var arrActionsData: []
+    //帧数据（动作名：系统的有 $Up、$Right、$Down、$Left）；
+    //  nSpriteType为0时，{'动作名': {Info: 特效信息, Script: 脚本}。。。}
+    //  nSpriteType为1时，{'动作名': [0,0]。。。}  //上右下左 的 行、列 偏移
+    //  nSpriteType为2时，{'动作名': [帧起始号, 帧数, 帧速度]。。。}
+    property var objActionsData: ({})
 
 
     property string strActionName: ''

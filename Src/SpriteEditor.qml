@@ -2273,10 +2273,10 @@ function $refresh(index, imageAnimate, path) {
                 spriteEffect.height = parseInt(textSpriteHeight.text);
 
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
-                if(FrameManager.sl_fileExists(path + GameMakerGlobal.separator + 'sprite.js')) {
+                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text + GameMakerGlobal.separator + 'sprite.js';
+                if(FrameManager.sl_fileExists(jsPath)) {
                     _private.jsEngine.clear();
-                    let ts = _private.jsEngine.load('sprite.js', GlobalJS.toURL(path));
+                    let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
                     spriteEffect.sprite.fnRefresh = ts.$refresh;
                     //FrameManager.sl_clearComponentCache();
                     //FrameManager.sl_trimComponentCache();
@@ -2294,7 +2294,7 @@ function $refresh(index, imageAnimate, path) {
 
             /*spriteEffect.sizeFrame = Qt.size(37, 58);
             spriteEffect.nFrameCount = 3;
-            arrActionsData = [3,2,1,0];
+            objActionsData = [3,2,1,0];
             spriteEffect.interval = 100;
             spriteEffect.width = 37;
             spriteEffect.height = 58;
@@ -2478,7 +2478,7 @@ function $refresh(index, imageAnimate, path) {
 
         console.debug("[SpriteEditor]Keys.onReleased", event.key, event.isAutoRepeat);
 
-        //console.debug(arrActionsData);
+        //console.debug(objActionsData);
         //console.debug(textSpriteFangXiangIndex.text.split(','));
     }
 

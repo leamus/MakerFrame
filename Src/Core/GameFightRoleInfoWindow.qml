@@ -85,7 +85,7 @@ Item {
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](conbatant.$equipment[position], {image: true, color: true}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](conbatant.$equipment[position], {Image: true, Color: true}));
             if(tIndex > -1) {
                 //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
                 arrEquipment[tIndex] = '%1：%2'.arg(position).arg(tgoodsName);

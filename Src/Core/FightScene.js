@@ -219,7 +219,7 @@ function showSkillsOrGoods(type, value) {
             //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
             if(goods.$commons.$fightScript) {
                 arrData.push(goods);
-                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
             }
         }
 
@@ -750,28 +750,27 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             if(spriteEffect === null)
                 break;
 
-            let combatantActionSpriteDataID;
             if(combatantActionSpriteData.ID === undefined)
-                combatantActionSpriteDataID = combatantActionSpriteData.Name;
-            else
-                combatantActionSpriteDataID = combatantActionSpriteData.ID;
+                combatantActionSpriteData.ID = combatantActionSpriteData.Name;
 
             //检测ID是否重复
-            if(_private.mapSpriteEffectsTemp[combatantActionSpriteDataID] !== undefined) {
-                game.$sys.unloadSpriteEffect(_private.mapSpriteEffectsTemp[combatantActionSpriteDataID]);
-                //_private.mapSpriteEffectsTemp[combatantActionSpriteDataID].destroy();
-                delete _private.mapSpriteEffectsTemp[combatantActionSpriteDataID];
+            if(_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID] !== undefined) {
+                game.$sys.unloadSpriteEffect(_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID]);
+                //_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID].destroy();
+                delete _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID];
             }
 
             //保存到列表中，退出时会删除所有，防止删除错误
-            _private.mapSpriteEffectsTemp[combatantActionSpriteDataID] = spriteEffect;
-            spriteEffect.sg_finished.connect(function() {
+            _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID] = spriteEffect;
+            let _finished = function() {
                 if(GlobalLibraryJS.isComponent(spriteEffect)) {
                     game.$sys.unloadSpriteEffect(spriteEffect);
                     //spriteEffect.destroy();
                 }
-                delete _private.mapSpriteEffectsTemp[combatantActionSpriteDataID];
-            });
+                delete _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID];
+                spriteEffect.sg_finished.disconnect(_finished);
+            };
+            spriteEffect.sg_finished.connect(_finished);
             //spriteEffect.z = 999;
 
 
@@ -1161,8 +1160,8 @@ function *fnRound() {
 
                     //得到技能生成器函数
                     let genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
-                    //_private.asyncScriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
-                    //GlobalJS.createScript(_private.asyncScriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
+                    //_private.scriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
 
                     //循环 技能（或者 道具技能）包含的特效
@@ -1172,7 +1171,7 @@ function *fnRound() {
                         let tCombatantActionSpriteData;
 
                         /*/方案1：
-                        let [tCombatantActionSpriteData] = _private.asyncScriptQueue.run(SkillEffectResult);
+                        let [tCombatantActionSpriteData] = _private.scriptQueue.run(SkillEffectResult);
 
                         //如果动画结束
                         if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
@@ -1251,22 +1250,22 @@ function *fnRound() {
                 //得到技能生成器函数
                 //let genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
                 //if(goodsInfo.$commons.$fightScript['$playScript'])
-                //    _private.asyncScriptQueue.create(goodsInfo.$commons.$fightScript['$playScript'](goods, combatant), '$playScript', -1);
+                //    _private.scriptQueue.create(goodsInfo.$commons.$fightScript['$playScript'](goods, combatant), '$playScript', -1);
 
                 if(goodsInfo.$commons.$fightScript['$completeScript'])
-                    //_private.asyncScriptQueue.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
-                    GlobalJS.createScript(_private.asyncScriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
+                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
+                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
                 else if(goodsInfo.$commons.$fightScript['$overScript'])
-                    //_private.asyncScriptQueue.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.asyncScriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
+                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
+                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
                 else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
-                    //_private.asyncScriptQueue.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.asyncScriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
+                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
+                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
 
                 while(1) {
 
                     //一个特效
-                    let [tCombatantActionSpriteData] = _private.asyncScriptQueue.run(SkillEffectResult);
+                    let [tCombatantActionSpriteData] = _private.scriptQueue.run(SkillEffectResult);
                     //如果动画结束
                     if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
                         break;
@@ -1328,6 +1327,7 @@ function *fnRound() {
 
 
         yield* runCombatantRoundScript(combatant, 3);
+        //game.$sys.resources.commonScripts["fight_combatant_set_choice"](combatant, -1, false);
 
     }   //for
 
@@ -1435,15 +1435,15 @@ function *gfFighting() {
 
 
 
-        //如果asyncScriptQueue内部有脚本没执行完毕，则等待 asyncScriptQueue 运行完毕（主要是 两个回合脚本），再回来运行
+        //如果scriptQueue内部有脚本没执行完毕，则等待 scriptQueue 运行完毕（主要是 两个回合脚本），再回来运行
         /*/鹰：有了上面代码貌似不用下面代码了
-        if(!_private.asyncScriptQueue.isEmpty()) {
+        if(!_private.scriptQueue.isEmpty()) {
 
             //将 continueFight 放在脚本队列最后
             fight.run([function() {
 
-                //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 asyncScriptQueue）
-                //否则导致递归代码：在 asyncScriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScriptQueue，导致递归运行!!!
+                //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
+                //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
                 GlobalLibraryJS.setTimeout(function() {
                     //开始运行
                     fight.$sys.continueFight();
@@ -1497,14 +1497,14 @@ function *gfFighting() {
         /*/运行两个回合脚本（阶段3）
 
         //通用回合开始脚本
-        if(GlobalJS.createScript(_private.asyncScriptQueue, 0, 0, game.$sys.resources.commonScripts["fight_round_script"].call({game, fight}, _private.nRound, 1)) === 0)
-            _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+        if(GlobalJS.createScript(_private.scriptQueue, 0, 0, game.$sys.resources.commonScripts["fight_round_script"].call({game, fight}, _private.nRound, 1)) === 0)
+            _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
 
         //回合开始脚本
         if(_private.fightRoundScript) {
             //console.debug("运行回合事件!!!", _private.nRound)
-            if(GlobalJS.createScript(_private.asyncScriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
-                _private.asyncScriptQueue.run(_private.asyncScriptQueue.lastEscapeValue);
+            if(GlobalJS.createScript(_private.scriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
+                _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
         }*/
 
 
@@ -1519,7 +1519,7 @@ function *gfFighting() {
 
 
 //战斗人物回合脚本
-//stage：0为回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
+//stage：0为大回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
 function *runCombatantRoundScript(combatant, stage) {
     //执行 战斗人物回合 脚本
     let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, stage);
@@ -1635,7 +1635,7 @@ function fightOver(result, force=false) {
     if(force) {
         timerRoleSprite.stop();
         _private.genFighting.clear(3);
-        _private.asyncScriptQueue.clear(3);
+        _private.scriptQueue.clear(3);
     }
 
     //if(result !== undefined && result !== null) {

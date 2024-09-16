@@ -232,23 +232,23 @@ Item {
             objPlugins = {};
 
             //载入扩展 插件/组件
-            let pluginPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
+            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
 
             //循环三方根目录
-            for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+            for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
                 //if(tc0 === '$Leamus')
                 //    continue;
 
                 //循环三方插件目录
-                for(let tc1 of FrameManager.sl_dirList(GlobalJS.toPath(pluginPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+                for(let tc1 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
                     let showName = '';
 
-                    let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
+                    let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
 
-                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
 
                         try {
-                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+                            let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
 
 
                             //放入 _private.objPlugins 中
@@ -288,11 +288,11 @@ Item {
                 OnClicked: (index, item)=>{
                     let tc0 = arrPluginsName[index][0];
                     let tc1 = arrPluginsName[index][1];
-                    let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends';
+                    let extendsDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends';
 
-                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.js'))) {
                         try {
-                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+                            let ts = _private.jsEngine.load(GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.js'));
 
                             if(ts.$load) {
                                 ts.$load(itemExtendsRoot);
@@ -308,8 +308,8 @@ Item {
                             return -1;
                         }
                     }
-                    else if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.qml'))) {
-                        loaderExtends.source = GlobalJS.toURL(jsPath + GameMakerGlobal.separator + 'main.qml');
+                    else if(FrameManager.sl_fileExists(GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.qml'))) {
+                        loaderExtends.source = GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml');
                         if(loaderExtends.status === Loader.Loading)
                             showBusyIndicator(true);
 
@@ -340,12 +340,12 @@ Item {
                 OnRemoveClicked: (index, item)=>{
                     let tc0 = arrPluginsName[index][0];
                     let tc1 = arrPluginsName[index][1];
-                    let dirUrl = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
+                    let pluginDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1;
 
                     let description = '';
-                    if(FrameManager.sl_fileExists(GlobalJS.toPath(dirUrl + GameMakerGlobal.separator + 'main.js'))) {
+                    if(FrameManager.sl_fileExists(GlobalJS.toPath(pluginDirPath + GameMakerGlobal.separator + 'main.js'))) {
                         try {
-                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(dirUrl));
+                            let ts = _private.jsEngine.load(GlobalJS.toURL(pluginDirPath + GameMakerGlobal.separator + 'main.js'));
 
                             if(ts.$description) {
                                 description = '\r\n' + '描述：' + ts.$description;
@@ -361,10 +361,10 @@ Item {
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
 
-                            let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1;
-                            if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                            let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
+                            if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                 try {
-                                    let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+                                    let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
 
                                     if(ts.$uninstall) {
                                         ts.$uninstall();
@@ -380,7 +380,7 @@ Item {
                                 }
                             }
 
-                            console.debug("[PluginsManager]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                            console.debug("[PluginsManager]删除：" + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath), FrameManager.sl_removeRecursively(pluginDirPath));
                             l_list.removeItem(index);
                             _private.refresh();
 

@@ -339,7 +339,7 @@ Item {
                     text: 'p'
 
                     onClicked: {
-                        _private.doAction(ttextActionName.text);
+                        _private.doAction(2, ttextActionName.text);
                     }
                 }
 
@@ -491,7 +491,7 @@ Item {
                     text: 'p'
 
                     onClicked: {
-                        _private.doAction(ttextActionName.text);
+                        _private.doAction(2, ttextActionName.text);
                     }
                 }
 
@@ -1812,7 +1812,7 @@ Item {
 
                     //sizeFrame: Qt.size(37, 58);
                     /*nFrameCount: 3;
-                    arrActionsData: [3,2,1,0];
+                    objActionsData: [3,2,1,0];
                     interval: 100;
                     width: 37;
                     height: 58;
@@ -2855,11 +2855,12 @@ function $refresh(index, imageAnimate, path) {
 
 
             if(comboType.currentIndex === 0) {
-                //role.arrActionsData = textRoleFangXiangIndex.text.split(',');
-                role.arrActionsData = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
+                //role.objActionsData = textRoleFangXiangIndex.text.split(',');
+                role.objActionsData = {'$Up': [parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                    '$Right': [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                    '$Down': [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                    '$Left': [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)],
+                };
 
                 //注意这个放在 role.sprite.sprite.width 和 role.sprite.sprite.height 之前
                 role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
@@ -2897,7 +2898,7 @@ function $refresh(index, imageAnimate, path) {
                 role.rYScale = parseFloat(textRoleFrameYScale.text);
 
 
-                role.arrActionsData = {};
+                role.objActionsData = {};
                 let actionNames = FrameManager.sl_findChildren(layoutAction1, 'ActionName');
                 let frameStartIndexes = FrameManager.sl_findChildren(layoutAction1, 'FrameStartIndex');
                 let frameCounts = FrameManager.sl_findChildren(layoutAction1, 'FrameCount');
@@ -2905,7 +2906,7 @@ function $refresh(index, imageAnimate, path) {
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
-                        role.arrActionsData[actionNames[tt].text.trim()] = [
+                        role.objActionsData[actionNames[tt].text.trim()] = [
                             parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
                         ];
                     else {
@@ -2914,10 +2915,10 @@ function $refresh(index, imageAnimate, path) {
                 }
 
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
-                if(FrameManager.sl_fileExists(path + GameMakerGlobal.separator + 'role.js')) {
+                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text + GameMakerGlobal.separator + 'role.js';
+                if(FrameManager.sl_fileExists(jsPath)) {
                     _private.jsEngine.clear();
-                    let ts = _private.jsEngine.load('role.js', GlobalJS.toURL(path));
+                    let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
                     role.sprite.sprite.fnRefresh = ts.$refresh;
                     //FrameManager.sl_clearComponentCache();
                     //FrameManager.sl_trimComponentCache();
@@ -2927,23 +2928,31 @@ function $refresh(index, imageAnimate, path) {
                 //role.implicitWidth = parseInt(textRoleWidth.text);
                 //role.implicitHeight = parseInt(textRoleHeight.text);
 
-                role.arrActionsData = {};
+                role.objActionsData = {};
                 let actionNames = FrameManager.sl_findChildren(layoutAction2, 'ActionName');
                 let SpriteNames = FrameManager.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
-                        //role.arrActionsData[actionNames[tt].text.trim()] = [
+                        //role.objActionsData[actionNames[tt].text.trim()] = [
                         //    SpriteNames[tt].text.trim()
                         //];
 
-                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-                        let data = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + SpriteNames[tt].text.trim() + GameMakerGlobal.separator + "sprite.json"));
-                        if(data)
-                            data = JSON.parse(data);
+                        let spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
+                        let info = FrameManager.sl_fileRead(GlobalJS.toPath(spritePath + GameMakerGlobal.separator + "sprite.json"));
+                        if(info)
+                            info = JSON.parse(info);
                         //else
                         //    return false;
-                        role.arrActionsData[actionNames[tt].text.trim()] = data;
+
+                        let ts = null;
+                        if(FrameManager.sl_fileExists(spritePath + GameMakerGlobal.separator + 'sprite.js')) {
+                            //_private.jsEngine.clear();
+                            ts = _private.jsEngine.load(GlobalJS.toURL(spritePath + GameMakerGlobal.separator + 'sprite.js'));
+                            //FrameManager.sl_clearComponentCache();
+                            //FrameManager.sl_trimComponentCache();
+                        }
+                        role.objActionsData[actionNames[tt].text.trim()] = {Info: info, Script: ts};
                     }
                     else {
                         textDialogMsg.text = "有必填项没填";
@@ -2969,7 +2978,7 @@ function $refresh(index, imageAnimate, path) {
 
             /*role.sizeFrame = Qt.size(37, 58);
             role.nFrameCount = 3;
-            role.arrActionsData = [3,2,1,0];
+            role.objActionsData = [3,2,1,0];
             role.interval = 100;
             role.width = 37;
             role.height = 58;
@@ -3043,7 +3052,7 @@ function $refresh(index, imageAnimate, path) {
             outputData.RoleSize = [role.implicitWidth, role.implicitHeight];
             outputData.FrameSize = [role.sizeFrame.width, role.sizeFrame.height];
             outputData.FrameCount = role.nFrameCount;
-            outputData.FrameIndex = role.arrActionsData.toString();
+            outputData.FrameIndex = role.objActionsData.toString();
             outputData.FrameInterval = role.interval;
             outputData.RealOffset = [role.x1, role.y1];
             outputData.RealSize = [role.width1, role.height1];
@@ -3327,7 +3336,7 @@ function $refresh(index, imageAnimate, path) {
 
         console.debug("[RoleEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
 
-        //console.debug(role.arrActionsData);
+        //console.debug(role.objActionsData);
         //console.debug(textRoleFangXiangIndex.text.split(','));
     }
 

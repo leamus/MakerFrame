@@ -39,23 +39,28 @@ Notepad {
         _private.nKeepTime = (keeptime > 0 ? keeptime : 0);
 
 
-        //如果是自适应宽高
+        //先设置为最宽（implicitHeight会变）
         root.width = nMaxWidth;
         textArea.text = pretext + msg;
+        //如果是自适应宽
         if(type & 0b1) {
-            if(textArea.implicitWidth < nMaxWidth)
-                root.width = textArea.implicitWidth;
-            else
+            if(textArea.implicitWidth < nMinWidth)
+                root.width = nMinWidth;
+            else if(textArea.implicitWidth > nMaxWidth)
                 root.width = nMaxWidth;
+            else
+                root.width = textArea.implicitWidth;
         }
         else
             root.width = nMaxWidth;
-
+        //如果是自适应高
         if(type & 0b10) {
-            if(textArea.implicitHeight < nMaxHeight)
-                root.height = textArea.implicitHeight;
-            else
+            if(textArea.implicitHeight < nMinHeight)
+                root.height = nMinHeight;
+            else if(textArea.implicitHeight > nMaxHeight)
                 root.height = nMaxHeight;
+            else
+                root.height = textArea.implicitHeight;
         }
         else
             root.height = nMaxHeight;
@@ -112,7 +117,9 @@ Notepad {
     property alias timer: timer
 
 
+    property int nMinWidth: 0
     property int nMaxWidth: Screen.desktopAvailableWidth * 0.9
+    property int nMinHeight: 0
     property int nMaxHeight: Screen.desktopAvailableHeight * 0.9
 
 

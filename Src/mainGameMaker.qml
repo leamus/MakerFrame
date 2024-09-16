@@ -855,6 +855,7 @@ Item {
 
                 text: "导入工程"
                 onClicked: {
+                    filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
                     filedialogOpenProject.open();
                 }
             }
@@ -1096,7 +1097,7 @@ Item {
                 //Layout.preferredWidth: 1
 
                 font.pointSize: 12
-                text: qsTr("<a href='https://afdian.net/a/Leamus'>爱发电</a>")
+                text: qsTr("<a href='https://afdian.com/a/Leamus'>爱发电</a>")
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
 
@@ -1223,6 +1224,7 @@ Item {
 
         title: "选择项目包文件"
         //folder: shortcuts.home
+        folder: GameMakerGlobal.config.strProjectRootPath
         nameFilters: [ "zip files (*.zip)", "All files (*)" ]
 
         selectMultiple: false
@@ -1252,15 +1254,16 @@ Item {
 
                 //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_baseName(fUrl);
+                let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
                 //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
+                //console.debug('[mainGameMaker]path:', fUrl, projectPath, FrameManager.sl_completeBaseName(fUrl))
 
                 FrameManager.sl_dirCreate(projectPath);
                 let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
 
 
                 if(ret.length > 0) {
-                    _private.changeProject(FrameManager.sl_baseName(fUrl));
+                    _private.changeProject(FrameManager.sl_completeBaseName(fUrl));
 
                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                     dialogCommon.msg = "成功";

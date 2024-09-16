@@ -212,6 +212,10 @@ let $config = {
             $fontSize: 16,
             $fontColor: 'white',
             $maskColor: '#01000000',
+            $minWidth: null,
+            $maxWidth: null,
+            $minHeight: null,
+            $maxHeight: null,
             //$maskColor: '#00000000',  //全0会隐藏Mask，导致只能点击消息框才能有效
         },
         $msg: {
@@ -220,7 +224,10 @@ let $config = {
             $fontSize: 16,
             $fontColor: 'white',
             $maskColor: '#7FFFFFFF',
-            $type: 0b10,
+            $minWidth: null,
+            $maxWidth: null,
+            $minHeight: null,
+            $maxHeight: null,
         },
         $menu: {
             $maskColor: '#7FFFFFFF',
@@ -303,7 +310,7 @@ function *$gameInit(newGame) {
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
     if(FrameManager.sl_fileExists(game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js'))) {
-        let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(game.$projectpath));
+        let gameJS = game.$sys.caches.jsEngine.load(game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js'));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
             if(gameJS.$init) {
@@ -321,7 +328,7 @@ function *$gameInit(newGame) {
             game.gf.$plugins[tp0][tp1] = {};
             let gameJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
             if(FrameManager.sl_fileExists(game.$globalJS.toPath(gameJSPath + game.$gameMakerGlobal.separator + 'game.js'))) {
-                let gameJS = game.$sys.caches.jsEngine.load('game.js', game.$globalJS.toURL(gameJSPath));
+                let gameJS = game.$sys.caches.jsEngine.load(game.$globalJS.toURL(gameJSPath + game.$gameMakerGlobal.separator + 'game.js'));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
                     if(gameJS.$init) {
@@ -627,34 +634,58 @@ let $combatantInfo = function(combatant) {
 }
 
 //显示的道具名格式
-//flags：image、color、count分别表示是否显示图像、颜色和数量（数量只有可叠加的才显示）
+//flags：Image、Color、Count、Price分别表示是否显示图像、颜色和数量（数量只有可叠加的才显示）、价格（0、1、2）；
 let $showGoodsName = function(goods, flags=null) {
-    let name = '';
-
     if(flags === undefined || flags === null)
-        flags = {image: true, color: true, count: true};
+        flags = {Image: true, Color: true, Count: true, Price: 0};
 
-    if(flags['image'] && goods.$image) {
+
+    let tstr = '';
+    let name = '<table width=100% height=100%><td width=0% style=\"vertical-align:middle;\">%1</td><td width=100% style=\"text-align:center;vertical-align:middle;\">%2</td><td width=0% style=\"text-align:right;vertical-align:middle;\"><font color=\"yellow\">%3</font></td></table>';
+
+
+    if(flags['Image'] && goods.$image) {
         //let goodsPath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strGoodsDirName) + game.$gameMakerGlobal.separator;
 
         //game.$globalLibraryJS.showRichTextImage();
-        name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
+        tstr = ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
             //arg(goodsPath + goods.$rid + game.$gameMakerGlobal.separator + goods.$image).
             arg(game.$gameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
 
-    if(flags['color'] && goods.$color)
-        name += `<font color=\"${goods.$color}\">`;
+    name = name.arg(tstr);
 
-    name += goods.$name;
 
-    if(flags['color'] && goods.$color)
-        name += '</font>';
+    tstr = '';
 
-    if(flags['count'] && (goods.$stackable || goods.$count > 1))
-        name += ` x${goods.$count}`;
+    if(flags['Color'] && goods.$color)
+        tstr = `<font color=\"${goods.$color}\">`;
+
+    tstr += goods.$name;
+
+    if(flags['Color'] && goods.$color)
+        tstr += '</font>';
+
+
+    if(flags['Count'] && (goods.$stackable || goods.$count > 1))
+        tstr += ` x${goods.$count}`;
+
+    name = name.arg(tstr);
+
+
+    tstr = '';
+
+    if(flags['Price'] !== undefined) {
+        if(GlobalLibraryJS.isArray(goods.$price))
+            tstr = ' ￥' + goods.$price[flags['Price']];
+        else
+            tstr = ' ￥?';
+    }
+
+    name = name.arg(tstr);
+
 
     return name;
 }
@@ -864,6 +895,10 @@ function $commonRunAwayAlgorithm(team, index) {
 //返回数字表示延迟多久ms再继续
 //返回null表示战斗回合结束
 function *$fightRolesRound(round) {
+    //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
+    //yield* game.$gameMakerGlobalJS.fightRolesRound1(round, '$speed');
+
+
     //所有的战斗人物
     let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
 
@@ -1047,7 +1082,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
         useSkillsOrGoods = game.$globalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0, 1])[1]);
 
 
-        //普通攻击或技能或道具（敌人被乱）
+        //普通攻击或技能或道具（敌人被乱？？？）；鹰：感觉这句没用，像是如果选择了按上次的选择来
         if(combatant.$$fightData.$choice.$type === 3 || combatant.$$fightData.$choice.$type === 2) {
             useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
         }
@@ -1188,7 +1223,7 @@ function getBuff(combatant, buffCode, params={}) {
             //执行脚本，objBuff为 本buff对象
             buffScript: function*(combatant, objBuff) {
                 $fightCombatantSetChoice(combatant, 1, false);
-                //combatant.$$fightData.$choice.$type = 1;
+                ///combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
 
                 //显示
@@ -1254,7 +1289,7 @@ function $combatantRoundScript(combatant, round, stage) {
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             $fightCombatantSetChoice(combatant, 1, false);
-            combatant.$$fightData.$choice.$type = 1;
+            ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
             return null;
@@ -1264,7 +1299,7 @@ function $combatantRoundScript(combatant, round, stage) {
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             $fightCombatantSetChoice(combatant, 1, false);
-            combatant.$$fightData.$choice.$type = 1;
+            ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
             return null;
@@ -1274,7 +1309,7 @@ function $combatantRoundScript(combatant, round, stage) {
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             $fightCombatantSetChoice(combatant, 1, false);
-            combatant.$$fightData.$choice.$type = 1;
+            ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
             return null;
@@ -1284,11 +1319,15 @@ function $combatantRoundScript(combatant, round, stage) {
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
             $fightCombatantSetChoice(combatant, 1, false);
-            combatant.$$fightData.$choice.$type = 1;
+            ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
             return null;
         }
+        //如果没有回合，则加这句清空此次的战斗选择数据
+        //else
+        //    $fightCombatantSetChoice(combatant, -1, false);
+        //    //fight.$sys.loadLast(combatant);
         break;
     }
 
@@ -1296,9 +1335,14 @@ function $combatantRoundScript(combatant, round, stage) {
     return combatantRoundEffects(combatant, round, stage);
 }
 
-//战斗人物回合脚本（主要是剧情和Buff），会在两个阶段分别执行一次；
+//战斗人物回合脚本（主要是剧情和Buff）；
 //参数同 $combatantRoundScript；
 function *combatantRoundEffects(combatant, round, stage) {
+    /*/可以加一些东西，比如加气血等
+    if(stage === 1) {
+        game.addprops(combatant, {'HP,0': 10, 'MP,0': 10});
+    }
+    */
 
     let buffs = combatant.$$fightData.$buffs;
     /*if(buffs['$$Sleep']) {
@@ -1966,7 +2010,7 @@ let $fightMenus = {
             let combatant = fight.myCombatants[combatantIndex];
 
             $fightCombatantSetChoice(combatant, 1, true);
-            //combatant.$$fightData.$choice.$type = 1;
+            ///combatant.$$fightData.$choice.$type = 1;
             //combatant.$$fightData.$choice.$attack = undefined;
             //combatant.$$fightData.$choice.$targets = undefined;
             //combatant.$$fightData.$lastChoice.$type = 1;

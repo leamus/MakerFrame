@@ -89,7 +89,7 @@ Item {
 
                 //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_baseName(fUrl);
+                //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
                 let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                 //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
 
@@ -98,7 +98,7 @@ Item {
 
 
                 if(ret.length > 0) {
-                    //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_baseName(fUrl);
+                    //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_completeBaseName(fUrl);
                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                     dialogCommon.msg = "成功";
                 }
@@ -151,7 +151,7 @@ Item {
 
         function refresh() {
 
-            let menuJS = jsEngine.load('menu.js', 'http://MakerFrame.Leamus.cn/RPGMaker/Plugins');
+            let menuJS = jsEngine.load('http://MakerFrame.Leamus.cn/RPGMaker/Plugins/menu.js');
 
             if(!menuJS)
                 return false;
@@ -219,10 +219,10 @@ Item {
                                     msg = "安装成功";
 
 
-                                    let jsPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'];
-                                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath + GameMakerGlobal.separator + 'main.js'))) {
+                                    let jsPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
+                                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                         try {
-                                            let ts = _private.jsEngine.load('main.js', GlobalJS.toURL(jsPath));
+                                            const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
 
                                             if(ts.$install) {
                                                 ts.$install();

@@ -64,7 +64,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$useScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
@@ -75,7 +75,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$equipScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
@@ -86,7 +86,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$fightScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -97,7 +97,7 @@ Item {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$price && goods.$price[1] !== undefined) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -108,7 +108,7 @@ Item {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$type === 4) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -117,7 +117,7 @@ Item {
         default:
             gameGoodsMenu.arrGoods = game.gd["$sys_goods"];
             for(let goods of game.gd["$sys_goods"]) {
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {image: true, color: true, count: true})));
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
             }
 
             break;

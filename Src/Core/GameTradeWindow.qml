@@ -51,14 +51,8 @@ Item {
 
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: (g.$count >= 0 ? true : false)}));
-            if(g.$price) {
-                if(GlobalLibraryJS.isNumber(g.$price))
-                    g.$price = [g.$price, parseInt(g.$price / 2)];  //默认5折卖
-                arrShowSaleGoods.push(tgoodsName + ' ￥' + g.$price[0]);
-            }
-            else
-                arrShowSaleGoods.push(tgoodsName);
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
+            arrShowSaleGoods.push(tgoodsName);
         }
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
 
@@ -70,16 +64,8 @@ Item {
                     (GlobalLibraryJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
 
                 //let goodsInfo = _private.goodsResource[g.$rid];
-                let price = '?';
-                if(g.$price) {
-                    if(GlobalLibraryJS.isNumber(g.$price))
-                        price = parseInt(g.$price / 2);  //默认5折卖
-                    else if(GlobalLibraryJS.isArray(g.$price))
-                        price = g.$price[1];
-                }
-
                 let tgoods = game.$sys.getGoodsObject(g, false);
-                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {image: true, color: true, count: true})) + ' ￥' + price);
+                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {Image: true, Color: true, Count: true, Price: 1})));
                 arrMyGoods.push(g);
             }
         }

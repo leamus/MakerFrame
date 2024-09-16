@@ -36,8 +36,8 @@ import "FightScene.js" as FightSceneJS
 
     设计思路：
       1、3个生成器：
-        genFightChoice是选择系统使用；genFighting是主回合战斗循环使用；asyncScriptQueue是各种事件、特效使用；
-          genFighting生成各种脚本给asyncScriptQueue运行，分开的好处是随时可以插入用户定义的脚本去运行；
+        genFightChoice是选择系统使用；genFighting是主回合战斗循环使用；scriptQueue是各种事件、特效使用；
+          genFighting生成各种脚本给scriptQueue运行，分开的好处是随时可以插入用户定义的脚本去运行；
 */
 
 
@@ -299,7 +299,7 @@ Item {
         fight.d = {};
 
         _private.genFighting.clear(3);
-        ////_private.asyncScriptQueue.clear(1);
+        ////_private.scriptQueue.clear(1);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
@@ -514,11 +514,16 @@ Item {
     function release() {
         //audioFightMusic.stop();
 
+        for(let ti in itemTempComponent.children) {
+            itemTempComponent.children[ti].destroy();
+        }
+
+
         FightSceneJS.resetFightScene();
 
         fight.d = {};
 
-        _private.asyncScriptQueue.clear(1);
+        _private.scriptQueue.clear(1);
         _private.genFighting.clear(3);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
@@ -609,8 +614,8 @@ Item {
             */
 
 
-            return game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback, itemFightViewPort);
-            //itemGameMsg.parent = itemFightViewPort;
+            return game.msg(msg, interval, pretext, keeptime, style, false/*, buttonNum*/, callback, itemTempComponent);
+            //itemGameMsg.parent = itemTempComponent;
             //return itemGameMsg;
         }
 
@@ -631,7 +636,7 @@ Item {
             */
 
 
-            return game.talk(role, msg, interval, pretext, keeptime, style, false, callback, itemFightViewPort);
+            return game.talk(role, msg, interval, pretext, keeptime, style, false, callback, itemTempComponent);
         }
 
         //同 game.menu
@@ -651,7 +656,7 @@ Item {
             */
 
 
-            return game.menu(title, items, style, false, callback, itemFightViewPort);
+            return game.menu(title, items, style, false, callback, itemTempComponent);
         }
 
         //技能选择菜单
@@ -670,10 +675,10 @@ Item {
         //参数同 game.run
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
-                scriptProps.AsyncScriptQueue = _private.asyncScriptQueue;
+                scriptProps.ScriptQueue = _private.scriptQueue;
             }
             else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
-                scriptProps = {AsyncScriptQueue: _private.asyncScriptQueue, Priority: scriptProps};
+                scriptProps = {ScriptQueue: _private.scriptQueue, Priority: scriptProps};
             }
             return game.run(vScript, scriptProps, ...params);
         }
@@ -797,6 +802,7 @@ Item {
             screen: rootFightScene,    //固定屏幕上（所有，包含战斗场景）
             viewport: itemFightViewPort,      //战斗视窗
             scene: fightScene,  //容器（包含所有战斗人物）
+            tempComponent: itemTempComponent,  //容器（包含所有战斗人物）
 
             showSkillsOrGoods: FightSceneJS.showSkillsOrGoods,
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
@@ -820,8 +826,8 @@ Item {
                     //将 continueFight 放在脚本队列最后
                     fight.run([function() {
 
-                        //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 asyncScriptQueue）
-                        //否则导致递归代码：在 asyncScriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到asyncScriptQueue，导致递归运行!!!
+                        //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
+                        //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
                         GlobalLibraryJS.setTimeout(function() {
                             //开始运行
                             _private.genFighting.run();
@@ -888,7 +894,7 @@ Item {
                 spriteEffectEnemies: repeaterEnemies,
             },
             caches: {
-                asyncScriptQueue: _private.asyncScriptQueue,
+                scriptQueue: _private.scriptQueue,
                 genFighting: _private.genFighting,
                 genFightChoice: _private.genFightChoice,
             },
@@ -1088,7 +1094,7 @@ Item {
             animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
 
             onSg_playEffect: {
-                game.$sys.playSoundEffect(soundeffectSource);
+                game.playsoundeffect(soundeffectSource, -1);
             }
         }
     }*/
@@ -1285,6 +1291,8 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
+                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+
                         //bTest: false
 
 
@@ -1347,7 +1355,10 @@ Item {
                         }
 
                         onSg_playEffect: {
-                            game.$sys.playSoundEffect(soundeffectSource);
+                            if(game.soundeffectpausing())
+                                return;
+
+                            game.playsoundeffect(soundeffectSource, -1);
                         }
                     }
 
@@ -1536,6 +1547,8 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
+                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+
                         //bTest: false
 
 
@@ -1555,7 +1568,10 @@ Item {
                         }
 
                         onSg_playEffect: {
-                            game.$sys.playSoundEffect(soundeffectSource);
+                            if(game.soundeffectpausing())
+                                return;
+
+                            game.playsoundeffect(soundeffectSource, -1);
                         }
                     }
 
@@ -1642,6 +1658,13 @@ Item {
 
         }
 
+
+        Item {
+            id: itemTempComponent
+            width: parent.width
+            height: parent.height
+        }
+
     }
 
 
@@ -1691,7 +1714,7 @@ Item {
             target: loaderFightMenu.item
             //忽略没有的信号
             ignoreUnknownSignals: true
-            
+
             function onSg_choice(index) {
             }
         }
@@ -1812,8 +1835,17 @@ Item {
         //implicitHeight: parent.height / 2
         //height: parent.height / 2
 
+        nScrollHorizontal: 0
+        nScrollVertical: 1
+
         textArea.enabled: false
         textArea.readOnly: true
+
+        nMinWidth: 0
+        //nMaxWidth: parent.width
+        nMinHeight: 0
+        //nMaxHeight: 32
+
         //text: ""
     }
 
@@ -1913,7 +1945,7 @@ Item {
                         if(ret.value === 1) {   //1个回合结束
                             if(_private.fightRoundScript) {
                                 //console.debug("运行回合事件!!!", _private.nRound)
-                                GlobalJS.runScript(_private.asyncScriptQueue, 0, _private.fightRoundScript, _private.nRound);
+                                GlobalJS.runScript(_private.scriptQueue, 0, _private.fightRoundScript, _private.nRound);
                                 ++_private.nRound;
                             }
                             break;
@@ -1924,12 +1956,12 @@ Item {
                     }
                     else {  //战斗结束
                         if(_private.fightEndScript)
-                            GlobalJS.runScript(_private.asyncScriptQueue, 0, _private.fightEndScript, ret.value);
+                            GlobalJS.runScript(_private.scriptQueue, 0, _private.fightEndScript, ret.value);
                         if(ret.value === 1) {
-                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, "", 100, 1);sg_fightOver();');
+                            GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, "", 100, 1);sg_fightOver();');
                         }
                         else
-                            GlobalJS.runScript(_private.asyncScriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, "", 100, 1);sg_fightOver();');
+                            GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, "", 100, 1);sg_fightOver();');
                     }
                     break;
                 }*/
@@ -2076,7 +2108,7 @@ Item {
             rootFightScene.forceActiveFocus();
             //GlobalJS._eval(textScript.text);
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.asyncScriptQueue, 0, textScript.text);
+            //GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;
@@ -2143,11 +2175,11 @@ Item {
 
 
         //战斗脚本（也可以直接用Generator对象）
-        property var genFighting: new GlobalLibraryJS.AsyncScriptQueue()
+        property var genFighting: new GlobalLibraryJS.ScriptQueue()
 
         //异步脚本（播放特效、事件等）
-        property var asyncScriptQueue: new GlobalLibraryJS.AsyncScriptQueue()
-        //property var asyncScriptQueue: game.$caches.asyncScriptQueue
+        property var scriptQueue: new GlobalLibraryJS.ScriptQueue()
+        //property var scriptQueue: game.$caches.scriptQueue
 
         //战斗选择 异步脚本
         property var genFightChoice: null
