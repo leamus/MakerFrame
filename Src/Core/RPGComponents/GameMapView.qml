@@ -713,10 +713,14 @@ Item {
                         anchors.bottom: parent.top
                         anchors.horizontalCenter: parent.horizontalCenter
 
+
                         //textArea.enabled: false
                         textArea.readOnly: true
+                        textArea.font.pointSize: 16
+
 
                         nMaxHeight: 32
+
 
                         onSg_over: {
                             visible = false;

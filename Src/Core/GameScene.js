@@ -177,6 +177,19 @@ function *loadResources() {
 
 
 
+    //创建一个主角
+    const tf = function(soundeffectSource){
+        if(game.soundeffectpausing())
+            return;
+
+        game.playsoundeffect(soundeffectSource, -1);
+    }
+    mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
+    mainRole.sprite.sg_playEffect.connect(tf);
+    //mainRole.customSprite.sg_playEffect.connect(tf);
+
+
+
 //读取配置：
 
     //是否提前载入所有资源
@@ -197,14 +210,8 @@ function *loadResources() {
 
         _private.lastOrient = Platform.sl_getScreenOrientation();
 
-        if(game.$userscripts.$config === undefined)
-            break;
-        if(game.$userscripts.$config.$android === undefined)
-            break;
         //旋转配置
-        if(game.$userscripts.$config.$android.$orient) {
-            Platform.sl_setScreenOrientation(game.$userscripts.$config.$android.$orient);
-        }
+        Platform.sl_setScreenOrientation(GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$android', '$orient'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$android', '$orient'), 4));
 
     }while(0);
 
@@ -249,14 +256,12 @@ function *loadResources() {
     };*/
 
     do {
-        if(game.$userscripts.$config === undefined)
-            break;
-
         //摇杆 配置
         do {
-            if(game.$userscripts.$config.$joystick === undefined)
+            const tConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick'), null);
+            if(!tConfig)
                 break;
-            let tConfig = game.$userscripts.$config.$joystick;
+
             if(tConfig.$size !== undefined) {
                 joystickConfig.$size = tConfig.$size;
             }
@@ -270,14 +275,15 @@ function *loadResources() {
 
         //按键配置
         do {
-            if(game.$userscripts.$config.$buttons === undefined)
+            const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'), null);
+            if(!buttonsConfig)
                 break;
 
             /*/A键
             do {
-                if(game.$userscripts.$config.$buttons[0] === undefined)
+                if(buttonsConfig[0] === undefined)
                     break;
-                let tConfig = game.$userscripts.$config.$buttons[0];
+                let tConfig = buttonsConfig[0];
                 if(tConfig.$size !== undefined) {
                     buttonAConfig.$size = tConfig.$size;
                 }
@@ -298,9 +304,9 @@ function *loadResources() {
 
             //B键
             do {
-                if(game.$userscripts.$config.$buttons[1] === undefined)
+                if(buttonsConfig[1] === undefined)
                     break;
-                let tConfig = game.$userscripts.$config.$buttons[1];
+                let tConfig = buttonsConfig[1];
                 if(tConfig.$size !== undefined) {
                     buttonMenuConfig.$size = tConfig.$size;
                 }
@@ -320,8 +326,8 @@ function *loadResources() {
             */
 
             //自定义
-            for(let tb = 0; tb < game.$userscripts.$config.$buttons.length; ++tb) {
-                let tConfig = game.$userscripts.$config.$buttons[tb];
+            for(let tb = 0; tb < buttonsConfig.length; ++tb) {
+                let tConfig = buttonsConfig[tb];
                 let button = compButtons.createObject(itemButtons);
                 button.width = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
                 button.height = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
@@ -384,6 +390,7 @@ function *loadResources() {
     buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonMenu.buttonClicked = buttonMenuConfig.$clicked;
     */
+
 
 
     game.$sys.protoObjects.fightRole = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightRole'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightRole'));
@@ -832,6 +839,10 @@ function *unloadResources() {
         itemButtons.children[tb].destroy();
     }
 
+
+
+    if(mainRole)
+        mainRole.destroy();
 }
 
 

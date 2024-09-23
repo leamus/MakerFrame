@@ -1835,16 +1835,21 @@ Item {
         //implicitHeight: parent.height / 2
         //height: parent.height / 2
 
+
         nScrollHorizontal: 0
         nScrollVertical: 1
 
+
         textArea.enabled: false
         textArea.readOnly: true
+        textArea.font.pointSize: 16
+
 
         nMinWidth: 0
         //nMaxWidth: parent.width
         nMinHeight: 0
         //nMaxHeight: 32
+
 
         //text: ""
     }
@@ -2260,7 +2265,7 @@ Item {
 
         FrameManager.sl_globalObject().fight = fight;
 
-        console.debug("[FightScene]Component.onCompleted", game, fight);
+        console.debug("[FightScene]Component.onCompleted:", fight);
     }
 
     Component.onDestruction: {

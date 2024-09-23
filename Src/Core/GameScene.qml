@@ -117,10 +117,6 @@ Item {
 
 
 
-    //游戏初始化脚本
-    //startScript为true，则载入start.js；为函数/生成器，则直接运行startScript；为false则不执行；
-    //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）
-    //必须用yield标记来让它运行完毕（第一次使用则不必）
     function init(startScript=true, bLoadResources=true, gameData=null) {
 
         //console.debug(_private.scriptQueue.getGeneratorScriptArray().toJson());
@@ -135,9 +131,13 @@ Item {
         //let priority = 0;
 
 
-        game.run(_init(startScript, bLoadResources, gameData));
+        game.run(_init(startScript, bLoadResources, gameData) ?? null, {Priority: -1, Running: 1});
     }
 
+    //游戏初始化脚本
+    //startScript为true，则载入start.js；为函数/生成器，则直接运行startScript；为false则不执行；
+    //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）；
+    //必须用yield*标记来让它运行完毕（第一次使用则不必）；
     function *_init(startScript=true, bLoadResources=true, gameData=null) {
 
         //game.run(function*() {
@@ -856,12 +856,13 @@ Item {
             //样式
             if(!style)
                 style = {};
-            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$say') || {};
-            const styleSystem = game.$gameMakerGlobalJS.$config.$styles.$say;
+            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$say') || {};
+            const styleSystem = game.$gameMakerGlobalJS.$config.$role.$say;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
             role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
-            role.message.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            //role.message.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
+            role.message.textArea.font.pixelSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
             role.message.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             //role.message.visible = true;
@@ -1184,10 +1185,8 @@ Item {
                 //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
                     hero.$name = heroComp.textName.text = props.$name;
-                if(props.$showName !== undefined)   //修改名字
-                    hero.$showName = heroComp.textName.visible = props.$showName;
-                else if(props.$showName === false)
-                    hero.$showName = heroComp.textName.visible = false;
+                if(props.$showName !== undefined)   //名字可见
+                    hero.$showName = heroComp.rectName.visible = props.$showName;
                 if(props.$penetrate !== undefined)   //可穿透
                     hero.$penetrate = /*heroComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
@@ -1198,12 +1197,14 @@ Item {
                 if(props.$scale && props.$scale[1] !== undefined) {
                     hero.$scale[1] = heroComp.rYScale = props.$scale[1];
                 }
+
                 //!!!这里要加入名字是否重复
                 if(props.$avatar !== undefined)   //修改头像
                     hero.$avatar/* = heroComp.$avatar*/ = props.$avatar;
                 if(props.$avatarSize !== undefined) {  //修改头像
-                    hero.$avatarSize[0]/* = heroComp.$avatarSize.width*/ = props.$avatarSize[0];
-                    hero.$avatarSize[1]/* = heroComp.$avatarSize.height*/ = props.$avatarSize[1];
+                    //hero.$avatarSize[0]/* = heroComp.$avatarSize.width*/ = props.$avatarSize[0];
+                    //hero.$avatarSize[1]/* = heroComp.$avatarSize.height*/ = props.$avatarSize[1];
+                    hero.$avatarSize = props.$avatarSize;
                 }
 
 
@@ -1270,7 +1271,8 @@ Item {
                             if(heroComp)
                                 heroComp.start(props.$direction, null);
                         },20,rootGameScene
-                    );*/
+                    );
+                    */
 
                 if(props.$realSize !== undefined) {
                     heroComp.width1 = props.$realSize[0];
@@ -1308,6 +1310,7 @@ Item {
                     heroComp.stop();
 
             }
+
 
             return heroComp;
         }
@@ -1572,13 +1575,13 @@ Item {
 
                 if(props.$name !== undefined)   //修改名字
                     role.$name = roleComp.textName.text = props.$name;
-                if(props.$showName !== undefined)   //修改名字
-                    role.$showName = roleComp.textName.visible = props.$showName;
+                if(props.$showName !== undefined)   //名字可见
+                    role.$showName = roleComp.rectName.visible = props.$showName;
                 if(props.$penetrate !== undefined)   //可穿透
                     role.$penetrate = /*roleComp.$penetrate = */props.$penetrate;
                 if(props.$speed !== undefined)   //修改速度
                     role.$speed = roleComp.$$speed = parseFloat(props.$speed);
-                if(props.$scale && props.$scale[0] !== undefined) {
+                if(props.$scale && props.$scale[0] !== undefined) { //缩放
                     role.$scale[0] = roleComp.rXScale = props.$scale[0];
                 }
                 if(props.$scale && props.$scale[1] !== undefined) {
@@ -1587,7 +1590,7 @@ Item {
 
                 //!!!这里要加入名字是否重复
                 if(props.$avatar !== undefined)   //修改头像
-                    role.$avatar = props.$avatar;
+                    role.$avatar/* = roleComp.$avatar*/ = props.$avatar;
                 if(props.$avatarSize !== undefined) {  //修改头像
                     //roleComp.$avatarSize.width = props.$avatarSize[0];
                     //roleComp.$avatarSize.height = props.$avatarSize[1];
@@ -1670,7 +1673,7 @@ Item {
 
 
                 //如果不是从 createrole 过来的（createrole过来的，role和props是一个对象）
-                if(props !== hero) {
+                if(props !== role) {
                     //其他属性直接赋值
                     let usedProps = ['RID', '$id', '$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$realSize', '$start'];
                     //for(let tp in props) {
@@ -4620,8 +4623,7 @@ Item {
         }
 
 
-        //异步脚本
-        //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(3);
+        //异步脚本（协程运行）
         readonly property var async: GlobalLibraryJS.asyncScript
 
         //将代码放入 系统脚本引擎（scriptQueue）中 等候执行；
@@ -4633,10 +4635,11 @@ Item {
         //    如果为对象，则有以下参数：
         //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾（默认）；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
         //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
-        //      Running为1或2，表示如果队列里如果为空则：1（默认）是发送一个JS事件在下一个JS事件循环里执行，2是立即执行；为0时不处理；
+        //      Running为1或2，表示如果队列里如果为空则：1（默认）是立即执行；为0时不处理，2是发送一个JS事件在下一个JS事件循环里执行；
         //      Value：传递给事件队列的值，无则默认上一次的；
         //      ScriptQueue：脚本队列，无则默认 本脚本队列；
         //      Tips：
+        //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(3);
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
                 console.warn('[!GameScene]运行脚本未定义（可忽略）');
@@ -4711,8 +4714,14 @@ Item {
             if(ret === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
-
-                if(running === 1) {
+                if(running === 0) {
+                    return 0;
+                }
+                else if(running === 1) {
+                    scriptQueue.run(value);
+                    return 1;
+                }
+                else if(running === 2) {
                     //GlobalLibraryJS.setTimeout(function() {
                     /*GlobalLibraryJS.runNextEventLoop(function() {
                         //game.goon('$event');
@@ -4722,13 +4731,11 @@ Item {
                     scriptQueue.lastEscapeValue = value;
                     scriptQueue.runNextEventLoop('game.run');
 
-                    return 1;
-                }
-                else if(running === 2) {
-                    scriptQueue.run(value);
-                    return 0;
+                    return 2;
                 }
             }
+
+            return 3;
         }
 
         //鹰：NO
@@ -4837,6 +4844,7 @@ Item {
             release: release,
             init: _init,
             exit: _private.exitGame,
+            showExitDialog: _private.showExitDialog,
 
             screen: rootGameScene,          //屏幕（组件位置和大小固定）（所有，包含战斗场景）
             viewport: itemViewPort,         //游戏视窗，组件位置和大小固定
@@ -5108,6 +5116,10 @@ Item {
             let blockPixel = Qt.point(Math.floor(mouse.x / itemViewPort.sizeMapBlockScaledSize.width) * itemViewPort.sizeMapBlockScaledSize.width, Math.floor(mouse.y / itemViewPort.sizeMapBlockScaledSize.height) * itemViewPort.sizeMapBlockScaledSize.height);
             console.warn(blockPixel.x, blockPixel.y);
         }*/
+
+
+        Component.onCompleted: {
+        }
     }
 
 
@@ -6230,12 +6242,13 @@ Item {
 
             width: parent.width
 
-            placeholderText: '输入脚本命令'
 
-            //textFormat: Text.RichText
+            placeholderText: '输入脚本命令'
+            textFormat: TextArea.PlainText
+            wrapMode: TextEdit.Wrap
+
             selectByKeyboard: true
             selectByMouse: true
-            wrapMode: TextEdit.Wrap
         }
 
         onAccepted: {
@@ -6682,7 +6695,8 @@ Item {
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    exitGame();
+                    if(rootGameScene)rootGameScene.forceActiveFocus();
+                    exitGame(false);
                 },
                 OnRejected: ()=>{
                     if(rootGameScene)rootGameScene.forceActiveFocus();
@@ -6690,34 +6704,40 @@ Item {
             });
         }
 
-        function exitGame() {
-            //！！放在下一次执行（必须跳出事件队列，因为 _private.scriptQueue.clear(6); 会导致生成器重入）
-            GlobalLibraryJS.runNextEventLoop(function() {
-                game.run([function*() {
+        function exitGame(force=false) {
+            if(!force) {
+                ///！！放在下一次执行（必须跳出事件队列，因为 _private.scriptQueue.clear(6); 会导致生成器重入）
+                //GlobalLibraryJS.runNextEventLoop(function() {
+                    //将队列中的脚本强制运行完毕（不等待）
+                    _private.scriptQueue.clear(6);
 
-                    try {
-                        yield* release();
-                    }
-                    catch(e) {
-                        GlobalLibraryJS.printException(e);
-                        console.warn('[!GameScene]游戏退出报错');
-                        //throw err;
-                    }
+                    game.run([function*() {
 
-                    console.debug('[GameScene]Close');
+                        try {
+                            yield* release();
+                        }
+                        catch(e) {
+                            GlobalLibraryJS.printException(e);
+                            console.warn('[!GameScene]游戏退出报错');
+                            //throw err;
+                        }
 
-                    //console.debug(_private.scriptQueue.getGeneratorScriptArray().toJson());
-                    _private.scriptQueue.clear(0);
-                    //console.debug(_private.scriptQueue.getGeneratorScriptArray().toJson());
+                        console.debug('[GameScene]Close');
+
+                        //console.debug(_private.scriptQueue.getGeneratorScriptArray().toJson());
+                        _private.scriptQueue.clear(0);
+                        //console.debug(_private.scriptQueue.getGeneratorScriptArray().toJson());
 
 
-                    sg_close();
+                        sg_close();
 
 
-                }, 'exitGame']);
+                    }(), 'exitGame']);
 
-                _private.scriptQueue.clear(6);
-            }, 'exitGame');
+                //}, 'exitGame');
+            }
+            else
+                sg_close();
         }
     }
 
@@ -6951,6 +6971,7 @@ Item {
 
             Message {
                 id: messageRole
+
                 width: parent.width
                 height: parent.height * 0.1
                 //height: 90
@@ -6963,6 +6984,7 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
+                textArea.font.pointSize: 16
 
                 textArea.onReleased: {
                     rootRoleMsg.clicked();
@@ -7211,8 +7233,10 @@ Item {
                 nScrollHorizontal: 0
                 nScrollVertical: 1
 
+
                 textArea.enabled: false
                 textArea.readOnly: true
+                textArea.font.pointSize: 16
 
                 textArea.onReleased: {
                     rootGameMsgDialog.clicked();
@@ -7611,15 +7635,17 @@ Item {
 
                             anchors.fill: parent
 
-                            color: 'white'
 
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
 
+                            color: 'white'
+                            textFormat: TextArea.RichText
+                            wrapMode: Text.Wrap
+
                             font.pointSize: 16
                             font.bold: true
 
-                            wrapMode: Text.Wrap
                         }
 
                     }
@@ -7652,17 +7678,19 @@ Item {
 
                             //textArea.enabled: false
                             //textArea.readOnly: true
+                            //textArea.wrapMode: Text.Wrap
+                            textArea.textFormat: TextArea.PlainText
+                            //textArea.placeholderTextColor: '#7F7F7F7F'
+
+                            textArea.selectByKeyboard: true
+                            textArea.selectByMouse: true
+
+
                             textArea.font.pointSize: 16
                             textArea.font.bold: true
-                            textArea.textFormat: TextArea.PlainText
-
-                            /*placeholderTextColor: '#7F7F7F7F'
-
-                            selectByKeyboard: true
-                            selectByMouse: true
-                            wrapMode: Text.Wrap
 
 
+                            /*
                             //padding : nPadding
                             leftPadding : 6
                             rightPadding : 6
@@ -7815,43 +7843,66 @@ Item {
                 enabled: false
                 width: parent.width
                 height: parent.height * 0.2
-                anchors.bottom: rootRole.textName.top
+                anchors.bottom: rootRole.rectName.top
                 anchors.horizontalCenter: parent.horizontalCenter
+
 
                 nScrollHorizontal: 0
                 nScrollVertical: 1
 
+
                 textArea.enabled: false
                 textArea.readOnly: true
+                //textArea.font.pointSize: 16
+                //textArea.font.pixelSize: 16
+
 
                 nMinWidth: 0
                 //nMaxWidth: parent.width
                 nMinHeight: 0
-                nMaxHeight: 32
+                nMaxHeight: 66
+
 
                 onSg_over: {
                     visible = false;
                 }
             }
 
-            //名字
-            property Text textName: Text {
+            //名字背景
+            property Rectangle rectName: Rectangle {
                 parent: rootRole
                 visible: true
+                //width: parent.width
+                width: textName.implicitWidth
+                height: textName.implicitHeight
+                anchors.bottom: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                color: 'transparent'
+            }
+
+            //名字
+            property Text textName: Text {
+                parent: rectName
+                /*visible: true
                 width: parent.width
                 height: implicitHeight
                 anchors.bottom: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
+                */
+                anchors.fill: parent
 
-                color: 'white'
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                font.pointSize: 9
-                font.bold: true
                 text: (rootRole.$data && rootRole.$data.$name) ? rootRole.$data.$name : ''
+                color: 'white'
+                textFormat: Text.RichText
                 wrapMode: Text.NoWrap
+
+                //font.pointSize: 9
+                font.bold: true
             }
 
 
@@ -7914,8 +7965,7 @@ Item {
 
 
             //缩放效果是否平滑过度
-            bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
-            //customSprite.bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true)
+            //bSmooth: true
 
 
             //strSource: './Role2.png'
@@ -8082,6 +8132,17 @@ Item {
 
             Component.onCompleted: {
                 //console.debug('[GameScene]Role Component.onCompleted');
+
+
+                bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true);
+                //customSprite.bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true);
+
+
+                textName.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$fontColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$fontColor;
+                textName.font.pixelSize = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$fontSize') ?? game.$gameMakerGlobalJS.$config.$role.$name.$fontSize;
+
+                rectName.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$backgroundColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$backgroundColor;
+                rectName.border.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$borderColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$borderColor;
             }
         }
     }
@@ -8217,7 +8278,7 @@ Item {
 
             //visible: false
 
-            smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+            smooth: true
 
 
             MouseArea {
@@ -8274,6 +8335,9 @@ Item {
                 game.playsoundeffect(soundeffectSource, -1);
             }
 
+            Component.onCompleted: {
+                smooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true);
+            }
         }
     }
 
@@ -8359,7 +8423,7 @@ Item {
 
     //Keys.forwardTo: [itemViewPort.itemContainer]
 
-    Keys.onEscapePressed: {
+    /*Keys.onEscapePressed: {
         _private.showExitDialog();
         event.accepted = true;
 
@@ -8371,6 +8435,7 @@ Item {
 
         console.debug('[GameScene]Back Key');
     }
+    */
     Keys.onTabPressed: {
         rootGameScene.forceActiveFocus();
         event.accepted = true;
@@ -8438,6 +8503,10 @@ Item {
             break;
 
         default:
+            const fn = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key), null);
+            if(fn)
+                game.run(fn(true, event) ?? null);
+
             event.accepted = true;
         }
     }
@@ -8476,6 +8545,10 @@ Item {
             break;
 
         default:
+            const fn = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key), null);
+            if(fn)
+                game.run(fn(false, event) ?? null);
+
             event.accepted = true;
         }
 
@@ -8486,24 +8559,13 @@ Item {
 
 
     Component.onCompleted: {
-        const tf = function(soundeffectSource){
-            if(game.soundeffectpausing())
-                return;
-
-            game.playsoundeffect(soundeffectSource, -1);
-        }
-        mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
-        mainRole.sprite.sg_playEffect.connect(tf);
-        //mainRole.customSprite.sg_playEffect.connect(tf);
-
-
         FrameManager.sl_globalObject().game = game;
         FrameManager.sl_globalObject().g = game;
         //FrameManager.sl_globalObject().g = g;
 
         //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject().game);
 
-        console.debug('[GameScene]Component.onCompleted');
+        console.debug('[GameScene]Component.onCompleted:', game);
     }
 
     Component.onDestruction: {

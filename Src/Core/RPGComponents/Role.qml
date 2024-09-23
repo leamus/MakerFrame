@@ -157,7 +157,7 @@ Item {
             const info = objActionsData[actionName].Info;
             if(!info)
                 return false;
-            const script = info.Script;
+            const script = objActionsData[actionName].Script;
 
             spriteEffect.nSpriteType = info.SpriteType ?? 1;
 

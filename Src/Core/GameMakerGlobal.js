@@ -18,6 +18,18 @@ let $config = {
     //角色
     $role: {
         $smooth: true,   //缩放是否平滑或点阵
+        $say: {
+            $backgroundColor: '#BF6699FF',
+            $borderColor: 'white',
+            $fontSize: 16,
+            $fontColor: 'white',
+        },
+        $name: {
+            $backgroundColor: '#7F000000',
+            $borderColor: '#00000000',
+            $fontSize: 16,
+            $fontColor: 'white',
+        },
     },
     //特效
     $spriteEffect: {
@@ -99,6 +111,17 @@ let $config = {
             },
         },
     ],
+    //按键函数（press为true表示按下，为false表示弹起）
+    $keys: {
+        [Qt.Key_Escape]: (pressed, event)=>{
+            if(pressed)
+                game.$sys.showExitDialog();
+        },
+        [Qt.Key_Back]: (pressed, event)=>{
+            if(pressed)
+                game.$sys.showExitDialog();
+        },
+    },
     //窗口
     $window: {
         //窗口显示事件
@@ -144,12 +167,6 @@ let $config = {
             $titleText: '',
         },
 
-        $say: {
-            $backgroundColor: '#BF6699FF',
-            $borderColor: 'white',
-            $fontSize: 9,
-            $fontColor: 'white',
-        },
         $talk: {
             $name: true,
             $avatar: true,

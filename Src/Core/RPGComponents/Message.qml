@@ -137,7 +137,7 @@ Notepad {
     radius: height / 20
 
 
-    font.pointSize: 16
+    //font.pointSize: 16
 
 
     //textArea.enabled: false
