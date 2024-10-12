@@ -10,7 +10,7 @@ let data = (function() {
     //  key: {
     //      command: [命令显示, 命令模板, 说明, 缩进空格数, 是否换行, 代码颜色, 按钮颜色, [联用命令列表], [编译运行函数]],
     //          编译运行函数的参数为：参数数组、tab个数、命令信息（包含command和params），如果为undefined或null则使用默认的处理方案（替换模板命令字符串的%n）；
-    //      params: [[参数1说明, 类型, 是否必须（true为必填，false为编译缺省是空字符串，其他（包括undefined、null也为字符串）为编译时原值）, 输入类型, 输入参数, 颜色], 。。。]]
+    //      params: [[参数1说明, 类型, 是否必须（true为必填，其他（包括undefined、null、false等关键字）为没填写参数时的缺省值）, 输入类型, 输入参数, 颜色], 。。。]]
     //          其中：
     //              类型：string、number、bool、string|number、name、json、unformatted、text、code、label；
     //                  string、number、bool、string|number、name、json、unformatted、text、code 可以长按选择；
@@ -73,8 +73,8 @@ let data = (function() {
         '菜单': {
             command: ['显示菜单', 'var $index = yield game.menu(%1,%2);var $value = %2[$index];', '', 0, true, 'red', 'white'],
             params: [
-                ['标题', 'string', '', 0, '标题', 'green'],
-                ['*菜单内容', 'json', 'true', 0, '[]', 'blue'],
+                ['标题', 'string', '``', 0, '标题', 'green'],
+                ['*菜单内容', 'json', true, 0, '[]', 'blue'],
                 //['@是否暂停游戏', 'bool', 'true', 2, [['是', '否'], ['true', 'false']], 'darkblue'],
                 ['菜单内容 是字符串数组；<br>命令返回的数据是 $index（选择的第几项，0起始） 和 $value（选择的值） 变量', 'label'],
             ],
@@ -83,7 +83,7 @@ let data = (function() {
             command: ['输入文本', 'var $value = yield game.input(%1,%2);', '输入文本', 0, true, 'red', 'white'],
             params: [
                 ['标题', 'string', true, 0, '标题', 'green'],
-                ['预设值', 'string', '', 0, '', 'blue'],
+                ['预设值', 'string', '``', 0, '', 'blue'],
                 //['@是否暂停游戏', 'bool', 'true', 2, [['是', '否'], ['true', 'false']], 'darkblue'],
                 ['命令返回的文本是 $value 变量', 'label'],
             ],
@@ -462,7 +462,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['装备对象', 'game.equipment(%1,%2);', '装备对象', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['@部位', 'string', '', 2, [['武器', '头戴', '身穿', '鞋子', '所有'], ['武器', '头戴', '身穿', '鞋子', '']], 'darkgreen'],
+                ['@部位', 'string', '``', 2, [['武器', '头戴', '身穿', '鞋子', '所有'], ['武器', '头戴', '身穿', '鞋子', '']], 'darkgreen'],
                 ['命令返回 战斗角色 的 部位 的 装备；如果部位为空，则返回所有装备的数组', 'label'],
             ],
         },
@@ -681,11 +681,11 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['值', 'name', undefined, 0, '', 'green'],
             ],
         },
-        '立即调用函数/生成器': {
-            command: ['立即调用函数/生成器', 'game.run(%1,%2);', '立即调用函数/生成器', 0, true, 'red', 'white'],
+        '协程': {
+            command: ['协程', 'game.async(%1);', '协程', 0, true, 'red', 'white'],
             params: [
                 ['*名称', 'name', true, 0, '名称', 'green'],
-                ['立刻运行 函数/生成器/生成器对象（不会放入事件队列）；<br>注意：支持yield的6个命令必须调整一下，方法为：<br>a、将这6个命令的最后一个参数callback设置为0即可；<br>b、或者命令名+1（比如game.msg1），参数与原函数完全相同；', 'label'],
+                [' 协程运行 生成器/生成器对象（和game.run的区别是立刻运行，不会放入事件队列）；', 'label'],
             ],
         },
 
@@ -748,7 +748,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         ['运算', 'lightpink', ['运算', '判断', '与或非', '运算符', '随机数']],
         ['条件', 'lightblue', ['条件(', '否则条件(', '否则']],
         ['循环', 'linen', ['循环(', '跳出循环', '继续循环']],
-        ['函数/生成器', 'greenyellow', ['函数/生成器{', '调用函数/生成器', '函数/生成器结束', '立即调用函数/生成器', '生成器中断']],
+        ['函数/生成器', 'greenyellow', ['函数/生成器{', '调用函数/生成器', '函数/生成器结束', '协程', '生成器中断']],
         ['变量', 'gold', ['当前地图名', '金钱', '战斗角色属性', '道具个数', '地图变量', '全局变量', '存档变量', '引擎变量']],
         //['媒体', 'gold', []],
         ['其他', 'lightslategray', ['括号开始(', '括号结束)', '块开始{', '块结束}', '自定义']],

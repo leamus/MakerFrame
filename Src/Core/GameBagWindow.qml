@@ -480,13 +480,13 @@ Item {
                     //_private.close();
 
                     let index = gameFightRoleMenu.nChoiceIndex;
-                    let goods = gameGoodsMenu.arrGoods[index];
+                    let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
 
                     //脚本执行完毕后刷新背包
                     game.run(function*(){
                         yield game.usegoods(index, goods);
                         root.showGoods(root.nlastShowType);
-                    });
+                    }());
                 }
             }
 
@@ -515,8 +515,8 @@ Item {
                         else
                             tfh = game.fighthero(gameFightRoleMenu.nChoiceIndex);
 
-                        game.run(goodsInfo.$commons.$equipScript(goods, tfh));
-                        //game.run(goodsInfo.$commons.$equipScript(goods.$rid));
+                        game.run(goodsInfo.$commons.$equipScript(goods, tfh) ?? null);
+                        //game.run(goodsInfo.$commons.$equipScript(goods.$rid) ?? null);
                     }
 
                     //脚本执行完毕后刷新背包

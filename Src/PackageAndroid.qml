@@ -126,7 +126,7 @@ Item {
             Layout.fillWidth: true
 
             Label {
-                text: '*图标:'
+                text: '图标:'
             }
 
             TextField {
@@ -167,12 +167,24 @@ Item {
 
                 Layout.fillWidth: true
 
-                placeholderText: 'Tap Client ID'
+                placeholderText: '为空则不使用Tap实名认证'
 
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextField.Wrap
 
+            }
+        }
+
+        Label {
+            Layout.fillWidth: true
+
+            wrapMode: Label.Wrap
+            text: {
+                if(Qt.platform.os === "android")
+                    return '<font color="red">注意：Android 下打包，需要安装 Apktool M 或 MT 软件辅助</font>'
+                else if(Qt.platform.os === "windows")
+                    return '<font color="red">注意：Windows 下打包，需要安装 Java 环境 和 Apktools 软件辅助</font>'
             }
         }
 
@@ -187,7 +199,8 @@ Item {
                 //implicitWidth: 200
                 //implicitHeight: 40
                 color: Global.style.backgroundColor
-                border.color: textDebugInfo.textArea.enabled ? "#21be2b" : "transparent"
+                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
             textArea.color: 'white'
             //textArea.readOnly: true
@@ -198,7 +211,7 @@ Item {
         Button {
             Layout.alignment: Qt.AlignCenter
 
-            text: '生  成'
+            text: '生　成'
             onClicked: {
                 _private.makePackage();
             }
@@ -315,15 +328,25 @@ Item {
     QObject {
         id: _private
 
-        //property string strPackageDir: 'D:/Documents/Desktop/QtEnv/_MakerFrame/Packages/Android/MakerFrame_鹰歌框架引擎_ALL_Qt5.15.2'
+        //property string strPackageDir: 'D:/Documents/Desktop/QtEnv/_MakerFrame/Packages/Android/MakerFrame_鹰歌软件框架游戏引擎_ALL_Qt5.15.2'
         property alias strPackageDir: textPackageDirPath.text
 
+        //初始化，读取配置
         function init() {
+            textGameName.text = '';
+            textPackageName.text = '';
+            textIconPath.text = '';
+            textTapClientID.text = '';
+            textResult.text = '';
+
+
             if(!FrameManager.sl_fileExists(_private.strPackageDir + '/AndroidManifest.xml')) {
                 textResult.text = '没有找到打包文件夹，请配置后点击“生成”按钮';
                 return false;
             }
 
+
+            let error = 0;
 
             let content;
             let reg;
@@ -333,8 +356,10 @@ Item {
 
 
             content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/RPGRuntime/GameMakerGlobal.qml');
-            if(!content)
+            if(!content) {
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
+                ++error;
+            }
 
             reg = /category: '(\S*)'/;
             res = reg.exec(content);
@@ -346,14 +371,21 @@ Item {
 
 
             content = FrameManager.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
-            if(!content)
+            if(!content) {
                 textResult.text += '读取 AndroidManifest.xml 失败\r\n';
+                ++error;
+            }
 
             reg = /package="(\S*)"/;
             res = reg.exec(content);
             textPackageName.text = res[1];
+
+
+            if(error === 0)
+                textResult.text = '读取打包文件夹配置成功';
         }
 
+        //修改配置文件（GameMakerGlobal.qml、AndroidManifest.xml）
         function modifyConfig() {
             let content;
             let reg;
@@ -438,14 +470,18 @@ Item {
             }
 
 
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xhdpi/icon.png', true);
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
-            FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
+            //复制 icon
+            if(FrameManager.sl_fileExists(GlobalJS.toPath(textIconPath.text))) {
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xhdpi/icon.png', true);
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
+                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
+            }
         }
 
+        //制作打包环境
         function makePackage() {
             let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
 
@@ -472,7 +508,7 @@ Item {
 
             if(missingFiles !== '') {
                 dialogCommon.show({
-                    Msg: '请将 %1 文件下载并放入 %2 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
+                    Msg: '请将 <font color="red">%1</font> 文件下载并放入 <font color="red">%2</font> 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         root.forceActiveFocus();
@@ -487,6 +523,7 @@ Item {
 
             //let strPackageDir = path + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
 
+            //1：只更新工程；2：全部更新；
             function continueScript(packageType) {
                 dialogCommon.show({
                     Msg: '请等待。。。',
@@ -499,6 +536,7 @@ Item {
 
                 showBusyIndicator(true);
 
+
                 GlobalLibraryJS.setTimeout(function() {
                     let ret;
 
@@ -506,8 +544,7 @@ Item {
                         if(packageType === 1) {
                             FrameManager.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
                         }
-
-                        if(packageType === 2) {
+                        else if(packageType === 2) {
                             FrameManager.sl_removeRecursively(strPackageDir);
                             ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[0], strPackageDir);
                             ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[1], strPackageDir);
@@ -528,7 +565,7 @@ Item {
 
 
                     dialogCommon.show({
-                        Msg: '生成打包文件夹成功，请用“APKtool软件”来打包APK（%1）'.arg(strPackageDir),
+                        Msg: '生成打包文件夹成功，请用三方软件来打包并签名APK（<font color="red">%1</font>）'.arg(strPackageDir),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
                             root.forceActiveFocus();
@@ -545,7 +582,7 @@ Item {
             if(FrameManager.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
 
                 dialogCommon.show({
-                    Msg: '检测到有旧打包文件夹，Yes（是）：只更新工程；Discard（丢弃）：更新整个打包文件夹',
+                    Msg: '检测到有旧打包文件夹，Yes（是）：只更新工程；Discard（丢弃）：更新整个打包文件夹<br><font color="red">此操作会删除打包文件夹路径，请确保路径选择正确！</font>',
                     Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                     OnAccepted: function() {
                         continueScript(1);

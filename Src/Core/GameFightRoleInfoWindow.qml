@@ -88,12 +88,12 @@ Item {
             let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](conbatant.$equipment[position], {Image: true, Color: true}));
             if(tIndex > -1) {
                 //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
-                arrEquipment[tIndex] = '%1：%2'.arg(position).arg(tgoodsName);
+                arrEquipment[tIndex] = '<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName);
                 root.arrEquipmentPositions[tIndex] = position;
             }
             else {
                 //arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name) );
-                arrEquipment.push('%1：%2'.arg(position).arg(tgoodsName) );
+                arrEquipment.push('<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName) );
                 root.arrEquipmentPositions.push(position);
             }
             //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name + "\r\n";

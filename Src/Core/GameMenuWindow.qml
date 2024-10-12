@@ -391,8 +391,8 @@ Item {
                     let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
 
                     if(goodsInfo.$commons.$equipScript)
-                        game.run(goodsInfo.$commons.$equipScript(goods, goodsInfo));
-                        //game.run(goodsInfo.$commons.$equipScript(goods.$rid));
+                        game.run(goodsInfo.$commons.$equipScript(goods, goodsInfo) ?? null);
+                        //game.run(goodsInfo.$commons.$equipScript(goods.$rid) ?? null);
                 }
             }
         }

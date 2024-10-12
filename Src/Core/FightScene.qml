@@ -423,7 +423,7 @@ Item {
         if(game.$sys.resources.commonScripts["fight_init_script"]) {
             const r = game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))yield* r;
-            //yield fight.run([game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight_init_script'], -2, );
+            //yield fight.run(game.$sys.resources.commonScripts["fight_init_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight_init_script'});
         }
 
 
@@ -489,14 +489,14 @@ Item {
         if(game.$sys.resources.commonScripts["fight_start_script"]) {
             const r = game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))yield* r;
-            //yield fight.run([game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight start1'], -2);
+            //yield fight.run(game.$sys.resources.commonScripts["fight_start_script"]([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
         }
 
 
         //GlobalLibraryJS.setTimeout(function() {
             //战斗起始脚本
             //if(_private.fightStartScript) {
-            //    fight.run([_private.fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript), 'fight start2'], -1, );
+            //    fight.run(_private.fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -1, Tips: 'fight start2'});
             //}
 
 
@@ -555,17 +555,6 @@ Item {
         }
 
 
-        //计算新属性
-        game.run(function() {
-            //计算新属性
-            for(let tfh of fight.myCombatants)
-            //for(let tfh of game.gd['$sys_fight_heros'])
-                game.$resources.commonScripts['refresh_combatant'](tfh);
-            //刷新战斗时人物数据
-            //fight.$sys.refreshCombatant(-1);
-        }, {Running: 1, Tips: 'FightScene release refresh_combatant'});
-
-
         rootFightScene.visible = false;
 
         rootGameScene.focus = true;
@@ -576,6 +565,18 @@ Item {
         game.goon('$fight');
 
         //game.run(true);
+
+
+        //计算新属性
+        game.run(function() {
+            //计算新属性
+            //for(let tfh of fight.myCombatants)
+            for(let tfh of game.gd['$sys_fight_heros'])
+                game.$resources.commonScripts['refresh_combatant'](tfh);
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(-1);
+        }, {Running: 1, Tips: 'FightScene release refresh_combatant'});
+
     }
 
 
@@ -677,8 +678,11 @@ Item {
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
                 scriptProps.ScriptQueue = _private.scriptQueue;
             }
-            else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
+            else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字
                 scriptProps = {ScriptQueue: _private.scriptQueue, Priority: scriptProps};
+            }
+            else if(GlobalLibraryJS.isString(scriptProps)) {   //如果是字符串
+                scriptProps = {ScriptQueue: _private.scriptQueue, Tips: scriptProps};
             }
             return game.run(vScript, scriptProps, ...params);
         }
@@ -701,7 +705,7 @@ Item {
 
                 let fightHeros = game.fighthero();
                 if(fightHeros.length === 0) {
-                    //game.run(function *(){yield game.msg('没有战斗人物', 10);});
+                    //game.run(function*(){yield game.msg('没有战斗人物', 10);});
                     yield game.msg('没有战斗人物', 10);
                     return null;
                 }
@@ -713,7 +717,7 @@ Item {
 
                 //loaderFightScene.test();
                 //loaderFightScene.init(GameSceneJS.getFightScriptObject(fightScript));
-                fight.run(init, {Tips: 'FightScene fighting'}, fightScript);
+                fight.run(init(fightScript) ?? null, {Tips: 'FightScene fighting'});
 
 
                 //暂停脚本，直到stage为0
@@ -721,7 +725,7 @@ Item {
                 //while(game.stage() !== 0)
                 //    yield null;
 
-            }, {Tips: 'FightScene fighting'});
+            }(), {Tips: 'FightScene fighting'});
 
             return true;
         }
@@ -824,7 +828,7 @@ Item {
             continueFight: function(type=0, delay=0) {
                 if(type === 1)
                     //将 continueFight 放在脚本队列最后
-                    fight.run([function() {
+                    fight.run(function() {
 
                         //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
                         //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
@@ -833,7 +837,7 @@ Item {
                             _private.genFighting.run();
                         }, delay, rootFightScene, 'fight.continueFight');
 
-                    }, 'continueFight']);
+                    }, 'continueFight');
                 else
                     _private.genFighting.run();
 
@@ -2265,14 +2269,14 @@ Item {
 
         FrameManager.sl_globalObject().fight = fight;
 
-        console.debug("[FightScene]Component.onCompleted:", fight);
+        console.debug("[FightScene]Component.onCompleted");
     }
 
     Component.onDestruction: {
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
-        if(FrameManager.sl_globalObject().fight === fight)
-            delete FrameManager.sl_globalObject().fight;
+        //if(FrameManager.sl_globalObject().fight === fight)
+        //    delete FrameManager.sl_globalObject().fight;
 
         console.debug("[FightScene]Component.onDestruction");
     }

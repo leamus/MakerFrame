@@ -88,6 +88,11 @@ Loader {
             onSg_stoped: root.sg_stoped()
 
             onSg_playEffect: root.sg_playEffect(soundeffectSource)
+
+
+            Component.onCompleted: {
+                //root.sg_stoped();
+            }
         }
     }
 
@@ -150,6 +155,11 @@ Loader {
             onSg_stoped: root.sg_stoped()
 
             onSg_playEffect: root.sg_playEffect(soundeffectSource)
+
+
+            Component.onCompleted: {
+                //root.sg_stoped();
+            }
         }
     }
 

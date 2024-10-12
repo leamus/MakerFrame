@@ -207,7 +207,11 @@ Item {
 
                 text: '选择文件'
                 onClicked: {
-                    _private.strTmpPath = textFilePath.text;
+                    if(textFilePath.text.lastIndexOf('/') === -1)
+                        _private.strTmpPath = '';
+                    else
+                        _private.strTmpPath = _private.strTmpPath.slice(0, textFilePath.text.lastIndexOf('/') + 1);
+
                     _private.showList();
                 }
             }
@@ -275,7 +279,7 @@ Item {
                 fileName += '.vjs';
             if(textFilePath.text.indexOf('.qml') >= 0)
                 fileName += '.vqml';
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + fileName;
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + fileName;
             loaderVisualScript.item.loadData(filePath);
 
 
@@ -288,10 +292,10 @@ Item {
         }
 
 
-        anchors.fill: parent
-
         visible: false
         focus: true
+
+        anchors.fill: parent
 
 
         //source: './GameVisualScript.qml'
@@ -303,7 +307,6 @@ Item {
                 defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
             }
         }
-
         asynchronous: true
 
 
@@ -337,10 +340,18 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                setSource('');
+
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
+                visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
 
+
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 
@@ -348,6 +359,19 @@ Item {
             console.debug('[GameScriptEditor]loaderVisualScript onLoaded');
 
             try {
+                /*/应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //focus = true;
+                forceActiveFocus();
+
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
+
+                if(item.init)
+                    item.init();
+
+                visible = true;
+                */
             }
             catch(e) {
                 throw e;
@@ -376,23 +400,33 @@ Item {
             //}
 
 
-            if(_private.strTmpPath.indexOf('/') < 0)
-                _private.strTmpPath = '';
+            //if(_private.strTmpPath.indexOf('/') < 0)
+            //    _private.strTmpPath = '';
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
 
             /*/设置为文件夹
             if(!FrameManager.sl_dirExists(path)) {
                 _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/'))
-                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
+                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
             }*/
 
 
-            //新建
             if(index === 0) {
-                _private.strTmpPath += '/新文件.js';
+                //到顶层
+                if(_private.strTmpPath.lastIndexOf('/', _private.strTmpPath.length - 2) < 0)
+                    _private.strTmpPath = '';
+                else
+                    _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/', _private.strTmpPath.length - 2) + 1);
+
+                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
+            }
+            //新建
+            else if(index === 1) {
+                _private.strTmpPath += '新文件.js';
 
                 textFilePath.text = _private.strTmpPath;
+                notepadScript.text = '';
 
 
                 l_listExplorer.visible = false;
@@ -400,35 +434,25 @@ Item {
 
                 return;
             }
-            else if(index === 1) {
-                _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/'))
-                //到顶层
-                if(_private.strTmpPath.indexOf('/') < 0) {
-                    _private.strTmpPath = '';
-
-                    //return;
-                }
-
-                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
-
-            }
             else {
 
-                _private.strTmpPath += '/' + item;
+                _private.strTmpPath += item;
 
-                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
+                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
 
-
-                textFilePath.text =  _private.strTmpPath;
+                if(FrameManager.sl_dirExists(path))
+                    _private.strTmpPath += GameMakerGlobal.separator;
             }
 
-            console.debug("[mainScriptEditor]path：", path);
+            console.debug("[GameScriptEditor]path：", path);
 
             if(FrameManager.sl_dirExists(path)) {
                 _private.showList();
                 return;
             }
 
+
+            textFilePath.text =  _private.strTmpPath;
 
             //let cfg = File.read(filePath);
             let data = FrameManager.sl_fileRead(path);
@@ -447,7 +471,7 @@ Item {
         }
 
         onRemoveClicked: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath + GameMakerGlobal.separator + item;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath + GameMakerGlobal.separator + item;
 
 
             dialogCommon.show({
@@ -455,11 +479,11 @@ Item {
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     if(FrameManager.sl_dirExists(path)) {
-                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_removeRecursively(path));
+                        console.debug("[GameScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_removeRecursively(path));
                         removeItem(index);
                     }
                     else if(FrameManager.sl_fileExists(path)) {
-                        console.debug("[mainScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
+                        console.debug("[GameScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
                         removeItem(index);
                     }
 
@@ -492,21 +516,21 @@ Item {
     QtObject {
         id: _private
 
+        //选择时的 临时路径
         property string strTmpPath
 
 
         function showList() {
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
 
 
-            if(!FrameManager.sl_dirExists(path)) {
-                _private.strTmpPath = _private.strTmpPath.slice(0, _private.strTmpPath.lastIndexOf('/'))
-                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + _private.strTmpPath;
-            }
+            //if(!FrameManager.sl_dirExists(path)) {
+                path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
+            //}
 
             let list = FrameManager.sl_dirList(path, "*.qml|*.js|*.vjs|*.json|*.txt", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
-            list.unshift('【新建文件】', '..');
+            list.unshift('..', '【新建文件】', );
             //console.warn(l_listExplorer.listview.itemAtIndex(0)); //null，还没创建
             l_listExplorer.removeButtonVisible = {0: false, 1: false, '-1': true};
             l_listExplorer.show(list);
@@ -531,7 +555,7 @@ Item {
                 return false;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + filePath;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + filePath;
 
             let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), path, 0);
 
@@ -564,22 +588,22 @@ Item {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[mainScriptEditor]Escape Key');
+        console.debug('[GameScriptEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[mainScriptEditor]Back Key');
+        console.debug('[GameScriptEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[mainScriptEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameScriptEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[mainScriptEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[GameScriptEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
@@ -588,9 +612,9 @@ Item {
         if(loaderVisualScript.status === Loader.Loading)
             showBusyIndicator(true);
 
-        console.debug("[mainScriptEditor]Component.onCompleted");
+        console.debug("[GameScriptEditor]Component.onCompleted");
     }
     Component.onDestruction: {
-        console.debug("[mainScriptEditor]Component.onDestruction");
+        console.debug("[GameScriptEditor]Component.onDestruction");
     }
 }

@@ -1103,7 +1103,7 @@ Item {
                     }
 
                     if(textUseScript.text.trim() !== '')
-                        strEffects += "game.run(%1, -1, goods, combatant);\r\n".arg(textUseScript.text.trim());
+                        strEffects += "game.run(%1(goods, combatant) ?? null, -1);\r\n".arg(textUseScript.text.trim());
                     else
                         strEffects += "game.removegoods(goods, 1);   //背包道具-1\r\n";
 

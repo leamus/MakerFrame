@@ -424,10 +424,10 @@ game.goon();
     Loader {
         id: loaderGameScene
 
-        anchors.fill: parent
-
         visible: false
         focus: true
+
+        anchors.fill: parent
 
 
         source: ''
@@ -457,7 +457,13 @@ game.goon();
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
+                visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
 
+
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 
@@ -468,17 +474,17 @@ game.goon();
                 let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
 
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //loaderGameScene.focus = true;
-                loaderGameScene.forceActiveFocus();
+                //focus = true;
+                forceActiveFocus();
 
-                //loaderGameScene.item.focus = true;
-                if(loaderGameScene.item.forceActiveFocus)
-                    loaderGameScene.item.forceActiveFocus();
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
 
-                if(loaderGameScene.item.init)
-                    loaderGameScene.item.init(true, true);
+                if(item.init)
+                    item.init(true, true);
 
-                loaderGameScene.visible = true;
+                visible = true;
             }
             catch(e) {
                 _private.gameSceneClose();
@@ -574,20 +580,11 @@ function *$start() {
         `
 
         function gameSceneClose() {
-            FrameManager.sl_clearComponentCache();
-            FrameManager.sl_trimComponentCache();
-
-
             loaderGameScene.source = '';
-            loaderGameScene.visible = false;
 
 
             textGameStartScript.enabled = true;
             buttonStartGame.enabled = true;
-
-
-            //root.focus = true;
-            root.forceActiveFocus();
         }
     }
 

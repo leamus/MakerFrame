@@ -44,6 +44,11 @@ Item {
     signal sg_close();
 
 
+    function init() {
+        _private.refresh();
+    }
+
+
 
     //width: 600
     //height: 800
@@ -74,13 +79,14 @@ Item {
                 itemExtendsRoot.children[tc].destroy();
             }
 
-            //l_list.visible = true;
-            //l_list.forceActiveFocus();
-            _private.refresh();
-
 
             FrameManager.sl_clearComponentCache();
             FrameManager.sl_trimComponentCache();
+
+
+            //l_list.visible = true;
+            //l_list.forceActiveFocus();
+            _private.refresh();
         }
 
 
@@ -108,22 +114,16 @@ Item {
 
 
         function close() {
-            loaderExtends.source = '';
-
-            //l_list.visible = true;
-            //l_list.forceActiveFocus();
-            _private.refresh();
-
-
-            FrameManager.sl_clearComponentCache();
-            FrameManager.sl_trimComponentCache();
+            //source = '';
+            setSource('');
         }
 
 
-        anchors.fill: parent
 
         //visible: false
         //focus: true
+
+        anchors.fill: parent
 
 
         source: ""
@@ -148,16 +148,23 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                setSource('');
+
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
-                //l_list.visible = true;
-                //l_list.forceActiveFocus();
-                _private.refresh();
+                visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
 
 
                 FrameManager.sl_clearComponentCache();
                 FrameManager.sl_trimComponentCache();
+
+
+                //l_list.visible = true;
+                //l_list.forceActiveFocus();
+                _private.refresh();
             }
         }
 
@@ -166,17 +173,17 @@ Item {
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //loaderExtends.focus = true;
-                loaderExtends.forceActiveFocus();
+                //focus = true;
+                forceActiveFocus();
 
-                //loader.item.focus = true;
-                if(loaderExtends.item.forceActiveFocus)
-                    loaderExtends.item.forceActiveFocus();
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
 
-                if(loaderExtends.item.init)
-                    loaderExtends.item.init();
+                if(item.init)
+                    item.init();
 
-                loaderExtends.visible = true;
+                visible = true;
 
 
                 l_list.visible = false;
@@ -384,7 +391,7 @@ Item {
                             l_list.removeItem(index);
                             _private.refresh();
 
-                            l_list.forceActiveFocus();
+                            //l_list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
                             l_list.forceActiveFocus();
@@ -424,8 +431,6 @@ Item {
 
 
     Component.onCompleted: {
-        _private.refresh();
-
         console.debug("[PluginsManager]Component.onCompleted");
     }
     Component.onDestruction: {

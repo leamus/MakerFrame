@@ -212,12 +212,12 @@ Item {
                     ////let goodsInfo = _private.goodsResource[arrData[index]];
 
                     /*if(game.gd["$sys_money"] < arrData[index].$price[0]) {
-                        game.run(function*(){yield game.msg('金钱不足');});
+                        game.run(function*(){yield game.msg('金钱不足');}());
                         return;
                     }
 
                     if(arrData[index].$count === 0) {
-                        game.run(function*(){yield game.msg('已卖完');});
+                        game.run(function*(){yield game.msg('已卖完');}());
                         return;
                     }
                     else if(arrData[index].$count > 0) {
@@ -283,7 +283,7 @@ Item {
                         root.refresh();
                     }
                     else
-                        game.run(function*(){yield game.msg('此物品不能卖');});
+                        game.run(function*(){yield game.msg('此物品不能卖');}());
                     */
                 }
             }

@@ -71,9 +71,9 @@ Item {
 
             textArea.color: 'white'
             //textArea.enabled: false
-            textArea.readOnly: true
+            //textArea.readOnly: true
 
-            textArea.selectByMouse: false
+            //textArea.selectByMouse: false
 
             textArea.font {
                 pointSize: 15
@@ -496,7 +496,7 @@ Item {
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
 
-<font color='yellow'>game.run(strScript, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
+<font color='yellow'>game.run(vScript, scriptProps=-1, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
 <font color='yellow'>game.script(fileName, filePath)</font>：执行脚本文件（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）；参数同game.loadjson。
 <font color='yellow'>game.lastreturn</font>：脚本上次返回的值；
 <font color='yellow'>game.lastvalue</font>：脚本上次返回的值（return+yield）；
@@ -525,10 +525,7 @@ Item {
 <font color='yellow'>fight.background(image)</font>：切换战斗背景图片；image为图片名。
 
 
-<font color='yellow'>fight.run(strScript, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入fight系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
-<font color='yellow'>fight.runFirst(strScript, ...params);</font>
-<font color='yellow'>fight.script(fileName, filePath)</font>：执行脚本文件（注意：此命令会将脚本放入fight系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）；参数同game.loadjson。
-<font color='yellow'>fight.scriptFirst(fileName, filePath);</font>
+<font color='yellow'>fight.run(vScript, scriptProps=-1, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入fight系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
 
 //得到某个战斗角色的 所有 普通技能 和 技能；
 //types：技能的type，系统默认0为普通攻击，1为技能

@@ -131,7 +131,7 @@ Item {
         //let priority = 0;
 
 
-        game.run(_init(startScript, bLoadResources, gameData) ?? null, {Priority: -1, Running: 1});
+        game.run(_init(startScript, bLoadResources, gameData) ?? null, {Priority: -1, Running: 1, Tips: 'init'});
     }
 
     //游戏初始化脚本
@@ -205,8 +205,8 @@ Item {
 
         if(_private.objCommonScripts['game_init']) {
             try {
-                //game.run([_private.objCommonScripts['game_init'](bLoadResources) ?? null, 'game_init'],
-                //    {Priority: priority++, Type: 0, Running: 1});
+                //game.run(_private.objCommonScripts['game_init'](bLoadResources) ?? null,
+                //    {Priority: priority++, Type: 0, Running: 1, Tips: 'game_init'});
                 const r = _private.objCommonScripts['game_init'](bLoadResources);
                 if(GlobalLibraryJS.isGenerator(r))yield* r;
             } catch(e) {
@@ -274,7 +274,7 @@ Item {
                         console.warn('[!GameScene]游戏start函数调用错误');
                         //throw err;
                     }
-                //}, {Tips: 'start'});
+                //}(), {Tips: 'start'});
             }
         }
         else if(startScript === false) {
@@ -291,13 +291,13 @@ Item {
                     console.warn('[!GameScene]游戏start函数调用错误2');
                     //throw err;
                 }
-            //}, {Tips: 'start'});
+            //}(), {Tips: 'start'});
         }
 
-        //}, {Tips: 'start'});
+        //}(), {Tips: 'start'});
 
 
-        //}, {Priority: -2, Type: 0, Running: 1, Tips: 'init'});
+        //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'init'});
 
 
 
@@ -457,7 +457,7 @@ Item {
 
             if(bUnloadResources)
                 yield* GameSceneJS.unloadResources();
-        //}, {Priority: -2, Type: 0, Running: 1, Tips: 'release'});
+        //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'release'});
 
 
 
@@ -645,12 +645,12 @@ Item {
                     if(itemViewPort.mapScript.$start) {
                         const r = itemViewPort.mapScript.$start(userData);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([itemViewPort.mapScript.$start(userData) ?? null, 'map $start'], {Priority: priority++, Type: 0, Running: 1});
+                        //game.run(itemViewPort.mapScript.$start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
                     }
                     else if(itemViewPort.mapScript.start) {
                         const r = itemViewPort.mapScript.start(userData);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([itemViewPort.mapScript.start(userData) ?? null, 'map start'], {Priority: priority++, Type: 0, Running: 1});
+                        //game.run(itemViewPort.mapScript.start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
                     }
 
 
@@ -659,13 +659,13 @@ Item {
                     if(afterLoadmap) {
                         const r = afterLoadmap(mapRID, userData);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([afterLoadmap(mapRID, userData) ?? null, 'afterLoadmap'], {Priority: priority++, Type: 0, Running: 1});
+                        //game.run(afterLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'afterLoadmap'});
                     }
 
 
                     return resolve(mapInfo);
 
-                    //}, {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
+                    //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
                     //return true;
 
                 }());
@@ -1110,6 +1110,9 @@ Item {
 
 
 
+            //发送一次停止信号，来调用相关回调函数
+            roleComp.sprite.sg_stoped();
+
             game.hero(index, role);
 
 
@@ -1513,6 +1516,9 @@ Item {
             //    role.$direction = 2;
 
 
+
+            //发送一次停止信号，来调用相关回调函数
+            roleComp.sprite.sg_stoped();
 
             game.role(roleComp, role);
 
@@ -2273,62 +2279,40 @@ Item {
             return fighthero;
         }
 
-        //背包内 获得 count个道具；返回背包中 改变后 道具个数，返回false表示错误。
+        //从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误。
         //goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
-        //count为0表示使用goods内的$count；
-        readonly property var getgoods: function(goods, count=0) {
-            if(!count)
-                count = 0;
+        //  如果为 下标，则直接加减；如果为 字符串（默认1个数量）、对象（数量要提供），则获取道具对象后，从这个对象中转移；
+        //count为>0表示转移个数，为0表示返回数量；<0表示将goods的$count全部转移（默认）。
+        readonly property var getgoods: function(goods, count) {
+            if(!GlobalLibraryJS.isNumber(count))
+                count = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(goods, '$count'), -1);
 
             if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
+                if(count > 0 && goods.$count === undefined)
+                    goods.$count = count;
                 goods = GameSceneJS.getGoodsObject(goods, false);
 
                 if(!goods.$count)
                     goods.$count = 0;
-                else {
+                /*else {
                     count += goods.$count;
                     goods.$count = 0;
-                }
+                }*/
 
-                if(!goods.$stackable) {
-                    if(count > 0)
-                        goods.$count = count;
-                    else
-                        return false;
-
-                    game.gd['$sys_goods'].push(goods);
-                    return goods.$count;
-                }
             }
             else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
-                if(count === 0) {
-                    for(let tg of game.gd['$sys_goods']) {
-                        //找到
-                        if(tg && tg.$rid === goods) {
-                            count += tg.$count;
-                        }
-                    }
-                    return count;
-                }
+                goods = GameSceneJS.getGoodsObject(goods, count > 0 ? {$count: count} : undefined);
 
-                goods = GameSceneJS.getGoodsObject(goods);
+                if(!goods.$count)
+                    goods.$count = 0;
 
-                if(!goods.$stackable) {
-                    if(count > 0)
-                        goods.$count = count;
-                    else
-                        return false;
-
-                    game.gd['$sys_goods'].push(goods);
-                    return goods.$count;
-                }
             }
             else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd['$sys_goods'].length)
                     return false;
 
                 goods = game.gd['$sys_goods'][goods];
-                if(count > 0)
+                if(goods.$count + count > 0)
                     goods.$count += count;
                 //if(goodsProps)
                 //    GlobalLibraryJS.copyPropertiesToObject(goods, goodsProps/*, true*/);  //!!更改对象属性
@@ -2339,26 +2323,48 @@ Item {
                 return false;
 
 
+            if(count > 0 && goods.$count - count < 0)
+                return false;
 
 
-            //下面是 stackable（可叠加） 的 goods（对象） 查找
+            //如果count为0（返回个数） 或 stackable（可叠加），则查找
+            if(count === 0 || goods.$stackable) {
+                //循环查找goods
+                for(let tg of game.gd['$sys_goods']) {
+                    //找到
+                    if(tg && tg.$rid === goods.$rid) {
+                        //返回个数
+                        if(count === 0) {
+                            return tg.$count;
+                        }
 
-            //循环查找goods
-            for(let tg of game.gd['$sys_goods']) {
-                //找到
-                if(tg && tg.$rid === goods.$rid && tg.$stackable) {
-                    tg.$count += count;
-                    return tg.$count;
+                        //如果都可叠加
+                        if(tg.$stackable && goods.$stackable) {
+                            //如果不是同一个物品，则把goods减一下（其他地方可能有用）
+                            //if(tg !== goods)
+                            //    goods.$count -= count;
+
+                            if(count > 0)
+                                tg.$count += count;
+                            else
+                                tg.$count += goods.$count;
+
+                            return tg.$count;
+                        }
+                    }
                 }
             }
 
-            //如果没有找到
 
-            if(count > 0)
+            //如果没有找到 或 要叠加
+
+            if(count === 0)
+                return 0;
+            else if(count > 0)
                 goods.$count = count;
-            else
-                return false;
+
             game.gd['$sys_goods'].push(goods);
+
             return goods.$count;
         }
 
@@ -2583,7 +2589,7 @@ Item {
 
                     return resolve(true);
 
-                    //}, {Priority: -2, Type: 0, Running: 1, Tips: 'usegoods'});
+                    //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'usegoods'});
                     //return true;
                 }());
             };
@@ -4361,7 +4367,7 @@ Item {
                     if(_private.objCommonScripts['before_save']) {
                         const r = _private.objCommonScripts['before_save']();
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([_private.objCommonScripts['before_save']() ?? null, 'before_save'], {Priority: -3, Type: 0, Running: 1});
+                        //game.run(_private.objCommonScripts['before_save']() ?? null, {Priority: -3, Type: 0, Running: 1, Tips: 'before_save'});
                     }
 
 
@@ -4425,14 +4431,14 @@ Item {
                     if(_private.objCommonScripts['after_save']) {
                         const r = _private.objCommonScripts['after_save'](ret);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([_private.objCommonScripts['after_save']() ?? null, 'after_save'], {Priority: -1, Type: 0, Running: 1});
+                        //game.run(_private.objCommonScripts['after_save']() ?? null, {Priority: -1, Type: 0, Running: 1, Tips: 'after_save'});
                     }
 
 
                     return resolve(ret);
 
 
-                    //}, {Priority: -2, Type: 0, Running: 1, Tips: 'save'});
+                    //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'save'});
                     //return true;
 
                 }());
@@ -4477,7 +4483,7 @@ Item {
                     if(_private.objCommonScripts['before_load']) {
                         const r = _private.objCommonScripts['before_load']();
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([_private.objCommonScripts['before_load']() ?? null, 'before_load'], {Priority: priority++, Type: 0, Running: 1});
+                        //game.run(_private.objCommonScripts['before_load']() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'before_load'});
                     }
 
 
@@ -4504,13 +4510,13 @@ Item {
                     if(_private.objCommonScripts['after_load']) {
                         const r = _private.objCommonScripts['after_load']();
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
-                        //game.run([_private.objCommonScripts['after_load']() ?? null, 'after_load'], {Priority: priority++, Type: 0, Running: 1});
+                        //game.run(_private.objCommonScripts['after_load']() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'after_load'});
                     }
 
 
                     return resolve(true);
 
-                    //}, {Priority: -2, Type: 0, Running: 1, Tips: 'load'});
+                    //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'load'});
                     //return true;
                 }());
             };
@@ -4570,10 +4576,10 @@ Item {
 
                         return resolve(plugin);
 
-                        //}, {Priority: -2, Type: 0, Running: 1, Tips: 'plugin'});
+                        //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'plugin'});
 
-                        //game.run([plugin.$load() ?? null, 'plugin_load:' + params[0] + params[1]]);
-                        //game.run([plugin.$init() ?? null, 'plugin_init:' + params[0] + params[1]]);
+                        //game.run(plugin.$load() ?? null, 'plugin_load:' + params[0] + params[1]);
+                        //game.run(plugin.$init() ?? null, 'plugin_init:' + params[0] + params[1]);
                     }
                     else {
                         if(!plugin) {
@@ -4641,13 +4647,6 @@ Item {
         //      Tips：
         //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(3);
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
-            if(vScript === undefined || (GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined)) {
-                console.warn('[!GameScene]运行脚本未定义（可忽略）');
-                console.debug(new Error().stack);
-                //console.exception('[!GameScene]运行脚本未定义（可忽略）');
-
-                return undefined;
-            }
             if(vScript === null) {
                 return null;
             }
@@ -4658,6 +4657,9 @@ Item {
             if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
                 scriptProps = {Priority: scriptProps};
             }
+            else if(GlobalLibraryJS.isString(scriptProps)) {   //如果是数字，则默认是Tips
+                scriptProps = {Tips: scriptProps};
+            }
             if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
                 scriptQueue = scriptProps.ScriptQueue || _private.scriptQueue;
                 priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : -1;
@@ -4667,8 +4669,8 @@ Item {
                 tips = scriptProps.Tips;
             }
             else {
-                console.warn('[!GameScene]运行脚本属性错误!!!');
-                return null;
+                console.warn('[!GameScene]game.run脚本属性参数错误');
+                return undefined;
             }
 
 
@@ -4690,14 +4692,21 @@ Item {
                 scriptQueue.run(value);
                 return 0;
             }
-            else if(GlobalLibraryJS.isArray(vScript)) {
+            //!!兼容旧代码
+            else if(GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined) {
                 tips = vScript[1] ?? tips;
                 vScript = vScript[0];
             }
-            //else {
-            //    console.warn('[!GameScene]运行脚本属性错误!!!');
-            //    return null;
+            //else if(GlobalLibraryJS.isString(vScript)) {
             //}
+            else if(vScript === undefined) {
+            //else {
+                console.warn('[!GameScene]game.run脚本参数错误（可忽略）');
+                console.debug(new Error().stack);
+                //console.exception('[!GameScene]运行脚本未定义（可忽略）');
+
+                return undefined;
+            }
 
 
             if(runType === 0) { //vScript是代码
@@ -4738,7 +4747,7 @@ Item {
             return 3;
         }
 
-        //鹰：NO
+        //鹰：NO：已废弃
         //将脚本放入 系统脚本引擎（scriptQueue）中 等候执行；一般用在编辑器中载入外部脚本文件
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
         readonly property var script: function(fileName, priority, filePath) {
@@ -4846,11 +4855,11 @@ Item {
             exit: _private.exitGame,
             showExitDialog: _private.showExitDialog,
 
-            screen: rootGameScene,          //屏幕（组件位置和大小固定）（所有，包含战斗场景）
-            viewport: itemViewPort,         //游戏视窗，组件位置和大小固定
-            scene: itemViewPort.gameScene,              //场景（组件位置和大小固定，但会被scale影响）
-            map: itemViewPort.itemContainer,            //地图（组件会改变大小和随地图移动），会覆盖所有地图上的元素
-            ground: itemViewPort.itemRoleContainer,     //地图地面（组件会改变大小和随地图移动），会根据z值判断是否覆盖元素
+            screen: rootGameScene,          //屏幕，创建的组件位置和大小固定（包含所有系统组件，包括战斗场景、摇杆、消息框、对话框等）
+            viewport: itemViewPort,         //视窗，创建的组件位置和大小固定
+            scene: itemViewPort.gameScene,              //场景，组件位置和大小固定，但会被scale影响
+            map: itemViewPort.itemContainer,            //地图，创建的组件会改变大小和随地图移动（一般只做挂载）
+            ground: itemViewPort.itemRoleContainer,     //地图地板，创建的组件会改变大小和随地图移动（一般只做挂载）
 
             interact: GameSceneJS.buttonAClicked,  //交互函数
 
@@ -4868,7 +4877,7 @@ Item {
                         _private.objCommonScripts['refresh_combatant'](tfh);
                     }
                     else {
-                        console.warn('[!GameScene]跳过存档中错误的战斗人物：', tfh);
+                        console.warn('[!GameScene]跳过错误的战斗人物：', tfh);
                     }
 
 
@@ -4896,7 +4905,7 @@ Item {
                         game.gd['$sys_goods'].push(tg);
                     }
                     else {
-                        console.warn('[!GameScene]跳过存档中错误的道具：', tg);
+                        console.warn('[!GameScene]跳过错误的道具：', tg);
                     }
                 }
             },
@@ -5144,7 +5153,7 @@ Item {
         onTriggered: {
             GameSceneJS.onTriggered();
             //使用脚本队列的话，人物移动就不能在scriptQueue.wait下使用了
-            //game.run(GameSceneJS.onTriggered);
+            //game.run(GameSceneJS.onTriggered() ?? null);
             //game.run(true);
         }
     }
@@ -5168,19 +5177,23 @@ Item {
 
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-
-            width: 20 * Screen.pixelDensity
-            height: 20 * Screen.pixelDensity
-
-            //anchors.margins: 1 * Screen.pixelDensity
-            transformOrigin: Item.BottomLeft
             anchors.leftMargin: 6 * Screen.pixelDensity
             anchors.bottomMargin: 7 * Screen.pixelDensity
             //anchors.verticalCenterOffset: -100
             //anchors.horizontalCenterOffset: -100
+            //anchors.margins: 1 * Screen.pixelDensity
+
+            width: 20 * Screen.pixelDensity
+            height: 20 * Screen.pixelDensity
+
+            transformOrigin: Item.BottomLeft
 
             opacity: 0.6
             scale: 1
+
+            //imageBackground.source: ''
+            //imageHandle.source: ''
+
 
             onPressedChanged: {
                 if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
@@ -5250,7 +5263,7 @@ Item {
             onSg_pressed: {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
-                game.run(buttonClicked);
+                game.run(buttonClicked() ?? null);
             }
         }
 
@@ -5286,7 +5299,7 @@ Item {
             onSg_pressed: {
                 //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
-                game.run(buttonClicked);
+                game.run(buttonClicked() ?? null);
             }
         }
         */
@@ -5762,7 +5775,7 @@ Item {
                     }
 
                     onPlaybackStateChanged: {
-                        let eventName = `$video_state`;
+                        const eventName = `$video_state`;
                         let tScript;
                         do {
                             if(tScript = itemVideo.fStateCallback)
@@ -5777,7 +5790,7 @@ Item {
                         } while(0);
 
                         if(tScript)
-                            game.async([tScript.call(mediaPlayer, playbackState, mediaPlayer, videoOutput) ?? null, eventName]);
+                            game.async(tScript.call(mediaPlayer, playbackState, mediaPlayer, videoOutput) ?? null, eventName);
                     }
                 }
 
@@ -5975,7 +5988,7 @@ Item {
 
 
             onPlaybackStateChanged: {
-                let eventName = `$music_state`;
+                const eventName = `$music_state`;
                 let tScript;
                 do {
                     if(tScript = itemBackgroundMusic.fStateCallback)
@@ -5990,7 +6003,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.async([tScript.call(audioBackgroundMusic, playbackState, audioBackgroundMusic) ?? null, eventName]);
+                    game.async(tScript.call(audioBackgroundMusic, playbackState, audioBackgroundMusic) ?? null, eventName);
             }
         }
     }
@@ -6706,12 +6719,12 @@ Item {
 
         function exitGame(force=false) {
             if(!force) {
-                ///！！放在下一次执行（必须跳出事件队列，因为 _private.scriptQueue.clear(6); 会导致生成器重入）
-                //GlobalLibraryJS.runNextEventLoop(function() {
+                ///！！放在下一次执行（因为exitGame有可能在事件队列中运行，此时 _private.scriptQueue.clear(6) 会导致生成器重入，所以必须跳出事件队列）。
+                GlobalLibraryJS.runNextEventLoop(function() {
                     //将队列中的脚本强制运行完毕（不等待）
                     _private.scriptQueue.clear(6);
 
-                    game.run([function*() {
+                    game.run(function*() {
 
                         try {
                             yield* release();
@@ -6732,9 +6745,9 @@ Item {
                         sg_close();
 
 
-                    }(), 'exitGame']);
+                    }(), 'exitGame');
 
-                //}, 'exitGame');
+                }, 'exitGame');
             }
             else
                 sg_close();
@@ -7671,16 +7684,13 @@ Item {
                             anchors.fill: parent
 
 
-                            //color: 'white'
-
-                            //horizontalAlignment: Text.AlignHCenter
-                            //verticalAlignment: Text.AlignVCenter
+                            //textArea.color: 'white'
+                            //textArea.placeholderTextColor: '#7F7F7F7F'
 
                             //textArea.enabled: false
                             //textArea.readOnly: true
                             //textArea.wrapMode: Text.Wrap
                             textArea.textFormat: TextArea.PlainText
-                            //textArea.placeholderTextColor: '#7F7F7F7F'
 
                             textArea.selectByKeyboard: true
                             textArea.selectByMouse: true
@@ -7691,18 +7701,13 @@ Item {
 
 
                             /*
-                            //padding : nPadding
-                            leftPadding : 6
-                            rightPadding : 6
-                            topPadding : 6
-                            bottomPadding: 6
-                            background: Item {
-                                //color: 'transparent'
-                                implicitHeight: 0
-                                //color: Global.style.backgroundColor
-                                //border.color: textGameInput.focus ? Global.style.accent : Global.style.hintTextColor
-                                //border.width: textGameInput.focus ? 2 : 1
-                            }
+                            //implicitWidth: 200
+                            //implicitHeight: 40
+                            color: 'black'
+                            //color: 'transparent'
+                            //color: Global.style.backgroundColor
+                            border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                            border.width: parent.parent.textArea.activeFocus ? 2 : 1
                             */
                         }
                     }
@@ -7996,7 +8001,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_refreshed: {
@@ -8021,7 +8026,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_looped: {
@@ -8046,7 +8051,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_finished: {
@@ -8071,7 +8076,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_paused: {
@@ -8096,7 +8101,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_stoped: {
@@ -8121,7 +8126,7 @@ Item {
                 } while(0);
 
                 if(tScript)
-                    game.run([tScript.call(rootRole, strActionName, rootRole) ?? null, eventName]);
+                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
 
@@ -8561,11 +8566,10 @@ Item {
     Component.onCompleted: {
         FrameManager.sl_globalObject().game = game;
         FrameManager.sl_globalObject().g = game;
-        //FrameManager.sl_globalObject().g = g;
 
-        //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject().game);
+        //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject());
 
-        console.debug('[GameScene]Component.onCompleted:', game);
+        console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
 
     Component.onDestruction: {
@@ -8580,6 +8584,6 @@ Item {
             delete FrameManager.sl_globalObject().g;
         }
 
-        console.debug('[GameScene]Component.onDestruction');
+        console.debug('[GameScene]Component.onDestruction:', Qt.resolvedUrl('.'));
     }
 }

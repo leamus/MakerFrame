@@ -373,6 +373,10 @@ Item {
         anchors.fill: parent
 
 
+        source: ''
+        asynchronous: true
+
+
 
         Connections {
             target: loader.item
@@ -380,9 +384,8 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                root.forceActiveFocus();
-
-                loader.visible = false;
+                //loader.source = '';
+                _private.loadModule('');
             }
         }
 
@@ -393,7 +396,18 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                setSource('');
+
                 showBusyIndicator(false);
+            }
+            else if(status === Loader.Null) {
+                visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
+
+
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 
@@ -401,7 +415,18 @@ Item {
             console.debug("[mainTutorial]loader onLoaded");
 
             try {
-                //item.testFresh();
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //focus = true;
+                forceActiveFocus();
+
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
+
+                if(item.init)
+                    item.init();
+
+                visible = true;
             }
             catch(e) {
                 throw e;
@@ -424,9 +449,16 @@ Item {
         id: _private
 
         function loadModule(url) {
-            loader.source = url;
-            loader.visible = true;
-            loader.forceActiveFocus();
+            //loader.visible = true;
+            //loader.focus = true;
+            //loader.forceActiveFocus();
+
+            //loader.source = url;
+            loader.setSource(url);
+            if(loader.status === Loader.Loading)
+                showBusyIndicator(true);
+
+            return true;
         }
     }
 

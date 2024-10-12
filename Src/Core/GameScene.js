@@ -196,8 +196,6 @@ function *loadResources() {
     _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'), 0);
     //万向移动
     _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'), true);
-    //
-    joystick.rJoystickMinimumProportion = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick', '$joystickMinimumProportion'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick', '$joystickMinimumProportion'), true);
 
     //地图遮挡透明度
     itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
@@ -218,13 +216,16 @@ function *loadResources() {
 
     //摇杆 默认值
 
-    let joystickConfig = {
+    /*let joystickConfig = {
         $left: 6,
         $bottom: 7,
         $size: 20,
         $opacity: 0.6,
+        $image: '',
+        $backgroundImage: '',
+        $joystickMinimumProportion: 0.2,    //使能最低的比例
     };
-    /*let buttonAConfig = {
+    let buttonAConfig = {
         $right: 10,
         $bottom: 16,
         $size: 6,
@@ -255,120 +256,113 @@ function *loadResources() {
         }
     };*/
 
+    //摇杆 配置
+    const joystickDefaultConfig = GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick');
+    const joystickConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), /*GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick'), */joystickDefaultConfig);
+
+    joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * rootWindow.aliasComponents.Screen.pixelDensity;
+    joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * rootWindow.aliasComponents.Screen.pixelDensity;
+    joystick.anchors.leftMargin = (joystickConfig.$left ?? joystickDefaultConfig.$left) * rootWindow.aliasComponents.Screen.pixelDensity;
+    joystick.anchors.bottomMargin = (joystickConfig.$bottom ?? joystickDefaultConfig.$bottom) * rootWindow.aliasComponents.Screen.pixelDensity;
+    joystick.opacity = (joystickConfig.$opacity ?? joystickDefaultConfig.$opacity);
+    joystick.rJoystickMinimumProportion = (joystickConfig.$joystickMinimumProportion ?? joystickDefaultConfig.$joystickMinimumProportion);
+    joystick.imageHandle.source = (joystickConfig.$image ?? joystickDefaultConfig.$image);
+    joystick.imageBackground.source = (joystickConfig.$backgroundImage ?? joystickDefaultConfig.$backgroundImage);
+    if(joystick.imageHandle.source.toString())
+        joystick.rectHandle.visible = false;
+    if(joystick.imageBackground.source.toString())
+        joystick.rectBackground.visible = false;
+
+
+    //按键配置
     do {
-        //摇杆 配置
-        do {
-            const tConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick'), null);
-            if(!tConfig)
-                break;
+        const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'), null);
+        if(!buttonsConfig)
+            break;
 
+        /*/A键
+        do {
+            if(buttonsConfig[0] === undefined)
+                break;
+            let tConfig = buttonsConfig[0];
             if(tConfig.$size !== undefined) {
-                joystickConfig.$size = tConfig.$size;
+                buttonAConfig.$size = tConfig.$size;
             }
-            if(tConfig.$left !== undefined)
-                joystickConfig.$left = tConfig.$left;
-            if(tConfig.$bottom !== undefined)
-                joystickConfig.$bottom = tConfig.$bottom;
+            if(tConfig.$color !== undefined)
+                buttonAConfig.$color = tConfig.$color;
             if(tConfig.$opacity !== undefined)
-                joystickConfig.$opacity = tConfig.$opacity;
+                buttonAConfig.$opacity = tConfig.$opacity;
+            if(tConfig.$image !== undefined)
+                buttonAConfig.$image = tConfig.$image;
+
+            if(tConfig.$right !== undefined)
+                buttonAConfig.$right = tConfig.$right;
+            if(tConfig.$bottom !== undefined)
+                buttonAConfig.$bottom = tConfig.$bottom;
+            if(tConfig.$clicked !== undefined)
+                buttonAConfig.$clicked = tConfig.$clicked;
         }while(0);
 
-        //按键配置
+        //B键
         do {
-            const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'), null);
-            if(!buttonsConfig)
+            if(buttonsConfig[1] === undefined)
                 break;
-
-            /*/A键
-            do {
-                if(buttonsConfig[0] === undefined)
-                    break;
-                let tConfig = buttonsConfig[0];
-                if(tConfig.$size !== undefined) {
-                    buttonAConfig.$size = tConfig.$size;
-                }
-                if(tConfig.$color !== undefined)
-                    buttonAConfig.$color = tConfig.$color;
-                if(tConfig.$opacity !== undefined)
-                    buttonAConfig.$opacity = tConfig.$opacity;
-                if(tConfig.$image !== undefined)
-                    buttonAConfig.$image = tConfig.$image;
-
-                if(tConfig.$right !== undefined)
-                    buttonAConfig.$right = tConfig.$right;
-                if(tConfig.$bottom !== undefined)
-                    buttonAConfig.$bottom = tConfig.$bottom;
-                if(tConfig.$clicked !== undefined)
-                    buttonAConfig.$clicked = tConfig.$clicked;
-            }while(0);
-
-            //B键
-            do {
-                if(buttonsConfig[1] === undefined)
-                    break;
-                let tConfig = buttonsConfig[1];
-                if(tConfig.$size !== undefined) {
-                    buttonMenuConfig.$size = tConfig.$size;
-                }
-                if(tConfig.$color !== undefined)
-                    buttonMenuConfig.$color = tConfig.$color;
-                if(tConfig.$opacity !== undefined)
-                    buttonMenuConfig.$opacity = tConfig.$opacity;
-                if(tConfig.$image !== undefined)
-                    buttonMenuConfig.$image = tConfig.$image;
-                if(tConfig.$right !== undefined)
-                    buttonMenuConfig.$right = tConfig.$right;
-                if(tConfig.$bottom !== undefined)
-                    buttonMenuConfig.$bottom = tConfig.$bottom;
-                if(tConfig.$clicked !== undefined)
-                    buttonMenuConfig.$clicked = tConfig.$clicked;
-            }while(0);
-            */
-
-            //自定义
-            for(let tb = 0; tb < buttonsConfig.length; ++tb) {
-                let tConfig = buttonsConfig[tb];
-                let button = compButtons.createObject(itemButtons);
-                button.width = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
-                button.height = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
-                if(tConfig.$color !== undefined)
-                    button.color = tConfig.$color;
-                if(tConfig.$opacity !== undefined)
-                    button.opacity = tConfig.$opacity;
-                if(tConfig.$image)
-                    button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
-                button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
-                button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
-
-                if(tConfig.$pressed)
-                    button.sg_pressed.connect(function() {
-                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                        //    return;
-                        game.async(tConfig.$pressed.call(button) ?? null);
-                });
-                //！！！兼容旧代码
-                else if(tConfig.$clicked)
-                    button.sg_pressed.connect(function() {
-                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                        //    return;
-                        game.async(tConfig.$clicked.call(button) ?? null);
-                });
-                if(tConfig.$released)
-                    button.sg_released.connect(function() {
-                        //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                        //    return;
-                        game.async(tConfig.$released.call(button) ?? null);
-                });
+            let tConfig = buttonsConfig[1];
+            if(tConfig.$size !== undefined) {
+                buttonMenuConfig.$size = tConfig.$size;
             }
-
+            if(tConfig.$color !== undefined)
+                buttonMenuConfig.$color = tConfig.$color;
+            if(tConfig.$opacity !== undefined)
+                buttonMenuConfig.$opacity = tConfig.$opacity;
+            if(tConfig.$image !== undefined)
+                buttonMenuConfig.$image = tConfig.$image;
+            if(tConfig.$right !== undefined)
+                buttonMenuConfig.$right = tConfig.$right;
+            if(tConfig.$bottom !== undefined)
+                buttonMenuConfig.$bottom = tConfig.$bottom;
+            if(tConfig.$clicked !== undefined)
+                buttonMenuConfig.$clicked = tConfig.$clicked;
         }while(0);
-    }while(0);
+        */
 
-    joystick.width = joystickConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
-    joystick.height = joystickConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
-    joystick.anchors.leftMargin = joystickConfig.$left * rootWindow.aliasComponents.Screen.pixelDensity;
-    joystick.anchors.bottomMargin = joystickConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
-    joystick.opacity = joystickConfig.$opacity;
+        //自定义
+        for(let tb = 0; tb < buttonsConfig.length; ++tb) {
+            let tConfig = buttonsConfig[tb];
+            let button = compButtons.createObject(itemButtons);
+            button.width = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
+            button.height = tConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
+            if(tConfig.$color !== undefined)
+                button.color = tConfig.$color;
+            if(tConfig.$opacity !== undefined)
+                button.opacity = tConfig.$opacity;
+            if(tConfig.$image)
+                button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
+            button.anchors.rightMargin = tConfig.$right * rootWindow.aliasComponents.Screen.pixelDensity;
+            button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasComponents.Screen.pixelDensity;
+
+            if(tConfig.$pressed)
+                button.sg_pressed.connect(function() {
+                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //    return;
+                    game.async(tConfig.$pressed.call(button) ?? null);
+            });
+            //！！！兼容旧代码
+            else if(tConfig.$clicked)
+                button.sg_pressed.connect(function() {
+                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //    return;
+                    game.async(tConfig.$clicked.call(button) ?? null);
+            });
+            if(tConfig.$released)
+                button.sg_released.connect(function() {
+                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //    return;
+                    game.async(tConfig.$released.call(button) ?? null);
+            });
+        }
+
+    }while(0);
 
     /*buttonA.width = buttonAConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
     buttonA.height = buttonAConfig.$size * rootWindow.aliasComponents.Screen.pixelDensity;
@@ -743,7 +737,7 @@ function *loadResources() {
                 if(ts.$load && ts.$autoLoad !== false) {
                     try {
                         //ts.$load();
-                        //game.run([ts.$load() ?? null, 'plugin_load:' + tc0 + tc1]);
+                        //game.run(ts.$load() ?? null, 'plugin_load:' + tc0 + tc1);
                         const r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
                         if(GlobalLibraryJS.isGenerator(r))yield* r;
                     } catch(e) {
@@ -772,7 +766,7 @@ function *unloadResources() {
             if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false) {
                 try {
                     //_private.objPlugins[tc][tp].$unload();
-                    //game.run([_private.objPlugins[tc][tp].$unload() ?? null, 'plugin_unload:' + tc + tp]);
+                    //game.run(_private.objPlugins[tc][tp].$unload() ?? null, 'plugin_unload:' + tc + tp);
                     const r = _private.objPlugins[tc][tp].$unload();
                     if(GlobalLibraryJS.isGenerator(r))yield* r;
                 } catch(e) {
@@ -1973,7 +1967,7 @@ function buttonAClicked() {
             } while(0);
 
             if(tScript) {
-                game.run([tScript.call(role, role) ?? null, '$interactive:' + role.$data.$id]);
+                game.run(tScript.call(role, role) ?? null, '$interactive:' + role.$data.$id);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(role.$data.$id));
 
                 return; //!!只执行一次事件
@@ -2013,7 +2007,7 @@ function mapEvent(eventName, role) {
 
     if(tScript)
         GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
-    //game.run([tScript, '地图事件:' + eventName]);
+    //game.run(tScript() ?? null, '地图事件:' + eventName);
 
 
     //调用总事件处理
@@ -2052,7 +2046,7 @@ function mapEventCanceled(eventName, role) {
 
     if(tScript)
         GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
-    //game.run([tScript, '地图事件离开:' + eventName + '_leave']);
+    //game.run(tScript() ?? null, '地图事件离开:' + eventName + '_leave');
 
 
     //调用总事件处理
@@ -2082,7 +2076,7 @@ function mapClickEvent(x, y) {
     } while(0);
 
     if(tScript)
-        game.run([tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y) ?? null, eventName], -1, );
+        game.run(tScript(Math.floor(x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(y / itemViewPort.sizeMapBlockScaledSize.height), x, y) ?? null, eventName);
 
     //console.debug(mouse.x, mouse.y,
     //              Math.floor(mouse.x / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(mouse.y / itemViewPort.sizeMapBlockScaledSize.height))
@@ -2109,7 +2103,7 @@ function roleClickEvent(role, dx, dy) {
     } while(0);
 
     if(tScript) {
-        game.run([tScript.call(role, role) ?? null, eventName], );
+        game.run(tScript.call(role, role) ?? null, eventName);
         //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(_private.objRoles[r].$name));
 
         return; //!!只执行一次事件
@@ -2178,7 +2172,7 @@ function onTriggered() {
 
             if(_private.objGlobalTimers[tt][2] & 0b10) {
                 GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][4], _private.objGlobalTimers[tt][1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
-                //game.run([game.gf[tt], tt]);
+                //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
             }
             else
@@ -2220,7 +2214,7 @@ function onTriggered() {
 
             if(_private.objTimers[tt][2] & 0b10) {
                 GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][4], _private.objTimers[tt][1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
-                //game.run([tScript, tt]);
+                //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
             }
             else
@@ -2294,7 +2288,7 @@ function onTriggered() {
 
                         if(tScript)
                             GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: eventName}, );
-                            //game.run([tScript, role.$name]);
+                            //game.run(tScript() ?? null, role.$name);
                     }
                     else
                         continue;
@@ -2651,7 +2645,7 @@ function onTriggered() {
 
                         if(tScript)
                             GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: eventName}, );
-                            //game.run([tScript, mainRole.$name]);
+                            //game.run(tScript() ?? null, mainRole.$name);
                     }
                     else
                         continue;
@@ -2900,7 +2894,7 @@ function onTriggered() {
                 offsetMoveY = Math.round(dta);
         }
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移
-        else if(joystick.rJoystickMinimumProportion > 0) {
+        else {  // if(joystick.rJoystickMinimumProportion > 0) {
             offsetMoveX = Math.round(dta);
             offsetMoveY = Math.round(dta);
 
@@ -2934,7 +2928,7 @@ function onTriggered() {
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
             if(_private.objPlugins[tc][tp].$timerTriggered && _private.objPlugins[tc][tp].$autoLoad !== false)
-                game.run([_private.objPlugins[tc][tp].$timerTriggered(realinterval) ?? null, 'plugin $timerTriggered:' + tc + tp]);
+                game.run(_private.objPlugins[tc][tp].$timerTriggered(realinterval) ?? null, 'plugin $timerTriggered:' + tc + tp);
 
     /*/精确控制下一帧（有问题）
     let runinterval = new Date().getTime() - timer.nLastTime;

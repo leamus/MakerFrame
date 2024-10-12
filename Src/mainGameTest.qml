@@ -243,10 +243,10 @@ Item {
     Loader {
         id: loaderGameScene
 
-        anchors.fill: parent
-
         visible: false
         focus: true
+
+        anchors.fill: parent
 
 
         source: ''
@@ -276,7 +276,13 @@ Item {
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
+                visible = false;
+                //root.focus = true;
+                root.forceActiveFocus();
 
+
+                FrameManager.sl_clearComponentCache();
+                FrameManager.sl_trimComponentCache();
             }
         }
 
@@ -300,18 +306,18 @@ Item {
 
 
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //loaderGameScene.focus = true;
-                loaderGameScene.forceActiveFocus();
+                //focus = true;
+                forceActiveFocus();
 
-                //loaderGameScene.item.focus = true;
-                if(loaderGameScene.item.forceActiveFocus)
-                    loaderGameScene.item.forceActiveFocus();
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
 
 
                 //item.testFresh();
-                loaderGameScene.item.bTest = true;
-                //loaderGameScene.item.openMap(item);
-                let tScript = function*() {
+                item.bTest = true;
+                //item.openMap(item);
+                const tScript = function*() {
                     yield game.loadmap(textMapName.text);
                     game.createhero(textRoleName.text);
                     game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
@@ -320,11 +326,11 @@ Item {
                     yield game.msg('欢迎来到鹰歌Maker世界！');
                 }
 
-                if(loaderGameScene.item.init)
-                    loaderGameScene.item.init(tScript, true);
 
+                if(item.init)
+                    item.init(tScript, true);
 
-                loaderGameScene.visible = true;
+                visible = true;
             }
             catch(e) {
                 _private.gameSceneClose();
@@ -400,11 +406,6 @@ Item {
 
 
         function gameSceneClose() {
-            loaderGameScene.visible = false;
-            //root.focus = true;
-            root.forceActiveFocus();
-
-
             loaderGameScene.source = '';
 
 

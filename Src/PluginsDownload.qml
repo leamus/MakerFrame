@@ -33,6 +33,11 @@ Item {
     signal sg_close();
 
 
+    function init() {
+        _private.refresh();
+    }
+
+
 
     //width: 600
     //height: 800
@@ -184,7 +189,8 @@ Item {
 
                             //const httpReply = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
                             const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
-                            httpReply.sg_finished.connect(function(networkReply) {
+                            httpReply.sg_finished.connect(function(httpReply) {
+                                const networkReply = httpReply.networkReply;
                                 const code = FrameManager.sl_objectProperty("Code", networkReply);
                                 console.debug("[PluginsDownload]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
@@ -314,8 +320,6 @@ Item {
 
 
     Component.onCompleted: {
-        _private.refresh();
-
         console.debug("[PluginsDownload]Component.onCompleted");
     }
     Component.onDestruction: {

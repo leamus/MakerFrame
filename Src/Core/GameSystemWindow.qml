@@ -87,7 +87,7 @@ Item {
                         break;
                     }
                 }
-                game.run(continueScript);
+                game.run(continueScript() ?? null);
 
                 break;
             case 1:
@@ -114,7 +114,7 @@ Item {
                         break;
                     }
                 }
-                game.run(continueScript);
+                game.run(continueScript() ?? null);
 
                 break;
             case 2:
@@ -186,7 +186,7 @@ Item {
                         break;
                     }
                 }
-                game.run(continueScript);
+                game.run(continueScript() ?? null);
 
                 break;
             case 3:

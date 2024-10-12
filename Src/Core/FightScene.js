@@ -1376,12 +1376,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round21'], -1, );
+        //    fight.run(_private.fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round21');
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight round11'], {Running: 1});
+        fight.run(game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1423,12 +1423,12 @@ function *gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run([_private.fightRoundScript( _private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round22'], -1,);
+        //    fight.run(_private.fightRoundScript( _private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round22');
         //}
 
         //通用回合开始脚本
         //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run([game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight round12'], {Running: 1});
+        fight.run(game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1440,7 +1440,7 @@ function *gfFighting() {
         if(!_private.scriptQueue.isEmpty()) {
 
             //将 continueFight 放在脚本队列最后
-            fight.run([function() {
+            fight.run(function() {
 
                 //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
                 //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
@@ -1449,7 +1449,7 @@ function *gfFighting() {
                     fight.$sys.continueFight();
                 },0,rootFightScene, 'fight.$sys.continueFight');
 
-            }, 'continueFight']);
+            }, 'continueFight');
 
             //开始执行脚本队列
             //fight.run(false);
@@ -1601,7 +1601,7 @@ function runAway() {
     }
 
     //脚本形式执行
-    let continueScript = function *() {
+    let continueScript = function*() {
         yield fight.msg("逃跑失败");
 
         //全部设置为 休息
@@ -1623,7 +1623,7 @@ function runAway() {
         fight.$sys.continueFight(1);
     }
 
-    fight.run([continueScript, '逃跑失败脚本']);
+    fight.run(continueScript() ?? null, '逃跑失败脚本');
 
     return false;
 }
@@ -1641,10 +1641,10 @@ function fightOver(result, force=false) {
     //if(result !== undefined && result !== null) {
         //战斗结束脚本
         //if(_private.fightEndScript) {
-        //    fight.run([_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end'], -1, );
+        //    fight.run(_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end');
         //}
 
-        fight.run([game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2']);
+        fight.run(game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2');
     //}
 }
 

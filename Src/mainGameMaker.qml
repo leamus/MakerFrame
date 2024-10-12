@@ -187,7 +187,8 @@ Item {
                                 if(!FrameManager.sl_fileExists(resTemplate)) {
                                     //https://qiniu.leamus.cn/$资源模板.zip
                                     const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip", resTemplate);
-                                    httpReply.sg_finished.connect(function(networkReply) {
+                                    httpReply.sg_finished.connect(function(httpReply) {
+                                        const networkReply = httpReply.networkReply;
                                         const code = FrameManager.sl_objectProperty("Code", networkReply);
                                         console.debug("[mainGameMaker]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
@@ -744,31 +745,14 @@ Item {
 
                 text: "打包项目"
                 onClicked: {
-                    if(Qt.platform.os === "android") {
-                        if(Platform.compileType === "debug") {
-                            _private.loadModule("PackageAndroid.qml");
-                            //userMainProject.source = "PackageAndroid.qml";
-                        }
-                        else {
-                            _private.loadModule("PackageAndroid.qml");
-                            //userMainProject.source = "PackageAndroid.qml";
-                        }
-
-                        return;
+                    if(Platform.compileType === "debug") {
+                        _private.loadModule("mainPackage.qml");
+                        //userMainProject.source = "mainPackage.qml";
                     }
-
-                    textinputDialogCommonInput.visible = false;
-                    dialogCommon.standardButtons = Dialog.Ok;
-                    dialogCommon.fOnAccepted = ()=>{
-                        rootGameMaker.forceActiveFocus();
-                    };
-                    dialogCommon.fOnRejected = ()=>{
-                        rootGameMaker.forceActiveFocus();
-                    };
-
-                    dialogCommon.msg = "敬请期待~";
-                    dialogCommon.open();
-                    return;
+                    else {
+                        _private.loadModule("mainPackage.qml");
+                        //userMainProject.source = "mainPackage.qml";
+                    }
                 }
             }
 
@@ -882,7 +866,8 @@ Item {
                             //https://qiniu.leamus.cn/$Leamus.zip
                             //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
                             const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip", projectPath + ".zip");
-                            httpReply.sg_finished.connect(function(networkReply) {
+                            httpReply.sg_finished.connect(function(httpReply) {
+                                const networkReply = httpReply.networkReply;
                                 const code = FrameManager.sl_objectProperty("Code", networkReply);
                                 console.debug("下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
@@ -1309,10 +1294,10 @@ Item {
     Loader {
         id: loader
 
-        anchors.fill: parent
-
         visible: false
         focus: true
+
+        anchors.fill: parent
 
 
         source: ""
@@ -1338,10 +1323,12 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
+                setSource('');
+
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
-                loader.visible = false;
+                visible = false;
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
 
@@ -1356,17 +1343,17 @@ Item {
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //loader.focus = true;
-                loader.forceActiveFocus();
+                //focus = true;
+                forceActiveFocus();
 
-                //loader.item.focus = true;
-                if(loader.item.forceActiveFocus)
-                    loader.item.forceActiveFocus();
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
 
-                if(loader.item.init)
-                    loader.item.init();
+                if(item.init)
+                    item.init();
 
-                loader.visible = true;
+                visible = true;
             }
             catch(e) {
                 throw e;
@@ -1530,8 +1517,8 @@ Item {
         }
 
         //载入模块
-        function loadModule(modulePath) {
-            if(modulePath.length !== 0 && !checkCurrentProjectName())
+        function loadModule(moduleURL) {
+            if(moduleURL.length !== 0 && !checkCurrentProjectName())
                 return false;
 
 
@@ -1539,7 +1526,8 @@ Item {
             //loader.focus = true;
             //loader.forceActiveFocus();
 
-            loader.setSource(modulePath);
+            //loader.source = moduleURL;
+            loader.setSource(moduleURL);
             if(loader.status === Loader.Loading)
                 showBusyIndicator(true);
 
@@ -1618,11 +1606,11 @@ Item {
         //console.debug = 123;
         //d("!!!!!!!!!!!", d, console.debug, d === console.debug);
 
-        console.debug("[mainGameMaker]Component.onCompleted");
+        console.debug("[mainGameMaker]Component.onCompleted:", Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
         //delete FrameManager.sl_globalObject().GameMakerGlobal;
 
-        console.debug("[mainGameMaker]Component.onDestruction");
+        console.debug("[mainGameMaker]Component.onDestruction:", Qt.resolvedUrl('.'));
     }
 }
