@@ -2920,8 +2920,6 @@ function $refresh(index, imageAnimate, path) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
                     role.sprite.sprite.fnRefresh = ts.$refresh;
-                    //FrameManager.sl_clearComponentCache();
-                    //FrameManager.sl_trimComponentCache();
                 }
             }
             else if(comboType.currentIndex === 2) {
@@ -2949,8 +2947,6 @@ function $refresh(index, imageAnimate, path) {
                         if(FrameManager.sl_fileExists(spritePath + GameMakerGlobal.separator + 'sprite.js')) {
                             //_private.jsEngine.clear();
                             ts = _private.jsEngine.load(GlobalJS.toURL(spritePath + GameMakerGlobal.separator + 'sprite.js'));
-                            //FrameManager.sl_clearComponentCache();
-                            //FrameManager.sl_trimComponentCache();
                         }
                         role.objActionsData[actionNames[tt].text.trim()] = {Info: info, Script: ts};
                     }

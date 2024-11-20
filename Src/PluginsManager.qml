@@ -80,10 +80,6 @@ Item {
             }
 
 
-            FrameManager.sl_clearComponentCache();
-            FrameManager.sl_trimComponentCache();
-
-
             //l_list.visible = true;
             //l_list.forceActiveFocus();
             _private.refresh();
@@ -158,13 +154,13 @@ Item {
                 root.forceActiveFocus();
 
 
-                FrameManager.sl_clearComponentCache();
-                FrameManager.sl_trimComponentCache();
-
-
                 //l_list.visible = true;
                 //l_list.forceActiveFocus();
                 _private.refresh();
+            }
+            if(status !== Loader.Loading) {
+                clearComponentCache();
+                trimComponentCache();
             }
         }
 
@@ -233,6 +229,10 @@ Item {
 
         function refresh() {
             jsEngine.clear();
+
+            clearComponentCache();
+            trimComponentCache();
+
 
             arrPluginsShowName = [];
             arrPluginsName = [];

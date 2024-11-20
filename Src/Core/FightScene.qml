@@ -2228,9 +2228,9 @@ Item {
         //忽略没有的信号
         ignoreUnknownSignals: true
 
-        function onSg_signalHandler() {
-        }
-        function onSg_messageHandler() {
+        //function onSg_signalHandler(v) {
+        //}
+        function onSg_messageHandler(msgType, msg) {
         }
         function onRAspectRatioChanged() {
             FightSceneJS.resetRolesPosition();

@@ -873,7 +873,7 @@ Item {
                     onPainted: {
                         itemFrontMapContainer.visible = true;
 
-                        console.debug("[GameMapView]canvasMapBack onPainted");
+                        console.debug("[GameMapView]canvasMapFront onPainted");
                     }
 
                     onImageLoaded: {    //载入图片完成

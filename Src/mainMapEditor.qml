@@ -774,11 +774,11 @@ Item {
                 root.forceActiveFocus();
 
 
-                FrameManager.sl_clearComponentCache();
-                FrameManager.sl_trimComponentCache();
-
-
                 _private.refresh();
+            }
+            if(status !== Loader.Loading) {
+                clearComponentCache();
+                trimComponentCache();
             }
         }
 

@@ -1523,7 +1523,8 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, pa
     if(spriteResourceInfo) {
         if(!spriteEffectComp) {
             //spriteEffectComp = compCacheSpriteEffect.createObject(parent);
-            [spriteEffectComp] = _private.cacheSprites.create(parent);
+            let bNew;
+            [spriteEffectComp, bNew] = _private.cacheSprites.get(parent);
             spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
         }
         else {//if(spriteEffectComp.bRunning === true)
@@ -1645,7 +1646,7 @@ function unloadSpriteEffect(spriteEffectComp) {
         console.warn('[!GameScene]unloadSpriteEffect Fail:', spriteEffectComp);
         return;
     }
-    _private.cacheSprites.release(spriteEffectComp);
+    _private.cacheSprites.put(spriteEffectComp);
 }
 
 

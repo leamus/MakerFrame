@@ -1331,10 +1331,10 @@ Item {
                 visible = false;
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
-
-
-                FrameManager.sl_clearComponentCache();
-                FrameManager.sl_trimComponentCache();
+            }
+            if(status !== Loader.Loading) {
+                clearComponentCache();
+                trimComponentCache();
             }
         }
 

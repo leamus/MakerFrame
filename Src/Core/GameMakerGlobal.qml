@@ -37,7 +37,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.13.8.241019'
+    property string version: '1.13.10.241119'
 
 
     //配置
@@ -113,8 +113,9 @@ QtObject {
     }
 
 
-    //TapTap 开发者中心对应 Client ID，为空表示不使用tap验证
-    //property string tds_ClientID: 'wpgisjxcdrwf0nnzdr'
+    //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
+    //readonly property string tds_ClientID: ''
+    //readonly property string tds_ClientToken: ''
 
 
 
@@ -144,139 +145,71 @@ QtObject {
 
 
     property var soundResourceURL: filepath=>GlobalJS.toURL(soundResourcePath(filepath))
-    function soundResourcePath(filepath) {
-        let ret;
-
-        if(!filepath)
-            filepath = '';
-
-        //协议
-        if(
-            filepath.indexOf('file:') === 0 ||
-            //filepath.indexOf(':/') === 0 ||
-            filepath.indexOf('qrc:') === 0 ||
-            filepath.indexOf('assets:') === 0 ||
-            filepath.indexOf('http:') === 0 ||
-            filepath.indexOf('https:') === 0 ||
-            filepath.indexOf('ftp:') === 0 ||
-            filepath.indexOf('ftps:') === 0
-        )
-            return filepath;
-        else if(filepath.indexOf(':/') === 0)
-            ret = 'qrc';
-        //绝对目录，则相对于项目根路径
-        else if(filepath.indexOf('/') === 0)
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName;
+    function soundResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.indexOf('/') === 0)
+            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+        //绝对目录
+        else if(filepath.indexOf(':') >= 0)
+            return GlobalJS.toPath(filepath);
         //相对目录
-        else
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSoundResourceDirName;
-
-        if(filepath)
-            return ret + separator + filepath;
-
-        return ret;
+        else {
+            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSoundResourceDirName;
+            if(filepath)
+                return ret + separator + filepath;
+            return ret;
+        }
     }
 
     property var musicResourceURL: filepath=>GlobalJS.toURL(musicResourcePath(filepath))
-    function musicResourcePath(filepath) {
-        let ret;
-
-        if(!filepath)
-            filepath = '';
-
-        //协议
-        if(
-            filepath.indexOf('file:') === 0 ||
-            //filepath.indexOf(':/') === 0 ||
-            filepath.indexOf('qrc:') === 0 ||
-            filepath.indexOf('assets:') === 0 ||
-            filepath.indexOf('http:') === 0 ||
-            filepath.indexOf('https:') === 0 ||
-            filepath.indexOf('ftp:') === 0 ||
-            filepath.indexOf('ftps:') === 0
-        )
-            return filepath;
-        else if(filepath.indexOf(':/') === 0)
-            ret = 'qrc';
-        //绝对目录，则相对于项目根路径
-        else if(filepath.indexOf('/') === 0)
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName;
+    function musicResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.indexOf('/') === 0)
+            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+        //绝对目录
+        else if(filepath.indexOf(':') >= 0)
+            return GlobalJS.toPath(filepath);
         //相对目录
-        else
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMusicResourceDirName;
-
-        if(filepath)
-            return ret + separator + filepath;
-
-        return ret;
+        else {
+            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMusicResourceDirName;
+            if(filepath)
+                return ret + separator + filepath;
+            return ret;
+        }
     }
 
     property var imageResourceURL: filepath=>GlobalJS.toURL(imageResourcePath(filepath))
-    function imageResourcePath(filepath) {
-        let ret;
-
-        if(!filepath)
-            filepath = '';
-
-        //协议
-        if(
-            filepath.indexOf('file:') === 0 ||
-            //filepath.indexOf(':/') === 0 ||
-            filepath.indexOf('qrc:') === 0 ||
-            filepath.indexOf('assets:') === 0 ||
-            filepath.indexOf('http:') === 0 ||
-            filepath.indexOf('https:') === 0 ||
-            filepath.indexOf('ftp:') === 0 ||
-            filepath.indexOf('ftps:') === 0
-        )
-            return filepath;
-        else if(filepath.indexOf(':/') === 0)
-            ret = 'qrc';
-        //绝对目录，则相对于项目根路径
-        else if(filepath.indexOf('/') === 0)
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName;
+    function imageResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.indexOf('/') === 0)
+            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+        //绝对目录
+        else if(filepath.indexOf(':') >= 0)
+            return GlobalJS.toPath(filepath);
         //相对目录
-        else
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strImageResourceDirName;
-
-        if(filepath)
-            return ret + separator + filepath;
-
-        return ret;
+        else {
+            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strImageResourceDirName;
+            if(filepath)
+                return ret + separator + filepath;
+            return ret;
+        }
     }
 
     property var videoResourceURL: filepath=>GlobalJS.toURL(videoResourcePath(filepath))
-    function videoResourcePath(filepath) {
-        let ret;
-
-        if(!filepath)
-            filepath = '';
-
-        //协议
-        if(
-            filepath.indexOf('file:') === 0 ||
-            //filepath.indexOf(':/') === 0 ||
-            filepath.indexOf('qrc:') === 0 ||
-            filepath.indexOf('assets:') === 0 ||
-            filepath.indexOf('http:') === 0 ||
-            filepath.indexOf('https:') === 0 ||
-            filepath.indexOf('ftp:') === 0 ||
-            filepath.indexOf('ftps:') === 0
-        )
-            return filepath;
-        else if(filepath.indexOf(':/') === 0)
-            ret = 'qrc';
-        //绝对目录，则相对于项目根路径
-        else if(filepath.indexOf('/') === 0)
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName;
+    function videoResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.indexOf('/') === 0)
+            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+        //绝对目录
+        else if(filepath.indexOf(':') >= 0)
+            return GlobalJS.toPath(filepath);
         //相对目录
-        else
-            ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strVideoResourceDirName;
-
-        if(filepath)
-            return ret + separator + filepath;
-
-        return ret;
+        else {
+            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strVideoResourceDirName;
+            if(filepath)
+                return ret + separator + filepath;
+            return ret;
+        }
     }
 
     //!!!兼容旧代码!!!

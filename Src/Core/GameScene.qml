@@ -4049,7 +4049,7 @@ Item {
                 else if(tmpSprites.destroy)
                     tmpSprites.destroy();
 
-                //_private.cacheSprites.release(tmpSprites);
+                //_private.cacheSprites.put(tmpSprites);
                 if(objTmpComponents)
                     delete objTmpComponents[idParams.$id];
 
@@ -6414,6 +6414,7 @@ Item {
         //特效缓存类
         //  目前只有战斗的特效使用，地图场景的特效因为会挂载到 对应对象的tmp缓存中，和其他组件混在一起，只能使用destroy来释放，所以不适用。
         property var cacheSprites: new GlobalLibraryJS.Cache({
+            //创建时回调
             $create: function(p){
                 let o = compCacheSpriteEffect.createObject(p);
                 /*o.sg_playEffect.connect(function(soundeffectSource){
@@ -6425,12 +6426,15 @@ Item {
                 */
                 return o;
             },
+            //初始化回调
             $init: function(o, p) {
                 o.visible = true;
                 o.parent=p;
                 return o;
             },
+            //释放回调
             $release: function(o){o.visible = false; o.sprite.stop();return o;},
+            //销毁回调
             $destroy: function(o){o.destroy();},
         })
 
@@ -8403,9 +8407,9 @@ Item {
         //忽略没有的信号
         ignoreUnknownSignals: true
 
-        function onSg_signalHandler() {
-        }
-        function onSg_messageHandler() {
+        //function onSg_signalHandler(v) {
+        //}
+        function onSg_messageHandler(msgType, msg) {
         }
         function onRAspectRatioChanged() {
             if(_private.sceneRole)

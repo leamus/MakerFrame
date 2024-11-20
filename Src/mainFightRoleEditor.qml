@@ -187,10 +187,10 @@ Item {
                 visible = false;
                 //root.focus = true;
                 root.forceActiveFocus();
-
-
-                FrameManager.sl_clearComponentCache();
-                FrameManager.sl_trimComponentCache();
+            }
+            if(status !== Loader.Loading) {
+                clearComponentCache();
+                trimComponentCache();
             }
         }
 

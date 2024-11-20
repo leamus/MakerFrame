@@ -2278,8 +2278,6 @@ function $refresh(index, imageAnimate, path) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
                     spriteEffect.sprite.fnRefresh = ts.$refresh;
-                    //FrameManager.sl_clearComponentCache();
-                    //FrameManager.sl_trimComponentCache();
                 }
 
             }
