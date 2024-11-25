@@ -99,8 +99,6 @@ game.goon();
         buttonStartGame.enabled = false;
 
         loaderGameScene.source = './Core/GameScene.qml';
-        if(loaderGameScene.status === Loader.Loading)
-            showBusyIndicator(true);
     }
 
 
@@ -447,7 +445,7 @@ game.goon();
 
 
         onStatusChanged: {
-            console.debug('[GameStart]loaderGameScene.status：', status);
+            console.debug('[GameStart]loaderGameScene:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -458,8 +456,12 @@ game.goon();
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();

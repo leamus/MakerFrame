@@ -2831,7 +2831,6 @@ Item {
 
 
             let objTimer;
-
             if(flags & 0b1)
                 objTimer = _private.objGlobalTimers;
             else
@@ -2866,7 +2865,7 @@ Item {
 
             //delete game.gd['$sys_timer'][timerName];
 
-            if(objTimer[timerName]) {
+            if(objTimer[timerName] !== undefined) {
                 delete objTimer[timerName];
 
                 return true;
@@ -2924,13 +2923,13 @@ Item {
 
         //暂停音乐；
         //参数name为暂停名称；如果为true，表示引擎级关闭音乐；如果为false，表示存档级关闭音乐；
-        readonly property var pausemusic: function(name='$user') {
+        function pausemusic(name='$user') {
             itemBackgroundMusic.pause(name);
         }
 
         //恢复播放音乐；
         //参数name为恢复名称；如果为true，表示引擎级恢复播放音乐；如果为false，表示存档级恢复播放音乐；如果为-1，打开全部强制恢复；
-        readonly property var resumemusic: function(name='$user') {
+        function resumemusic(name='$user') {
             itemBackgroundMusic.resume(name);
         }
         //将音乐暂停并存栈；一般用在需要播放战斗音乐前；
@@ -2973,19 +2972,22 @@ Item {
         }
 
 
-        function playsoundeffect(soundeffectName, channel=-1) {
+        function playsoundeffect(soundeffectName, channel=-1, forcePlay=false) {
+            if(!forcePlay && game.soundeffectpausing())
+                return;
+
             return rootSoundEffect.play(GameMakerGlobal.soundResourceURL(soundeffectName), channel);
         }
 
         //暂停音效；
         //参数name为暂停名称；如果为true，表示引擎级关闭音效；如果为false，表示存档级关闭音效；
-        readonly property var pausesoundeffect: function(name='$user') {
+        function pausesoundeffect(name='$user') {
             rootSoundEffect.pause(name);
         }
 
         //恢复播放音效；
         //参数name为恢复名称；如果为true，表示引擎级恢复播放音效；如果为false，表示存档级恢复播放音效；如果为-1，打开全部强制恢复；
-        readonly property var resumesoundeffect: function(name='$user') {
+        function resumesoundeffect(name='$user') {
             rootSoundEffect.resume(name);
         }
 
@@ -6418,9 +6420,6 @@ Item {
             $create: function(p){
                 let o = compCacheSpriteEffect.createObject(p);
                 /*o.sg_playEffect.connect(function(soundeffectSource){
-                    if(game.soundeffectpausing())
-                        return;
-
                     game.playsoundeffect(soundeffectSource, -1);
                 });
                 */
@@ -8338,9 +8337,6 @@ Item {
 
 
             onSg_playEffect: {
-                if(game.soundeffectpausing())
-                    return;
-
                 game.playsoundeffect(soundeffectSource, -1);
             }
 

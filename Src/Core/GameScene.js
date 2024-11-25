@@ -179,9 +179,6 @@ function *loadResources() {
 
     //创建一个主角
     const tf = function(soundeffectSource){
-        if(game.soundeffectpausing())
-            return;
-
         game.playsoundeffect(soundeffectSource, -1);
     }
     mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
@@ -1671,9 +1668,6 @@ function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRo
         if(!roleComp) {
             roleComp = compRole.createObject(parent);
             const tf = function(soundeffectSource){
-                if(game.soundeffectpausing())
-                    return;
-
                 game.playsoundeffect(soundeffectSource, -1);
             }
             roleComp.sprite.sg_playEffect.connect(tf);
@@ -2145,19 +2139,20 @@ function onTriggered() {
 
     //遍历全局定时器
     for(let tt in _private.objGlobalTimers) {
-        _private.objGlobalTimers[tt][0] -= realinterval;
+        const objTimer = _private.objGlobalTimers[tt];
+        objTimer[0] -= realinterval;
 
         //触发
-        if(_private.objGlobalTimers[tt][0] <= 0) {
+        if(objTimer[0] <= 0) {
             //如果次数完毕
-            if(_private.objGlobalTimers[tt][1] === 0) {
+            if(objTimer[1] === 0) {
                 delete _private.objGlobalTimers[tt];
                 continue;
             }
-            else if(_private.objGlobalTimers[tt][1] > 0) {
-                --_private.objGlobalTimers[tt][1];
+            else if(objTimer[1] > 0) {
+                --objTimer[1];
             }
-            _private.objGlobalTimers[tt][0] = _private.objGlobalTimers[tt][3];
+            objTimer[0] = objTimer[3];
 
 
             let tScript;
@@ -2171,35 +2166,36 @@ function onTriggered() {
                     break;
             } while(0);
 
-            if(_private.objGlobalTimers[tt][2] & 0b10) {
-                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(_private.objGlobalTimers[tt][4], _private.objGlobalTimers[tt][1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
+            if(objTimer[2] & 0b10) {
+                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
                 //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
             }
             else
-                game.async(tScript.call(_private.objGlobalTimers[tt], _private.objGlobalTimers[tt][4], _private.objGlobalTimers[tt][1], realinterval) ?? null, '全局定时器事件:' + tt, );
+                game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '全局定时器事件:' + tt, );
 
 
             //如果次数完毕
-            if(_private.objGlobalTimers[tt][1] === 0)
+            if(objTimer[1] === 0)
                 delete _private.objGlobalTimers[tt];
         }
     }
     //遍历定时器
     for(let tt in _private.objTimers) {
-        _private.objTimers[tt][0] -= realinterval;
+        const objTimer = _private.objTimers[tt];
+        objTimer[0] -= realinterval;
 
         //触发
-        if(_private.objTimers[tt][0] <= 0) {
+        if(objTimer[0] <= 0) {
             //如果次数完毕
-            if(_private.objTimers[tt][1] === 0) {
+            if(objTimer[1] === 0) {
                 delete _private.objTimers[tt];
                 continue;
             }
-            else if(_private.objTimers[tt][1] > 0) {
-                --_private.objTimers[tt][1];
+            else if(objTimer[1] > 0) {
+                --objTimer[1];
             }
-            _private.objTimers[tt][0] = _private.objTimers[tt][3];
+            objTimer[0] = objTimer[3];
 
 
             let tScript;
@@ -2213,17 +2209,17 @@ function onTriggered() {
                     break;
             } while(0);
 
-            if(_private.objTimers[tt][2] & 0b10) {
-                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(_private.objTimers[tt][4], _private.objTimers[tt][1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
+            if(objTimer[2] & 0b10) {
+                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
                 //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
             }
             else
-                game.async(tScript.call(_private.objTimers[tt], _private.objTimers[tt][4], _private.objTimers[tt][1], realinterval) ?? null, '定时器事件:' + tt, );
+                game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '定时器事件:' + tt, );
 
 
             //如果次数完毕
-            if(_private.objTimers[tt][1] === 0)
+            if(objTimer[1] === 0)
                 delete _private.objTimers[tt];
         }
     }

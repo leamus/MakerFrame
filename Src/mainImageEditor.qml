@@ -356,7 +356,6 @@ Item {
 
             let tIndex = path.lastIndexOf("/");
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
-            //let extname = path.lastIndexOf(".") > 0 ? path.slice(path.lastIndexOf(".")) : "";
 
 
             dialogCommon.show({

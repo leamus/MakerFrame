@@ -319,7 +319,7 @@ Item {
                                 });
                                 return;
                             }
-                            console.warn("重命名失败：", GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input);
+                            console.warn("[mainGameMaker]重命名失败：", GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input);
                         }
 
                         rootGameMaker.forceActiveFocus();
@@ -869,7 +869,7 @@ Item {
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
                                 const code = FrameManager.sl_objectProperty("Code", networkReply);
-                                console.debug("下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
+                                console.debug("[mainGameMaker]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
 
                                 FrameManager.sl_deleteLater(httpReply);
 
@@ -1250,7 +1250,7 @@ Item {
                 if(ret.length > 0) {
                     _private.changeProject(FrameManager.sl_completeBaseName(fUrl));
 
-                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
+                    //console.debug('[mainGameMaker]', ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                     dialogCommon.msg = "成功";
                 }
                 else
@@ -1318,7 +1318,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainGameMaker]loader.status：', status);
+            console.debug('[mainGameMaker]loader:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -1329,8 +1329,12 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();
@@ -1518,6 +1522,9 @@ Item {
 
         //载入模块
         function loadModule(moduleURL) {
+            //console.debug('~~~loadModule:', moduleURL);
+
+
             if(moduleURL.length !== 0 && !checkCurrentProjectName())
                 return false;
 
@@ -1528,14 +1535,12 @@ Item {
 
             //loader.source = moduleURL;
             loader.setSource(moduleURL);
-            if(loader.status === Loader.Loading)
-                showBusyIndicator(true);
 
             /*if(loader.status === Loader.Ready) {
                 if(loader.item.init)
                     loader.item.init();
 
-                console.debug("Loader.Ready");
+                console.debug("[mainGameMaker]Loader.Ready");
                 //loader.item.forceActiveFocus();
             }*/
 

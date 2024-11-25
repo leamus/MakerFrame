@@ -35,9 +35,6 @@ Item {
 
 
     function init() {
-        if(loader.status === Loader.Loading)
-            showBusyIndicator(true);
-
         _private.refresh();
     }
 
@@ -172,7 +169,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainRoleEditor]loader.status：', status);
+            console.debug('[mainRoleEditor]loader:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -183,8 +180,12 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();

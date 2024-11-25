@@ -1359,9 +1359,6 @@ Item {
                         }
 
                         onSg_playEffect: {
-                            if(game.soundeffectpausing())
-                                return;
-
                             game.playsoundeffect(soundeffectSource, -1);
                         }
                     }
@@ -1572,9 +1569,6 @@ Item {
                         }
 
                         onSg_playEffect: {
-                            if(game.soundeffectpausing())
-                                return;
-
                             game.playsoundeffect(soundeffectSource, -1);
                         }
                     }

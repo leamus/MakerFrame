@@ -35,9 +35,6 @@ Item {
 
 
     function init() {
-        if(loader.status === Loader.Loading)
-            showBusyIndicator(true);
-
         _private.refresh();
     }
 
@@ -106,7 +103,7 @@ Item {
 
 
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json";
-            console.debug("[mainSpriteEditor]filePath：", filePath);
+            console.debug("[mainSpriteEditor]filePath:", filePath);
 
             let cfg = FrameManager.sl_fileRead(filePath);
             //let cfg = File.read(filePath);
@@ -128,7 +125,7 @@ Item {
                 Msg: '确认删除？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainSpriteEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug("[mainSpriteEditor]删除:" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listSprite.forceActiveFocus();
@@ -172,7 +169,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainSpriteEditor]loader.status：', status);
+            console.debug('[mainSpriteEditor]loader:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -183,8 +180,12 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();

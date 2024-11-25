@@ -253,12 +253,19 @@ Item {
 
         function show() {
             const fileSuffixPosition = textFilePath.text.lastIndexOf('.');
-            let fileSuffix = '';
-            if(fileSuffixPosition >= 0)
-                fileSuffix = textFilePath.text.slice(fileSuffixPosition + 1);
+            const extname = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toUpperCase() : '';
+            const filename = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
 
-            if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
-
+            let virtualFileName = filename;
+            //if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
+            switch(extname) {
+            case 'JS':
+                virtualFileName += '.vjs';
+                break;
+            case 'QML':
+                virtualFileName += '.vqml';
+                break;
+            default:
                 dialogCommon.show({
                     Msg: '编辑的文件非js/qml文件，不能用可视化',
                     Buttons: Dialog.Ok,
@@ -274,12 +281,24 @@ Item {
             }
 
 
-            let fileName = textFilePath.text.slice(0, textFilePath.text.lastIndexOf('.'));
-            if(textFilePath.text.indexOf('.js') >= 0)
-                fileName += '.vjs';
+            /*if(textFilePath.text.indexOf('.js') >= 0)
+                virtualFileName += '.vjs';
             if(textFilePath.text.indexOf('.qml') >= 0)
-                fileName += '.vqml';
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + fileName;
+                virtualFileName += '.vqml';
+            */
+            /*
+            switch(fileSuffix) {
+            case 'js':
+                virtualFileName += '.vjs';
+                break;
+            case 'qml':
+                virtualFileName += '.vqml';
+                break;
+            default:
+            }
+            */
+
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + virtualFileName;
             loaderVisualScript.item.loadData(filePath);
 
 
@@ -335,7 +354,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[GameScriptEditor]loaderVisualScript.status：', status);
+            console.debug('[GameScriptEditor]loaderVisualScript:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -345,9 +364,13 @@ Item {
                 showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();
@@ -452,7 +475,7 @@ Item {
             }
 
 
-            textFilePath.text =  _private.strTmpPath;
+            textFilePath.text = _private.strTmpPath;
 
             //let cfg = File.read(filePath);
             let data = FrameManager.sl_fileRead(path);
@@ -609,9 +632,6 @@ Item {
 
 
     Component.onCompleted: {
-        if(loaderVisualScript.status === Loader.Loading)
-            showBusyIndicator(true);
-
         console.debug("[GameScriptEditor]Component.onCompleted");
     }
     Component.onDestruction: {

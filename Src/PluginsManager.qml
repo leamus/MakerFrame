@@ -139,7 +139,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[PluginsManager]loaderExtends.status：', status);
+            console.debug('[PluginsManager]loaderExtends:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -150,6 +150,7 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
 
@@ -157,6 +158,9 @@ Item {
                 //l_list.visible = true;
                 //l_list.forceActiveFocus();
                 _private.refresh();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();
@@ -317,8 +321,6 @@ Item {
                     }
                     else if(FrameManager.sl_fileExists(GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.qml'))) {
                         loaderExtends.source = GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml');
-                        if(loaderExtends.status === Loader.Loading)
-                            showBusyIndicator(true);
 
                         return 2;
                     }

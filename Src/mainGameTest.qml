@@ -266,7 +266,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainGameTest]loaderGameScene.status：', status);
+            console.debug('[mainGameTest]loaderGameScene:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -277,8 +277,12 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();
@@ -400,8 +404,6 @@ Item {
             buttonStart.enabled = false;
 
             loaderGameScene.source = './Core/GameScene.qml';
-            if(loaderGameScene.status === Loader.Loading)
-                showBusyIndicator(true);
         }
 
 

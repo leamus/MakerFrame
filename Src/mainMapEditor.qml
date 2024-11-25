@@ -35,9 +35,6 @@ Item {
 
 
     function init() {
-        if(loader.status === Loader.Loading)
-            showBusyIndicator(true);
-
         _private.refresh();
     }
 
@@ -403,8 +400,6 @@ Item {
 
 
             loader.source = './MapEditor.qml';
-            if(loader.status === Loader.Loading)
-                showBusyIndicator(true);
         }
         onRejected: {
             textMapBlockImageURL.text = "";
@@ -759,7 +754,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainMapEditor]loader.status：', status);
+            console.debug('[mainMapEditor]loader:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -770,11 +765,15 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
 
 
                 _private.refresh();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();

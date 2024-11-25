@@ -146,7 +146,7 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainPackage]loader.status：', status);
+            console.debug('[mainPackage]loader:', source, status);
 
             if(status === Loader.Ready) {
             }
@@ -157,8 +157,12 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
                 //root.focus = true;
                 root.forceActiveFocus();
+            }
+            else if(status === Loader.Loading) {
+                showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
                 clearComponentCache();
@@ -210,8 +214,6 @@ Item {
 
             //loader.source = url;
             loader.setSource(url);
-            if(loader.status === Loader.Loading)
-                showBusyIndicator(true);
 
             return true;
         }

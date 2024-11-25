@@ -1262,10 +1262,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
             $create: function(p){
                 let o = compCacheSpriteEffect.createObject(p);
                 /*o.sg_playEffect.connect(function(soundeffectSource){
-                    if(game.soundeffectpausing())
-                        return;
-
-                    game.playsoundeffect(soundeffectSource, -1);
+                    。。。
                 });
                 */
                 return o;
