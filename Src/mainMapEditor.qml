@@ -67,7 +67,7 @@ Item {
         colorText: Global.style.primaryTextColor
 
 
-        onCanceled: {
+        onSg_canceled: {
             //visible = false;
             //loader.visible = true;
             //root.focus = true;
@@ -76,7 +76,7 @@ Item {
             sg_close();
         }
 
-        onClicked: {
+        onSg_clicked: {
             //if(!loader.item)
             //    return false;
 
@@ -135,7 +135,7 @@ Item {
             dialogMapData.forceActiveFocus();
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             if(index === 0) {
                 return;
             }
@@ -144,7 +144,7 @@ Item {
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
 
             dialogCommon.show({
-                Msg: '确认删除?',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Yes | Dialog.Cancel,
                 OnAccepted: ()=>{
                     console.debug("[mainMapEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
@@ -511,7 +511,7 @@ Item {
         colorText: Global.style.primaryTextColor
 
 
-        onClicked: {
+        onSg_clicked: {
             //let filepath = GameMakerGlobal.config.strProjectRootPath + "/" + GameMakerGlobal.config.strCurrentProjectName + "/" + GameMakerGlobal.config.strMapResourceDirName + "/" + item;
 
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(item);
@@ -540,7 +540,7 @@ Item {
             console.debug("[mainMapEditor]filepath", textMapBlockImageURL.text);
         }
 
-        onCanceled: {
+        onSg_canceled: {
             dialogMapData.visible = true;
 
             visible = false;
@@ -550,11 +550,11 @@ Item {
             //loader.item.focus = true;
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Resources" + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
 
             dialogCommon.show({
-                Msg: '确认删除？',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug("[mainMapEditor]删除地图资源：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));

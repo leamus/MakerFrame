@@ -2326,7 +2326,7 @@ Item {
         //removeButtonVisible: false
 
 
-        onClicked: {
+        onSg_clicked: {
             textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(item);
             textRoleImageResourceName.text = item;
 
@@ -2352,7 +2352,7 @@ Item {
             console.debug("[RoleEditor]fileURL", textRoleImageURL.text);
         }
 
-        onCanceled: {
+        onSg_canceled: {
             dialogRoleData.visible = true;
 
             visible = false;
@@ -2362,11 +2362,11 @@ Item {
             //loader.item.focus = true;
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let filepath = GameMakerGlobal.spriteResourcePath(item);
 
             dialogCommon.show({
-                Msg: '确认删除？',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug("[RoleEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));

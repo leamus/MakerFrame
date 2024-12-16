@@ -67,7 +67,7 @@ Item {
         colorText: Global.style.primaryTextColor
 
 
-        onCanceled: {
+        onSg_canceled: {
             //visible = false;
             //loader.visible = true;
             //root.focus = true;
@@ -77,7 +77,7 @@ Item {
             sg_close();
         }
 
-        onClicked: {
+        onSg_clicked: {
             if(!loader.item)
                 return false;
 
@@ -118,11 +118,11 @@ Item {
             loader.item.openSprite(cfg);
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item;
 
             dialogCommon.show({
-                Msg: '确认删除？',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug("[mainSpriteEditor]删除:" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));

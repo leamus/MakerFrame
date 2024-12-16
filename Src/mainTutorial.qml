@@ -96,9 +96,9 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "简易教程"
+            text: "引擎简易教程"
             onClicked: {
-                _private.loadModule('mainEasyTutorial.qml');
+                _private.loadModule('mainEasyRPGMakerTutorial.qml');
             }
         }
 
@@ -108,7 +108,31 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "官方教程"
+            text: "JavaScript简易教程"
+            onClicked: {
+                _private.loadModule('mainEasyJavaScriptTutorial.qml');
+            }
+        }
+
+        Button {
+            //Layout.fillWidth: true
+            Layout.preferredWidth: parent.width
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.preferredHeight: 50
+
+            text: "高级玩法教程"
+            onClicked: {
+                _private.loadModule('mainAdvancedTutorial.qml');
+            }
+        }
+
+        Button {
+            //Layout.fillWidth: true
+            Layout.preferredWidth: parent.width
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.preferredHeight: 50
+
+            text: "官方在线教程"
             onClicked: {
                 Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame/blob/main/Tutorials');
             }
@@ -245,6 +269,33 @@ Item {
 
 
                     font.pointSize: 12
+                    text: qsTr("<a href='#'>BOSS凶猛(Tap)</a>")
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally('https://www.taptap.cn/app/721920');
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                //Layout.preferredHeight: 1
+                Layout.minimumHeight: 0
+
+                Label {
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
                     text: qsTr("<a href='#'>剑心之誓(快爆)</a>")
 
                     horizontalAlignment: Label.AlignHCenter
@@ -274,34 +325,6 @@ Item {
                     }
                 }
 
-            }
-
-            RowLayout {
-                Layout.alignment: Qt.AlignCenter
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                //Layout.preferredHeight: 1
-                Layout.minimumHeight: 0
-
-                Label {
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    Layout.preferredWidth: implicitWidth
-                    //Layout.maximumWidth: parent.width
-                    //Layout.fillWidth: true
-                    //Layout.fillHeight: true
-
-
-                    font.pointSize: 12
-                    text: qsTr("<a href='#'>BOSS凶猛(Tap)</a>")
-
-                    horizontalAlignment: Label.AlignHCenter
-                    verticalAlignment: Label.AlignVCenter
-
-                    onLinkActivated: {
-                        Qt.openUrlExternally('https://www.taptap.cn/app/721920');
-                    }
-                }
-
                 Label {
                     Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                     Layout.preferredWidth: implicitWidth
@@ -320,6 +343,14 @@ Item {
                         Qt.openUrlExternally('https://www.taptap.cn/app/683317');
                     }
                 }
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                //Layout.preferredHeight: 1
+                Layout.minimumHeight: 0
 
                 Label {
                     Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter

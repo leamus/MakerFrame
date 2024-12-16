@@ -22,6 +22,7 @@ QtObject {
         id: settings
         category: 'RPGMaker'    //类别
         //fileName: 'RPGMaker.ini'
+        //fileName: parseInt(FrameManager.sl_configValue('RunType')) === 0 ? '' : 'RPGMaker.ini'
 
         //当前工程
         property string $strCurrentProjectName: ''  //'Project'
@@ -37,7 +38,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.13.10.241119'
+    property string version: '1.13.11.241212'
 
 
     //配置

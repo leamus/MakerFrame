@@ -1832,7 +1832,7 @@ Item {
         //  role为角色组件（可用hero和role命令返回的组件）；
         //    如果为数字或空，则是主角；如果是字符串表示$id，会在 主角和NPC 中查找；
         //  pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
-        //返回：如果是判断，返回true或false；如果返回是坐标，则包括x、y（实际坐标）、bx、by（地图块坐标）、cx、cy（中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
+        //返回：如果是判断，返回true或false；如果返回是坐标，则包括bx、by（地图块坐标）、cx、cy（或x、y，中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
         function rolepos(role, pos=null) {
             if(GlobalLibraryJS.isValidNumber(role)) {
                 role = mainRole;
@@ -1870,9 +1870,11 @@ Item {
                     bx: Math.floor(centerX / itemViewPort.sizeMapBlockScaledSize.width),
                     by: Math.floor(centerY / itemViewPort.sizeMapBlockScaledSize.height),
                     //实际坐标
-                    x: role.x,
-                    y: role.y,
+                    //x: role.x,
+                    //y: role.y,
                     //中心坐标
+                    x: centerX,
+                    y: centerY,
                     cx: centerX,
                     cy: centerY,
                     //影子左上角坐标
@@ -4695,7 +4697,7 @@ Item {
                 return 0;
             }
             //!!兼容旧代码
-            else if(GlobalLibraryJS.isArray(vScript) && vScript[0] === undefined) {
+            else if(GlobalLibraryJS.isArray(vScript) && vScript[0] !== undefined) {
                 tips = vScript[1] ?? tips;
                 vScript = vScript[0];
             }
@@ -6187,10 +6189,13 @@ Item {
     Rectangle {
         id: itemFPS
 
-        //width: Platform.compileType === 'debug' ? rootGameScene.width / 3 : rootGameScene.width / 2
+        ///width: Platform.compileType === 'debug' ? rootGameScene.width / 3 : rootGameScene.width / 2
+        //width: GameMakerGlobal.config.debug === true ? rootGameScene.width / 3 : rootGameScene.width / 2
         //width: textFPS.width + textPos.width
         width: 150
-        height: Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
+        //height: Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
+        height: GameMakerGlobal.config.debug === true ? textFPS.implicitHeight : textFPS.implicitHeight
+
         color: '#90FFFFFF'
 
 
@@ -6212,7 +6217,8 @@ Item {
                 //width: contentWidth + 50
                 height: textFPS.implicitHeight
 
-                //visible: Platform.compileType === 'debug'
+                ///visible: Platform.compileType === 'debug'
+                //visible: GameMakerGlobal.config.debug === true
             }
         }
 
@@ -6223,7 +6229,8 @@ Item {
             width: 120
             height: 15
 
-            visible: Platform.compileType === 'debug'
+            //visible: Platform.compileType === 'debug'
+            visible: GameMakerGlobal.config.debug === true
         }
 
 

@@ -63,7 +63,7 @@ Item {
 
         visible: false
 
-        title: "选择项目包文件"
+        title: "选择插件文件"
         //folder: shortcuts.home
         nameFilters: [ "zip files (*.zip)", "All files (*)" ]
 
@@ -80,53 +80,47 @@ Item {
             console.debug("[PluginsDownload]You chose: " + fileUrl, fileUrls);
 
 
-            dialogCommon.msg = "确认解包吗？这会替换目标项目中的同名文件！";
-            textinputDialogCommonInput.visible = false;
-            dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
-            dialogCommon.fOnAccepted = ()=>{
-                let fUrl;
-                if(Qt.platform.os === "android")
-                    fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
-                else
-                    fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
+            dialogCommon.show({
+                Msg: "确认安装吗？这可能会替换同名插件！",
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    let fUrl;
+                    if(Qt.platform.os === "android")
+                        fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
+                    else
+                        fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
 
-                //console.error("!!!", fUrl, fileUrl)
+                    //console.error("!!!", fUrl, fileUrl)
 
-                //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+                    //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
-                let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                //let projectPath = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
+                    //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
-                //FrameManager.sl_dirCreate(projectPath);
-                let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectUrl);
+                    //FrameManager.sl_dirCreate(projectPath);
+                    let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
 
 
-                if(ret.length > 0) {
-                    //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_completeBaseName(fUrl);
-                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
-                    dialogCommon.msg = "成功";
-                }
-                else
-                    dialogCommon.msg = "失败";
+                    if(ret.length > 0) {
+                        //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_completeBaseName(fUrl);
+                        //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
+                    }
 
-                textinputDialogCommonInput.visible = false;
-                dialogCommon.standardButtons = Dialog.Ok;
-
-                dialogCommon.fOnAccepted = ()=>{
+                    dialogCommon.show({
+                        Msg: ret.length > 0 ? "成功" : "失败",
+                        Buttons: Dialog.Ok,
+                        OnAccepted: function() {
+                            rootGameMaker.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            rootGameMaker.forceActiveFocus();
+                        },
+                    });
+                },
+                OnRejected: ()=>{
                     rootGameMaker.forceActiveFocus();
-                };
-                dialogCommon.fOnRejected = ()=>{
-                    rootGameMaker.forceActiveFocus();
-                };
-                dialogCommon.open();
-            };
-
-            dialogCommon.fOnRejected = ()=>{
-                rootGameMaker.forceActiveFocus();
-            };
-            dialogCommon.open();
-
+                },
+            });
         }
         onRejected: {
             //rootGameMaker.forceActiveFocus();
@@ -184,10 +178,10 @@ Item {
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
 
-                            let projectUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            let zipPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
+                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+                            let zipPath = projectPath + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
-                            //const httpReply = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectUrl + ".zip");
+                            //const httpReply = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectPath + ".zip");
                             const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
@@ -215,17 +209,15 @@ Item {
 
 
 
-                                //let projectUrl = "F:\\_Projects/Pets/Qt_Pets/Desktop_Qt_5_15_2_MinGW_32_bit-Debug/debug/MakerFrame/RPGMaker/Projects/cde"
-
-                                let ret = FrameManager.sl_extractDir(zipPath, projectUrl);
+                                let ret = FrameManager.sl_extractDir(zipPath, projectPath);
 
                                 let msg;
                                 if(ret.length > 0) {
-                                    //console.debug(ret, projectUrl, fileUrl, FrameManager.sl_absolutePath(fileUrl));
+                                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                                     msg = "安装成功";
 
 
-                                    let jsPath = projectUrl + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
+                                    let jsPath = projectPath + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
                                     if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                         try {
                                             const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
@@ -265,9 +257,11 @@ Item {
                                 Buttons: Dialog.NoButton,
                                 OnAccepted: function() {
                                     dialogCommon.open();
+                                    dialogCommon.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
                                     dialogCommon.open();
+                                    dialogCommon.forceActiveFocus();
                                 },
                             });
 

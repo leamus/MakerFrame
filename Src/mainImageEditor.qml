@@ -39,8 +39,9 @@ Item {
 
 
     function init() {
-        _private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug("[mainImageEditor]_private.arrImages", JSON.stringify(_private.arrImages))
+        _private.refresh();
     }
 
 
@@ -66,69 +67,60 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
-        ListView {
+        L_List {
             id: listview
 
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
 
-            clip: true
+            bHighLightSelected: true
 
-            //snapMode: ListView.SnapOneItem
-            //orientation:ListView.Horizontal
 
-            model: _private.arrImages
 
-            delegate: L_ListItem {
-                height: 6.9 * Screen.pixelDensity
+            onSg_clicked: {
+                //listview.listview.currentIndex = index;
+                //root.clicked(index, modelData.Name);
 
-                colorText: Global.style.primaryTextColor
-                text: modelData
-                bSelected: index === listview.currentIndex
-                //removeButtonVisible: modelData !== "main.qml"
-                strPath: GameMakerGlobal.imageResourceURL()
+                //textImageName.text = modelData;
 
-                onClicked: {
-                    listview.currentIndex = index;
-                    //root.clicked(index, modelData.Name);
-
-                    //textImageName.text = modelData;
-
-                    console.debug(JSON.stringify(modelData));
-                }
-
-                onDoubleClicked: {
-                    imageReview.source = GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]);
-
-                    _private.setImageVisible(true);
-                }
-
-                onRemoveClicked: {
-                    //console.debug("delete", modelData);
-                    //root.removeClicked(index, modelData.Name);
-                    //_private.arrImages.splice(index, 1);
-                    //_private.arrImages = _private.arrImages;
-
-                    dialogCommon.show({
-                        Msg: '确认删除？',
-                        Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function() {
-                            root.forceActiveFocus();
-
-                            FrameManager.sl_fileDelete(GameMakerGlobal.imageResourcePath(modelData));
-                            _private.refresh();
-                        },
-                        OnRejected: ()=>{
-                            root.forceActiveFocus();
-                        },
-                    });
-                }
+                console.debug('[mainImageEditor]onSg_clicked:', index, item);
             }
 
-            ScrollBar.vertical: ScrollBar { }
-            //ScrollIndicator.vertical: ScrollIndicator { }
+            onSg_doubleClicked: {
+                imageReview.source = GameMakerGlobal.imageResourceURL(item);
 
+                _private.setImageVisible(true);
+
+                console.debug('[mainImageEditor]onSg_doubleClicked:', index, item);
+            }
+
+            onSg_removeClicked: {
+                //console.debug("delete", modelData);
+                //root.removeClicked(index, modelData.Name);
+                //_private.arrImages.splice(index, 1);
+                //_private.arrImages = _private.arrImages;
+
+                dialogCommon.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        root.forceActiveFocus();
+
+                        FrameManager.sl_fileDelete(GameMakerGlobal.imageResourcePath(item));
+                        _private.refresh();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
+            }
+
+            onSg_canceled: {
+                sg_close();
+            }
         }
 
 
@@ -176,30 +168,35 @@ Item {
 
                 text: "修改"
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
+
+                    let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
+                    //let oldFileName = _private.arrImages[listview.listview.currentIndex];
 
                     dialogCommon.show({
                         Msg: '请输入新文件名',
-                        Input: _private.arrImages[listview.currentIndex],
-                        Buttons: Dialog.Yes,
+                        Input: oldFileName,
+                        Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
                             let newFileName = dialogCommon.input.trim();
-                            if(_private.arrImages.indexOf(newFileName) >= 0) {
-                                if(_private.arrImages.indexOf(newFileName) === listview.currentIndex)
+                            //if(_private.arrImages.indexOf(newFileName) >= 0) {
+                            if(listview.listData.indexOf(newFileName) >= 0) {
+                                if(newFileName === oldFileName)
                                     return;
 
                                 dialogCommon.msg = '文件名重复，请重新输入';
-                                dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                                //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                                 dialogCommon.open();
+                                dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.imageResourcePath(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
                                     Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
-                                    console.error("[mainImageEditor]RenameFile ERROR:", GameMakerGlobal.imageResourcePath(_private.arrImages[listview.currentIndex]), GameMakerGlobal.imageResourcePath(newFileName));
+                                    console.error("[!mainImageEditor]RenameFile ERROR:", GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -219,10 +216,10 @@ Item {
 
                 text: "显示"
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
 
-                    imageReview.source = GameMakerGlobal.imageResourceURL(_private.arrImages[listview.currentIndex]);
+                    imageReview.source = GameMakerGlobal.imageResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
 
                     _private.setImageVisible(true);
 
@@ -231,11 +228,10 @@ Item {
                     //console.debug("file:", GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
                 }
             }
-
         }
     }
 
-    
+
     Mask {
         id: maskImage
 
@@ -254,13 +250,13 @@ Item {
             anchors.fill: parent
             maximumTouchPoints: 1
             onPressed: {
-                console.log('press', touchPoints);
+                console.log('[mainImageEditor]onPressed', touchPoints);
             }
             onUpdated: {
-                console.log('onupdated', touchPoints);
+                console.log('[mainImageEditor]onUpdated', touchPoints);
             }
             onTouchUpdated: {
-                console.log('ontouchupdated', touchPoints);
+                console.log('[mainImageEditor]onTouchUpdated', touchPoints);
             }
 
 
@@ -291,7 +287,8 @@ Item {
             }
         }
 
-        Image {
+        AnimatedImage {
+        //Image {
             id: imageReview
 
             //anchors.fill: parent
@@ -303,15 +300,12 @@ Item {
             Keys.onEscapePressed: {
                 _private.setImageVisible(false);
                 event.accepted = true;
-                //Qt.quit();
             }
             Keys.onBackPressed: {
                 _private.setImageVisible(false);
                 event.accepted = true;
-                //Qt.quit();
             }
         }
-
     }
 
 
@@ -361,21 +355,23 @@ Item {
             dialogCommon.show({
                 Msg: '请输入新文件名',
                 Input: filename,
-                Buttons: Dialog.Yes,
+                Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
                     root.forceActiveFocus();
 
                     let newFileName = dialogCommon.input.trim();
-                    if(_private.arrImages.indexOf(newFileName) >= 0) {
+                    //if(_private.arrImages.indexOf(newFileName) >= 0) {
+                    if(listview.listData.indexOf(newFileName) >= 0) {
                         dialogCommon.msg = '文件名重复，请重新输入';
-                        dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                        //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                         dialogCommon.open();
+                        dialogCommon.forceActiveFocus();
                     }
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
                         if(ret <= 0) {
                             Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            console.error("[mainImageEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
+                            console.error("[!mainImageEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -404,23 +400,27 @@ Item {
         id: _private
 
         //图片资源数据
-        property var arrImages: ([])
+        //property var arrImages: ([])
 
 
         function refresh() {
-            let index = listview.currentIndex;
+            let index = listview.listview.currentIndex;
 
-            _private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            let arrImages = listview.show(GameMakerGlobal.imageResourcePath());
 
-            if(_private.arrImages.length === 0)
-                listview.currentIndex = -1;
-            else if(index >= _private.arrImages.length) {
-                listview.currentIndex = _private.arrImages.length - 1;
-                //textImageName.text = _private.arrImages[listview.currentIndex];
+            if(arrImages.length === 0)
+                listview.listview.currentIndex = -1;
+            else if(index >= arrImages.length) {
+                listview.listview.currentIndex = arrImages.length - 1;
+                //textImageName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrImages[listview.listview.currentIndex];
+            }
+            else if(index < 0) {
+                listview.listview.currentIndex = 0;
+                //textImageName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrImages[listview.listview.currentIndex];
             }
             else {
-                listview.currentIndex = index;
-                //textImageName.text = _private.arrImages[listview.currentIndex];
+                listview.listview.currentIndex = index;
+                //textImageName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrImages[listview.listview.currentIndex];
             }
         }
 
@@ -443,6 +443,8 @@ Item {
                 //imageReview.transform = 0;
                 imageReview.rotation = 0;
 
+                imageReview.source = '';
+
 
                 root.forceActiveFocus();
             }
@@ -463,14 +465,12 @@ Item {
 
         console.debug("[mainImageEditor]Escape Key");
         event.accepted = true;
-        //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
         console.debug("[mainImageEditor]Back Key");
         event.accepted = true;
-        //Qt.quit();
     }
     Keys.onPressed: {
         console.debug("[mainImageEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);

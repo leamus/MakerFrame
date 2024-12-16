@@ -3384,7 +3384,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
         break;
 
     default:
-        //console.warn("[GameScene]fComputeRoleMoveOffset:", direction);
+        //console.warn("[!GameScene]fComputeRoleMoveOffset:", direction);
         return;
     }
 

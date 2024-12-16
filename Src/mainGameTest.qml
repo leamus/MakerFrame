@@ -363,7 +363,7 @@ Item {
         removeButtonVisible: false
 
 
-        onClicked: {
+        onSg_clicked: {
             if(item === "..") {
                 return;
             }
@@ -375,7 +375,7 @@ Item {
             root.forceActiveFocus();
         }
 
-        onCanceled: {
+        onSg_canceled: {
             visible = false;
             //loader.visible = true;
             //root.focus = true;

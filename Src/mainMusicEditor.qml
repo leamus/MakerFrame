@@ -39,8 +39,9 @@ Item {
 
 
     function init() {
-        _private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
-        //console.debug("[mainImageEditor]_private.arrImages", JSON.stringify(_private.arrImages))
+        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //console.debug("[mainMusicEditor]_private.arrMusic", JSON.stringify(_private.arrMusic))
+        _private.refresh();
     }
 
 
@@ -66,65 +67,58 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
-        ListView {
+        L_List {
             id: listview
 
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
 
-            clip: true
+            bHighLightSelected: true
 
-            //snapMode: ListView.SnapOneItem
-            //orientation:ListView.Horizontal
 
-            model: _private.arrMusic
 
-            delegate: L_ListItem {
-                height: 6.9 * Screen.pixelDensity
-                colorText: Global.style.primaryTextColor
-                text: modelData
-                bSelected: index === listview.currentIndex
-                //removeButtonVisible: modelData !== "main.qml"
+            onSg_clicked: {
+                //listview.listview.currentIndex = index;
+                //root.clicked(index, modelData.Name);
 
-                onClicked: {
-                    listview.currentIndex = index;
-                    //root.clicked(index, modelData.Name);
+                //textMusicName.text = modelData;
 
-                    //textMusicName.text = modelData;
-
-                    console.debug(JSON.stringify(modelData));
-                }
-
-                onDoubleClicked: {
-                    _private.playOrPause();
-                }
-
-                onRemoveClicked: {
-                    //console.debug("delete", modelData);
-                    //root.removeClicked(index, modelData.Name);
-                    //_private.arrMusic.splice(index, 1);
-                    //_private.arrMusic = _private.arrMusic;
-
-                    dialogCommon.show({
-                        Msg: '确认删除？',
-                        Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function() {
-                            root.forceActiveFocus();
-
-                            FrameManager.sl_fileDelete(GameMakerGlobal.musicResourcePath(modelData));
-                            _private.refresh();
-                        },
-                        OnRejected: ()=>{
-                            root.forceActiveFocus();
-                        },
-                    });
-                }
+                console.debug('[mainMusicEditor]onSg_clicked:', index, item);
             }
 
-            ScrollBar.vertical: ScrollBar { }
-            //ScrollIndicator.vertical: ScrollIndicator { }
+            onSg_doubleClicked: {
+                _private.playOrPause();
 
+                console.debug('[mainMusicEditor]onSg_doubleClicked:', index, item);
+            }
+
+            onSg_removeClicked: {
+                //console.debug("delete", modelData);
+                //root.removeClicked(index, modelData.Name);
+                //_private.arrMusic.splice(index, 1);
+                //_private.arrMusic = _private.arrMusic;
+
+                dialogCommon.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        root.forceActiveFocus();
+
+                        FrameManager.sl_fileDelete(GameMakerGlobal.musicResourcePath(item));
+                        _private.refresh();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
+            }
+
+            onSg_canceled: {
+                sg_close();
+            }
         }
 
 
@@ -188,7 +182,7 @@ Item {
             Button {
                 id: buttonAddMusic
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "新增"
                 onClicked: {
@@ -199,34 +193,39 @@ Item {
             Button {
                 id: buttonModifyMusic
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "修改"
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
+
+                    let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
+                    //let oldFileName = _private.arrMusic[listview.listview.currentIndex];
 
                     dialogCommon.show({
                         Msg: '请输入新文件名',
-                        Input: _private.arrMusic[listview.currentIndex],
-                        Buttons: Dialog.Yes,
+                        Input: oldFileName,
+                        Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
                             let newFileName = dialogCommon.input.trim();
-                            if(_private.arrMusic.indexOf(newFileName) >= 0) {
-                                if(_private.arrMusic.indexOf(newFileName) === listview.currentIndex)
+                            //if(_private.arrMusic.indexOf(newFileName) >= 0) {
+                            if(listview.listData.indexOf(newFileName) >= 0) {
+                                if(newFileName === oldFileName)
                                     return;
 
                                 dialogCommon.msg = '文件名重复，请重新输入';
-                                dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                                //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                                 dialogCommon.open();
+                                dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.musicResourcePath(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                 if(ret <= 0) {
                                     Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
-                                    console.error("[mainMusicEditor]RenameFile ERROR:", GameMakerGlobal.musicResourcePath(_private.arrMusic[listview.currentIndex]), GameMakerGlobal.musicResourcePath(newFileName));
+                                    console.error("[!mainMusicEditor]RenameFile ERROR:", GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -242,11 +241,11 @@ Item {
             Button {
                 id: buttonPlayMusic
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
 
                     _private.playOrPause();
@@ -256,7 +255,7 @@ Item {
             Button {
                 id: buttonStopMusic
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "停止"
                 onClicked: {
@@ -322,21 +321,23 @@ Item {
             dialogCommon.show({
                 Msg: '请输入新文件名',
                 Input: filename,
-                Buttons: Dialog.Yes,
+                Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
                     root.forceActiveFocus();
 
                     let newFileName = dialogCommon.input.trim();
-                    if(_private.arrMusic.indexOf(newFileName) >= 0) {
+                    //if(_private.arrMusic.indexOf(newFileName) >= 0) {
+                    if(listview.listData.indexOf(newFileName) >= 0) {
                         dialogCommon.msg = '文件名重复，请重新输入';
-                        dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                        //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                         dialogCommon.open();
+                        dialogCommon.forceActiveFocus();
                     }
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
                         if(ret <= 0) {
                             Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            console.error("[mainMusicEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
+                            console.error("[!mainMusicEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -365,28 +366,32 @@ Item {
         id: _private
 
         //音乐资源数据
-        property var arrMusic: ([])
+        //property var arrMusic: ([])
 
 
         function refresh() {
-            let index = listview.currentIndex;
+            let index = listview.listview.currentIndex;
 
-            _private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath());
 
-            if(_private.arrMusic.length === 0)
-                listview.currentIndex = -1;
-            else if(index >= _private.arrMusic.length) {
-                listview.currentIndex = _private.arrMusic.length - 1;
-                //textMusicName.text = _private.arrMusic[listview.currentIndex];
+            if(arrMusic.length === 0)
+                listview.listview.currentIndex = -1;
+            else if(index >= arrMusic.length) {
+                listview.listview.currentIndex = arrMusic.length - 1;
+                //textMusicName.text = listview.listview.model.get(listview.listview.currentIndex).Name;   //arrMusic[listview.listview.currentIndex];
+            }
+            else if(index < 0) {
+                listview.listview.currentIndex = 0;
+                //textMusicName.text = listview.listview.model.get(listview.listview.currentIndex).Name;   //arrMusic[listview.listview.currentIndex];
             }
             else {
-                listview.currentIndex = index;
-                //textMusicName.text = _private.arrMusic[listview.currentIndex];
+                listview.listview.currentIndex = index;
+                //textMusicName.text = listview.listview.model.get(listview.listview.currentIndex).Name;   //arrMusic[listview.listview.currentIndex];
             }
         }
 
         function playOrPause() {
-            mediaPlayer.source = GameMakerGlobal.musicResourceURL(_private.arrMusic[listview.currentIndex]);
+            mediaPlayer.source = GameMakerGlobal.musicResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);    //arrMusic[listview.listview.model.get(listview.listview.currentIndex).Index]
             if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                 mediaPlayer.pause();
             else

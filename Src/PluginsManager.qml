@@ -365,8 +365,9 @@ Item {
                         }
                     }
                     dialogCommon.show({
-                        TextFormat: Label.PlainText,
-                        Msg: '确认删除？' + description,
+                        TextFormat: Label.RichText,
+                        //TextFormat: Label.PlainText,
+                        Msg: '确认删除 <font color="red">' + item + '</font> ？<br>' + description,
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
 

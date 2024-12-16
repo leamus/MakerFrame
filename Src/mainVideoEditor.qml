@@ -39,8 +39,9 @@ Item {
 
 
     function init() {
-        _private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug("[mainVideoEditor]_private.arrVideos", JSON.stringify(_private.arrVideos))
+        _private.refresh();
     }
 
 
@@ -66,65 +67,58 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
-        ListView {
+        L_List {
             id: listview
 
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
 
-            clip: true
+            bHighLightSelected: true
 
-            //snapMode: ListView.SnapOneItem
-            //orientation:ListView.Horizontal
 
-            model: _private.arrVideos
 
-            delegate: L_ListItem {
-                height: 6.9 * Screen.pixelDensity
-                colorText: Global.style.primaryTextColor
-                text: modelData
-                bSelected: index === listview.currentIndex
-                //removeButtonVisible: modelData !== "main.qml"
+            onSg_clicked: {
+                //listview.listview.currentIndex = index;
+                //root.clicked(index, modelData.Name);
 
-                onClicked: {
-                    listview.currentIndex = index;
-                    //root.clicked(index, modelData.Name);
+                //textVideoName.text = modelData;
 
-                    //textVideoName.text = modelData;
-
-                    console.debug(JSON.stringify(modelData));
-                }
-
-                onDoubleClicked: {
-                    _private.playOrPause();
-                }
-
-                onRemoveClicked: {
-                    //console.debug("delete", modelData);
-                    //root.removeClicked(index, modelData.Name);
-                    //_private.arrVideos.splice(index, 1);
-                    //_private.arrVideos = _private.arrVideos;
-
-                    dialogCommon.show({
-                        Msg: '确认删除？',
-                        Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function() {
-                            root.forceActiveFocus();
-
-                            FrameManager.sl_fileDelete(GameMakerGlobal.videoResourcePath(modelData));
-                            _private.refresh();
-                        },
-                        OnRejected: ()=>{
-                            root.forceActiveFocus();
-                        },
-                    });
-                }
+                console.debug('[mainVideoEditor]onSg_clicked:', index, item);
             }
 
-            ScrollBar.vertical: ScrollBar { }
-            //ScrollIndicator.vertical: ScrollIndicator { }
+            onSg_doubleClicked: {
+                _private.playOrPause();
 
+                console.debug('[mainVideoEditor]onSg_doubleClicked:', index, item);
+            }
+
+            onSg_removeClicked: {
+                //console.debug("delete", modelData);
+                //root.removeClicked(index, modelData.Name);
+                //_private.arrVideos.splice(index, 1);
+                //_private.arrVideos = _private.arrVideos;
+
+                dialogCommon.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        root.forceActiveFocus();
+
+                        FrameManager.sl_fileDelete(GameMakerGlobal.videoResourcePath(item));
+                        _private.refresh();
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
+            }
+
+            onSg_canceled: {
+                sg_close();
+            }
         }
 
 
@@ -157,7 +151,7 @@ Item {
             Button {
                 id: buttonAddVideo
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "新增"
                 onClicked: {
@@ -168,34 +162,39 @@ Item {
             Button {
                 id: buttonModifyVideo
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "修改"
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
+
+                    let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
+                    //let oldFileName = _private.arrVideos[listview.listview.currentIndex];
 
                     dialogCommon.show({
                         Msg: '请输入新文件名',
-                        Input: _private.arrVideos[listview.currentIndex],
-                        Buttons: Dialog.Yes,
+                        Input: oldFileName,
+                        Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
                             let newFileName = dialogCommon.input.trim();
-                            if(_private.arrVideos.indexOf(newFileName) >= 0) {
-                                if(_private.arrVideos.indexOf(newFileName) === listview.currentIndex)
+                            //if(_private.arrVideos.indexOf(newFileName) >= 0) {
+                            if(listview.listData.indexOf(newFileName) >= 0) {
+                                if(newFileName === oldFileName)
                                     return;
 
                                 dialogCommon.msg = '文件名重复，请重新输入';
-                                dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                                //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                                 dialogCommon.open();
+                                dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.videoResourcePath(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourcePath(newFileName));
+                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
                                 if(ret <= 0) {
                                     Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
-                                    console.error("[mainVideoEditor]RenameFile ERROR:", GameMakerGlobal.videoResourcePath(_private.arrVideos[listview.currentIndex]), GameMakerGlobal.videoResourcePath(newFileName));
+                                    console.error("[!mainVideoEditor]RenameFile ERROR:", GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -211,11 +210,11 @@ Item {
             Button {
                 id: buttonPlayVideo
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
-                    if(listview.currentIndex < 0)
+                    if(listview.listview.currentIndex < 0)
                         return;
 
                     _private.playOrPause();
@@ -227,7 +226,7 @@ Item {
 
                 visible: false
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: 60
 
                 text: "停止"
                 onClicked: {
@@ -376,21 +375,23 @@ Item {
             dialogCommon.show({
                 Msg: '请输入新文件名',
                 Input: filename,
-                Buttons: Dialog.Yes,
+                Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
                     root.forceActiveFocus();
 
                     let newFileName = dialogCommon.input.trim();
-                    if(_private.arrVideos.indexOf(newFileName) >= 0) {
+                    //if(_private.arrVideos.indexOf(newFileName) >= 0) {
+                    if(listview.listData.indexOf(newFileName) >= 0) {
                         dialogCommon.msg = '文件名重复，请重新输入';
-                        dialogCommon.standardButtons = Dialog.Ok | Dialog.Cancel;
+                        //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
                         dialogCommon.open();
+                        dialogCommon.forceActiveFocus();
                     }
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
                         if(ret <= 0) {
                             Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            console.error("[mainVideoEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
+                            console.error("[!mainVideoEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -419,23 +420,27 @@ Item {
         id: _private
 
         //资源数据
-        property var arrVideos: ([])
+        //property var arrVideos: ([])
 
 
         function refresh() {
-            let index = listview.currentIndex;
+            let index = listview.listview.currentIndex;
 
-            _private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+            let arrVideos = listview.show(GameMakerGlobal.videoResourcePath());
 
-            if(_private.arrVideos.length === 0)
-                listview.currentIndex = -1;
-            else if(index >= _private.arrVideos.length) {
-                listview.currentIndex = _private.arrVideos.length - 1;
-                //textVideoName.text = _private.arrVideos[listview.currentIndex];
+            if(arrVideos.length === 0)
+                listview.listview.currentIndex = -1;
+            else if(index >= arrVideos.length) {
+                listview.listview.currentIndex = arrVideos.length - 1;
+                //textVideoName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrVideos[listview.listview.currentIndex];
+            }
+            else if(index < 0) {
+                listview.listview.currentIndex = 0;
+                //textVideoName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrVideos[listview.listview.currentIndex];
             }
             else {
-                listview.currentIndex = index;
-                //textVideoName.text = _private.arrVideos[listview.currentIndex];
+                listview.listview.currentIndex = index;
+                //textVideoName.text = listview.listview.model.get(listview.listview.currentIndex).Name;    //arrVideos[listview.listview.currentIndex];
             }
         }
 
@@ -449,7 +454,7 @@ Item {
         }
 
         function playOrPause() {
-            mediaPlayer.source = GameMakerGlobal.videoResourceURL(_private.arrVideos[listview.currentIndex]);
+            mediaPlayer.source = GameMakerGlobal.videoResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
             if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                 mediaPlayer.pause();
             else

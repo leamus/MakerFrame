@@ -253,16 +253,16 @@ Item {
 
         function show() {
             const fileSuffixPosition = textFilePath.text.lastIndexOf('.');
-            const extname = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toUpperCase() : '';
+            const extname = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toLowerCase() : '';
             const filename = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
 
             let virtualFileName = filename;
             //if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
             switch(extname) {
-            case 'JS':
+            case 'js':
                 virtualFileName += '.vjs';
                 break;
-            case 'QML':
+            case 'qml':
                 virtualFileName += '.vqml';
                 break;
             default:
@@ -416,7 +416,7 @@ Item {
         colorText: Global.style.primaryTextColor
 
 
-        onClicked: {
+        onSg_clicked: {
             //if(item === "..") {
             //    l_list.visible = false;
             //    return;
@@ -493,12 +493,12 @@ Item {
             root.forceActiveFocus();
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath + GameMakerGlobal.separator + item;
 
 
             dialogCommon.show({
-                Msg: '确认删除：' + path,
+                Msg: '确认删除 <font color="red">' + item + '</font> ？<br>路径：' + path,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     if(FrameManager.sl_dirExists(path)) {
@@ -518,7 +518,7 @@ Item {
             });
         }
 
-        onCanceled: {
+        onSg_canceled: {
             visible = false;
             //loader.visible = true;
             //root.focus = true;

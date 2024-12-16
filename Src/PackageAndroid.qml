@@ -528,9 +528,13 @@ Item {
                 dialogCommon.show({
                     Msg: '请等待。。。',
                     Buttons: Dialog.NoButton,
+                    OnAccepted: function() {
+                        dialogCommon.open();
+                        dialogCommon.forceActiveFocus();
+                    },
                     OnRejected: ()=>{
                         dialogCommon.open();
-                        root.forceActiveFocus();
+                        dialogCommon.forceActiveFocus();
                     },
                 });
 

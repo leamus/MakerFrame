@@ -1321,7 +1321,7 @@ Item {
         //removeButtonVisible: false
 
 
-        onClicked: {
+        onSg_clicked: {
             textSpriteImageURL.text = GameMakerGlobal.spriteResourceURL(item);
             textSpriteImageResourceName.text = item;
             
@@ -1347,7 +1347,7 @@ Item {
             console.debug("[SpriteEditor]fileURL", textSpriteImageURL.text);
         }
 
-        onCanceled: {
+        onSg_canceled: {
             dialogSpriteImageData.visible = true;
 
             visible = false;
@@ -1357,11 +1357,11 @@ Item {
             //loader.item.focus = true;
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let filepath = GameMakerGlobal.spriteResourcePath(item);
 
             dialogCommon.show({
-                Msg: '确认删除？',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
@@ -1699,7 +1699,7 @@ Item {
         //removeButtonVisible: false
 
 
-        onClicked: {
+        onSg_clicked: {
             textSpriteSoundURL.text = GameMakerGlobal.soundResourceURL(item);
             textSpriteSoundResourceName.text = item;
             //console.debug("[SpriteEditor]List Clicked:", textSpriteSoundURL.text);
@@ -1726,7 +1726,7 @@ Item {
             console.debug("[SpriteEditor]fileURL", textSpriteSoundURL.text);
         }
 
-        onCanceled: {
+        onSg_canceled: {
             dialogSpriteSoundData.visible = true;
 
             //loader.visible = true;
@@ -1736,11 +1736,11 @@ Item {
             visible = false;
         }
 
-        onRemoveClicked: {
+        onSg_removeClicked: {
             let filepath = GameMakerGlobal.soundResourcePath(item);
 
             dialogCommon.show({
-                Msg: '确认删除？',
+                Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug("[SpriteEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
