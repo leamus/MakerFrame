@@ -231,7 +231,7 @@ let data = (function() {
                     let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument));
 
                     if(e) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -245,7 +245,7 @@ let data = (function() {
                         return;
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -280,7 +280,7 @@ let data = (function() {
                 text: 'V'
                 onClicked: {
                     if(!_private.strSavedName) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -425,7 +425,7 @@ let data = (function() {
             textGoodsName.text = textGoodsName.text.trim();
 
             if(textGoodsName.text.length === 0) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '名称不能为空',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -439,7 +439,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -468,7 +468,7 @@ let data = (function() {
             }
 
             if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_dirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -480,7 +480,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -496,7 +496,7 @@ let data = (function() {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -508,7 +508,7 @@ let data = (function() {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

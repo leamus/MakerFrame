@@ -101,7 +101,7 @@ Item {
                 //_private.arrVideos.splice(index, 1);
                 //_private.arrVideos = _private.arrVideos;
 
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
                     Buttons: Dialog.Ok | Dialog.Cancel,
                     OnAccepted: function() {
@@ -172,23 +172,23 @@ Item {
                     let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
                     //let oldFileName = _private.arrVideos[listview.listview.currentIndex];
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '请输入新文件名',
                         Input: oldFileName,
                         Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
-                            let newFileName = dialogCommon.input.trim();
+                            let newFileName = rootWindow.aliasGlobal.dialogCommon.input.trim();
                             //if(_private.arrVideos.indexOf(newFileName) >= 0) {
                             if(listview.listData.indexOf(newFileName) >= 0) {
                                 if(newFileName === oldFileName)
                                     return;
 
-                                dialogCommon.msg = '文件名重复，请重新输入';
-                                //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
-                                dialogCommon.open();
-                                dialogCommon.forceActiveFocus();
+                                rootWindow.aliasGlobal.dialogCommon.msg = '文件名重复，请重新输入';
+                                //rootWindow.aliasGlobal.dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
+                                rootWindow.aliasGlobal.dialogCommon.open();
+                                rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                             }
                             else {
                                 let ret = FrameManager.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
@@ -372,20 +372,20 @@ Item {
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
 
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '请输入新文件名',
                 Input: filename,
                 Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
                     root.forceActiveFocus();
 
-                    let newFileName = dialogCommon.input.trim();
+                    let newFileName = rootWindow.aliasGlobal.dialogCommon.input.trim();
                     //if(_private.arrVideos.indexOf(newFileName) >= 0) {
                     if(listview.listData.indexOf(newFileName) >= 0) {
-                        dialogCommon.msg = '文件名重复，请重新输入';
-                        //dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
-                        dialogCommon.open();
-                        dialogCommon.forceActiveFocus();
+                        rootWindow.aliasGlobal.dialogCommon.msg = '文件名重复，请重新输入';
+                        //rootWindow.aliasGlobal.dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
+                        rootWindow.aliasGlobal.dialogCommon.open();
+                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     }
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);

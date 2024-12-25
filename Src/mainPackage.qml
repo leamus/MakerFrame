@@ -86,7 +86,7 @@ Item {
 
             text: "打包Windows"
             onClicked: {
-                /*dialogCommon.show({
+                /*rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有需要时再做~',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -153,7 +153,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -162,11 +162,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -191,7 +191,7 @@ Item {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }

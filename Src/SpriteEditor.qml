@@ -774,7 +774,7 @@ Item {
                             onClicked: {
 
                                 if(!_private.strSpriteName) {
-                                    dialogCommon.show({
+                                    rootWindow.aliasGlobal.dialogCommon.show({
                                           Msg: '请先保存特效',
                                           Buttons: Dialog.Yes,
                                           OnAccepted: function() {
@@ -1360,7 +1360,7 @@ Item {
         onSg_removeClicked: {
             let filepath = GameMakerGlobal.spriteResourcePath(item);
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1739,7 +1739,7 @@ Item {
         onSg_removeClicked: {
             let filepath = GameMakerGlobal.soundResourcePath(item);
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1791,7 +1791,7 @@ Item {
                         let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textCode.textDocument));
 
                         if(e) {
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                 Msg: e,
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
@@ -1805,7 +1805,7 @@ Item {
                             return;
                         }
 
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '恭喜，没有语法错误',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -1828,7 +1828,7 @@ Item {
 
                     onClicked: {
                         /*if(!_private.strMapName) {
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                   Msg: '请先保存地图',
                                   Buttons: Dialog.Yes,
                                   OnAccepted: function() {
@@ -1943,7 +1943,7 @@ Item {
             }
 
             if(textSpriteName.text !== _private.strSpriteName && FrameManager.sl_dirExists(path)) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -1957,7 +1957,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -2414,7 +2414,7 @@ function $refresh(index, imageAnimate, path) {
 
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -2429,7 +2429,7 @@ function $refresh(index, imageAnimate, path) {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

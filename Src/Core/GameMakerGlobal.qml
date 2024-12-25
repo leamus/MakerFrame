@@ -38,7 +38,7 @@ QtObject {
 
 
     //引擎版本
-    property string version: '1.13.11.241212'
+    property string version: '1.13.12.241224'
 
 
     //配置
@@ -256,7 +256,7 @@ QtObject {
         if(FrameManager.sl_globalObject().GameMakerGlobal && FrameManager.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
             console.warn('[!GameMakerGlobal]已经存在单例类，请重启框架或返回原引擎');
 
-            Global.window.aliasComponents.dialogCommon.show({
+            Global.window.aliasGlobal.dialogCommon.show({
                 Msg: '已经存在单例类，请重启框架或返回原引擎，否则数据出错',
                 //Buttons: 0,
                 OnAccepted: function() {

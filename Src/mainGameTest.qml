@@ -147,7 +147,7 @@ Item {
             Layout.maximumWidth: parent.width
 
             Label {
-                text: qsTr("地图坐标：")
+                text: qsTr("地图块坐标：")
             }
 
             TextField {
@@ -273,7 +273,7 @@ Item {
             else if(status === Loader.Error) {
                 _private.gameSceneClose();
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -282,11 +282,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -341,7 +341,7 @@ Item {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }

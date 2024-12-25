@@ -96,7 +96,7 @@ Item {
                     let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -110,7 +110,7 @@ Item {
                         return;
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -253,20 +253,20 @@ Item {
 
         function show() {
             const fileSuffixPosition = textFilePath.text.lastIndexOf('.');
-            const extname = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toLowerCase() : '';
-            const filename = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
+            const fileExtName = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toLowerCase() : '';
+            const filePathAndName = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
 
-            let virtualFileName = filename;
+            let virtualFilePathAndName = filePathAndName;
             //if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
-            switch(extname) {
+            switch(fileExtName) {
             case 'js':
-                virtualFileName += '.vjs';
+                virtualFilePathAndName += '.vjs';
                 break;
             case 'qml':
-                virtualFileName += '.vqml';
+                virtualFilePathAndName += '.vqml';
                 break;
             default:
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '编辑的文件非js/qml文件，不能用可视化',
                     Buttons: Dialog.Ok,
                     OnAccepted: function() {
@@ -282,23 +282,23 @@ Item {
 
 
             /*if(textFilePath.text.indexOf('.js') >= 0)
-                virtualFileName += '.vjs';
+                virtualFilePathAndName += '.vjs';
             if(textFilePath.text.indexOf('.qml') >= 0)
-                virtualFileName += '.vqml';
+                virtualFilePathAndName += '.vqml';
             */
             /*
             switch(fileSuffix) {
             case 'js':
-                virtualFileName += '.vjs';
+                virtualFilePathAndName += '.vjs';
                 break;
             case 'qml':
-                virtualFileName += '.vqml';
+                virtualFilePathAndName += '.vqml';
                 break;
             default:
             }
             */
 
-            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + virtualFileName;
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + virtualFilePathAndName;
             loaderVisualScript.item.loadData(filePath);
 
 
@@ -361,7 +361,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 //visible = false;
@@ -370,11 +370,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -400,7 +400,7 @@ Item {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }
@@ -418,7 +418,7 @@ Item {
 
         onSg_clicked: {
             //if(item === "..") {
-            //    l_list.visible = false;
+            //    rootWindow.aliasGlobal.l_list.visible = false;
             //    return;
             //}
 
@@ -497,7 +497,7 @@ Item {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath + GameMakerGlobal.separator + item;
 
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？<br>路径：' + path,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -564,7 +564,7 @@ Item {
             let filePath = textFilePath.text.trim();
 
             if(filePath.length === 0) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '名称不能为空',
                     Buttons: Dialog.Ok,
                     OnAccepted: function() {
@@ -586,7 +586,7 @@ Item {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -598,7 +598,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

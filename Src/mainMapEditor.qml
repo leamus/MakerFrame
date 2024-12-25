@@ -143,7 +143,7 @@ Item {
 
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Yes | Dialog.Cancel,
                 OnAccepted: ()=>{
@@ -553,7 +553,7 @@ Item {
         onSg_removeClicked: {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Resources" + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -761,7 +761,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -773,11 +773,11 @@ Item {
                 _private.refresh();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -842,7 +842,7 @@ Item {
             }
             finally {
                 //busyIndicator.running = false;
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }

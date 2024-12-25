@@ -90,16 +90,16 @@ Item {
                         let data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
                                     ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
 
-                        l_list.open({
+                        rootWindow.aliasGlobal.l_list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -125,16 +125,16 @@ Item {
                         let data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
-                        l_list.open({
+                        rootWindow.aliasGlobal.l_list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -412,16 +412,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -452,16 +452,16 @@ Item {
 
                             onPressAndHold: {
                                 let data = [['白', '红', '绿', '蓝', '黑', '灰', '黄'], ['white', 'red', 'green', 'blue', 'black', 'gray', 'yellow']]
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -491,16 +491,16 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: GameMakerGlobal.imageResourcePath(),
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -570,16 +570,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -612,16 +612,16 @@ Item {
 
                             onPressAndHold: {
                                 let data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gf[""]']];
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -654,16 +654,16 @@ Item {
 
                             onPressAndHold: {
                                 let data = ['头戴', '身穿', '武器', '鞋子'];
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: data,
                                     OnClicked: (index, item)=>{
                                         text = data[index];
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -697,16 +697,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -1000,7 +1000,7 @@ Item {
                 }
             }while(0);
             if(!bCheck) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1010,7 +1010,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1155,7 +1155,7 @@ Item {
                 eval(data);
             }
             catch(e) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1165,7 +1165,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1176,7 +1176,7 @@ Item {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -1198,7 +1198,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

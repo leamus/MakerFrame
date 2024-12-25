@@ -80,8 +80,8 @@ Item {
             }
 
 
-            //l_list.visible = true;
-            //l_list.forceActiveFocus();
+            //rootWindow.aliasGlobal.l_list.visible = true;
+            //rootWindow.aliasGlobal.l_list.forceActiveFocus();
             _private.refresh();
         }
 
@@ -146,7 +146,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -155,16 +155,16 @@ Item {
                 root.forceActiveFocus();
 
 
-                //l_list.visible = true;
-                //l_list.forceActiveFocus();
+                //rootWindow.aliasGlobal.l_list.visible = true;
+                //rootWindow.aliasGlobal.l_list.forceActiveFocus();
                 _private.refresh();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -186,13 +186,13 @@ Item {
                 visible = true;
 
 
-                l_list.visible = false;
+                rootWindow.aliasGlobal.l_list.visible = false;
             }
             catch(e) {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
 
@@ -234,8 +234,8 @@ Item {
         function refresh() {
             jsEngine.clear();
 
-            clearComponentCache();
-            trimComponentCache();
+            rootWindow.clearComponentCache();
+            rootWindow.trimComponentCache();
 
 
             arrPluginsShowName = [];
@@ -293,7 +293,7 @@ Item {
 
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            l_list.open({
+            rootWindow.aliasGlobal.l_list.open({
                 RemoveButtonVisible: true,
                 Data: arrPluginsShowName,
                 OnClicked: (index, item)=>{
@@ -310,7 +310,7 @@ Item {
                             }
 
                             itemExtendsRoot.forceActiveFocus();
-                            l_list.visible = false;
+                            rootWindow.aliasGlobal.l_list.visible = false;
 
                             return 1;
                         }
@@ -326,23 +326,23 @@ Item {
                     }
 
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '扩展不能运行',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
                         },
                     });
 
-                    //l_list.visible = false;
+                    //rootWindow.aliasGlobal.l_list.visible = false;
                     //root.forceActiveFocus();
                     return 0;
                 },
                 OnCanceled: ()=>{
-                    l_list.visible = false;
+                    rootWindow.aliasGlobal.l_list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -364,7 +364,7 @@ Item {
                             console.error('[!PluginsManager]', e);
                         }
                     }
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         TextFormat: Label.RichText,
                         //TextFormat: Label.PlainText,
                         Msg: '确认删除 <font color="red">' + item + '</font> ？<br>' + description,
@@ -381,7 +381,7 @@ Item {
                                     }
 
                                     //itemExtendsRoot.forceActiveFocus();
-                                    //l_list.visible = false;
+                                    //rootWindow.aliasGlobal.l_list.visible = false;
 
                                 }
                                 catch(e) {
@@ -391,13 +391,13 @@ Item {
                             }
 
                             console.debug("[PluginsManager]删除：" + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath), FrameManager.sl_removeRecursively(pluginDirPath));
-                            l_list.removeItem(index);
+                            rootWindow.aliasGlobal.l_list.removeItem(index);
                             _private.refresh();
 
-                            //l_list.forceActiveFocus();
+                            //rootWindow.aliasGlobal.l_list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
                         },
                     });
 
@@ -410,7 +410,7 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        l_list.visible = false;
+        rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
         console.debug("[PluginsManager]Escape Key");
@@ -418,7 +418,7 @@ Item {
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        l_list.visible = false;
+        rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
         console.debug("[PluginsManager]Back Key");

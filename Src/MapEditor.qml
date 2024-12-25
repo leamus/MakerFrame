@@ -427,7 +427,7 @@ Item {
                     //textCode.setPlainText(objSystemEventsData["$1"] || "");
 
                     if(!_private.strMapName) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                               Msg: '请先保存地图',
                               Buttons: Dialog.Yes,
                               OnAccepted: function() {
@@ -2261,7 +2261,7 @@ Item {
                         }
                         //如果值无效
                         catch(e) {
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                 Msg: '特殊图块值无效，请输入一个数字（支持二进制、八进制和十六进制）',
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
@@ -2603,7 +2603,7 @@ Item {
             }
 
             if(textMapName.text !== _private.strMapName && FrameManager.sl_dirExists(path)) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -2617,7 +2617,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -2840,7 +2840,7 @@ Item {
                         let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textCode.textDocument));
 
                         if(e) {
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                 Msg: e,
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
@@ -2854,7 +2854,7 @@ Item {
                             return;
                         }
 
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '恭喜，没有语法错误',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -2877,7 +2877,7 @@ Item {
 
                     onClicked: {
                         /*if(!_private.strMapName) {
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                   Msg: '请先保存地图',
                                   Buttons: Dialog.Yes,
                                   OnAccepted: function() {
@@ -3679,7 +3679,7 @@ Item {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -3695,7 +3695,7 @@ Item {
                     //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

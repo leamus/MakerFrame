@@ -507,7 +507,7 @@ Item {
                 missingFiles += 'MakerFrame_RPGRuntime_Android_xxx.zip ';
 
             if(missingFiles !== '') {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '请将 <font color="red">%1</font> 文件下载并放入 <font color="red">%2</font> 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -525,20 +525,20 @@ Item {
 
             //1：只更新工程；2：全部更新；
             function continueScript(packageType) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '请等待。。。',
                     Buttons: Dialog.NoButton,
                     OnAccepted: function() {
-                        dialogCommon.open();
-                        dialogCommon.forceActiveFocus();
+                        rootWindow.aliasGlobal.dialogCommon.open();
+                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        dialogCommon.open();
-                        dialogCommon.forceActiveFocus();
+                        rootWindow.aliasGlobal.dialogCommon.open();
+                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     },
                 });
 
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
 
 
                 GlobalLibraryJS.setTimeout(function() {
@@ -559,16 +559,16 @@ Item {
                         GlobalLibraryJS.printException(e);
                         return;
                     } finally {
-                        showBusyIndicator(false);
+                        rootWindow.aliasGlobal.showBusyIndicator(false);
 
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                     }
 
 
                     modifyConfig();
 
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '生成打包文件夹成功，请用三方软件来打包并签名APK（<font color="red">%1</font>）'.arg(strPackageDir),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -585,7 +585,7 @@ Item {
 
             if(FrameManager.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
 
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '检测到有旧打包文件夹，Yes（是）：只更新工程；Discard（丢弃）：更新整个打包文件夹<br><font color="red">此操作会删除打包文件夹路径，请确保路径选择正确！</font>',
                     Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                     OnAccepted: function() {
@@ -595,7 +595,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                         continueScript(2);
                     },
                 });

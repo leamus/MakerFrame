@@ -4,18 +4,23 @@ module RPGMaker
 
 ColorPicker 1.0 ColorPicker.qml
 
+GameStartScript 1.0 GameStartScript.qml
 GameCommonScript 1.0 GameCommonScript.qml
+GameScriptEditor 1.0 GameScriptEditor.qml
 
 GameVisualGoods 1.0 GameVisualGoods.qml
 GameVisualFightSkill 1.0 GameVisualFightSkill.qml
 GameVisualFightScript 1.0 GameVisualFightScript.qml
 GameVisualFightRole 1.0 GameVisualFightRole.qml
 
-RoleEditor 1.0 RoleEditor.qml
-
 SpriteEditor 1.0 SpriteEditor.qml
-
+RoleEditor 1.0 RoleEditor.qml
+GoodsEditor 1.0 GoodsEditor.qml
 MapEditor 1.0 MapEditor.qml
+
+FightRoleEditor 1.0 FightRoleEditor.qml
+FightScriptEditor 1.0 FightScriptEditor.qml
+FightSkillEditor 1.0 FightSkillEditor.qml
 
 PackageWindows 1.0 PackageWindows.qml
 PackageAndroid 1.0 PackageAndroid.qml

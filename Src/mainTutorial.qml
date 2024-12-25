@@ -78,9 +78,16 @@ Item {
             verticalAlignment: Label.AlignVCenter
         }
 
+
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredHeight: 2
+        }
+
+
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -92,7 +99,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -104,7 +111,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -116,7 +123,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -128,7 +135,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -139,10 +146,15 @@ Item {
         }
 
 
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
+        }
+
 
         Label {
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: parent.width * 0.69
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
             //Layout.preferredHeight: 20
 
             //anchors.horizontalCenter: parent.horizontalCenter
@@ -159,12 +171,12 @@ Item {
         }
 
         RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.fillWidth: false
+            Layout.preferredWidth: parent.width * 0.69
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
             Layout.preferredHeight: 50
             Layout.minimumHeight: 20
-            //Layout.fillHeight: true
+            Layout.fillHeight: false
 
             Button {
                 Layout.preferredWidth: 1
@@ -209,6 +221,11 @@ Item {
                     }
                 }
             }
+        }
+
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
         }
 
         ColumnLayout {
@@ -391,6 +408,7 @@ Item {
                 }
             }
         }
+
     }
 
 
@@ -429,7 +447,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -438,11 +456,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -467,7 +485,7 @@ Item {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }

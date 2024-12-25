@@ -65,15 +65,13 @@ Item {
 
             //data = JSON.parse(data);
             //console.debug('data', data);
-            //loaderGameScene.setSource('./MapEditor.qml', {});
-            //loaderGameScene.item.init(data);
 
             //textGameStartScript.text = data.GameStartScript;
             textGameStartScript.setPlainText(data);
             textGameStartScript.toBegin();
             //textGameFPS.text = data.GameFPS;
 
-            return true;
+            return 1;
         }
         else {
             textGameStartScript.setPlainText(
@@ -90,15 +88,8 @@ game.goon();
             );
             textGameStartScript.toBegin();
 
-            return false;
+            return 0;
         }
-    }
-
-    function start() {
-        textGameStartScript.enabled = false;
-        buttonStartGame.enabled = false;
-
-        loaderGameScene.source = './Core/GameScene.qml';
     }
 
 
@@ -140,7 +131,7 @@ game.goon();
                     let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textGameStartScript.textDocument));
 
                     if(e) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -154,7 +145,7 @@ game.goon();
                         return;
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -215,7 +206,7 @@ game.goon();
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: ''
+                textArea.placeholderText: '请输入脚本代码'
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -268,7 +259,7 @@ game.goon();
             Layout.preferredHeight: 50
 
             Button {
-                id: buttonStartGame
+                id: buttonSave
 
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
@@ -276,10 +267,10 @@ game.goon();
 
                 enabled: true
 
-                text: '开始游戏'
+                text: "保　存"
 
                 onClicked: {
-                    start();
+                    _private.save();
                 }
             }
 
@@ -417,88 +408,6 @@ game.goon();
     }
 
 
-    //游戏场景
-    //关闭时会释放，这样如果有资源释放失败（GameScene的ReleaseResource）也没问题；
-    Loader {
-        id: loaderGameScene
-
-        visible: false
-        focus: true
-
-        anchors.fill: parent
-
-
-        source: ''
-        asynchronous: true
-
-
-
-        Connections {
-            target: loaderGameScene.item
-            //忽略没有的信号
-            ignoreUnknownSignals: true
-
-            function onSg_close() {
-                _private.gameSceneClose();
-            }
-        }
-
-
-        onStatusChanged: {
-            console.debug('[GameStart]loaderGameScene:', source, status);
-
-            if(status === Loader.Ready) {
-            }
-            else if(status === Loader.Error) {
-                _private.gameSceneClose();
-
-                showBusyIndicator(false);
-            }
-            else if(status === Loader.Null) {
-                visible = false;
-
-                //root.focus = true;
-                root.forceActiveFocus();
-            }
-            else if(status === Loader.Loading) {
-                showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
-            }
-        }
-
-        onLoaded: {
-            console.debug('[GameStart]loaderGameScene onLoaded');
-
-            try {
-                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
-
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //focus = true;
-                forceActiveFocus();
-
-                //item.focus = true;
-                if(item.forceActiveFocus)
-                    item.forceActiveFocus();
-
-                if(item.init)
-                    item.init(true, true);
-
-                visible = true;
-            }
-            catch(e) {
-                _private.gameSceneClose();
-                throw e;
-            }
-            finally {
-                showBusyIndicator(false);
-            }
-        }
-    }
-
-
 
     //配置
     QtObject {
@@ -581,12 +490,30 @@ function *$start() {
 }
         `
 
-        function gameSceneClose() {
-            loaderGameScene.source = '';
 
+        function save() {
+            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textGameStartScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strMainJSName, 0);
 
-            textGameStartScript.enabled = true;
-            buttonStartGame.enabled = true;
+            return true;
+        }
+
+        function close() {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '退出前需要保存吗？',
+                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
+                OnAccepted: function() {
+                    if(save())
+                        sg_close();
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    sg_close();
+                },
+                OnDiscarded: ()=>{
+                    rootWindow.aliasGlobal.dialogCommon.close();
+                    root.forceActiveFocus();
+                },
+            });
         }
     }
 
@@ -594,14 +521,14 @@ function *$start() {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        sg_close();
+        _private.close();
 
         console.debug('[GameStart]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        sg_close();
+        _private.close();
 
         console.debug('[GameStart]Back Key');
         event.accepted = true;

@@ -117,16 +117,16 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                        l_list.open({
+                        rootWindow.aliasGlobal.l_list.open({
                             Data: path,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                l_list.visible = false;
+                                rootWindow.aliasGlobal.l_list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -423,16 +423,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.imageResourcePath();
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -505,16 +505,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -546,16 +546,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -587,16 +587,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                l_list.open({
+                                rootWindow.aliasGlobal.l_list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        l_list.visible = false;
+                                        rootWindow.aliasGlobal.l_list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -782,16 +782,16 @@ Item {
                                         onPressAndHold: {
                                             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                                            l_list.open({
+                                            rootWindow.aliasGlobal.l_list.open({
                                                 Data: path,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    l_list.visible = false;
+                                                    rootWindow.aliasGlobal.l_list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    l_list.visible = false;
+                                                    rootWindow.aliasGlobal.l_list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                             });
@@ -1012,7 +1012,7 @@ Item {
                 }
             }while(0);
             if(!bCheck) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1022,7 +1022,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1071,7 +1071,7 @@ Item {
                 eval(data);
             }
             catch(e) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1081,7 +1081,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        dialogCommon.close();
+                        rootWindow.aliasGlobal.dialogCommon.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1092,7 +1092,7 @@ Item {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -1114,7 +1114,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

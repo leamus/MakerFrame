@@ -80,7 +80,7 @@ Item {
             console.debug("[PluginsDownload]You chose: " + fileUrl, fileUrls);
 
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: "确认安装吗？这可能会替换同名插件！",
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -106,7 +106,7 @@ Item {
                         //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: ret.length > 0 ? "成功" : "失败",
                         Buttons: Dialog.Ok,
                         OnAccepted: function() {
@@ -156,7 +156,7 @@ Item {
                 return false;
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            l_list.open({
+            rootWindow.aliasGlobal.l_list.open({
                 RemoveButtonVisible: false,
                 Data: Object.keys(menuJS.plugins),
                 OnClicked: (index, item)=>{
@@ -165,7 +165,7 @@ Item {
                         return;
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         TextFormat: Label.PlainText,
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
                                           .arg(menuJS.plugins[item]['Name'])
@@ -191,10 +191,10 @@ Item {
                                 FrameManager.sl_deleteLater(httpReply);
 
 
-                                dialogCommon.close();
+                                rootWindow.aliasGlobal.dialogCommon.close();
 
                                 if(code !== 0) {
-                                    dialogCommon.show({
+                                    rootWindow.aliasGlobal.dialogCommon.show({
                                         Msg: '下载失败：%1'.arg(code),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
@@ -227,7 +227,7 @@ Item {
                                             }
 
                                             //itemExtendsRoot.forceActiveFocus();
-                                            //l_list.visible = false;
+                                            //rootWindow.aliasGlobal.l_list.visible = false;
 
                                         }
                                         catch(e) {
@@ -239,7 +239,7 @@ Item {
                                 else
                                     msg = "安装失败";
 
-                                dialogCommon.show({
+                                rootWindow.aliasGlobal.dialogCommon.show({
                                     Msg: msg,
                                     Buttons: Dialog.Yes,
                                     OnAccepted: function() {
@@ -252,16 +252,16 @@ Item {
                             });
 
 
-                            dialogCommon.show({
+                            rootWindow.aliasGlobal.dialogCommon.show({
                                 Msg: '正在下载，请等待（请勿进行其他操作）',
                                 Buttons: Dialog.NoButton,
                                 OnAccepted: function() {
-                                    dialogCommon.open();
-                                    dialogCommon.forceActiveFocus();
+                                    rootWindow.aliasGlobal.dialogCommon.open();
+                                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
-                                    dialogCommon.open();
-                                    dialogCommon.forceActiveFocus();
+                                    rootWindow.aliasGlobal.dialogCommon.open();
+                                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                                 },
                             });
 
@@ -274,11 +274,11 @@ Item {
                         },
                     });
 
-                    //l_list.visible = false;
+                    //rootWindow.aliasGlobal.l_list.visible = false;
                     //root.forceActiveFocus();
                 },
                 OnCanceled: ()=>{
-                    l_list.visible = false;
+                    rootWindow.aliasGlobal.l_list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -290,7 +290,7 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        l_list.visible = false;
+        rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
         console.debug("[PluginsDownload]Escape Key");
@@ -298,7 +298,7 @@ Item {
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        l_list.visible = false;
+        rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
         console.debug("[PluginsDownload]Back Key");

@@ -1,6 +1,10 @@
 .pragma library
 
 
+
+console.debug('[GameVisualScriptJS]Loading');
+
+
 let data = (function() {
 
     //命令格式加入 type和param（比如可以选择路径、可以选择一些参数）

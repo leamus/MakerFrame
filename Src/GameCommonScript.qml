@@ -46,6 +46,8 @@ Item {
 
         if(data) {
             notepadScript.setPlainText(data);
+
+            return 1;
         }
         else {
             notepadScript.setPlainText("
@@ -2157,6 +2159,8 @@ function $readSavesInfo(count=3) {
         }
 
         notepadScript.toBegin();
+
+        return 0;
     }
 
 
@@ -2197,7 +2201,7 @@ function $readSavesInfo(count=3) {
                     let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -2211,7 +2215,7 @@ function $readSavesInfo(count=3) {
                         return;
                     }
 
-                    dialogCommon.show({
+                    rootWindow.aliasGlobal.dialogCommon.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -2246,7 +2250,7 @@ function $readSavesInfo(count=3) {
                 text: 'V'
                 onClicked: {
                     if(!_private.strSavedName) {
-                        dialogCommon.show({
+                        rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -2384,7 +2388,7 @@ function $readSavesInfo(count=3) {
         }
 
         function close() {
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -2396,7 +2400,7 @@ function $readSavesInfo(count=3) {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    dialogCommon.close();
+                    rootWindow.aliasGlobal.dialogCommon.close();
                     root.forceActiveFocus();
                 },
             });

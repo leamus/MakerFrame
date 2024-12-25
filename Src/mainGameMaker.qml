@@ -63,7 +63,7 @@ Item {
         width: parent.width * 0.9
         anchors.centerIn: parent
 
-        spacing: 6
+        spacing: 0
 
 
         Label {
@@ -84,6 +84,10 @@ Item {
             verticalAlignment: Label.AlignVCenter
         }
 
+        Item {
+            Layout.preferredHeight: 1
+            Layout.fillHeight: true
+        }
 
         Label {
             Layout.preferredWidth: parent.width
@@ -97,946 +101,897 @@ Item {
             font.pointSize: 16
             text: qsTr('当前工程：' + GameMakerGlobal.config.strCurrentProjectName)
 
-            //horizontalAlignment: Label.AlignHCenter
-            //verticalAlignment: Label.AlignVCenter
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
         }
 
 
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '新建工程'
-                onClicked: {
-                    dialogCommon.show({
-                        Msg: '输入工程名',
-                        Input: '新建工程',
-                        Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function() {
-                            if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
-                                dialogCommon.show({
-                                    Msg: '工程已存在',
-                                    Buttons: Dialog.Yes,
-                                    OnAccepted: function() {
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                    OnRejected: ()=>{
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                });
-                                return;
-                            }
-
-                            _private.changeProject(dialogCommon.input);
-
-                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-                            FrameManager.sl_dirCreate(projectPath);
-
-
-                            dialogCommon.show({
-                                Msg: '是否复制素材资源？\r\n（注意：素材资源均来自互联网，仅供测试使用，侵删）',
-                                Buttons: Dialog.Yes | Dialog.No,
-                                OnAccepted: function() {
-                                    /*dialogCommon.show({
-                                        Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
-                                        Buttons: Dialog.Yes | Dialog.No,
-                                        OnAccepted: function() {
-                                    */
-
-
-                                    let resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + '$资源模板.zip';
-
-                                    function _continue() {
-                                        //FrameManager.sl_dirCreate(projectPath);
-                                        let ret = FrameManager.sl_extractDir(resTemplate, projectPath);
-
-                                        if(ret.length > 0) {
-                                            //_private.changeProject('Leamus');
-
-                                            //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
-                                        }
-
-                                        dialogCommon.show({
-                                            Msg: ret.length > 0 ? '成功' : '失败',
-                                            Buttons: Dialog.Ok,
-                                            OnAccepted: function() {
-                                                rootGameMaker.forceActiveFocus();
-                                            },
-                                            OnRejected: ()=>{
-                                                rootGameMaker.forceActiveFocus();
-                                            },
-                                        });
-                                    }
-
-                                    //enabled = false;
-
-                                    if(!FrameManager.sl_fileExists(resTemplate)) {
-                                        //https://qiniu.leamus.cn/$资源模板.zip
-                                        const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip', resTemplate);
-                                        httpReply.sg_finished.connect(function(httpReply) {
-                                            const networkReply = httpReply.networkReply;
-                                            const code = FrameManager.sl_objectProperty('Code', networkReply);
-                                            console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
-
-                                            FrameManager.sl_deleteLater(httpReply);
-
-
-                                            dialogCommon.close();
-                                            //enabled = true;
-
-                                            if(code !== 0) {
-                                                dialogCommon.show({
-                                                    Msg: '下载失败：%1'.arg(code),
-                                                    Buttons: Dialog.Yes,
-                                                    OnAccepted: function() {
-                                                        rootGameMaker.forceActiveFocus();
-                                                    },
-                                                    OnRejected: ()=>{
-                                                        rootGameMaker.forceActiveFocus();
-                                                    },
-                                                });
-                                                return;
-                                            }
-
-                                            _continue();
-                                        });
-
-
-                                        dialogCommon.show({
-                                            Msg: '正在下载，请等待（请勿进行其他操作）',
-                                            Buttons: Dialog.NoButton,
-                                            OnAccepted: function() {
-                                                dialogCommon.open();
-                                                dialogCommon.forceActiveFocus();
-                                            },
-                                            OnRejected: ()=>{
-                                                dialogCommon.open();
-                                                dialogCommon.forceActiveFocus();
-                                            },
-                                        });
-                                    }
-                                    else
-                                        _continue();
-
-                                    /*
-                                        },
-                                        OnRejected: ()=>{
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                    });
-                                    */
-
-                                    rootGameMaker.forceActiveFocus();
-                                },
-                                OnRejected: ()=>{
-                                    rootGameMaker.forceActiveFocus();
-                                },
-                            });
-
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-                }
-            }
-
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '打开工程'
-                onClicked: {
-                    l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, '*', 0x001 | 0x2000, 0x03);
-                    l_listProjects.visible = true;
-                    //l_listProjects.focus = true;
-                    //l_listProjects.forceActiveFocus();
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '重命名'
-                onClicked: {
-                    dialogCommon.show({
-                        Msg: '输入工程名',
-                        Input: GameMakerGlobal.config.strCurrentProjectName,
-                        Buttons: Dialog.Ok | Dialog.Cancel,
-                        OnAccepted: function() {
-                            if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
-                                dialogCommon.show({
-                                    Msg: '工程已存在',
-                                    Buttons: Dialog.Yes,
-                                    OnAccepted: function() {
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                    OnRejected: ()=>{
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                });
-                                return;
-                            }
-
-                            if(FrameManager.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input) > 0) {
-                                _private.changeProject(dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
-                            }
-                            else {
-                                if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input)) {
-                                    dialogCommon.show({
-                                        Msg: '重命名失败，请检查名称',
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                    });
-                                    return;
-                                }
-                                console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + dialogCommon.input);
-                            }
-
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-                }
-            }
-        }
-
-
-
-        Button {
-            //Layout.fillWidth: true
+        ColumnLayout {
             Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
+            Layout.preferredHeight: 5
+            //Layout.preferredHeight: parent.height * 0.7
+            //Layout.fillHeight: false
 
-            text: '地　图'
-            onClicked: {
-                if(Platform.compileType === 'debug') {
-                    _private.loadModule('mainMapEditor.qml');
-                    //userMainProject.source = 'mainMapEditor.qml';
-                }
-                else {
-                    _private.loadModule('mainMapEditor.qml');
-                    //userMainProject.source = 'mainMapEditor.qml';
-                }
-            }
-        }
+            //anchors.centerIn: parent
 
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '角　色'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainRoleEditor.qml');
-                        //userMainProject.source = 'eventMaker.qml';
-                    }
-                    else {
-                        _private.loadModule('mainRoleEditor.qml');
-                        //userMainProject.source = 'eventMaker.qml';
-                    }
-                }
-            }
-
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '特　效'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainSpriteEditor.qml');
-                        //userMainProject.source = 'eventMaker.qml';
-                    }
-                    else {
-                        _private.loadModule('mainSpriteEditor.qml');
-                        //userMainProject.source = 'eventMaker.qml';
-                    }
-                }
-            }
-
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '道　具'
-                onClicked: {
-                    /*
-                    dialogCommon.show({
-                        Msg: '敬请期待~',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-
-                    return;
-                    */
-
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainGoodsEditor.qml');
-                        //userMainProject.source = 'mainGoodsEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainGoodsEditor.qml');
-                        //userMainProject.source = 'mainGoodsEditor.qml';
-                    }
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '战斗角色'
-                //font.pointSize: 14
-
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainFightRoleEditor.qml');
-                        //userMainProject.source = 'mainFightRoleEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainFightRoleEditor.qml');
-                        //userMainProject.source = 'mainFightRoleEditor.qml';
-                    }
-                }
-            }
-
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '战斗技能'
-                //font.pointSize: 14
-
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainFightSkillEditor.qml');
-                        //userMainProject.source = 'mainFightSkillEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainFightSkillEditor.qml');
-                        //userMainProject.source = 'mainFightSkillEditor.qml';
-                    }
-                }
-            }
-
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '战斗脚本'
-                //font.pointSize: 14
-
-                onClicked: {
-                    /*
-                    dialogCommon.show({
-                        Msg: '敬请期待~',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-
-                    return;
-                    */
-
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainFightScriptEditor.qml');
-                        //userMainProject.source = 'mainFightScriptEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainFightScriptEditor.qml');
-                        //userMainProject.source = 'mainFightScriptEditor.qml';
-                    }
-                }
-            }
-
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                //Layout.preferredHeight: 50
-                Layout.fillHeight: true
-
-                text: '通用脚本'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('GameCommonScript.qml');
-                        //userMainProject.source = 'GameCommonScript.qml';
-                    }
-                    else {
-                        _private.loadModule('GameCommonScript.qml');
-                        //userMainProject.source = 'GameCommonScript.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '脚　本'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('GameScriptEditor.qml');
-                        //userMainProject.source = 'GameScriptEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('GameScriptEditor.qml');
-                        //userMainProject.source = 'GameScriptEditor.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '插　件'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainPlugins.qml');
-                        //userMainProject.source = 'GameScriptEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainPlugins.qml');
-                        //userMainProject.source = 'GameScriptEditor.qml';
-                    }
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '图片管理'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainImageEditor.qml');
-                        //userMainProject.source = 'mainImageEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainImageEditor.qml');
-                        //userMainProject.source = 'mainImageEditor.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '音乐管理'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainMusicEditor.qml');
-                        //userMainProject.source = 'mainMusicEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainMusicEditor.qml');
-                        //userMainProject.source = 'mainMusicEditor.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '视频管理'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainVideoEditor.qml');
-                        //userMainProject.source = 'mainVideoEditor.qml';
-                    }
-                    else {
-                        _private.loadModule('mainVideoEditor.qml');
-                        //userMainProject.source = 'mainVideoEditor.qml';
-                    }
-                }
-            }
-        }
-
-        Button {
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            text: '开始游戏'
-            onClicked: {
-                if(Platform.compileType === 'debug') {
-                    _private.loadModule('GameStart.qml');
-                    //userMainProject.source = 'GameStart.qml';
-                }
-                else {
-                    _private.loadModule('GameStart.qml');
-                    //userMainProject.source = 'GameStart.qml';
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '测　试'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainGameTest.qml');
-                        //userMainProject.source = 'mainGameTest.qml';
-                    }
-                    else {
-                        _private.loadModule('mainGameTest.qml');
-                        //userMainProject.source = 'mainGameTest.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '打包项目'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainPackage.qml');
-                        //userMainProject.source = 'mainPackage.qml';
-                    }
-                    else {
-                        _private.loadModule('mainPackage.qml');
-                        //userMainProject.source = 'mainPackage.qml';
-                    }
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '平台分发'
-                onClicked: {
-
-                    dialogCommon.show({
-                        Msg: '敬请期待~',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-
-                    return;
-
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '导出工程'
-                onClicked: {
-                    if(!_private.checkCurrentProjectName()) {
-                        return;
-                    }
-
-
-                    let ret = FrameManager.sl_compressDir(
-                        GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + '.zip',
-                        GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
-                    );
-
-                    dialogCommon.show({
-                        Msg: ret ? '成功：' + GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + '.zip' : '失败',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '导入工程'
-                onClicked: {
-                    filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
-                    filedialogOpenProject.open();
-                }
-            }
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '示例工程'
-                onClicked: {
-                    dialogCommon.show({
-                        Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
-                        Buttons: Dialog.Yes | Dialog.No,
-                        OnAccepted: function() {
-
-                            enabled = false;
-
-                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + '$Leamus';
-
-                            //https://qiniu.leamus.cn/$Leamus.zip
-                            //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
-                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip', projectPath + '.zip');
-                            httpReply.sg_finished.connect(function(httpReply) {
-                                const networkReply = httpReply.networkReply;
-                                const code = FrameManager.sl_objectProperty('Code', networkReply);
-                                console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
-
-                                FrameManager.sl_deleteLater(httpReply);
-
-
-                                dialogCommon.close();
-                                enabled = true;
-
-                                if(code !== 0) {
-                                    dialogCommon.show({
-                                        Msg: '下载失败：%1'.arg(code),
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            rootGameMaker.forceActiveFocus();
-                                        },
-                                    });
-                                    return;
-                                }
-
-
-                                FrameManager.sl_dirCreate(projectPath);
-                                let ret = FrameManager.sl_extractDir(projectPath + '.zip', projectPath);
-
-                                if(ret.length > 0) {
-                                    _private.changeProject('$Leamus');
-
-                                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
-                                }
-
-                                dialogCommon.show({
-                                    Msg: ret.length > 0 ? '成功' : '失败',
-                                    Buttons: Dialog.Ok,
-                                    OnAccepted: function() {
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                    OnRejected: ()=>{
-                                        rootGameMaker.forceActiveFocus();
-                                    },
-                                });
-                            });
-
-
-                            dialogCommon.show({
-                                Msg: '正在下载，请等待（请勿进行其他操作）',
-                                Buttons: Dialog.NoButton,
-                                OnAccepted: function() {
-                                    dialogCommon.open();
-                                    dialogCommon.forceActiveFocus();
-                                },
-                                OnRejected: ()=>{
-                                    dialogCommon.open();
-                                    dialogCommon.forceActiveFocus();
-                                },
-                            });
-
-
-
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-
-                }
-            }
-        }
-
-        RowLayout {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width * 0.4
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.preferredHeight: 50
-            Layout.minimumHeight: 20
-            Layout.fillHeight: true
-
-            Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
-                Layout.fillHeight: true
-
-                text: '教　程'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainTutorial.qml');
-                        //userMainProject.source = 'mainTutorial.qml';
-                    }
-                    else {
-                        _private.loadModule('mainTutorial.qml');
-                        //userMainProject.source = 'mainTutorial.qml';
-                    }
-                }
-            }
+            spacing: 0
 
             /*Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
+                //id: buttonTest
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: '关于'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainAbout.qml');
-                        //userMainProject.source = 'mainAbout.qml';
+                text: "Test"
+                onClicked: menuTest.open();
+
+                Menu {
+                    id: menuTest
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "MenuItem"
+                        onClicked: {
+                            console.warn(9)
+                        }
+                        onTriggered: {
+                            console.warn(99)
+                        }
                     }
-                    else {
-                        _private.loadModule('mainAbout.qml');
-                        //userMainProject.source = 'mainAbout.qml';
+                    MenuSeparator { }
+                    Action {
+                        text: "Action"
+                        onTriggered: {
+                            console.warn(999)
+                        }
+                    }
+
+                    onAboutToHide: {
+                        console.warn(6)
+                    }
+                    onClosed: {
+                        console.warn(66)
                     }
                 }
             }
             */
 
+
             Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
+                //id: buttonProjectManage
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: '使用协议'
-                onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainAgreement.qml');
-                        //userMainProject.source = 'mainAgreement.qml';
+                text: "工程管理"
+                onClicked: menuProjectManage.open();
+
+                Menu {
+                    id: menuProjectManage
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "新建工程"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.newProject();
+                        }
                     }
-                    else {
-                        _private.loadModule('mainAgreement.qml');
-                        //userMainProject.source = 'mainAgreement.qml';
+                    MenuItem {
+                        text: "打开工程"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.openProject();
+                        }
+                    }
+                    MenuItem {
+                        text: "重命名工程"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.renameProject();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: '导出工程'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            if(!_private.checkCurrentProjectName()) {
+                                return;
+                            }
+                            _private.exportProject();
+                        }
+                    }
+                    MenuItem {
+                        text: '导入工程'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.importProject();
+                        }
+                    }
+                    MenuItem {
+                        text: '下载示例工程'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.downloadDemoProject();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: "打包项目"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            if(!_private.checkCurrentProjectName()) {
+                                return;
+                            }
+                            _private.gamePackage();
+                        }
+                    }
+                    MenuItem {
+                        text: "平台分发"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.future();
+                        }
                     }
                 }
             }
 
             Button {
-                Layout.preferredWidth: 1
-                Layout.fillWidth: true
-                //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                //Layout.preferredHeight: 50
-                //Layout.minimumHeight: 20
+                //id: buttonProjectManage
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: '更新日志'
+                text: "游戏编辑器"
                 onClicked: {
-                    if(Platform.compileType === 'debug') {
-                        _private.loadModule('mainUpdateLog.qml');
-                        //userMainProject.source = 'mainUpdateLog.qml';
+                    if(!_private.checkCurrentProjectName()) {
+                        return;
                     }
-                    else {
-                        _private.loadModule('mainUpdateLog.qml');
-                        //userMainProject.source = 'mainUpdateLog.qml';
+                    menuGameEditor.open();
+                }
+
+                Menu {
+                    id: menuGameEditor
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "地图编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.mapEditor();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: "角色编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.roleEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "特效编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.spriteEditor();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: "道具编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.goodsEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "战斗角色编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.fightRoleEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "战斗技能编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.fightSkillEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "战斗脚本编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.fightScriptEditor();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: "起始脚本编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.gameStartScriptEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "通用脚本编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.gameCommonScriptEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "脚本编辑器"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.gameScriptEditor();
+                        }
+                    }
+                    MenuSeparator { }
+                    MenuItem {
+                        text: '测　试'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.gameTest();
+                        }
                     }
                 }
             }
 
+            Button {
+                //id: buttonProjectManage
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: "媒体资源管理"
+                onClicked: {
+                    if(!_private.checkCurrentProjectName()) {
+                        return;
+                    }
+                    menuResourceManager.open();
+                }
+
+                Menu {
+                    id: menuResourceManager
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "图片管理"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.imageEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "音乐管理"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.musicEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: "视频管理"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.videoEditor();
+                        }
+                    }
+                }
+            }
+
+            Button {
+                //id: buttonProjectManage
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: "插件管理"
+                onClicked: {
+                    if(!_private.checkCurrentProjectName()) {
+                        return;
+                    }
+                    menuPluginsManager.open();
+                }
+
+                Menu {
+                    id: menuPluginsManager
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "插件管理"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.pluginsManager();
+                        }
+                    }
+                    MenuItem {
+                        text: "插件下载"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.pluginsDownload();
+                        }
+                    }
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: '开始游戏'
+                onClicked: {
+                    if(!_private.checkCurrentProjectName()) {
+                        return;
+                    }
+                    _private.gameStart();
+                }
+            }
+
+            Button {
+                //id: buttonProjectManage
+
+                Layout.preferredWidth: parent.width / 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: "文　档"
+                onClicked: menuDocuments.open();
+
+                Menu {
+                    id: menuDocuments
+
+                    //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
+                    x: parent.width - 103
+                    y: Qt.platform.os === 'android' ? -130 : 0
+
+                    MenuItem {
+                        text: "教　程"
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.tutorial();
+                        }
+                    }
+                    MenuItem {
+                        text: '使用协议'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.agreement();
+                        }
+                    }
+                    MenuItem {
+                        text: '更新日志'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.updateLog();
+                        }
+                    }
+                }
+            }
+
+
+            /*
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '新建工程'
+                    onClicked: {
+                        _private.newProject();
+                    }
+                }
+
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '打开工程'
+                    onClicked: {
+                        _private.openProject();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '重命名'
+                    onClicked: {
+                        _private.renameProject();
+                    }
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.preferredWidth: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: '地　图'
+                onClicked: {
+                    _private.mapEditor();
+                }
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '角　色'
+                    onClicked: {
+                        _private.roleEditor();
+                    }
+                }
+
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '特　效'
+                    onClicked: {
+                        _private.spriteEditor();
+                    }
+                }
+
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '道　具'
+                    onClicked: {
+                        _private.goodsEditor();
+                    }
+                }
+
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '战斗角色'
+                    //font.pointSize: 14
+
+                    onClicked: {
+                        _private.fightRoleEditor();
+                    }
+                }
+
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '战斗技能'
+                    //font.pointSize: 14
+
+                    onClicked: {
+                        _private.fightSkillEditor();
+                    }
+                }
+
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '战斗脚本'
+                    //font.pointSize: 14
+
+                    onClicked: {
+                        _private.fightScriptEditor();
+                    }
+                }
+
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    //Layout.preferredHeight: 50
+                    Layout.fillHeight: true
+
+                    text: '通用脚本'
+                    onClicked: {
+                        _private.gameCommonScriptEditor();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '脚　本'
+                    onClicked: {
+                        _private.gameScriptEditor();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '插　件'
+                    onClicked: {
+                        _private.pluginsManage();
+                    }
+                }
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '图片管理'
+                    onClicked: {
+                        _private.imageEditor();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '音乐管理'
+                    onClicked: {
+                        _private.musicEditor();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '视频管理'
+                    onClicked: {
+                        _private.videoEditor();
+                    }
+                }
+            }
+
+            Button {
+                //Layout.fillWidth: true
+                Layout.preferredWidth: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                text: '开始游戏'
+                onClicked: {
+                    _private.gameStart();
+                }
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '测　试'
+                    onClicked: {
+                        _private.gameTest();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '打包项目'
+                    onClicked: {
+                        _private.gamePackage();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '平台分发'
+                    onClicked: {
+                        _private.future();
+                    }
+                }
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '导出工程'
+                    onClicked: {
+                        _private.exportProject();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '导入工程'
+                    onClicked: {
+                        _private.importProject();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '示例工程'
+                    onClicked: {
+                        _private.downloadDemoProject();
+                    }
+                }
+            }
+
+            RowLayout {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width * 0.4
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.preferredHeight: 50
+                Layout.minimumHeight: 20
+                Layout.fillHeight: true
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '教　程'
+                    onClicked: {
+                        _private.tutorial();
+                    }
+                }
+
+                /*Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '关于'
+                    onClicked: {
+                        if(Platform.compileType === 'debug') {
+                            _private.loadModule('mainAbout.qml');
+                            //userMainProject.source = 'mainAbout.qml';
+                        }
+                        else {
+                            _private.loadModule('mainAbout.qml');
+                            //userMainProject.source = 'mainAbout.qml';
+                        }
+                    }
+                }
+                * /
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '使用协议'
+                    onClicked: {
+                        _private.agreement();
+                    }
+                }
+
+                Button {
+                    Layout.preferredWidth: 1
+                    Layout.fillWidth: true
+                    //Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    //Layout.preferredHeight: 50
+                    //Layout.minimumHeight: 20
+                    Layout.fillHeight: true
+
+                    text: '更新日志'
+                    onClicked: {
+                        _private.updateLog();
+                    }
+                }
+            }
+            */
         }
 
 
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
+        }
 
         RowLayout {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
             //Layout.preferredHeight: 30
             //Layout.minimumHeight: 20
             //Layout.fillHeight: true
@@ -1049,7 +1004,7 @@ Item {
                 //anchors.verticalCenter: parent.verticalCenter
                 //height: 50
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                Layout.fillHeight: true
+                //Layout.fillHeight: true
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
 
@@ -1070,7 +1025,7 @@ Item {
                 //height: 50
                 //width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.fillHeight: true
+                //Layout.fillHeight: true
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
 
@@ -1093,7 +1048,7 @@ Item {
                 //height: 50
                 //width: parent.width
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                Layout.fillHeight: true
+                //Layout.fillHeight: true
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
 
@@ -1175,7 +1130,7 @@ Item {
         onSg_removeClicked: {
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + item;
 
-            dialogCommon.show({
+            rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ?',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1217,49 +1172,15 @@ Item {
 
             console.debug('[mainGameMaker]You chose: ' + fileUrl, fileUrls);
 
+            let fUrl;
+            if(Qt.platform.os === 'android')
+                fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
+            else
+                fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
 
-            dialogCommon.show({
-                Msg: '确认解包吗？这会替换目标项目中的同名文件！',
-                Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function() {
-                    let fUrl;
-                    if(Qt.platform.os === 'android')
-                        fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
-                    else
-                        fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
+            //console.error('!!!', fUrl, fileUrl, FrameManager.sl_absolutePath(fileUrl))
 
-                    //console.error('!!!', fUrl, fileUrl)
-
-                    //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
-
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
-                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, FrameManager.sl_completeBaseName(fUrl))
-
-                    FrameManager.sl_dirCreate(projectPath);
-                    let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
-
-
-                    if(ret.length > 0) {
-                        _private.changeProject(FrameManager.sl_completeBaseName(fUrl));
-
-                        //console.debug('[mainGameMaker]', ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
-                    }
-
-                    dialogCommon.show({
-                        Msg: ret.length > 0 ? '成功' : '失败',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-                },
-                OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
-                },
-            });
+            _private.openProjectPackage(fUrl);
         }
         onRejected: {
             //rootGameMaker.forceActiveFocus();
@@ -1312,7 +1233,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -1321,11 +1242,11 @@ Item {
                 rootGameMaker.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                showBusyIndicator(true);
+                rootWindow.aliasGlobal.showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                clearComponentCache();
-                trimComponentCache();
+                rootWindow.clearComponentCache();
+                rootWindow.trimComponentCache();
             }
         }
 
@@ -1350,7 +1271,7 @@ Item {
                 throw e;
             }
             finally {
-                showBusyIndicator(false);
+                rootWindow.aliasGlobal.showBusyIndicator(false);
             }
         }
     }
@@ -1483,6 +1404,8 @@ Item {
     //配置
     QtObject {
         id: _config
+
+        property int nMenuItemHeight: 39
     }
 
 
@@ -1491,7 +1414,7 @@ Item {
 
         function checkCurrentProjectName() {
             if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
-                dialogCommon.show({
+                rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '请先新建或选择一个工程',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1512,8 +1435,8 @@ Item {
             //console.debug('~~~loadModule:', moduleURL);
 
 
-            if(moduleURL.length !== 0 && !checkCurrentProjectName())
-                return false;
+            //if(moduleURL.length !== 0 && !checkCurrentProjectName())
+            //    return false;
 
 
             //loader.visible = true;
@@ -1547,6 +1470,584 @@ Item {
             GameMakerGlobal.config.strCurrentProjectName = newProject;
         }
 
+
+        //打开工程
+        function newProject() {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '输入工程名',
+                Input: '新建工程',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                        rootWindow.aliasGlobal.dialogCommon.show({
+                            Msg: '工程已存在',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+
+                    _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input);
+
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+                    FrameManager.sl_dirCreate(projectPath);
+
+
+                    rootWindow.aliasGlobal.dialogCommon.show({
+                        Msg: '是否复制素材资源？\r\n（注意：素材资源均来自互联网，仅供测试使用，侵删）',
+                        Buttons: Dialog.Yes | Dialog.No,
+                        OnAccepted: function() {
+                            /*rootWindow.aliasGlobal.dialogCommon.show({
+                                Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
+                                Buttons: Dialog.Yes | Dialog.No,
+                                OnAccepted: function() {
+                            */
+
+
+                            let resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + '$资源模板.zip';
+
+                            function _continue() {
+                                //FrameManager.sl_dirCreate(projectPath);
+                                let ret = FrameManager.sl_extractDir(resTemplate, projectPath);
+
+                                if(ret.length > 0) {
+                                    //_private.changeProject('Leamus');
+
+                                    //console.debug(ret, projectPath);
+                                }
+
+                                rootWindow.aliasGlobal.dialogCommon.show({
+                                    Msg: ret.length > 0 ? '成功' : '失败',
+                                    Buttons: Dialog.Ok,
+                                    OnAccepted: function() {
+                                        rootGameMaker.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        rootGameMaker.forceActiveFocus();
+                                    },
+                                });
+                            }
+
+                            //enabled = false;
+
+                            if(!FrameManager.sl_fileExists(resTemplate)) {
+                                //https://qiniu.leamus.cn/$资源模板.zip
+                                const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip', resTemplate);
+                                httpReply.sg_finished.connect(function(httpReply) {
+                                    const networkReply = httpReply.networkReply;
+                                    const code = FrameManager.sl_objectProperty('Code', networkReply);
+                                    console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+
+                                    FrameManager.sl_deleteLater(httpReply);
+
+
+                                    rootWindow.aliasGlobal.dialogCommon.close();
+                                    //enabled = true;
+
+                                    if(code !== 0) {
+                                        rootWindow.aliasGlobal.dialogCommon.show({
+                                            Msg: '下载失败：%1'.arg(code),
+                                            Buttons: Dialog.Yes,
+                                            OnAccepted: function() {
+                                                rootGameMaker.forceActiveFocus();
+                                            },
+                                            OnRejected: ()=>{
+                                                rootGameMaker.forceActiveFocus();
+                                            },
+                                        });
+                                        return;
+                                    }
+
+                                    _continue();
+                                });
+
+
+                                rootWindow.aliasGlobal.dialogCommon.show({
+                                    Msg: '正在下载，请等待（请勿进行其他操作）',
+                                    Buttons: Dialog.NoButton,
+                                    OnAccepted: function() {
+                                        rootWindow.aliasGlobal.dialogCommon.open();
+                                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        rootWindow.aliasGlobal.dialogCommon.open();
+                                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                    },
+                                });
+                            }
+                            else
+                                _continue();
+
+                            /*
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            */
+
+                            rootGameMaker.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            rootGameMaker.forceActiveFocus();
+                        },
+                    });
+
+                    rootGameMaker.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+
+        function openProject() {
+            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, '*', 0x001 | 0x2000, 0x03);
+            l_listProjects.visible = true;
+            //l_listProjects.focus = true;
+            //l_listProjects.forceActiveFocus();
+        }
+
+        function renameProject() {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '输入工程名',
+                Input: GameMakerGlobal.config.strCurrentProjectName,
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                        rootWindow.aliasGlobal.dialogCommon.show({
+                            Msg: '工程已存在',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+
+                    if(FrameManager.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input) > 0) {
+                        _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
+                    }
+                    else {
+                        if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                            rootWindow.aliasGlobal.dialogCommon.show({
+                                Msg: '重命名失败，请检查名称',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            return;
+                        }
+                        console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input);
+                    }
+
+                    rootGameMaker.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+
+        function mapEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainMapEditor.qml');
+                //userMainProject.source = 'mainMapEditor.qml';
+            }
+            else {
+                _private.loadModule('mainMapEditor.qml');
+                //userMainProject.source = 'mainMapEditor.qml';
+            }
+        }
+        function roleEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainRoleEditor.qml');
+                //userMainProject.source = 'eventMaker.qml';
+            }
+            else {
+                _private.loadModule('mainRoleEditor.qml');
+                //userMainProject.source = 'eventMaker.qml';
+            }
+        }
+        function spriteEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainSpriteEditor.qml');
+                //userMainProject.source = 'eventMaker.qml';
+            }
+            else {
+                _private.loadModule('mainSpriteEditor.qml');
+                //userMainProject.source = 'eventMaker.qml';
+            }
+        }
+        function goodsEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainGoodsEditor.qml');
+                //userMainProject.source = 'mainGoodsEditor.qml';
+            }
+            else {
+                _private.loadModule('mainGoodsEditor.qml');
+                //userMainProject.source = 'mainGoodsEditor.qml';
+            }
+        }
+        function fightRoleEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainFightRoleEditor.qml');
+                //userMainProject.source = 'mainFightRoleEditor.qml';
+            }
+            else {
+                _private.loadModule('mainFightRoleEditor.qml');
+                //userMainProject.source = 'mainFightRoleEditor.qml';
+            }
+        }
+        function fightSkillEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainFightSkillEditor.qml');
+                //userMainProject.source = 'mainFightSkillEditor.qml';
+            }
+            else {
+                _private.loadModule('mainFightSkillEditor.qml');
+                //userMainProject.source = 'mainFightSkillEditor.qml';
+            }
+        }
+        function fightScriptEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainFightScriptEditor.qml');
+                //userMainProject.source = 'mainFightScriptEditor.qml';
+            }
+            else {
+                _private.loadModule('mainFightScriptEditor.qml');
+                //userMainProject.source = 'mainFightScriptEditor.qml';
+            }
+        }
+        function gameStartScriptEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('GameStartScript.qml');
+                //userMainProject.source = 'GameStartScript.qml';
+            }
+            else {
+                _private.loadModule('GameStartScript.qml');
+                //userMainProject.source = 'GameStartScript.qml';
+            }
+        }
+        function gameCommonScriptEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('GameCommonScript.qml');
+                //userMainProject.source = 'GameCommonScript.qml';
+            }
+            else {
+                _private.loadModule('GameCommonScript.qml');
+                //userMainProject.source = 'GameCommonScript.qml';
+            }
+        }
+        function gameScriptEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('GameScriptEditor.qml');
+                //userMainProject.source = 'GameScriptEditor.qml';
+            }
+            else {
+                _private.loadModule('GameScriptEditor.qml');
+                //userMainProject.source = 'GameScriptEditor.qml';
+            }
+        }
+        function pluginsManage() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainPlugins.qml');
+                //userMainProject.source = 'GameScriptEditor.qml';
+            }
+            else {
+                _private.loadModule('mainPlugins.qml');
+                //userMainProject.source = 'GameScriptEditor.qml';
+            }
+        }
+        function imageEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainImageEditor.qml');
+                //userMainProject.source = 'mainImageEditor.qml';
+            }
+            else {
+                _private.loadModule('mainImageEditor.qml');
+                //userMainProject.source = 'mainImageEditor.qml';
+            }
+        }
+        function musicEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainMusicEditor.qml');
+                //userMainProject.source = 'mainMusicEditor.qml';
+            }
+            else {
+                _private.loadModule('mainMusicEditor.qml');
+                //userMainProject.source = 'mainMusicEditor.qml';
+            }
+        }
+        function videoEditor() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainVideoEditor.qml');
+                //userMainProject.source = 'mainVideoEditor.qml';
+            }
+            else {
+                _private.loadModule('mainVideoEditor.qml');
+                //userMainProject.source = 'mainVideoEditor.qml';
+            }
+        }
+
+        function pluginsManager() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('PluginsManager.qml');
+                //userMainProject.source = 'PluginsManager.qml';
+            }
+            else {
+                _private.loadModule('PluginsManager.qml');
+                //userMainProject.source = 'PluginsManager.qml';
+            }
+        }
+
+        function pluginsDownload() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('PluginsDownload.qml');
+                //userMainProject.source = 'PluginsDownload.qml';
+            }
+            else {
+                _private.loadModule('PluginsDownload.qml');
+                //userMainProject.source = 'PluginsDownload.qml';
+            }
+        }
+
+        function gameStart() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('Core/GameScene.qml');
+                //userMainProject.source = 'Core/GameScene.qml';
+            }
+            else {
+                _private.loadModule('Core/GameScene.qml');
+                //userMainProject.source = 'Core/GameScene.qml';
+            }
+        }
+        function gameTest() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainGameTest.qml');
+                //userMainProject.source = 'mainGameTest.qml';
+            }
+            else {
+                _private.loadModule('mainGameTest.qml');
+                //userMainProject.source = 'mainGameTest.qml';
+            }
+        }
+        function gamePackage() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainPackage.qml');
+                //userMainProject.source = 'mainPackage.qml';
+            }
+            else {
+                _private.loadModule('mainPackage.qml');
+                //userMainProject.source = 'mainPackage.qml';
+            }
+        }
+        function future() {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '敬请期待~',
+                Buttons: Dialog.Ok,
+                OnAccepted: function() {
+                    rootGameMaker.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+
+        function exportProject() {
+            if(!_private.checkCurrentProjectName()) {
+                return;
+            }
+
+
+            let ret = FrameManager.sl_compressDir(
+                GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + '.zip',
+                GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
+            );
+
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: ret ? '成功：' + GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + '.zip' : '失败',
+                Buttons: Dialog.Ok,
+                OnAccepted: function() {
+                    rootGameMaker.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+        function importProject() {
+            filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
+            filedialogOpenProject.open();
+        }
+
+        function openProjectPackage(fUrl) {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '确认解包吗？这会替换目标项目中的同名文件！',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
+                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, FrameManager.sl_completeBaseName(fUrl))
+
+                    FrameManager.sl_dirCreate(projectPath);
+                    let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
+
+
+                    if(ret.length > 0) {
+                        _private.changeProject(FrameManager.sl_completeBaseName(fUrl));
+
+                        //console.debug('[mainGameMaker]', ret, projectPath);
+                    }
+
+                    rootWindow.aliasGlobal.dialogCommon.show({
+                        Msg: ret.length > 0 ? '成功' : '失败',
+                        Buttons: Dialog.Ok,
+                        OnAccepted: function() {
+                            rootGameMaker.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            rootGameMaker.forceActiveFocus();
+                        },
+                    });
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+
+        function downloadDemoProject() {
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
+                Buttons: Dialog.Yes | Dialog.No,
+                OnAccepted: function() {
+
+                    enabled = false;
+
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + '$Leamus';
+
+                    //https://qiniu.leamus.cn/$Leamus.zip
+                    //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
+                    const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip', projectPath + '.zip');
+                    httpReply.sg_finished.connect(function(httpReply) {
+                        const networkReply = httpReply.networkReply;
+                        const code = FrameManager.sl_objectProperty('Code', networkReply);
+                        console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+
+                        FrameManager.sl_deleteLater(httpReply);
+
+
+                        rootWindow.aliasGlobal.dialogCommon.close();
+                        enabled = true;
+
+                        if(code !== 0) {
+                            rootWindow.aliasGlobal.dialogCommon.show({
+                                Msg: '下载失败：%1'.arg(code),
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    rootGameMaker.forceActiveFocus();
+                                },
+                            });
+                            return;
+                        }
+
+
+                        FrameManager.sl_dirCreate(projectPath);
+                        let ret = FrameManager.sl_extractDir(projectPath + '.zip', projectPath);
+
+                        if(ret.length > 0) {
+                            _private.changeProject('$Leamus');
+
+                            //console.debug(ret, projectPath);
+                        }
+
+                        rootWindow.aliasGlobal.dialogCommon.show({
+                            Msg: ret.length > 0 ? '成功' : '失败',
+                            Buttons: Dialog.Ok,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                    });
+
+
+                    rootWindow.aliasGlobal.dialogCommon.show({
+                        Msg: '正在下载，请等待（请勿进行其他操作）',
+                        Buttons: Dialog.NoButton,
+                        OnAccepted: function() {
+                            rootWindow.aliasGlobal.dialogCommon.open();
+                            rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            rootWindow.aliasGlobal.dialogCommon.open();
+                            rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                        },
+                    });
+
+
+
+                    rootGameMaker.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    rootGameMaker.forceActiveFocus();
+                },
+            });
+        }
+
+        function tutorial() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainTutorial.qml');
+                //userMainProject.source = 'mainTutorial.qml';
+            }
+            else {
+                _private.loadModule('mainTutorial.qml');
+                //userMainProject.source = 'mainTutorial.qml';
+            }
+        }
+        function agreement() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainAgreement.qml');
+                //userMainProject.source = 'mainAgreement.qml';
+            }
+            else {
+                _private.loadModule('mainAgreement.qml');
+                //userMainProject.source = 'mainAgreement.qml';
+            }
+        }
+        function updateLog() {
+            if(Platform.compileType === 'debug') {
+                _private.loadModule('mainUpdateLog.qml');
+                //userMainProject.source = 'mainUpdateLog.qml';
+            }
+            else {
+                _private.loadModule('mainUpdateLog.qml');
+                //userMainProject.source = 'mainUpdateLog.qml';
+            }
+        }
+
+
+        property var fnBackupOpenFile: null
     }
 
 
@@ -1599,6 +2100,19 @@ Item {
 
 
 
+        _private.fnBackupOpenFile = rootWindow.fnOpenFile;
+        rootWindow.fnOpenFile = (url, type)=>{
+            const fileExtName = FrameManager.sl_completeSuffix(url);
+            if(fileExtName === 'zip') {
+                _private.openProjectPackage(url);
+                return true;
+            }
+            else
+                return false;
+        }
+
+
+
         //let d = console.debug;
         //console.debug = 123;
         //d('!!!!!!!!!!!', d, console.debug, d === console.debug);
@@ -1606,7 +2120,11 @@ Item {
         console.debug('[mainGameMaker]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
+        rootWindow.fnOpenFile = _private.fnBackupOpenFile;
+
+
         //delete FrameManager.sl_globalObject().GameMakerGlobal;
+
 
         console.debug('[mainGameMaker]Component.onDestruction:', Qt.resolvedUrl('.'));
     }
