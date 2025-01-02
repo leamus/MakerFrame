@@ -3077,10 +3077,10 @@ Item {
 
 
             //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-            if(GlobalLibraryJS.isFunction(callback)) {
+            if(GlobalLibraryJS.isFunction(itemVideo.fCallback)) {
                 ret = new Promise(function(resolve, reject){
-                    const fcallback = callback;
-                    callback = (cb, ...params)=>{
+                    const fcallback = itemVideo.fCallback;
+                    itemVideo.fCallback = (cb, ...params)=>{
                         fcallback(cb, ...params);
                         resolve(params[0]);
                         //reject(params[0]);
@@ -3110,7 +3110,8 @@ Item {
             //console.debug(itemViewPort.gameScene.color==='#ccffffff');
         }
         //结束播放；
-        readonly property var stopvideo: function(code=-2) {
+        //code为-1表示释放退出；为0表示播放结束；为1表示用户退出；
+        readonly property var stopvideo: function(code=1) {
             itemVideo.stop(code);
         }
 
@@ -4204,7 +4205,7 @@ Item {
         }
 
         //暂停time毫秒。
-        readonly property var wait: function(ms, callback=true) {
+        readonly property var wait: function(ms) {
 
             /*if(callback === true || callback === 1)
                 _private.scriptQueue.wait(ms);
@@ -5482,56 +5483,55 @@ Item {
         }
 
         function close() {
-            if(!visible)
-                return;
+            if(visible) {
+
+                //默认回调函数
+                let callback = function(itemTrade) {
+
+                    itemTrade.visible = false;
+                    //itemTrade.destroy();
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true);
+                        //_private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
+                        return true;
+                    }
+                    //rootGameScene.forceActiveFocus();
+
+                    return false;
+                };
+
+
+                if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, -1);
+                }
+                else {   //默认回调函数
+                    callback(dialogTrade);
+
+
+                    //dialogTrade.visible = false;
+                    //dialogTrade.destroy();
+
+
+                    /* /*if(dialogTrade.bPauseGame && _private.config.bPauseGame) {
+                        game.goon();
+                        dialogTrade.bPauseGame = false;
+                    }* /*/
+
+                    /*if(_private.config.objPauseNames['$msg'] !== undefined) {
+                        game.goon('$msg');
+                        _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
+                    }*/
+
+
+                    ////FrameManager.goon();
+                }
+            }
 
             rootGameScene.forceActiveFocus();
-
-
-            //默认回调函数
-            let callback = function(itemTrade) {
-
-                itemTrade.visible = false;
-                //itemTrade.destroy();
-
-                //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
-                    //如果没有使用yield来中断代码，可以不要game.run(true)
-                    game.goon(pauseGame);
-                    //game.run(true);
-                    //_private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
-                    return true;
-                }
-                //rootGameScene.forceActiveFocus();
-
-                return false;
-            };
-
-
-            if(GlobalLibraryJS.isFunction(dialogTrade.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                game.run(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, -1);
-            }
-            else {   //默认回调函数
-                callback(dialogTrade);
-
-
-                //dialogTrade.visible = false;
-                //dialogTrade.destroy();
-
-
-                /* /*if(dialogTrade.bPauseGame && _private.config.bPauseGame) {
-                    game.goon();
-                    dialogTrade.bPauseGame = false;
-                }* /*/
-
-                /*if(_private.config.objPauseNames['$msg'] !== undefined) {
-                    game.goon('$msg');
-                    _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
-                }*/
-
-
-                ////FrameManager.goon();
-            }
         }
 
 
@@ -5685,57 +5685,58 @@ Item {
             sliderMovie.forceActiveFocus();
         }
 
-        function stop(code=-2) {
-            if(mediaPlayer.playbackState === MediaPlayer.StoppedState)
-                return;
+        function stop(code=0) {
+            //if(mediaPlayer.playbackState !== MediaPlayer.StoppedState) {
+
+                //默认回调函数
+                let callback = function(code, itemVideo) {
+
+                    itemVideo.visible = false;
+                    mediaPlayer.stop();
+                    mediaPlayer.source = '';
+                    //itemMsg.destroy();
+
+                    //game.pause(true)[pauseGame]
+                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                        //如果没有使用yield来中断代码，可以不要game.run(true)
+                        game.goon(pauseGame);
+                        //game.run(true);
+                        //_private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
+                        return true;
+                    }
+                    //rootGameScene.forceActiveFocus();
+
+                    return false;
+                };
 
 
-            //默认回调函数
-            let callback = function(code, itemVideo) {
-
-                itemVideo.visible = false;
-                mediaPlayer.stop();
-                mediaPlayer.source = '';
-                //itemMsg.destroy();
-
-                //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
-                    //如果没有使用yield来中断代码，可以不要game.run(true)
-                    game.goon(pauseGame);
-                    //game.run(true);
-                    //_private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
-                    return true;
+                if(GlobalLibraryJS.isFunction(itemVideo.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                    game.run(itemVideo.fCallback.call(itemVideo, callback, code, itemVideo) ?? null, -1);
                 }
-                //rootGameScene.forceActiveFocus();
-
-                return false;
-            };
+                else {   //默认回调函数
+                    callback(code, itemVideo);
 
 
-            if(GlobalLibraryJS.isFunction(itemVideo.fCallback)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                game.run(itemVideo.fCallback.call(itemVideo, callback, code, itemVideo) ?? null, -1);
-            }
-            else {   //默认回调函数
-                callback(code, itemVideo);
+                    //rootRoleMsg.visible = false;
+                    //rootRoleMsg.destroy();
 
 
-                //rootRoleMsg.visible = false;
-                //rootRoleMsg.destroy();
+                    /* /*if(rootRoleMsg.bPauseGame && _private.config.bPauseGame) {
+                        game.goon();
+                        rootRoleMsg.bPauseGame = false;
+                    }* / */
+
+                    /*if(_private.config.objPauseNames['$talk'] !== undefined) {
+                        game.goon('$talk');
+                        _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
+                    }*/
 
 
-                /* /*if(rootRoleMsg.bPauseGame && _private.config.bPauseGame) {
-                    game.goon();
-                    rootRoleMsg.bPauseGame = false;
-                }* / */
+                    ////FrameManager.goon();
+                }
+            //}
 
-                /*if(_private.config.objPauseNames['$talk'] !== undefined) {
-                    game.goon('$talk');
-                    _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
-                }*/
-
-
-                ////FrameManager.goon();
-            }
+            rootGameScene.forceActiveFocus();
         }
 
 
@@ -5775,7 +5776,7 @@ Item {
                     //playbackRate: 0.1
 
                     onStopped: {
-                        game.stopvideo(2);
+                        game.stopvideo(0);
                     }
 
                     onPlaybackStateChanged: {
