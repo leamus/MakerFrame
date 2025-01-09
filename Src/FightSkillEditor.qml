@@ -550,6 +550,6 @@ let data = (function() {
         console.debug('[GameFightSkill]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameFightSkill]Component.onDestruction");
+        console.debug('[GameFightSkill]Component.onDestruction');
     }
 }

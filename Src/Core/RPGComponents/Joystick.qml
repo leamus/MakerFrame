@@ -32,7 +32,7 @@ Item {
 
         anchors.fill: parent
         border.width: 2 * Screen.pixelDensity
-        border.color: "#1e1b18"
+        border.color: '#1e1b18'
         radius: width / 2
     }
     Image {
@@ -64,7 +64,7 @@ Item {
         }*/
 
         radius: width / 2
-        color: "#1e1b18"
+        color: '#1e1b18'
 
     }
 
@@ -81,7 +81,7 @@ Item {
     NumberAnimation {
         id: returnAnimation
         target: rectHandle.anchors
-        properties: "horizontalCenterOffset,verticalCenterOffset"
+        properties: 'horizontalCenterOffset,verticalCenterOffset'
         to: 0
         duration: 200
         easing.type: Easing.OutSine

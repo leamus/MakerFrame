@@ -541,9 +541,9 @@ let data = (function() {
 
 
     Component.onCompleted: {
-        console.debug("[GoodsEditor]Component.onCompleted");
+        console.debug('[GoodsEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GoodsEditor]Component.onDestruction");
+        console.debug('[GoodsEditor]Component.onDestruction');
     }
 }

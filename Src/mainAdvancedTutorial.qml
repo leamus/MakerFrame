@@ -82,7 +82,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返　回"
+            text: '返　回'
             onClicked: {
                 sg_close();
             }
@@ -122,14 +122,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainAdvancedTutorial]Escape Key");
+        console.debug('[mainAdvancedTutorial]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainAdvancedTutorial]Back Key");
+        console.debug('[mainAdvancedTutorial]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -172,8 +172,8 @@ Item {
     if(httpReply)
         httpReply.sg_finished.connect(function(httpReply) {
             const networkReply = httpReply.networkReply;
-            //FrameManager.sl_objectProperty("属性", networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
-            //console.debug(httpReply, FrameManager.sl_objectProperty("Data", httpReply.networkReply), Object.keys(httpReply.networkReply));
+            //FrameManager.sl_objectProperty('属性', networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
+            //console.debug(httpReply, FrameManager.sl_objectProperty('Data', httpReply.networkReply), Object.keys(httpReply.networkReply));
 
             FrameManager.sl_deleteLater(httpReply);
         });
@@ -186,11 +186,11 @@ Item {
         }
     }
 
-    httpService.baseURL = "/v1/api";
+    httpService.baseURL = '/v1/api';
     //方式1：使用sl_addRoute添加路由，这种方式使用QML主线程来处理；
-    httpService.sl_addRoute('POST', "/echo", function(body){return {code: 200, data: 'hello1'}});
-    httpService.sl_addRoute('GET', "/user/:id", function(body){return {code: 200, data: 'hello2'}});
-    httpService.sl_addRoute("/echoAll", function(body){return {code: 200, data: 'hello1'}});
+    httpService.sl_addRoute('POST', '/echo', function(body){return {code: 200, data: 'hello1'}});
+    httpService.sl_addRoute('GET', '/user/:id', function(body){return {code: 200, data: 'hello2'}});
+    httpService.sl_addRoute('/echoAll', function(body){return {code: 200, data: 'hello1'}});
     //方式2：使用sl_addJSFileRoute添加JS文件的路由，这种方式使用 子线程+QJSEngine 来处理；
     httpService.sl_addJSFileRoute(GlobalJS.toPath(Qt.resolvedUrl('testHTTPServerRoute.js')));
     httpService.sl_static('/static/', 'd:/');
@@ -201,10 +201,10 @@ Item {
 
     JS路由格式：
     export default [
-        ['GET', '/get1', function(body){
+        ['GET', '/get1', function(body) {
             console.info(body); return {code: 200, data: 'hello3'};
         }],
-        ['POST', '/post1', function(body){
+        ['POST', '/post1', function(body) {
             console.info(body); return {code: 201, data: 'hello4'};
         }],
     ]
@@ -213,30 +213,30 @@ Item {
         id: tcpSocket
 
         Component.onCompleted: {
-            tcpSocket.sg_hostFound.connect(function(tcp){
+            tcpSocket.sg_hostFound.connect(function(tcp) {
                 console.info('sg_hostFound', tcp);
             });
-            tcpSocket.sg_connected.connect(function(tcp){
+            tcpSocket.sg_connected.connect(function(tcp) {
                 console.info('sg_connected', tcp);
             });
-            tcpSocket.sg_disconnected.connect(function(tcp){
+            tcpSocket.sg_disconnected.connect(function(tcp) {
                 console.info('sg_disconnected', tcp);
             });
-            tcpSocket.sg_stateChanged.connect(function(state, tcp){
+            tcpSocket.sg_stateChanged.connect(function(state, tcp) {
                 console.info('sg_stateChanged', state, tcp);
             });
-            tcpSocket.sg_errorOccurred.connect(function(error, tcp){
+            tcpSocket.sg_errorOccurred.connect(function(error, tcp) {
                 console.warn('sg_errorOccurred', error, tcp);
             });
 
 
-            tcpSocket.sg_readyRead.connect(function(data, tcp){
+            tcpSocket.sg_readyRead.connect(function(data, tcp) {
                 console.info('sg_readyRead', data, tcp);
             });
-            tcpSocket.sg_bytesWritten.connect(function(bytes, tcp){
+            tcpSocket.sg_bytesWritten.connect(function(bytes, tcp) {
                 console.info('sg_bytesWritten', bytes, tcp);
             });
-            tcpSocket.sg_aboutToClose.connect(function(tcp){
+            tcpSocket.sg_aboutToClose.connect(function(tcp) {
                 console.info('sg_aboutToClose', tcp);
             });
         }
@@ -251,30 +251,30 @@ Item {
             console.info('onSg_newConnection:', id, tcpSocket);
 
 
-            tcpSocket.sg_hostFound.connect(function(udp){
+            tcpSocket.sg_hostFound.connect(function(udp) {
                 console.info('sg_hostFound', udp);
             });
-            tcpSocket.sg_connected.connect(function(udp){
+            tcpSocket.sg_connected.connect(function(udp) {
                 console.info('sg_connected', udp);
             });
-            tcpSocket.sg_disconnected.connect(function(udp){
+            tcpSocket.sg_disconnected.connect(function(udp) {
                 console.info('sg_disconnected', udp);
             });
-            tcpSocket.sg_stateChanged.connect(function(state, udp){
+            tcpSocket.sg_stateChanged.connect(function(state, udp) {
                 console.info('sg_stateChanged', state, udp);
             });
-            tcpSocket.sg_errorOccurred.connect(function(error, udp){
+            tcpSocket.sg_errorOccurred.connect(function(error, udp) {
                 console.warn('sg_errorOccurred', error, udp);
             });
 
 
-            tcpSocket.sg_readyRead.connect(function(data, udp){
+            tcpSocket.sg_readyRead.connect(function(data, udp) {
                 console.info('sg_readyRead', data, udp);
             });
-            tcpSocket.sg_bytesWritten.connect(function(bytes, udp){
+            tcpSocket.sg_bytesWritten.connect(function(bytes, udp) {
                 console.info('sg_bytesWritten', bytes, udp);
             });
-            tcpSocket.sg_aboutToClose.connect(function(udp){
+            tcpSocket.sg_aboutToClose.connect(function(udp) {
                 console.info('sg_aboutToClose', udp);
             });
         }
@@ -293,36 +293,36 @@ Item {
         1、receiveDatagram() 和 readAll() 只能返回一次数据，再调用无效；
           前者类似服务器用法，后者类似TCPSocket用法；
           如果是使用 sl_connectToHost，peerXxx 和 Datagram中的senderXxx、destinationXxx 都没问题；
-          如果是使用 sl_bind，peerXxx为空，Datagram中的senderAddress不知为何像IP6（"::ffff:127.0.0.1"），destinationAddress为空，destinationPort为-1，hopLimit为-1
+          如果是使用 sl_bind，peerXxx为空，Datagram中的senderAddress不知为何像IP6（'::ffff:127.0.0.1'），destinationAddress为空，destinationPort为-1，hopLimit为-1
     */
     UDPSocket {
         id: udpSocket
 
         Component.onCompleted: {
-            this.sg_hostFound.connect(function(udp){
+            this.sg_hostFound.connect(function(udp) {
                 console.info('sg_hostFound', udp);
             });
-            this.sg_connected.connect(function(udp){
+            this.sg_connected.connect(function(udp) {
                 console.info('sg_connected', udp);
             });
-            this.sg_disconnected.connect(function(udp){
+            this.sg_disconnected.connect(function(udp) {
                 console.info('sg_disconnected', udp);
             });
-            this.sg_stateChanged.connect(function(state, udp){
+            this.sg_stateChanged.connect(function(state, udp) {
                 console.info('sg_stateChanged', state, udp);
             });
-            this.sg_errorOccurred.connect(function(error, udp){
+            this.sg_errorOccurred.connect(function(error, udp) {
                 console.warn('sg_errorOccurred', error, udp);
             });
 
 
-            this.sg_readyRead.connect(function(data, addr, ip, udp){
+            this.sg_readyRead.connect(function(data, addr, ip, udp) {
                 console.info('sg_readyRead', data, addr, ip, udp);
             });
-            this.sg_bytesWritten.connect(function(bytes, udp){
+            this.sg_bytesWritten.connect(function(bytes, udp) {
                 console.info('sg_bytesWritten', bytes, udp);
             });
-            this.sg_aboutToClose.connect(function(udp){
+            this.sg_aboutToClose.connect(function(udp) {
                 console.info('sg_aboutToClose', udp);
             });
         }
@@ -380,7 +380,7 @@ Item {
             //Info: {AppID: '549XXXX', AppName: '鹰歌软件框架&游戏引擎', ForceInit: false, MediaID: '10XXXXXXX', Orient: 1},
             Type: 1,
             Flags: 0b111,
-            ErrorCallback: function(e){
+            ErrorCallback: function(e) {
                 console.warn(e, JSON.stringify(e.$params)); //code, msg, data
             },
         });
@@ -400,7 +400,7 @@ Item {
             ...
             try{
               res2 = yield x2;
-            }catch(e) {
+            } catch(e) {
               ...
             }
             ...
@@ -415,19 +415,19 @@ Item {
     用法二（对象形式，功能更多）：
       使用AsyncScript产生一个对象来运行，这个对象除了有用法一的功能外，还可以使用waitAll函数等待它的所有生成器运行完毕；
         示例：
-        GlobalLibraryJS.asyncScript(function*(){
+        GlobalLibraryJS.asyncScript(function*() {
             //let as = new GlobalLibraryJS.AsyncScript();   //创建一个新的
             let as = GlobalLibraryJS.$asyncScript;          //使用系统自带的
             console.info(1);
-            as.async(function*(){
+            as.async(function*() {
                 console.info(2);
             });
-            as.async(function*(){
+            as.async(function*() {
                 console.info(3);
             });
             console.info(4);
             yield as.sleep(1000);
-            as.async(function*(){
+            as.async(function*() {
                 console.info(5);
             });
             console.info(6);
@@ -439,9 +439,10 @@ Item {
 
 11、脚本队列
     游戏中已经封装了一个 主脚本队列，用game.run(vScript, scriptProps=-1, ...params)来运行，具体见命令教程；
-    单独用法：
+    另一种底层用法：
       scriptQueue = new GlobalLibraryJS.ScriptQueue();  //创建一个脚本队列
-      GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
+      //GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
+      const ret = scriptQueue.create(genfunc(...) ?? null, -1, true, 'tips', ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       scriptQueue.clear(3);     //清空脚本队列；参数不同效果不同；
       scriptQueue.run(value);   //运行一次脚本队列；参数为给脚本中断的yield返回值；
       scriptQueue.runNextEventLoop('tips'); //运行一次脚本队列；放在下次事件循环中；
@@ -452,9 +453,9 @@ Item {
     示例：
     let cacheSprites = new GlobalLibraryJS.Cache({
         //创建时回调
-        $create: function(p){
+        $create: function(p) {
             let o = compCacheSpriteEffect.createObject(p);
-            /*o.sg_playEffect.connect(function(soundeffectSource){
+            /*o.sg_playEffect.connect(function(soundeffectSource) {
                 。。。
             });
             */
@@ -499,9 +500,9 @@ Item {
 `;
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainAdvancedTutorial]Component.onCompleted");
+        console.debug('[mainAdvancedTutorial]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainAdvancedTutorial]Component.onDestruction");
+        console.debug('[mainAdvancedTutorial]Component.onDestruction');
     }
 }

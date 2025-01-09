@@ -454,6 +454,6 @@ let data = (function() {
         console.debug('[GameFightRole]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameFightRole]Component.onDestruction");
+        console.debug('[GameFightRole]Component.onDestruction');
     }
 }

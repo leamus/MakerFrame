@@ -137,7 +137,7 @@ Item {
         console.debug('[mainUpdateLog]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainUpdateLog]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainUpdateLog]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
@@ -149,10 +149,26 @@ Item {
 
 版本A.B.C说明：
     A表示大版本，一般情况下不会变化（如果变化表示鹰歌有极大的改动，不会兼容以前工程）；
-    B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽力去兼容旧工程）；
+    B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽可能的去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
-2024/12/24：发布 1.13.12.241224 版本（框架 1.6.3.241224版本）
+2025/1/1：发布 1.14.2.250101 版本（Updater 1.5.17.250101版本，框架 1.6.4.250101版本）
+1、修改：Updater的一些细节（避免了升级后再载入有概率自动退出的问题）；
+2、新增：openssl库的一些常用函数（RSA密钥对生成、RSA加解密、RSA验证、md5摘要、sha256摘要、des对称加解密）；
+3、修改：将SQLITECIPHER密码加密后放到Config.cfg，这样可以做自己的本地加密SQLITE；
+4、新增：拖动文件夹到鹰歌可以打包为zip；
+5、修改：sl_compressFile、sl_compressFiles、sl_compressDir新增了参数；
+6、新增：sl_compressFileEx、sl_compressFilesEx、sl_extractDirEx加密zip操作函数；
+7、修复：game.playvideo播放时报错、结束时无法退出的问题；
+8、新增：异步脚本AsyncScript新增terminateAll函数；
+9、修改：增强了AsyncScript的功能；
+10、修改：增强了ScriptQueue功能，解决了递归问题，合并了GlobalJS.createScript函数；
+11、修复：退出游戏时会强制停止并清空所有异步脚本，修复了退出时报的一些找不到游戏变量的Bug；
+12、发布：linux的deb新版包；
+13、其他：优化调整很多代码和细节，修复一些Bugs；
+14、先这样吧。
+
+2024/12/24：发布 1.14.1.241224 版本（框架 1.6.3.241224版本）
 1、修改：重新设计游戏引擎主界面；
 2、修改：request函数返回的值类型（ArrayBuffer改为String）；
 3、新增：支持直接从QQ和微信（安卓）和拖动（win）中打开各类型文件（比如媒体、zip项目）到鹰歌（如果是zip项目文件，则需要进入到游戏引擎界面才可以导入），原理是根据Intent.data的Uri复制文件到Cache目录下再进行操作，所以具有这个文件的访问权限；
@@ -173,7 +189,7 @@ Item {
 1、增加：封装了Libhv的HTTPServer来实现简单的HTTP服务器；
 2、增加：QWebApp库（后期再封装）；
 3、增加：QextSerialPort串口库；
-**4、修改：将TapSDK更新到v4最新版，实名认证函数也有变化，且旧游戏需要Tap后台提工单升级SDK版本；
+**4、修改：将TapSDK更新到v4最新版（GameMakerGlobal.qml中也多了tds_ClientToken属性必须设置），实名认证函数也有变化，且旧游戏需要Tap后台提工单升级SDK版本；
 5、修改：TapAD更新到最新版；
 6、新增：安卓端最新支持 能使用文件管理器选择鹰歌打开任何文件（可以作为万能播放器使用），QML文件默认直接运行；
 7、新增：安卓端最新支持 能使用Scheme URL（比如用链接来传递数据）；
@@ -1696,9 +1712,9 @@ Item {
 `;
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainUpdateLog]Component.onCompleted");
+        console.debug('[mainUpdateLog]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainUpdateLog]Component.onDestruction");
+        console.debug('[mainUpdateLog]Component.onDestruction');
     }
 }

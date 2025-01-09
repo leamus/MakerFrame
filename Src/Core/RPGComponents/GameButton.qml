@@ -17,8 +17,8 @@ Rectangle {
 
     opacity: 0.6
     radius: width / 2
-    color: "white"
-    border.color: "black"
+    color: 'white'
+    border.color: 'black'
 
 
 

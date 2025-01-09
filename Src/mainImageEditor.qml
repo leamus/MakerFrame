@@ -39,8 +39,8 @@ Item {
 
 
     function init() {
-        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
-        //console.debug("[mainImageEditor]_private.arrImages", JSON.stringify(_private.arrImages))
+        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), '*', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();
     }
 
@@ -98,7 +98,7 @@ Item {
             }
 
             onSg_removeClicked: {
-                //console.debug("delete", modelData);
+                //console.debug('delete', modelData);
                 //root.removeClicked(index, modelData.Name);
                 //_private.arrImages.splice(index, 1);
                 //_private.arrImages = _private.arrImages;
@@ -136,8 +136,8 @@ Item {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                text: ""
-                placeholderText: "图片名"
+                text: ''
+                placeholderText: '图片名'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -155,7 +155,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "新增"
+                text: '新增'
                 onClicked: {
                     filedialog.open();
                 }
@@ -166,7 +166,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "修改"
+                text: '修改'
                 onClicked: {
                     if(listview.listview.currentIndex < 0)
                         return;
@@ -195,8 +195,8 @@ Item {
                             else {
                                 let ret = FrameManager.sl_fileRename(GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
-                                    console.error("[!mainImageEditor]RenameFile ERROR:", GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
+                                    Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    console.error('[!mainImageEditor]RenameFile ERROR:', GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -214,7 +214,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "显示"
+                text: '显示'
                 onClicked: {
                     if(listview.listview.currentIndex < 0)
                         return;
@@ -223,9 +223,9 @@ Item {
 
                     _private.setImageVisible(true);
 
-                    //console.debug("image:", textImageName.text, imageReview.source);
-                    //console.debug("resolve:", Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
-                    //console.debug("file:", GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
+                    //console.debug('image:', textImageName.text, imageReview.source);
+                    //console.debug('resolve:', Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
+                    //console.debug('file:', GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
                 }
             }
         }
@@ -315,25 +315,25 @@ Item {
 
         visible: false
 
-        title: "选择图片文件"
+        title: '选择图片文件'
         //folder: shortcuts.home
-        nameFilters: [ "Image files (*.jpg *.jpeg *.bmp *.gif *.png)", "All files (*)" ]
+        nameFilters: [ 'Image files (*.jpg *.jpeg *.bmp *.gif *.png)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
         selectFolder: false
 
         onAccepted: {
-            console.debug("[mainImageEditor]You chose: " + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[mainImageEditor]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
-            if(Qt.platform.os === "android") {
-                if(strFileUrl.indexOf("primary") >= 0) {
-                    textImageResourceName.text = "file:/storage/emulated/0/" + strFileUrl.substr(strFileUrl.indexOf("%3A")+3);
+            if(Qt.platform.os === 'android') {
+                if(strFileUrl.indexOf('primary') >= 0) {
+                    textImageResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
                 }
-                else if(strFileUrl.indexOf("document/") >= 0) {
-                    let tt = strFileUrl.indexOf("%3A");
-                    textImageResourceName.text = "file:/storage/" + strFileUrl.slice(strFileUrl.indexOf("/document/") + "/document/".length, tt) + "/" + strFileUrl.slice(tt + 3);
+                else if(strFileUrl.indexOf('document/') >= 0) {
+                    let tt = strFileUrl.indexOf('%3A');
+                    textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
                 else
                     textImageResourceName.text = fileUrl;
@@ -343,13 +343,13 @@ Item {
             */
 
             let path;
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 path = Platform.sl_getRealPathFromURI(fileUrl);
             else
                 path = FrameManager.sl_urlDecode(fileUrl);
 
-            let tIndex = path.lastIndexOf("/");
-            let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
+            let tIndex = path.lastIndexOf('/');
+            let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
 
 
             rootWindow.aliasGlobal.dialogCommon.show({
@@ -370,8 +370,8 @@ Item {
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            console.error("[!mainImageEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
+                            Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -386,7 +386,7 @@ Item {
         onRejected: {
             //gameMap.forceActiveFocus();
 
-            console.debug("[mainImageEditor]onRejected")
+            console.debug('[mainImageEditor]onRejected')
             //Qt.quit();
         }
         Component.onCompleted: {
@@ -406,7 +406,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrImages = listview.show(GameMakerGlobal.imageResourcePath());
+            let arrImages = listview.show(GameMakerGlobal.imageResourcePath(), '*', /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrImages.length === 0)
                 listview.listview.currentIndex = -1;
@@ -463,27 +463,27 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainImageEditor]Escape Key");
+        console.debug('[mainImageEditor]Escape Key');
         event.accepted = true;
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainImageEditor]Back Key");
+        console.debug('[mainImageEditor]Back Key');
         event.accepted = true;
     }
     Keys.onPressed: {
-        console.debug("[mainImageEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainImageEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainImageEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainImageEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainImageEditor]Component.onCompleted");
+        console.debug('[mainImageEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainImageEditor]Component.onDestruction");
+        console.debug('[mainImageEditor]Component.onDestruction');
     }
 }

@@ -91,9 +91,9 @@ Item {
                     background: Rectangle {
                         //implicitWidth: comboBoxComponentItem.comboBoxWidth
                         implicitHeight: 35
-                        //border.color: control.pressed ? "#6495ED" : "#696969"
+                        //border.color: control.pressed ? '#6495ED' : '#696969'
                         //border.width: control.visualFocus ? 2 : 1
-                        color: "transparent"
+                        color: 'transparent'
                         //border.color: comboBoxComponentItem.color
                         border.width: 2
                         radius: 6
@@ -553,9 +553,9 @@ Item {
                             background: Rectangle {
                                 //implicitWidth: comboBoxComponentItem.comboBoxWidth
                                 implicitHeight: 35
-                                //border.color: control.pressed ? "#6495ED" : "#696969"
+                                //border.color: control.pressed ? '#6495ED' : '#696969'
                                 //border.width: control.visualFocus ? 2 : 1
-                                color: "transparent"
+                                color: 'transparent'
                                 //border.color: comboBoxComponentItem.color
                                 border.width: 2
                                 radius: 6
@@ -1233,21 +1233,21 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
-                text: "保存"
+                text: '保存'
                 font.pointSize: 9
                 onClicked: {
                     _private.saveData();
                 }
             }
             Button {
-                text: "读取"
+                text: '读取'
                 font.pointSize: 9
                 onClicked: {
                     _private.loadData();
                 }
             }
             Button {
-                text: "编译"
+                text: '编译'
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
@@ -1257,11 +1257,11 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug("[GameVisualFightSkill]compile:", _private.filepath, jsScript);
+                    console.debug('[GameVisualFightSkill]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
-                text: "关闭"
+                text: '关闭'
                 font.pointSize: 9
                 onClicked: {
                     _private.close();
@@ -1269,7 +1269,7 @@ Item {
             }
 
             Button {
-                text: "帮助"
+                text: '帮助'
                 font.pointSize: 9
                 onClicked: {
                     rootGameMaker.showMsg('
@@ -1372,8 +1372,8 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug("[GameVisualFightSkill]filePath：", filePath);
-            //console.exception("????")
+            console.debug('[GameVisualFightSkill]filePath：', filePath);
+            //console.exception('????')
 
             if(data) {
                 data = JSON.parse(data);
@@ -1500,7 +1500,7 @@ Item {
                         }
                     }
                 }
-            }while(0);
+            } while(0);
             if(!bCheck) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
@@ -2082,29 +2082,29 @@ $$buffs$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualFightSkill]Escape Key");
+        console.debug('[GameVisualFightSkill]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualFightSkill]Back Key");
+        console.debug('[GameVisualFightSkill]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualFightSkill]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameVisualFightSkill]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualFightSkill]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[GameVisualFightSkill]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[GameVisualFightSkill]Component.onCompleted");
+        console.debug('[GameVisualFightSkill]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameVisualFightSkill]Component.onDestruction");
+        console.debug('[GameVisualFightSkill]Component.onDestruction');
     }
 }

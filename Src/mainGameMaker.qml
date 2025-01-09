@@ -125,7 +125,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "Test"
+                text: 'Test'
                 onClicked: menuTest.open();
 
                 Menu {
@@ -136,7 +136,7 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "MenuItem"
+                        text: 'MenuItem'
                         onClicked: {
                             console.warn(9)
                         }
@@ -146,7 +146,7 @@ Item {
                     }
                     MenuSeparator { }
                     Action {
-                        text: "Action"
+                        text: 'Action'
                         onTriggered: {
                             console.warn(999)
                         }
@@ -172,7 +172,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "工程管理"
+                text: '工程管理'
                 onClicked: menuProjectManage.open();
 
                 Menu {
@@ -183,21 +183,21 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "新建工程"
+                        text: '新建工程'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.newProject();
                         }
                     }
                     MenuItem {
-                        text: "打开工程"
+                        text: '打开工程'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.openProject();
                         }
                     }
                     MenuItem {
-                        text: "重命名工程"
+                        text: '重命名工程'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.renameProject();
@@ -230,7 +230,7 @@ Item {
                     }
                     MenuSeparator { }
                     MenuItem {
-                        text: "打包项目"
+                        text: '打包项目'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             if(!_private.checkCurrentProjectName()) {
@@ -240,7 +240,7 @@ Item {
                         }
                     }
                     MenuItem {
-                        text: "平台分发"
+                        text: '平台分发'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.future();
@@ -258,7 +258,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "游戏编辑器"
+                text: '游戏编辑器'
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -274,7 +274,7 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "地图编辑器"
+                        text: '地图编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.mapEditor();
@@ -282,14 +282,14 @@ Item {
                     }
                     MenuSeparator { }
                     MenuItem {
-                        text: "角色编辑器"
+                        text: '角色编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.roleEditor();
                         }
                     }
                     MenuItem {
-                        text: "特效编辑器"
+                        text: '特效编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.spriteEditor();
@@ -297,28 +297,28 @@ Item {
                     }
                     MenuSeparator { }
                     MenuItem {
-                        text: "道具编辑器"
+                        text: '道具编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.goodsEditor();
                         }
                     }
                     MenuItem {
-                        text: "战斗角色编辑器"
+                        text: '战斗角色编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.fightRoleEditor();
                         }
                     }
                     MenuItem {
-                        text: "战斗技能编辑器"
+                        text: '战斗技能编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.fightSkillEditor();
                         }
                     }
                     MenuItem {
-                        text: "战斗脚本编辑器"
+                        text: '战斗脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.fightScriptEditor();
@@ -326,21 +326,21 @@ Item {
                     }
                     MenuSeparator { }
                     MenuItem {
-                        text: "起始脚本编辑器"
+                        text: '起始脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.gameStartScriptEditor();
                         }
                     }
                     MenuItem {
-                        text: "通用脚本编辑器"
+                        text: '通用脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.gameCommonScriptEditor();
                         }
                     }
                     MenuItem {
-                        text: "脚本编辑器"
+                        text: '脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.gameScriptEditor();
@@ -366,7 +366,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "媒体资源管理"
+                text: '媒体资源管理'
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -382,26 +382,41 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "图片管理"
+                        text: '图片管理'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.imageEditor();
                         }
                     }
                     MenuItem {
-                        text: "音乐管理"
+                        text: '音乐管理'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.musicEditor();
                         }
                     }
                     MenuItem {
-                        text: "视频管理"
+                        text: '视频管理'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.videoEditor();
                         }
                     }
+                    /*MenuItem {
+                        text: '压缩文件夹'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.compressDir();
+                        }
+                    }
+                    MenuItem {
+                        text: '解压文件夹'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.uncompressDir();
+                        }
+                    }
+                    */
                 }
             }
 
@@ -414,7 +429,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "插件管理"
+                text: '插件管理'
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -430,14 +445,14 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "插件管理"
+                        text: '插件管理'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.pluginsManager();
                         }
                     }
                     MenuItem {
-                        text: "插件下载"
+                        text: '插件下载'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.pluginsDownload();
@@ -472,7 +487,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: "文　档"
+                text: '文　档'
                 onClicked: menuDocuments.open();
 
                 Menu {
@@ -483,7 +498,7 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: "教　程"
+                        text: '教　程'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.tutorial();
@@ -1801,6 +1816,10 @@ Item {
                 //userMainProject.source = 'mainVideoEditor.qml';
             }
         }
+        function compressDir() {
+        }
+        function uncompressDir() {
+        }
 
         function pluginsManager() {
             if(Platform.compileType === 'debug') {
@@ -2102,6 +2121,12 @@ Item {
 
         _private.fnBackupOpenFile = rootWindow.fnOpenFile;
         rootWindow.fnOpenFile = (url, type)=>{
+            //如果是文件夹
+            if(FrameManager.sl_isDir(GlobalJS.toPath(url))) {
+                return false;
+            }
+
+
             const fileExtName = FrameManager.sl_completeSuffix(url);
             if(fileExtName === 'zip') {
                 _private.openProjectPackage(url);

@@ -155,14 +155,14 @@ Rectangle {
     //property int nItemMinHeight: 20
     property int nItemHeight: 60    //选项高度
     property int nItemFontSize: 16  //选项字体大小
-    property color colorItemFontColor: "white"  //选项字体颜色
-    property color colorItemColor1: "#00FFFFFF" //选项静止颜色
-    property color colorItemColor2: "#66FFFFFF" //选项被选颜色
-    property color colorItemBorderColor: "#60FFFFFF"    //选项边框颜色
+    property color colorItemFontColor: 'white'  //选项字体颜色
+    property color colorItemColor1: '#00FFFFFF' //选项静止颜色
+    property color colorItemColor2: '#66FFFFFF' //选项被选颜色
+    property color colorItemBorderColor: '#60FFFFFF'    //选项边框颜色
     property int nTitleFontSize: 16     //标题字体大小
-    property int nTitleHeight: 60
-    property color colorTitleColor: "#EE00CC99" //标题颜色
-    property color colorTitleFontColor: "white" //标题文字颜色
+    property int nTitleHeight: 39
+    property color colorTitleColor: '#EE00CC99' //标题颜色
+    property color colorTitleFontColor: 'white' //标题文字颜色
 
     property var itemAlignment: Text.AlignHCenter //每个项目对齐方式
 
@@ -190,8 +190,8 @@ Rectangle {
     property alias column2: columnChoices
 
 
-    color: "#CF6699FF"
-    //color: "#9900CC99"
+    color: '#CF6699FF'
+    //color: '#9900CC99'
     //implicitWidth: columnChoices.implicitWidth
     implicitHeight: (rectMenuTitle.visible ? rectMenuTitle.implicitHeight : 0) +
                     (rectPage.visible ? rectPage.height : 0) +
@@ -213,7 +213,7 @@ Rectangle {
                 parent: tRoot
                 anchors.fill: parent
 
-                text: ""
+                text: ''
                 font.pointSize: nItemFontSize
                 readOnly: true
                 color: colorItemFontColor
@@ -266,7 +266,7 @@ Rectangle {
                 color: colorItemBorderColor
             }
 
-            //color: nChoiceListIndex === nIndex ? "#66FFFFFF" : "#00FFFFFF"
+            //color: nChoiceListIndex === nIndex ? '#66FFFFFF' : '#00FFFFFF'
             color: nChoiceListIndex === nIndex ? colorItemColor2 : colorItemColor1
 
 
@@ -293,14 +293,17 @@ Rectangle {
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             Layout.preferredWidth: parent.width
+            //！！如果preferredHeight为-1，则先用implicitHeight，如果没有（貌似包括为0）则用height
             //Layout.preferredHeight: root.nTitleHeight
+            Layout.preferredHeight: implicitHeight
             implicitHeight: Math.max(textMenuTitle.implicitHeight, root.nTitleHeight)  //鹰：删除会导致 binding loop 错误
+            //height: Math.max(textGameInputTitle.implicitHeight, root.nTitleHeight)
 
             //visible: (root.strTitle !== false && root.strTitle !== null && root.strTitle !== undefined)
             visible: (root.strTitle)
 
-            //color: "darkred"
-            //color: "#EE00CC99"
+            //color: 'darkred'
+            //color: '#EE00CC99'
             color: colorTitleColor
             //radius: rectMenu.radius
 
@@ -350,7 +353,7 @@ Rectangle {
                     Text {
                         anchors.fill: parent
 
-                        color: "white"
+                        color: 'white'
 
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -381,7 +384,7 @@ Rectangle {
                     //Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    color: "white"
+                    color: 'white'
 
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -404,7 +407,7 @@ Rectangle {
                     Text {
                         anchors.fill: parent
 
-                        color: "white"
+                        color: 'white'
 
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -476,6 +479,6 @@ Rectangle {
             _private.arrItems[ti].destroy();
         }
 
-        //console.debug("[main]Component.onDestruction");
+        //console.debug('[main]Component.onDestruction');
     }
 }

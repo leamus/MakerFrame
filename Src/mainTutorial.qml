@@ -72,7 +72,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr("教　程")
+            text: qsTr('教　程')
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -91,7 +91,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "关　于"
+            text: '关　于'
             onClicked: {
                 _private.loadModule('mainAbout.qml');
             }
@@ -103,7 +103,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "引擎简易教程"
+            text: '引擎简易教程'
             onClicked: {
                 _private.loadModule('mainEasyRPGMakerTutorial.qml');
             }
@@ -115,7 +115,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "JavaScript简易教程"
+            text: 'JavaScript简易教程'
             onClicked: {
                 _private.loadModule('mainEasyJavaScriptTutorial.qml');
             }
@@ -127,7 +127,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "高级玩法教程"
+            text: '高级玩法教程'
             onClicked: {
                 _private.loadModule('mainAdvancedTutorial.qml');
             }
@@ -139,7 +139,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "官方在线教程"
+            text: '官方在线教程'
             onClicked: {
                 Qt.openUrlExternally('https://gitee.com/leamus/MakerFrame/blob/main/Tutorials');
             }
@@ -164,7 +164,7 @@ Item {
 
             font.pointSize: 12
             font.bold: true
-            text: qsTr("实验性功能")
+            text: qsTr('实验性功能')
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -187,15 +187,15 @@ Item {
                 //Layout.fillHeight: true
 
 
-                text: "简易画板"
+                text: '简易画板'
                 onClicked: {
-                    if(Platform.compileType === "debug") {
-                        _private.loadModule("PaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
+                    if(Platform.compileType === 'debug') {
+                        _private.loadModule('PaintView.qml');
+                        //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule("PaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
+                        _private.loadModule('PaintView.qml');
+                        //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
             }
@@ -209,15 +209,15 @@ Item {
                 //Layout.fillHeight: true
 
 
-                text: "简易画板2"
+                text: '简易画板2'
                 onClicked: {
-                    if(Platform.compileType === "debug") {
-                        _private.loadModule("NanoPaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
+                    if(Platform.compileType === 'debug') {
+                        _private.loadModule('NanoPaintView.qml');
+                        //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule("NanoPaintView.qml");
-                        //userMainProject.source = "mainMapEditor.qml";
+                        _private.loadModule('NanoPaintView.qml');
+                        //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
             }
@@ -252,7 +252,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("上架游戏：")
+                    text: qsTr('上架游戏：')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -267,7 +267,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>侠道仙缘(Tap)</a>")
+                    text: qsTr('<a href="#">侠道仙缘(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -286,7 +286,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>BOSS凶猛(Tap)</a>")
+                    text: qsTr('<a href="#">BOSS凶猛(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -313,7 +313,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>剑心之誓(快爆)</a>")
+                    text: qsTr('<a href="#">剑心之誓(快爆)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -332,7 +332,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>猎魔人(快爆)</a>")
+                    text: qsTr('<a href="#">猎魔人(快爆)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -351,7 +351,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>封魔传记(Tap)</a>")
+                    text: qsTr('<a href="#">封魔传记(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -378,7 +378,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>英语杀(Tap)</a>")
+                    text: qsTr('<a href="#">英语杀(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -397,7 +397,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr("<a href='#'>英语杀(Steam)</a>")
+                    text: qsTr('<a href="#">英语杀(Steam)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -465,7 +465,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainTutorial]loader onLoaded");
+            console.debug('[mainTutorial]loader onLoaded');
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -519,29 +519,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainTutorial]Escape Key");
+        console.debug('[mainTutorial]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainTutorial]Back Key");
+        console.debug('[mainTutorial]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainTutorial]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainTutorial]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainTutorial]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainTutorial]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainTutorial]Component.onCompleted");
+        console.debug('[mainTutorial]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainTutorial]Component.onDestruction");
+        console.debug('[mainTutorial]Component.onDestruction');
     }
 }

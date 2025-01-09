@@ -7,7 +7,7 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
 
@@ -321,7 +321,7 @@ Item {
     ColorOverlay {
         id: colorOverlay
 
-        property var arrColors: ["#00000000", "#7FFF0000", "#7F00FF00", '#7F0000FF']
+        property var arrColors: ['#00000000', '#7FFF0000', '#7F00FF00', '#7F0000FF']
         property int nStep: 0
         property int nInterval: 500
 
@@ -340,7 +340,7 @@ Item {
 
         anchors.fill: animatedsprite
         source: animatedsprite
-        color: "#00000000"
+        color: '#00000000'
 
         Behavior on color {
             ColorAnimation {
@@ -380,7 +380,7 @@ Item {
     /*SoundEffect {
         id: soundeffect
         onStatusChanged: {
-            //console.debug("~~~~~~~SoundEffect1", status);
+            //console.debug('~~~~~~~SoundEffect1', status);
         }
     }*/
     Audio {
@@ -391,7 +391,7 @@ Item {
     NumberAnimation {
         id: numberanimationSpriteEffectX
         target: root
-        properties: "x"
+        properties: 'x'
         //to: 0
         //duration: 200
         easing.type: Easing.OutSine
@@ -399,7 +399,7 @@ Item {
     NumberAnimation {
         id: numberanimationSpriteEffectY
         target: root
-        properties: "y"
+        properties: 'y'
         //to: 0
         //duration: 200
         easing.type: Easing.OutSine
@@ -488,7 +488,7 @@ Item {
             event.accepted = true;
             break;
         }
-        //console.debug("[Role]Keys.onPressed:", event.key);
+        //console.debug('[Role]Keys.onPressed:', event.key);
     }
 
     Keys.onReleased: {
@@ -499,7 +499,7 @@ Item {
         case Qt.Key_Down:
             sprite.running = false;
             event.accepted = true;
-            //console.debug("[Role]Keys.onReleased:", event.key);
+            //console.debug('[Role]Keys.onReleased:', event.key);
             break;
         }
 

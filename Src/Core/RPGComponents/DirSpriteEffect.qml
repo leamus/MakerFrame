@@ -7,7 +7,7 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
 
@@ -152,7 +152,7 @@ Item {
 
     readonly property int nSpriteType: 2
 
-    property string strSource: ""   //精灵图片文件夹路径
+    property string strSource: ''   //精灵图片文件夹路径
     onStrSourceChanged: {
         root.stop();
 
@@ -200,7 +200,7 @@ Item {
     }
     property var fGetImageFixPositions: function(path) {
         /*var request = new XMLHttpRequest();
-        request.open("GET", '布衣_男/x.txt', false); // false为同步操作设置
+        request.open('GET', '布衣_男/x.txt', false); // false为同步操作设置
         request.send(null);
         //console.debug(request.responseText);
         let data = request.responseText;
@@ -367,7 +367,7 @@ Item {
         ColorOverlay {
             id: colorOverlay
 
-            property var arrColors: ["#00000000", "#7FFF0000", "#7F00FF00", '#7F0000FF']
+            property var arrColors: ['#00000000', '#7FFF0000', '#7F00FF00', '#7F0000FF']
             property int nStep: 0
             property int nInterval: 500
 
@@ -386,7 +386,7 @@ Item {
 
             anchors.fill: imageAnimate
             source: imageAnimate
-            color: "#00000000"
+            color: '#00000000'
             visible: color.a !== 0
 
             Behavior on color {
@@ -429,7 +429,7 @@ Item {
     /*SoundEffect {
         id: soundeffect
         onStatusChanged: {
-            //console.debug("~~~~~~~SoundEffect1", status);
+            //console.debug('~~~~~~~SoundEffect1', status);
         }
     }*/
     Audio {
@@ -440,7 +440,7 @@ Item {
     NumberAnimation {
         id: numberanimationSpriteEffectX
         target: root
-        properties: "x"
+        properties: 'x'
         //to: 0
         //duration: 200
         easing.type: Easing.OutSine
@@ -448,7 +448,7 @@ Item {
     NumberAnimation {
         id: numberanimationSpriteEffectY
         target: root
-        properties: "y"
+        properties: 'y'
         //to: 0
         //duration: 200
         easing.type: Easing.OutSine
@@ -540,7 +540,7 @@ Item {
             event.accepted = true;
             break;
         }
-        //console.debug("[Role]Keys.onPressed:", event.key);
+        //console.debug('[Role]Keys.onPressed:', event.key);
     }
 
     Keys.onReleased: {
@@ -551,7 +551,7 @@ Item {
         case Qt.Key_Down:
             sprite.running = false;
             event.accepted = true;
-            //console.debug("[Role]Keys.onReleased:", event.key);
+            //console.debug('[Role]Keys.onReleased:', event.key);
             break;
         }
 

@@ -92,14 +92,14 @@ Item {
         Keys.onEscapePressed: {
             close();
 
-            console.debug("[PluginsManager1]Escape Key");
+            console.debug('[PluginsManager1]Escape Key');
             event.accepted = true;
             //Qt.quit();
         }
         Keys.onBackPressed: {
             close();
 
-            console.debug("[PluginsManager1]Back Key");
+            console.debug('[PluginsManager1]Back Key');
             event.accepted = true;
             //Qt.quit();
         }
@@ -122,7 +122,7 @@ Item {
         anchors.fill: parent
 
 
-        source: ""
+        source: ''
         asynchronous: true
 
 
@@ -169,7 +169,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[PluginsManager]loaderExtends onLoaded");
+            console.debug('[PluginsManager]loaderExtends onLoaded');
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -200,14 +200,14 @@ Item {
         Keys.onEscapePressed: {
             close();
 
-            console.debug("[PluginsManager2]Escape Key");
+            console.debug('[PluginsManager2]Escape Key');
             event.accepted = true;
             //Qt.quit();
         }
         Keys.onBackPressed: {
             close();
 
-            console.debug("[PluginsManager2]Back Key");
+            console.debug('[PluginsManager2]Back Key');
             event.accepted = true;
             //Qt.quit();
         }
@@ -243,7 +243,7 @@ Item {
             objPlugins = {};
 
             //载入扩展 插件/组件
-            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Plugins" + GameMakerGlobal.separator;
+            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator;
 
             //循环三方根目录
             for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
@@ -390,7 +390,7 @@ Item {
                                 }
                             }
 
-                            console.debug("[PluginsManager]删除：" + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath), FrameManager.sl_removeRecursively(pluginDirPath));
+                            console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath), FrameManager.sl_removeRecursively(pluginDirPath));
                             rootWindow.aliasGlobal.l_list.removeItem(index);
                             _private.refresh();
 
@@ -413,7 +413,7 @@ Item {
         rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
-        console.debug("[PluginsManager]Escape Key");
+        console.debug('[PluginsManager]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -421,22 +421,22 @@ Item {
         rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
-        console.debug("[PluginsManager]Back Key");
+        console.debug('[PluginsManager]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[PluginsManager]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[PluginsManager]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[PluginsManager]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[PluginsManager]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[PluginsManager]Component.onCompleted");
+        console.debug('[PluginsManager]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[PluginsManager]Component.onDestruction");
+        console.debug('[PluginsManager]Component.onDestruction');
     }
 }

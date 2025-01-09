@@ -39,7 +39,7 @@ Item {
 
         nFightRoleIndex = n;
         refresh();
-        msgDetail.text = "双击道具可脱下";
+        msgDetail.text = '双击道具可脱下';
 
         //root.visible = true;
     }
@@ -53,21 +53,21 @@ Item {
     function refresh() {
         let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
         //let fightRolePath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
-        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](conbatant, {avatar: true, color: true}));
+        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_combatant_name'](conbatant, {avatar: true, color: true}));
 
 
-        /*textFightRoleInfo.text = "HP：" + conbatant.$$propertiesWithExtra.remainHP + "/" + conbatant.$$propertiesWithExtra.healthHP + "/" + conbatant.$$propertiesWithExtra.HP + ' ' +
-            "MP：" + conbatant.$$propertiesWithExtra.remainMP + "/" + conbatant.$$propertiesWithExtra.MP + ' ' +
-            "攻击：" + conbatant.$$propertiesWithExtra.attack + ' ' +
-            "防御：" + conbatant.$$propertiesWithExtra.defense + ' ' +
-            "灵力：" + conbatant.$$propertiesWithExtra.power + ' ' +
-            "幸运：" + conbatant.$$propertiesWithExtra.luck + ' ' +
-            "速度：" + conbatant.$$propertiesWithExtra.speed + ' ' +
-            "经验：" + conbatant.$properties.EXP + ' ' +
-            "级别：" + conbatant.$properties.level;
+        /*textFightRoleInfo.text = 'HP：' + conbatant.$$propertiesWithExtra.remainHP + '/' + conbatant.$$propertiesWithExtra.healthHP + '/' + conbatant.$$propertiesWithExtra.HP + ' ' +
+            'MP：' + conbatant.$$propertiesWithExtra.remainMP + '/' + conbatant.$$propertiesWithExtra.MP + ' ' +
+            '攻击：' + conbatant.$$propertiesWithExtra.attack + ' ' +
+            '防御：' + conbatant.$$propertiesWithExtra.defense + ' ' +
+            '灵力：' + conbatant.$$propertiesWithExtra.power + ' ' +
+            '幸运：' + conbatant.$$propertiesWithExtra.luck + ' ' +
+            '速度：' + conbatant.$$propertiesWithExtra.speed + ' ' +
+            '经验：' + conbatant.$properties.EXP + ' ' +
+            '级别：' + conbatant.$properties.level;
         */
 
-        textFightRoleInfo.text = game.$sys.resources.commonScripts["combatant_info"](conbatant);
+        textFightRoleInfo.text = game.$sys.resources.commonScripts['combatant_info'](conbatant);
 
 
         //装备
@@ -85,7 +85,7 @@ Item {
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](conbatant.$equipment[position], {Image: true, Color: true}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](conbatant.$equipment[position], {Image: true, Color: true}));
             if(tIndex > -1) {
                 //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
                 arrEquipment[tIndex] = '<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName);
@@ -96,7 +96,7 @@ Item {
                 arrEquipment.push('<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName) );
                 root.arrEquipmentPositions.push(position);
             }
-            //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name + "\r\n";
+            //textEquipment.text = textEquipment.text + equipment + '  ' + game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name + '\r\n';
         }
         for(let ti = 0; ti < equipReservedSlots.length; ++ti)
             if(arrEquipment[ti] === undefined)
@@ -132,7 +132,7 @@ Item {
         id: maskFightRoleInfo
 
         anchors.fill: parent
-        color: "#7FFFFFFF"
+        color: '#7FFFFFFF'
 
         mouseArea.onPressed: {
             root.hide();
@@ -157,7 +157,7 @@ Item {
                 Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width
                 Layout.preferredHeight: 60
-                color: "blue"
+                color: 'blue'
 
                 RowLayout {
                     //Layout.alignment: Qt.AlignRight
@@ -170,21 +170,21 @@ Item {
                         Layout.fillWidth: true
                         //anchors.fill: parent
 
-                        color: "white"
+                        color: 'white'
 
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 
                         font.pointSize: 16
                         font.bold: true
-                        text: ""
+                        text: ''
                         wrapMode: Text.Wrap
                     }
 
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: "上一个"
+                        text: '上一个'
                         textTips.color: 'white'
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
@@ -200,7 +200,7 @@ Item {
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: "下一个"
+                        text: '下一个'
                         textTips.color: 'white'
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
@@ -216,7 +216,7 @@ Item {
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: "关闭"
+                        text: '关闭'
                         textTips.color: 'white'
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
@@ -240,7 +240,7 @@ Item {
             Layout.preferredHeight: textFightRoleInfo.textArea.implicitHeight
 
 
-            color: "darkblue"
+            color: 'darkblue'
 
             //textArea.horizontalAlignment: Text.AlignHCenter
             textArea.verticalAlignment: Text.AlignVCenter
@@ -269,20 +269,20 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.maximumHeight: 100
             Layout.preferredHeight: textFightRoleInfo.implicitHeight
-            color: "darkred"
+            color: 'darkred'
 
             Text {
                 id: textFightRoleInfo
                 anchors.fill: parent
 
-                color: "white"
+                color: 'white'
 
                 //horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
                 font.pointSize: 16
                 font.bold: true
-                text: ""
+                text: ''
                 wrapMode: Text.Wrap
             }
         }

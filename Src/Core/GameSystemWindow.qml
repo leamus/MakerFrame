@@ -41,7 +41,7 @@ Item {
         id: maskSystemMenu
 
         anchors.fill: parent
-        color: "#7FFFFFFF"
+        color: '#7FFFFFFF'
 
         mouseArea.onPressed: {
             root.hide();
@@ -107,7 +107,7 @@ Item {
                             yield game.msg('读档成功');
                         }
                         else {
-                            yield game.msg("读取失败");
+                            yield game.msg('读取失败');
                         }
                         break;
                     default:
@@ -120,8 +120,8 @@ Item {
             case 2:
 
                 continueScript = function*() {
-                    let musicInfo = '音乐状态：' + ((game.gd["$sys_sound"] & 0b1) ? '开' : '关');
-                    let soundInfo = '音效状态：' + ((game.gd["$sys_sound"] & 0b10) ? '开' : '关');
+                    let musicInfo = '音乐状态：' + ((game.gd['$sys_sound'] & 0b1) ? '开' : '关');
+                    let soundInfo = '音效状态：' + ((game.gd['$sys_sound'] & 0b10) ? '开' : '关');
                     //全局音乐
                     //let musicInfo = '音乐状态：' + (/*GameMakerGlobal.settings.value('$PauseMusic')*/game.cd['$PauseMusic'] ? '开' : '关');
                     //let soundInfo = '音效状态：' + (/*GameMakerGlobal.settings.value('$PauseSound')*/game.cd['$PauseSound'] ? '开' : '关');
@@ -130,7 +130,7 @@ Item {
                     switch(c) {
                     case 0:
                         //存档音乐
-                        if(game.gd["$sys_sound"] & 0b1) {
+                        if(game.gd['$sys_sound'] & 0b1) {
                             //itemBackgroundMusic.pause(false);
                             game.pausemusic(false);
                             yield game.msg('关闭音乐');
@@ -138,7 +138,7 @@ Item {
                         else {
                             //itemBackgroundMusic.resume(false);
                             game.resumemusic(false);
-                            yield game.msg("打开音乐");
+                            yield game.msg('打开音乐');
                         }
                         /*
                         //全局音乐
@@ -146,7 +146,7 @@ Item {
                         if(game.cd['$PauseMusic']) {
                             //itemBackgroundMusic.resume(true);
                             game.resumemusic(true);
-                            yield game.msg("打开音乐");
+                            yield game.msg('打开音乐');
                         }
                         else {
                             //itemBackgroundMusic.pause(true);
@@ -157,7 +157,7 @@ Item {
                         break;
                     case 1:
                         //存档音效
-                        if(game.gd["$sys_sound"] & 0b10) {
+                        if(game.gd['$sys_sound'] & 0b10) {
                             //rootSoundEffect.pause(false);
                             game.pausesoundeffect(false);
                             yield game.msg('关闭音效');
@@ -165,7 +165,7 @@ Item {
                         else {
                             //rootSoundEffect.resume(false);
                             game.resumesoundeffect(false);
-                            yield game.msg("打开音效");
+                            yield game.msg('打开音效');
                         }
                         /*
                         //全局音效
@@ -173,7 +173,7 @@ Item {
                         if(game.cd['$PauseSound']) {
                             //rootSoundEffect.resume(true);
                             game.resumesoundeffect(true);
-                            yield game.msg("打开音效");
+                            yield game.msg('打开音效');
                         }
                         else {
                             //rootSoundEffect.pause(true);

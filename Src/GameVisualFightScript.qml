@@ -230,15 +230,15 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "images.json";
+                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'images.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = FrameManager.sl_fileRead(filePath);
-                                //console.debug("[mainImageEditor]filePath：", filePath);
+                                //console.debug('[mainImageEditor]filePath：', filePath);
 
                                 if(!cfg)
                                     return false;
 
-                                console.debug('!!!', JSON.stringify(JSON.parse(cfg)["List"]))
+                                console.debug('!!!', JSON.stringify(JSON.parse(cfg)['List']))
                                 */
 
                                 rootWindow.aliasGlobal.l_list.open({
@@ -280,10 +280,10 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "music.json";
+                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'music.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = FrameManager.sl_fileRead(filePath);
-                                //console.debug("[mainImageEditor]filePath：", filePath);
+                                //console.debug('[mainImageEditor]filePath：', filePath);
 
                                 if(!cfg)
                                     return false;
@@ -547,21 +547,21 @@ Item {
 
 
             Button {
-                text: "保存"
+                text: '保存'
                 font.pointSize: 9
                 onClicked: {
                     _private.saveData();
                 }
             }
             Button {
-                text: "读取"
+                text: '读取'
                 font.pointSize: 9
                 onClicked: {
                     _private.loadData();
                 }
             }
             Button {
-                text: "编译"
+                text: '编译'
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
@@ -571,11 +571,11 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug("[GameVisualFightScript]compile:", _private.filepath, jsScript);
+                    console.debug('[GameVisualFightScript]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
-                text: "关闭"
+                text: '关闭'
                 font.pointSize: 9
                 onClicked: {
                     _private.close();
@@ -583,7 +583,7 @@ Item {
             }
 
             Button {
-                text: "帮助"
+                text: '帮助'
                 font.pointSize: 9
                 onClicked: {
                     rootGameMaker.showMsg('
@@ -650,8 +650,8 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug("[GameVisualFightScript]filePath：", filePath);
-            //console.exception("????")
+            console.debug('[GameVisualFightScript]filePath：', filePath);
+            //console.exception('????')
 
             if(data) {
                 data = JSON.parse(data);
@@ -717,7 +717,7 @@ Item {
                     bCheck = false;
                     break;
                 }
-            }while(0);
+            } while(0);
             if(!bCheck) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
@@ -745,7 +745,7 @@ Item {
             //console.debug(enemyTextFields);
             for(let tt in enemyTextFields) {
                 //console.debug(tt.text.trim());
-                strEnemies += "{RID: '%1', %2}, ".arg(enemyTextFields[tt].text.trim()).arg(enemyParamsTextFields[tt].text.trim());
+                strEnemies += '{RID: "%1", %2}, '.arg(enemyTextFields[tt].text.trim()).arg(enemyParamsTextFields[tt].text.trim());
             }
 
             /*console.debug('------------', layoutEnemyLayout.children);
@@ -757,11 +757,11 @@ Item {
 
 
 
-            //let filePath = "fight_script.tpl";
+            //let filePath = 'fight_script.tpl';
 
             /*let data = File.read(filePath);
-            console.debug("filePath：", filePath);
-            console.debug("data:", data);
+            console.debug('filePath：', filePath);
+            console.debug('data:', data);
             */
 
             //let tpl = FrameManager.sl_fileRead(filePath);
@@ -941,29 +941,29 @@ $$enemiesData$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualFightScript]Escape Key");
+        console.debug('[GameVisualFightScript]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualFightScript]Back Key");
+        console.debug('[GameVisualFightScript]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualFightScript]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameVisualFightScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualFightScript]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[GameVisualFightScript]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[GameVisualFightScript]Component.onCompleted");
+        console.debug('[GameVisualFightScript]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameVisualFightScript]Component.onDestruction");
+        console.debug('[GameVisualFightScript]Component.onDestruction');
     }
 }

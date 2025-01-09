@@ -82,7 +82,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返　回"
+            text: '返　回'
             onClicked: {
                 sg_close();
             }
@@ -122,14 +122,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainAbout]Escape Key");
+        console.debug('[mainAbout]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainAbout]Back Key");
+        console.debug('[mainAbout]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -201,6 +201,7 @@ Item {
   已集成QtWebApp库，支持做Web服务应用；
   已集成Lua环境；
   已集成QextSerialPort库；
+  已集成OpenSSL库，支持RSA创建密钥对、RSA加解密和签名验证、sha256摘要、DES对称加解密等；
   以上功能大都已封装完成并提供给QML或JavaScript来使用。感谢以上框架、库、SDK、扩展的作者、组织和公司。
 15.可开发类型：
   游戏：理论上几乎支持所有2D游戏类型(比如已有的RPG和放置、ARPG、AVG、即时战略、战棋、棋牌等等)的网络/单机游戏，3D的可用QML3D或opengl来自行学习和设计（但我对3D不熟悉）；
@@ -221,7 +222,7 @@ Item {
   a.上层（纯图形化编辑开发）：道具、战斗人物、技能、战斗脚本使用图形化编辑生成，脚本使用纯图形化编程来制作，只需设计 剧情、道具、地图、人物、战斗 等等就可以做出游戏，后期还可能做Excel、Json等来设计游戏内容，用框架引擎导入来生成游戏；
   b.中层（图形化编辑+JavaScript代码）：用JavaScript来扩展图形化编辑的生成结果，可以开发和设计更多的内容，比如游戏的算法、界面效果、升级链、道具、人物、登录、联网功能、图形化命令 等等；
   c.底层（QML+JavaScript）：用来扩展界面和功能，也可使用框架提供的Box2D和qnanopainter库，比如制作插件、扩展图形化命令、修改增强游戏引擎和编辑器、甚至可以做其他类型的游戏引擎、编辑器和游戏，还可以做各种类型的软件APP（系统软件、行业业务软件、播放器、浏览器、各种工具、爬虫等）；
-  d.内核/扩展层（框架层）：一般作者我来维护，包括跨平台、网络、资源整合打包、屏幕自适应、热更新、压缩解压、文件下载、数据库、文件管理、线程池、脚本引擎、异步脚本（协程）、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、三方库（Bacon2D、Box2D-qml、qnanopainter、SCodes/QZXing、Quazip、SDL3、SQLITECIPHER、libhv、QtWebApp、Lua、QextSerialPort等）、三方SDK（Tap实名、Tap和穿山甲广告SDK、微信相关、支付宝等）等系统功能；
+  d.内核/扩展层（框架层）：一般作者我来维护，包括跨平台、网络、资源整合打包、屏幕自适应、热更新、压缩解压、文件下载、数据库、文件管理、线程池、脚本引擎、异步脚本（协程）、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、三方库（Bacon2D、Box2D-qml、qnanopainter、SCodes/QZXing、Quazip、OpenSSL、SQLITECIPHER、libhv、QtWebApp、Lua、QextSerialPort、SDL3等）、三方SDK（Tap实名、Tap和穿山甲广告SDK、微信相关、支付宝等）等系统功能；
 2.此框架适合：
   a.非专业人士；想在任意端编写、任意端运行，能简单高效便捷的开发，且能快速发布在Steam、Tap、应用商店等平台的软件和游戏；
   b.学习Javascript、QML或游戏引擎开发的：鹰歌是个不错的宿主环境，可以任意在几个功能层面上进行编写运行；
@@ -284,9 +285,9 @@ Item {
 `;
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainAbout]Component.onCompleted");
+        console.debug('[mainAbout]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainAbout]Component.onDestruction");
+        console.debug('[mainAbout]Component.onDestruction');
     }
 }

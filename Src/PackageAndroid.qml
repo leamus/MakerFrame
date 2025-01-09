@@ -176,14 +176,34 @@ Item {
             }
         }
 
+        RowLayout {
+            Layout.fillWidth: true
+
+            Label {
+                text: 'Tap Client Token：'
+            }
+            TextField {
+                id: textTapClientToken
+
+                Layout.fillWidth: true
+
+                placeholderText: ''
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextField.Wrap
+
+            }
+        }
+
         Label {
             Layout.fillWidth: true
 
             wrapMode: Label.Wrap
             text: {
-                if(Qt.platform.os === "android")
+                if(Qt.platform.os === 'android')
                     return '<font color="red">注意：Android 下打包，需要安装 Apktool M 或 MT 软件辅助</font>'
-                else if(Qt.platform.os === "windows")
+                else if(Qt.platform.os === 'windows')
                     return '<font color="red">注意：Windows 下打包，需要安装 Java 环境 和 Apktools 软件辅助</font>'
             }
         }
@@ -226,10 +246,10 @@ Item {
 
         visible: false
 
-        title: "选择文件夹"
+        title: '选择文件夹'
         //folder: shortcuts.home
         folder: GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath)
-        //nameFilters: [ "zip files (*.zip)", "All files (*)" ]
+        //nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
@@ -241,11 +261,11 @@ Item {
             //rootGameMaker.focus = true;
             //rootGameMaker.forceActiveFocus();
 
-            console.debug("[AndroidConfigure]You chose: " + fileUrl, fileUrls);
+            console.debug('[AndroidConfigure]You chose: ' + fileUrl, fileUrls);
 
 
             let fUrl;
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 //注意：content://com.android.externalstorage.documents/tree转换真实路径时会报错：
                 fUrl = GlobalJS.toPath(Platform.sl_getRealPathFromURI(fileUrl.toString().replace('content://com.android.externalstorage.documents/tree', 'content://com.android.externalstorage.documents/document')));
             else
@@ -261,7 +281,7 @@ Item {
 
 
             //sg_close();
-            console.debug("[AndroidConfigure]onRejected");
+            console.debug('[AndroidConfigure]onRejected');
             //Qt.quit()
 
         }
@@ -275,25 +295,25 @@ Item {
 
         visible: false
 
-        title: "选择图标文件"
+        title: '选择图标文件'
         //folder: shortcuts.home
-        nameFilters: [ "PNG files (*.png)", "All files (*)" ]
+        nameFilters: [ 'PNG files (*.png)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
         selectFolder: false
 
         onAccepted: {
-            console.debug("[AndroidConfigure]You chose: " + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[AndroidConfigure]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
-            if(Qt.platform.os === "android") {
-                if(strFileUrl.indexOf("primary") >= 0) {
-                    textImageResourceName.text = "file:/storage/emulated/0/" + strFileUrl.substr(strFileUrl.indexOf("%3A")+3);
+            if(Qt.platform.os === 'android') {
+                if(strFileUrl.indexOf('primary') >= 0) {
+                    textImageResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
                 }
-                else if(strFileUrl.indexOf("document/") >= 0) {
-                    let tt = strFileUrl.indexOf("%3A");
-                    textImageResourceName.text = "file:/storage/" + strFileUrl.slice(strFileUrl.indexOf("/document/") + "/document/".length, tt) + "/" + strFileUrl.slice(tt + 3);
+                else if(strFileUrl.indexOf('document/') >= 0) {
+                    let tt = strFileUrl.indexOf('%3A');
+                    textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
                 else
                     textImageResourceName.text = fileUrl;
@@ -303,7 +323,7 @@ Item {
             */
 
             let path;
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 path = Platform.sl_getRealPathFromURI(fileUrl);
             else
                 path = FrameManager.sl_urlDecode(fileUrl);
@@ -315,7 +335,7 @@ Item {
         onRejected: {
             //gameMap.forceActiveFocus();
 
-            console.debug("[AndroidConfigure]onRejected")
+            console.debug('[AndroidConfigure]onRejected')
             //Qt.quit();
         }
         Component.onCompleted: {
@@ -337,6 +357,7 @@ Item {
             textPackageName.text = '';
             textIconPath.text = '';
             textTapClientID.text = '';
+            textTapClientToken.text = '';
             textResult.text = '';
 
 
@@ -368,6 +389,10 @@ Item {
             reg = /property string tds_ClientID: '(\w*)'/;
             res = reg.exec(content);
             textTapClientID.text = res[1];
+
+            reg = /property string tds_ClientToken: '(\w*)'/;
+            res = reg.exec(content);
+            textTapClientToken.text = res[1];
 
 
             content = FrameManager.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
@@ -403,6 +428,10 @@ Item {
 
                 reg = /(property string tds_ClientID: ')\w*(')/;
                 content = content.replace(reg, '$1' + textTapClientID.text + '$2');
+
+                reg = /(property string tds_ClientToken: ')\w*(')/;
+                content = content.replace(reg, '$1' + textTapClientToken.text + '$2');
+
 
                 res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/RPGRuntime/GameMakerGlobal.qml');
                 if(res === 0) {
@@ -483,7 +512,7 @@ Item {
 
         //制作打包环境
         function makePackage() {
-            let path = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame";
+            let path = Platform.externalDataPath + GameMakerGlobal.separator + 'RPGMaker' + GameMakerGlobal.separator + 'RPGGame';
 
             let jsFiles = FrameManager.sl_dirList(path, '*', 0x002 | 0x2000 | 0x4000, 0);
             jsFiles.sort();
@@ -614,14 +643,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[PackageAndroid]Escape Key");
+        console.debug('[PackageAndroid]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[PackageAndroid]Back Key");
+        console.debug('[PackageAndroid]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -635,12 +664,12 @@ Item {
 
     Component.onCompleted: {
         //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-        textPackageDirPath.text = Platform.externalDataPath + GameMakerGlobal.separator + "RPGMaker" + GameMakerGlobal.separator + "RPGGame" + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+        textPackageDirPath.text = Platform.externalDataPath + GameMakerGlobal.separator + 'RPGMaker' + GameMakerGlobal.separator + 'RPGGame' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
         _private.init();
 
         console.debug('[PackageAndroid]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[PackageAndroid]Component.onDestruction");
+        console.debug('[PackageAndroid]Component.onDestruction');
     }
 }

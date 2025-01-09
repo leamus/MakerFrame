@@ -4,7 +4,7 @@ function saveLast(combatant=true) {
     if(combatant === true) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(game.$sys.resources.commonScripts["combatant_is_valid"](tc)) {
+            if(game.$sys.resources.commonScripts['combatant_is_valid'](tc)) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 tc.$$fightData.$lastChoice = {};
                 GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$lastChoice, tc.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
@@ -29,7 +29,7 @@ function loadLast(combatant=true, type=0) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            if(game.$sys.resources.commonScripts["combatant_is_valid"](tc)) {
+            if(game.$sys.resources.commonScripts['combatant_is_valid'](tc)) {
                 if(type === 1 && tc.$$fightData.$choice.$type !== -1) {   //已经有选择
                     continue;
                 }
@@ -64,7 +64,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
     //if(i >= repeaterMyCombatants.count)
     //    break;
-    //console.debug("!!!", fight.myCombatants, i, fightRole, JSON.stringify(fightRole));
+    //console.debug('!!!', fight.myCombatants, i, fightRole, JSON.stringify(fightRole));
 
     //fightRole.$$fightData.$actionData = {};
     //fightRole.$$fightData.$buffs = {};
@@ -103,7 +103,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
         }
     }
     else
-        console.warn("[!FightScene]载入战斗精灵失败：" + fightRole.$rid);
+        console.warn('[!FightScene]载入战斗精灵失败：' + fightRole.$rid);
     */
 
 
@@ -114,7 +114,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
 
 
-    FightSceneJS.refreshFightRoleAction(fightRole, "Normal", AnimatedSprite.Infinite);
+    FightSceneJS.refreshFightRoleAction(fightRole, 'Normal', AnimatedSprite.Infinite);
 
     //刷新血条
     //if(fightRole.$$propertiesWithExtra.HP[0] <= 0)
@@ -151,7 +151,7 @@ function showSkillsOrGoods(type, value) {
             }
 
 
-            menuSkillsOrGoods.strTitle = "选择技能";
+            menuSkillsOrGoods.strTitle = '选择技能';
             menuSkillsOrGoods.nType = 3;
 
             rectSkills.visible = true;
@@ -159,7 +159,7 @@ function showSkillsOrGoods(type, value) {
         }
         else {
             if(arrData.length === 0) {
-                fight.msg("没有技能", 50);
+                fight.msg('没有技能', 50);
                 return;
             }
             else if(value === -2)
@@ -187,7 +187,7 @@ function showSkillsOrGoods(type, value) {
             //}
 
 
-            menuSkillsOrGoods.strTitle = "选择技能";
+            menuSkillsOrGoods.strTitle = '选择技能';
             menuSkillsOrGoods.nType = 3;
 
             rectSkills.visible = true;
@@ -195,7 +195,7 @@ function showSkillsOrGoods(type, value) {
         }
         else {
             if(arrData.length === 0) {
-                fight.msg("没有技能", 50);
+                fight.msg('没有技能', 50);
                 return;
             }
             else if(value === -2)
@@ -215,11 +215,11 @@ function showSkillsOrGoods(type, value) {
     else if(type === 2) {
 
         //显示所有战斗可用的道具
-        for(let goods of game.gd["$sys_goods"]) {
+        for(let goods of game.gd['$sys_goods']) {
             //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
             if(goods.$commons.$fightScript) {
                 arrData.push(goods);
-                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
             }
         }
 
@@ -230,7 +230,7 @@ function showSkillsOrGoods(type, value) {
             //}
 
 
-            menuSkillsOrGoods.strTitle = "选择道具";
+            menuSkillsOrGoods.strTitle = '选择道具';
             menuSkillsOrGoods.nType = 2;
 
             rectSkills.visible = true;
@@ -238,7 +238,7 @@ function showSkillsOrGoods(type, value) {
         }
         else {
             if(arrData.length === 0) {
-                fight.msg("没有道具", 50);
+                fight.msg('没有道具', 50);
                 return;
             }
             else if(value === -2)
@@ -260,8 +260,8 @@ function showSkillsOrGoods(type, value) {
 //type：3为技能，2为道具
 function choicedSkillOrGoods(used, type) {
 
-    //console.debug("~~~~~~~~~weapon", JSON.stringify(tWeapon))
-    //console.debug("~~~~~~~~~weapon", JSON.stringify(game.$sys.getGoodsResource(tWeapon.RID)))
+    //console.debug('~~~~~~~~~weapon', JSON.stringify(tWeapon))
+    //console.debug('~~~~~~~~~weapon', JSON.stringify(game.$sys.getGoodsResource(tWeapon.RID)))
 
 
 
@@ -274,9 +274,9 @@ function choicedSkillOrGoods(used, type) {
 
     //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
     if(type === 3 || type === 2) {
-        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](used, combatant, 0);
+        let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](used, combatant, 0);
         if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
-            fight.msg(checkSkill || "不能选择", 50);
+            fight.msg(checkSkill || '不能选择', 50);
             return;
         }
         else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
@@ -284,7 +284,7 @@ function choicedSkillOrGoods(used, type) {
             return;
         }
         else if(checkSkill !== true) {   //如果不可用
-            fight.msg("不能选择", 50);
+            fight.msg('不能选择', 50);
             return;
         }
     }
@@ -294,7 +294,7 @@ function choicedSkillOrGoods(used, type) {
     //combatant.$$fightData.$lastChoice.$type = type;
     //combatant.$$fightData.$lastChoice.$attack = used;
 
-    //console.debug("~~~~~~~~~~used: ", used);
+    //console.debug('~~~~~~~~~~used: ', used);
 
 
 
@@ -307,7 +307,7 @@ function choicedSkillOrGoods(used, type) {
         if(skill && skill.$commons.$choiceScript)
             _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
         else if(!skill) {   //如果不可用
-            fight.msg("技能不能使用", 50);
+            fight.msg('技能不能使用', 50);
             return;
         }
     }
@@ -332,7 +332,7 @@ function choicedSkillOrGoods(used, type) {
         else if(skill && skill.$commons.$choiceScript)
             _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
         else if(!skill) {   //如果不可用
-            fight.msg("道具不能使用", 50);
+            fight.msg('道具不能使用', 50);
             return;
         }
     }
@@ -341,12 +341,12 @@ function choicedSkillOrGoods(used, type) {
     if(!_private.genFightChoice) {
         //单人技能 且 目标敌方
         if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}});
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}});
         }
 
         //目标己方
         else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}});
+            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}});
         }
 
         //不选（全体）
@@ -355,7 +355,7 @@ function choicedSkillOrGoods(used, type) {
             _private.genFightChoice = game.$gameMakerGlobalJS.gfNoChoiceSkill(skill, combatant);
         }
         else {   //不可用
-            fight.msg("不能使用", 50);
+            fight.msg('不能使用', 50);
             return;
         }
     }
@@ -394,9 +394,9 @@ function skillStepChoiced(type, value) {
             //    return;
 
             //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
-            let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](skillOrGoods, combatant, 1);
+            let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](skillOrGoods, combatant, 1);
             if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
-                fight.msg(checkSkill || "不能使用", 50);
+                fight.msg(checkSkill || '不能使用', 50);
                 return;
             }
             else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果技能不可用
@@ -404,7 +404,7 @@ function skillStepChoiced(type, value) {
                 return;
             }
             else if(checkSkill !== true) {   //如果技能不可用
-                fight.msg("不能使用", 50);
+                fight.msg('不能使用', 50);
                 return;
             }
 
@@ -499,7 +499,7 @@ function skillStepGetReadyToChoice(params, combatant) {
 //combatant：正在进行选择的战斗人物，有可能为null
 function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
     if(!filter)
-        filter = function(targetCombatant, combatant){return game.$sys.resources.commonScripts["combatant_is_valid"](targetCombatant);}
+        filter = function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}
 
     if(enabled) {
         if(teamFlags & 0b1) {
@@ -530,7 +530,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
                 //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
+                if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
                     repeaterMyCombatants.itemAt(i).setEnable(false);
                 }
             }
@@ -539,7 +539,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
                 //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.enemies[i])) {
+                if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.enemies[i])) {
                     repeaterEnemies.itemAt(i).setEnable(false);
                 }
             }
@@ -556,7 +556,7 @@ function checkToFight() {
 
     //遍历，判断target
     for(let i = 0; i < fight.myCombatants.length; ++i) {
-        if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
+        if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
         //if(repeaterEnemies.itemAt(i).opacity !== 0) {
             //如果 没选择 且 有技能
             if(fight.myCombatants[i].$$fightData.$choice.$type === -1 && fight.myCombatants[i].$skills.length > 0) {
@@ -613,7 +613,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         //break;
 
     case 3:    //调用战斗技能算法
-        SkillEffectResult = game.$sys.resources.commonScripts["fight_skill_algorithm"](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
+        SkillEffectResult = game.$sys.resources.commonScripts['fight_skill_algorithm'](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
         //SkillEffectResult = (doSkillEffect(role1.$$fightData.$teams, role1.$$fightData.$index, role2.$$fightData.$teams, role2.$$fightData.$index, tSkillEffect));
 
         return SkillEffectResult;
@@ -679,7 +679,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             switch(combatantActionSpriteData.Run) {
             case 0:
                 //位置
-                position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                 combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                 combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                 //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
@@ -687,7 +687,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 break;
 
             case 1:
-                position = game.$sys.resources.commonScripts["fight_combatant_melee_position_algorithm"](combatant, targetCombatantOrTeamIndex);
+                position = game.$sys.resources.commonScripts['fight_combatant_melee_position_algorithm'](combatant, targetCombatantOrTeamIndex);
                 /*let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
                 //x偏移一下
@@ -704,12 +704,12 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 //combatantSpriteEffect.x = position.x + combatantSpriteEffect.x;
                 //combatantSpriteEffect.y = position.y + combatantSpriteEffect.y;
 
-                //console.debug("!!!", position, combatantSpriteEffect.x, position.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
+                //console.debug('!!!', position, combatantSpriteEffect.x, position.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
 
                 break;
 
             case 2:
-                position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                 combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                 combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                 //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
@@ -809,18 +809,18 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 let position;
                 switch(combatantActionSpriteData.Position) {
                 case 0:
-                    position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
                     break;
                 case 1:
-                    position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
 
                     break;
                 case 2:
-                    position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
 
@@ -845,13 +845,13 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 let position;
                 switch(combatantActionSpriteData.Run) {
                 case 0:
-                    position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.numberanimationSpriteEffectX.to = position.x - spriteEffect.width / 2 + offset[0];
                     spriteEffect.numberanimationSpriteEffectY.to = position.y - spriteEffect.height / 2 + offset[1];
                     break;
 
                 case 1:
-                    position = game.$sys.resources.commonScripts["fight_skill_melee_position_algorithm"](targetCombatantOrTeamIndex, spriteEffect);
+                    position = game.$sys.resources.commonScripts['fight_skill_melee_position_algorithm'](targetCombatantOrTeamIndex, spriteEffect);
                     /*
                     let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
@@ -865,12 +865,12 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                     //spriteEffect.x = position.x + spriteEffect.x;
                     //spriteEffect.y = position.y + spriteEffect.y;
 
-                    //console.debug("!!!", position, spriteEffect.x, position.x + spriteEffect.x, AnimatedSprite.Infinite);
+                    //console.debug('!!!', position, spriteEffect.x, position.x + spriteEffect.x, AnimatedSprite.Infinite);
 
                     break;
 
                 case 2:
-                    position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                     spriteEffect.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                     spriteEffect.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                     break;
@@ -947,7 +947,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         if(combatantActionSpriteData.Color !== undefined) {
             wordmove.text.color = combatantActionSpriteData.Color;
             //wordmove.text.styleColor = combatantActionSpriteData.Color;
-            wordmove.text.styleColor = "";
+            wordmove.text.styleColor = '';
         }
 
         //显示文字
@@ -957,7 +957,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         /*/或者显示 Data字符串方法 的返回值（可以使用 SkillEffectResult 对象）
         if(combatantActionSpriteData.Data) {
             //console.debug(SkillEffectResult[0].value)
-            wordmove.text.text = GlobalJS._eval(combatantActionSpriteData.Data, "", {SkillEffectResult: SkillEffectResult});
+            wordmove.text.text = GlobalJS._eval(combatantActionSpriteData.Data, '', {SkillEffectResult: SkillEffectResult});
             //console.debug(wordmove.text.text)
         }*/
 
@@ -972,14 +972,14 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             let position;
             switch(combatantActionSpriteData.Position) {
             case 1:
-                /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role2.$$fightData.$teamsID, role2.$$fightData.$index);
+                /*position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](role2.$$fightData.$teamsID, role2.$$fightData.$index);
                 wordmove.x = position.x - wordmove.width / 2;
                 wordmove.y = position.y - wordmove.height / 2;
                 */
 
                 break;
             case 4:
-                /*position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](role1.$$fightData.$teamsID, role1.$$fightData.$index);
+                /*position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](role1.$$fightData.$teamsID, role1.$$fightData.$index);
                 wordmove.x = position.x - wordmove.width / 2;
                 wordmove.y = position.y - wordmove.height / 2;
                 */
@@ -987,7 +987,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             }
         }
         else {
-            let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+            let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
             wordmove.x = position.x - wordmove.width / 2;
             wordmove.y = position.y - wordmove.height / 2;
         }
@@ -1011,7 +1011,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         break;
 
     default:
-        console.warn("[!FightScene]actionSpritePlay ERROR:", JSON.stringify(combatantActionSpriteData))
+        console.warn('[!FightScene]actionSpritePlay ERROR:', JSON.stringify(combatantActionSpriteData))
     }   //switch
 
     return 0;
@@ -1037,7 +1037,7 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
     let spriteEffect = fightrole.$$fightData.$info.$spriteEffect;
 
     if(!game.$sys.loadSpriteEffect(actions[action], spriteEffect, {Loops: loop})) {
-        console.warn("[!FightScene]载入战斗精灵动作失败：" + action);
+        console.warn('[!FightScene]载入战斗精灵动作失败：' + action);
         return false;
     }
 
@@ -1051,14 +1051,14 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 //重置所有Roles位置
 function resetRolesPosition() {
     for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-        let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](0, i);
+        let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](0, i);
         let tRoleSpriteEffect = repeaterMyCombatants.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
         tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
     }
 
     for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-        let position = game.$sys.resources.commonScripts["fight_combatant_position_algorithm"](1, i);
+        let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](1, i);
         let tRoleSpriteEffect = repeaterEnemies.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
         tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
@@ -1084,7 +1084,7 @@ function *fnRound() {
 
 
     //!!!开始循环每一角色的攻击
-    let genFightRolesRound = game.$sys.resources.commonScripts["fight_roles_round"](_private.nRound);
+    let genFightRolesRound = game.$sys.resources.commonScripts['fight_roles_round'](_private.nRound);
     //返回战斗人物数组，或 暂停时间（数字）
     for(let tValue of genFightRolesRound) {
     ////for(let combatant of _private.arrTempLoopedAllFightRoles) {
@@ -1104,8 +1104,8 @@ function *fnRound() {
             continue;
         }
 
-        /*console.debug("!!!!!", JSON.stringify(combatant, function(k, v) {
-            if(k.indexOf("$$") === 0)
+        /*console.debug('!!!!!', JSON.stringify(combatant, function(k, v) {
+            if(k.indexOf('$$') === 0)
                 return undefined;
             return v;
         }))*/
@@ -1142,7 +1142,7 @@ function *fnRound() {
                 fightSkills = goods.$fight;
             }
 
-            //console.debug("[FightScene]fightSkill:", JSON.stringify(fightSkillInfo));
+            //console.debug('[FightScene]fightSkill:', JSON.stringify(fightSkillInfo));
 
             //如果有技能信息，则执行技能动画
             if(fightSkills) {
@@ -1156,12 +1156,12 @@ function *fnRound() {
                     //执行技能脚本
                     //fightSkillInfo = fightSkillInfo.$commons.$playScript(combatant.$$fightData.$teams, combatant.$$fightData.$index, role2.$$fightData.$teams, role2.$$fightData.$index, SkillEffects);
 
-                    //console.debug("!!!", SkillEffects);
+                    //console.debug('!!!', SkillEffects);
 
                     //得到技能生成器函数
                     let genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
-                    //_private.scriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant), '$playScript', -1);
-                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
+                    //const ret1 = _private.scriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript', );
+                    ///GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
 
                     //循环 技能（或者 道具技能）包含的特效
@@ -1191,7 +1191,7 @@ function *fnRound() {
 
 
 
-                        //console.debug("!!!1", tCombatantActionSpriteData);
+                        //console.debug('!!!1', tCombatantActionSpriteData);
                         if(!tCombatantActionSpriteData)  //如果是其他yield（比如msg）
                             continue;
 
@@ -1208,24 +1208,24 @@ function *fnRound() {
                         //let tRepeaterSpriteEffect1 = repeaterSpriteEffect1;
                         //let tRepeaterSpriteEffect2 = repeaterSpriteEffect2;
 
-                        //console.debug("!!!0", tCombatantActionSpriteData.SkillEffect);
+                        //console.debug('!!!0', tCombatantActionSpriteData.SkillEffect);
                         //if(tCombatantActionSpriteData.SkillEffect)
-                        //    console.debug("!!!1", tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
+                        //    console.debug('!!!1', tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
 
-                        //console.debug("!!!2", JSON.stringify(tSkillEffect));
-                        //console.debug("!!!33", tSkillEffect);
+                        //console.debug('!!!2', JSON.stringify(tSkillEffect));
+                        //console.debug('!!!33', tSkillEffect);
                         //if(tSkillEffect)
-                        //    console.debug("!!!3", tSkillEffect, tSkillEffect.roleIndex2)
-                        //console.debug("!!!4", tRoleSpriteEffect2, tRole2)
+                        //    console.debug('!!!3', tSkillEffect, tSkillEffect.roleIndex2)
+                        //console.debug('!!!4', tRoleSpriteEffect2, tRole2)
 
 
 
                         //!!!!!!注意：这里soundeffect如果同时载入很多时，Win下会非常卡（安卓貌似不会）
 
 
-                        console.time("SkillSprite");
+                        console.time('SkillSprite');
                         SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-                        console.timeEnd("SkillSprite");
+                        console.timeEnd('SkillSprite');
 
                         if(SkillEffectResult === 1)
                             yield 0;
@@ -1253,14 +1253,14 @@ function *fnRound() {
                 //    _private.scriptQueue.create(goodsInfo.$commons.$fightScript['$playScript'](goods, combatant), '$playScript', -1);
 
                 if(goodsInfo.$commons.$fightScript['$completeScript'])
-                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant), '$completeScript', -1);
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
+                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, -1, true, '$completeScript', );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
                 else if(goodsInfo.$commons.$fightScript['$overScript'])
-                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
+                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, -1, true, '$overScript', );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
                 else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
-                    //_private.scriptQueue.create(goodsInfo.$commons.$fightScript[2](goods, combatant), '$overScript', -1);
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
+                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, -1, true, '$overScript', );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
 
                 while(1) {
 
@@ -1276,9 +1276,9 @@ function *fnRound() {
                         continue;
 
 
-                    console.time("SkillSprite");
+                    console.time('SkillSprite');
                     SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-                    console.timeEnd("SkillSprite");
+                    console.timeEnd('SkillSprite');
 
                     if(SkillEffectResult === 1)
                         yield 0;
@@ -1310,7 +1310,7 @@ function *fnRound() {
             //tRoleSpriteEffect1.Layout.topMargin = 0;
 
             //重置normal Action
-            //FightSceneJS.refreshFightRoleAction(combatant, "normal", AnimatedSprite.Infinite);
+            //FightSceneJS.refreshFightRoleAction(combatant, 'normal', AnimatedSprite.Infinite);
 
 
             //if(harm !== 0) {   //对方生命为0
@@ -1322,12 +1322,12 @@ function *fnRound() {
             }
         //}
 
-        }while(0);
+        } while(0);
 
 
 
         yield* runCombatantRoundScript(combatant, 3);
-        //game.$sys.resources.commonScripts["fight_combatant_set_choice"](combatant, -1, false);
+        //game.$sys.resources.commonScripts['fight_combatant_set_choice'](combatant, -1, false);
 
     }   //for
 
@@ -1339,12 +1339,12 @@ function *fnRound() {
 //yield：<0同fnRound；10、11：等待选择 或 等待下一个事件循环
 //return：战斗结果
 function *gfFighting() {
-    console.debug("[FightScene]gfFighting");
+    console.debug('[FightScene]gfFighting');
 
     let fightResult;
 
     while(1) {
-        //console.debug("[FightScene]Fighting...");
+        //console.debug('[FightScene]Fighting...');
 
         /*let tTeamsParam = [
             fight.myCombatants,
@@ -1380,8 +1380,8 @@ function *gfFighting() {
         //}
 
         //通用回合开始脚本
-        //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run(game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
+        //console.debug('运行回合事件!!!', _private.nRound)
+        fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1427,8 +1427,8 @@ function *gfFighting() {
         //}
 
         //通用回合开始脚本
-        //console.debug("运行回合事件!!!", _private.nRound)
-        fight.run(game.$sys.resources.commonScripts["fight_round_script"](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
+        //console.debug('运行回合事件!!!', _private.nRound)
+        fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
         //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         yield 10;
@@ -1471,7 +1471,7 @@ function *gfFighting() {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts["fight_combatant_set_choice"](tcombatant, -1, false);
+                game.$sys.resources.commonScripts['fight_combatant_set_choice'](tcombatant, -1, false);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
                 //tcombatant.$$fightData.$choice.$attack = undefined;
@@ -1483,7 +1483,7 @@ function *gfFighting() {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts["fight_combatant_set_choice"](tcombatant, -1, true);
+                game.$sys.resources.commonScripts['fight_combatant_set_choice'](tcombatant, -1, true);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
                 //tcombatant.$$fightData.$choice.$attack = undefined;
@@ -1497,13 +1497,15 @@ function *gfFighting() {
         /*/运行两个回合脚本（阶段3）
 
         //通用回合开始脚本
-        if(GlobalJS.createScript(_private.scriptQueue, 0, 0, game.$sys.resources.commonScripts["fight_round_script"].call({game, fight}, _private.nRound, 1)) === 0)
+        if(_private.scriptQueue.create(game.$sys.resources.commonScripts['fight_round_script'].call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
+        //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, game.$sys.resources.commonScripts['fight_round_script'].call({game, fight}, _private.nRound, 1)) === 0)
             _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
 
         //回合开始脚本
         if(_private.fightRoundScript) {
-            //console.debug("运行回合事件!!!", _private.nRound)
-            if(GlobalJS.createScript(_private.scriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
+            //console.debug('运行回合事件!!!', _private.nRound)
+            if(_private.scriptQueue.create(_private.fightRoundScript(_private.nRound, 1) ?? null, -1, true, '', ) === 0)
+            //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
                 _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
         }*/
 
@@ -1522,7 +1524,7 @@ function *gfFighting() {
 //stage：0为大回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
 function *runCombatantRoundScript(combatant, stage) {
     //执行 战斗人物回合 脚本
-    let combatantRoundScript = game.$sys.resources.commonScripts["combatant_round_script"](combatant, _private.nRound, stage);
+    let combatantRoundScript = game.$sys.resources.commonScripts['combatant_round_script'](combatant, _private.nRound, stage);
 
     if(combatantRoundScript === null) {
         return null;
@@ -1587,7 +1589,7 @@ function runAway() {
 
     //如果是true，则调用通用逃跑算法
     if(_private.runAway === true) {
-        if(game.$sys.resources.commonScripts["common_run_away_algorithm"](fight.myCombatants, -1)) {
+        if(game.$sys.resources.commonScripts['common_run_away_algorithm'](fight.myCombatants, -1)) {
             fight.over(-2);
             return true;
         }
@@ -1602,14 +1604,14 @@ function runAway() {
 
     //脚本形式执行
     let continueScript = function*() {
-        yield fight.msg("逃跑失败");
+        yield fight.msg('逃跑失败');
 
         //全部设置为 休息
         for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(game.$sys.resources.commonScripts["combatant_is_valid"](fight.myCombatants[i])) {
+            if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts["fight_combatant_set_choice"](fight.myCombatants[i], 1, false);
+                game.$sys.resources.commonScripts['fight_combatant_set_choice'](fight.myCombatants[i], 1, false);
                 //fight.myCombatants[i].$$fightData.$choice.$type = 1;
                 //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
                 //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
@@ -1644,7 +1646,7 @@ function fightOver(result, force=false) {
         //    fight.run(_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end');
         //}
 
-        fight.run(game.$sys.resources.commonScripts["fight_end_script"](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2');
+        fight.run(game.$sys.resources.commonScripts['fight_end_script'](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2');
     //}
 }
 
@@ -1691,7 +1693,7 @@ function showFightRoleInfo(nIndex) {
 
 /*/读 role战斗角色 的 属性 和 所有Action 到 role
 function readFightRole(role) {
-    //console.debug("[FightScene]readFightRole");
+    //console.debug('[FightScene]readFightRole');
 
     let data = game.$sys.getFightRoleResource(role.$rid);
     if(data) {
@@ -1704,12 +1706,12 @@ function readFightRole(role) {
         return true;
     }
     else
-        console.warn("[!FightScene]载入战斗精灵失败：" + role.$rid);
+        console.warn('[!FightScene]载入战斗精灵失败：' + role.$rid);
 
 
-    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + role.$rid + GameMakerGlobal.separator + "fight_role.json");
+    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + role.$rid + GameMakerGlobal.separator + 'fight_role.json');
 
-    //console.debug("[FightScene]filePath：", filePath);
+    //console.debug('[FightScene]filePath：', filePath);
 
     //let data = File.read(filePath);
     let data = FrameManager.sl_fileRead(filePath);
@@ -1726,7 +1728,7 @@ function readFightRole(role) {
         return true;
     }
     else
-        console.warn("[!FightScene]载入战斗精灵失败：" + filePath);
+        console.warn('[!FightScene]载入战斗精灵失败：' + filePath);
 
     return false;
     * /
@@ -1736,20 +1738,20 @@ function readFightRole(role) {
 
 //读取技能文件
 function loadFightSkillInfo(fightSkillName) {
-    //console.debug("[FightScene]loadFightSkillInfo0");
+    //console.debug('[FightScene]loadFightSkillInfo0');
     return game.$sys.getSkillResource(fightSkillName);
 
     /*if(fightSkillName) {
 
-        /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + "fight_skill.json");
+        /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
         //let data = File.read(filePath);
-        //console.debug("[GameFightSkill]filePath：", filePath);
+        //console.debug('[GameFightSkill]filePath：', filePath);
 
         let data = FrameManager.sl_fileRead(filePath);
 
         if(data) {
             data = JSON.parse(data);
-            //console.debug("data", data);
+            //console.debug('data', data);
             try {
                 data = GlobalJS._eval(data.FightSkill);
             }
@@ -1760,9 +1762,9 @@ function loadFightSkillInfo(fightSkillName) {
             return data;
         }
         else
-            console.warn("[!FightScene]Load Skill Fail:", filePath);
+            console.warn('[!FightScene]Load Skill Fail:', filePath);
         * /
-        let data = game.loadjson(GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + "fight_skill.json");
+        let data = game.loadjson(GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
         if(data) {
             return GlobalJS._eval(data.FightSkill);
         }
@@ -1794,7 +1796,7 @@ function doSkillEffect(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     let role1 = team1[roleIndex1];
     let role2 = team2[roleIndex2];
 
-    let skillEffectResult = game.$sys.resources.commonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
+    let skillEffectResult = game.$sys.resources.commonScripts['fight_skill_algorithm'](team1, roleIndex1, team2, roleIndex2, skillEffect);
     //for(let t in skillEffectResult) {
     //}
     return skillEffectResult;
@@ -1802,7 +1804,7 @@ function doSkillEffect(team1, roleIndex1, team2, roleIndex2, skillEffect) {
 
 //显示伤害文字，并设置伤害
 function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
-    //console.debug("[FightScene]doSkillEffect");
+    //console.debug('[FightScene]doSkillEffect');
     //console.debug(team1, roleIndex1, team2, roleIndex2, skillEffect);
     //console.debug(JSON.stringify(fight.myCombatants), JSON.stringify(fight.enemies))
 
@@ -1814,50 +1816,50 @@ function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     let harm;
     let str;
 
-    /*if(role1["name"] === "$$$") {
-        name1 = "你";
+    /*if(role1['name'] === '$$$') {
+        name1 = '你';
     }
-    else if(role1["name"] === 0) {
-        name1 = "敌人";
+    else if(role1['name'] === 0) {
+        name1 = '敌人';
     }
     else {
-        name1 = FrameManager.sl_getPlayerInfo(role1["GroupIndex"]).nickname;
+        name1 = FrameManager.sl_getPlayerInfo(role1['GroupIndex']).nickname;
     }* /
-    name1 = role1.$name || "无名";
+    name1 = role1.$name || '无名';
 
-    /*if(role2["GameUserID"] === UserInfo.gameUserID) {
-        name2 = "你";
+    /*if(role2['GameUserID'] === UserInfo.gameUserID) {
+        name2 = '你';
     }
-    else if(role2["GameUserID"] === 0) {
-        name2 = "敌人";
+    else if(role2['GameUserID'] === 0) {
+        name2 = '敌人';
     }
     else {
-        name2 = FrameManager.sl_getPlayerInfo(role2["GroupIndex"]).nickname;
+        name2 = FrameManager.sl_getPlayerInfo(role2['GroupIndex']).nickname;
     }* /
-    name2 = role2.$name || "无名";
+    name2 = role2.$name || '无名';
 
     //console.debug(Global.frameData.arrayPets)
     //console.debug(Global.frameData.arrayPets[0])
     //console.debug(Global.frameData.arrayPets[0].$$fightData.attackProp)
-    //console.debug("debug1:", data2.choice)
+    //console.debug('debug1:', data2.choice)
 
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Global.frameData.arrayEnemyPets[0].$$fightData.attackProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
 
-    msgbox.textArea.append(name1 + "使用【" + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + "】攻击");
-    msgbox.textArea.append(name1 + "使用【" + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + "】防御");
-    //msgbox.textArea.append(name2 + "使用" + role2.$$fightData.attackProp + "攻击");
-    //msgbox.textArea.append(name2 + "使用" + role2.$$fightData.defenseProp + "防御");
+    msgbox.textArea.append(name1 + '使用【' + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + '】攻击');
+    msgbox.textArea.append(name1 + '使用【' + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + '】防御');
+    //msgbox.textArea.append(name2 + '使用' + role2.$$fightData.attackProp + '攻击');
+    //msgbox.textArea.append(name2 + '使用' + role2.$$fightData.defenseProp + '防御');
 
 
-    harm = game.$sys.resources.commonScripts["fight_skill_algorithm"](team1, roleIndex1, team2, roleIndex2, skillEffect);
+    harm = game.$sys.resources.commonScripts['fight_skill_algorithm'](team1, roleIndex1, team2, roleIndex2, skillEffect);
 
 
-    str = "属性使用";
-    if(harm.propertySuccess === 1)str += "成功";
-    else if(harm.propertySuccess === -1)str += "失败";
-    else str += "无效果";
-    str += ",%1把%2揍了".arg(name1).arg(name2) + harm.harm + "血";
+    str = '属性使用';
+    if(harm.propertySuccess === 1)str += '成功';
+    else if(harm.propertySuccess === -1)str += '失败';
+    else str += '无效果';
+    str += ',%1把%2揍了'.arg(name1).arg(name2) + harm.harm + '血';
     msgbox.textArea.append(str);
 
     role2.$$propertiesWithExtra.HP[0] -= harm.harm;
@@ -1865,12 +1867,12 @@ function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
         role2.$$propertiesWithExtra.HP[0] = 0;
         //role1.$$propertiesWithExtra.HP[0] = role1.$$propertiesWithExtra.HP[2];
         //role2.$$propertiesWithExtra.HP[0] = role2.$$propertiesWithExtra.HP[2];
-        //msgbox.textArea.append("战斗胜利");
+        //msgbox.textArea.append('战斗胜利');
         return {};
     }
 
 
-    msgbox.textArea.append("--------------------------");
+    msgbox.textArea.append('--------------------------');
     return 0;
 }
 */

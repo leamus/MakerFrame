@@ -7,7 +7,7 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
 

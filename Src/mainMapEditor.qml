@@ -81,7 +81,7 @@ Item {
             //    return false;
 
             //if(index === 0) {
-            /*if(item === "..") {
+            /*if(item === '..') {
                 visible = false;
                 return;
             }*/
@@ -106,16 +106,16 @@ Item {
             }
 
 
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
             //let cfg = File.read(filePath);
             let cfg = FrameManager.sl_fileRead(filePath);
-            //console.debug("[mainMapEditor]filePath：", filePath);
+            //console.debug('[mainMapEditor]filePath：', filePath);
 
             if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor.qml", {});
+            //console.debug('cfg', cfg);
+            //loader.setSource('./MapEditor.qml', {});
             //loader.item.openMap(cfg);
 
 
@@ -129,7 +129,7 @@ Item {
             textBlockHeight.text = cfg.MapBlockSize[1];
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
             textMapBlockResourceName.text = cfg.MapBlockImage[0];
-            //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
+            //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 
             dialogMapData.open();
             dialogMapData.forceActiveFocus();
@@ -147,7 +147,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Yes | Dialog.Cancel,
                 OnAccepted: ()=>{
-                    console.debug("[mainMapEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listMaps.forceActiveFocus();
@@ -177,7 +177,7 @@ Item {
         width: parent.width * 0.9
         //height: 600
 
-        title: "地图数据"
+        title: '地图数据'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
@@ -190,27 +190,27 @@ Item {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
                 Label {
-                    text: qsTr("地图大小（宽*高）：")
+                    text: qsTr('地图大小（宽*高）：')
                 }
 
                 TextField {
                     id: textMapWidth
                     Layout.fillWidth: true
-                    placeholderText: "宽"
-                    text: "50"
+                    placeholderText: '宽'
+                    text: '50'
 
                     //selectByKeyboard: true
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
                 }
                 Label {
-                    text: qsTr("*")
+                    text: qsTr('*')
                 }
                 TextField {
                     id: textMapHeight
                     Layout.fillWidth: true
-                    placeholderText: "高"
-                    text: "50"
+                    placeholderText: '高'
+                    text: '50'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -223,14 +223,14 @@ Item {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
                 Label {
-                    text: qsTr("地图块大小（宽*高）：")
+                    text: qsTr('地图块大小（宽*高）：')
                 }
 
                 TextField {
                     id: textBlockWidth
                     Layout.fillWidth: true
-                    placeholderText: "宽"
-                    text: "32"
+                    placeholderText: '宽'
+                    text: '32'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -238,14 +238,14 @@ Item {
                 }
 
                 Label {
-                    text: qsTr("*")
+                    text: qsTr('*')
                 }
 
                 TextField {
                     id: textBlockHeight
                     Layout.fillWidth: true
-                    placeholderText: "高"
-                    text: "32"
+                    placeholderText: '高'
+                    text: '32'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -259,13 +259,13 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 Label {
-                    text: qsTr("路径：")
+                    text: qsTr('路径：')
                 }
 
                 TextField {
                     id: textMapBlockImageURL
                     Layout.fillWidth: true
-                    placeholderText: ""
+                    placeholderText: ''
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -281,7 +281,7 @@ Item {
                 TextField {
                     id: textMapBlockResourceName
                     Layout.fillWidth: true
-                    placeholderText: "素材名"
+                    placeholderText: '素材名'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -292,7 +292,7 @@ Item {
                     id: checkboxSaveResource
                     checked: false
                     enabled: false
-                    text: "另存"
+                    text: '另存'
                 }
             }
 
@@ -303,7 +303,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: "选择Tile文件"
+                    text: '选择Tile文件'
                     Layout.fillWidth: true
                     onClicked: {
                         //dialogMapData.nChoiceType = 1;
@@ -312,14 +312,14 @@ Item {
                     }
                 }
                 Button {
-                    text: "选择素材"
+                    text: '选择素材'
                     Layout.fillWidth: true
                     onClicked: {
                         //dialogMapData.nChoiceType = 2;
 
                         let path = GameMakerGlobal.mapResourcePath();
 
-                        l_listMapBlockResource.show(path, "*", 0x002, 0x00);
+                        l_listMapBlockResource.show(path, '*', 0x002, 0x00);
                         l_listMapBlockResource.visible = true;
 
                         dialogMapData.visible = false;
@@ -338,8 +338,8 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     wrapMode: Label.WrapAnywhere
-                    color: "red"
-                    text: ""
+                    color: 'red'
+                    text: ''
                 }
             }
         }
@@ -350,16 +350,16 @@ Item {
             /*if(textMapBlockImageURL.text.length === 0) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "路径不能为空";
-                Platform.sl_showToast("路径不能为空");
+                labelDialogTips.text = '路径不能为空';
+                Platform.sl_showToast('路径不能为空');
                 return;
             }
             */
             if(textMapBlockResourceName.text.length === 0) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "资源名不能为空";
-                Platform.sl_showToast("资源名不能为空");
+                labelDialogTips.text = '资源名不能为空';
+                Platform.sl_showToast('资源名不能为空');
                 return;
             }
             //系统图片
@@ -369,9 +369,9 @@ Item {
                 let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
-                    labelDialogTips.text = "拷贝到资源目录失败";
-                    Platform.sl_showToast("拷贝到资源目录失败");
-                    //console.debug("[mainMapEditor]Copy ERROR:", filepath);
+                    labelDialogTips.text = '拷贝到资源目录失败';
+                    Platform.sl_showToast('拷贝到资源目录失败');
+                    //console.debug('[mainMapEditor]Copy ERROR:', filepath);
 
                     //root.forceActiveFocus();
                     return;
@@ -380,11 +380,11 @@ Item {
                 //textMapBlockImageURL.text = GlobalJS.toURL(filepath);
             }
             else {  //资源图库
-                //console.debug("ttt2:", filepath);
+                //console.debug('ttt2:', filepath);
 
                 //textMapBlockImageURL.text = filepath;
 
-                //console.debug("ttt", textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
+                //console.debug('ttt', textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
             }
 
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
@@ -392,8 +392,8 @@ Item {
             if(!FrameManager.sl_fileExists(GlobalJS.toPath(textMapBlockImageURL.text))) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "图块路径错误或文件不存在:" + GlobalJS.toPath(textMapBlockImageURL.text);
-                Platform.sl_showToast("图块路径错误或文件不存在");
+                labelDialogTips.text = '图块路径错误或文件不存在:' + GlobalJS.toPath(textMapBlockImageURL.text);
+                Platform.sl_showToast('图块路径错误或文件不存在');
                 return;
             }
 
@@ -402,18 +402,18 @@ Item {
             loader.source = './MapEditor.qml';
         }
         onRejected: {
-            textMapBlockImageURL.text = "";
+            textMapBlockImageURL.text = '';
             textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.text = "";
+            textMapBlockResourceName.text = '';
             textMapBlockResourceName.enabled = true;
 
-            labelDialogTips.text = "";
+            labelDialogTips.text = '';
 
 
             l_listMaps.forceActiveFocus();
 
 
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
             /*鹰：这点组件树的focus有点奇怪
             let p = dialogMapData;
             let n = 20;
@@ -446,9 +446,9 @@ Item {
 
         visible: false
 
-        title: "选择地图块文件"
+        title: '选择地图块文件'
         //folder: shortcuts.home
-        nameFilters: [ "Image files (*.jpg *.png *.bmp)", "All files (*)" ]
+        nameFilters: [ 'Image files (*.jpg *.png *.bmp)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
@@ -460,15 +460,15 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
 
-            console.debug("[mainMapEditor]You chose: " + fileUrl, fileUrls);
+            console.debug('[mainMapEditor]You chose: ' + fileUrl, fileUrls);
 
 
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 textMapBlockImageURL.text = Platform.sl_getRealPathFromURI(fileUrl);
             else
                 textMapBlockImageURL.text = FrameManager.sl_urlDecode(fileUrl);
 
-            textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf("/") + 1);
+            textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 
 
             textMapBlockImageURL.enabled = true;
@@ -484,7 +484,7 @@ Item {
             ////canvasMapBlock.requestPaint(); //重新绘图
 
 
-            //console.log("You chose: " + fileDialog.fileUrls);
+            //console.log('You chose: ' + fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {
@@ -492,7 +492,7 @@ Item {
 
 
             //sg_close();
-            console.debug("[mainMapEditor]onRejected")
+            console.debug('[mainMapEditor]onRejected')
             //Qt.quit()
 
         }
@@ -512,11 +512,11 @@ Item {
 
 
         onSg_clicked: {
-            //let filepath = GameMakerGlobal.config.strProjectRootPath + "/" + GameMakerGlobal.config.strCurrentProjectName + "/" + GameMakerGlobal.config.strMapResourceDirName + "/" + item;
+            //let filepath = GameMakerGlobal.config.strProjectRootPath + '/' + GameMakerGlobal.config.strCurrentProjectName + '/' + GameMakerGlobal.config.strMapResourceDirName + '/' + item;
 
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(item);
             textMapBlockResourceName.text = item;
-            //console.debug("[mainMapEditor]List Clicked::", textMapBlockImageURL.text)
+            //console.debug('[mainMapEditor]List Clicked::', textMapBlockImageURL.text)
 
             textMapBlockImageURL.enabled = false
             textMapBlockResourceName.enabled = true;
@@ -537,7 +537,7 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
 
-            console.debug("[mainMapEditor]filepath", textMapBlockImageURL.text);
+            console.debug('[mainMapEditor]filepath', textMapBlockImageURL.text);
         }
 
         onSg_canceled: {
@@ -551,13 +551,13 @@ Item {
         }
 
         onSg_removeClicked: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "Resources" + GameMakerGlobal.separator + "Maps" + GameMakerGlobal.separator + item;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Resources' + GameMakerGlobal.separator + 'Maps' + GameMakerGlobal.separator + item;
 
             rootWindow.aliasGlobal.dialogCommon.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainMapEditor]删除地图资源：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
+                    console.debug('[mainMapEditor]删除地图资源：' + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
                     removeItem(index);
 
                     l_listMapBlockResource.forceActiveFocus();
@@ -574,16 +574,16 @@ Item {
     /*Dialog1.Dialog {
         id: fileDialogSave
         visible: false
-          title: "Choose a date"
+          title: 'Choose a date'
           standardButtons: Dialog1.StandardButton.Save | Dialog1.StandardButton.Cancel
 
-          onAccepted: console.log("Saving the date ")
+          onAccepted: console.log('Saving the date ')
 
       }*/
 
     /*Dialog {
         id: dialogMapName
-        title: "请输入地图数据"
+        title: '请输入地图数据'
         width: 300
         height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -600,20 +600,20 @@ Item {
 
             //let cfg = File.read(fileUrl);
             let cfg = FrameManager.sl_fileRead(fileUrl);
-            //console.debug("cfg", cfg);
+            //console.debug('cfg', cfg);
 
             if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            loader.setSource("./MapEditor.qml", {});
+            //console.debug('cfg', cfg);
+            loader.setSource('./MapEditor.qml', {});
             loader.item.openMap(cfg);
         }
         onRejected: {
             root.forceActiveFocus();
 
 
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
         }
 
         ColumnLayout {
@@ -622,14 +622,14 @@ Item {
             RowLayout {
                 width: parent.width
                 Text {
-                    text: qsTr("地图块大小（宽*高）：")
+                    text: qsTr('地图块大小（宽*高）：')
                 }
 
                 TextField {
                     id: textBlockWidth
                     Layout.fillWidth: true
-                    placeholderText: "宽"
-                    text: "32"
+                    placeholderText: '宽'
+                    text: '32'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -637,14 +637,14 @@ Item {
                 }
 
                 Text {
-                    text: qsTr("*")
+                    text: qsTr('*')
                 }
 
                 TextField {
                     id: textBlockHeight
                     Layout.fillWidth: true
-                    placeholderText: "高"
-                    text: "32"
+                    placeholderText: '高'
+                    text: '32'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -655,27 +655,27 @@ Item {
             RowLayout {
                 width: parent.width
                 Text {
-                    text: qsTr("地图大小（宽*高）：")
+                    text: qsTr('地图大小（宽*高）：')
                 }
 
                 TextField {
                     id: textMapWidth
                     Layout.fillWidth: true
-                    placeholderText: "宽"
-                    text: "50"
+                    placeholderText: '宽'
+                    text: '50'
 
                     //selectByKeyboard: true
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
                 }
                 Text {
-                    text: qsTr("*")
+                    text: qsTr('*')
                 }
                 TextField {
                     id: textMapHeight
                     Layout.fillWidth: true
-                    placeholderText: "高"
-                    text: "50"
+                    placeholderText: '高'
+                    text: '50'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -689,11 +689,11 @@ Item {
 
     /*Dialog1.FileDialog {
         id: filedialogOpenMap
-        title: "选择地图文件"
+        title: '选择地图文件'
         selectMultiple: false
         //folder: shortcuts.home
-        folder: GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + "Map")
-        nameFilters: [ "Json files (*.json *.map *.jsn)", "All files (*)" ]
+        folder: GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+        nameFilters: [ 'Json files (*.json *.map *.jsn)', 'All files (*)' ]
         selectExisting: true
         selectFolder: false
         visible: false
@@ -706,13 +706,13 @@ Item {
 
             let cfg = File.read(fileUrl);
             //let cfg = FrameManager.sl_fileRead(fileUrl);
-            console.debug("cfg", cfg, fileUrl);
+            console.debug('cfg', cfg, fileUrl);
 
             if(!cfg)
                 return false;
             cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor.qml", {});
+            //console.debug('cfg', cfg);
+            //loader.setSource('./MapEditor.qml', {});
             loader.item.openMap(cfg);
         }
         onRejected: {
@@ -734,7 +734,7 @@ Item {
         anchors.fill: parent
 
 
-        //source: "./MapEditor.qml"
+        //source: './MapEditor.qml'
         asynchronous: true
 
 
@@ -782,7 +782,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainMapEditor]loader onLoaded");
+            console.debug('[mainMapEditor]loader onLoaded');
 
             try {
                 //_private.refresh();
@@ -790,7 +790,7 @@ Item {
                 //创建地图工作
 
                 if(dialogMapData.nCreateMapType === 1) {
-                    //loader.setSource("./MapEditor.qml", {});
+                    //loader.setSource('./MapEditor.qml', {});
                     //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
                     loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
                                                  MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
@@ -812,12 +812,12 @@ Item {
 
                 }
 
-                textMapBlockImageURL.text = "";
+                textMapBlockImageURL.text = '';
                 textMapBlockImageURL.enabled = false;
-                textMapBlockResourceName.text = "";
+                textMapBlockResourceName.text = '';
                 textMapBlockResourceName.enabled = true;
 
-                labelDialogTips.text = "";
+                labelDialogTips.text = '';
 
 
 
@@ -835,7 +835,7 @@ Item {
                 visible = true;
 
 
-                //console.debug("Ok clicked");
+                //console.debug('Ok clicked');
             }
             catch(e) {
                 throw e;
@@ -860,26 +860,26 @@ Item {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + "Map")
+            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
-            //console.debug("filedialogOpenMap.folder:", filedialogOpenMap.folder)
+            //console.debug('filedialogOpenMap.folder:', filedialogOpenMap.folder)
             //filedialogOpenMap.open();
 
 
             //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
 
-            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, "*", 0x001 | 0x2000, 0x00);
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, '*', 0x001 | 0x2000, 0x00);
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, '*', 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建地图】');
             l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug("path:", GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
-            //console.debug("path:", Qt.resolvedUrl(Platform.externalDataPath));
-            //console.debug("path:", Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.externalDataPath)));
+            //console.debug('path:', GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', Qt.resolvedUrl(Platform.externalDataPath));
+            //console.debug('path:', Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.externalDataPath)));
         }
     }
 
@@ -889,29 +889,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainMapEditor]Escape Key");
+        console.debug('[mainMapEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainMapEditor]Back Key");
+        console.debug('[mainMapEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainMapEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainMapEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainMapEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainMapEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainMapEditor]Component.onCompleted");
+        console.debug('[mainMapEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainMapEditor]Component.onDestruction");
+        console.debug('[mainMapEditor]Component.onDestruction');
     }
 }

@@ -46,12 +46,12 @@ Item {
 
     //刷新（主要是背包的道具）
     function refresh() {
-        textMoney.text = '金钱：￥ ' + game.gd["$sys_money"];
+        textMoney.text = '金钱：￥ ' + game.gd['$sys_money'];
 
 
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
             arrShowSaleGoods.push(tgoodsName);
         }
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
@@ -59,13 +59,13 @@ Item {
 
         let arrShowMyGoods = [];  //显示的名称
         let arrMyGoods = [];    //道具名
-        for(let g of game.gd["$sys_goods"]) {
+        for(let g of game.gd['$sys_goods']) {
             if(mygoodsinclude === true ||
                     (GlobalLibraryJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
 
                 //let goodsInfo = _private.goodsResource[g.$rid];
                 let tgoods = game.$sys.getGoodsObject(g, false);
-                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](g, {Image: true, Color: true, Count: true, Price: 1})));
+                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](g, {Image: true, Color: true, Count: true, Price: 1})));
                 arrMyGoods.push(g);
             }
         }
@@ -89,7 +89,7 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: "#7FFFFFFF"
+        color: '#7FFFFFFF'
     }
 
 
@@ -108,7 +108,7 @@ Item {
             Layout.preferredHeight: buttonCloseTrade.implicitHeight
             //Layout.preferredWidth: parent.width
 
-            color: "blue"
+            color: 'blue'
 
             RowLayout {
                 //Layout.preferredWidth: parent.width
@@ -125,14 +125,14 @@ Item {
 
                     //anchors.fill: parent
 
-                    color: "white"
+                    color: 'white'
 
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
                     font.pointSize: 16
                     font.bold: true
-                    text: ""
+                    text: ''
                     wrapMode: Text.Wrap
                 }
 
@@ -171,7 +171,7 @@ Item {
                 Layout.fillHeight: true
 
                 nTitleHeight: 30
-                colorTitleColor: "darkred"
+                colorTitleColor: 'darkred'
                 strTitle: '买'
                 //每页个数
                 nPageItemsCount: 20
@@ -211,7 +211,7 @@ Item {
 
                     ////let goodsInfo = _private.goodsResource[arrData[index]];
 
-                    /*if(game.gd["$sys_money"] < arrData[index].$price[0]) {
+                    /*if(game.gd['$sys_money'] < arrData[index].$price[0]) {
                         game.run(function*(){yield game.msg('金钱不足');}());
                         return;
                     }
@@ -224,7 +224,7 @@ Item {
                         --arrData[index].$count;
                     }
 
-                    game.gd["$sys_money"] -= arrData[index].$price[0];
+                    game.gd['$sys_money'] -= arrData[index].$price[0];
                     game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, arrData[index]), 1);
                     root.refresh();
                     */
@@ -238,16 +238,16 @@ Item {
                 Layout.fillHeight: true
 
                 nTitleHeight: 30
-                colorTitleColor: "darkred"
+                colorTitleColor: 'darkred'
                 strTitle: '卖'
                 //每页个数
                 nPageItemsCount: 20
 
                 onSg_choice: {
-                    //let goodsInfo = _private.goodsResource[game.gd["$sys_goods"][index].$rid];
-                    let description = game.gd["$sys_goods"][index].$description;
+                    //let goodsInfo = _private.goodsResource[game.gd['$sys_goods'][index].$rid];
+                    let description = game.gd['$sys_goods'][index].$description;
                     if(GlobalLibraryJS.isFunction(description))
-                        description = description(game.gd["$sys_goods"][index]);
+                        description = description(game.gd['$sys_goods'][index]);
                     goodsDetail.text = description;
                 }
                 onSg_doubleChoice: {
@@ -274,12 +274,12 @@ Item {
 
                     return;
 
-                    ////let goodsInfo = game.gd["$sys_goods"][index];
+                    ////let goodsInfo = game.gd['$sys_goods'][index];
 
                     /*
                     if(arrData[index].$price && GlobalLibraryJS.isValidNumber(arrData[index].$price[1])) {
                         game.removegoods(arrData[index], 1);
-                        game.gd["$sys_money"] += arrData[index].$price[1];
+                        game.gd['$sys_money'] += arrData[index].$price[1];
                         root.refresh();
                     }
                     else
@@ -333,9 +333,9 @@ Item {
         visible: false
 
 
-        //color: "#CF6699FF"
-        //color: "#EE00CC99"
-        color: "darkblue"
+        //color: '#CF6699FF'
+        //color: '#EE00CC99'
+        color: 'darkblue'
 
 
         ColumnLayout {
@@ -355,13 +355,13 @@ Item {
                 wrapMode: Text.NoWrap
 
                 text: '输入数量'
-                color: "white"
+                color: 'white'
 
                 font.pointSize: 16
                 font.bold: true
 
                 background: Rectangle {
-                    color: "#EE00CC99"
+                    color: '#EE00CC99'
                     implicitHeight: 0
                     //color: Global.style.backgroundColor
                     //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
@@ -432,7 +432,7 @@ Item {
                 Layout.fillWidth: true
                 //Layout.preferredHeight: 60
 
-                color: "white"
+                color: 'white'
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -470,7 +470,7 @@ Item {
 
                         //买
                         if(itemCountBox.tradeData.type === 1) {
-                            if(game.gd["$sys_money"] < goods.$price[0] * count) {
+                            if(game.gd['$sys_money'] < goods.$price[0] * count) {
                                 //game.run(function() {
                                     game.msg('金钱不足', 20, '', 0, {Type: 0b10}, false);
                                 //    return false;
@@ -488,7 +488,7 @@ Item {
 
                             if(goods.$count > 0)
                                 goods.$count -= count;
-                            game.gd["$sys_money"] -= (goods.$price[0] * count);
+                            game.gd['$sys_money'] -= (goods.$price[0] * count);
                             game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, goods), count);
                             root.refresh();
                         }
@@ -496,7 +496,7 @@ Item {
                         else {
                             if(goods.$count >= count) {
                                 game.removegoods(goods, count);
-                                game.gd["$sys_money"] += (goods.$price[1] * count);
+                                game.gd['$sys_money'] += (goods.$price[1] * count);
                                 root.refresh();
                             }
                             else

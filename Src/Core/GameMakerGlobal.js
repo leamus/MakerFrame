@@ -200,7 +200,7 @@ let $config = {
             $borderColor: 'white',
             $backgroundColor: '#CF6699FF',
             $itemHeight: 60,
-            $titleHeight: 60,
+            $titleHeight: 39,
             $itemFontSize: 16,
             $itemFontColor: 'white',
             $itemBackgroundColor1: '#00FFFFFF',
@@ -213,6 +213,7 @@ let $config = {
         $input: {
             $backgroundColor: 'black',
             $borderColor: '#FFFFFF',
+            $titleHeight: undefined,
             $fontSize: 16,
             $fontColor: 'white',
             $titleBackgroundColor: '#FF0035A8',
@@ -235,7 +236,7 @@ let $config = {
                 $borderColor: 'white',
                 $backgroundColor: '#CF6699FF',
                 $itemHeight: 60,
-                $titleHeight: 60,
+                $titleHeight: 39,
                 $itemFontSize: 16,
                 $itemFontColor: 'white',
                 $itemBackgroundColor1: '#00FFFFFF',
@@ -396,7 +397,7 @@ function *$afterLoad() {
 
 
 //打开地图前调用
-function *$beforeLoadmap(mapName) {
+function *$beforeLoadmap(mapName, userData) {
     /*if(game.$globalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
@@ -407,7 +408,7 @@ function *$beforeLoadmap(mapName) {
 }
 
 //打开地图后调用
-function *$afterLoadmap(mapName) {
+function *$afterLoadmap(mapName, userData) {
     /*if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
@@ -926,7 +927,8 @@ function *$gameOverScript(params) {
     if(params === -1) {
         yield game.msg('游戏结束', 60, '', 0, 0b11);
         yield* game.$sys.release(false);
-        yield* game.$sys.init(true, false);
+        //yield* game.$sys.init(true, false);
+        game.run(function*(){yield* game.$sys.init(true, false);}, {Priority: -2, Type: 0, Running: 0, Tips: '$gameOverScript'});
     }
 
     return null;
@@ -957,7 +959,7 @@ function *$fightRolesRound(round) {
         if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
         if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
     });
-    //console.debug("all", arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
+    //console.debug('all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
 
 
     //循环每个战斗人物
@@ -1088,7 +1090,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
                 //if(combatant.$$fightData.$choice.$attack.$type !== 0)
                     useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
 
-            }while(0);
+            } while(0);
 
         }
         //道具
@@ -1106,7 +1108,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
                 //放在最后
                 useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
 
-            }while(0);
+            } while(0);
         }
         //其他类型（-1和-2）
         else {
@@ -2254,11 +2256,11 @@ function *commonLevelUpScript(combatant) {
         yield game.msg('%1升为%2级'.arg(combatant.$name).arg(combatant.$properties.level), 20, '', 0, 0b11);
 
 
-        if(combatant.$name === "killer") {
+        if(combatant.$name === 'killer') {
             switch(combatant.$properties.level) {
             case 1:
-                game.getskill(combatant, "恢复血量");
-                yield game.msg("%1 获得技能 %2".arg(combatant.$name).arg("恢复血量"), 20, '', 0, 0b11);
+                game.getskill(combatant, '恢复血量');
+                yield game.msg('%1 获得技能 %2'.arg(combatant.$name).arg('恢复血量'), 20, '', 0, 0b11);
                 break;
             }
         }
@@ -2530,8 +2532,8 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 function computePath(blockPos, targetBlockPos) {
 
     const aPlus = game.$globalLibraryJS.APlus.create({
-        screenSize: [game.d["$sys_map"].$columns, game.d["$sys_map"].$rows],
-        obstacles: game.d["$sys_map"].$obstacles,
+        screenSize: [game.d['$sys_map'].$columns, game.d['$sys_map'].$rows],
+        obstacles: game.d['$sys_map'].$obstacles,
         // true使用穷举法。默认为false贪心算法不一定是最优解。
         // isExhaustive: true,
         // starSearch: true,
@@ -2569,13 +2571,13 @@ function resetFightRole(fightRole, index, teamID, myCombatants, enemies) {
         fightRole.$$fightData.$info.$teamsID = [0, 1];
         fightRole.$$fightData.$info.$teams = [myCombatants, enemies];
 
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, false);
+        game.$sys.resources.commonScripts['fight_combatant_set_choice'](fightRole, -1, false);
     }
     else if(teamID === 1) { //敌方
         fightRole.$$fightData.$info.$teamsID = [1, 0];
         fightRole.$$fightData.$info.$teams = [enemies, myCombatants];
 
-        game.$sys.resources.commonScripts["fight_combatant_set_choice"](fightRole, -1, true);
+        game.$sys.resources.commonScripts['fight_combatant_set_choice'](fightRole, -1, true);
 
     }
 }
@@ -2695,7 +2697,7 @@ function combatantChoiceSkillOrGoods(combatant) {
 
 
     //战斗人物选择技能或道具算法
-    useSkillsOrGoods = game.$sys.resources.commonScripts["fight_role_choice_skills_or_goods_algorithm"](combatant);
+    useSkillsOrGoods = game.$sys.resources.commonScripts['fight_role_choice_skills_or_goods_algorithm'](combatant);
     //不做处理
     if(useSkillsOrGoods === true)
         return 1;
@@ -2719,9 +2721,9 @@ function combatantChoiceSkillOrGoods(combatant) {
             combatant.$$fightData.$choice.$type = 2;
 
         //检测技能 或 道具是否可以使用（我方和敌方人物刚选择技能时判断）
-        let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 10);
+        let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](choiceSkillOrGoods, combatant, 10);
         if(game.$globalLibraryJS.isString(checkSkill)) {   //如果不可用
-            //fight.msg(checkSkill || "不能使用", 50);
+            //fight.msg(checkSkill || '不能使用', 50);
             continue;
         }
         else if(game.$globalLibraryJS.isArray(checkSkill)) {   //如果不可用
@@ -2729,7 +2731,7 @@ function combatantChoiceSkillOrGoods(combatant) {
             continue;
         }
         else if(checkSkill !== true) {   //如果不可用
-            //fight.msg("不能使用", 50);
+            //fight.msg('不能使用', 50);
             continue;
         }
 
@@ -2807,9 +2809,9 @@ function combatantChoiceSkillOrGoods(combatant) {
 
 
                 //检测技能 或 道具是否可以使用（我方和敌方人物选择技能的步骤完毕时判断）
-                let checkSkill = game.$sys.resources.commonScripts["common_check_skill"](choiceSkillOrGoods, combatant, 11);
+                let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](choiceSkillOrGoods, combatant, 11);
                 if(game.$globalLibraryJS.isString(checkSkill)) {   //如果不可用
-                    //fight.msg(checkSkill || "不能使用", 50);
+                    //fight.msg(checkSkill || '不能使用', 50);
                     break;
                 }
                 else if(game.$globalLibraryJS.isArray(checkSkill)) {   //如果不可用
@@ -2817,7 +2819,7 @@ function combatantChoiceSkillOrGoods(combatant) {
                     break;
                 }
                 else if(checkSkill !== true) {   //如果不可用
-                    //fight.msg("不能使用", 50);
+                    //fight.msg('不能使用', 50);
                     break;
                 }
 
@@ -2894,12 +2896,12 @@ function combatantChoiceSkillOrGoods(combatant) {
             //combatant.$$fightData.defenseProp = combatant.$$fightData.attackProp = game.$globalLibraryJS.random(0, 5);
 
             combatant.$$fightData.$choice.$targets = [tarrAlive[game.$globalLibraryJS.random(0, tarrAlive.length)]];
-            //console.debug("t1", t, JSON.stringify(team2));
+            //console.debug('t1', t, JSON.stringify(team2));
 
             //roleSpriteEffect2 = repeaterSpriteEffect2.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
         }
 
-        //console.debug("!!!", combatant.$$fightData.$choice.$targets)
+        //console.debug('!!!', combatant.$$fightData.$choice.$targets)
     }
 
     //单人，己方
@@ -2925,12 +2927,12 @@ function combatantChoiceSkillOrGoods(combatant) {
             //combatant.$$fightData.$info.defenseProp = combatant.$$fightData.$info.attackProp = game.$globalLibraryJS.random(0, 5);
 
             combatant.$$fightData.$choice.$targets = [tarrAlive[game.$globalLibraryJS.random(0, tarrAlive.length)]];
-            //console.debug("t1", t, JSON.stringify(team2));
+            //console.debug('t1', t, JSON.stringify(team2));
 
             //roleSpriteEffect2 = repeaterSpriteEffect1.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
         }
 
-        //console.debug("!!!", combatant.$$fightData.$choice.$targets)
+        //console.debug('!!!', combatant.$$fightData.$choice.$targets)
     }
 
     */

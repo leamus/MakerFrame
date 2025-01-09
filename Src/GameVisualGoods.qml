@@ -240,9 +240,9 @@ Item {
                             background: Rectangle {
                                 //implicitWidth: comboBoxComponentItem.comboBoxWidth
                                 implicitHeight: 35
-                                //border.color: control.pressed ? "#6495ED" : "#696969"
+                                //border.color: control.pressed ? '#6495ED' : '#696969'
                                 //border.width: control.visualFocus ? 2 : 1
-                                color: "transparent"
+                                color: 'transparent'
                                 //border.color: comboBoxComponentItem.color
                                 border.width: 2
                                 radius: 6
@@ -798,21 +798,21 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
-                text: "保存"
+                text: '保存'
                 font.pointSize: 9
                 onClicked: {
                     _private.saveData();
                 }
             }
             Button {
-                text: "读取"
+                text: '读取'
                 font.pointSize: 9
                 onClicked: {
                     _private.loadData();
                 }
             }
             Button {
-                text: "编译"
+                text: '编译'
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
@@ -822,11 +822,11 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug("[GameVisualGoods]compile:", _private.filepath, jsScript);
+                    console.debug('[GameVisualGoods]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
-                text: "关闭"
+                text: '关闭'
                 font.pointSize: 9
                 onClicked: {
                     _private.close();
@@ -834,7 +834,7 @@ Item {
             }
 
             Button {
-                text: "帮助"
+                text: '帮助'
                 font.pointSize: 9
                 onClicked: {
                     rootGameMaker.showMsg('
@@ -927,8 +927,8 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug("[GameVisualGoods]filePath：", filePath);
-            //console.exception("????")
+            console.debug('[GameVisualGoods]filePath：', filePath);
+            //console.exception('????')
 
             if(data) {
                 data = JSON.parse(data);
@@ -998,7 +998,7 @@ Item {
                     bCheck = false;
                     break;
                 }
-            }while(0);
+            } while(0);
             if(!bCheck) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
@@ -1066,9 +1066,9 @@ Item {
 
                         //倍率
                         if(effectTextFields[tt].text.indexOf('.') >= 0)
-                            strEffects += "combatant.$$$$$$$$propertiesWithExtra.%1 += combatant.$$properties.%1 * %2;\r\n".arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += combatant.$$properties.%1 * %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                         else
-                            strEffects += "combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n".arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                     }
                     equipScript = _private.strTemplateEquipment1.replace(/\$\$equipEffectAlgorithm\$\$/g, strEffects);
                 }
@@ -1097,15 +1097,15 @@ Item {
 
                         //倍率
                         if(effectTextFields[tt].text.indexOf('.') >= 0)
-                            strEffects += "game.addprops(combatant, {'%1': %2}, 1);\r\n".arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'game.addprops(combatant, {"%1": %2}, 1);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                         else
-                            strEffects += "game.addprops(combatant, {'%1': %2}, 2);\r\n".arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'game.addprops(combatant, {"%1": %2}, 2);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                     }
 
                     if(textUseScript.text.trim() !== '')
-                        strEffects += "game.run(%1(goods, combatant) ?? null, -1);\r\n".arg(textUseScript.text.trim());
+                        strEffects += 'game.run(%1(goods, combatant) ?? null, -1);\r\n'.arg(textUseScript.text.trim());
                     else
-                        strEffects += "game.removegoods(goods, 1);   //背包道具-1\r\n";
+                        strEffects += 'game.removegoods(goods, 1);   //背包道具-1\r\n';
 
 
                     useScript = _private.strTemplateUseScript1.replace(/\$\$useEffect\$\$/g, strEffects);
@@ -1301,7 +1301,7 @@ $$equipEffectAlgorithm$$
         game.equip(combatant, goods);	//装备；使用 goods 的 position 属性来装备；
         game.removegoods(goods, 1);	//背包道具-1
 
-        //yield game.msg("装备脚本信息");
+        //yield game.msg('装备脚本信息');
         //console.debug(goods, c);
     },
 
@@ -1320,7 +1320,7 @@ $$equipEffectAlgorithm$$
 
 $$useEffect$$
 
-        //yield game.msg("你用西瓜刀切了两片西瓜开始吆喝：好甜的西瓜啊，一斤2块5啦", 50);
+        //yield game.msg('你用西瓜刀切了两片西瓜开始吆喝：好甜的西瓜啊，一斤2块5啦', 50);
 
         //game.removegoods(goods, 1);   //背包道具-1
         return -1;
@@ -1373,29 +1373,29 @@ $$useEffect$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualGoods]Escape Key");
+        console.debug('[GameVisualGoods]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualGoods]Back Key");
+        console.debug('[GameVisualGoods]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualGoods]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameVisualGoods]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualGoods]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[GameVisualGoods]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[GameVisualGoods]Component.onCompleted");
+        console.debug('[GameVisualGoods]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameVisualGoods]Component.onDestruction");
+        console.debug('[GameVisualGoods]Component.onDestruction');
     }
 }

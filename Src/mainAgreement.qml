@@ -82,7 +82,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返　回"
+            text: '返　回'
             onClicked: {
                 sg_close();
             }
@@ -122,14 +122,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainAgreement]Escape Key");
+        console.debug('[mainAgreement]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainAgreement]Back Key");
+        console.debug('[mainAgreement]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -145,11 +145,11 @@ Item {
         let t = `
 <CENTER><B>使用协议</B></CENTER>
 
-  请务必认真阅读和理解本《软件许可使用协议》（以下简称《协议》）中规定的所有权利和限制。除非您接受本《协议》全部条款，否则您无权下载、安装或使用本"软件"及其相关服务。您一旦安装、复制、下载、访问或以其它方式使用本软件产品，将视为对本《协议》的接受，即表示您同意接受本《协议》各项条款的约束。如果您不同意本《协议》中的任何一个条款，请不要安装、复制或使用本软件。
+  请务必认真阅读和理解本《软件许可使用协议》（以下简称《协议》）中规定的所有权利和限制。除非您接受本《协议》全部条款，否则您无权下载、安装或使用本“软件”及其相关服务。您一旦安装、复制、下载、访问或以其它方式使用本软件产品，将视为对本《协议》的接受，即表示您同意接受本《协议》各项条款的约束。如果您不同意本《协议》中的任何一个条款，请不要安装、复制或使用本软件。
   本《协议》是用户与 鹰歌软件框架游戏引擎开发者（以下简称“开发者”） 之间关于用户下载、安装、使用、复制随附本《协议》的 鹰歌软件框架游戏引擎 软件（以下简称“软件”）的法律协议。
 
 1、权利声明
-    本"软件"的一切知识产权，以及与"软件"相关的所有信息内容，包括但不限于：文字表述及其组合、图标、图饰、图像、图表、色彩、界面设计、版面框架、有关数据、附加程序、印刷材料或电子文档等均为开发者所有，受著作权法和国际著作权条约以及其他知识产权法律法规的保护。
+    本软件的一切知识产权，以及与本软件相关的所有信息内容，包括但不限于：文字表述及其组合、图标、图饰、图像、图表、色彩、界面设计、版面框架、有关数据、附加程序、印刷材料或电子文档等均为开发者所有，受著作权法和国际著作权条约以及其他知识产权法律法规的保护。
 2、许可范围
     2.1、下载、安装和使用：本软件为免费软件，用户可以非商业性、无限制数量地下载、安装及使用本软件。
     2.2、复制、分发和传播：用户可以非商业性、无限制数量地复制、分发和传播本软件产品。但必须保证每一份复制、分发和传播都是完整和真实的, 包括所有有关本软件产品的软件、电子文档, 版权和商标，亦包括本协议。
@@ -188,9 +188,9 @@ Item {
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainAgreement]Component.onCompleted");
+        console.debug('[mainAgreement]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainAgreement]Component.onDestruction");
+        console.debug('[mainAgreement]Component.onDestruction');
     }
 }

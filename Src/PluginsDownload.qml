@@ -63,9 +63,9 @@ Item {
 
         visible: false
 
-        title: "选择插件文件"
+        title: '选择插件文件'
         //folder: shortcuts.home
-        nameFilters: [ "zip files (*.zip)", "All files (*)" ]
+        nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
@@ -77,20 +77,20 @@ Item {
             //loader.forceActiveFocus();
             //rootGameMaker.forceActiveFocus();
 
-            console.debug("[PluginsDownload]You chose: " + fileUrl, fileUrls);
+            console.debug('[PluginsDownload]You chose: ' + fileUrl, fileUrls);
 
 
             rootWindow.aliasGlobal.dialogCommon.show({
-                Msg: "确认安装吗？这可能会替换同名插件！",
+                Msg: '确认安装吗？这可能会替换同名插件！',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     let fUrl;
-                    if(Qt.platform.os === "android")
+                    if(Qt.platform.os === 'android')
                         fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
                     else
                         fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
 
-                    //console.error("!!!", fUrl, fileUrl)
+                    //console.error('!!!', fUrl, fileUrl)
 
                     //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
@@ -107,7 +107,7 @@ Item {
                     }
 
                     rootWindow.aliasGlobal.dialogCommon.show({
-                        Msg: ret.length > 0 ? "成功" : "失败",
+                        Msg: ret.length > 0 ? '成功' : '失败',
                         Buttons: Dialog.Ok,
                         OnAccepted: function() {
                             rootGameMaker.forceActiveFocus();
@@ -127,7 +127,7 @@ Item {
 
 
             //sg_close();
-            console.debug("[PluginsDownload]onRejected")
+            console.debug('[PluginsDownload]onRejected')
             //Qt.quit()
 
         }
@@ -179,14 +179,14 @@ Item {
                         OnAccepted: function() {
 
                             let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            let zipPath = projectPath + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
+                            let zipPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
-                            //const httpReply = FrameManager.sl_downloadFile("https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip", projectPath + ".zip");
-                            const httpReply = FrameManager.sl_downloadFile("http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1".arg(menuJS.plugins[item]['File']), zipPath);
+                            //const httpReply = FrameManager.sl_downloadFile('https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip', projectPath + '.zip');
+                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
-                                const code = FrameManager.sl_objectProperty("Code", networkReply);
-                                console.debug("[PluginsDownload]下载完毕", httpReply, networkReply, code, FrameManager.sl_objectProperty("Data", networkReply));
+                                const code = FrameManager.sl_objectProperty('Code', networkReply);
+                                console.debug('[PluginsDownload]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
 
                                 FrameManager.sl_deleteLater(httpReply);
 
@@ -214,10 +214,10 @@ Item {
                                 let msg;
                                 if(ret.length > 0) {
                                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
-                                    msg = "安装成功";
+                                    msg = '安装成功';
 
 
-                                    let jsPath = projectPath + "Plugins" + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
+                                    let jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
                                     if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                         try {
                                             const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
@@ -237,7 +237,7 @@ Item {
                                     }
                                 }
                                 else
-                                    msg = "安装失败";
+                                    msg = '安装失败';
 
                                 rootWindow.aliasGlobal.dialogCommon.show({
                                     Msg: msg,
@@ -293,7 +293,7 @@ Item {
         rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
-        console.debug("[PluginsDownload]Escape Key");
+        console.debug('[PluginsDownload]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -301,22 +301,22 @@ Item {
         rootWindow.aliasGlobal.l_list.visible = false;
         sg_close();
 
-        console.debug("[PluginsDownload]Back Key");
+        console.debug('[PluginsDownload]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[PluginsDownload]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[PluginsDownload]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[PluginsDownload]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[PluginsDownload]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[PluginsDownload]Component.onCompleted");
+        console.debug('[PluginsDownload]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[PluginsDownload]Component.onDestruction");
+        console.debug('[PluginsDownload]Component.onDestruction');
     }
 }

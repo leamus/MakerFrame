@@ -459,7 +459,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredWidth: 10
 
-                            text: "*"
+                            text: '*'
                             //font.pointSize: _config.nLabelFontSize
                         }
 
@@ -813,21 +813,21 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
-                text: "保存"
+                text: '保存'
                 font.pointSize: 9
                 onClicked: {
                     _private.saveData();
                 }
             }
             Button {
-                text: "读取"
+                text: '读取'
                 font.pointSize: 9
                 onClicked: {
                     _private.loadData();
                 }
             }
             Button {
-                text: "编译"
+                text: '编译'
                 font.pointSize: 9
                 onClicked: {
                     let jsScript = _private.compile();
@@ -837,11 +837,11 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug("[GameVisualFightRole]compile:", _private.filepath, jsScript);
+                    console.debug('[GameVisualFightRole]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
-                text: "关闭"
+                text: '关闭'
                 font.pointSize: 9
                 onClicked: {
                     _private.close();
@@ -849,7 +849,7 @@ Item {
             }
 
             Button {
-                text: "帮助"
+                text: '帮助'
                 font.pointSize: 9
                 onClicked: {
                     rootGameMaker.showMsg('
@@ -931,8 +931,8 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug("[GameVisualFightRole]filePath：", filePath);
-            //console.exception("????")
+            console.debug('[GameVisualFightRole]filePath：', filePath);
+            //console.exception('????')
 
             if(data) {
                 data = JSON.parse(data);
@@ -1010,7 +1010,7 @@ Item {
                     bCheck = false;
                     break;
                 }
-            }while(0);
+            } while(0);
             if(!bCheck) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有必填项没有完成',
@@ -1038,7 +1038,7 @@ Item {
             //console.debug(actionTextFields);
             for(let tt in actionTextFields) {
                 //console.debug(tt.text.trim());
-                strActions += "'%1': '%2', ".arg(actionTextFields[tt].text.trim()).arg(spriteTextFields[tt].text.trim());
+                strActions += '"%1": "%2", '.arg(actionTextFields[tt].text.trim()).arg(spriteTextFields[tt].text.trim());
             }
 
 
@@ -1194,29 +1194,29 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameVisualFightRole]Escape Key");
+        console.debug('[GameVisualFightRole]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameVisualFightRole]Back Key");
+        console.debug('[GameVisualFightRole]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameVisualFightRole]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameVisualFightRole]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameVisualFightRole]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[GameVisualFightRole]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[GameVisualFightRole]Component.onCompleted");
+        console.debug('[GameVisualFightRole]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameVisualFightRole]Component.onDestruction");
+        console.debug('[GameVisualFightRole]Component.onDestruction');
     }
 }

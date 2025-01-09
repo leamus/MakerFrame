@@ -80,7 +80,7 @@ Item {
             if(!loader.item)
                 return false;
 
-            //if(item === "..") {
+            //if(item === '..') {
             //    rootWindow.aliasGlobal.l_list.visible = false;
             //    return;
             //}
@@ -102,17 +102,17 @@ Item {
 
 
             /*
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json";
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_role.json';
 
-            console.debug("[mainFightRoleEditor]filePath：", filePath);
+            console.debug('[mainFightRoleEditor]filePath：', filePath);
 
             //let cfg = File.read(filePath);
             let cfg = FrameManager.sl_fileRead(filePath);
 
             if(cfg) {
                 cfg = JSON.parse(cfg);
-                //console.debug("cfg", cfg);
-                //loader.setSource("./MapEditor_1.qml", {});
+                //console.debug('cfg', cfg);
+                //loader.setSource('./MapEditor_1.qml', {});
                 loader.item.openFightRole(cfg);
             }
             */
@@ -127,7 +127,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainFightRoleEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainFightRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listFightRole.forceActiveFocus();
@@ -150,7 +150,7 @@ Item {
         anchors.fill: parent
 
 
-        source: "./FightRoleEditor.qml"
+        source: './FightRoleEditor.qml'
         asynchronous: true
 
 
@@ -196,7 +196,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainFightRoleEditor]loader onLoaded");
+            console.debug('[mainFightRoleEditor]loader onLoaded');
 
             try {
                 /*/应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -233,7 +233,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, '*', 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建战斗角色】');
             l_listFightRole.removeButtonVisible = {0: false, '-1': true};
             l_listFightRole.show(list);
@@ -247,14 +247,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainFightRoleEditor]Escape Key");
+        console.debug('[mainFightRoleEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainFightRoleEditor]Back Key");
+        console.debug('[mainFightRoleEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -267,9 +267,9 @@ Item {
 
 
     Component.onCompleted: {
-        console.debug("[mainFightRoleEditor]Component.onCompleted");
+        console.debug('[mainFightRoleEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainFightRoleEditor]Component.onDestruction");
+        console.debug('[mainFightRoleEditor]Component.onDestruction');
     }
 }

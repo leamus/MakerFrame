@@ -75,7 +75,7 @@ Item {
         }
         else {
             textGameStartScript.setPlainText(
-                _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, "
+                _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, `
 game.scale(1);
 game.interval(16);
 //yield game.loadmap('鹰歌地图');
@@ -84,7 +84,7 @@ game.interval(16);
 //game.playmusic('音乐1mp3');
 yield game.msg('Hello World<br>欢迎来到鹰歌Maker，这是一个最简单的demo，如果需要体验完整游戏请点击 示例工程 或加群下载更多工程！');
 game.goon();
-")
+`)
             );
             textGameStartScript.toBegin();
 
@@ -267,7 +267,7 @@ game.goon();
 
                 enabled: true
 
-                text: "保　存"
+                text: '保　存'
 
                 onClicked: {
                     _private.save();
@@ -370,7 +370,7 @@ game.goon();
 
         defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-        defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+        defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
 
@@ -431,11 +431,11 @@ game.goon();
 //游戏开始脚本（开始时调用）
 function *$start() {
 
-    game.playmusic("");
+    game.playmusic('');
 
 
     while(1) {
-        let c = yield game.menu("请选择", ["开始游戏","读取存档","游戏说明","制作人员"]);
+        let c = yield game.menu('请选择', ['开始游戏','读取存档','游戏说明','制作人员']);
         switch(c) {
             case 0:
                 $$START_SCRIPT$$
@@ -455,7 +455,7 @@ function *$start() {
                 let readSavesInfo = game.$userscripts.$readSavesInfo || game.$gameMakerGlobalJS.$readSavesInfo;
                 let arrSave = readSavesInfo();
 
-                c = yield game.menu("载入存档", [...arrSave,"自动存档","取消"]);
+                c = yield game.menu('载入存档', [...arrSave,'自动存档','取消']);
                 switch(c) {
                     case 0:
                     case 1:
@@ -464,24 +464,24 @@ function *$start() {
                         if(yield game.load('存档' + c))
                             break;
                         else
-                            yield game.msg("读取失败");
+                            yield game.msg('读取失败');
                         continue;
                     case 3:
                         //game.$globalLibraryJS.runNextEventLoop(function() {yield game.load('autosave')},);
                         if(yield game.load('autosave'))
                             break;
                         else
-                            yield game.msg("读取失败");
+                            yield game.msg('读取失败');
                         continue;
                     default:
                         continue;
                 }
                 break;
             case 2:
-                yield game.msg("这里写游戏说明");
+                yield game.msg('这里写游戏说明');
                 continue;
             case 3:
-                yield game.msg("框架和引擎开发：深林孤鹰", 60, '', 0);
+                yield game.msg('框架和引擎开发：深林孤鹰', 60, '', 0);
                 continue;
         }
 
@@ -543,9 +543,9 @@ function *$start() {
 
 
     Component.onCompleted: {
-        console.debug("[GameStart]Component.onCompleted");
+        console.debug('[GameStart]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameStart]Component.onDestruction");
+        console.debug('[GameStart]Component.onDestruction');
     }
 }

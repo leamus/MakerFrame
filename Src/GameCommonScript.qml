@@ -16,13 +16,13 @@ import _Global.Button 1.0
 //import 'Core/RPGComponents'
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
 import './Core'
 
 
-//import "File.js" as File
+//import 'File.js' as File
 
 
 
@@ -37,12 +37,12 @@ Item {
 
         //读算法
 
-        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator +  "common_script.js";
+        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator +  'common_script.js';
         //let data = File.read(filePath);
-        //console.debug("data", filePath, data)
+        //console.debug('data', filePath, data)
 
         let data = FrameManager.sl_fileRead(filePath);
-        //data = JSON.parse(data)["FightAlgorithm"];
+        //data = JSON.parse(data)['FightAlgorithm'];
 
         if(data) {
             notepadScript.setPlainText(data);
@@ -256,7 +256,7 @@ let $config = {
             $borderColor: 'white',
             $backgroundColor: '#CF6699FF',
             $itemHeight: 60,
-            $titleHeight: 60,
+            $titleHeight: 39,
             $itemFontSize: 16,
             $itemFontColor: 'white',
             $itemBackgroundColor1: '#00FFFFFF',
@@ -269,6 +269,7 @@ let $config = {
         $input: {
             $backgroundColor: 'black',
             $borderColor: '#FFFFFF',
+            $titleHeight: undefined,
             $fontSize: 16,
             $fontColor: 'white',
             $titleBackgroundColor: '#FF0035A8',
@@ -291,7 +292,7 @@ let $config = {
                 $borderColor: 'white',
                 $backgroundColor: '#CF6699FF',
                 $itemHeight: 60,
-                $titleHeight: 60,
+                $titleHeight: 39,
                 $itemFontSize: 16,
                 $itemFontColor: 'white',
                 $itemBackgroundColor1: '#00FFFFFF',
@@ -452,7 +453,7 @@ function *$afterLoad() {
 
 
 //打开地图前调用
-function *$beforeLoadmap(mapName) {
+function *$beforeLoadmap(mapName, userData) {
     /*if(game.$globalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
@@ -463,7 +464,7 @@ function *$beforeLoadmap(mapName) {
 }
 
 //打开地图后调用
-function *$afterLoadmap(mapName) {
+function *$afterLoadmap(mapName, userData) {
     /*if(game.$globalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
@@ -899,7 +900,8 @@ function *$gameOverScript(params) {
     if(params === -1) {
         yield game.msg('游戏结束', 60, '', 0, 0b11);
         yield* game.$sys.release(false);
-        yield* game.$sys.init(true, false);
+        //yield* game.$sys.init(true, false);
+        game.run(function*(){yield* game.$sys.init(true, false);}, {Priority: -2, Type: 0, Running: 0, Tips: '$gameOverScript'});
     }
 
     return null;
@@ -1061,7 +1063,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
                 //if(combatant.$$fightData.$choice.$attack.$type !== 0)
                     useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
 
-            }while(0);
+            } while(0);
 
         }
         //道具
@@ -1079,7 +1081,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
                 //放在最后
                 useSkillsOrGoods.push(combatant.$$fightData.$choice.$attack);
 
-            }while(0);
+            } while(0);
         }
         //其他类型（-1和-2）
         else {
@@ -2234,7 +2236,7 @@ function $readSavesInfo(count=3) {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.fillWidth: true
-                text: "游戏通用算法脚本"
+                text: '游戏通用算法脚本'
                 font.pointSize: 16
                 wrapMode: Label.WordWrap
                 verticalAlignment: Label.AlignVCenter
@@ -2297,7 +2299,7 @@ function $readSavesInfo(count=3) {
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: "请输入脚本代码"
+                textArea.placeholderText: '请输入脚本代码'
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -2318,7 +2320,7 @@ function $readSavesInfo(count=3) {
             //Layout.preferredHeight: 50
             Layout.bottomMargin: 10
 
-            text: "保　存"
+            text: '保　存'
             onClicked: {
                 _private.save();
             }
@@ -2333,7 +2335,7 @@ function $readSavesInfo(count=3) {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "主角大小："
+                text: '主角大小：'
             }
 
             TextField {
@@ -2341,7 +2343,7 @@ function $readSavesInfo(count=3) {
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
-                text: "50"
+                text: '50'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -2352,7 +2354,7 @@ function $readSavesInfo(count=3) {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "X"
+                text: 'X'
             }
 
             TextField {
@@ -2360,7 +2362,7 @@ function $readSavesInfo(count=3) {
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
-                text: "80"
+                text: '80'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -2382,7 +2384,7 @@ function $readSavesInfo(count=3) {
 
 
         function save() {
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + "common_script.js", 0);
+            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'common_script.js', 0);
 
             return true;
         }
@@ -2413,29 +2415,29 @@ function $readSavesInfo(count=3) {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug("[GameCommonScript]Escape Key");
+        console.debug('[GameCommonScript]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug("[GameCommonScript]Back Key");
+        console.debug('[GameCommonScript]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[GameCommonScript]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GameCommonScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[GameCommonScript]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[GameCommonScript]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[GameCommonScript]Component.onCompleted");
+        console.debug('[GameCommonScript]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameCommonScript]Component.onDestruction");
+        console.debug('[GameCommonScript]Component.onDestruction');
     }
 }

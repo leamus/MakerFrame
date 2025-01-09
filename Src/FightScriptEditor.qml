@@ -506,6 +506,6 @@ let data = (function() {
         console.debug('[GameFightScript]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameFightScript]Component.onDestruction");
+        console.debug('[GameFightScript]Component.onDestruction');
     }
 }

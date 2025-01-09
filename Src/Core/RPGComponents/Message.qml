@@ -129,10 +129,10 @@ Notepad {
     //height: 50
 
     //color: 'transparent'
-    color: "#BF6699FF"
+    color: '#BF6699FF'
     border {
         width: 1
-        color: "white"
+        color: 'white'
     }
     radius: height / 20
 
@@ -191,11 +191,11 @@ Notepad {
             height: rect.height
             gradient: Gradient {
                 GradientStop {
-                    position: 0.0; color: "#87CEFF"
+                    position: 0.0; color: '#87CEFF'
                 }
                 GradientStop {
                     position: 1.0;
-                    color: "blue"
+                    color: 'blue'
                 }
             }
             source: rect
@@ -205,7 +205,7 @@ Notepad {
                 width: rect.border.width
                 height: width
                 radius: width / 2
-                color: "blue"
+                color: 'blue'
             }
             RotationAnimation on rotation {
                 from: 0
@@ -254,7 +254,7 @@ Notepad {
 
                 //判断是否结束
                 if(_private.textIndex >= _private.textVar.length) {
-                    //textArea.text = ""
+                    //textArea.text = ''
 
                     timer.nStatus = 2;
                     if(_private.nKeepTime > 0)
@@ -281,8 +281,8 @@ Notepad {
     QtObject {
         id: _private
 
-        property string textVar: ""
-        property string pretext: ""
+        property string textVar: ''
+        property string pretext: ''
         property var textIndex: 0
 
         property int nKeepTime: -1

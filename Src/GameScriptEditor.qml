@@ -50,8 +50,8 @@ Item {
             notepadScript.toBegin();
         }
         else {
-            notepadScript.setPlainText("
-"
+            notepadScript.setPlainText('
+'
             );
             notepadScript.toBegin();
         }
@@ -254,16 +254,16 @@ Item {
         function show() {
             const fileSuffixPosition = textFilePath.text.lastIndexOf('.');
             const fileExtName = fileSuffixPosition >= 0 ? textFilePath.text.slice(fileSuffixPosition + 1).toLowerCase() : '';
-            const filePathAndName = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
+            const filePathAndBaseName = fileSuffixPosition >= 0 ? textFilePath.text.slice(0, fileSuffixPosition) : textFilePath.text;
 
-            let virtualFilePathAndName = filePathAndName;
+            let virtualFilePathAndBaseName = filePathAndBaseName;
             //if(textFilePath.text.indexOf('.js') < 0 && textFilePath.text.indexOf('.qml') < 0) {
             switch(fileExtName) {
             case 'js':
-                virtualFilePathAndName += '.vjs';
+                virtualFilePathAndBaseName += '.vjs';
                 break;
             case 'qml':
-                virtualFilePathAndName += '.vqml';
+                virtualFilePathAndBaseName += '.vqml';
                 break;
             default:
                 rootWindow.aliasGlobal.dialogCommon.show({
@@ -282,23 +282,23 @@ Item {
 
 
             /*if(textFilePath.text.indexOf('.js') >= 0)
-                virtualFilePathAndName += '.vjs';
+                virtualFilePathAndBaseName += '.vjs';
             if(textFilePath.text.indexOf('.qml') >= 0)
-                virtualFilePathAndName += '.vqml';
+                virtualFilePathAndBaseName += '.vqml';
             */
             /*
             switch(fileSuffix) {
             case 'js':
-                virtualFilePathAndName += '.vjs';
+                virtualFilePathAndBaseName += '.vjs';
                 break;
             case 'qml':
-                virtualFilePathAndName += '.vqml';
+                virtualFilePathAndBaseName += '.vqml';
                 break;
             default:
             }
             */
 
-            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + virtualFilePathAndName;
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + virtualFilePathAndBaseName;
             loaderVisualScript.item.loadData(filePath);
 
 
@@ -323,7 +323,7 @@ Item {
                 strTitle: '游戏脚本'
                 defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
                 defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-                defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+                defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
             }
         }
         asynchronous: true
@@ -417,7 +417,7 @@ Item {
 
 
         onSg_clicked: {
-            //if(item === "..") {
+            //if(item === '..') {
             //    rootWindow.aliasGlobal.l_list.visible = false;
             //    return;
             //}
@@ -467,7 +467,7 @@ Item {
                     _private.strTmpPath += GameMakerGlobal.separator;
             }
 
-            console.debug("[GameScriptEditor]path：", path);
+            console.debug('[GameScriptEditor]path：', path);
 
             if(FrameManager.sl_dirExists(path)) {
                 _private.showList();
@@ -502,11 +502,11 @@ Item {
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     if(FrameManager.sl_dirExists(path)) {
-                        console.debug("[GameScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_removeRecursively(path));
+                        console.debug('[GameScriptEditor]删除：' + path, Qt.resolvedUrl(path), FrameManager.sl_removeRecursively(path));
                         removeItem(index);
                     }
                     else if(FrameManager.sl_fileExists(path)) {
-                        console.debug("[GameScriptEditor]删除：" + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
+                        console.debug('[GameScriptEditor]删除：' + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
                         removeItem(index);
                     }
 
@@ -552,7 +552,7 @@ Item {
                 path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + _private.strTmpPath;
             //}
 
-            let list = FrameManager.sl_dirList(path, "*.qml|*.js|*.vjs|*.json|*.txt", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(path, '*.qml|*.js|*.vjs|*.json|*.txt', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00)
             list.unshift('..', '【新建文件】', );
             //console.warn(l_listExplorer.listview.itemAtIndex(0)); //null，还没创建
             l_listExplorer.removeButtonVisible = {0: false, 1: false, '-1': true};
@@ -632,9 +632,9 @@ Item {
 
 
     Component.onCompleted: {
-        console.debug("[GameScriptEditor]Component.onCompleted");
+        console.debug('[GameScriptEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[GameScriptEditor]Component.onDestruction");
+        console.debug('[GameScriptEditor]Component.onDestruction');
     }
 }

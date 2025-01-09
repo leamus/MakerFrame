@@ -81,7 +81,7 @@ Item {
             if(!loader.item)
                 return false;
 
-            //if(item === "..") {
+            //if(item === '..') {
             //    rootWindow.aliasGlobal.l_list.visible = false;
             //    return;
             //}
@@ -102,8 +102,8 @@ Item {
             }
 
 
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "sprite.json";
-            console.debug("[mainSpriteEditor]filePath:", filePath);
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'sprite.json';
+            console.debug('[mainSpriteEditor]filePath:', filePath);
 
             let cfg = FrameManager.sl_fileRead(filePath);
             //let cfg = File.read(filePath);
@@ -112,8 +112,8 @@ Item {
                 return false;
 
             cfg = JSON.parse(cfg);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor_1.qml", {});
+            //console.debug('cfg', cfg);
+            //loader.setSource('./MapEditor_1.qml', {});
 
             loader.item.openSprite(cfg);
         }
@@ -125,7 +125,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainSpriteEditor]删除:" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainSpriteEditor]删除:' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listSprite.forceActiveFocus();
@@ -148,7 +148,7 @@ Item {
         anchors.fill: parent
 
 
-        source: "./SpriteEditor.qml"
+        source: './SpriteEditor.qml'
         asynchronous: true
 
 
@@ -194,7 +194,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainSpriteEditor]loader onLoaded");
+            console.debug('[mainSpriteEditor]loader onLoaded');
 
             try {
                 /*/应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -231,7 +231,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, '*', 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建特效】');
             l_listSprite.removeButtonVisible = {0: false, '-1': true};
             l_listSprite.show(list);
@@ -245,29 +245,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainSpriteEditor]Escape Key");
+        console.debug('[mainSpriteEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainSpriteEditor]Back Key");
+        console.debug('[mainSpriteEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainSpriteEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainSpriteEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainSpriteEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainSpriteEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainSpriteEditor]Component.onCompleted");
+        console.debug('[mainSpriteEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainSpriteEditor]Component.onDestruction");
+        console.debug('[mainSpriteEditor]Component.onDestruction');
     }
 }

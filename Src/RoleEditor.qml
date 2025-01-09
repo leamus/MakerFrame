@@ -62,10 +62,10 @@ Item {
     function newRole() {
         comboType.currentIndex = 0;
 
-        textRoleName.text = "";
+        textRoleName.text = '';
 
-        textRoleImageURL.text = "";
-        textRoleImageResourceName.text = "";
+        textRoleImageURL.text = '';
+        textRoleImageResourceName.text = '';
 //        textRoleFrameWidth.text = cfg.FrameSize[0].toString();
 //        textRoleFrameHeight.text = cfg.FrameSize[1].toString();
 //        textRoleFrameCount.text = cfg.FrameCount.toString();
@@ -97,7 +97,7 @@ Item {
 
     function openRole(cfg) {
 
-        console.debug("[RoleEditor]openRole:", JSON.stringify(cfg))
+        console.debug('[RoleEditor]openRole:', JSON.stringify(cfg))
 
         //cfg.Version;
         //cfg.RoleType;
@@ -130,7 +130,7 @@ Item {
 
         if(comboType.currentIndex === 0) {
             //textRoleImageURL.text = cfg.Image;
-            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
             textRoleImageResourceName.text = cfg.Image;
             textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
 
@@ -161,7 +161,7 @@ Item {
         }
         else if(comboType.currentIndex === 1) {
             //textRoleImageURL.text = cfg.Image;
-            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
             textRoleImageResourceName.text = cfg.Image;
             textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
 
@@ -600,9 +600,9 @@ Item {
                             background: Rectangle {
                                 //implicitWidth: comboBoxComponentItem.comboBoxWidth
                                 implicitHeight: 35
-                                //border.color: control.pressed ? "#6495ED" : "#696969"
+                                //border.color: control.pressed ? '#6495ED' : '#696969'
                                 //border.width: control.visualFocus ? 2 : 1
-                                color: "transparent"
+                                color: 'transparent'
                                 //border.color: comboBoxComponentItem.color
                                 border.width: 2
                                 radius: 6
@@ -640,7 +640,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "移动速度"
+                            text: '移动速度'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -651,7 +651,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0.1"
+                            text: '0.1'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -670,7 +670,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "可穿透"
+                            text: '可穿透'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -681,7 +681,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0"
+                            text: '0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -700,7 +700,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "显示名字"
+                            text: '显示名字'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -711,7 +711,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "1"
+                            text: '1'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -736,7 +736,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "@头像和大小"
+                            text: '@头像和大小'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -803,7 +803,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredWidth: 10
 
-                            text: "*"
+                            text: '*'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -841,7 +841,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "[影子]"
+                            text: '[影子]'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -850,7 +850,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "偏移和大小"
+                            text: '偏移和大小'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -861,7 +861,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0"
+                            text: '0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -882,7 +882,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0"
+                            text: '0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -903,7 +903,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "50"
+                            text: '50'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -922,7 +922,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "*"
+                            text: '*'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -934,7 +934,7 @@ Item {
                             //Layout.preferredHeight: _private.nColumnHeight
 
                             font.pointSize: _config.nTextFontSize
-                            text: "80"
+                            text: '80'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -952,7 +952,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "透明度"
+                            text: '透明度'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -963,7 +963,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0.5"
+                            text: '0.5'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -991,7 +991,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "[角色]"
+                            text: '[角色]'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -1000,7 +1000,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "偏移"
+                            text: '偏移'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -1011,7 +1011,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0"
+                            text: '0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1032,7 +1032,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "0"
+                            text: '0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1051,7 +1051,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "大小"
+                            text: '大小'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -1062,7 +1062,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "50"
+                            text: '50'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1081,7 +1081,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: "*"
+                            text: '*'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -1092,7 +1092,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "80"
+                            text: '80'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1111,7 +1111,7 @@ Item {
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
-                            text: "X/Y轴缩放"
+                            text: 'X/Y轴缩放'
                         }
 
                         TextField {
@@ -1121,7 +1121,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "1.0"
+                            text: '1.0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1142,7 +1142,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: "1.0"
+                            text: '1.0'
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -1185,7 +1185,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "[帧]"
+                                text: '[帧]'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1194,7 +1194,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "宽高"
+                                text: '宽高'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1205,7 +1205,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "37"
+                                text: '37'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1224,7 +1224,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "*"
+                                text: '*'
                                 font.pointSize: _config.nLabelFontSize
                             }
                             TextField {
@@ -1234,7 +1234,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "58"
+                                text: '58'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1253,7 +1253,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "帧数"
+                                text: '帧数'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1264,7 +1264,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "3"
+                                text: '3'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1284,7 +1284,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "速度（ms）"
+                                text: '速度（ms）'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1295,7 +1295,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "100"
+                                text: '100'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1322,7 +1322,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "上向（列行）"
+                                text: '上向（列行）'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1333,7 +1333,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1353,7 +1353,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1371,7 +1371,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "右向（列行）"
+                                text: '右向（列行）'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1382,7 +1382,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1402,7 +1402,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1427,7 +1427,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "下向（列行）"
+                                text: '下向（列行）'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1438,7 +1438,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1458,7 +1458,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1476,7 +1476,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: "左向（列行）"
+                                text: '左向（列行）'
                                 font.pointSize: _config.nLabelFontSize
                             }
 
@@ -1487,7 +1487,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1507,7 +1507,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: _private.nColumnHeight
 
-                                text: "0"
+                                text: '0'
                                 font.pointSize: _config.nTextFontSize
 
                                 //selectByKeyboard: true
@@ -1749,7 +1749,7 @@ Item {
                     }
                     else
                         forceActiveFocus();
-                    console.debug("[RoleEditor]Joystick onPressedChanged:", pressed)
+                    console.debug('[RoleEditor]Joystick onPressedChanged:', pressed)
                 }
 
                 onPointInputChanged: {
@@ -1780,7 +1780,7 @@ Item {
                         nLastDirection = direction;
                     }
 
-                    //console.debug("[RoleEditor]onPointInputChanged", pointInput);
+                    //console.debug('[RoleEditor]onPointInputChanged', pointInput);
                 }
             }
 
@@ -1894,7 +1894,7 @@ Item {
                 Layout.preferredHeight: 50
 
                 visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
-                text: "图片资源"
+                text: '图片资源'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
@@ -1913,7 +1913,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "刷新"
+                text: '刷新'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
@@ -1926,7 +1926,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "保存"
+                text: '保存'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
@@ -1942,7 +1942,7 @@ Item {
                 Layout.preferredHeight: 50
 
                 visible: comboType.currentIndex === 0// || comboType.currentIndex === 2
-                text: "原图"
+                text: '原图'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
@@ -1956,7 +1956,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "帮助"
+                text: '帮助'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
@@ -1980,17 +1980,17 @@ Item {
             }
 
             Button {
-                visible: Platform.compileType === "debug" ? true : false
+                visible: Platform.compileType === 'debug' ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
 
-                text: "Test"
+                text: 'Test'
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
                     /*role.sprite.running = true;
-                    console.debug("[Role]test", role.sprite, role.sprite.state, role.sprite.currentSprite)
+                    console.debug('[Role]test', role.sprite, role.sprite.state, role.sprite.currentSprite)
                     console.debug(role.sprite.sprites);
                     for(let s in role.sprite.sprites) {
                         console.debug(role.sprite.sprites[s].frameY);
@@ -2013,9 +2013,9 @@ Item {
     Dialog1.FileDialog {
         id: filedialogOpenRoleImage
 
-        title: "选择角色图片"
+        title: '选择角色图片'
         //folder: shortcuts.home
-        nameFilters: [ "Image files (*.jpg *.png *.bmp)", "All files (*)" ]
+        nameFilters: [ 'Image files (*.jpg *.png *.bmp)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
@@ -2029,15 +2029,15 @@ Item {
             //loader.forceActiveFocus();
 
 
-            console.debug("[RoleEditor]You chose: " + fileUrl, fileUrls);
+            console.debug('[RoleEditor]You chose: ' + fileUrl, fileUrls);
 
 
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 textRoleImageURL.text = Platform.sl_getRealPathFromURI(fileUrl);
             else
                 textRoleImageURL.text = FrameManager.sl_urlDecode(fileUrl);
 
-            textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf("/") + 1);
+            textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
 
 
             textRoleImageURL.enabled = true;
@@ -2048,13 +2048,13 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            //console.log("You chose: " + fileDialog.fileUrls);
+            //console.log('You chose: ' + fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {
             //root.forceActiveFocus();
 
-            console.debug("[RoleEditor]onRejected")
+            console.debug('[RoleEditor]onRejected')
             //Qt.quit()
 
         }
@@ -2072,7 +2072,7 @@ Item {
         //property int nChoiceType: 0
 
 
-        title: "角色图片数据"
+        title: '角色图片数据'
         width: parent.width * 0.9
         //height: 600
 
@@ -2091,13 +2091,13 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 Label {
-                    text: qsTr("路径：")
+                    text: qsTr('路径：')
                 }
 
                 TextField {
                     id: textRoleImageURL
                     Layout.fillWidth: true
-                    placeholderText: ""
+                    placeholderText: ''
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -2112,7 +2112,7 @@ Item {
                 TextField {
                     id: textRoleImageResourceName
                     Layout.fillWidth: true
-                    placeholderText: "素材名"
+                    placeholderText: '素材名'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -2123,7 +2123,7 @@ Item {
                     id: checkboxSaveResource
                     checked: false
                     enabled: false
-                    text: "另存"
+                    text: '另存'
                 }
             }
 
@@ -2136,7 +2136,7 @@ Item {
                 Button {
                     visible: comboType.currentIndex === 0
 
-                    text: "选择图片文件"
+                    text: '选择图片文件'
 
                     onClicked: {
                         //dialogRoleData.nChoiceType = 1;
@@ -2145,7 +2145,7 @@ Item {
                     }
                 }
                 Button {
-                    text: "选择素材"
+                    text: '选择素材'
 
                     onClicked: {
                         //dialogRoleData.nChoiceType = 2;
@@ -2153,9 +2153,9 @@ Item {
                         let path = GameMakerGlobal.spriteResourcePath();
 
                         if(comboType.currentIndex === 0)
-                            l_listRoleResource.show(path, "*", 0x002, 0x00);
+                            l_listRoleResource.show(path, '*', 0x002, 0x00);
                         else if(comboType.currentIndex === 1)
-                            l_listRoleResource.show(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+                            l_listRoleResource.show(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listRoleResource.visible = true;
                         //l_listRoleResource.focus = true;
                         //l_listRoleResource.forceActiveFocus();
@@ -2175,8 +2175,8 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     wrapMode: Label.WrapAnywhere
-                    color: "red"
-                    text: ""
+                    color: 'red'
+                    text: ''
                 }
             }
         }
@@ -2187,15 +2187,15 @@ Item {
             /*if(textRoleImageURL.text.length === 0) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "路径不能为空";
-                Platform.sl_showToast("路径不能为空");
+                labelDialogTips.text = '路径不能为空';
+                Platform.sl_showToast('路径不能为空');
                 return;
             }*/
             if(textRoleImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
-                labelDialogTips.text = "资源名不能为空";
-                Platform.sl_showToast("资源名不能为空");
+                labelDialogTips.text = '资源名不能为空';
+                Platform.sl_showToast('资源名不能为空');
                 return;
             }
             //系统图片
@@ -2204,9 +2204,9 @@ Item {
                 let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
-                    labelDialogTips.text = "拷贝资源失败，是否重名或目录不可写？";
-                    Platform.sl_showToast("拷贝资源失败，是否重名或目录不可写？");
-                    //console.debug("[RoleEditor]Copy ERROR:", textRoleImageURL.text);
+                    labelDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
+                    Platform.sl_showToast('拷贝资源失败，是否重名或目录不可写？');
+                    //console.debug('[RoleEditor]Copy ERROR:', textRoleImageURL.text);
 
                     //root.forceActiveFocus();
                     return;
@@ -2215,9 +2215,9 @@ Item {
             }
             else {  //资源图库
 
-                //console.debug("ttt2:", filepath);
+                //console.debug('ttt2:', filepath);
 
-                //console.debug("ttt", textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
+                //console.debug('ttt', textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
             }
 
             //textRoleImageURL.text = textRoleImageResourceName.text;
@@ -2228,8 +2228,8 @@ Item {
                 if(!FrameManager.sl_fileExists(GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = "路径错误或文件不存在:" + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.sl_showToast("路径错误或文件不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件不存在:' + GlobalJS.toPath(textRoleImageURL.text);
+                    Platform.sl_showToast('路径错误或文件不存在' + GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
@@ -2237,8 +2237,8 @@ Item {
                 if(!FrameManager.sl_dirExists(GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = "路径错误或文件夹不存在:" + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.sl_showToast("路径错误或文件夹不存在" + GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件夹不存在:' + GlobalJS.toPath(textRoleImageURL.text);
+                    Platform.sl_showToast('路径错误或文件夹不存在' + GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
@@ -2257,8 +2257,8 @@ Item {
 
             labelDialogTips.text = '';
             /*
-            textRoleImageURL.text = "";
-            textRoleImageResourceName.text = "";
+            textRoleImageURL.text = '';
+            textRoleImageResourceName.text = '';
             textRoleImageResourceName.enabled = true;
             */
 
@@ -2270,17 +2270,17 @@ Item {
             //loader.item.focus = true;
             root.forceActiveFocus();
 
-            //console.log("Ok clicked");
+            //console.log('Ok clicked');
         }
         onRejected: {
             textRoleImageURL.text = _private.strTextBackupRoleImageURL;
             textRoleImageResourceName.text = _private.strTextBackupRoleImageResourceName;
 
 
-            labelDialogTips.text = "";
+            labelDialogTips.text = '';
             /*
-            textRoleImageURL.text = "";
-            textRoleImageResourceName.text = "";
+            textRoleImageURL.text = '';
+            textRoleImageResourceName.text = '';
             textRoleImageResourceName.enabled = true;
             */
 
@@ -2288,7 +2288,7 @@ Item {
             root.forceActiveFocus();
 
 
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
             /*鹰：这点组件树的focus有点奇怪
             let p = dialogRoleData;
             let n = 20;
@@ -2349,7 +2349,7 @@ Item {
             //root.focus = true;
             root.forceActiveFocus();
 
-            console.debug("[RoleEditor]fileURL", textRoleImageURL.text);
+            console.debug('[RoleEditor]fileURL', textRoleImageURL.text);
         }
 
         onSg_canceled: {
@@ -2369,7 +2369,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[RoleEditor]删除：" + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
+                    console.debug('[RoleEditor]删除：' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listRoleResource.forceActiveFocus();
@@ -2390,7 +2390,7 @@ Item {
         id: dialogScript
 
         visible: false
-        title: "角色脚本"
+        title: '角色脚本'
         width: parent.width * 0.9
         //height: parent.height * 0.9
         anchors.centerIn: parent
@@ -2495,7 +2495,7 @@ Item {
                 //textArea.readOnly: true
                 textArea.textFormat: TextArea.PlainText
                 textArea.text: ''
-                textArea.placeholderText: "请输入脚本代码"
+                textArea.placeholderText: '请输入脚本代码'
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
@@ -2517,12 +2517,12 @@ Item {
 
             root.forceActiveFocus();
 
-            //console.debug("[MapEditor]onAccepted");
+            //console.debug('[MapEditor]onAccepted');
         }
         onRejected: {
             root.forceActiveFocus();
 
-            //console.debug("[MapEditor]onRejected");
+            //console.debug('[MapEditor]onRejected');
         }
     }
 
@@ -2531,7 +2531,7 @@ Item {
     //导出对话框
     Dialog {
         id: dialogSaveRole
-        title: "请输入名称"
+        title: '请输入名称'
         width: parent.width * 0.9
         //height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -2542,8 +2542,8 @@ Item {
         onAccepted: {
             textRoleName.text = textRoleName.text.trim();
             if(textRoleName.text.length === 0) {
-                //Platform.sl_showToast("名称不能为空");
-                textDialogMsg.text = "名称不能为空";
+                //Platform.sl_showToast('名称不能为空');
+                textDialogMsg.text = '名称不能为空';
                 open();
                 return;
             }
@@ -2604,7 +2604,7 @@ Item {
             //root.focus = true;
             root.forceActiveFocus();
 
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
         }
 
         ColumnLayout {
@@ -2614,14 +2614,14 @@ Item {
             RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr("角色名：")
+                    text: qsTr('角色名：')
                 }
                 TextField {
                     id: textRoleName
 
                     Layout.fillWidth: true
-                    placeholderText: "深林孤鹰"
-                    text: ""
+                    placeholderText: '深林孤鹰'
+                    text: ''
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -2631,14 +2631,14 @@ Item {
             /*RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr("地图缩放：")
+                    text: qsTr('地图缩放：')
                 }
                 TextField {
                     id: textMapScale
                     Layout.fillWidth: true
                     selectByMouse: true
-                    placeholderText: "1"
-                    text: "1"
+                    placeholderText: '1'
+                    text: '1'
 
                     //selectByKeyboard: true
                     selectByMouse: true
@@ -2659,7 +2659,7 @@ Item {
     Dialog {
         id: dialogDebugScript
 
-        title: "执行脚本"
+        title: '执行脚本'
         width: 300
         height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -2670,7 +2670,7 @@ Item {
         TextArea {
             id: textScript
             width: parent.width
-            placeholderText: "输入脚本命令"
+            placeholderText: '输入脚本命令'
 
             selectByKeyboard: true
             selectByMouse: true
@@ -2685,7 +2685,7 @@ Item {
         onRejected: {
             //root.focus = true;
             root.forceActiveFocus();
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
         }
     }
 
@@ -2758,15 +2758,15 @@ Item {
 
         defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-        defaultCommandTemplate: [{"command":"函数/生成器{","params":["*$start",""],"status":{"enabled":true}},{"command":"块结束}","params":[],"status":{"enabled":true}}]
+        defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
 
         /*onLoaded: {
-            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "role.vjs";
+            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.vjs';
             //item.loadData(filePath);
 
-            console.debug("[MapEditor]loaderVisualScript onLoaded");
+            console.debug('[MapEditor]loaderVisualScript onLoaded');
         }
         */
 
@@ -2937,7 +2937,7 @@ function $refresh(index, imageAnimate, path) {
                         //];
 
                         let spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
-                        let info = FrameManager.sl_fileRead(GlobalJS.toPath(spritePath + GameMakerGlobal.separator + "sprite.json"));
+                        let info = FrameManager.sl_fileRead(GlobalJS.toPath(spritePath + GameMakerGlobal.separator + 'sprite.json'));
                         if(info)
                             info = JSON.parse(info);
                         //else
@@ -2951,7 +2951,7 @@ function $refresh(index, imageAnimate, path) {
                         role.objActionsData[actionNames[tt].text.trim()] = {Info: info, Script: ts};
                     }
                     else {
-                        textDialogMsg.text = "有必填项没填";
+                        textDialogMsg.text = '有必填项没填';
                         return false;
                     }
                 }
@@ -2984,7 +2984,7 @@ function $refresh(index, imageAnimate, path) {
             role.height1 = 58;
             role.moveSpeed = 100;
             */
-            //console.debug("测试:", role.width, role.height, parseInt(textRoleWidth.text), parseInt(textRoleHeight.text))
+            //console.debug('测试:', role.width, role.height, parseInt(textRoleWidth.text), parseInt(textRoleHeight.text))
         }
 
 
@@ -3041,7 +3041,7 @@ function $refresh(index, imageAnimate, path) {
             */
 
             let outputData = {};
-            /*outputData.Version = "0.6";
+            /*outputData.Version = '0.6';
             outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
@@ -3055,7 +3055,7 @@ function $refresh(index, imageAnimate, path) {
             outputData.MoveSpeed = role.moveSpeed;
             outputData.Image = role.strSource;
             */
-            outputData.Version = "0.9";
+            outputData.Version = '0.9';
             outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型
             //outputData.SpriteType = comboType.currentIndex + 1;
@@ -3116,7 +3116,7 @@ function $refresh(index, imageAnimate, path) {
                             parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
                         ];
                     else {
-                        textDialogMsg.text = "有必填项没填";
+                        textDialogMsg.text = '有必填项没填';
                         return false;
                     }
                 }
@@ -3137,7 +3137,7 @@ function $refresh(index, imageAnimate, path) {
                             SpriteNames[tt].text.trim()
                         ];
                     else {
-                        textDialogMsg.text = "有必填项没填";
+                        textDialogMsg.text = '有必填项没填';
                         return false;
                     }
                 }
@@ -3156,7 +3156,7 @@ function $refresh(index, imageAnimate, path) {
             copyVJS();
 
 
-            console.debug("[RoleEditor]exportRole ret:", ret, filepath);
+            console.debug('[RoleEditor]exportRole ret:', ret, filepath);
 
 
             return true;
@@ -3237,14 +3237,14 @@ function $refresh(index, imageAnimate, path) {
                         //timer.stop();
                         role.stop();
                         //role.stop();
-                        console.debug("[RoleEditor]_private.stopAction stop");
+                        console.debug('[RoleEditor]_private.stopAction stop');
                     }
                     else {
                         doAction(-1, parseInt(l[0]));
                         //_private.startSprite(role, l[0]);
                         //role.moveDirection = l[0];    //弹出第一个按键
                         //role.start();
-                        console.debug("[RoleEditor]_private.stopAction nextKey");
+                        console.debug('[RoleEditor]_private.stopAction nextKey');
                     }
                     break;
 
@@ -3252,13 +3252,13 @@ function $refresh(index, imageAnimate, path) {
                     keys = {};
                     role.stop();
                     //role.stop();
-                    console.debug("[RoleEditor]_private.stopAction stop1");
+                    console.debug('[RoleEditor]_private.stopAction stop1');
                 }
             }
             else {
                 role.stop();
                 //role.stop();
-                console.debug("[RoleEditor]_private.stopAction stop2");
+                console.debug('[RoleEditor]_private.stopAction stop2');
             }
         }
 
@@ -3300,12 +3300,12 @@ function $refresh(index, imageAnimate, path) {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        console.debug("[RoleEditor]Escape Key");
+        console.debug('[RoleEditor]Escape Key');
         _private.close();
         event.accepted = true;
     }
     Keys.onBackPressed: {
-        console.debug("[RoleEditor]Back Key");
+        console.debug('[RoleEditor]Back Key');
         _private.close();
         event.accepted = true;
     }
@@ -3319,7 +3319,7 @@ function $refresh(index, imageAnimate, path) {
 
 
 
-        console.debug("[RoleEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[RoleEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
         event.accepted = true;
@@ -3330,7 +3330,7 @@ function $refresh(index, imageAnimate, path) {
         _private.stopAction(1, event.key);
 
 
-        console.debug("[RoleEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[RoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
 
         //console.debug(role.objActionsData);
         //console.debug(textRoleFangXiangIndex.text.split(','));
@@ -3350,9 +3350,9 @@ function $refresh(index, imageAnimate, path) {
         layoutAction2.arrCacheComponent.push(compActions2.createObject(layoutAction2, {bShowDelete: false, textActionName: '$Left', bActionReadOnly: true, bActionColor: 'red'}));
 
 
-        console.debug("[RoleEditor]Component.onCompleted");
+        console.debug('[RoleEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[RoleEditor]Component.onDestruction");
+        console.debug('[RoleEditor]Component.onDestruction');
     }
 }

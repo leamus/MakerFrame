@@ -98,13 +98,13 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "选择地图"
+            text: '选择地图'
             onClicked: {
 
                 l_listChoice.visible = true;
                 //l_listChoice.focus = true;
                 //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, "*", 0x001 | 0x2000, 0x00);
+                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, '*', 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textMapName;
             }
@@ -129,13 +129,13 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "选择角色"
+            text: '选择角色'
             onClicked: {
 
                 l_listChoice.visible = true;
                 //l_listChoice.focus = true;
                 //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, "*", 0x001 | 0x2000, 0x00);
+                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, '*', 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textRoleName;
             }
@@ -147,14 +147,14 @@ Item {
             Layout.maximumWidth: parent.width
 
             Label {
-                text: qsTr("地图块坐标：")
+                text: qsTr('地图块坐标：')
             }
 
             TextField {
                 id: textMapBlockX
                 Layout.fillWidth: true
-                text: "0"
-                placeholderText: "0"
+                text: '0'
+                placeholderText: '0'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -164,8 +164,8 @@ Item {
             TextField {
                 id: textMapBlockY
                 Layout.fillWidth: true
-                text: "0"
-                placeholderText: "0"
+                text: '0'
+                placeholderText: '0'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -181,7 +181,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "开　始"
+            text: '开　始'
 
             onClicked: {
                 _private.start();
@@ -200,7 +200,7 @@ Item {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "主角大小："
+                text: '主角大小：'
             }
 
             TextField {
@@ -208,7 +208,7 @@ Item {
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
-                text: "50"
+                text: '50'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -219,7 +219,7 @@ Item {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: "X"
+                text: 'X'
             }
 
             TextField {
@@ -227,7 +227,7 @@ Item {
                 Layout.preferredWidth: 50
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
-                text: "80"
+                text: '80'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -291,19 +291,19 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainGameTest]loaderGameScene onLoaded");
+            console.debug('[mainGameTest]loaderGameScene onLoaded');
 
             try {
-                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "map.json";
+                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
                 //let cfg = File.read(filePath);
                 let cfg = FrameManager.sl_fileRead(filePath);
-                //console.debug("cfg", cfg, filePath);
+                //console.debug('cfg', cfg, filePath);
 
                 if(!cfg)
                     return false;
                 cfg = JSON.parse(cfg);
-                //console.debug("cfg", cfg);
-                //loaderGameScene.setSource("./MapEditor_1.qml", {});
+                //console.debug('cfg', cfg);
+                //loaderGameScene.setSource('./MapEditor_1.qml', {});
                 loaderGameScene.item.openMap(cfg);
                 */
 
@@ -364,7 +364,7 @@ Item {
 
 
         onSg_clicked: {
-            if(item === "..") {
+            if(item === '..') {
                 return;
             }
 
@@ -397,7 +397,7 @@ Item {
         id: _private
 
         function start() {
-            if(textMapName.text === "" || textRoleName.text === "")
+            if(textMapName.text === '' || textRoleName.text === '')
                 return;
 
 
@@ -421,29 +421,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainGameTest]Escape Key");
+        console.debug('[mainGameTest]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainGameTest]Back Key");
+        console.debug('[mainGameTest]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameTest]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainGameTest]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainGameTest]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainGameTest]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainGameTest]Component.onCompleted");
+        console.debug('[mainGameTest]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainGameTest]Component.onDestruction");
+        console.debug('[mainGameTest]Component.onDestruction');
     }
 }

@@ -25,7 +25,7 @@ Item {
         let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
-            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_combatant_name"](tf, {avatar: true, color: true})));
+            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_combatant_name'](tf, {avatar: true, color: true})));
         }
         gameFightRoleMenu.show(arrFightHerosName);
         if(arrFightHerosName.length > 0)
@@ -60,64 +60,64 @@ Item {
         switch(type) {
         case 1:
             gameGoodsMenu.arrGoods = [];
-            for(let goods of game.gd["$sys_goods"]) {
+            for(let goods of game.gd['$sys_goods']) {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$useScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
             break;
         case 2:
             gameGoodsMenu.arrGoods = [];
-            for(let goods of game.gd["$sys_goods"]) {
+            for(let goods of game.gd['$sys_goods']) {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$equipScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
             break;
         case 3:
             gameGoodsMenu.arrGoods = [];
-            for(let goods of game.gd["$sys_goods"]) {
+            for(let goods of game.gd['$sys_goods']) {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$fightScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
 
         case 4:
             gameGoodsMenu.arrGoods = [];
-            for(let goods of game.gd["$sys_goods"]) {
+            for(let goods of game.gd['$sys_goods']) {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$price && goods.$price[1] !== undefined) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
 
         case 5:
             gameGoodsMenu.arrGoods = [];
-            for(let goods of game.gd["$sys_goods"]) {
+            for(let goods of game.gd['$sys_goods']) {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$type === 4) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
 
         case -1:
         default:
-            gameGoodsMenu.arrGoods = game.gd["$sys_goods"];
-            for(let goods of game.gd["$sys_goods"]) {
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts["show_goods_name"](goods, {Image: true, Color: true, Count: true})));
+            gameGoodsMenu.arrGoods = game.gd['$sys_goods'];
+            for(let goods of game.gd['$sys_goods']) {
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
             }
 
             break;
@@ -129,7 +129,7 @@ Item {
 
         textGoodsInfo.text = textGoodsInfo.strPreText;
         let moneyName = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$money'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$money'));
-        textMoney.text = moneyName + ':' + game.gd["$sys_money"];
+        textMoney.text = moneyName + ':' + game.gd['$sys_money'];
 
 
         if(arrGoodsName.length > 0 && gameGoodsMenu.nChoiceIndex < 0)
@@ -161,7 +161,7 @@ Item {
         id: maskGoods
 
         anchors.fill: parent
-        color: "#7FFFFFFF"
+        color: '#7FFFFFFF'
 
         mouseArea.onPressed: {
             //点击后关闭
@@ -186,21 +186,21 @@ Item {
             Layout.preferredHeight: textMoney.implicitHeight
             //Layout.fillHeight: true
 
-            color: "darkblue"
+            color: 'darkblue'
 
             //金钱文字
             Text {
                 id: textMoney
                 anchors.fill: parent
 
-                color: "white"
+                color: 'white'
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
                 font.pointSize: 16
                 font.bold: true
-                text: ""
+                text: ''
                 wrapMode: Text.Wrap
             }
         }
@@ -343,7 +343,7 @@ Item {
 
                 font.pointSize: 16
                 font.bold: true
-                text: ""
+                text: ''
                 //wrapMode: Text.Wrap
 
                 textArea.background: Rectangle {
@@ -469,7 +469,7 @@ Item {
                 Layout.fillWidth: true
                 //width: parent.width
 
-                text: "使用"
+                text: '使用'
                 textTips.font.pointSize: 12
 
                 //点击后操作
@@ -483,7 +483,7 @@ Item {
                     let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
 
                     //脚本执行完毕后刷新背包
-                    game.run(function*(){
+                    game.run(function*() {
                         yield game.usegoods(index, goods);
                         root.showGoods(root.nlastShowType);
                     }());
@@ -497,7 +497,7 @@ Item {
                 Layout.fillWidth: true
                 //width: parent.width
 
-                text: "装备"
+                text: '装备'
                 textTips.font.pointSize: 12
                 onSg_clicked: {
                     if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
@@ -531,7 +531,7 @@ Item {
                 Layout.fillWidth: true
                 //width: parent.width
 
-                text: "丢弃"
+                text: '丢弃'
                 textTips.font.pointSize: 12
                 onSg_clicked: {
                     if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
@@ -551,7 +551,7 @@ Item {
                 //Layout.fillWidth: true
                 //width: parent.width
 
-                text: "关闭"
+                text: '关闭'
                 textTips.font.pointSize: 12
                 onSg_clicked: {
                     root.hide();

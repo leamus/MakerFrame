@@ -34,9 +34,9 @@ Rectangle {
         anchors.fill: parent
 
 
-        color: "lightgray"
+        color: 'lightgray'
         border.width: 2
-        border.color: "darkgray"
+        border.color: 'darkgray'
     }
 
     Text {
@@ -46,15 +46,15 @@ Rectangle {
         anchors.bottomMargin: 4
         anchors.horizontalCenter: parent.horizontalCenter
         font.pointSize: 14
-        color: "blue"
+        color: 'blue'
     }
     
     MouseArea {
         anchors.fill: parent
         onClicked: {
             if(colorDialog == null){
-                //colorDialog = Qt.createQmlObject("import QtQuick 2.14;Qt.labs.platform 1.1; ColorDialog{}",
-                //                                 colorPicker, "dynamic_color_dialog")
+                //colorDialog = Qt.createQmlObject('import QtQuick 2.14;Qt.labs.platform 1.1; ColorDialog{}',
+                //                                 colorPicker, 'dynamic_color_dialog')
                 //colorDialog.accepted.connect(colorPicker.onColorDialogAccepted)
                 //colorDialog.rejected.connect(colorPicker.onColorDialogRejected)
                 //colorDialog.open();

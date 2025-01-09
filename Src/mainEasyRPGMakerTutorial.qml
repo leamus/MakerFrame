@@ -82,7 +82,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返　回"
+            text: '返　回'
             onClicked: {
                 sg_close();
             }
@@ -122,14 +122,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainEasyRPGMakerTutorial]Escape Key");
+        console.debug('[mainEasyRPGMakerTutorial]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainEasyRPGMakerTutorial]Back Key");
+        console.debug('[mainEasyRPGMakerTutorial]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -406,9 +406,9 @@ Item {
 //加入定时器；
 //timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；
 //成功返回true。
-<font color='yellow'>game.addtimer("timerName", interval, times, bGlobal=false);</font>
+<font color='yellow'>game.addtimer(timerName, interval, times, bGlobal=false);</font>
 <font color='yellow'>game.deltimer(timerName, bGlobal=false)</font>：删除定时器。
-  如果是局部定时器，则触发的脚本在 地图脚本 或 game.f["定时器名"] 中定义；如果是全局，则触发的脚本在 game.gf["定时器名"] 中定义。
+  如果是局部定时器，则触发的脚本在 地图脚本 或 game.f[定时器名] 中定义；如果是全局，则触发的脚本在 game.gf[定时器名] 中定义。
 
 //播放音乐；
 //music为音乐名；
@@ -489,9 +489,9 @@ Item {
 
 <font color='yellow'>game.date()</font>：返回 JS 的 new Date()对象。
 
-<font color='yellow'>game.checksave("文件名")</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>yield game.save("文件名", showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
-<font color='yellow'>yield game.load("文件名")</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
+<font color='yellow'>game.checksave(文件名)</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
+<font color='yellow'>yield game.save(文件名, showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
+<font color='yellow'>yield game.load(文件名)</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
 <font color='yellow'>yield game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
@@ -544,7 +544,7 @@ Item {
     支持JS的 let、var、const定义变量。
   game.math 或 Math：JS 的 Math对象。
 
-  game.d["$sys_map"]：当前地图信息
+  game.d['$sys_map']：当前地图信息
     .$name：当前地图名
     .$columns：列数
     .$rows：行数
@@ -571,14 +571,14 @@ Item {
 
 
 NPC事件的四种写法（前两种支持同步调用）：
-  game.f["角色游戏名"] = "。。。"   （推荐写法）
-  game.f["角色游戏名"] = function*(){。。。}
-  game.f["角色游戏名"] = function(){。。。}
-  game.f["角色游戏名"] = ()=>{。。。}
+  game.f[角色游戏名] = 。。。   （推荐写法）
+  game.f[角色游戏名] = function*(){。。。}
+  game.f[角色游戏名] = function(){。。。}
+  game.f[角色游戏名] = ()=>{。。。}
 
 定时器事件（写法同上）：
-  局部定时器：game.f["局部定时器名"]
-  全局定时器：game.gf["全局定时器名"]
+  局部定时器：game.f[局部定时器名]
+  全局定时器：game.gf[全局定时器名]
 
 
 
@@ -598,13 +598,13 @@ NPC事件的四种写法（前两种支持同步调用）：
 
 同步代码调用说明：
   由于Javascript本身是异步调用，所有的指令都是一瞬间运行完毕。比如你想让人物说几句话，这样调用的话：
-    game.talk("第1句")
-    game.talk("第2句")
-    game.talk("第3句")
+    game.talk('第1句')
+    game.talk('第2句')
+    game.talk('第3句')
   默认是一瞬间执行到了第3句指令，第1句和第2句会一闪而过看不到（msg组件则是全部显示出来），如果你想一句一句执行，等每一句彻底执行完毕再执行下一句，则应该这样：
-    yield game.talk("第1句")
-    yield game.talk("第2句")
-    yield game.talk("第3句")
+    yield game.talk('第1句')
+    yield game.talk('第2句')
+    yield game.talk('第3句')
   没错，只需要前面加一条 yield 单词就可以了。
   目前所有指令都支持同步调用，但真正有意义的异步命令：
     game.msg
@@ -708,7 +708,7 @@ NPC事件的四种写法（前两种支持同步调用）：
   3、战斗角色
     战斗角色的脚本都是可选的。
     格式：
-      let $createData = function(){return {RID: "killer2", $name: "敌人1", $properties: {HP: 5, healthHP: 5, remainHP: 5, EXP: 5}, $skills: [{RID: "fight"}], $goods: [{RID: '西瓜刀'}], $money: 5};}
+      let $createData = function(){return {RID: 'killer2', $name: '敌人1', $properties: {HP: 5, healthHP: 5, remainHP: 5, EXP: 5}, $skills: [{RID: 'fight'}], $goods: [{RID: '西瓜刀'}], $money: 5};}
         在战斗脚本中可以修改覆盖这些属性。
       function *$levelUpScript(combatant)：角色单独升级链
         如果不定义，则使用通用的升级链算法；
@@ -767,9 +767,9 @@ NPC事件的四种写法（前两种支持同步调用）：
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainEasyRPGMakerTutorial]Component.onCompleted");
+        console.debug('[mainEasyRPGMakerTutorial]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainEasyRPGMakerTutorial]Component.onDestruction");
+        console.debug('[mainEasyRPGMakerTutorial]Component.onDestruction');
     }
 }

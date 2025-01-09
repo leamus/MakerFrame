@@ -82,7 +82,7 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: "#80000000"
+                color: '#80000000'
                 //color: 'transparent'
                 //color: Global.style.backgroundColor
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -96,7 +96,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
 
-            text: "返　回"
+            text: '返　回'
             onClicked: {
                 sg_close();
             }
@@ -122,14 +122,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainEasyJavaScriptTutorial]Escape Key");
+        console.debug('[mainEasyJavaScriptTutorial]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainEasyJavaScriptTutorial]Back Key");
+        console.debug('[mainEasyJavaScriptTutorial]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -239,7 +239,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
 
   do {
     语句。。。
-  }while(条件);	//至少执行一遍
+  } while(条件);	//至少执行一遍
 
 
 4、函数
@@ -298,9 +298,9 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
 `;
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug("[mainEasyJavaScriptTutorial]Component.onCompleted");
+        console.debug('[mainEasyJavaScriptTutorial]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainEasyJavaScriptTutorial]Component.onDestruction");
+        console.debug('[mainEasyJavaScriptTutorial]Component.onDestruction');
     }
 }

@@ -74,7 +74,7 @@ Item {
         else
             start();*/
 
-        //console.debug("[Role]start", root.sprite, root.sprite.sprite.state, root.sprite.sprite.currentSprite)
+        //console.debug('[Role]start', root.sprite, root.sprite.sprite.state, root.sprite.sprite.currentSprite)
     }
 
     //停止动画
@@ -148,7 +148,7 @@ Item {
         if(root.nSpriteType === 0) {
             //读特效信息
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-            //let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + "sprite.json"));
+            //let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + 'sprite.json'));
             //if(info)
             //    info = JSON.parse(info);
             //else
@@ -201,7 +201,7 @@ Item {
             else {
                 spriteEffect.strSoundeffectName = '';
             }
-            //console.warn("!!!", info.Sound, strSoundeffectName)
+            //console.warn('!!!', info.Sound, strSoundeffectName)
             spriteEffect.nSoundeffectDelay = (info.SoundDelay);
 
 
@@ -282,7 +282,7 @@ Item {
         }
 
         spriteEffect.restart();
-        //console.debug("[Role]Test Start");
+        //console.debug('[Role]Test Start');
     }
 
 
@@ -439,7 +439,7 @@ Item {
         y: 0
         width: parent.width
         height: parent.height
-        color: "#FF000000"
+        color: '#FF000000'
         radius: width / 2
 
         opacity: 0.3
@@ -495,7 +495,7 @@ Item {
         spriteEffect.start();
 
         event.accepted = true;
-        //console.debug("[Role]Keys.onPressed:", event.key);
+        //console.debug('[Role]Keys.onPressed:', event.key);
     }
 
     Keys.onReleased: {
@@ -506,7 +506,7 @@ Item {
         case Qt.Key_Down:
             spriteEffect.stop();
             event.accepted = true;
-            //console.debug("[Role]Keys.onReleased:", event.key);
+            //console.debug('[Role]Keys.onReleased:', event.key);
             break;
         }
 

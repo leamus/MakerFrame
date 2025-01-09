@@ -2,7 +2,7 @@
 //载入资源
 function *loadResources() {
     //读取引擎变量
-    game.cd = GameMakerGlobal.settings.value("$RPG/" + GameMakerGlobal.config.strCurrentProjectName);
+    game.cd = GameMakerGlobal.settings.value('$RPG/' + GameMakerGlobal.config.strCurrentProjectName);
     if(!game.cd)
         game.cd = {};
 
@@ -13,172 +13,172 @@ function *loadResources() {
     if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'common_script.js')))
         tCommoncript = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'common_script.js'));
     if(tCommoncript) {
-        _private.objCommonScripts["game_init"] = tCommoncript.$gameInit;
+        _private.objCommonScripts['game_init'] = tCommoncript.$gameInit;
         _private.objCommonScripts['game_release'] = tCommoncript.$gameRelease;
-        _private.objCommonScripts["before_save"] = tCommoncript.$beforeSave;
-        _private.objCommonScripts["before_load"] = tCommoncript.$beforeLoad;
-        _private.objCommonScripts["after_save"] = tCommoncript.$afterSave;
-        _private.objCommonScripts["after_load"] = tCommoncript.$afterLoad;
-        _private.objCommonScripts["combatant_class"] = tCommoncript.$Combatant;
-        _private.objCommonScripts["combatant_info"] = tCommoncript.$combatantInfo;
-        _private.objCommonScripts["show_goods_name"] = tCommoncript.$showGoodsName;
-        _private.objCommonScripts["show_combatant_name"] = tCommoncript.$showCombatantName;
-        _private.objCommonScripts["refresh_combatant"] = tCommoncript.$refreshCombatant;
+        _private.objCommonScripts['before_save'] = tCommoncript.$beforeSave;
+        _private.objCommonScripts['before_load'] = tCommoncript.$beforeLoad;
+        _private.objCommonScripts['after_save'] = tCommoncript.$afterSave;
+        _private.objCommonScripts['after_load'] = tCommoncript.$afterLoad;
+        _private.objCommonScripts['combatant_class'] = tCommoncript.$Combatant;
+        _private.objCommonScripts['combatant_info'] = tCommoncript.$combatantInfo;
+        _private.objCommonScripts['show_goods_name'] = tCommoncript.$showGoodsName;
+        _private.objCommonScripts['show_combatant_name'] = tCommoncript.$showCombatantName;
+        _private.objCommonScripts['refresh_combatant'] = tCommoncript.$refreshCombatant;
         _private.objCommonScripts['combatant_is_valid'] = tCommoncript.$combatantIsValid;
-        _private.objCommonScripts["game_over_script"] = tCommoncript.$gameOverScript;
-        //_private.objCommonScripts["resume_event_script"] = tCommoncript.$resumeEventScript;
-        //_private.objCommonScripts["get_goods_script"] = tCommoncript.commonGetGoodsScript;
-        //_private.objCommonScripts["use_goods_script"] = tCommoncript.commonUseGoodsScript;
+        _private.objCommonScripts['game_over_script'] = tCommoncript.$gameOverScript;
+        //_private.objCommonScripts['resume_event_script'] = tCommoncript.$resumeEventScript;
+        //_private.objCommonScripts['get_goods_script'] = tCommoncript.commonGetGoodsScript;
+        //_private.objCommonScripts['use_goods_script'] = tCommoncript.commonUseGoodsScript;
 
-        //_private.objCommonScripts["events"] = tCommoncript.$events;
-        //_private.objCommonScripts["get_buff"] = tCommoncript.$getBuff;
+        //_private.objCommonScripts['events'] = tCommoncript.$events;
+        //_private.objCommonScripts['get_buff'] = tCommoncript.$getBuff;
 
         game.$userscripts = tCommoncript;
     }
     else
         game.$userscripts = GameMakerGlobalJS;
 
-    /*data = game.loadjson("common_algorithm.json");
+    /*data = game.loadjson('common_algorithm.json');
     if(data) {
-        let ret = GlobalJS._eval(data["FightAlgorithm"]);
-        _private.objCommonScripts["game_over_script"] = ret.$gameOverScript;
-        _private.objCommonScripts["common_run_away_algorithm"] = ret.$commonRunAwayAlgorithm;
-        _private.objCommonScripts["fight_skill_algorithm"] = ret.$fightSkillAlgorithm;
-        _private.objCommonScripts["fight_role_choice_skills_or_goods_algorithm"] = ret.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-        _private.objCommonScripts["fight_start_script"] = ret.$commonFightStartScript;
-        _private.objCommonScripts["fight_round_script"] = ret.$commonFightRoundScript;
-        _private.objCommonScripts["fight_end_script"] = ret.$commonFightEndScript;
-        //_private.objCommonScripts["resume_event_script"] = ret.$resumeEventScript;
-        _private.objCommonScripts["get_goods_script"] = ret.commonGetGoodsScript;
-        _private.objCommonScripts["use_goods_script"] = ret.commonUseGoodsScript;
+        let ret = GlobalJS._eval(data['FightAlgorithm']);
+        _private.objCommonScripts['game_over_script'] = ret.$gameOverScript;
+        _private.objCommonScripts['common_run_away_algorithm'] = ret.$commonRunAwayAlgorithm;
+        _private.objCommonScripts['fight_skill_algorithm'] = ret.$fightSkillAlgorithm;
+        _private.objCommonScripts['fight_role_choice_skills_or_goods_algorithm'] = ret.$fightRoleChoiceSkillsOrGoodsAlgorithm;
+        _private.objCommonScripts['fight_start_script'] = ret.$commonFightStartScript;
+        _private.objCommonScripts['fight_round_script'] = ret.$commonFightRoundScript;
+        _private.objCommonScripts['fight_end_script'] = ret.$commonFightEndScript;
+        //_private.objCommonScripts['resume_event_script'] = ret.$resumeEventScript;
+        _private.objCommonScripts['get_goods_script'] = ret.commonGetGoodsScript;
+        _private.objCommonScripts['use_goods_script'] = ret.commonUseGoodsScript;
     }*/
-    if(!_private.objCommonScripts["game_init"]) {
-        _private.objCommonScripts["game_init"] = GameMakerGlobalJS.$gameInit;
-        console.debug("[GameScene]!载入系统游戏初始化脚本");
+    if(!_private.objCommonScripts['game_init']) {
+        _private.objCommonScripts['game_init'] = GameMakerGlobalJS.$gameInit;
+        console.debug('[GameScene]!载入系统游戏初始化脚本');
     }
     else
-        console.debug("[GameScene]载入游戏初始化脚本OK");
+        console.debug('[GameScene]载入游戏初始化脚本OK');
 
-    if(!_private.objCommonScripts["game_release"]) {
-        _private.objCommonScripts["game_release"] = GameMakerGlobalJS.$gameRelease;
-        console.debug("[GameScene]!载入系统游戏结束脚本");
+    if(!_private.objCommonScripts['game_release']) {
+        _private.objCommonScripts['game_release'] = GameMakerGlobalJS.$gameRelease;
+        console.debug('[GameScene]!载入系统游戏结束脚本');
     }
     else
-        console.debug("[GameScene]载入游戏结束脚本OK");
+        console.debug('[GameScene]载入游戏结束脚本OK');
 
-    if(!_private.objCommonScripts["before_save"]) {
-        _private.objCommonScripts["before_save"] = GameMakerGlobalJS.$beforeSave;
-        console.debug("[GameScene]!载入系统存档前脚本");
+    if(!_private.objCommonScripts['before_save']) {
+        _private.objCommonScripts['before_save'] = GameMakerGlobalJS.$beforeSave;
+        console.debug('[GameScene]!载入系统存档前脚本');
     }
     else
-        console.debug("[GameScene]载入存档前脚本OK");
+        console.debug('[GameScene]载入存档前脚本OK');
 
-    if(!_private.objCommonScripts["before_load"]) {
-        _private.objCommonScripts["before_load"] = GameMakerGlobalJS.$beforeLoad;
-        console.debug("[GameScene]!载入系统读档前脚本");
+    if(!_private.objCommonScripts['before_load']) {
+        _private.objCommonScripts['before_load'] = GameMakerGlobalJS.$beforeLoad;
+        console.debug('[GameScene]!载入系统读档前脚本');
     }
     else
-        console.debug("[GameScene]载入读档前脚本OK");
+        console.debug('[GameScene]载入读档前脚本OK');
 
-    if(!_private.objCommonScripts["after_save"]) {
-        _private.objCommonScripts["after_save"] = GameMakerGlobalJS.$afterSave;
-        console.debug("[GameScene]!载入系统存档后脚本");
+    if(!_private.objCommonScripts['after_save']) {
+        _private.objCommonScripts['after_save'] = GameMakerGlobalJS.$afterSave;
+        console.debug('[GameScene]!载入系统存档后脚本');
     }
     else
-        console.debug("[GameScene]载入存档后脚本OK");
+        console.debug('[GameScene]载入存档后脚本OK');
 
-    if(!_private.objCommonScripts["after_load"]) {
-        _private.objCommonScripts["after_load"] = GameMakerGlobalJS.$afterLoad;
-        console.debug("[GameScene]!载入系统读档后脚本");
+    if(!_private.objCommonScripts['after_load']) {
+        _private.objCommonScripts['after_load'] = GameMakerGlobalJS.$afterLoad;
+        console.debug('[GameScene]!载入系统读档后脚本');
     }
     else
-        console.debug("[GameScene]载入读档后脚本OK");
+        console.debug('[GameScene]载入读档后脚本OK');
 
 
-    if(!_private.objCommonScripts["combatant_class"]) {
-        _private.objCommonScripts["combatant_class"] = GameMakerGlobalJS.$Combatant;
-        console.debug("[GameScene]!载入系统创建战斗角色脚本");
+    if(!_private.objCommonScripts['combatant_class']) {
+        _private.objCommonScripts['combatant_class'] = GameMakerGlobalJS.$Combatant;
+        console.debug('[GameScene]!载入系统创建战斗角色脚本');
     }
     else
-        console.debug("[GameScene]载入创建战斗角色脚本OK");
+        console.debug('[GameScene]载入创建战斗角色脚本OK');
 
-    if(!_private.objCommonScripts["refresh_combatant"]) {
-        _private.objCommonScripts["refresh_combatant"] = GameMakerGlobalJS.$refreshCombatant;
-        console.debug("[GameScene]!载入系统计算属性脚本");
+    if(!_private.objCommonScripts['refresh_combatant']) {
+        _private.objCommonScripts['refresh_combatant'] = GameMakerGlobalJS.$refreshCombatant;
+        console.debug('[GameScene]!载入系统计算属性脚本');
     }
     else
-        console.debug("[GameScene]载入计算属性脚本OK");
+        console.debug('[GameScene]载入计算属性脚本OK');
 
-    if(!_private.objCommonScripts["combatant_is_valid"]) {
-        _private.objCommonScripts["combatant_is_valid"] = GameMakerGlobalJS.$combatantIsValid;
-        console.debug("[GameScene]!载入系统战斗人物可用脚本");
+    if(!_private.objCommonScripts['combatant_is_valid']) {
+        _private.objCommonScripts['combatant_is_valid'] = GameMakerGlobalJS.$combatantIsValid;
+        console.debug('[GameScene]!载入系统战斗人物可用脚本');
     }
     else
-        console.debug("[GameScene]载入战斗人物可用脚本OK");
+        console.debug('[GameScene]载入战斗人物可用脚本OK');
 
-    if(!_private.objCommonScripts["game_over_script"]) {
-        _private.objCommonScripts["game_over_script"] = GameMakerGlobalJS.$gameOverScript;
-        console.debug("[GameScene]!载入系统游戏结束脚本");
+    if(!_private.objCommonScripts['game_over_script']) {
+        _private.objCommonScripts['game_over_script'] = GameMakerGlobalJS.$gameOverScript;
+        console.debug('[GameScene]!载入系统游戏结束脚本');
     }
     else
-        console.debug("[GameScene]载入游戏结束脚本OK");
+        console.debug('[GameScene]载入游戏结束脚本OK');
 
-    /*if(!_private.objCommonScripts["resume_event_script"]) {
-        _private.objCommonScripts["resume_event_script"] = GameMakerGlobalJS.$resumeEventScript;
-        console.debug("[GameScene]!载入系统恢复脚本");
+    /*if(!_private.objCommonScripts['resume_event_script']) {
+        _private.objCommonScripts['resume_event_script'] = GameMakerGlobalJS.$resumeEventScript;
+        console.debug('[GameScene]!载入系统恢复脚本');
     }
     else
-        console.debug("[GameScene]载入恢复算法脚本OK");  //, _private.objCommonScripts["resume_timer"], data, eval("()=>{}"));
+        console.debug('[GameScene]载入恢复算法脚本OK');  //, _private.objCommonScripts['resume_timer'], data, eval('()=>{}'));
     */
 
-    /*if(!_private.objCommonScripts["get_goods_script"]) {
-        _private.objCommonScripts["get_goods_script"] = GameMakerGlobalJS.commonGetGoodsScript;
-        console.debug("[GameScene]!载入系统通用获得道具脚本");
+    /*if(!_private.objCommonScripts['get_goods_script']) {
+        _private.objCommonScripts['get_goods_script'] = GameMakerGlobalJS.commonGetGoodsScript;
+        console.debug('[GameScene]!载入系统通用获得道具脚本');
     }
     else
-        console.debug("[GameScene]载入通用获得道具脚本OK");
-    if(!_private.objCommonScripts["use_goods_script"]) {
-        _private.objCommonScripts["use_goods_script"] = GameMakerGlobalJS.commonUseGoodsScript;
-        console.debug("[GameScene]!载入系统通用使用道具脚本");
+        console.debug('[GameScene]载入通用获得道具脚本OK');
+    if(!_private.objCommonScripts['use_goods_script']) {
+        _private.objCommonScripts['use_goods_script'] = GameMakerGlobalJS.commonUseGoodsScript;
+        console.debug('[GameScene]!载入系统通用使用道具脚本');
     }
     else
-        console.debug("[GameScene]载入通用使用道具脚本OK");
+        console.debug('[GameScene]载入通用使用道具脚本OK');
     */
 
-    if(!_private.objCommonScripts["combatant_info"]) {
-        _private.objCommonScripts["combatant_info"] = GameMakerGlobalJS.$combatantInfo;
-        console.debug("[GameScene]!载入系统战斗人物信息");
+    if(!_private.objCommonScripts['combatant_info']) {
+        _private.objCommonScripts['combatant_info'] = GameMakerGlobalJS.$combatantInfo;
+        console.debug('[GameScene]!载入系统战斗人物信息');
     }
     else
-        console.debug("[GameScene]载入战斗人物信息OK");
+        console.debug('[GameScene]载入战斗人物信息OK');
 
-    if(!_private.objCommonScripts["show_goods_name"]) {
-        _private.objCommonScripts["show_goods_name"] = GameMakerGlobalJS.$showGoodsName;
-        console.debug("[GameScene]!载入系统显示道具名称信息");
+    if(!_private.objCommonScripts['show_goods_name']) {
+        _private.objCommonScripts['show_goods_name'] = GameMakerGlobalJS.$showGoodsName;
+        console.debug('[GameScene]!载入系统显示道具名称信息');
     }
     else
-        console.debug("[GameScene]载入显示道具名称信息OK");
+        console.debug('[GameScene]载入显示道具名称信息OK');
 
-    if(!_private.objCommonScripts["show_combatant_name"]) {
-        _private.objCommonScripts["show_combatant_name"] = GameMakerGlobalJS.$showCombatantName;
-        console.debug("[GameScene]!载入系统显示战斗人物名称信息");
+    if(!_private.objCommonScripts['show_combatant_name']) {
+        _private.objCommonScripts['show_combatant_name'] = GameMakerGlobalJS.$showCombatantName;
+        console.debug('[GameScene]!载入系统显示战斗人物名称信息');
     }
     else
-        console.debug("[GameScene]载入显示战斗人物名称信息OK");
+        console.debug('[GameScene]载入显示战斗人物名称信息OK');
 
     /*
-    if(!_private.objCommonScripts["events"]) {
-        _private.objCommonScripts["events"] = GameMakerGlobalJS.$events;
-        console.debug("[GameScene]!载入系统通用events");
+    if(!_private.objCommonScripts['events']) {
+        _private.objCommonScripts['events'] = GameMakerGlobalJS.$events;
+        console.debug('[GameScene]!载入系统通用events');
     }
     else
-        console.debug("[GameScene]载入通用eventsOK");
+        console.debug('[GameScene]载入通用eventsOK');
         */
 
 
 
     //创建一个主角
-    const tf = function(soundeffectSource){
+    const tf = function(soundeffectSource) {
         game.playsoundeffect(soundeffectSource, -1);
     }
     mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
@@ -200,7 +200,7 @@ function *loadResources() {
 
     //安卓配置
     do {
-        if(Qt.platform.os !== "android")
+        if(Qt.platform.os !== 'android')
             break;
 
         _private.lastOrient = Platform.sl_getScreenOrientation();
@@ -208,7 +208,7 @@ function *loadResources() {
         //旋转配置
         Platform.sl_setScreenOrientation(GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$android', '$orient'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$android', '$orient'), 4));
 
-    }while(0);
+    } while(0);
 
 
     //摇杆 默认值
@@ -298,7 +298,7 @@ function *loadResources() {
                 buttonAConfig.$bottom = tConfig.$bottom;
             if(tConfig.$clicked !== undefined)
                 buttonAConfig.$clicked = tConfig.$clicked;
-        }while(0);
+        } while(0);
 
         //B键
         do {
@@ -320,13 +320,13 @@ function *loadResources() {
                 buttonMenuConfig.$bottom = tConfig.$bottom;
             if(tConfig.$clicked !== undefined)
                 buttonMenuConfig.$clicked = tConfig.$clicked;
-        }while(0);
+        } while(0);
         */
 
         //自定义
         for(let tb = 0; tb < buttonsConfig.length; ++tb) {
-            let tConfig = buttonsConfig[tb];
-            let button = compButtons.createObject(itemButtons);
+            const tConfig = buttonsConfig[tb];
+            const button = compButtons.createObject(itemButtons);
             button.width = tConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
             button.height = tConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
             if(tConfig.$color !== undefined)
@@ -342,24 +342,24 @@ function *loadResources() {
                 button.sg_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    game.async(tConfig.$pressed.call(button) ?? null);
-            });
+                    game.async(tConfig.$pressed.call(button) ?? null, 'ButtonPressed');  //也可以用game.run
+                });
             //！！！兼容旧代码
             else if(tConfig.$clicked)
                 button.sg_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    game.async(tConfig.$clicked.call(button) ?? null);
-            });
+                    game.async(tConfig.$clicked.call(button) ?? null, 'ButtonClicked');  //也可以用game.run
+                });
             if(tConfig.$released)
                 button.sg_released.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    game.async(tConfig.$released.call(button) ?? null);
-            });
+                    game.async(tConfig.$released.call(button) ?? null, 'ButtonReleased'); //也可以用game.run
+                });
         }
 
-    }while(0);
+    } while(0);
 
     /*buttonA.width = buttonAConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
     buttonA.height = buttonAConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
@@ -402,10 +402,10 @@ function *loadResources() {
             ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'start.js'));
         }
         if(ts) {
-            _private.objCommonScripts["game_start"] = ts.$start || ts.start;
-            //_private.objCommonScripts["game_init"] = ts.$init || ts.init;
-            //_private.objCommonScripts["game_save_script"] = ts.$save || ts.save;
-            //_private.objCommonScripts["game_load_script"] = ts.$load || ts.load;
+            _private.objCommonScripts['game_start'] = ts.$start || ts.start;
+            //_private.objCommonScripts['game_init'] = ts.$init || ts.init;
+            //_private.objCommonScripts['game_save_script'] = ts.$save || ts.save;
+            //_private.objCommonScripts['game_load_script'] = ts.$load || ts.load;
         }
     }
 
@@ -420,33 +420,33 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读道具信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let info = getGoodsResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入Goods", item);
+                //console.debug('[GameScene]载入Goods', item);
             }
             else {
-                //console.warn("[!GameScene]载入Goods ERROR", item);
+                //console.warn('[!GameScene]载入Goods ERROR', item);
             }
 
 
-            /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "goods.json";
+            /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'goods.json';
             //console.debug(path, items, item, filePath)
             let info = FrameManager.sl_fileRead(GlobalJS.toPath(filePath));
 
             if(info) {
                 info = JSON.parse(info);
-                let t = GlobalJS._eval(info["Goods"]);
+                let t = GlobalJS._eval(info['Goods']);
                 if(t) {
                     _private.goodsResource[item] = t;
                     _private.goodsResource[item].$rid = item;
-                    console.debug("[GameScene]载入Goods", item);
+                    console.debug('[GameScene]载入Goods', item);
                 }
             }
             if(!info)
-                console.warn("[!GameScene]载入Goods ERROR", item);
+                console.warn('[!GameScene]载入Goods ERROR', item);
             */
         }
     }
@@ -455,33 +455,33 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读技能信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let info = getSkillResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入FightSkill", item);
+                //console.debug('[GameScene]载入FightSkill', item);
             }
             else {
-                //console.warn("[!GameScene]载入FightSkill ERROR", item);
+                //console.warn('[!GameScene]载入FightSkill ERROR', item);
             }
 
 
-            /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_skill.json";
+            /*let filePath = path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_skill.json';
             //console.debug(path, items, item, filePath)
             let info = FrameManager.sl_fileRead(GlobalJS.toPath(filePath));
 
             if(info) {
                 info = JSON.parse(info);
-                let t = GlobalJS._eval(info["FightSkill"]);
+                let t = GlobalJS._eval(info['FightSkill']);
                 if(t) {
                     _private.skillsResource[item] = t;
                     _private.skillsResource[item].$rid = item;
-                    console.debug("[GameScene]载入FightSkill", item);
+                    console.debug('[GameScene]载入FightSkill', item);
                 }
             }
             if(!info)
-                console.warn("[!GameScene]载入FightSkill ERROR", item);
+                console.warn('[!GameScene]载入FightSkill ERROR', item);
             */
         }
     }
@@ -490,15 +490,15 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读战斗脚本信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let info = getFightScriptResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入FightScript", item);
+                //console.debug('[GameScene]载入FightScript', item);
             }
             else {
-                //console.warn("[!GameScene]载入FightScript ERROR", item);
+                //console.warn('[!GameScene]载入FightScript ERROR', item);
             }
 
         }
@@ -509,31 +509,31 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读战斗角色信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             let info = getFightRoleResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入FightRole Script", item);
+                //console.debug('[GameScene]载入FightRole Script', item);
             }
             else {
-                //console.warn("[!GameScene]载入FightRole Script ERROR", item);
+                //console.warn('[!GameScene]载入FightRole Script ERROR', item);
             }
 
 
 
             //let info = File.read(filePath);
-            /*let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "fight_role.json"));
+            /*let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_role.json'));
 
             if(info) {
                 info = JSON.parse(info);
 
                 //_private.fightRolesResource[item] = info;
                 _private.fightRolesResource[item].ActionData = info.ActionData;
-                console.debug("[GameScene]载入FightRole", item);
+                console.debug('[GameScene]载入FightRole', item);
             }
             else {
-                console.warn("[!GameScene]载入FightRole ERROR：" + item);
+                console.warn('[!GameScene]载入FightRole ERROR：' + item);
                 continue;
             }
             */
@@ -546,16 +546,16 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读特效信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             //console.debug(path, items, item)
             let info = getSpriteResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入Sprite", item);
+                //console.debug('[GameScene]载入Sprite', item);
             }
             else {
-                //console.warn("[!GameScene]载入Sprite ERROR", item);
+                //console.warn('[!GameScene]载入Sprite ERROR', item);
             }
         }
     }
@@ -563,16 +563,16 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读角色信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             //console.debug(path, items, item)
             let info = getRoleResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入Role", item);
+                //console.debug('[GameScene]载入Role', item);
             }
             else {
-                //console.warn("[!GameScene]载入Role ERROR", item);
+                //console.warn('[!GameScene]载入Role ERROR', item);
             }
         }
     }
@@ -580,16 +580,16 @@ function *loadResources() {
     if(_private.config.nLoadAllResources) {
         //读地图信息
         path = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName);
-        items = FrameManager.sl_dirList(path, "*", 0x001 | 0x2000 | 0x4000, 0x00);
+        items = FrameManager.sl_dirList(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
 
         for(let item of items) {
             //console.debug(path, items, item)
             let info = getMapResource(item, true);
             if(info) {
-                //console.debug("[GameScene]载入Map", item);
+                //console.debug('[GameScene]载入Map', item);
             }
             else {
-                //console.warn("[!GameScene]载入Map ERROR", item);
+                //console.warn('[!GameScene]载入Map ERROR', item);
             }
         }
     }
@@ -599,60 +599,60 @@ function *loadResources() {
     //let info;
 
     /*/读图片信息
-    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "images.json");
+    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  'images.json');
     //let cfg = File.read(filePath);
     info = FrameManager.sl_fileRead(filePath);
-    //console.debug("info", filePath, info)
-    //console.debug("cfg", cfg, filePath);
+    //console.debug('info', filePath, info)
+    //console.debug('cfg', cfg, filePath);
 
     if(info) {
-        info = JSON.parse(info)["List"];
+        info = JSON.parse(info)['List'];
         for(let m in info) {
-            _private.objImages[info[m]["Name"]] = info[m]["URL"];
+            _private.objImages[info[m]['Name']] = info[m]['URL'];
         }
-        console.debug("[GameScene]载入图片OK");
+        console.debug('[GameScene]载入图片OK');
     }
 
     //读音乐信息
-    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "music.json");
+    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  'music.json');
     //let cfg = File.read(filePath);
     info = FrameManager.sl_fileRead(filePath);
-    //console.debug("info", filePath, info)
-    //console.debug("cfg", cfg, filePath);
+    //console.debug('info', filePath, info)
+    //console.debug('cfg', cfg, filePath);
 
     if(info) {
-        info = JSON.parse(info)["List"];
+        info = JSON.parse(info)['List'];
         for(let m in info) {
-            _private.objMusic[info[m]["Name"]] = info[m]["URL"];
+            _private.objMusic[info[m]['Name']] = info[m]['URL'];
         }
-        console.debug("[GameScene]载入音乐OK");
+        console.debug('[GameScene]载入音乐OK');
     }
 
     //读视频信息
-    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  "videos.json");
+    filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator +  'videos.json');
     //let cfg = File.read(filePath);
     info = FrameManager.sl_fileRead(filePath);
-    //console.debug("info", filePath, info)
-    //console.debug("cfg", cfg, filePath);
+    //console.debug('info', filePath, info)
+    //console.debug('cfg', cfg, filePath);
 
     if(info) {
-        info = JSON.parse(info)["List"];
+        info = JSON.parse(info)['List'];
         for(let m in info) {
-            _private.objVideos[info[m]["Name"]] = info[m]["URL"];
+            _private.objVideos[info[m]['Name']] = info[m]['URL'];
         }
-        console.debug("[GameScene]载入视频OK");
+        console.debug('[GameScene]载入视频OK');
     }
     */
 
 
 
 
-    /*if(!_private.objCommonScripts["get_buff"]) {
-        _private.objCommonScripts["get_buff"] = GameMakerGlobalJS.$getBuff;
-        console.debug("[GameScene]!载入系统通用获得Buff脚本");
+    /*if(!_private.objCommonScripts['get_buff']) {
+        _private.objCommonScripts['get_buff'] = GameMakerGlobalJS.$getBuff;
+        console.debug('[GameScene]!载入系统通用获得Buff脚本');
     }
     else
-        console.debug("[GameScene]载入通用获得Buff脚本OK");
+        console.debug('[GameScene]载入通用获得Buff脚本OK');
     */
 
 
@@ -663,36 +663,36 @@ function *loadResources() {
     if(FrameManager.sl_fileExists(filePath + 'level_chain.js'))
         tlevelChainScript = _private.jsEngine.load(GlobalJS.toURL(filePath + 'level_chain.js'));
     if(tlevelChainScript) {
-        _private.objCommonScripts["levelup_script"] = tlevelChainScript.$commonLevelUpScript;
-        _private.objCommonScripts["level_Algorithm"] = tlevelChainScript.$commonLevelAlgorithm;
+        _private.objCommonScripts['levelup_script'] = tlevelChainScript.$commonLevelUpScript;
+        _private.objCommonScripts['level_Algorithm'] = tlevelChainScript.$commonLevelAlgorithm;
     }*/
 
-    /*info = game.loadjson("level_chain.json");
+    /*info = game.loadjson('level_chain.json');
     if(info) {
-        let ret = GlobalJS._eval(info["LevelChainScript"]);
-        _private.objCommonScripts["levelup_script"] = ret.$commonLevelUpScript;
-        _private.objCommonScripts["level_Algorithm"] = ret.$commonLevelAlgorithm;
+        let ret = GlobalJS._eval(info['LevelChainScript']);
+        _private.objCommonScripts['levelup_script'] = ret.$commonLevelUpScript;
+        _private.objCommonScripts['level_Algorithm'] = ret.$commonLevelAlgorithm;
     }
 
-    if(!_private.objCommonScripts["levelup_script"]) {
-        _private.objCommonScripts["levelup_script"] = GameMakerGlobalJS.$commonLevelUpScript;
-        console.debug("[GameScene]!载入系统升级脚本");
-    }
-    else
-        console.debug("[GameScene]载入升级脚本OK");  //, _private.objCommonScripts["levelup_script"], info, eval("()=>{}"));
-
-
-    if(!_private.objCommonScripts["level_Algorithm"]) {
-        _private.objCommonScripts["level_Algorithm"] = GameMakerGlobalJS.$commonLevelAlgorithm;
-        console.debug("[GameScene]!载入系统升级算法");
+    if(!_private.objCommonScripts['levelup_script']) {
+        _private.objCommonScripts['levelup_script'] = GameMakerGlobalJS.$commonLevelUpScript;
+        console.debug('[GameScene]!载入系统升级脚本');
     }
     else
-        console.debug("[GameScene]载入升级算法OK");  //, _private.objCommonScripts["level_Algorithm"], info, eval("()=>{}"));
+        console.debug('[GameScene]载入升级脚本OK');  //, _private.objCommonScripts['levelup_script'], info, eval('()=>{}'));
+
+
+    if(!_private.objCommonScripts['level_Algorithm']) {
+        _private.objCommonScripts['level_Algorithm'] = GameMakerGlobalJS.$commonLevelAlgorithm;
+        console.debug('[GameScene]!载入系统升级算法');
+    }
+    else
+        console.debug('[GameScene]载入升级算法OK');  //, _private.objCommonScripts['level_Algorithm'], info, eval('()=>{}'));
     */
 
 
 
-    //console.debug("_private.objMusic", JSON.stringify(_private.objMusic))
+    //console.debug('_private.objMusic', JSON.stringify(_private.objMusic))
 
 
     for(let i = 0; i < 10; ++i)
@@ -704,7 +704,7 @@ function *loadResources() {
 
 
 //载入扩展 插件/组件
-    let pluginPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + "Plugins") + GameMakerGlobal.separator;
+    let pluginPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'Plugins') + GameMakerGlobal.separator;
 
     //循环三方根目录
     for(let tc0 of FrameManager.sl_dirList(pluginPath, '*', 0x001 | 0x2000 | 0x4000, 0)) {
@@ -777,7 +777,7 @@ function *unloadResources() {
     loaderFightScene.unload();
 
 
-    if(Qt.platform.os === "android") {
+    if(Qt.platform.os === 'android') {
         Platform.sl_setScreenOrientation(_private.lastOrient);
         //if(game.$userscripts.$config && game.$userscripts.$config.$android)
     }
@@ -821,7 +821,7 @@ function *unloadResources() {
     _private.jsEngine.clear();
 
     //写入引擎变量
-    GameMakerGlobal.settings.setValue("$RPG/" + GameMakerGlobal.config.strCurrentProjectName, game.cd);
+    GameMakerGlobal.settings.setValue('$RPG/' + GameMakerGlobal.config.strCurrentProjectName, game.cd);
     game.cd = {};
 
 
@@ -873,11 +873,11 @@ function getGoodsResource(item, forceLoad=false) {
         else
             _private.goodsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]getGoodsResource:", item);
+        console.debug('[GameScene]getGoodsResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getGoodsResource ERROR:", item);
+    console.warn('[!GameScene]getGoodsResource ERROR:', item);
     return null;
 }
 
@@ -909,11 +909,11 @@ function getSkillResource(item, forceLoad=false) {
         else
             _private.skillsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]getSkillResource:", item);
+        console.debug('[GameScene]getSkillResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getSkillResource ERROR:", item);
+    console.warn('[!GameScene]getSkillResource ERROR:', item);
     return null;
 }
 
@@ -945,11 +945,11 @@ function getFightScriptResource(item, forceLoad=false) {
         else
             _private.fightScriptsResource[item].__proto__ = _proto_;
 
-        console.debug("[GameScene]getFightScriptResource:", item);
+        console.debug('[GameScene]getFightScriptResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getFightScriptResource ERROR:", item);
+    console.warn('[!GameScene]getFightScriptResource ERROR:', item);
     return null;
 }
 
@@ -985,11 +985,11 @@ function getFightRoleResource(item, forceLoad=false) {
             _private.fightRolesResource[item].__proto__ = _proto_;
         }
 
-        console.debug("[GameScene]getFightRoleResource:", item);
+        console.debug('[GameScene]getFightRoleResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getFightRoleResource ERROR:", item);
+    console.warn('[!GameScene]getFightRoleResource ERROR:', item);
     return null;
 }
 
@@ -1008,7 +1008,7 @@ function getSpriteResource(item, forceLoad=false) {
     //读特效信息
     let spriteDirPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item);
 
-    let info = FrameManager.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + "sprite.json");
+    let info = FrameManager.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
     if(info)
         info = JSON.parse(info);
 
@@ -1027,7 +1027,7 @@ function getSpriteResource(item, forceLoad=false) {
                 _private.objCacheSoundEffects[info.Sound] = cacheSoundEffect;
             }
         }
-        //let cacheImage = Qt.createQmlObject("import QtQuick 2.14;import QtMultimedia 5.14; Audio {}", parent);
+        //let cacheImage = Qt.createQmlObject('import QtQuick 2.14;import QtMultimedia 5.14; Audio {}', parent);
         let cacheImage;
         if(FrameManager.sl_isFile(GameMakerGlobal.spriteResourcePath(info.Image))) {
             if(_private.objCacheImages[info.Image])
@@ -1046,11 +1046,11 @@ function getSpriteResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]getSpriteResource:", item);
+        console.debug('[GameScene]getSpriteResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getSpriteResource ERROR:", item);
+    console.warn('[!GameScene]getSpriteResource ERROR:', item);
     return null;
 }
 
@@ -1067,7 +1067,7 @@ function getRoleResource(item, forceLoad=false) {
     //读角色信息
     let roleDirPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item);
 
-    let info = FrameManager.sl_fileRead(roleDirPath + GameMakerGlobal.separator + "role.json");
+    let info = FrameManager.sl_fileRead(roleDirPath + GameMakerGlobal.separator + 'role.json');
     if(info)
         info = JSON.parse(info);
 
@@ -1082,11 +1082,11 @@ function getRoleResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]getRoleResource:", item);
+        console.debug('[GameScene]getRoleResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getRoleResource ERROR:", item);
+    console.warn('[!GameScene]getRoleResource ERROR:', item);
     return null;
 }
 
@@ -1103,7 +1103,7 @@ function getMapResource(item, forceLoad=false) {
     //读地图信息
     let mapDirPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item);
 
-    let info = FrameManager.sl_fileRead(mapDirPath + GameMakerGlobal.separator + "map.json");
+    let info = FrameManager.sl_fileRead(mapDirPath + GameMakerGlobal.separator + 'map.json');
     if(info)
         info = JSON.parse(info);
 
@@ -1118,11 +1118,11 @@ function getMapResource(item, forceLoad=false) {
         }
 
 
-        console.debug("[GameScene]getMapResource:", item);
+        console.debug('[GameScene]getMapResource:', item);
         return info;
     }
 
-    console.warn("[!GameScene]getMapResource ERROR:", item);
+    console.warn('[!GameScene]getMapResource ERROR:', item);
     return null;
 }
 
@@ -1319,7 +1319,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
 
         //创建战斗人物
         retFightRole = {$rid: fightrole, $id: fightrole};
-        GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole));
+        GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts['combatant_class'](fightrole));
         if(resFightRole.$createData)
             GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData());
         if(GlobalLibraryJS.isObject(forceNew))
@@ -1336,7 +1336,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
                 //return fightrole;
             }
             else {
-                retFightRole = new _private.objCommonScripts["combatant_class"](fightrole.$rid);
+                retFightRole = new _private.objCommonScripts['combatant_class'](fightrole.$rid);
                 //if(resFightRole.$createData)
                 //    GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData());
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {$$fightData: undefined, Params: undefined}}/*, true*/);
@@ -1357,7 +1357,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
             }
             //创建战斗人物
             retFightRole = {$rid: fightrole.RID};
-            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts["combatant_class"](fightrole.RID));
+            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts['combatant_class'](fightrole.RID));
             if(resFightRole.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData(fightrole.Params));
             //delete fightrole.RID;
@@ -1414,7 +1414,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
 
 
     //刷新
-    _private.objCommonScripts["refresh_combatant"](retFightRole, false);
+    _private.objCommonScripts['refresh_combatant'](retFightRole, false);
 
 
     return retFightRole;
@@ -1454,7 +1454,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
                     retFightScript = {};
                 */
                 retFightScript = {};
-                //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts["combatant_class"](fightscript.$rid));
+                //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts['combatant_class'](fightscript.$rid));
                 GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript/*, true*/);
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
@@ -1497,14 +1497,14 @@ function getFightScriptObject(fightscript, forceNew=true) {
 //spriteEffectParams是 特效的资源名（会读取对应特效的信息）或 特效的信息（不会再次读取）；
 //如果 spriteEffectComp 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
 function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
-    //console.debug("[FightScene]loadSpriteEffect0");
+    //console.debug('[FightScene]loadSpriteEffect0');
 
     /*if(GlobalLibraryJS.isString(spriteEffectParams))
         spriteEffectParams = {RID: spriteEffectParams};
     spriteEffectParams.RID = spriteEffectParams.RID ?? spriteEffectParams.RID ?? spriteEffectParams.RId;
 
-    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectParams + GameMakerGlobal.separator + "sprite.json");
-    //console.debug("[FightScene]filePath2：", filePath);
+    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteEffectParams + GameMakerGlobal.separator + 'sprite.json');
+    //console.debug('[FightScene]filePath2：', filePath);
     let spriteResourceInfo = FrameManager.sl_fileRead(filePath);
     * /
     let spriteResourceInfo = GameSceneJS.getSpriteResource(spriteEffectParams.RID);
@@ -1653,8 +1653,8 @@ function unloadSpriteEffect(spriteEffectComp) {
 function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
     //console.debug('[GameScene]loadRole:', roleParams);
 
-    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + "role.json");
-    //console.debug("[FightScene]filePath2：", filePath);
+    /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + 'role.json');
+    //console.debug('[FightScene]filePath2：', filePath);
     let roleResourceInfo = FrameManager.sl_fileRead(filePath);
     */
 
@@ -1667,7 +1667,7 @@ function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRo
     if(roleResourceInfo) {
         if(!roleComp) {
             roleComp = compRole.createObject(parent);
-            const tf = function(soundeffectSource){
+            const tf = function(soundeffectSource) {
                 game.playsoundeffect(soundeffectSource, -1);
             }
             roleComp.sprite.sg_playEffect.connect(tf);
@@ -1832,7 +1832,8 @@ function openMap(mapName, forceRepaint=false) {
 
     //之前的
     //if(itemViewPort.mapInfo.SystemEventData !== undefined && itemViewPort.mapInfo.SystemEventData['$1'] !== undefined) {
-    //    if(GlobalJS.createScript(_private.scriptQueue, 0, 0, itemViewPort.mapInfo.SystemEventData['$1']) === 0)
+    //    if(_private.scriptQueue.create(itemViewPort.mapInfo.SystemEventData['$1'] ?? null, 0, true, '', ) === 0)
+    //    //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, itemViewPort.mapInfo.SystemEventData['$1']) === 0)
     //        return _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
     //}
 
@@ -1863,7 +1864,7 @@ function openMap(mapName, forceRepaint=false) {
 
 
 function buttonAClicked() {
-    console.debug("[GameScene]buttonAClicked");
+    console.debug('[GameScene]buttonAClicked');
 
     let bScriptQueueIsEmpty = _private.scriptQueue.isEmpty();
 
@@ -1910,13 +1911,13 @@ function buttonAClicked() {
         }
     }
 
-    //console.debug("人物占用图块：", usedMapBlocks,mainRoleUseBlocks)
+    //console.debug('人物占用图块：', usedMapBlocks,mainRoleUseBlocks)
 
     //循环地图事件（优先）
     for(let event in itemViewPort.mapEventBlocks) {
-        //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
+        //console.debug('[GameScene]检测事件：', event, mainRoleUseBlocks);
         if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {  //如果事件触发
-            //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            //console.debug('[GameScene]mapEvent触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
             GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], mainRole);   //触发事件
 
             //放在这里运行事件，因为 loadmap 的地图事件会改掉所有原来的事件；
@@ -1926,7 +1927,7 @@ function buttonAClicked() {
 
             return; //!!只执行一次事件
         }
-        //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+        //console.debug('event:', event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
     }
 
     //循环NPC
@@ -1937,7 +1938,7 @@ function buttonAClicked() {
             Qt.rect(role.x + role.x1, role.y + role.y1, role.width1, role.height1),
             0
         )) {
-            console.debug("[GameScene]触发NPC事件：", role.$data.$id);
+            console.debug('[GameScene]触发NPC事件：', role.$data.$id);
 
             //获得脚本（地图脚本优先级 > game.f定义的）
             let tScript;
@@ -2001,18 +2002,20 @@ function mapEvent(eventName, role) {
     } while(0);
 
     if(tScript)
-        GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:' + role.$data.$id + '_' + eventName + '_map', );
+        //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
     //game.run(tScript() ?? null, '地图事件:' + eventName);
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map'];
     if(tScript)
-        GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:map_' + eventName, );
+        //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
 
 
 
-    console.debug("[GameScene]mapEvent:", role.$data.$id + '_' + eventName + '_map');
+    console.debug('[GameScene]mapEvent:', role.$data.$id + '_' + eventName + '_map');
 }
 
 //离开事件触发
@@ -2040,18 +2043,20 @@ function mapEventCanceled(eventName, role) {
     } while(0);
 
     if(tScript)
-        GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave', );
+        //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
     //game.run(tScript() ?? null, '地图事件离开:' + eventName + '_leave');
 
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map_leave'];
     if(tScript)
-        GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:map_leave_' + eventName, );
+        //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
 
 
 
-    console.debug("[GameScene]mapEventCanceled:", role.$data.$id + '_' + eventName + '_map_leave');    //触发
+    console.debug('[GameScene]mapEventCanceled:', role.$data.$id + '_' + eventName + '_map_leave');    //触发
 }
 
 
@@ -2080,7 +2085,7 @@ function mapClickEvent(x, y) {
 
 //角色点击
 function roleClickEvent(role, dx, dy) {
-    console.debug("[GameScene]触发NPC点击事件：", role.$data.$id);
+    console.debug('[GameScene]触发NPC点击事件：', role.$data.$id);
 
     let eventName = `$${role.$data.$id}_click`;
     //获得脚本（地图脚本优先级 > game.f定义的）
@@ -2128,11 +2133,11 @@ function onTriggered() {
 
     game.$frameDuration = realinterval;
 
-    //console.debug("!!!realinterval", realinterval)
+    //console.debug('!!!realinterval', realinterval)
 
 
     if(realinterval > 0)
-        textFPS.text = "FPS:" + Math.round(1000 / realinterval);
+        textFPS.text = 'FPS:' + Math.round(1000 / realinterval);
 
 
     //定时器操作
@@ -2167,11 +2172,13 @@ function onTriggered() {
             } while(0);
 
             if(objTimer[2] & 0b10) {
-                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
+                const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '全局定时器事件1:' + tt, );
+                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
                 //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
             }
             else
+                //也可以用game.run
                 game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '全局定时器事件:' + tt, );
 
 
@@ -2210,11 +2217,13 @@ function onTriggered() {
             } while(0);
 
             if(objTimer[2] & 0b10) {
-                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
+                const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '定时器事件1:' + tt, );
+                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
                 //game.run(tScript() ?? null, tt);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
             }
             else
+                //也可以用game.run
                 game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '定时器事件:' + tt, );
 
 
@@ -2284,7 +2293,8 @@ function onTriggered() {
                         } while(0);
 
                         if(tScript)
-                            GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: eventName}, );
+                            /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, eventName, );
+                            //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: eventName}, );
                             //game.run(tScript() ?? null, role.$name);
                     }
                     else
@@ -2309,7 +2319,7 @@ function onTriggered() {
 
         //走路状态
         if(role.$$nActionType === 1 || role.$$nActionType === 2) {
-            //console.debug("walk status")
+            //console.debug('walk status')
 
             do {
                 //随机走
@@ -2350,7 +2360,7 @@ function onTriggered() {
                         //continue;
                     }
                 }
-            }while(0);
+            } while(0);
         }
         //站立状态
         else if(role.$$nActionType === 0) {
@@ -2359,7 +2369,7 @@ function onTriggered() {
                 role.$$nActionStatusKeepTime = 0;
 
                 //移动（概率）
-                //console.debug("stop status")
+                //console.debug('stop status')
                 let tn = GlobalLibraryJS.random(0, 100)
                 if(tn < _private.config.arrRoleChangeActionProbability[0]) {
                     role.$$nActionType = 1;
@@ -2398,7 +2408,7 @@ function onTriggered() {
                     //role.start();
                 }
             }
-            //console.debug("status:", role.moveDirection)
+            //console.debug('status:', role.moveDirection)
         }
 
 
@@ -2448,13 +2458,15 @@ function onTriggered() {
                     else
                         collideRoles[key] = realinterval;
 
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
         }
@@ -2498,37 +2510,43 @@ function onTriggered() {
                     }
                     else
                         collideRoles[key] = realinterval;
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
 
                 //主角脚本
                 if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
                 if(tScript) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
 
                 //主角脚本
                 if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
         }
@@ -2556,7 +2574,7 @@ function onTriggered() {
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
         for(let event in itemViewPort.mapEventBlocks) {
-            //console.debug("[GameScene]检测事件：", event, roleUseBlocks);
+            //console.debug('[GameScene]检测事件：', event, roleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(roleUseBlocks.indexOf(parseInt(event)) > -1) {
                 let isTriggered = role.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
@@ -2571,17 +2589,17 @@ function onTriggered() {
                     delete role.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+                //console.debug('[GameScene]mapEvent触发:', event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
                 GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], role);   //触发事件
             }
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug('event:', event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in role.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            //console.debug('[GameScene]mapEventCanceled触发:', event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
             GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
-            //console.debug("event:", event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
+            //console.debug('event:', event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
         role.$$mapEventsTriggering = tEvents;
@@ -2641,7 +2659,8 @@ function onTriggered() {
                         } while(0);
 
                         if(tScript)
-                            GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: eventName}, );
+                            /*const ret1 = */_private.scriptQueue.create(tScript.call(mainRole, mainRole) ?? null, -1, true, eventName, );
+                            //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: eventName}, );
                             //game.run(tScript() ?? null, mainRole.$name);
                     }
                     else
@@ -2650,7 +2669,7 @@ function onTriggered() {
                     //console.debug('!!!ok, getup')
                 }
                 break;
-            }while(1);
+            } while(1);
         }
 
         //console.debug('moveDirection:', mainRole.moveDirection)
@@ -2720,8 +2739,8 @@ function onTriggered() {
         //mainRole.x = roleNewX;
         //mainRole.y = roleNewY;
 
-        game.gd["$sys_main_roles"][tIndex].$x = mainRole.x;
-        game.gd["$sys_main_roles"][tIndex].$y = mainRole.y;
+        game.gd['$sys_main_roles'][tIndex].$x = mainRole.x;
+        game.gd['$sys_main_roles'][tIndex].$y = mainRole.y;
 
 
 
@@ -2741,7 +2760,7 @@ function onTriggered() {
             let py = parseInt(roleUseBlocks[i] / itemViewPort.mapInfo.MapSize[0]);
             let strP = [px, py].toString();
 
-            console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
+            console.debug('检测障碍：', strP, itemViewPort.mapInfo.MapBlockSpecialData)
             //存在障碍
             if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                 switch(itemViewPort.mapInfo.MapBlockSpecialData[strP]) {
@@ -2754,7 +2773,7 @@ function onTriggered() {
                         roleNewX = rolePos[0];
                         checkover = true;
 
-                        console.debug("碰到左边墙壁", px, (px + 1) * itemViewPort.sizeMapBlockScaledSize.width, (mainRole.x + mainRole.x1), v);
+                        console.debug('碰到左边墙壁', px, (px + 1) * itemViewPort.sizeMapBlockScaledSize.width, (mainRole.x + mainRole.x1), v);
                     }
                     if(mainRole.moveDirection === Qt.Key_Right) {
 
@@ -2762,7 +2781,7 @@ function onTriggered() {
                         roleNewX = rolePos[0];
                         checkover = true;
 
-                        console.debug("碰到右边障碍");
+                        console.debug('碰到右边障碍');
                     }
                     if(mainRole.moveDirection === Qt.Key_Up) {
 
@@ -2770,7 +2789,7 @@ function onTriggered() {
                         roleNewX = rolePos[1];
                         checkover = true;
 
-                        console.debug("碰到上方障碍");
+                        console.debug('碰到上方障碍');
                     }
                     if(mainRole.moveDirection === Qt.Key_Down) {
 
@@ -2778,7 +2797,7 @@ function onTriggered() {
                         roleNewX = rolePos[1];
                         checkover = true;
 
-                        console.debug("碰到下边障碍");
+                        console.debug('碰到下边障碍');
                     }
                     break;
                 }
@@ -2815,7 +2834,7 @@ function onTriggered() {
         let tEvents = {};   //暂存这次触发的所有事件
         //循环事件
         for(let event in itemViewPort.mapEventBlocks) {
-            //console.debug("[GameScene]检测事件：", event, mainRoleUseBlocks);
+            //console.debug('[GameScene]检测事件：', event, mainRoleUseBlocks);
             //如果占用块包含事件块，则事件触发
             if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {
                 let isTriggered = mainRole.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
@@ -2830,29 +2849,29 @@ function onTriggered() {
                     delete mainRole.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]];
                     continue;
                 }
-                //console.debug("[GameScene]mapEvent触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+                //console.debug('[GameScene]mapEvent触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
                 GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], mainRole);   //触发事件
             }
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug('event:', event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         //检测离开事件区域
         for(let event in mainRole.$$mapEventsTriggering) {
-            //console.debug("[GameScene]mapEventCanceled触发:", event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            //console.debug('[GameScene]mapEventCanceled触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
             GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
-            //console.debug("event:", event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
+            //console.debug('event:', event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
         mainRole.$$mapEventsTriggering = tEvents;
 
 
 
-        textPos.text = " 【%1】".
+        textPos.text = ' 【%1】'.
             arg([Math.floor(centerX / itemViewPort.sizeMapBlockScaledSize.width), Math.floor(centerY / itemViewPort.sizeMapBlockScaledSize.height)])
             //.arg(itemViewPort.mapInfo.data.length)
         ;
 
-        textPos1.text = "[%1](%2),(%3),(%4),(%5)".
+        textPos1.text = '[%1](%2),(%3),(%4),(%5)'.
             arg(mainRoleUseBlocks).
             arg([centerX, centerY]).
             arg([mainRole.x, mainRole.y]).
@@ -2860,7 +2879,7 @@ function onTriggered() {
             arg([mainRole.x + mainRole.x2, mainRole.y + mainRole.y2])
         ;
 
-    }while(0);
+    } while(0);
 
     //console.timeEnd('all')
 
@@ -2925,7 +2944,7 @@ function onTriggered() {
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
             if(_private.objPlugins[tc][tp].$timerTriggered && _private.objPlugins[tc][tp].$autoLoad !== false)
-                game.run(_private.objPlugins[tc][tp].$timerTriggered(realinterval) ?? null, 'plugin $timerTriggered:' + tc + tp);
+                game.run(_private.objPlugins[tc][tp].$timerTriggered(realinterval) ?? null, 'plugin $timerTriggered:' + tc + '-' + tp);
 
     /*/精确控制下一帧（有问题）
     let runinterval = new Date().getTime() - timer.nLastTime;
@@ -2936,7 +2955,7 @@ function onTriggered() {
         timer.interval = _private.config.nInterval + _private.config.nInterval - runinterval;
     }
 
-    //console.debug("!!!runinterval", runinterval, timer.interval);
+    //console.debug('!!!runinterval', runinterval, timer.interval);
     */
 
     //timer.nLastTime = timer.nLastTime + realinterval;
@@ -2989,7 +3008,8 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             } while(0);
 
             if(tScript) {
-                GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: eventName}, );
+                const ret1 = _private.scriptQueue.create(tScript.call(role, role, collideObstacle, keep) ?? null, -1, true, eventName, );
+                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: eventName}, );
             }
 
 
@@ -2997,7 +3017,8 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
                 if(tScript) {
-                    GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: eventName}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(role, role, collideObstacle, 0) ?? null, -1, true, eventName, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: eventName}, );
                 }
             }
         //}
@@ -3009,7 +3030,8 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
                 role.$$collideRoles['$obstacle'] = collideObstacle;
             return null;
         }
-        GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: continueScript, Tips: '角色碰撞障碍事件2:' + role.$data.$id}, );
+        const ret1 = _private.scriptQueue.create(continueScript, -1, true, '角色碰撞障碍事件2:' + role.$data.$id, );
+        //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: continueScript, Tips: '角色碰撞障碍事件2:' + role.$data.$id}, );
         */
         //这里不用事件队列了（因为很容易积攒事件），可以使用参数中的 collideObstacle 体现当时的状态；
 
@@ -3040,7 +3062,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
         //定向走，需要检查处理是否越过
         if(role.$$nActionType === 2) {
 
-            //console.debug("Start...", role.moveDirection, offsetMove);
+            //console.debug('Start...', role.moveDirection, offsetMove);
             //人物移动计算（值为按键值）
             switch(role.direction()) {
             case 3:
@@ -3384,7 +3406,7 @@ function fComputeRoleMoveToRolesOffset(role, direction, offsetMove) {
         break;
 
     default:
-        //console.warn("[!GameScene]fComputeRoleMoveOffset:", direction);
+        //console.warn('[!GameScene]fComputeRoleMoveOffset:', direction);
         return;
     }
 
@@ -3461,14 +3483,14 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1 - offsetMove, role.y + role.y1, role.x + role.x1, role.y + role.y2);
 
-        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //console.debug('usedMapBlocks:', usedMapBlocks);
 
         //从上到下，从右到左（由近到远） 检测障碍
         for(let xb = usedMapBlocks[2]; usedMapBlocks[0] <= xb; --xb) {
             for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
+                //console.debug('检测障碍：', strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
                 if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
@@ -3497,13 +3519,13 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x2, role.y + role.y1, role.x + role.x2 + offsetMove, role.y + role.y2);
 
-        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //console.debug('usedMapBlocks:', usedMapBlocks);
         //从上到下，从左到右
         for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
             for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
+                //console.debug('检测障碍：', strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
                 if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
@@ -3531,13 +3553,13 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y1 - offsetMove, role.x + role.x2, role.y + role.y1);
 
-        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //console.debug('usedMapBlocks:', usedMapBlocks);
         //从左到右，从下到上
         for(let yb = usedMapBlocks[3]; yb >= usedMapBlocks[1]; --yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
+                //console.debug('检测障碍：', strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
                 if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
@@ -3565,13 +3587,13 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 
         usedMapBlocks = itemViewPort.fComputeUseBlocks(role.x + role.x1, role.y + role.y2, role.x + role.x2, role.y + role.y2 + offsetMove);
 
-        //console.debug("usedMapBlocks:", usedMapBlocks);
+        //console.debug('usedMapBlocks:', usedMapBlocks);
         //从左到右，从上到下
         for(let yb = usedMapBlocks[1]; yb <= usedMapBlocks[3]; ++yb) {
             for(let xb = usedMapBlocks[0]; usedMapBlocks[2] >= xb; ++xb) {
                 let strP = [xb, yb].toString();
 
-                //console.debug("检测障碍：", strP, itemViewPort.mapInfo.MapBlockSpecialData)
+                //console.debug('检测障碍：', strP, itemViewPort.mapInfo.MapBlockSpecialData)
                 //存在特殊图块
                 if(itemViewPort.mapInfo.MapBlockSpecialData[strP] !== undefined) {
                     //障碍
@@ -3604,7 +3626,7 @@ function fComputeRoleMoveToObstacleOffset(role, direction, offsetMove) {
 function fChangeMainRoleDirection() {
     return;
 
-    console.debug("！！碰墙返回", mainRole.moveDirection);
+    console.debug('！！碰墙返回', mainRole.moveDirection);
     if(mainRole.$props.$tmpDirection !== undefined) {
         _private.startSprite(mainRole, mainRole.$props.$tmpDirection);
         delete mainRole.$props.$tmpDirection;
@@ -3632,7 +3654,7 @@ function fChangeMainRoleDirection() {
 
     case Qt.Key_Up:
         if(mainRole.y + mainRole.y1 === 0) {
-            console.debug("！！碰边界返回2")
+            console.debug('！！碰边界返回2')
             return;
         }
 
@@ -3641,16 +3663,16 @@ function fChangeMainRoleDirection() {
         let toffset2 = itemViewPort.sizeMapBlockScaledSize.width - (mainRole.x + mainRole.x1) % itemViewPort.sizeMapBlockScaledSize.width;
         if(toffset1 > itemViewPort.sizeMapBlockScaledSize.width / 3 && toffset2 > itemViewPort.sizeMapBlockScaledSize.width / 3 ) {
             //_private.startSprite(mainRole, Qt.Key_Up);
-            console.debug("！！不能转方向返回")
+            console.debug('！！不能转方向返回')
             return;
         }
         if(toffset1 < toffset2) {
             if(toffset1 < fComputeRoleMoveOffset(mainRole, Qt.Key_Left, toffset1)) {
-                console.debug("！！左有障碍返回")
+                console.debug('！！左有障碍返回')
                 return;
             }
 
-            console.debug("！！转方向Left", mainRole.moveDirection, Qt.Key_Left)
+            console.debug('！！转方向Left', mainRole.moveDirection, Qt.Key_Left)
             mainRole.$props.$tmpDirection = mainRole.moveDirection;
             _private.startSprite(mainRole, Qt.Key_Left);
             if(offsetMove > toffset1)
@@ -3658,11 +3680,11 @@ function fChangeMainRoleDirection() {
         }
         else {
             if(toffset2 < fComputeRoleMoveOffset(mainRole, Qt.Key_Right, toffset2)) {
-                console.debug("！！右有障碍返回")
+                console.debug('！！右有障碍返回')
                 return;
             }
 
-            console.debug("！！转方向Right", mainRole.moveDirection, Qt.Key_Right)
+            console.debug('！！转方向Right', mainRole.moveDirection, Qt.Key_Right)
             mainRole.$props.$tmpDirection = mainRole.moveDirection;
             _private.startSprite(mainRole, Qt.Key_Right);
             if(offsetMove > toffset2)

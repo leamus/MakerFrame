@@ -42,7 +42,7 @@ Rectangle {
 
         anchors.fill: row
 
-        color: "lightgray";
+        color: 'lightgray';
 
         /*Component{
             id: btnStyle;
@@ -51,18 +51,18 @@ Rectangle {
                     implicitWidth: 70;
                     implicitHeight: 28;
                     border.width: control.hovered ? 2 : 1;
-                    border.color: "#888";
+                    border.color: '#888';
                     radius: 4;
                     gradient: Gradient {
-                        GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-                        GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
+                        GradientStop { position: 0 ; color: control.pressed ? '#ccc' : '#eee' }
+                        GradientStop { position: 1 ; color: control.pressed ? '#aaa' : '#ccc' }
                     }
                 }
 
                 label: Text {
                     text: control.text;
                     font.pointSize: 12;
-                    color: "blue";
+                    color: 'blue';
                     horizontalAlignment: Text.AlignHCenter;
                     verticalAlignment: Text.AlignVCenter;
                 }
@@ -90,8 +90,8 @@ Rectangle {
 
                 //anchors.verticalCenter: parent.verticalCenter;
 
-                //text: "背景";
-                selectedColor: "white";
+                //text: '背景';
+                selectedColor: 'white';
                 onColorPicked: painter.fillColor = clr;
             }
             ColorPicker {
@@ -101,8 +101,8 @@ Rectangle {
                 Layout.preferredHeight: 30
                 //Layout.fillHeight: true
 
-                //text: "前景";
-                selectedColor: "black";
+                //text: '前景';
+                selectedColor: 'black';
                 onColorPicked: painter.penColor = clr;
             }
         }
@@ -119,11 +119,11 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
 
-                    text: "画笔:%1px".arg(thickness.value);
+                    text: '画笔:%1px'.arg(thickness.value);
                     horizontalAlignment: Text.AlignHCenter
 
                     font.pointSize: 16;
-                    color: "steelblue";
+                    color: 'steelblue';
                 }
 
                 /*Text {
@@ -170,7 +170,7 @@ Rectangle {
                 Layout.preferredWidth: 60
                 Layout.preferredHeight: 28
 
-                text: "清除";
+                text: '清除';
                 //style: btnStyle;
                 onClicked: painter.clear();
             }
@@ -181,7 +181,7 @@ Rectangle {
                 Layout.preferredWidth: 60
                 Layout.preferredHeight: 28
 
-                text: "撤销";
+                text: '撤销';
                 //style: btnStyle;
                 onClicked: painter.undo();
 
@@ -199,7 +199,7 @@ Rectangle {
     Dialog {
         id: dialogScript
 
-        title: "执行脚本"
+        title: '执行脚本'
         width: parent.width * 0.9
         height: Math.max(200, Math.min(parent.height, textScript.implicitHeight + 160))
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -211,7 +211,7 @@ Rectangle {
         TextArea {
             id: textScript
             width: parent.width
-            placeholderText: "输入脚本命令"
+            placeholderText: '输入脚本命令'
 
             //textFormat: Text.RichText
             selectByKeyboard: true
@@ -229,7 +229,7 @@ Rectangle {
         onRejected: {
             //gameMap.focus = true;
             root.forceActiveFocus();
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
         }
     }
 
@@ -240,19 +240,19 @@ Rectangle {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainGameAbout]:Escape Key");
+        console.debug('[mainGameAbout]:Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainGameAbout]:Back Key");
+        console.debug('[mainGameAbout]:Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGameAbout]:key:", event, event.key, event.text)
+        console.debug('[mainGameAbout]:key:', event, event.key, event.text)
     }
 
 

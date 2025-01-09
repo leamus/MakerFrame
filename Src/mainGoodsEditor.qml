@@ -80,7 +80,7 @@ Item {
             if(!loader.item)
                 return false;
 
-            //if(item === "..") {
+            //if(item === '..') {
             //    rootWindow.aliasGlobal.l_list.visible = false;
             //    return;
             //}
@@ -102,17 +102,17 @@ Item {
 
 
             /*
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + "goods.json";
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'goods.json';
 
-            console.debug("[mainGoodsEditor]filePath：", filePath);
+            console.debug('[mainGoodsEditor]filePath：', filePath);
 
             //let cfg = File.read(filePath);
             let cfg = FrameManager.sl_fileRead(filePath);
 
             if(cfg) {
                 cfg = JSON.parse(cfg);
-                //console.debug("cfg", cfg);
-                //loader.setSource("./MapEditor_1.qml", {});
+                //console.debug('cfg', cfg);
+                //loader.setSource('./MapEditor_1.qml', {});
                 loader.item.openGoods(cfg);
             }
             */
@@ -127,7 +127,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug("[mainGoodsEditor]删除：" + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainGoodsEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listGoods.forceActiveFocus();
@@ -150,7 +150,7 @@ Item {
         anchors.fill: parent
 
 
-        source: "./GoodsEditor.qml"
+        source: './GoodsEditor.qml'
         asynchronous: true
 
 
@@ -196,7 +196,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainGoodsEditor]loader onLoaded");
+            console.debug('[mainGoodsEditor]loader onLoaded');
 
             try {
                 /*/应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -233,7 +233,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, "*", 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, '*', 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建道具】');
             l_listGoods.removeButtonVisible = {0: false, '-1': true};
             l_listGoods.show(list);
@@ -247,29 +247,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainGoodsEditor]Escape Key");
+        console.debug('[mainGoodsEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainGoodsEditor]Back Key");
+        console.debug('[mainGoodsEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainGoodsEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainGoodsEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainGoodsEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainGoodsEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainGoodsEditor]Component.onCompleted");
+        console.debug('[mainGoodsEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainGoodsEditor]Component.onDestruction");
+        console.debug('[mainGoodsEditor]Component.onDestruction');
     }
 }

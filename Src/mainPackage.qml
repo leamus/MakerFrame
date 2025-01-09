@@ -72,7 +72,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr("打　包")
+            text: qsTr('打　包')
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -84,7 +84,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "打包Windows"
+            text: '打包Windows'
             onClicked: {
                 /*rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '有需要时再做~',
@@ -110,7 +110,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
-            text: "打包Android"
+            text: '打包Android'
             onClicked: {
                 _private.loadModule('PackageAndroid.qml');
             }
@@ -171,7 +171,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug("[mainPackage]loader onLoaded");
+            console.debug('[mainPackage]loader onLoaded');
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -225,29 +225,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainPackage]Escape Key");
+        console.debug('[mainPackage]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainPackage]Back Key");
+        console.debug('[mainPackage]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainPackage]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainPackage]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainPackage]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainPackage]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainPackage]Component.onCompleted");
+        console.debug('[mainPackage]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainPackage]Component.onDestruction");
+        console.debug('[mainPackage]Component.onDestruction');
     }
 }

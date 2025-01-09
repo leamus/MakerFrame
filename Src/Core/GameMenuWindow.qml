@@ -221,7 +221,7 @@ Item {
             id: maskMainMenu
 
             anchors.fill: parent
-            color: "#7FFFFFFF"
+            color: '#7FFFFFFF'
 
             mouseArea.onPressed: {
                 closeWindow(0b1);
@@ -247,7 +247,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                border.color: "white"
+                border.color: 'white'
                 radius: height / 20
 
                 onSg_choice: function(index) {
@@ -322,7 +322,7 @@ Item {
 
         Mask {
             anchors.fill: parent
-            color: "lightgray"
+            color: 'lightgray'
             opacity: 0.6
 
             mouseArea.onPressed: {
@@ -345,20 +345,20 @@ Item {
                 width: parent.width
                 height: textGoodsInfo.implicitHeight
 
-                color: "darkblue"
+                color: 'darkblue'
 
                 Text {
                     id: textGoodsInfo
                     anchors.fill: parent
 
-                    color: "white"
+                    color: 'white'
 
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
                     font.pointSize: 16
                     font.bold: true
-                    text: ""
+                    text: ''
                     wrapMode: Text.Wrap
                 }
             }
@@ -368,12 +368,12 @@ Item {
 
                 width: parent.width
 
-                text: "使用"
+                text: '使用'
                 onSg_clicked: {
                     _private.close();
 
 
-                    let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
+                    let goods = game.gd['$sys_goods'][itemUseOrEquip.choiceIndex];
                     yield game.usegoods(goods.$rid);
                 }
             }
@@ -382,12 +382,12 @@ Item {
 
                 width: parent.width
 
-                text: "装备"
+                text: '装备'
                 onSg_clicked: {
                     _private.close();
 
 
-                    let goods = game.gd["$sys_goods"][itemUseOrEquip.choiceIndex];
+                    let goods = game.gd['$sys_goods'][itemUseOrEquip.choiceIndex];
                     let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
 
                     if(goodsInfo.$commons.$equipScript)
@@ -409,7 +409,7 @@ Item {
         anchors.centerIn: parent
         width: parent.width * 0.6
         height: parent.height * 0.5
-        color: "lightgray"
+        color: 'lightgray'
         visible: false
 
         Column {
@@ -417,39 +417,39 @@ Item {
 
             Text {
                 id: textHP
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textMP
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textAttack
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textDefense
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textPower
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textLuck
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textSpeed
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textEXP
-                text: qsTr("")
+                text: qsTr('')
             }
             Text {
                 id: textLevel
-                text: qsTr("")
+                text: qsTr('')
             }
         }
 
@@ -467,7 +467,7 @@ Item {
         anchors.centerIn: parent
         width: parent.width * 0.6
         height: parent.height * 0.5
-        //color: "lightgray"
+        //color: 'lightgray'
         visible: false
 
         GameMenu {
@@ -495,7 +495,7 @@ Item {
 
                 rectEquipInfo.choicePosition = index;
 
-                let hero = game.gd["$sys_fight_heros"][0];
+                let hero = game.gd['$sys_fight_heros'][0];
                 let position = rectEquipInfo.positions[rectEquipInfo.choicePosition];
                 textEquipInfo.text = game.$sys.getGoodsResource(hero.$equipment[position].$rid).$description;
 
@@ -513,7 +513,7 @@ Item {
         width: parent.width * 0.6
         height: parent.height * 0.5
 
-        //color: "lightgray"
+        //color: 'lightgray'
 
         visible: false
 
@@ -552,7 +552,7 @@ Item {
         anchors.centerIn: parent
         width: parent.width * 0.6
         height: parent.height * 0.5
-        color: "lightgray"
+        color: 'lightgray'
         visible: false
 
         property int choicePosition
@@ -573,12 +573,12 @@ Item {
 
                 width: parent.width
 
-                text: "脱下"
+                text: '脱下'
                 onSg_clicked: {
                     _private.close();
 
 
-                    //let hero = game.gd["$sys_fight_heros"][0];
+                    //let hero = game.gd['$sys_fight_heros'][0];
                     game.getgoods(game.unload(0, rectEquipInfo.positions[rectEquipInfo.choicePosition]));
                 }
             }
@@ -595,13 +595,13 @@ Item {
 
         /*/显示技能
         function showSkills(heroIndex=0) {
-            if(game.gd["$sys_fight_heros"].length <= heroIndex) {
+            if(game.gd['$sys_fight_heros'].length <= heroIndex) {
                 return;
             }
 
-            let hero = game.gd["$sys_fight_heros"][heroIndex];
+            let hero = game.gd['$sys_fight_heros'][heroIndex];
             let arrName = [];
-            for(let skill of hero["skills"]) {
+            for(let skill of hero['skills']) {
                 arrName.push(skill.$name);
             }
 
@@ -614,18 +614,18 @@ Item {
 
         function showEquipment(heroIndex=0) {
 
-            if(game.gd["$sys_fight_heros"].length <= heroIndex) {
+            if(game.gd['$sys_fight_heros'].length <= heroIndex) {
                 rectEquipment.visible = true;
                 return;
             }
 
             rectEquipInfo.positions = [];
             let arrEquipment = [];
-            let hero = game.gd["$sys_fight_heros"][heroIndex];
+            let hero = game.gd['$sys_fight_heros'][heroIndex];
             for(let position in hero.$equipment) {
                 rectEquipInfo.positions.push(position);
                 arrEquipment.push('%1：%2'.arg(position).arg(game.$sys.getGoodsResource(hero.$equipment[position].$rid).$properties.name) );
-                //textEquipment.text = textEquipment.text + equipment + "  " + game.$sys.getGoodsResource(hero.$equipment[position].$rid).$properties.name + "\r\n";
+                //textEquipment.text = textEquipment.text + equipment + '  ' + game.$sys.getGoodsResource(hero.$equipment[position].$rid).$properties.name + '\r\n';
             }
 
             //for(let i = 0; i < 2; ++i)
@@ -638,23 +638,23 @@ Item {
 
         function showStatus(heroIndex=0) {
 
-            if(game.gd["$sys_fight_heros"].length <= heroIndex) {
-                textHP.text = "没有这个战斗角色";
+            if(game.gd['$sys_fight_heros'].length <= heroIndex) {
+                textHP.text = '没有这个战斗角色';
                 rectStatus.visible = true;
                 return;
             }
 
-            let hero = game.gd["$sys_fight_heros"][heroIndex];
+            let hero = game.gd['$sys_fight_heros'][heroIndex];
 
-            textHP.text = "HP：" + hero.$$propertiesWithExtra.remainHP + "/" + hero.$$propertiesWithExtra.healthHP + "/" + hero.$$propertiesWithExtra.HP;
-            textMP.text = "MP："+ hero.$$propertiesWithExtra.remainMP + "/" + hero.$$propertiesWithExtra.MP;
-            textAttack.text = "攻击：" + hero.$$propertiesWithExtra.attack;
-            textDefense.text = "防御：" + hero.$$propertiesWithExtra.defense;
-            textPower.text = "灵力：" + hero.$$propertiesWithExtra.power;
-            textLuck.text = "幸运：" + hero.$$propertiesWithExtra.luck;
-            textSpeed.text = "速度：" + hero.$$propertiesWithExtra.speed;
-            textEXP.text = "经验：" + hero.$properties.EXP;
-            textLevel.text = "级别：" + hero.$properties.level;
+            textHP.text = 'HP：' + hero.$$propertiesWithExtra.remainHP + '/' + hero.$$propertiesWithExtra.healthHP + '/' + hero.$$propertiesWithExtra.HP;
+            textMP.text = 'MP：'+ hero.$$propertiesWithExtra.remainMP + '/' + hero.$$propertiesWithExtra.MP;
+            textAttack.text = '攻击：' + hero.$$propertiesWithExtra.attack;
+            textDefense.text = '防御：' + hero.$$propertiesWithExtra.defense;
+            textPower.text = '灵力：' + hero.$$propertiesWithExtra.power;
+            textLuck.text = '幸运：' + hero.$$propertiesWithExtra.luck;
+            textSpeed.text = '速度：' + hero.$$propertiesWithExtra.speed;
+            textEXP.text = '经验：' + hero.$properties.EXP;
+            textLevel.text = '级别：' + hero.$properties.level;
 
             rectStatus.visible = true;
         }
@@ -665,6 +665,6 @@ Item {
 
 
     Component.onCompleted: {
-        gameMenu.show(["状态", "背包", "系统", "关闭菜单"]);
+        gameMenu.show(['状态', '背包', '系统', '关闭菜单']);
     }
 }

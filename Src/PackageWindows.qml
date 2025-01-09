@@ -101,14 +101,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[PackageWindows]Escape Key");
+        console.debug('[PackageWindows]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[PackageWindows]Back Key");
+        console.debug('[PackageWindows]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
@@ -124,6 +124,6 @@ Item {
         console.debug('[PackageWindows]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[PackageWindows]Component.onDestruction");
+        console.debug('[PackageWindows]Component.onDestruction');
     }
 }

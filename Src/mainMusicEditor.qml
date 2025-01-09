@@ -39,8 +39,8 @@ Item {
 
 
     function init() {
-        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), "*", 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
-        //console.debug("[mainMusicEditor]_private.arrMusic", JSON.stringify(_private.arrMusic))
+        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), '*', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //console.debug('[mainMusicEditor]_private.arrMusic', JSON.stringify(_private.arrMusic))
         _private.refresh();
     }
 
@@ -96,7 +96,7 @@ Item {
             }
 
             onSg_removeClicked: {
-                //console.debug("delete", modelData);
+                //console.debug('delete', modelData);
                 //root.removeClicked(index, modelData.Name);
                 //_private.arrMusic.splice(index, 1);
                 //_private.arrMusic = _private.arrMusic;
@@ -134,8 +134,8 @@ Item {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                text: ""
-                placeholderText: "音乐名"
+                text: ''
+                placeholderText: '音乐名'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -184,7 +184,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "新增"
+                text: '新增'
                 onClicked: {
                     filedialog.open();
                 }
@@ -195,7 +195,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "修改"
+                text: '修改'
                 onClicked: {
                     if(listview.listview.currentIndex < 0)
                         return;
@@ -224,8 +224,8 @@ Item {
                             else {
                                 let ret = FrameManager.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.sl_showToast("重命名资源失败，请检查是否名称已存在或目录不可写" + newFileName);
-                                    console.error("[!mainMusicEditor]RenameFile ERROR:", GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
+                                    Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    console.error('[!mainMusicEditor]RenameFile ERROR:', GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -257,7 +257,7 @@ Item {
 
                 Layout.preferredWidth: 60
 
-                text: "停止"
+                text: '停止'
                 onClicked: {
                     mediaPlayer.stop();
                 }
@@ -281,25 +281,25 @@ Item {
 
         visible: false
 
-        title: "选择音乐文件"
+        title: '选择音乐文件'
         //folder: shortcuts.home
-        nameFilters: [ "Music files (*.wav *.mp3 *.wma *.ogg *.mid)", "All files (*)" ]
+        nameFilters: [ 'Music files (*.wav *.mp3 *.wma *.ogg *.mid)', 'All files (*)' ]
 
         selectMultiple: false
         selectExisting: true
         selectFolder: false
 
         onAccepted: {
-            console.debug("[mainMusicEditor]You chose: " + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[mainMusicEditor]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
-            if(Qt.platform.os === "android") {
-                if(strFileUrl.indexOf("primary") >= 0) {
-                    textMusicResourceName.text = "file:/storage/emulated/0/" + strFileUrl.substr(strFileUrl.indexOf("%3A")+3);
+            if(Qt.platform.os === 'android') {
+                if(strFileUrl.indexOf('primary') >= 0) {
+                    textMusicResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
                 }
-                else if(strFileUrl.indexOf("document/") >= 0) {
-                    let tt = strFileUrl.indexOf("%3A");
-                    textMusicResourceName.text = "file:/storage/" + strFileUrl.slice(strFileUrl.indexOf("/document/") + "/document/".length, tt) + "/" + strFileUrl.slice(tt + 3);
+                else if(strFileUrl.indexOf('document/') >= 0) {
+                    let tt = strFileUrl.indexOf('%3A');
+                    textMusicResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
                 else
                     textMusicResourceName.text = fileUrl;
@@ -309,13 +309,13 @@ Item {
             */
 
             let path;
-            if(Qt.platform.os === "android")
+            if(Qt.platform.os === 'android')
                 path = Platform.sl_getRealPathFromURI(fileUrl);
             else
                 path = FrameManager.sl_urlDecode(fileUrl);
 
-            let tIndex = path.lastIndexOf("/");
-            let filename = tIndex > 0 ? path.slice(tIndex + 1) : "";
+            let tIndex = path.lastIndexOf('/');
+            let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
 
 
             rootWindow.aliasGlobal.dialogCommon.show({
@@ -336,8 +336,8 @@ Item {
                     else {
                         let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.sl_showToast("拷贝资源失败，是否目录不可写？" + newFileName);
-                            console.error("[!mainMusicEditor]Copy ERROR:", fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
+                            Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                            console.error('[!mainMusicEditor]Copy ERROR:', fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -352,7 +352,7 @@ Item {
         onRejected: {
             //gameMap.forceActiveFocus();
 
-            console.debug("[mainMusicEditor]onRejected")
+            console.debug('[mainMusicEditor]onRejected')
             //Qt.quit();
         }
         Component.onCompleted: {
@@ -372,7 +372,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath());
+            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath(), '*', /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrMusic.length === 0)
                 listview.listview.currentIndex = -1;
@@ -399,9 +399,9 @@ Item {
 
             sliderMusic.forceActiveFocus();
 
-            //console.debug("mediaPlayer:", textMusicName.text, mediaPlayer.source);
-            //console.debug("resolve:", Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
-            //console.debug("file:", GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
+            //console.debug('mediaPlayer:', textMusicName.text, mediaPlayer.source);
+            //console.debug('resolve:', Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
+            //console.debug('file:', GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
     }
 
@@ -417,29 +417,29 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug("[mainMusicEditor]Escape Key");
+        console.debug('[mainMusicEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug("[mainMusicEditor]Back Key");
+        console.debug('[mainMusicEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug("[mainMusicEditor]Keys.onPressed:", event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainMusicEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug("[mainMusicEditor]Keys.onReleased:", event.key, event.isAutoRepeat);
+        console.debug('[mainMusicEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug("[mainMusicEditor]Component.onCompleted");
+        console.debug('[mainMusicEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug("[mainMusicEditor]Component.onDestruction");
+        console.debug('[mainMusicEditor]Component.onDestruction');
     }
 }
