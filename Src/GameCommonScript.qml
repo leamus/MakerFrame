@@ -1859,11 +1859,9 @@ function *$commonFightEndScript(res, teams, fightData) {
 
     if(res.result === 1) {
         yield fight.msg('战斗胜利<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
-        //fight.run('');
     }
     else if(res.result === -1) {
         yield fight.msg('战斗失败<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
-        //fight.run('fight.popmusic();s_FightOver();'.arg(res.exp).arg(res.money));
     }
     if(bGetGoods)
         yield fight.msg(msgGoods);

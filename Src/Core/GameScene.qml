@@ -47,6 +47,15 @@ import 'GameScene.js' as GameSceneJS
 
     gameScene是视窗，itemContainer是整个地图、特效的容器，角色移动时，itemContainer也在移动，一直会将角色移动在最中央。
 
+  脚本设计：
+    1、game.run、game.async、GlobalLibraryJS.asyncScript 的区别：
+      game.run：系统脚本队列，只能按顺序执行；
+      game.async：异步脚本对象，可以运行生成器，无顺序限制，可以控制所有的生成器（waitAll和terminateAll）；
+      GlobalLibraryJS.asyncScript：异步脚本函数，类似game.async，但不能控制所有生成器；
+      上面3个可以任意组合使用，但：游戏事件尽量放在game.run里运行；GlobalLibraryJS.asyncScript必须运行带有release的生成器（因为里面有清空 系统脚本队列 和 异步脚本对象 的代码）；
+    2、loadmap、usegoods、save、load、gameover、plugin 这些命令有脚本的，必须要立即运行，所以可以用 game.run 的 -2，也可以使用 game.async，但最好不要用 异步脚本函数（因为release不能清空它）；
+    3、很多命令返回Promise对象，除了上述还有6+1个（msg、talk、menu、input、window、trade、wait）：
+      所以这些命令用yield都有暂停效果，loadmap、usegoods等这些命令要立即运行代码并完成才能激活Promise对象，而msg、talk等这些是通过交互后调用回调函数来激活Promise对象）；
 
   说明：占用的全局属性、事件和定时器：
     game.addtimer('$sys_random_fight_timer', 1000, -1, true)：战斗定时
@@ -119,9 +128,9 @@ Item {
 
     function init(startScript=true, bLoadResources=true, gameData=null) {
 
-        //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
         _private.scriptQueue.clear(5);
-        //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
 
 
         //scriptQueue.runNextEventLoop('init');
@@ -466,10 +475,10 @@ Item {
 
 
 
-        //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
         //_private.scriptQueue.clear(0);
         ///_private.scriptQueue.clear(4);
-        //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
     }
 
 
@@ -564,12 +573,13 @@ Item {
             //！如果使用生成器方式，则将 resolve 和 reject 删除即可，再用return返回数据；
             //！使用async是因为返回的是Promise（脚本队列必须等待Promise才能继续执行，如果用game.run则互相等造成死锁，下同）；
             const _loadmap = function(resolve, reject) {
-                game.async(function*() {
+                game.run(function*() {
+                //game.async(function*() {
 
                     if(!mapRID) {
                         //scriptQueue.runNextEventLoop('loadmap');
-                        console.exception('[!GameScene]loadmap Fail:', mapRID);
-                        return reject('loadmap Fail');
+                        console.exception('[!GameScene]loadmap FAIL:', mapRID);
+                        return reject('loadmap FAIL');
                     }
 
 
@@ -674,7 +684,8 @@ Item {
                     //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'map load'});
                     //return true;
 
-                }(), 'loadmap');
+                //}(), 'loadmap');
+                }(), {Priority: -2, Type: 0, Running: 0, Tips: 'loadmap'});
             };
 
             return new Promise(_loadmap);
@@ -2529,7 +2540,8 @@ Item {
         readonly property var usegoods: function(fighthero, goods) {
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _usegoods = function(resolve, reject) {
-                game.async(function*() {
+                game.run(function*() {
+                //game.async(function*() {
 
                     let goodsInfo = null;
                     if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
@@ -2603,7 +2615,8 @@ Item {
 
                     //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'usegoods'});
                     //return true;
-                }(), 'usegoods');
+                //}(), 'usegoods');
+                }(), {Priority: -2, Type: 0, Running: 0, Tips: 'usegoods'});
             };
 
             return new Promise(_usegoods);
@@ -4366,7 +4379,8 @@ Item {
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _save = function(resolve, reject) {
-                game.async(function*() {
+                game.run(function*() {
+                //game.async(function*() {
 
                     if(GlobalLibraryJS.isString(fileName)) {
                         fileName = fileName.trim();
@@ -4459,7 +4473,8 @@ Item {
                     //}(), {Priority: -2, Type: 0, Running: 1, Tips: 'save'});
                     //return true;
 
-                }(), 'save');
+                //}(), 'save');
+                }(), {Priority: -2, Type: 0, Running: 0, Tips: 'save'});
             };
 
             return new Promise(_save);
@@ -4474,6 +4489,7 @@ Item {
             const _load = function(resolve, reject) {
                 //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 GlobalLibraryJS.asyncScript(function*() {
+                //game.run(function*() {
                 //game.async(function*() {
 
                     if(GlobalLibraryJS.isString(data)) {
@@ -4548,19 +4564,20 @@ Item {
         }
 
         //游戏结束（调用游戏结束脚本）；
-        readonly property var gameover: function(params) {
+        readonly property var gameover: function(...params) {
             //scriptQueue.runNextEventLoop('gameover');
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _gameover = function(resolve, reject) {
                 //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 GlobalLibraryJS.asyncScript(function*() {
+                //game.run(function*() {
                 //game.async(function*() {
 
-                    //game.run(_private.objCommonScripts['game_over_script'](params) ?? null,
+                    //game.run(_private.objCommonScripts['game_over_script'](...params) ?? null,
                     //    {Priority: -1, Type: 0, Running: 1, Tips: 'gameover'});
 
-                    const r = _private.objCommonScripts['game_over_script'](params);
+                    const r = _private.objCommonScripts['game_over_script'](...params);
                     if(GlobalLibraryJS.isGenerator(r))yield* r;
 
                     return resolve(true);
@@ -4576,7 +4593,8 @@ Item {
         readonly property var plugin: function(...params) {
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _plugin = function(resolve, reject) {
-                game.async(function*() {
+                game.run(function*() {
+                //game.async(function*() {
 
                     if(params.length < 2) {
                         //scriptQueue.runNextEventLoop('plugin');
@@ -4616,7 +4634,8 @@ Item {
 
 
                     return resolve(plugin);
-                }(), 'plugin');
+                //}(), 'plugin');
+                }(), {Priority: -2, Type: 0, Running: 0, Tips: 'plugin'});
             };
 
             return new Promise(_plugin);
@@ -4659,6 +4678,7 @@ Item {
         readonly property var async: GlobalLibraryJS.$asyncScript.async
 
         //将代码放入 系统脚本引擎（scriptQueue）中 等候执行；
+        //参数：
         //  vScript 为执行脚本（字符串、函数、生成器函数、生成器对象都可以），如果为false则表示强制执行队列，为true表示下次js事件循环再运行，为null直接返回，为undefined报错后返回；
         //    可以为数组（vScript是执行脚本时 为 第二个下标为tips，是null或true时为给_private.scriptQueue.lastEscapeValue值）；
         //  scriptProps：
@@ -4667,11 +4687,13 @@ Item {
         //    如果为对象，则有以下参数：
         //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾（默认）；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
         //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
-        //      Running为1或2，表示如果队列里如果为空则：1（默认）是立即执行；为0时不处理，2是发送一个JS事件在下一个JS事件循环里执行；
+        //      Running为0、1、2或-1。表示如果队列里如果为空则：0是不处理；1是立即执行；2是发送一个JS事件在下一个JS事件循环里执行；-1（默认）是自动选择（函数类是-2，非函数类是1）；但这除了priority为-2、-3的情况下，如果priority为-2或-3则都会立刻运行；
         //      Value：传递给事件队列的值，无则默认上一次的；
         //      ScriptQueue：脚本队列，无则默认 本脚本队列；
-        //      Tips：简要说明 或 文件路径
-        //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(3);
+        //      Tips：简要说明 或 文件路径；
+        //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(n);
+        //返回：-9<ret<9：run的返回值；其他为scriptQueue.create的返回值+-10；
+        //  1：立刻运行了；2：下一次事件循环中运行；0：只是加入；null、undefined：没有作用；-1：参数错误；
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
             if(vScript === null) {
                 return null;
@@ -4679,7 +4701,7 @@ Item {
 
 
             //参数
-            let priority = -1, runType = 0, running = 1, value, scriptQueue, autoRunNext = true, tips;
+            let priority = -1, runType = 0, running = -1, value, scriptQueue, autoRunNext = true, tips;
             if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
                 scriptProps = {Priority: scriptProps};
             }
@@ -4697,13 +4719,18 @@ Item {
             }
             else {
                 console.warn('[!GameScene]game.run脚本属性参数错误');
-                return undefined;
+                return -1;
             }
 
 
 
+            //直接运行
+            if(vScript === false) {
+                scriptQueue.run(value);
+                return 1;
+            }
             //下次js循环运行
-            if(vScript === true) {
+            else if(vScript === true) {
                 /*GlobalLibraryJS.runNextEventLoop(function() {
                     //game.goon('$event');
                         scriptQueue.run(scriptQueue.lastEscapeValue);
@@ -4712,12 +4739,7 @@ Item {
                 scriptQueue.lastEscapeValue = value;
                 scriptQueue.runNextEventLoop('game.run1');
 
-                return 1;
-            }
-            //直接运行
-            else if(vScript === false) {
-                scriptQueue.run(value);
-                return 0;
+                return 2;
             }
             //!!兼容旧代码
             else if(GlobalLibraryJS.isArray(vScript) && vScript[0] !== undefined) {
@@ -4737,12 +4759,12 @@ Item {
 
 
             if(runType === 0) { //vScript是代码
-                if(typeof(vScript) === 'string') {   //做简单的异常处理，且提前执行可以绑定环境上下文
-                    //vScript = vScript.replace(/game.msg/g, 'yield game.msg');
-                    //vScript = '(function*(){' + vScript + '})()';
-                    vScript = '(function*(){try{' + vScript + '}catch(e){GlobalLibraryJS.printException(e);}})';
-                    //console.debug('[GameScene]Script:', vScript, params, scriptQueue.getGeneratorScriptArray());
+                if(typeof(vScript) === 'string') {
+                    //console.debug('[GameScene]Script:', vScript, params, scriptQueue.getScriptInfos());
 
+                    //方案1：做简单的异常处理，且提前执行可以绑定环境上下文
+                    ///vScript = '(function*(){' + vScript + '})()';
+                    //vScript = '(function*(){try{' + vScript + '}catch(e){GlobalLibraryJS.printException(e);}})';
                     /*try {
                         vScript = eval(vScript);
                     }
@@ -4751,7 +4773,9 @@ Item {
                         GlobalLibraryJS.printException(e);
                         return false;
                     }*/
-                    vScript = GlobalJS._eval(vScript);
+
+                    //方案2：或使用这个：
+                    vScript = GlobalLibraryJS._eval(vScript);
                     if(!vScript)
                         return -2;
 
@@ -4785,6 +4809,19 @@ Item {
             if(ret === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
+
+                //自动判断
+                if(running === -1) {
+                    switch(Object.prototype.toString.call(vScript)) {
+                    case '[object GeneratorFunction]':
+                    case '[object Function]':
+                        running = 2;
+                        break;
+                    default:
+                        running = 1;
+                    }
+                }
+
                 if(running === 0) {
                     return 0;
                 }
@@ -4805,8 +4842,13 @@ Item {
                     return 2;
                 }
             }
+            else if(ret === 3) {
+                scriptQueue.runNextEventLoop('game.run3');
+            }
+            else if(ret < 0)
+                return ret - 10;
 
-            return 3;
+            return ret + 10;
         }
 
         /*/鹰：NO：已废弃
@@ -4825,18 +4867,14 @@ Item {
         */
 
         //脚本上次返回的值
-        readonly property var lastreturn: function() {
-            return _private.scriptQueue.lastReturnedValue;
-        }
+        readonly property var lastreturn: ()=>_private.scriptQueue.lastReturnedValue
         //脚本上次返回的值（return+yield）
-        readonly property var lastvalue: function() {
-            return _private.scriptQueue.lastEscapeValue;
-        }
+        readonly property var lastvalue: ()=>_private.scriptQueue.lastEscapeValue
 
         //运行代码；
         //在这里执行会有上下文环境
         readonly property var evalcode: function(data, filePath='', envs={}) {
-            return GlobalJS._eval(data, filePath, envs);
+            return GlobalLibraryJS._eval(data, filePath, envs);
         }
 
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
@@ -4847,7 +4885,7 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            GlobalJS._evalFile(filePath, envs);
+            GlobalLibraryJS._evalFile(filePath, envs);
         }
 
         //用C++执行脚本；已注入game和fight环境
@@ -6818,11 +6856,13 @@ Item {
                         //throw err;
                     }
 
-                    console.debug('[GameScene]Close:', _private.scriptQueue.getGeneratorScriptArray().$toJson());
+                    console.debug('[GameScene]Close:',
+                        JSON.stringify(_private.scriptQueue.getScriptInfos(), function(k, v){switch(k){case 'Script': case 'Running': if(typeof v === 'object')return undefined;}return v;})
+                    );
 
-                    //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+                    //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
                     //_private.scriptQueue.clear(0);
-                    //console.debug(_private.scriptQueue.getGeneratorScriptArray().$toJson());
+                    //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
 
 
                     sg_close();
@@ -8694,7 +8734,7 @@ Item {
     Component.onDestruction: {
         //release();
         //console.warn('!!!', Object.keys(_private.config.objPauseNames));
-        //console.warn('!!!3', _private.scriptQueue.getGeneratorScriptArray().$toJson());
+        //console.warn('!!!3', _private.scriptQueue.getScriptInfos().$toJson());
 
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
