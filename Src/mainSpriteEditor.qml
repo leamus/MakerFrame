@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -231,7 +231,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, '*', 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, [], 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建特效】');
             l_listSprite.removeButtonVisible = {0: false, '-1': true};
             l_listSprite.show(list);

@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -75,7 +75,7 @@ Item {
             //textArea.readOnly: true
             textArea.selectByMouse: false
 
-            text: '生成Windows版本很简单，只需下载并解压 QtEnv_Win_x64_xxx.rar/QtEnv_Win_x86_xxx.rar 和 MakerFrame_RPGRuntime_Win_x64_xxx.rar/MakerFrame_RPGRuntime_Win_x86_xxx.rar 并解压在一起，将工程命名为Project放在其根目录即可'
+            text: '生成Windows版本很简单，只需下载并解压 QtEnv_Win_x64_xxx.rar/QtEnv_Win_x86_xxx.rar 和 MakerFrame_GameRuntime_Win_x64_xxx.rar/MakerFrame_GameRuntime_Win_x86_xxx.rar 并解压在一起，将工程命名为Project放在其根目录即可'
         }
 
         Button {

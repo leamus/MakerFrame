@@ -15,8 +15,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -25,6 +25,7 @@ import 'qrc:/QML'
 import './Core'
 
 
+//import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -49,6 +50,36 @@ Item {
 
     //color: Global.style.backgroundColor
 
+
+
+    Component {
+        id: compScriptEditor
+
+        ScriptEditor {
+            anchors.fill: parent
+
+            //strBasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
+            //strTitle: '脚本编辑'
+            /*fnAfterCompile: function(code) {return code;}*/
+
+            //visualScriptEditor.strTitle: strTitle
+
+            visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+            visualScriptEditor.nLoadType: 1
+
+            //visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+            //visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+            visualScriptEditor.defaultCommandsInfo: _private.jsGameVisualScript.data.commandsInfo
+            visualScriptEditor.defaultCommandGroupsInfo: _private.jsGameVisualScript.data.groupsInfo
+            //visualScriptEditor.defaultCommandTemplate: []
+
+
+            onSg_close: function(saved) {
+                //scriptEditor.visible = false;
+                //root.forceActiveFocus();
+            }
+        }
+    }
 
 
     Mask {
@@ -304,17 +335,17 @@ Item {
                         }
                     }
                     MenuItem {
-                        text: '战斗角色编辑器'
-                        height: _config.nMenuItemHeight
-                        onClicked: {
-                            _private.fightRoleEditor();
-                        }
-                    }
-                    MenuItem {
                         text: '战斗技能编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.fightSkillEditor();
+                        }
+                    }
+                    MenuItem {
+                        text: '战斗角色编辑器'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.fightRoleEditor();
                         }
                     }
                     MenuItem {
@@ -329,21 +360,21 @@ Item {
                         text: '起始脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
-                            _private.gameStartScriptEditor();
+                            _private.startScriptEditor();
                         }
                     }
                     MenuItem {
                         text: '通用脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
-                            _private.gameCommonScriptEditor();
+                            _private.commonScriptEditor();
                         }
                     }
                     MenuItem {
                         text: '脚本编辑器'
                         height: _config.nMenuItemHeight
                         onClicked: {
-                            _private.gameScriptEditor();
+                            _private.scriptEditor();
                         }
                     }
                     MenuSeparator { }
@@ -469,7 +500,7 @@ Item {
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
-                text: '开始游戏'
+                text: `<font color="${Global.style.color(Global.style.Red)}"><b>开始游戏</b></font>`
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -720,7 +751,7 @@ Item {
 
                     text: '通用脚本'
                     onClicked: {
-                        _private.gameCommonScriptEditor();
+                        _private.commonScriptEditor();
                     }
                 }
 
@@ -735,7 +766,7 @@ Item {
 
                     text: '脚　本'
                     onClicked: {
-                        _private.gameScriptEditor();
+                        _private.scriptEditor();
                     }
                 }
 
@@ -1217,6 +1248,8 @@ Item {
     Loader {
         id: loader
 
+        property var vParam: undefined
+
         visible: false
         focus: true
 
@@ -1266,7 +1299,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug('[mainGameMaker]loader onLoaded');
+            console.debug('[mainGameMaker]loader onLoaded:', vParam);
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -1278,7 +1311,7 @@ Item {
                     item.forceActiveFocus();
 
                 if(item.init)
-                    item.init();
+                    item.init(vParam);
 
                 visible = true;
             }
@@ -1446,11 +1479,11 @@ Item {
         }
 
         //载入模块
-        function loadModule(moduleURL) {
-            //console.debug('~~~loadModule:', moduleURL);
+        function loadModule(module, param) {
+            //console.debug('~~~loadModule:', module);
 
 
-            //if(moduleURL.length !== 0 && !checkCurrentProjectName())
+            //if(module.length !== 0 && !checkCurrentProjectName())
             //    return false;
 
 
@@ -1458,8 +1491,14 @@ Item {
             //loader.focus = true;
             //loader.forceActiveFocus();
 
-            //loader.source = moduleURL;
-            loader.setSource(moduleURL);
+            loader.vParam = param;
+            if(GlobalLibraryJS.isObject(module)) {
+                loader.sourceComponent = module;
+            }
+            else {
+                //loader.source = module;
+                loader.setSource(module);
+            }
 
             /*if(loader.status === Loader.Ready) {
                 if(loader.item.init)
@@ -1476,11 +1515,11 @@ Item {
         //切换工程，转移和检查工程引擎变量
         function changeProject(newProject, oldProject=null) {
             if(oldProject !== null) {
-                GameMakerGlobal.settings.setValue('$RPG/' + newProject, GameMakerGlobal.settings.value('$RPG/' + oldProject));
-                GameMakerGlobal.settings.setValue('$RPG/' + oldProject, undefined);
+                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject));
+                GameMakerGlobal.settings.setValue('Projects/' + oldProject, undefined);
             }
-            if(GameMakerGlobal.settings.value('$RPG/' + newProject) === undefined)
-                GameMakerGlobal.settings.setValue('$RPG/' + newProject, {});
+            if(GameMakerGlobal.settings.value('Projects/' + newProject) === undefined)
+                GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
 
             GameMakerGlobal.config.strCurrentProjectName = newProject;
         }
@@ -1552,7 +1591,7 @@ Item {
 
                             if(!FrameManager.sl_fileExists(resTemplate)) {
                                 //https://qiniu.leamus.cn/$资源模板.zip
-                                const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/$资源模板.zip', resTemplate);
+                                const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip', resTemplate);
                                 httpReply.sg_finished.connect(function(httpReply) {
                                     const networkReply = httpReply.networkReply;
                                     const code = FrameManager.sl_objectProperty('Code', networkReply);
@@ -1622,7 +1661,7 @@ Item {
         }
 
         function openProject() {
-            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, '*', 0x001 | 0x2000, 0x03);
+            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, [], 0x001 | 0x2000, 0x03);
             l_listProjects.visible = true;
             //l_listProjects.focus = true;
             //l_listProjects.forceActiveFocus();
@@ -1746,44 +1785,56 @@ Item {
                 //userMainProject.source = 'mainFightScriptEditor.qml';
             }
         }
-        function gameStartScriptEditor() {
+        function startScriptEditor() {
             if(Platform.compileType === 'debug') {
-                _private.loadModule('GameStartScript.qml');
-                //userMainProject.source = 'GameStartScript.qml';
+                _private.loadModule('StartScriptEditor.qml');
+                //userMainProject.source = 'StartScriptEditor.qml';
             }
             else {
-                _private.loadModule('GameStartScript.qml');
-                //userMainProject.source = 'GameStartScript.qml';
+                _private.loadModule('StartScriptEditor.qml');
+                //userMainProject.source = 'StartScriptEditor.qml';
             }
         }
-        function gameCommonScriptEditor() {
+        function commonScriptEditor() {
             if(Platform.compileType === 'debug') {
-                _private.loadModule('GameCommonScript.qml');
-                //userMainProject.source = 'GameCommonScript.qml';
+                _private.loadModule('CommonScriptEditor.qml');
+                //userMainProject.source = 'CommonScriptEditor.qml';
             }
             else {
-                _private.loadModule('GameCommonScript.qml');
-                //userMainProject.source = 'GameCommonScript.qml';
+                _private.loadModule('CommonScriptEditor.qml');
+                //userMainProject.source = 'CommonScriptEditor.qml';
             }
         }
-        function gameScriptEditor() {
+        function scriptEditor() {
             if(Platform.compileType === 'debug') {
-                _private.loadModule('GameScriptEditor.qml');
-                //userMainProject.source = 'GameScriptEditor.qml';
+                _private.loadModule(compScriptEditor, {
+                    BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName,
+                    //RelativePath: '',
+                    //ChoiceButton: 0b11,
+                    //PathText: 0b11,
+                });
+                //_private.loadModule('ScriptEditor.qml');
+                //userMainProject.source = 'ScriptEditor.qml';
             }
             else {
-                _private.loadModule('GameScriptEditor.qml');
-                //userMainProject.source = 'GameScriptEditor.qml';
+                _private.loadModule(compScriptEditor, {
+                    BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName,
+                    //RelativePath: '',
+                    //ChoiceButton: 0b11,
+                    //PathText: 0b11,
+                });
+                //_private.loadModule('ScriptEditor.qml');
+                //userMainProject.source = 'ScriptEditor.qml';
             }
         }
         function pluginsManage() {
             if(Platform.compileType === 'debug') {
                 _private.loadModule('mainPlugins.qml');
-                //userMainProject.source = 'GameScriptEditor.qml';
+                //userMainProject.source = 'mainPlugins.qml';
             }
             else {
                 _private.loadModule('mainPlugins.qml');
-                //userMainProject.source = 'GameScriptEditor.qml';
+                //userMainProject.source = 'mainPlugins.qml';
             }
         }
         function imageEditor() {
@@ -1962,7 +2013,7 @@ Item {
 
                     //https://qiniu.leamus.cn/$Leamus.zip
                     //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
-                    const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/Projects/$Leamus.zip', projectPath + '.zip');
+                    const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Projects/$Leamus.zip', projectPath + '.zip');
                     httpReply.sg_finished.connect(function(httpReply) {
                         const networkReply = httpReply.networkReply;
                         const code = FrameManager.sl_objectProperty('Code', networkReply);
@@ -2066,6 +2117,10 @@ Item {
         }
 
 
+        //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsEngine延迟加载
+        readonly property var jsEngine: new GlobalJS.JSEngine(rootGameMaker)
+        property var jsGameVisualScript: null
+
         property var fnBackupOpenFile: null
     }
 
@@ -2100,6 +2155,9 @@ Item {
 
 
 
+        _private.jsGameVisualScript = _private.jsEngine.load(Qt.resolvedUrl('GameVisualScript.js'));
+
+
         //if(!GameMakerGlobal.settings.$RunTimes) {
         if(GameMakerGlobal.settings.value('$RunTimes') === 0) {
             rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
@@ -2127,7 +2185,7 @@ Item {
             }
 
 
-            const fileExtName = FrameManager.sl_completeSuffix(url);
+            const fileExtName = FrameManager.sl_completeSuffix(url).toLowerCase();
             if(fileExtName === 'zip') {
                 _private.openProjectPackage(url);
                 return true;

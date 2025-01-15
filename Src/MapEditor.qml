@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -423,8 +423,8 @@ Item {
                 text: '脚本'
                 onClicked: {
                     //textEventName.text = '$1';
-                    //textCode.text = objSystemEventsData['$1'] || '';
-                    //textCode.setPlainText(objSystemEventsData['$1'] || '');
+                    //scriptEditor.text = objSystemEventsData['$1'] || '';
+                    //scriptEditor.editor.setPlainText(objSystemEventsData['$1'] || '');
 
                     if(!_private.strMapName) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -445,7 +445,8 @@ Item {
                     //_private.loadScript(_private.strMapName);
 
 
-                    dialogScript.open();
+                    scriptEditor.visible = true;
+                    scriptEditor.forceActiveFocus();
                 }
             }
 
@@ -876,9 +877,9 @@ Item {
                                 bVisible = !bVisible;
                                 dialogEvent.nEventIndex = index;
                                 textEventName.text = listmodelEventsData.get(index)['EventName'];
-                                ////textCode.text = listmodelEventsData.get(index)['EventCode'];
-                                //textCode.text = objEventsData[textEventName.text];
-                                //textCode.setPlainText(objEventsData[textEventName.text]);
+                                ////scriptEditor.text = listmodelEventsData.get(index)['EventCode'];
+                                //scriptEditor.text = objEventsData[textEventName.text];
+                                //scriptEditor.editor.setPlainText(objEventsData[textEventName.text]);
 
                                 dialogEvent.open();
                                 //canvasMapContainer.arrCanvasMap[index].visible = bVisible;
@@ -2757,25 +2758,26 @@ Item {
 
 
             if(nEventIndex === -1) {    //新建事件
-                //_private.createEvent(textEventName.text, textCode.text);
+                //_private.createEvent(textEventName.text, scriptEditor.text);
                 _private.createEvent(textEventName.text);
-                //textCode.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
-                textCode.setPlainText(FrameManager.sl_toPlainText(textCode.textDocument) + '\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
-                textCode.toBegin();
+                //scriptEditor.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
+                scriptEditor.editor.appendText('\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                //scriptEditor.editor.setPlainText(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                //scriptEditor.editor.toBegin();
             }
             //else if(nEventIndex === -2) {  //新建系统事件
-                //objSystemEventsData[textEventName.text] = textCode.text;
-                //objSystemEventsData[textEventName.text] = FrameManager.sl_toPlainText(textCode.textDocument);
+                //objSystemEventsData[textEventName.text] = scriptEditor.text;
+                //objSystemEventsData[textEventName.text] = FrameManager.sl_toPlainText(scriptEditor.textDocument);
             //}
             else {  //修改
                 let oldEventName = listmodelEventsData.get(nEventIndex)['EventName'];
 
-                //listmodelEventsData.set(nEventIndex, {bVisible: true, EventName: textEventName.text, EventCode: textCode.text});
+                //listmodelEventsData.set(nEventIndex, {bVisible: true, EventName: textEventName.text, EventCode: scriptEditor.text});
                 listmodelEventsData.set(nEventIndex, {bVisible: true, EventName: textEventName.text});
 
                 //delete objEventsData[oldEventName];
-                ////objEventsData[textEventName.text] = textCode.text;
-                //objEventsData[textEventName.text] = FrameManager.sl_toPlainText(textCode.textDocument);
+                ////objEventsData[textEventName.text] = scriptEditor.text;
+                //objEventsData[textEventName.text] = FrameManager.sl_toPlainText(scriptEditor.editor.textDocument);
 
                 if(oldEventName !== textEventName.text)
                     for(let i in objMapEventsData) {    //修改地图上的对应关系
@@ -2784,7 +2786,7 @@ Item {
                     }
             }
 
-            /*_config.events[_config.strEventID] = [, textCode.text];
+            /*_config.events[_config.strEventID] = [, scriptEditor.text];
             let ctx = canvasEvent.getContext('2d');
             ctx.fillStyle = Qt.rgba(0.5, 0.5, 1, 0.6);
             ctx.fillRect(canvasEvent.pointPaint.x * _config.sizeMapBlockSize.width, canvasEvent.pointPaint.y * _config.sizeMapBlockSize.height, _config.sizeMapBlockSize.width, _config.sizeMapBlockSize.height);
@@ -2804,142 +2806,6 @@ Item {
             nEventIndex = -1;
 
 
-            root.forceActiveFocus();
-
-            //console.debug('[MapEditor]onRejected');
-        }
-    }
-
-    Dialog {
-        id: dialogScript
-
-        visible: false
-        title: '地图脚本'
-        width: parent.width * 0.9
-        //height: parent.height * 0.9
-        anchors.centerIn: parent
-
-
-        modal: true
-        //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
-        //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
-        standardButtons: Dialog.Ok | Dialog.Cancel
-
-
-        ColumnLayout {
-            anchors.fill: parent
-
-            RowLayout {
-                Button {
-                    Layout.fillWidth: true
-                    //Layout.preferredHeight: 70
-
-                    text: '查'
-
-                    onClicked: {
-                        let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textCode.textDocument));
-
-                        if(e) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
-                                Msg: e,
-                                Buttons: Dialog.Yes,
-                                OnAccepted: function() {
-                                    root.forceActiveFocus();
-                                },
-                                OnRejected: ()=>{
-                                    root.forceActiveFocus();
-                                },
-                            });
-
-                            return;
-                        }
-
-                        rootWindow.aliasGlobal.dialogCommon.show({
-                            Msg: '恭喜，没有语法错误',
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-
-                        return;
-                    }
-                }
-
-                Button {
-                    Layout.fillWidth: true
-                    //Layout.preferredHeight: 70
-
-                    text: 'V'
-
-                    onClicked: {
-                        /*if(!_private.strMapName) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
-                                  Msg: '请先保存地图',
-                                  Buttons: Dialog.Yes,
-                                  OnAccepted: function() {
-                                      root.forceActiveFocus();
-                                  },
-                                  OnRejected: ()=>{
-                                      root.forceActiveFocus();
-                                  },
-                              });
-
-                            return;
-                        }
-                        */
-
-                        gameVisualScript.show();
-
-                        dialogScript.visible = false;
-                    }
-                }
-            }
-
-            Notepad {
-                id: textCode
-
-                Layout.preferredWidth: parent.width
-
-                Layout.preferredHeight: textArea.implicitHeight
-                Layout.maximumHeight: root.height * 0.6
-                Layout.minimumHeight: 60
-                Layout.fillHeight: true
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                //textArea.enabled: false
-                //textArea.readOnly: true
-                textArea.textFormat: TextArea.PlainText
-                textArea.text: ''
-                textArea.placeholderText: '请输入脚本代码'
-
-                textArea.background: Rectangle {
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                }
-
-                bCode: true
-            }
-        }
-
-
-        onAccepted: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName;
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
-
-
-            root.forceActiveFocus();
-
-            //console.debug('[MapEditor]onAccepted');
-        }
-        onRejected: {
             root.forceActiveFocus();
 
             //console.debug('[MapEditor]onRejected');
@@ -3065,73 +2931,31 @@ Item {
 
 
 
-    //可视化
-    //Loader {
-    VisualScript {
-        id: gameVisualScript
-        //id: loaderVisualScript
-
-
-        function show() {
-            visible = true;
-            //focus = true;
-            forceActiveFocus();
-            //item.focus = true;
-            //item.forceActiveFocus();
-        }
-
-
-        anchors.fill: parent
+    ScriptEditor {
+        id: scriptEditor
 
         visible: false
-        //focus: true
-
-
-        //source: './GameVisualScript.qml'
-        /*sourceComponent: Component {
-            VisualScript {
-
-            }
-        }
-        */
-        //asynchronous: false
+        anchors.fill: parent
 
 
         strTitle: `${_private.strMapName}(地图脚本)`
+        /*fnAfterCompile: function(code) {return code;}*/
 
-        defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-        defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
+        visualScriptEditor.strTitle: strTitle
+
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.nLoadType: 1
+
+        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
-
-        /*onLoaded: {
-            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + 'map.vjs';
-            //item.loadData(filePath);
-
-            console.debug('[MapEditor]loaderVisualScript onLoaded');
+        onSg_close: function(saved) {
+            scriptEditor.visible = false;
+            root.forceActiveFocus();
         }
-        */
-
-        //Connections {
-        //    target: loaderVisualScript.item
-            onSg_close: function() {
-                //_private.loadScript();
-                dialogScript.visible = true;
-
-
-                gameVisualScript.visible = false;
-                //root.focus = true;
-                root.forceActiveFocus();
-            }
-
-            onSg_compile: function(code) {
-                textCode.setPlainText(code);
-                textCode.toBegin();
-            }
-        //}
     }
-
 
 
     //测试脚本对话框
@@ -3159,14 +2983,16 @@ Item {
         }
 
         onAccepted: {
-            //gameMap.focus = true;
-            root.forceActiveFocus();
             console.info(eval(textScript.text));
+
+            //root.focus = true;
+            root.forceActiveFocus();
         }
         onRejected: {
-            //gameMap.focus = true;
-            root.forceActiveFocus();
             //console.log('Cancel clicked');
+
+            //root.focus = true;
+            root.forceActiveFocus();
         }
     }
 
@@ -3292,6 +3118,7 @@ Item {
 
 
 
+        //读取地图配置和信息
         function readConfig(cfg) {
             //_private.cleanMap();
 
@@ -3359,20 +3186,27 @@ Item {
         }
 
 
+        //读取地图脚本
         function loadScript(mapName) {
             if(!mapName) {
-                textCode.text = ('function *$start(){ //地图载入事件 \r\n}');
-                gameVisualScript.loadData(null);
+                scriptEditor.text = ('function *$start(){ //地图载入事件 \r\n}');
+                scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator;
+            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator;
             //if(FrameManager.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
-            textCode.text = FrameManager.sl_fileRead(path + 'map.js') || ('function *$start(){ //地图载入事件 \r\n}');
-            //textCode.setPlainText(data);
-            //textCode.toBegin();
-            gameVisualScript.loadData(path + 'map.vjs');
+            scriptEditor.init({
+                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
+                RelativePath: GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator + 'map.js',
+                ChoiceButton: 0b0,
+                PathText: 0b0,
+            });
+            //scriptEditor.text = FrameManager.sl_fileRead(path + 'map.js') || ('function *$start(){ //地图载入事件 \r\n}');
+            //scriptEditor.editor.setPlainText(data);
+            //scriptEditor.editor.toBegin();
+            //scriptEditor.visualScriptEditor.loadData(path + 'map.vjs');
 
             //console.debug('[MapEditor]filePath：', path + 'map.js');
         }
@@ -3449,7 +3283,7 @@ Item {
             }*/
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
+            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
         }
         //复制可视化
         function copyVJS() {

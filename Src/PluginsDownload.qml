@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -150,7 +150,7 @@ Item {
 
         function refresh() {
 
-            let menuJS = jsEngine.load('http://MakerFrame.Leamus.cn/RPGMaker/Plugins/menu.js');
+            let menuJS = jsEngine.load('http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js');
 
             if(!menuJS)
                 return false;
@@ -182,7 +182,7 @@ Item {
                             let zipPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
 
                             //const httpReply = FrameManager.sl_downloadFile('https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip', projectPath + '.zip');
-                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/RPGMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
+                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
                                 const code = FrameManager.sl_objectProperty('Code', networkReply);

@@ -11,8 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -571,7 +571,7 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug('[GameVisualFightScript]compile:', _private.filepath, jsScript);
+                    console.debug('[FightScriptVisualEditor]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
@@ -650,7 +650,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[GameVisualFightScript]filePath：', filePath);
+            console.debug('[FightScriptVisualEditor]filePath：', filePath);
             //console.exception('????')
 
             if(data) {
@@ -941,29 +941,29 @@ $$enemiesData$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameVisualFightScript]Escape Key');
+        console.debug('[FightScriptVisualEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameVisualFightScript]Back Key');
+        console.debug('[FightScriptVisualEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameVisualFightScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[FightScriptVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameVisualFightScript]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[FightScriptVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameVisualFightScript]Component.onCompleted');
+        console.debug('[FightScriptVisualEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameVisualFightScript]Component.onDestruction');
+        console.debug('[FightScriptVisualEditor]Component.onDestruction');
     }
 }

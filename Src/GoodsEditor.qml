@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -228,7 +228,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument));
+                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument));
 
                     if(e) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -294,9 +294,9 @@ let data = (function() {
                     }
                     let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
 
-                    gameVisualGoods.forceActiveFocus();
-                    gameVisualGoods.visible = true;
-                    gameVisualGoods.init(filePath);
+                    goodsVisualEditor.forceActiveFocus();
+                    goodsVisualEditor.visible = true;
+                    goodsVisualEditor.init(filePath);
                 }
             }
 
@@ -382,20 +382,20 @@ let data = (function() {
 
 
 
-    GameVisualGoods {
-        id: gameVisualGoods
+    GoodsVisualEditor {
+        id: goodsVisualEditor
 
         anchors.fill: parent
 
         visible: false
 
         Connections {
-            target: gameVisualGoods
+            target: goodsVisualEditor
             //忽略没有的信号
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                gameVisualGoods.visible = false;
+                goodsVisualEditor.visible = false;
 
                 root.forceActiveFocus();
             }

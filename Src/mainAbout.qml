@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -165,7 +165,7 @@ Item {
 2.安卓：安装运行 MakerFrame_鹰歌框架引擎_xxx_armeabi-v7a.apk 或 MakerFrame_鹰歌框架引擎_xxx_arm64-v8a.apk 即可。
 3.Linux：目前已在OpenKylin系统上打包DEB，并上架了其公司的应用商店（应该支持Debian、Ubuntu及衍生的操作系统）；
 4.苹果iOS、macOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布。
-5.打开软件后，进入RPG Maker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了。
+5.打开软件后，进入GameMaker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了。
 6.各平台的框架引擎都支持热更新（打开软件后会自动检测并更新 动态链接库内核、QML引擎和Java代码库Dex），无需重新下载安装新版（服务器带宽较慢，可能升级和下载时间会稍微长一点）。
 
 
@@ -229,7 +229,7 @@ Item {
   c.技术爱好者：鹰歌在功能上来说是非常丰富的一款超级APP，它包含了多种编程语言、丰富的技术和算法（游戏引擎、游戏设计、图形绘制等），很适合用来学习研究；
 3.此框架引擎的重点在于打造 手持端（兼容PC、MAC等跨端）和国产化系统 的跨平台软件框架和游戏引擎，专业的游戏还请绕道Unity、虚幻等更好的游戏引擎；
 4.未来：
-  a.RPG Maker完成后，还会继续开发战旗类Maker、AVG Maker、ARPG Maker、卡牌类Maker等（都是我喜欢的游戏类型），欢迎有志同道合的朋友一起加入进来~；
+  a.继续开发战旗类Maker、AVG Maker、ARPG Maker、卡牌类Maker等（都是我喜欢的游戏类型），欢迎有志同道合的朋友一起加入进来~；
   b.优化引擎：引入缓存机制，并将QML中效率不高的算法（比如寻路）、图形引擎替换为OpenGL，JavaScript算法替换为C++等优化；
   c.开发3D引擎（已引入QML3D）；
 

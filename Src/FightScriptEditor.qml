@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -191,7 +191,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
+                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -257,9 +257,9 @@ let data = (function() {
                     }
                     let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
 
-                    gameVisualFightScript.forceActiveFocus();
-                    gameVisualFightScript.visible = true;
-                    gameVisualFightScript.init(filePath);
+                    fightScriptVisualEditor.forceActiveFocus();
+                    fightScriptVisualEditor.visible = true;
+                    fightScriptVisualEditor.init(filePath);
                 }
             }
         }
@@ -344,20 +344,20 @@ let data = (function() {
 
 
 
-    GameVisualFightScript {
-        id: gameVisualFightScript
+    FightScriptVisualEditor {
+        id: fightScriptVisualEditor
 
         anchors.fill: parent
 
         visible: false
 
         Connections {
-            target: gameVisualFightScript
+            target: fightScriptVisualEditor
             //忽略没有的信号
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                gameVisualFightScript.visible = false;
+                fightScriptVisualEditor.visible = false;
 
                 root.forceActiveFocus();
             }

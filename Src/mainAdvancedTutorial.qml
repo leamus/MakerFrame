@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -443,7 +443,7 @@ Item {
       scriptQueue = new GlobalLibraryJS.ScriptQueue();  //创建一个脚本队列
       //GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       const ret = scriptQueue.create(genfunc(...) ?? null, -1, true, 'tips', ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
-      scriptQueue.clear(3);     //清空脚本队列；参数不同效果不同；
+      scriptQueue.clear(5);     //清空脚本队列；参数不同效果不同；
       scriptQueue.run(value);   //运行一次脚本队列；参数为给脚本中断的yield返回值；
       scriptQueue.runNextEventLoop('tips'); //运行一次脚本队列；放在下次事件循环中；
       scriptQueue.lastEscapeValue;  //上次中断时返回值（yield或return）；
@@ -478,11 +478,11 @@ Item {
     cacheSprites.clear();   //清空缓冲池
 
 13、简单打包流程（详细见官网教程）
-    1、win下需要下载 鹰歌环境文件（MakerFrame_RPGRuntime_Win_xxxxxx.rar） 和 Qt框架库（QtEnv_Win_xxxxxx.rar），解压放在一起，将工程改名为Project复制到目录下即可；
-    2、安卓下需要下载 鹰歌环境文件（MakerFrame_RPGRuntime_Android_ALL_xxxxxx.rar） 和 Qt框架库（MakerFrame_Package_Android_ALL_xxxxxx.rar），解压放在特定目录下，将工程改名为Project复制到目录下，使用鹰歌的打包功能进行配置，然后用APKTools打包即可；
+    1、win下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Win_xxxxxx.rar） 和 Qt框架库（QtEnv_Win_xxxxxx.rar），解压放在一起，将工程改名为Project复制到目录下即可；
+    2、安卓下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Android_ALL_xxxxxx.rar） 和 Qt框架库（MakerFrame_Package_Android_ALL_xxxxxx.rar），解压放在特定目录下，将工程改名为Project复制到目录下，使用鹰歌的打包功能进行配置，然后用APKTools打包即可；
     3、如果是安卓打包apk，打开 APKTool M，找到第一步解压的文件夹，打开，点“编译此项目”，即可生成APK；
     4、如果是win打包apk，安装Java并下载我集成好的打包环境，将工程拖动到 _打包.bat 即可生成APK；
-    5、配置：鹰歌自带的打包可以简单的配置诸如游戏名、应用名、图标等一些选项，如果要详细配置，可以手动修改GameMakerGlobal.qml、AndroidManifest.xml（包括 图标、包名、应用名、权限等）、Privacy.txt（隐私协议）、Config.cfg（框架配置）、LGlobal（框架配置）、RPGRuntime（引擎核心文件）、隐私样式文件（privacy_button_shape.xml、privacy_dialog_shape.xml、privacy_activity_main.xml、privacy_dialog_show.xml）、手动打包x86或x64库 等，打包APK后海可以编辑信息（点击APK文件->快速编辑 或 详情）。
+    5、配置：鹰歌自带的打包可以简单的配置诸如游戏名、应用名、图标等一些选项，如果要详细配置，可以手动修改GameMakerGlobal.qml、AndroidManifest.xml（包括 图标、包名、应用名、权限等）、Privacy.txt（隐私协议）、Config.cfg（框架配置）、LGlobal（框架配置）、GameRuntime（引擎核心文件）、隐私样式文件（privacy_button_shape.xml、privacy_dialog_shape.xml、privacy_activity_main.xml、privacy_dialog_show.xml）、手动打包x86或x64库 等，打包APK后还可以编辑信息（点击APK文件->快速编辑 或 详情）。
     APKTool M切换中文：右上角菜单->第一个选项->第一个菜单->倒数第5个 就是选语言。
 
 14、其他（详细见官网教程）

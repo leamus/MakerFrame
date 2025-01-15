@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -319,7 +319,7 @@ Item {
 
                         let path = GameMakerGlobal.mapResourcePath();
 
-                        l_listMapBlockResource.show(path, '*', 0x002, 0x00);
+                        l_listMapBlockResource.show(path, [], 0x002, 0x00);
                         l_listMapBlockResource.visible = true;
 
                         dialogMapData.visible = false;
@@ -869,8 +869,8 @@ Item {
 
             //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
 
-            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, '*', 0x001 | 0x2000, 0x00);
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, '*', 0x001 | 0x2000 | 0x4000, 0x00)
+            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
+            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建地图】');
             l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);

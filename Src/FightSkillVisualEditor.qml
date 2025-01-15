@@ -11,8 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -99,7 +99,7 @@ Item {
                         radius: 6
                     }
                     onActivated: {
-                        console.debug('[GameVisualFightSkill]ComboBox:', comboType.currentIndex,
+                        console.debug('[FightSkillVisualEditor]ComboBox:', comboType.currentIndex,
                                       comboType.currentText,
                                       comboType.currentValue);
 
@@ -562,7 +562,7 @@ Item {
                             }
 
                             onActivated: {
-                                console.debug('[GameVisualFightSkill]ComboBox:', comboType.currentIndex,
+                                console.debug('[FightSkillVisualEditor]ComboBox:', comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
 
@@ -1257,7 +1257,7 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug('[GameVisualFightSkill]compile:', _private.filepath, jsScript);
+                    console.debug('[FightSkillVisualEditor]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
@@ -1372,7 +1372,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[GameVisualFightSkill]filePath：', filePath);
+            console.debug('[FightSkillVisualEditor]filePath：', filePath);
             //console.exception('????')
 
             if(data) {
@@ -2082,29 +2082,29 @@ $$buffs$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameVisualFightSkill]Escape Key');
+        console.debug('[FightSkillVisualEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameVisualFightSkill]Back Key');
+        console.debug('[FightSkillVisualEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameVisualFightSkill]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[FightSkillVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameVisualFightSkill]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[FightSkillVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameVisualFightSkill]Component.onCompleted');
+        console.debug('[FightSkillVisualEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameVisualFightSkill]Component.onDestruction');
+        console.debug('[FightSkillVisualEditor]Component.onDestruction');
     }
 }

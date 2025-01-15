@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -151,7 +151,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadFightRoleProperty.textDocument));
+                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadFightRoleProperty.textDocument));
 
                     if(e) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -216,9 +216,9 @@ let data = (function() {
                     }
                     let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
 
-                    gameVisualFightRole.forceActiveFocus();
-                    gameVisualFightRole.visible = true;
-                    gameVisualFightRole.init(filePath);
+                    fightRoleVisualEditor.forceActiveFocus();
+                    fightRoleVisualEditor.visible = true;
+                    fightRoleVisualEditor.init(filePath);
                 }
             }
         }
@@ -291,21 +291,21 @@ let data = (function() {
     }
 
 
-    GameVisualFightRole {
+    FightRoleVisualEditor {
 
-        id: gameVisualFightRole
+        id: fightRoleVisualEditor
 
         anchors.fill: parent
 
         visible: false
 
         Connections {
-            target: gameVisualFightRole
+            target: fightRoleVisualEditor
             //忽略没有的信号
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                gameVisualFightRole.visible = false;
+                fightRoleVisualEditor.visible = false;
 
                 root.forceActiveFocus();
             }

@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import RPGComponents 1.0
-import 'Core/RPGComponents'
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -1607,16 +1607,17 @@ Item {
 
 
                             //_private.loadScript(textRoleName.text);
-                            if(!textCode.text &&
+                            if(!scriptEditor.text &&
                                     !FrameManager.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.js')) {
                                 if(comboType.currentIndex === 1)
-                                    textCode.text = _private.strTemplateCode0;
+                                    scriptEditor.text = _private.strTemplateCode0;
                                 else
-                                    textCode.text = '';
+                                    scriptEditor.text = '';
                             }
 
 
-                            dialogScript.open();
+                            scriptEditor.visible = true;
+                            scriptEditor.forceActiveFocus();
                         }
                     }
 
@@ -2006,6 +2007,39 @@ Item {
     }
 
 
+    ScriptEditor {
+        id: scriptEditor
+
+        visible: false
+        anchors.fill: parent
+
+
+        strTitle: `${_private.strRoleName}(角色脚本)`
+        /*fnAfterCompile: function(code) {return code;}*/
+
+        visualScriptEditor.strTitle: strTitle
+
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.nLoadType: 1
+
+        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
+
+
+        onSg_close: function(saved) {
+            if(saved) {
+                //_private.saveJS();
+
+                _private.refreshRole();
+            }
+
+            scriptEditor.visible = false;
+            root.forceActiveFocus();
+        }
+    }
+
+
 
 
 
@@ -2153,9 +2187,9 @@ Item {
                         let path = GameMakerGlobal.spriteResourcePath();
 
                         if(comboType.currentIndex === 0)
-                            l_listRoleResource.show(path, '*', 0x002, 0x00);
+                            l_listRoleResource.show(path, [], 0x002, 0x00);
                         else if(comboType.currentIndex === 1)
-                            l_listRoleResource.show(path, '*', 0x001 | 0x2000 | 0x4000, 0x00);
+                            l_listRoleResource.show(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
                         l_listRoleResource.visible = true;
                         //l_listRoleResource.focus = true;
                         //l_listRoleResource.forceActiveFocus();
@@ -2386,148 +2420,6 @@ Item {
 
 
 
-    Dialog {
-        id: dialogScript
-
-        visible: false
-        title: '角色脚本'
-        width: parent.width * 0.9
-        //height: parent.height * 0.9
-        anchors.centerIn: parent
-
-
-        modal: true
-        //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
-        //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
-        standardButtons: Dialog.Ok | Dialog.Cancel
-
-
-        ColumnLayout {
-            anchors.fill: parent
-
-
-            RowLayout {
-                Layout.fillWidth: true
-
-                Button {
-                    Layout.fillWidth: true
-                    //Layout.preferredHeight: 70
-
-                    text: '查'
-
-                    onClicked: {
-                        let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(textCode.textDocument));
-
-                        if(e) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
-                                Msg: e,
-                                Buttons: Dialog.Yes,
-                                OnAccepted: function() {
-                                    root.forceActiveFocus();
-                                },
-                                OnRejected: ()=>{
-                                    root.forceActiveFocus();
-                                },
-                            });
-
-                            return;
-                        }
-
-                        rootWindow.aliasGlobal.dialogCommon.show({
-                            Msg: '恭喜，没有语法错误',
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-
-                        return;
-                    }
-                }
-
-                Button {
-                    Layout.fillWidth: true
-                    //Layout.preferredHeight: 70
-
-                    text: 'V'
-
-                    onClicked: {
-                        /*if(!_private.strMapName) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
-                                  Msg: '请先保存地图',
-                                  Buttons: Dialog.Yes,
-                                  OnAccepted: function() {
-                                      root.forceActiveFocus();
-                                  },
-                                  OnRejected: ()=>{
-                                      root.forceActiveFocus();
-                                  },
-                              });
-
-                            return;
-                        }
-                        */
-
-                        gameVisualScript.show();
-
-                        dialogScript.visible = false;
-                    }
-                }
-            }
-
-            Notepad {
-                id: textCode
-
-                Layout.preferredWidth: parent.width
-
-                Layout.preferredHeight: textArea.implicitHeight
-                Layout.maximumHeight: root.height * 0.6
-                Layout.minimumHeight: 60
-                Layout.fillHeight: true
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                //textArea.enabled: false
-                //textArea.readOnly: true
-                textArea.textFormat: TextArea.PlainText
-                textArea.text: ''
-                textArea.placeholderText: '请输入脚本代码'
-
-                textArea.background: Rectangle {
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                }
-
-                bCode: true
-            }
-        }
-
-
-        onAccepted: {
-            _private.saveJS();
-
-            _private.refreshRole();
-
-
-            root.forceActiveFocus();
-
-            //console.debug('[MapEditor]onAccepted');
-        }
-        onRejected: {
-            root.forceActiveFocus();
-
-            //console.debug('[MapEditor]onRejected');
-        }
-    }
-
-
-
     //导出对话框
     Dialog {
         id: dialogSaveRole
@@ -2718,75 +2610,6 @@ Item {
             anchors.fill: parent
             onClicked: rectImage.visible = false;
         }
-    }
-
-
-
-    //可视化
-    //Loader {
-    VisualScript {
-        id: gameVisualScript
-        //id: loaderVisualScript
-
-
-        function show() {
-            visible = true;
-            //focus = true;
-            forceActiveFocus();
-            //item.focus = true;
-            //item.forceActiveFocus();
-        }
-
-
-        anchors.fill: parent
-
-        visible: false
-        //focus: true
-
-
-        //source: './GameVisualScript.qml'
-        /*sourceComponent: Component {
-            VisualScript {
-
-            }
-        }
-        */
-        //asynchronous: false
-
-
-        strTitle: `${_private.strRoleName}(角色脚本)`
-
-        defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-        defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
-
-
-
-        /*onLoaded: {
-            //let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.vjs';
-            //item.loadData(filePath);
-
-            console.debug('[MapEditor]loaderVisualScript onLoaded');
-        }
-        */
-
-        //Connections {
-        //    target: loaderVisualScript.item
-            onSg_close: function() {
-                //_private.loadScript();
-                dialogScript.visible = true;
-
-
-                gameVisualScript.visible = false;
-                //root.focus = true;
-                root.forceActiveFocus();
-            }
-
-            onSg_compile: function(code) {
-                textCode.setPlainText(code);
-                textCode.toBegin();
-            }
-        //}
     }
 
 
@@ -2990,33 +2813,42 @@ function $refresh(index, imageAnimate, path) {
 
         function loadScript(roleName) {
             if(!roleName) {
-                //textCode.text = _private.strTemplateCode0;
-                textCode.text = '';
-                gameVisualScript.loadData(null);
+                //scriptEditor.text = _private.strTemplateCode0;
+                scriptEditor.text = '';
+                scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator;
+            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator;
             //if(FrameManager.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
-            textCode.text = FrameManager.sl_fileRead(path + 'role.js') || '';
-            //textCode.setPlainText(data);
-            //textCode.toBegin();
-            gameVisualScript.loadData(path + 'role.vjs');
+            scriptEditor.init({
+                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
+                RelativePath: GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.js',
+                ChoiceButton: 0b0,
+                PathText: 0b0,
+            });
+            //scriptEditor.text = FrameManager.sl_fileRead(path + 'role.js') || '';
+            //scriptEditor.editor.setPlainText(data);
+            //scriptEditor.editor.toBegin();
+            //visualScriptEditor.loadData(path + 'role.vjs');
         }
 
-        //保存js文件
-        function saveJS() {
-            //第一次保存，重新刷新
+        function createJS() {
+            //第一次保存js文件
             if(_private.strRoleName === '') {
                 if(comboType.currentIndex === 1)    //序列图片文件
-                    textCode.text = _private.strTemplateCode0;
+                    scriptEditor.text = _private.strTemplateCode0;
                 else
-                    textCode.text = '';
-            }
+                    scriptEditor.text = '';
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(textCode.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+            }
+            else
+                return false;
+
+            return true;
         }
         //复制可视化
         function copyVJS() {
@@ -3151,7 +2983,7 @@ function $refresh(index, imageAnimate, path) {
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 
-            saveJS();
+            createJS();
 
             copyVJS();
 

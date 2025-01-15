@@ -13,8 +13,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), '*', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();
     }
@@ -406,7 +406,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrImages = listview.show(GameMakerGlobal.imageResourcePath(), '*', /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrImages = listview.show(GameMakerGlobal.imageResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrImages.length === 0)
                 listview.listview.currentIndex = -1;

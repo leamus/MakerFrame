@@ -13,8 +13,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), '*', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainMusicEditor]_private.arrMusic', JSON.stringify(_private.arrMusic))
         _private.refresh();
     }
@@ -372,7 +372,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath(), '*', /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrMusic.length === 0)
                 listview.listview.currentIndex = -1;

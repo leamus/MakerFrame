@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -22,6 +22,7 @@ import 'qrc:/QML'
 import './Core'
 
 
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -30,27 +31,16 @@ Item {
     id: root
 
 
-    signal sg_close();
+    signal sg_close(bool saved)
+
 
 
     function init() {
+        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
-        //读算法
+        console.debug('[CommonScriptEditor]filePath:', path);
 
-        let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator +  'common_script.js';
-        //let data = File.read(filePath);
-        //console.debug('data', filePath, data)
-
-        let data = FrameManager.sl_fileRead(filePath);
-        //data = JSON.parse(data)['FightAlgorithm'];
-
-        if(data) {
-            notepadScript.setPlainText(data);
-
-            return 1;
-        }
-        else {
-            notepadScript.setPlainText("
+        const defaultCode = "
 //注意：game.$globalLibraryJS
 
 //.import 'level_chain.js' as JSLevelChain       //导入另一个js文件
@@ -424,7 +414,8 @@ function *$gameRelease(gameExit) {
 
 
     if(gameExit)
-        yield game.save();  //自动存档
+        if(game.gd['$sys_map'].$name)
+            yield game.save();  //自动存档
 
     return null;
 }
@@ -459,6 +450,7 @@ function *$beforeLoadmap(mapName, userData) {
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
     }
     */
+    //game.run(function*(){yield game.msg(game.d['$sys_map'].$name);});
 
     return null;
 }
@@ -546,7 +538,7 @@ function $Combatant(fightRoleRID, showName) {
             $teamsID: [0, 1],         //0：我方；1：敌方；2：友军。下标：己方、对方、友方
             $teams: [],               //保存队伍对象。下标：己方、对方、友方
 
-            //RPG组件：
+            //Game组件：
             //$teamsComp: [],
             //$comp: null,
             //$spriteEffect: null,
@@ -1087,7 +1079,7 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
         else {
             combatant.$$fightData.$choice.$type = -2;
             //combatant.$$fightData.$choice.$attack = -1;
-            //console.warn('[!GameCommonScript]', combatant.$$fightData.$choice.$type)
+            //console.warn('[!CommonScriptEditor]', combatant.$$fightData.$choice.$type)
         }
 
     }
@@ -1552,7 +1544,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
             return fightSkill.$check;
     }
     else
-        console.warn('[!GameCommonScript]commonCheckSkill:', choiceType);
+        console.warn('[!CommonScriptEditor]commonCheckSkill:', choiceType);
 
     //return true;
 }
@@ -2154,219 +2146,56 @@ function $readSavesInfo(count=3) {
     return arrSave;
 }
 
-"
-            );
-        }
+";
 
-        notepadScript.toBegin();
 
-        return 0;
+        scriptEditor.init({
+            BasePath: path,
+            RelativePath: 'common_script.js',
+            ChoiceButton: 0b0,
+            PathText: 0b0,
+            Default: defaultCode,
+        });
+
+        scriptEditor.forceActiveFocus();
     }
+
 
 
     //width: 600
     //height: 800
     anchors.fill: parent
 
-    focus: true
     clip: true
 
     //color: Global.style.backgroundColor
 
 
 
-    Mask {
-        anchors.fill: parent
-        color: Global.style.backgroundColor
-        //opacity: 0
-    }
+    ScriptEditor {
+        id: scriptEditor
 
-
-    ColumnLayout {
+        visible: true
+        focus: true
         anchors.fill: parent
 
 
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+        strTitle: '游戏通用算法脚本'
+        /*fnAfterCompile: function(code) {return code;}*/
+
+        visualScriptEditor.strTitle: strTitle
+
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.nLoadType: 1
+
+        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
+        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
-            Button {
-                //Layout.fillWidth: true
-                //Layout.preferredHeight: 70
-
-                text: '查'
-
-                onClicked: {
-                    let e = GameMakerGlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadScript.textDocument));
-
-                    if(e) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
-                            Msg: e,
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-
-                        return;
-                    }
-
-                    rootWindow.aliasGlobal.dialogCommon.show({
-                        Msg: '恭喜，没有语法错误',
-                        Buttons: Dialog.Yes,
-                        OnAccepted: function() {
-                            root.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            root.forceActiveFocus();
-                        },
-                    });
-
-                    return;
-                }
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.fillWidth: true
-                text: '游戏通用算法脚本'
-                font.pointSize: 16
-                wrapMode: Label.WordWrap
-                verticalAlignment: Label.AlignVCenter
-                horizontalAlignment: Label.AlignHCenter
-            }
-
-            /*Button {
-                id: buttonVisual
-
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                //Layout.preferredHeight: 50
-
-                text: 'V'
-                onClicked: {
-                    if(!_private.strSavedName) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
-                            Msg: '请先保存',
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-                        return;
-                    }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
-
-                    gameVisualFightScript.forceActiveFocus();
-                    gameVisualFightScript.visible = true;
-                    gameVisualFightScript.init(filePath);
-                }
-            }
-            */
+        onSg_close: function(saved) {
+            root.sg_close(saved);
         }
-
-        RowLayout {
-            Layout.maximumWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
-            Layout.fillHeight: true
-
-
-            Notepad {
-                id: notepadScript
-
-                Layout.preferredWidth: parent.width
-
-                Layout.preferredHeight: textArea.contentHeight
-                Layout.maximumHeight: parent.height
-                Layout.minimumHeight: 50
-                Layout.fillHeight: true
-
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-
-                //textArea.enabled: false
-                //textArea.readOnly: true
-                textArea.textFormat: TextArea.PlainText
-                textArea.text: ''
-                textArea.placeholderText: '请输入脚本代码'
-
-                textArea.background: Rectangle {
-                    //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
-                    border.width: parent.parent.textArea.activeFocus ? 2 : 1
-                }
-
-                bCode: true
-            }
-
-        }
-
-        Button {
-            id: buttonSave
-
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            Layout.bottomMargin: 10
-
-            text: '保　存'
-            onClicked: {
-                _private.save();
-            }
-        }
-
-        /*RowLayout {
-            //Layout.preferredWidth: root.width * 0.96
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: '主角大小：'
-            }
-
-            TextField {
-                id: textMainRoleWidth
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
-                text: '50'
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-            }
-
-            Label {
-                //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 10
-                text: 'X'
-            }
-
-            TextField {
-                id: textMainRoleHeight
-                Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 30
-                text: '80'
-
-                //selectByKeyboard: true
-                selectByMouse: true
-                //wrapMode: TextEdit.Wrap
-            }
-        }*/
     }
 
 
@@ -2376,66 +2205,40 @@ function $readSavesInfo(count=3) {
         id: _config
     }
 
-
     QtObject {
         id: _private
-
-
-        function save() {
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadScript.textDocument), GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'common_script.js', 0);
-
-            return true;
-        }
-
-        function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
-                Msg: '退出前需要保存吗？',
-                Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                OnAccepted: function() {
-                    if(save())
-                        sg_close();
-                    //root.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    sg_close();
-                },
-                OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
-                    root.forceActiveFocus();
-                },
-            });
-        }
     }
 
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    /*Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameCommonScript]Escape Key');
+        console.debug('[CommonScriptEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameCommonScript]Back Key');
+        console.debug('[CommonScriptEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameCommonScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[CommonScriptEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameCommonScript]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[CommonScriptEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameCommonScript]Component.onCompleted');
+        console.debug('[CommonScriptEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameCommonScript]Component.onDestruction');
+        console.debug('[CommonScriptEditor]Component.onDestruction');
     }
+    */
 }

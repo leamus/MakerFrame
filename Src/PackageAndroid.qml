@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -376,7 +376,7 @@ Item {
             imageIcon.source = GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/RPGRuntime/GameMakerGlobal.qml');
+            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
             if(!content) {
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
                 ++error;
@@ -419,7 +419,7 @@ Item {
             textResult.text = '';
 
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/RPGRuntime/GameMakerGlobal.qml');
+            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
             if(!content)
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
             else {
@@ -433,7 +433,7 @@ Item {
                 content = content.replace(reg, '$1' + textTapClientToken.text + '$2');
 
 
-                res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/RPGRuntime/GameMakerGlobal.qml');
+                res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
                 if(res === 0) {
                     textResult.text += '写入 GameMakerGlobal.qml 成功\r\n';
                 }
@@ -492,6 +492,9 @@ Item {
                 reg = /(android:authorities=")\S*(\.themisLite)/g;
                 content = content.replace(reg, '$1' + textPackageName.text + '$2');
 
+                reg = /\$\{applicationId\}/g;
+                content = content.replace(reg, textPackageName.text);
+
 
                 res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
                 if(res === 0) {
@@ -516,16 +519,17 @@ Item {
 
         //制作打包环境
         function makePackage() {
-            let path = Platform.externalDataPath + GameMakerGlobal.separator + 'RPGMaker' + GameMakerGlobal.separator + 'RPGGame';
+            let path = Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games';
 
-            let jsFiles = FrameManager.sl_dirList(path, '*', 0x002 | 0x2000 | 0x4000, 0);
-            jsFiles.sort();
+            let zipFiles = FrameManager.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            zipFiles.sort();
+            console.debug('[PackageAndroid]makePackage zip files:', zipFiles);
 
-            /*let needFilesName = ['Android_Package_', 'Android_MakerFrame_RPGRuntime_'];
+            /*let needFilesName = ['Android_Package_', 'Android_MakerFrame_GameRuntime_'];
             let needFilesIndex = [];
-            for(let fileName in jsFiles) {
+            for(let fileName in zipFiles) {
                 for(let needFileName in needFilesName) {
-                    if(jsFiles[fileName].indexOf(needFilesName[needFileName]) >= 0) {
+                    if(zipFiles[fileName].indexOf(needFilesName[needFileName]) >= 0) {
                         needFilesIndex[needFileName] = fileName;
                         break;
                     }
@@ -534,10 +538,10 @@ Item {
             */
 
             let missingFiles = '';
-            if(!jsFiles[0] || jsFiles[0].indexOf('MakerFrame_Package_Android_') < 0)
-                missingFiles += 'MakerFrame_Package_Android_xxx.zip ';
-            if(!jsFiles[1] || jsFiles[1].indexOf('MakerFrame_RPGRuntime_Android_') < 0)
-                missingFiles += 'MakerFrame_RPGRuntime_Android_xxx.zip ';
+            if(!zipFiles[0] || zipFiles[0].indexOf('MakerFrame_GameRuntime_Android_') < 0)
+                missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
+            if(!zipFiles[1] || zipFiles[1].indexOf('MakerFrame_Package_Android_') < 0)
+                missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
 
             if(missingFiles !== '') {
                 rootWindow.aliasGlobal.dialogCommon.show({
@@ -583,8 +587,8 @@ Item {
                         }
                         else if(packageType === 2) {
                             FrameManager.sl_removeRecursively(strPackageDir);
-                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[0], strPackageDir);
-                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + jsFiles[1], strPackageDir);
+                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
+                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
                         }
 
                         ret = FrameManager.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
@@ -634,7 +638,19 @@ Item {
                 });
             }
             else {
-                continueScript(2);
+                rootWindow.aliasGlobal.dialogCommon.show({
+                    Msg: '找到：' + zipFiles.join(',') + '是否继续？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        continueScript(2);
+                    },
+                    OnRejected: ()=>{
+                        root.forceActiveFocus();
+                    },
+                    OnDiscarded: ()=>{
+                        root.forceActiveFocus();
+                    },
+                });
             }
 
             return true;
@@ -668,7 +684,7 @@ Item {
 
     Component.onCompleted: {
         //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-        textPackageDirPath.text = Platform.externalDataPath + GameMakerGlobal.separator + 'RPGMaker' + GameMakerGlobal.separator + 'RPGGame' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+        textPackageDirPath.text = Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
         _private.init();
 
         console.debug('[PackageAndroid]Component.onCompleted');

@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -246,12 +246,12 @@ Item {
             let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator;
 
             //循环三方根目录
-            for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+            for(let tc0 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath), [], 0x001 | 0x2000 | 0x4000, 0)) {
                 //if(tc0 === '$Leamus')
                 //    continue;
 
                 //循环三方插件目录
-                for(let tc1 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath + tc0 + GameMakerGlobal.separator), '*', 0x001 | 0x2000 | 0x4000, 0)) {
+                for(let tc1 of FrameManager.sl_dirList(GlobalJS.toPath(pluginsRootPath + tc0 + GameMakerGlobal.separator), [], 0x001 | 0x2000 | 0x4000, 0)) {
                     let showName = '';
 
                     let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';

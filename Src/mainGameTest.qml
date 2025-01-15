@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -104,7 +104,7 @@ Item {
                 l_listChoice.visible = true;
                 //l_listChoice.focus = true;
                 //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, '*', 0x001 | 0x2000, 0x00);
+                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textMapName;
             }
@@ -135,7 +135,7 @@ Item {
                 l_listChoice.visible = true;
                 //l_listChoice.focus = true;
                 //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, '*', 0x001 | 0x2000, 0x00);
+                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
 
                 l_listChoice.choicedComponent = textRoleName;
             }

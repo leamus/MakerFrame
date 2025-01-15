@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -105,7 +105,7 @@ Item {
 
             text: '引擎简易教程'
             onClicked: {
-                _private.loadModule('mainEasyRPGMakerTutorial.qml');
+                _private.loadModule('mainEasyGameMakerTutorial.qml');
             }
         }
 

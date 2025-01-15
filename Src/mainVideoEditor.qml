@@ -13,8 +13,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), '*', 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainVideoEditor]_private.arrVideos', JSON.stringify(_private.arrVideos))
         _private.refresh();
     }
@@ -426,7 +426,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrVideos = listview.show(GameMakerGlobal.videoResourcePath(), '*', /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrVideos = listview.show(GameMakerGlobal.videoResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrVideos.length === 0)
                 listview.listview.currentIndex = -1;

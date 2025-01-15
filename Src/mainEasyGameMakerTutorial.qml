@@ -12,8 +12,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -122,22 +122,22 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainEasyRPGMakerTutorial]Escape Key');
+        console.debug('[mainEasyGameMakerTutorial]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainEasyRPGMakerTutorial]Back Key');
+        console.debug('[mainEasyGameMakerTutorial]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[mainEasyRPGMakerTutorial]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[mainEasyGameMakerTutorial]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[mainEasyRPGMakerTutorial]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[mainEasyGameMakerTutorial]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
@@ -665,7 +665,7 @@ NPC事件的四种写法（前两种支持同步调用）：
 
 游戏工程和数据主目录：
   1、windows环境，在 可执行程序 目录下的GameMaker\\Projects 目录下；
-  2、android环境，在 /storage/emulated/0/Leamus/MakerFrame/RPGMaker/Projects 目录下；
+  2、android环境，在 /storage/emulated/0/Leamus/MakerFrame/GameMaker/Projects 目录下；
 
   工程打包后导出的路径为 Projects/工程名.zip；
 
@@ -767,9 +767,9 @@ NPC事件的四种写法（前两种支持同步调用）：
 `
         msgBox.text = GlobalLibraryJS.convertToHTML(t);
 
-        console.debug('[mainEasyRPGMakerTutorial]Component.onCompleted');
+        console.debug('[mainEasyGameMakerTutorial]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[mainEasyRPGMakerTutorial]Component.onDestruction');
+        console.debug('[mainEasyGameMakerTutorial]Component.onDestruction');
     }
 }

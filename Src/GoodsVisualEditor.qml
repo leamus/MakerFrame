@@ -11,8 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import RPGComponents 1.0
-//import 'Core/RPGComponents'
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -249,7 +249,7 @@ Item {
                             }
 
                             onActivated: {
-                                console.debug('[GameVisualGoods]ComboBox:', comboType.currentIndex,
+                                console.debug('[GoodsVisualEditor]ComboBox:', comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
 
@@ -822,7 +822,7 @@ Item {
                     //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
-                    console.debug('[GameVisualGoods]compile:', _private.filepath, jsScript);
+                    console.debug('[GoodsVisualEditor]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
@@ -927,7 +927,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[GameVisualGoods]filePath：', filePath);
+            console.debug('[GoodsVisualEditor]filePath：', filePath);
             //console.exception('????')
 
             if(data) {
@@ -1373,29 +1373,29 @@ $$useEffect$$
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameVisualGoods]Escape Key');
+        console.debug('[GoodsVisualEditor]Escape Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameVisualGoods]Back Key');
+        console.debug('[GoodsVisualEditor]Back Key');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameVisualGoods]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[GoodsVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameVisualGoods]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[GoodsVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameVisualGoods]Component.onCompleted');
+        console.debug('[GoodsVisualEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameVisualGoods]Component.onDestruction');
+        console.debug('[GoodsVisualEditor]Component.onDestruction');
     }
 }
