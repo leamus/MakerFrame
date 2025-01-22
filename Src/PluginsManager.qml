@@ -370,31 +370,43 @@ Item {
                         Msg: '确认删除 <font color="red">' + item + '</font> ？<br>' + description,
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
+                            GlobalLibraryJS.asyncScript(function*() {
+                                console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath));
 
-                            let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
-                            if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
-                                try {
-                                    let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
+                                if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
+                                    try {
+                                        let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                        let ret;
 
-                                    if(ts.$uninstall) {
-                                        ts.$uninstall();
+                                        if(GlobalLibraryJS.isFunction(ts.$uninstall)) {
+                                            ret = ts.$uninstall();
+                                        }
+                                        else
+                                            ret = yield* ts.$uninstall();
+
+                                        if(ret === undefined || ret === null) {
+                                            //console.debug('删除', pluginDirPath);
+                                            FrameManager.sl_removeRecursively(pluginDirPath);
+                                        }
+                                        else if(ret === false)
+                                            return;
+
+                                        //itemExtendsRoot.forceActiveFocus();
+                                        //rootWindow.aliasGlobal.l_list.visible = false;
+
                                     }
-
-                                    //itemExtendsRoot.forceActiveFocus();
-                                    //rootWindow.aliasGlobal.l_list.visible = false;
-
+                                    catch(e) {
+                                        console.error('[!PluginsManager]', e);
+                                        //return -1;
+                                    }
                                 }
-                                catch(e) {
-                                    console.error('[!PluginsManager]', e);
-                                    //return -1;
-                                }
-                            }
 
-                            console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath), FrameManager.sl_removeRecursively(pluginDirPath));
-                            rootWindow.aliasGlobal.l_list.removeItem(index);
-                            _private.refresh();
+                                rootWindow.aliasGlobal.l_list.removeItem(index);
+                                _private.refresh();
 
-                            //rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                                //rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                            }, 'remove plugin');
                         },
                         OnRejected: ()=>{
                             rootWindow.aliasGlobal.l_list.forceActiveFocus();

@@ -36,8 +36,8 @@ import 'FightScene.js' as FightSceneJS
 
     设计思路：
       1、3个生成器：
-        genFightChoice是选择系统使用；genFighting是主回合战斗循环使用；scriptQueue是各种事件、特效使用；
-          genFighting生成各种脚本给scriptQueue运行，分开的好处是随时可以插入用户定义的脚本去运行；
+        genFightChoice是选择系统使用；genFighting/scriptQueueFighting 是主回合战斗循环使用；scriptQueue是各种事件、特效使用；
+          genFighting/scriptQueueFighting 生成各种脚本给scriptQueue运行，分开的好处是随时可以插入用户定义的脚本去运行；
 */
 
 
@@ -55,6 +55,9 @@ Item {
 
     //第一次载入（其他资源都已经载入完毕）
     function load() {
+        console.debug('[FightScene]load');
+
+
         let tCommoncript = game.$userscripts;
         let objCommonScripts = game.$resources.commonScripts;
 
@@ -214,14 +217,14 @@ Item {
                 button.sg_clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    fight.run(tb.$clicked.call(button, button) ?? null, {Tips: 'FightScene button clicked'});
+                    _private.asyncScript.async(tb.$clicked.call(button, button), 'FightScene button clicked');
                 });
             //！！！兼容旧代码
             else if(tb.$action)
                 button.sg_clicked.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
-                    fight.run(tb.$action.call(button, button) ?? null, 'FightScene button action');
+                    _private.asyncScript.async(tb.$action.call(button, button), 'FightScene button action');
                 });
             GlobalLibraryJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
         }
@@ -248,11 +251,11 @@ Item {
         menuSkillsOrGoods.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
         menuSkillsOrGoods.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
         menuSkillsOrGoods.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-        menuSkillsOrGoods.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+        menuSkillsOrGoods.rItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
         menuSkillsOrGoods.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
         menuSkillsOrGoods.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
         menuSkillsOrGoods.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-        menuSkillsOrGoods.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+        menuSkillsOrGoods.rTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
         menuSkillsOrGoods.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
         menuSkillsOrGoods.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
         menuSkillsOrGoods.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
@@ -270,10 +273,16 @@ Item {
 
             return null;
         }
+
+
+        console.debug('[FightScene]load over');
     }
 
     //释放卸载
     function unload() {
+        console.debug('[FightScene]unload');
+
+
         //钩子函数
         game.$sys.hooks.release['$fight'] = function(bUnloadResources) {
             if(!bUnloadResources) {
@@ -289,16 +298,19 @@ Item {
         for(let tb in rowlayoutButtons.children) {
             rowlayoutButtons.children[tb].destroy();
         }
+
+
+        console.debug('[FightScene]unload over');
     }
 
 
     //初始化
     function *init(fightScriptData) {
-        console.debug('[FightScene]init', fightScriptData);
+        console.debug('[FightScene]init:', fightScriptData);
 
         fight.d = {};
 
-        _private.genFighting.clear(3);
+        //_private.scriptQueueFighting.clear(3);
         ////_private.scriptQueue.clear(1);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
@@ -373,7 +385,7 @@ Item {
 
         fight.fightScript = fightScriptData;
 
-        _private.runAway = (fight.fightScript.$runAway === undefined ? true : fight.fightScript.$runAway);
+        _private.runAwayPercent = (fight.fightScript.$runAway === undefined ? true : fight.fightScript.$runAway);
 
 
 
@@ -504,14 +516,24 @@ Item {
 
 
 
-        const ret1 = _private.genFighting.create(FightSceneJS.gfFighting() ?? null, -1, true, '$gfFighting', );
-        //GlobalJS.createScript(_private.genFighting, {Type: 0, Priority: -1, Script: FightSceneJS.gfFighting(), Tips: '$gfFighting'}, );
+        //const ret1 = _private.scriptQueueFighting.create(FightSceneJS.gfFighting() ?? null, -1, true, '$gfFighting', );
+        //_private.genFighting = FightSceneJS.gfFighting();
+        fight.run(FightSceneJS.gfFighting());
+        ////GlobalJS.createScript(_private.genFighting, {Type: 0, Priority: -1, Script: FightSceneJS.gfFighting(), Tips: '$gfFighting'}, );
 
-        fight.$sys.continueFight(1);
+        //fight.$sys.continueFight(1);
+        //_private.genFighting.next();
+        //GlobalLibraryJS.runNextEventLoop(function() {
+        //    _private.genFighting.next();
+        //}, 'fight init');
+
+        console.debug('[FightScene]init over');
     }
 
     //释放
     function release() {
+        console.debug('[FightScene]release');
+
         //audioFightMusic.stop();
 
         for(let ti in itemTempComponent.children) {
@@ -523,8 +545,9 @@ Item {
 
         fight.d = {};
 
+        _private.asyncScript.terminateAll();
         _private.scriptQueue.clear(1);
-        _private.genFighting.clear(3);
+        //_private.scriptQueueFighting.clear(3);
         ////numberanimationSpriteEffectX.stop();
         ////numberanimationSpriteEffectY.stop();
         timerRoleSprite.stop();
@@ -577,6 +600,7 @@ Item {
             //fight.$sys.refreshCombatant(-1);
         }, {Running: 1, Tips: 'FightScene release refresh_combatant'});
 
+        console.debug('[FightScene]release over');
     }
 
 
@@ -773,7 +797,7 @@ Item {
         }
 
 
-        //result：为undefined 发送fightOver信号（关闭战斗画面并清理）；为null则判断战斗是否结束；为true或对象则强制战斗结束；为其他值（0平1胜-1败-2逃跑）执行事件（事件中调用结束信号）；
+        //result：为undefined 发送 sg_fightOver 信号（调用release，比如关闭战斗画面等）；为true或对象则强制结束战斗；为null只是判断战斗是否结束；为其他值（0平1胜-1败-2逃跑）执行事件（事件中调用结束信号）；
         //流程：手动或自动 游戏结束，调用依次FightSceneJS.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
         readonly property var over: function(result) {
             if(result === undefined) {
@@ -828,18 +852,28 @@ Item {
             continueFight: function(type=0, delay=0) {
                 if(type === 1)
                     //将 continueFight 放在脚本队列最后
-                    fight.run(function() {
+                    //一种实现方式（使用定时器）
+                    /*fight.run(function() {
 
                         //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
-                        //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
+                        //  否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
                         GlobalLibraryJS.setTimeout(function() {
                             //开始运行
-                            _private.genFighting.run();
+                            //_private.scriptQueueFighting.run();
+                            _private.genFighting.next();
                         }, delay, rootFightScene, 'fight.continueFight');
 
                     }, 'continueFight');
+                    */
+                    //另一种实现方式（使用wait）
+                    _private.asyncScript.async(function*() {
+                        yield game.wait(delay);
+                        //_private.genFighting.next();
+                        fight.run(true);
+                    }(), 'continueFight');
                 else
-                    _private.genFighting.run();
+                    //_private.scriptQueueFighting.run();
+                    fight.run(false);
 
             },
 
@@ -899,7 +933,8 @@ Item {
             },
             caches: {
                 scriptQueue: _private.scriptQueue,
-                genFighting: _private.genFighting,
+                //genFighting: _private.genFighting,
+                //scriptQueueFighting: _private.scriptQueueFighting,
                 genFightChoice: _private.genFightChoice,
             },
 
@@ -1339,11 +1374,11 @@ Item {
                                     menuFightRoleChoice.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
                                     menuFightRoleChoice.nItemHeight = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
                                     menuFightRoleChoice.nTitleHeight = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
-                                    menuFightRoleChoice.nItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
+                                    menuFightRoleChoice.rItemFontSize = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
                                     menuFightRoleChoice.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
                                     menuFightRoleChoice.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
                                     menuFightRoleChoice.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
-                                    menuFightRoleChoice.nTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
+                                    menuFightRoleChoice.rTitleFontSize = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
                                     menuFightRoleChoice.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
                                     menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                                     menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
@@ -1793,7 +1828,7 @@ Item {
                         fight.myCombatants[i].$$fightData.$choice.$attack = -2;
                     }
                 }
-                let ret = _private.genFighting.run();
+                let ret = _private.scriptQueueFighting.run();
                 * /
 
                 let combatant = fight.myCombatants[_private.nChoiceFightRoleIndex];
@@ -1846,7 +1881,10 @@ Item {
         nMinWidth: 0
         //nMaxWidth: parent.width
         nMinHeight: 0
-        //nMaxHeight: 32
+        nMaxHeight: parent.height * 0.7
+        //最小为2行，最大为3.5行
+        //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
+        //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
 
 
         //text: ''
@@ -1878,7 +1916,7 @@ Item {
 
                     if(_private.nStage === 1) {
                         FightSceneJS.loadLast(true, 0);
-                        _private.genFighting.run();
+                        _private.scriptQueueFighting.run();
                     }
                     else if(_private.nStage === 2)
                         return;
@@ -1915,7 +1953,7 @@ Item {
 
                         if(_private.nStage === 1) {
                             FightSceneJS.loadLast(true, 1);
-                            _private.genFighting.run();
+                            _private.scriptQueueFighting.run();
                         }
                         else
                             return;
@@ -1942,7 +1980,7 @@ Item {
 
                 /*while(1) {
                     console.time('round');
-                    let ret = _private.genFighting.run();
+                    let ret = _private.scriptQueueFighting.run();
                     console.timeEnd('round');
                     if(!ret.done) { //战斗没有结束
                         if(ret.value === 1) {   //1个回合结束
@@ -1971,7 +2009,7 @@ Item {
 
                 /*while(1) {
                     console.time('round');
-                    let ret = _private.genFighting.run();
+                    let ret = _private.scriptQueueFighting.run();
                     console.timeEnd('round');
 
                     if(!ret.done) { //战斗没有结束
@@ -1988,7 +2026,7 @@ Item {
                 }* /
 
                 menuGame.enabled = false;
-                let ret = _private.genFighting.run();
+                let ret = _private.scriptQueueFighting.run();
             }
             Component.onCompleted: {
                 show(['风攻击','土攻击','雷攻击','水攻击','火攻击']);
@@ -2134,7 +2172,9 @@ Item {
         running: false
         repeat: false
         onTriggered: {
-            let ret = _private.genFighting.run();
+            //let ret1 = _private.scriptQueueFighting.run();
+            //let ret1 = _private.genFighting.next();
+            fight.run(true);
         }
     }
 
@@ -2172,13 +2212,16 @@ Item {
 
 
         //逃跑概率
-        property var runAway
+        property var runAwayPercent
         //逃跑标记（0为没有，n为n次逃跑，-1为一直逃跑）
         property int nRunAwayFlag: 0
 
 
-        //战斗脚本（也可以直接用Generator对象）
-        readonly property var genFighting: new GlobalLibraryJS.ScriptQueue()
+        //战斗脚本（只用来运行gfFighting；所以也可以直接用Generator对象）
+        //property var genFighting
+        //readonly property var scriptQueueFighting: new GlobalLibraryJS.ScriptQueue()
+
+        readonly property var asyncScript: new GlobalLibraryJS.AsyncScript();
 
         //异步脚本（播放特效、事件等）
         readonly property var scriptQueue: new GlobalLibraryJS.ScriptQueue()

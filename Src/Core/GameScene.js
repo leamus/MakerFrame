@@ -1,6 +1,8 @@
 ﻿
 //载入资源
 function *loadResources() {
+    console.debug('[GameScene]loadResources');
+
     //读取引擎变量
     game.cd = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName);
     if(!game.cd)
@@ -751,11 +753,14 @@ function *loadResources() {
             }
         }
     }
+
+    console.debug('[GameScene]loadResources over');
 }
 
 
 //卸载资源
 function *unloadResources() {
+    console.debug('[GameScene]unloadResources');
 
     //卸载扩展 插件、组件
     for(let tc in _private.objPlugins)
@@ -834,6 +839,10 @@ function *unloadResources() {
 
     if(mainRole)
         mainRole.destroy();
+
+
+
+    console.debug('[GameScene]unloadResources over');
 }
 
 
@@ -2133,11 +2142,13 @@ function onTriggered() {
 
     game.$frameDuration = realinterval;
 
-    //console.debug('!!!realinterval', realinterval)
 
-
-    if(realinterval > 0)
-        textFPS.text = 'FPS:' + Math.round(1000 / realinterval);
+    ++timer.nFrameCount;
+    timer.nDuration += realinterval;
+    if(timer.nDuration > 1000) {
+        textFPS.text = 'FPS:' + Math.round(timer.nFrameCount / timer.nDuration * 1000);
+        timer.nDuration = timer.nFrameCount = 0;
+    }
 
 
     //定时器操作

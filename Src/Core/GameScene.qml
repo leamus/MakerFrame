@@ -148,6 +148,7 @@ Item {
     //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）；
     //必须用yield*标记来让它运行完毕（第一次使用则不必）；
     function *_init(startScript=true, bLoadResources=true, gameData=null) {
+        console.debug('[GameScene]init:', startScript, bLoadResources, gameData);
 
         //game.run(function*() {
 
@@ -317,6 +318,8 @@ Item {
         //        setSceneToRole(_private.sceneRole);
         //    },10,rootGameScene
         //);
+
+        console.debug('[GameScene]init over');
     }
 
 
@@ -324,6 +327,8 @@ Item {
     //释放所有资源
     //必须用yield标记来让它运行完毕
     function *release(bUnloadResources=true) {
+        console.debug('[GameScene]release');
+
         //scriptQueue.runNextEventLoop('release');
 
 
@@ -479,6 +484,8 @@ Item {
         //_private.scriptQueue.clear(0);
         ///_private.scriptQueue.clear(4);
         //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+
+        console.debug('[GameScene]release over');
     }
 
 
@@ -882,8 +889,11 @@ Item {
             role.message.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
             //role.message.textArea.font.pointSize = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
             tn = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-            if(tn > 0)
-                role.message.textArea.font.pixelSize = tn;
+            if(tn < 0)
+                role.message.textArea.font.pixelSize = -tn;
+            else
+                role.message.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                //role.message.textArea.font.pointSize = tn;
             role.message.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             //role.message.visible = true;
@@ -4715,10 +4725,10 @@ Item {
                 running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : running;
                 value = Object.keys(scriptProps).indexOf('Value') < 0 ? scriptQueue.lastEscapeValue : scriptProps.Value;
                 autoRunNext = scriptProps.AutoRunNext ?? autoRunNext;
-                tips = scriptProps.Tips;
+                tips = scriptProps.Tips ?? 'game.run';
             }
             else {
-                console.warn('[!GameScene]game.run脚本属性参数错误');
+                console.warn('[!GameScene]run参数错误');
                 return -1;
             }
 
@@ -4737,7 +4747,7 @@ Item {
                     }, 'game.run1');
                 */
                 scriptQueue.lastEscapeValue = value;
-                scriptQueue.runNextEventLoop('game.run1');
+                scriptQueue.runNextEventLoop(tips);
 
                 return 2;
             }
@@ -4748,14 +4758,32 @@ Item {
             }
             //else if(GlobalLibraryJS.isString(vScript)) {
             //}
+            //返回1个Promise对象；队列运行结束时，会将这个Promise激活；作用：可以实现两个ScriptQueue互等；
+            else if(GlobalLibraryJS.isNumber(vScript)) {
+                return new Promise(
+                    function (resolve, reject) {
+                        function __next() {
+                            if(vScript <= 0)
+                                resolve(scriptQueue.lastEscapeValue);
+                            else
+                                GlobalLibraryJS.setTimeout(function() {   //鹰：可以延时
+                                    resolve(scriptQueue.lastEscapeValue);
+                                }, vScript, rootGameScene, 'Promise resolve');
+                        }
+                        if(scriptQueue.isEmpty())
+                            __next();
+                        else
+                            scriptQueue.create(__next, priority, true, tips,/* ...params*/);
+                    });
+            }
             else if(vScript === undefined) {
-            //else {
-                console.warn('[!GameScene]game.run脚本参数错误（可忽略）');
-                console.debug(new Error().stack);
-                //console.exception('[!GameScene]运行脚本未定义（可忽略）');
+                //console.warn('[!GameScene]game.run脚本参数错误（可忽略）');
+                //console.debug(new Error().stack);
+                ///console.exception('[!GameScene]game.run脚本参数错误（可忽略）');
 
                 return undefined;
             }
+            //else {
 
 
             if(runType === 0) { //vScript是代码
@@ -4837,13 +4865,13 @@ Item {
                         }, 'game.run');
                     */
                     scriptQueue.lastEscapeValue = value;
-                    scriptQueue.runNextEventLoop('game.run');
+                    scriptQueue.runNextEventLoop('runNextEventLoop2:' + tips);
 
                     return 2;
                 }
             }
             else if(ret === 3) {
-                scriptQueue.runNextEventLoop('game.run3');
+                scriptQueue.runNextEventLoop('runNextEventLoop3:' + tips);
             }
             else if(ret < 0)
                 return ret - 10;
@@ -5239,6 +5267,10 @@ Item {
 
 
         property var nLastTime: 0
+
+        //计算FPS
+        property int nDuration: 0
+        property int nFrameCount: 0
 
 
         repeat: true
@@ -7023,8 +7055,11 @@ Item {
                 messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
                 messageRole.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
                 tn = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-                if(tn > 0)
-                    messageRole.textArea.font.pointSize = tn;
+                if(tn < 0)
+                    messageRole.textArea.font.pixelSize = -tn;
+                else
+                    messageRole.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                    //messageRole.textArea.font.pointSize = tn;
                 messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
@@ -7034,17 +7069,31 @@ Item {
                     tn = tn * parent.width;
                 messageRole.nMinWidth = tn;
                 tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageRole.nMaxWidth;
-                if(tn > 0 && tn < 1)
-                    tn = tn * parent.width;
-                messageRole.nMaxWidth = tn;
+                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                    messageRole.nMaxWidth = Qt.binding(()=>parent.width);
+                }
+                else {
+                    if(tn > 0 && tn < 1)
+                        tn = tn * parent.width;
+                    messageRole.nMaxWidth = tn;
+                }
                 tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageRole.nMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
+                else if(tn.toString().indexOf('.') >= 0)
+                    tn = parseInt((messageRole.textArea.contentHeight) / messageRole.textArea.lineCount) * parseFloat(tn) + messageRole.textArea.nPadding * 2;
                 messageRole.nMinHeight = tn;
                 tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageRole.nMaxHeight;
-                if(tn > 0 && tn < 1)
-                    tn = tn * parent.height;
-                messageRole.nMaxHeight = tn;
+                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                    messageRole.nMaxHeight = Qt.binding(()=>parent.height);
+                }
+                else {
+                    if(tn > 0 && tn < 1)
+                        tn = tn * parent.height;
+                    else if(tn.toString().indexOf('.') >= 0)
+                        tn = parseInt((messageRole.textArea.contentHeight) / messageRole.textArea.lineCount) * parseFloat(tn) + messageRole.textArea.nPadding * 2;
+                    messageRole.nMaxHeight = tn;
+                }
 
                 //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
                 rootRoleMsg.nKeepTime = keeptime || 0;
@@ -7122,7 +7171,7 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
-                textArea.font.pointSize: 16
+                //textArea.font.pointSize: 16
 
                 textArea.onReleased: {
                     rootRoleMsg.clicked();
@@ -7131,7 +7180,7 @@ Item {
 
 
                 nMinWidth: parent.width
-                nMaxWidth: parent.width
+                nMaxWidth: -1
                 //最小为2行，最大为3.5行
                 nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
                 nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
@@ -7275,8 +7324,11 @@ Item {
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
                 messageGame.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
                 tn = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-                if(tn > 0)
-                    messageGame.textArea.font.pointSize = tn;
+                if(tn < 0)
+                    messageGame.textArea.font.pixelSize = -tn;
+                else
+                    messageGame.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                    //messageGame.textArea.font.pointSize = tn;
                 messageGame.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
@@ -7286,17 +7338,31 @@ Item {
                     tn = tn * parent.width;
                 messageGame.nMinWidth = tn;
                 tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageGame.nMaxWidth;
-                if(tn > 0 && tn < 1)
-                    tn = tn * parent.width;
-                messageGame.nMaxWidth = tn;
+                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                    messageGame.nMaxWidth = Qt.binding(()=>parent.width);
+                }
+                else {
+                    if(tn > 0 && tn < 1)
+                        tn = tn * parent.width;
+                    messageGame.nMaxWidth = tn;
+                }
                 tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageGame.nMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
+                else if(tn.toString().indexOf('.') >= 0)
+                    tn = parseInt((messageGame.textArea.contentHeight) / messageGame.textArea.lineCount) * parseFloat(tn) + messageGame.textArea.nPadding * 2;
                 messageGame.nMinHeight = tn;
                 tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageGame.nMaxHeight;
-                if(tn > 0 && tn < 1)
-                    tn = tn * parent.height;
-                messageGame.nMaxHeight = tn;
+                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                    messageGame.nMaxHeight = Qt.binding(()=>parent.height);
+                }
+                else {
+                    if(tn > 0 && tn < 1)
+                        tn = tn * parent.height;
+                    else if(tn.toString().indexOf('.') >= 0)
+                        tn = parseInt((messageGame.textArea.contentHeight) / messageGame.textArea.lineCount) * parseFloat(tn) + messageGame.textArea.nPadding * 2;
+                    messageGame.nMaxHeight = tn;
+                }
 
                 //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
                 rootGameMsgDialog.nKeepTime = keeptime || 0;
@@ -7377,7 +7443,7 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
-                textArea.font.pointSize: 16
+                //textArea.font.pointSize: 16
 
                 textArea.onReleased: {
                     rootGameMsgDialog.clicked();
@@ -7389,6 +7455,9 @@ Item {
                 nMaxWidth: parent.width * 0.7
                 nMinHeight: 0
                 nMaxHeight: parent.height * 0.7
+                //最小为2行，最大为3.5行
+                //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
+                //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
 
 
                 onSg_over: {
@@ -7513,14 +7582,14 @@ Item {
                 if(tn > 0)
                     menuGame.nTitleHeight = tn;
                 tn = style.ItemFontSize || style.FontSize || styleUser.$itemFontSize || styleSystem.$itemFontSize;
-                if(tn > 0)
-                    menuGame.nItemFontSize = tn;
+                //if(tn > 0)
+                menuGame.rItemFontSize = tn;
                 menuGame.colorItemFontColor = style.ItemFontColor || style.FontColor || styleUser.$itemFontColor || styleSystem.$itemFontColor;
                 menuGame.colorItemColor1 = style.ItemBackgroundColor1 || style.BackgroundColor || styleUser.$itemBackgroundColor1 || styleSystem.$itemBackgroundColor1;
                 menuGame.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor || styleUser.$itemBackgroundColor2 || styleSystem.$itemBackgroundColor2;
                 tn = style.TitleFontSize || style.FontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-                if(tn > 0)
-                    menuGame.nTitleFontSize = tn;
+                //if(tn > 0)
+                menuGame.rTitleFontSize = tn;
                 menuGame.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor || styleUser.$titleBackgroundColor || styleSystem.$titleBackgroundColor;
                 menuGame.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                 menuGame.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
@@ -7698,8 +7767,11 @@ Item {
                 rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
                 rectGameInput.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
                 tn = style.FontSize || styleUser.$fontSize || styleSystem.$fontSize;
-                if(tn > 0)
-                    textGameInput.font.pointSize = tn;
+                if(tn < 0)
+                    textGameInput.font.pixelSize = -tn;
+                else
+                    textGameInput.font.pixelSize = tn * Global.rFontPointRatio;
+                    //textGameInput.font.pointSize = tn;
                 textGameInput.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
                 tn = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
@@ -7712,8 +7784,11 @@ Item {
                 rectGameInputTitle.border.color = style.TitleBorderColor || styleUser.$titleBorderColor || styleSystem.$titleBorderColor;
 
                 tn = style.TitleFontSize || styleUser.$titleFontSize || styleSystem.$titleFontSize;
-                if(tn > 0)
-                    textGameInputTitle.font.pointSize = tn;
+                if(tn < 0)
+                    textGameInputTitle.font.pixelSize = -tn;
+                else
+                    textGameInputTitle.font.pixelSize = tn * Global.rFontPointRatio;
+                    //textGameInputTitle.font.pointSize = tn;
                 textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
 
                 maskGameInput.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -8020,7 +8095,10 @@ Item {
                 nMinWidth: 0
                 //nMaxWidth: parent.width
                 nMinHeight: 0
-                nMaxHeight: 66
+                //nMaxHeight: 66
+                //最小为1行，最大为1.5行
+                //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 1 + textArea.nPadding * 2
+                nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 1.5 + textArea.nPadding * 2
 
 
                 onSg_over: {
@@ -8294,15 +8372,24 @@ Item {
                 //console.debug('[GameScene]Role Component.onCompleted');
 
 
-                bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true);
-                //customSprite.bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$role', '$smooth'), true);
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role') || {};
+                let styleSystem = game.$gameMakerGlobalJS.$config.$role;
+                let tn;
+
+                bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(styleUser, '$smooth'), GlobalLibraryJS.getObjectValue(styleSystem, '$smooth'), true);
+                //customSprite.bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(styleUser, '$smooth'), GlobalLibraryJS.getObjectValue(styleSystem, '$smooth'), true);
 
 
-                textName.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$fontColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$fontColor;
-                textName.font.pixelSize = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$fontSize') ?? game.$gameMakerGlobalJS.$config.$role.$name.$fontSize;
+                textName.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$fontColor') ?? styleSystem.$name.$fontColor;
+                tn = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$fontSize') ?? styleSystem.$name.$fontSize;
+                if(tn < 0)
+                    textName.font.pixelSize = -tn;
+                else
+                    textName.font.pixelSize = tn * Global.rFontPointRatio;
+                    //textName.font.pointSize = tn;
 
-                rectName.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$backgroundColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$backgroundColor;
-                rectName.border.color = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$name', '$borderColor') ?? game.$gameMakerGlobalJS.$config.$role.$name.$borderColor;
+                rectName.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$backgroundColor') ?? styleSystem.$name.$backgroundColor;
+                rectName.border.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$borderColor') ?? styleSystem.$name.$borderColor;
             }
         }
     }
@@ -8374,6 +8461,8 @@ Item {
 
             visible: false
 
+            smooth: true
+
 
 
             MouseArea {
@@ -8406,6 +8495,11 @@ Item {
                     if(parent.doubleClicked)
                         game.run(parent.doubleClicked.call(parent, parent) ?? null, 'Image onDoubleClicked', );
                 }
+            }
+
+
+            Component.onCompleted: {
+                smooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$image', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$image', '$smooth'), true);
             }
         }
     }

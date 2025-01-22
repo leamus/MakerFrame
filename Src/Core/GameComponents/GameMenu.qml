@@ -154,12 +154,12 @@ Rectangle {
     //property int nItemMaxHeight: 60
     //property int nItemMinHeight: 20
     property int nItemHeight: 60    //选项高度
-    property int nItemFontSize: 16  //选项字体大小
+    property real rItemFontSize: 16  //选项字体大小
     property color colorItemFontColor: 'white'  //选项字体颜色
     property color colorItemColor1: '#00FFFFFF' //选项静止颜色
     property color colorItemColor2: '#66FFFFFF' //选项被选颜色
     property color colorItemBorderColor: '#60FFFFFF'    //选项边框颜色
-    property int nTitleFontSize: 16     //标题字体大小
+    property real rTitleFontSize: 16     //标题字体大小
     property int nTitleHeight: 39
     property color colorTitleColor: '#EE00CC99' //标题颜色
     property color colorTitleFontColor: 'white' //标题文字颜色
@@ -214,7 +214,7 @@ Rectangle {
                 anchors.fill: parent
 
                 text: ''
-                font.pointSize: nItemFontSize
+                //font.pointSize: rItemFontSize
                 readOnly: true
                 color: colorItemFontColor
 
@@ -222,6 +222,7 @@ Rectangle {
 
                 horizontalAlignment: root.itemAlignment
                 verticalAlignment: Text.AlignVCenter
+
 
                 MouseArea {
                     anchors.fill: parent
@@ -244,6 +245,15 @@ Rectangle {
                         root.sg_doubleChoice(nChoiceIndex);
                         mouse.accepted = true;
                     }
+                }
+
+
+                Component.onCompleted: {
+                    if(rItemFontSize < 0)
+                        font.pixelSize = Qt.binding(function(){return -rItemFontSize;});
+                    else
+                        font.pixelSize = Qt.binding(function(){return rItemFontSize * Global.rFontPointRatio;});
+                        //font.pointSize = Qt.binding(function(){return rItemFontSize;});
                 }
             }
 
@@ -317,10 +327,19 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                font.pointSize: nTitleFontSize
+                //font.pointSize: rTitleFontSize
                 font.bold: true
                 text: root.strTitle
                 wrapMode: Text.Wrap
+
+
+                Component.onCompleted: {
+                    if(rTitleFontSize < 0)
+                        font.pixelSize = Qt.binding(function(){return -rTitleFontSize;});
+                    else
+                        font.pixelSize = Qt.binding(function(){return rTitleFontSize * Global.rFontPointRatio;});
+                        //font.pointSize = Qt.binding(function(){return rTitleFontSize;});
+                }
             }
         }
 

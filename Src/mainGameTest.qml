@@ -322,12 +322,14 @@ Item {
                 item.bTest = true;
                 //item.openMap(item);
                 const tScript = function*() {
+                    yield game.msg('欢迎来到鹰歌Maker世界！');
                     yield game.loadmap(textMapName.text);
-                    game.createhero(textRoleName.text);
-                    game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                    if(textRoleName.text.trim()) {
+                        game.createhero(textRoleName.text);
+                        game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
+                    }
                     game.interval(16);
                     game.goon();
-                    yield game.msg('欢迎来到鹰歌Maker世界！');
                 }
 
 
@@ -397,7 +399,7 @@ Item {
         id: _private
 
         function start() {
-            if(textMapName.text === '' || textRoleName.text === '')
+            if(textMapName.text === ''/* || textRoleName.text === ''*/)
                 return;
 
 

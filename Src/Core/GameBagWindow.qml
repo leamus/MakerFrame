@@ -406,7 +406,7 @@ Item {
                     //nItemMinHeight: 50
 
 
-                    nItemFontSize: 12
+                    rItemFontSize: 12
 
                     //每页个数
                     nPageItemsCount: 20

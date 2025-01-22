@@ -94,8 +94,8 @@ Item {
 
                     //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                    //let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+                    //const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
+                    const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
                     //FrameManager.sl_dirCreate(projectPath);
                     let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
@@ -168,46 +168,55 @@ Item {
                     rootWindow.aliasGlobal.dialogCommon.show({
                         TextFormat: Label.PlainText,
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
-                                          .arg(menuJS.plugins[item]['Name'])
-                                          .arg(menuJS.plugins[item]['Version'])
-                                          .arg(menuJS.plugins[item]['Update'])
-                                          .arg(menuJS.plugins[item]['Author'])
-                                          .arg(menuJS.plugins[item]['Size'])
-                                          .arg(menuJS.plugins[item]['Description'])
-                                          ,
+                            .arg(menuJS.plugins[item]['Name'])
+                            .arg(menuJS.plugins[item]['Version'])
+                            .arg(menuJS.plugins[item]['Update'])
+                            .arg(menuJS.plugins[item]['Author'])
+                            .arg(menuJS.plugins[item]['Size'])
+                            .arg(menuJS.plugins[item]['Description'])
+                        ,
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
+                            const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+                            const zipPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
+                            let jsPath;
+                            if(menuJS.plugins[item]['Path'])
+                                jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim() + GameMakerGlobal.separator + 'main.js';
+                            else
+                                jsPath = false;
 
-                            let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            let zipPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['File'];
+                            function *remove() {
+                                if(jsPath && FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
+                                    try {
+                                        const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                        let ret;
 
-                            //const httpReply = FrameManager.sl_downloadFile('https://gitee.com/leamus/MakerFrame/raw/master/Examples/Project.zip', projectPath + '.zip');
-                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
-                            httpReply.sg_finished.connect(function(httpReply) {
-                                const networkReply = httpReply.networkReply;
-                                const code = FrameManager.sl_objectProperty('Code', networkReply);
-                                console.debug('[PluginsDownload]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+                                        if(GlobalLibraryJS.isFunction(ts.$uninstall)) {
+                                            ret = ts.$uninstall();
+                                        }
+                                        else
+                                            ret = yield* ts.$uninstall();
 
-                                FrameManager.sl_deleteLater(httpReply);
+                                        if(ret === undefined || ret === null) {
+                                            //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                            FrameManager.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                        }
+                                        else if(ret === false)
+                                            return;
 
+                                        //itemExtendsRoot.forceActiveFocus();
+                                        //rootWindow.aliasGlobal.l_list.visible = false;
 
-                                rootWindow.aliasGlobal.dialogCommon.close();
-
-                                if(code !== 0) {
-                                    rootWindow.aliasGlobal.dialogCommon.show({
-                                        Msg: '下载失败：%1'.arg(code),
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            root.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            root.forceActiveFocus();
-                                        },
-                                    });
-                                    return;
+                                    }
+                                    catch(e) {
+                                        console.error('[!PluginsDownload]', e);
+                                        //return -1;
+                                    }
                                 }
+                            }
 
-
+                            function *setup() {
+                                yield* remove();
 
                                 let ret = FrameManager.sl_extractDir(zipPath, projectPath);
 
@@ -216,14 +225,23 @@ Item {
                                     //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
                                     msg = '安装成功';
 
-
-                                    let jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'] + GameMakerGlobal.separator + 'main.js';
-                                    if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
+                                    if(jsPath && FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                         try {
                                             const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                            let ret;
 
-                                            if(ts.$install) {
-                                                ts.$install();
+                                            if(GlobalLibraryJS.isFunction(ts.$install)) {
+                                                ret = ts.$install();
+                                            }
+                                            else
+                                                ret = yield* ts.$install();
+
+                                            if(ret === false) {
+                                                //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                                //FrameManager.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                                yield* remove();
+
+                                                return;
                                             }
 
                                             //itemExtendsRoot.forceActiveFocus();
@@ -249,7 +267,66 @@ Item {
                                         root.forceActiveFocus();
                                     },
                                 });
+                            }
+
+
+                            //方法一：
+                            /*const httpReply = */GlobalLibraryJS.request({
+                                Url: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']),
+                                Method: 'GET',
+                                //Data: {},
+                                //Gzip: [1, 1024],
+                                //Headers: {},
+                                FilePath: zipPath,
+                                //Params: ,
+                            }, 2).$then(function(xhr) {
+                                rootWindow.aliasGlobal.dialogCommon.close();
+
+                                GlobalLibraryJS.asyncScript(setup(), 'setup');
+                            }).$catch(function(e) {
+                                //rootWindow.aliasGlobal.dialogCommon.close();
+
+                                rootWindow.aliasGlobal.dialogCommon.show({
+                                    Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                                    Buttons: Dialog.Yes,
+                                    OnAccepted: function() {
+                                        root.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        root.forceActiveFocus();
+                                    },
+                                });
                             });
+
+                            /*/方法二：
+                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
+                            httpReply.sg_finished.connect(function(httpReply) {
+                                const networkReply = httpReply.networkReply;
+                                const code = FrameManager.sl_objectProperty('Code', networkReply);
+                                console.debug('[PluginsDownload]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+
+                                FrameManager.sl_deleteLater(httpReply);
+
+
+                                rootWindow.aliasGlobal.dialogCommon.close();
+
+                                if(code !== 0) {
+                                    rootWindow.aliasGlobal.dialogCommon.show({
+                                        Msg: '下载失败(%1)'.arg(code),
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            root.forceActiveFocus();
+                                        },
+                                    });
+                                    return;
+                                }
+
+                                setup();
+                            });
+                            */
 
 
                             rootWindow.aliasGlobal.dialogCommon.show({

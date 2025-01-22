@@ -46,7 +46,7 @@ Item {
             gameMenu.color = style.BackgroundColor ||
                     styleUser.$backgroundColor ||
                     styleSystem.$backgroundColor;
-            gameMenu.nItemFontSize = style.ItemFontSize || style.FontSize ||
+            gameMenu.rItemFontSize = style.ItemFontSize || style.FontSize ||
                     styleUser.$itemFontSize ||
                     styleSystem.$itemFontSize;
             gameMenu.colorItemFontColor = style.ItemFontColor || style.FontColor ||
@@ -58,7 +58,7 @@ Item {
             gameMenu.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor ||
                     styleUser.$itemBackgroundColor2 ||
                     styleSystem.$itemBackgroundColor2;
-            gameMenu.nTitleFontSize = style.TitleFontSize || style.FontSize ||
+            gameMenu.rTitleFontSize = style.TitleFontSize || style.FontSize ||
                     styleUser.$titleFontSize ||
                     styleSystem.$titleFontSize;
             gameMenu.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor ||
@@ -110,7 +110,7 @@ Item {
             containerSystemMenu.gamemenuSystemMenu.color = style.BackgroundColor ||
                     styleUser.$backgroundColor ||
                     styleSystem.$backgroundColor;
-            containerSystemMenu.gamemenuSystemMenu.nItemFontSize = style.ItemFontSize || style.FontSize ||
+            containerSystemMenu.gamemenuSystemMenu.rItemFontSize = style.ItemFontSize || style.FontSize ||
                     styleUser.$itemFontSize ||
                     styleSystem.$itemFontSize;
             containerSystemMenu.gamemenuSystemMenu.colorItemFontColor = style.ItemFontColor || style.FontColor ||
@@ -122,7 +122,7 @@ Item {
             containerSystemMenu.gamemenuSystemMenu.colorItemColor2 = style.ItemBackgroundColor2 || style.BackgroundColor ||
                     styleUser.$itemBackgroundColor2 ||
                     styleSystem.$itemBackgroundColor2;
-            containerSystemMenu.gamemenuSystemMenu.nTitleFontSize = style.TitleFontSize || style.FontSize ||
+            containerSystemMenu.gamemenuSystemMenu.rTitleFontSize = style.TitleFontSize || style.FontSize ||
                     styleUser.$titleFontSize ||
                     styleSystem.$titleFontSize;
             containerSystemMenu.gamemenuSystemMenu.colorTitleColor = style.TitleBackgroundColor || style.BackgroundColor ||

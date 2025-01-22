@@ -52,7 +52,7 @@ Notepad {
                 root.width = textArea.implicitWidth;
         }
         else
-            root.width = nMaxWidth;
+            root.width = Qt.binding(()=>nMaxWidth);
         //如果是自适应高
         if(type & 0b10) {
             if(textArea.implicitHeight < nMinHeight)
@@ -63,7 +63,7 @@ Notepad {
                 root.height = textArea.implicitHeight;
         }
         else
-            root.height = nMaxHeight;
+            root.height = Qt.binding(()=>nMaxHeight);
 
 
 
@@ -121,6 +121,9 @@ Notepad {
     property int nMaxWidth: Screen.desktopAvailableWidth * 0.9
     property int nMinHeight: 0
     property int nMaxHeight: Screen.desktopAvailableHeight * 0.9
+    //最小为2行，最大为3.5行
+    //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
+    //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
 
 
     width: parent.width

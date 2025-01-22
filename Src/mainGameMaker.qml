@@ -1591,6 +1591,37 @@ Item {
 
                             if(!FrameManager.sl_fileExists(resTemplate)) {
                                 //https://qiniu.leamus.cn/$资源模板.zip
+
+
+                                //方法一：
+                                /*const httpReply = */GlobalLibraryJS.request({
+                                    Url: 'http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip',
+                                    Method: 'GET',
+                                    //Data: {},
+                                    //Gzip: [1, 1024],
+                                    //Headers: {},
+                                    FilePath: resTemplate,
+                                    //Params: ,
+                                }, 2).$then(function(xhr) {
+                                    rootWindow.aliasGlobal.dialogCommon.close();
+
+                                    _continue();
+                                }).$catch(function(e) {
+                                    //rootWindow.aliasGlobal.dialogCommon.close();
+
+                                    rootWindow.aliasGlobal.dialogCommon.show({
+                                        Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            rootGameMaker.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            rootGameMaker.forceActiveFocus();
+                                        },
+                                    });
+                                });
+
+                                /*/方法二：
                                 const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip', resTemplate);
                                 httpReply.sg_finished.connect(function(httpReply) {
                                     const networkReply = httpReply.networkReply;
@@ -1601,7 +1632,6 @@ Item {
 
 
                                     rootWindow.aliasGlobal.dialogCommon.close();
-                                    //enabled = true;
 
                                     if(code !== 0) {
                                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -1619,6 +1649,7 @@ Item {
 
                                     _continue();
                                 });
+                                */
 
 
                                 rootWindow.aliasGlobal.dialogCommon.show({
@@ -2013,6 +2044,61 @@ Item {
 
                     //https://qiniu.leamus.cn/$Leamus.zip
                     //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
+
+                    function _continue() {
+                        FrameManager.sl_dirCreate(projectPath);
+                        let ret = FrameManager.sl_extractDir(projectPath + '.zip', projectPath);
+
+                        if(ret.length > 0) {
+                            _private.changeProject('$Leamus');
+
+                            //console.debug(ret, projectPath);
+                        }
+
+                        rootWindow.aliasGlobal.dialogCommon.show({
+                            Msg: ret.length > 0 ? '成功' : '失败',
+                            Buttons: Dialog.Ok,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                    }
+
+
+                    //方法一：
+                    /*const httpReply = */GlobalLibraryJS.request({
+                        Url: 'http://MakerFrame.Leamus.cn/GameMaker/Projects/$Leamus.zip',
+                        Method: 'GET',
+                        //Data: {},
+                        //Gzip: [1, 1024],
+                        //Headers: {},
+                        FilePath: projectPath + '.zip',
+                        //Params: ,
+                    }, 2).$then(function(xhr) {
+                        enabled = true;
+                        rootWindow.aliasGlobal.dialogCommon.close();
+
+                        _continue();
+                    }).$catch(function(e) {
+                        enabled = true;
+                        //rootWindow.aliasGlobal.dialogCommon.close();
+
+                        rootWindow.aliasGlobal.dialogCommon.show({
+                            Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                rootGameMaker.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                rootGameMaker.forceActiveFocus();
+                            },
+                        });
+                    });
+
+                    /*/方法二：
                     const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Projects/$Leamus.zip', projectPath + '.zip');
                     httpReply.sg_finished.connect(function(httpReply) {
                         const networkReply = httpReply.networkReply;
@@ -2039,27 +2125,9 @@ Item {
                             return;
                         }
 
-
-                        FrameManager.sl_dirCreate(projectPath);
-                        let ret = FrameManager.sl_extractDir(projectPath + '.zip', projectPath);
-
-                        if(ret.length > 0) {
-                            _private.changeProject('$Leamus');
-
-                            //console.debug(ret, projectPath);
-                        }
-
-                        rootWindow.aliasGlobal.dialogCommon.show({
-                            Msg: ret.length > 0 ? '成功' : '失败',
-                            Buttons: Dialog.Ok,
-                            OnAccepted: function() {
-                                rootGameMaker.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                rootGameMaker.forceActiveFocus();
-                            },
-                        });
+                        _continue();
                     });
+                    */
 
 
                     rootWindow.aliasGlobal.dialogCommon.show({

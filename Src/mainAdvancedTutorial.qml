@@ -154,11 +154,11 @@ Item {
     示例：
     let taskID = FrameManager.sl_insertScriptTask('console.info(0)', 0, function(params){console.info(999, params)}, 2);
     或：
-    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, function(params){console.info('params:', params);console.info(999, params.toJson())}, -1);
+    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, function(params){console.info('params:', params);console.info(999, params.$toJson())}, -1);
 
     FrameManager.sl_setThreadMaxCount(2);
     let taskParam = FrameManager.sl_getScriptTask(taskID);
-    //console.info('taskParam', taskParam, taskParam.toJson());
+    //console.info('taskParam', taskParam, taskParam.$toJson());
     console.info(taskParam.Running.sl_isFinished(), taskParam.Running.sl_isRunning());
     FrameManager.sl_cancelScriptTask(taskID);
     //taskParam.Running.sl_terminate();
@@ -166,6 +166,7 @@ Item {
     //taskParam.Running.sl_isRunning();
     //taskParam.Running.sl_wait(3000);
 3、QML 访问网络/下载文件 //~~~~~~~
+  a、使用封装底层的C++方案：
     示例：
     const httpReply = FrameManager.sl_request(url, baVerb, baPostData, mapHeaders);
     const httpReply = FrameManager.sl_downloadFile(url, filepath);
@@ -176,6 +177,38 @@ Item {
             //console.debug(httpReply, FrameManager.sl_objectProperty('Data', httpReply.networkReply), Object.keys(httpReply.networkReply));
 
             FrameManager.sl_deleteLater(httpReply);
+        });
+  b、使用封装的异步/协程方案：
+    示例：
+        GlobalLibraryJS.request({
+            Url: url,
+            Method: 'GET',
+            //Data: {},
+            //Gzip: [1, 1024],
+            //Headers: {},
+            //FilePath: path,
+            //Params: ,
+        }, 2).$then((xhr)=>{
+            console.info(xhr.$toString());
+        }).$catch((e)=>{
+            console.info(e.$params.$toString());
+        });
+      或：
+        GlobalLibraryJS.asyncScript(function*() {
+            try {
+                let res = yield GlobalLibraryJS.request({
+                    Url: url,
+                    Method: 'GET',
+                    //Data: {},
+                    //Gzip: [1, 1024],
+                    //Headers: {},
+                    //FilePath: path,
+                    //Params: ,
+                }, 2);
+                console.info(res.response);
+            } catch(e) {
+                console.info(e.$params.$toString());
+            }
         });
 4、HTTPServer    //~~~~~~
     示例：

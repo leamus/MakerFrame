@@ -277,8 +277,8 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
 
-        '挂载动画': {
-            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14;PropertyAnimation {property: "%2";from: %3; to: %4; duration: %5; running: true; targets: %1; easing {type: %6; period: %7; amplitude:%8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
+        '挂载动画': {   //targets: %1; target: %1; 这种绑定，如果动画正在运行时 父组件被释放就会有警告，所以不用绑定；
+            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14; PropertyAnimation {property: "%2"; from: %3; to: %4; duration: %5; running: false; easing {type: %6; period: %7; amplitude: %8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); Component.onCompleted: {target = %1; start();} %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
             params: [
                 ['*父组件', 'name', true, 0, '', 'green'],
                 ['*@动画属性', 'unformatted', true, 2, [['x', 'y', '宽', '高', '透明度', '缩放', '角度', '颜色',], ['x', 'y', 'width', 'height', 'opacity', 'scale', 'rotation', 'color',], ''], ''],

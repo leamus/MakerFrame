@@ -3,6 +3,9 @@
 
 
 //配置
+//  注意：
+//    1、fontSize为正数，表示用pointSize；为负数，表示用pixelSize；
+//    2、$minHeight和$maxHeight；>0且<1，表示高度为 值*屏幕大小；为小数（包括字符串）表示 值*行数；为整数表示像素；null表示默认；
 let $config = {
     //游戏
     $game: {
@@ -21,18 +24,22 @@ let $config = {
         $say: {
             $backgroundColor: '#BF6699FF',
             $borderColor: 'white',
-            $fontSize: 16,
+            $fontSize: 12,
             $fontColor: 'white',
         },
         $name: {
             $backgroundColor: '#7F000000',
             $borderColor: '#00000000',
-            $fontSize: 16,
+            $fontSize: 12,
             $fontColor: 'white',
         },
     },
     //特效
     $spriteEffect: {
+        $smooth: true,   //缩放是否平滑或点阵
+    },
+    //图片
+    $image: {
         $smooth: true,   //缩放是否平滑或点阵
     },
     //摇杆
@@ -175,7 +182,7 @@ let $config = {
             $avatar: true,
             $backgroundColor: '#BF6699FF',
             $borderColor: 'white',
-            $fontSize: 16,
+            $fontSize: 19,
             $fontColor: 'white',
             $maskColor: '#01000000',
             $minWidth: null,
@@ -187,7 +194,7 @@ let $config = {
         $msg: {
             $backgroundColor: '#BF6699FF',
             $borderColor: 'white',
-            $fontSize: 16,
+            $fontSize: 19,
             $fontColor: 'white',
             $maskColor: '#7FFFFFFF',
             $minWidth: null,
@@ -264,7 +271,7 @@ let $config = {
     $protoObjects: {
         $fightRole: {$objectType: 1},
         $goods: {$objectType: 2},
-        $skill:{$objectType: 3},
+        $skill: {$objectType: 3},
         $fightScript: {$objectType: 4},
     },
 };
@@ -609,8 +616,8 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 
 function 属性(p, n=0) {
     let ret;
-    if(game.$globalLibraryJS.isValidNumber(n) || game.$globalLibraryJS.isStringNumber(n)) {
-        n = parseFloat(n);
+    if(game.$globalLibraryJS.isValidNumber(n, 0b1)) {
+        n = Number(n);
         if(game.$globalLibraryJS.isString(mappingCombatantProperty[p])) {
             this.$properties[mappingCombatantProperty[p]] += n;
             ret = this.$properties[mappingCombatantProperty[p]];
@@ -625,8 +632,8 @@ function 属性(p, n=0) {
 
 function 附加属性(p, n=0) {
     let ret;
-    if(game.$globalLibraryJS.isValidNumber(n) || game.$globalLibraryJS.isStringNumber(n)) {
-        n = parseFloat(n);
+    if(game.$globalLibraryJS.isValidNumber(n, 0b1)) {
+        n = Number(n);
         if(game.$globalLibraryJS.isString(mappingCombatantProperty[p])) {
             this.$$propertiesWithExtra[mappingCombatantProperty[p]] += n;
             ret = this.$$propertiesWithExtra[mappingCombatantProperty[p]];
@@ -730,7 +737,7 @@ let $showGoodsName = function(goods, flags=null) {
     tstr = '';
 
     if(flags['Price'] !== undefined) {
-        if(GlobalLibraryJS.isArray(goods.$price))
+        if(game.$globalLibraryJS.isArray(goods.$price))
             tstr = ' ￥' + goods.$price[flags['Price']];
         else
             tstr = ' ￥?';
@@ -1907,12 +1914,11 @@ function *$commonFightEndScript(res, teams, fightData) {
 
 
 
-    fight.over();
-
-
-
     //返回地图代码
     game.run(function*() {
+        fight.over();
+
+
         //战斗结束脚本2
         if(fightEndScript) {
             let r = fightEndScript(res, 1, teams, fightData);
@@ -2081,22 +2087,17 @@ let $fightButtons = [
         $text: '重复上次',
         $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],
         $clicked: function(button) {
-            button.enabled = false;
-
-            return function*() {
+            if(fight.$sys.stage() === 2) {
                 fight.$sys.resetFightScene();
 
-                if(fight.$sys.stage() === 2) {
-                    fight.$sys.loadLast(true, 0);
-                    fight.$sys.continueFight();
-                }
-                else if(fight.$sys.stage() === 3) {
-                    //return null;
-                }
+                fight.$sys.loadLast(true, 0);
+                fight.$sys.continueFight();
+            }
+            else if(fight.$sys.stage() === 3) {
+                //return null;
+            }
 
-                button.enabled = true;
-                return null;
-            };
+            return null;
         },
         //其他属性
         $properties: {
@@ -2106,7 +2107,6 @@ let $fightButtons = [
         $text: '逃跑',
         $colors: ['lightyellow', 'lightblue', 'lightsteelblue'],
         $clicked: function(button) {
-            button.enabled = false;
             //逃跑次数，0为不逃跑，-1为一直逃跑
             if(fight.$sys.runAwayFlag() === -1) {
                 button.text = '逃跑';
@@ -2115,17 +2115,15 @@ let $fightButtons = [
             else {
                 button.text = '逃跑中';
                 fight.$sys.runAwayFlag(-1);
+
+                if(fight.$sys.stage() === 2) {
+                    fight.$sys.resetFightScene();
+
+                    fight.$sys.continueFight();
+                }
             }
 
-            return function*() {
-                if(fight.$sys.runAwayFlag() !== 0) {
-                    fight.$sys.runAway();
-                }
-                else {
-                }
-                button.enabled = true;
-                return null;
-            };
+            return null;
         },
         //其他属性
         $properties: {
@@ -2135,31 +2133,21 @@ let $fightButtons = [
         $text: '手动攻击',
         $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],
         $clicked: function(button) {
-            button.enabled = false;
             if(fight.$sys.autoAttack() === 0) {
                 button.text = '自动攻击';
                 fight.$sys.autoAttack(1);
+
+                if(fight.$sys.stage() === 2) {
+                    fight.$sys.loadLast(true, 1);
+                    fight.$sys.continueFight();
+                }
             }
             else {
                 button.text = '手动攻击';
                 fight.$sys.autoAttack(0);
             }
 
-            return function*() {
-                if(fight.$sys.autoAttack() === 1) {
-                    if(fight.$sys.stage() === 2) {
-                        fight.$sys.loadLast(true, 1);
-                        fight.$sys.continueFight();
-                    }
-                    else {
-                        //return null;
-                    }
-                }
-                else {
-                }
-                button.enabled = true;
-                return null;
-            };
+            return null;
         },
         //其他属性
         $properties: {

@@ -565,7 +565,9 @@ function checkToFight() {
         }
     }
 
-    let ret = _private.genFighting.run();
+    fight.$sys.continueFight(1);
+    //let ret1 = _private.genFighting.next();
+    //let ret1 = _private.scriptQueueFighting.run();
     return true;
 }
 
@@ -1381,23 +1383,41 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
-        //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
-        fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
-        yield 10;
+        //fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
+        let r = game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
+        if(GlobalLibraryJS.isGenerator(r))yield* r;
+
+
+        //等待脚本队列运行完毕，再继续执行：
+
+        //方案一：
+        //fight.run(()=>{_private.genFighting.next();}, {Running: 1, Tips: 'genFighting.next1'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
+        //fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
+        //yield 10;
+
+        //方案二：使用Promise
+        /*yield new Promise(
+            function (resolved, reject) {
+                fight.run(function() {resolved();});
+        });*/
+        //yield fight.run(0);
 
 
 
         //_private.nStep = 1;
         _private.nStage = 2;
 
-        if(_private.nRunAwayFlag !== 0) {
-            fight.run(runAway, {Tips: 'runAway'});
-        }
         //战斗准备中（选择技能）
-        if(_private.nRunAwayFlag !== 0 || _private.nAutoAttack === 0)
+        if(_private.nRunAwayFlag === 0 && _private.nAutoAttack === 0)
             yield 11;
 
+        if(_private.nRunAwayFlag !== 0) {
+            const ret = yield *runAway();
+            if(ret === true) {
+                fight.over(-2);
+                return ret;
+            }
+        }
 
         _private.nStage = 3;
         //rowlayoutButtons.enabled = false;
@@ -1428,10 +1448,24 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
-        //yield fight.run(()=>{_private.genFighting.run();});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
-        fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
-        yield 10;
+        //fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
+        r = game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
+        if(GlobalLibraryJS.isGenerator(r))yield* r;
+
+
+        //等待脚本队列运行完毕，再继续执行：
+
+        //方案一：
+        //fight.run(()=>{_private.genFighting.next();}, {Running: 1, Tips: 'genFighting.next2'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
+        //fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
+        //yield 10;
+
+        //方案二：使用Promise
+        /*yield new Promise(
+            function (resolved, reject) {
+                fight.run(function() {resolved();});
+        });*/
+        //yield fight.run(0);
 
 
 
@@ -1555,7 +1589,7 @@ function *runCombatantRoundScript(combatant, stage) {
 
 
 //逃跑处理
-function runAway() {
+function *runAway() {
     //if(flag === null)
     //    return _private.nRunAwayFlag;
 
@@ -1588,44 +1622,37 @@ function runAway() {
     //逃跑计算
 
     //如果是true，则调用通用逃跑算法
-    if(_private.runAway === true) {
+    if(_private.runAwayPercent === true) {
         if(game.$sys.resources.commonScripts['common_run_away_algorithm'](fight.myCombatants, -1)) {
-            fight.over(-2);
             return true;
         }
     }
     //如果是数字（0~1之间），则概率逃跑
-    else if(GlobalLibraryJS.isValidNumber(_private.runAway)) {
-        if(Math.random() < _private.runAway) {
-            fight.over(-2);
+    else if(GlobalLibraryJS.isValidNumber(_private.runAwayPercent)) {
+        if(Math.random() < _private.runAwayPercent) {
             return true;
         }
     }
 
-    //脚本形式执行
-    let continueScript = function*() {
-        yield fight.msg('逃跑失败');
+    yield fight.msg('逃跑失败');
 
-        //全部设置为 休息
-        for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
-            //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts['fight_combatant_set_choice'](fight.myCombatants[i], 1, false);
-                //fight.myCombatants[i].$$fightData.$choice.$type = 1;
-                //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
-                //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
-            }
+    //全部设置为 休息
+    for(let i = 0; i < fight.myCombatants.length; ++i) {
+        if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
+        //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
+            //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
+            game.$sys.resources.commonScripts['fight_combatant_set_choice'](fight.myCombatants[i], 1, false);
+            //fight.myCombatants[i].$$fightData.$choice.$type = 1;
+            //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
+            //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
         }
+    }
         //!!这里使用事件的形式执行genFighting，因为genFighting中也有 fight 脚本，貌似对之后的脚本造成了影响!!
         //if(flag !== true)
         //GlobalLibraryJS.runNextEventLoop(function() {
-        //    let ret = _private.genFighting.run();
+        //    let ret1 = _private.genFighting.next();
         //}/*,0,rootFightScene*/,'fight runaway');
-        fight.$sys.continueFight(1);
-    }
-
-    fight.run(continueScript() ?? null, '逃跑失败脚本');
+        //fight.$sys.continueFight(1);
 
     return false;
 }
@@ -1636,7 +1663,7 @@ function runAway() {
 function fightOver(result, force=false) {
     if(force) {
         timerRoleSprite.stop();
-        _private.genFighting.clear(3);
+        //_private.scriptQueueFighting.clear(3);
         _private.scriptQueue.clear(3);
     }
 
@@ -1646,7 +1673,7 @@ function fightOver(result, force=false) {
         //    fight.run(_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end');
         //}
 
-        fight.run(game.$sys.resources.commonScripts['fight_end_script'](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, 'fight end2');
+        fight.run(game.$sys.resources.commonScripts['fight_end_script'](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 2, Tips: 'fight end2'});
     //}
 }
 

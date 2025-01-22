@@ -154,8 +154,8 @@ Item {
 
 2025/1/1：发布 1.15.1.250101 版本（Updater 1.5.17.250101版本，框架 1.6.4.250101版本）
 1、修改：Updater的一些细节（避免了升级后载入内核有概率自动退出的问题）；
-2、新增：openssl库的一些常用函数（RSA密钥对生成、RSA加解密、RSA验证、md5摘要、sha256摘要、des对称加解密）；
-3、修改：将SQLITECIPHER密码加密后放到Config.cfg，这样可以做自己的本地加密SQLITE；
+2、新增：OpenSSL库的一些常用函数（RSA密钥对生成、RSA加解密、RSA验证、MD5摘要、SHA256摘要、DES对称加解密）；
+3、修改：将SQLITECIPHER密码加密后放到Config.cfg，这样可以做自己的本地加密Sqlite；
 4、新增：拖动文件夹到鹰歌可以打包为zip；
 5、修改：sl_compressFile、sl_compressFiles、sl_compressDir新增了参数；
 6、新增：sl_compressFileEx、sl_compressFilesEx、sl_extractDirEx加密zip操作函数；
@@ -168,9 +168,12 @@ Item {
 13、修改：将ScriptEditor抽出为系统组件；
 14、修改：修改了地图编辑器、角色编辑器、特效编辑器等的代码编辑器；
 15、修改：修改了很多组件的名字；
-16、发布：linux的deb新版包；
-17、其他：优化调整很多代码和细节，修复一些Bugs；
-18、先这样吧。
+16、修改：增强通用文件中 fontSize 和 $minWidth、$maxWidth 的功能；
+17、增强：优化网络插件、加解密插件，增强插件下载和管理；
+18、修改：将2个战斗脚本队列合并为1个；
+19、发布：linux的deb新版包；
+20、其他：优化调整很多代码和细节，修复一些Bugs；
+21、先这样吧。
 
 2024/12/24：发布 1.14.1.241224 版本（框架 1.6.3.241224版本）
 1、修改：重新设计游戏引擎主界面；
