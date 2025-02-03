@@ -1248,7 +1248,7 @@ Item {
     Loader {
         id: loader
 
-        property var vParam: undefined
+        property var vParams: undefined
 
         visible: false
         focus: true
@@ -1299,7 +1299,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug('[mainGameMaker]loader onLoaded:', vParam);
+            console.debug('[mainGameMaker]loader onLoaded:', vParams);
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -1311,7 +1311,7 @@ Item {
                     item.forceActiveFocus();
 
                 if(item.init)
-                    item.init(vParam);
+                    item.init(vParams);
 
                 visible = true;
             }
@@ -1479,7 +1479,7 @@ Item {
         }
 
         //载入模块
-        function loadModule(module, param) {
+        function loadModule(module, params) {
             //console.debug('~~~loadModule:', module);
 
 
@@ -1491,7 +1491,7 @@ Item {
             //loader.focus = true;
             //loader.forceActiveFocus();
 
-            loader.vParam = param;
+            loader.vParams = params;
             if(GlobalLibraryJS.isObject(module)) {
                 loader.sourceComponent = module;
             }
@@ -1692,7 +1692,7 @@ Item {
         }
 
         function openProject() {
-            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, [], 0x001 | 0x2000, 0x03);
+            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, [], 0x001 | 0x2000, 0x00);
             l_listProjects.visible = true;
             //l_listProjects.focus = true;
             //l_listProjects.forceActiveFocus();
