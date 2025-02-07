@@ -463,13 +463,13 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainImageEditor]Escape Key');
+        console.debug('[mainImageEditor]Keys.onEscapePressed');
         event.accepted = true;
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainImageEditor]Back Key');
+        console.debug('[mainImageEditor]Keys.onBackPressed');
         event.accepted = true;
     }
     Keys.onPressed: {

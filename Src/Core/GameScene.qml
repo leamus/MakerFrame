@@ -72,6 +72,7 @@ import 'GameScene.js' as GameSceneJS
     game.gd['$sys_main_roles']: 当前主角列表，保存了主角属性（{$rid、$id、$name、$index、$showName、$scale、$speed、$avatar、$avatarSize、$x、$y 等}）
     game.gd['$sys_music']: 当前播放的音乐名
     game.gd['$sys_sound']: 从右到左：音乐、音效 播放状态
+    game.gd['$sys_volume']: 从右到左：音乐、音效 播放音量
     game.gd['$sys_scale']: 当前缩放大小
     game.gd['$sys_random_fight']：随机战斗
 
@@ -3000,7 +3001,7 @@ Item {
             //return itemBackgroundMusic.objMusicPause[$name] !== undefined;
             if(GlobalLibraryJS.objectIsEmpty(itemBackgroundMusic.objMusicPause) &&
                 //!GameMakerGlobal.settings.value('$PauseMusic') &&
-                !game.cd['$PauseMusic'] &&
+                (game.cd['$sys_sound'] & 0b1) &&
                 (game.gd['$sys_sound'] & 0b1)
             )
                 return false;
@@ -3032,7 +3033,7 @@ Item {
             //return _private.config.nSoundConfig !== 0;
             if(GlobalLibraryJS.objectIsEmpty(rootSoundEffect.objSoundEffectPause) &&
                 //!GameMakerGlobal.settings.value('$PauseSound') &&
-                !game.cd['$PauseSound'] &&
+                (game.cd['$sys_sound'] & 0b10) &&
                 (game.gd['$sys_sound'] & 0b10)
             )
                 return false;
@@ -3241,7 +3242,7 @@ Item {
                     objTmpComponents = role.$tmpComponents;
                 }
                 else {
-                    console.warn('[!GameScene]找不到：', imageParams.$parent);
+                    console.warn('[!GameScene]showimage:找不到parent:', imageParams.$parent);
                     //delimage(id);
                     return false;
                 }
@@ -3708,7 +3709,7 @@ Item {
                     objTmpComponents = role.$tmpComponents;
                 }
                 else {
-                    console.warn('[!GameScene]找不到：', spriteParams.$parent);
+                    console.warn('[!GameScene]showsprite:找不到parent:', spriteParams.$parent);
                     //delsprite(id);
                     return false;
                 }
@@ -4356,7 +4357,7 @@ Item {
                 //压缩
                 if(data.Type === 1) {
                     //debug下不检测存档
-                    if(GameMakerGlobal.config.debug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + data.Data)) {
+                    if(GameMakerGlobal.config.bDebug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + data.Data)) {
                         return false;
                     }
                     try {
@@ -4370,7 +4371,7 @@ Item {
                 }
                 else {
                     //debug下不检测存档
-                    if(GameMakerGlobal.config.debug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
+                    if(GameMakerGlobal.config.bDebug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
                         return false;
                     }
                     return data;
@@ -4676,7 +4677,7 @@ Item {
             let data = FrameManager.sl_fileRead(filePath);
 
             if(!data) {
-                console.warn('[!GameScene]loadjson Fail:', filePath);
+                console.warn('[!GameScene]loadjson FAIL:', filePath);
                 return null;
             }
             return JSON.parse(data);
@@ -6039,7 +6040,7 @@ Item {
         function pause(name='$user') {
             if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseMusic', 1);
-                game.cd['$PauseMusic'] = 1;
+                game.cd['$sys_sound'] &= ~0b1;
             }
             else if(name === false) { //存档
                 game.gd['$sys_sound'] &= ~0b1;
@@ -6064,7 +6065,7 @@ Item {
         function resume(name='$user') {
             if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseMusic', 0);
-                game.cd['$PauseMusic'] = 0;
+                game.cd['$sys_sound'] |= 0b1;
             }
             else if(name === false) { //存档
                 game.gd['$sys_sound'] |= 0b1;
@@ -6084,7 +6085,7 @@ Item {
                 }
             }
             else if(name === -1) {
-                game.cd['$PauseMusic'] = 0;
+                game.cd['$sys_sound'] |= 0b1;
                 game.gd['$sys_sound'] |= 0b1;
                 objMusicPause = {};
             }
@@ -6208,7 +6209,7 @@ Item {
         function pause(name='$user') {
             if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseSound', 1);
-                game.cd['$PauseSound'] = 1;
+                game.cd['$sys_sound'] &= ~0b10;
             }
             else if(name === false) { //存档
                 game.gd['$sys_sound'] &= ~0b10;
@@ -6245,7 +6246,7 @@ Item {
         function resume(name='$user') {
             if(name === true) { //引擎全局
                 //GameMakerGlobal.settings.setValue('$PauseSound', 0);
-                game.cd['$PauseSound'] = 0;
+                game.cd['$sys_sound'] |= 0b10;
             }
             else if(name === false) { //存档
                 game.gd['$sys_sound'] |= 0b10;
@@ -6273,7 +6274,7 @@ Item {
                 }
             }
             else if(name === -1) {
-                game.cd['$PauseSound'] = 0;
+                game.cd['$sys_sound'] |= 0b10;
                 game.gd['$sys_sound'] |= 0b10;
                 objSoundEffectPause = {};
             }
@@ -6331,11 +6332,11 @@ Item {
         id: itemFPS
 
         ///width: Platform.compileType === 'debug' ? rootGameScene.width / 3 : rootGameScene.width / 2
-        //width: GameMakerGlobal.config.debug === true ? rootGameScene.width / 3 : rootGameScene.width / 2
+        //width: GameMakerGlobal.config.bDebug === true ? rootGameScene.width / 3 : rootGameScene.width / 2
         //width: textFPS.width + textPos.width
         width: 150
         //height: Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
-        height: GameMakerGlobal.config.debug === true ? textFPS.implicitHeight : textFPS.implicitHeight
+        height: GameMakerGlobal.config.bDebug === true ? textFPS.implicitHeight : textFPS.implicitHeight
 
         color: '#90FFFFFF'
 
@@ -6359,7 +6360,7 @@ Item {
                 height: textFPS.implicitHeight
 
                 ///visible: Platform.compileType === 'debug'
-                //visible: GameMakerGlobal.config.debug === true
+                //visible: GameMakerGlobal.config.bDebug === true
             }
         }
 
@@ -6371,7 +6372,7 @@ Item {
             height: 15
 
             //visible: Platform.compileType === 'debug'
-            visible: GameMakerGlobal.config.debug === true
+            visible: GameMakerGlobal.config.bDebug === true
         }
 
 
@@ -7914,7 +7915,7 @@ Item {
                             anchors.fill: parent
 
 
-                            //textArea.color: 'white'
+                            //textArea.color: Global.style.foreground
                             //textArea.placeholderTextColor: '#7F7F7F7F'
 
                             //textArea.enabled: false
@@ -7933,7 +7934,6 @@ Item {
                             /*
                             //implicitWidth: 200
                             //implicitHeight: 40
-                            color: 'black'
                             //color: 'transparent'
                             //color: Global.style.backgroundColor
                             border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
@@ -8439,7 +8439,7 @@ Item {
     }
 
 
-    //地图图片
+    //图片
     Component {
         id: compCacheImage
 
@@ -8504,7 +8504,7 @@ Item {
         }
     }
 
-    //地图特效
+    //特效
     Component {
         id: compCacheSpriteEffect
 
@@ -8679,14 +8679,14 @@ Item {
         _private.showExitDialog();
         event.accepted = true;
 
-        console.debug('[GameScene]Escape Key');
+        console.debug('[GameScene]Keys.onEscapePressed');
     }
     Keys.onBackPressed: {
         //sg_close();
         _private.showExitDialog();
         event.accepted = true;
 
-        console.debug('[GameScene]Back Key');
+        console.debug('[GameScene]Keys.onBackPressed');
     }
     */
 

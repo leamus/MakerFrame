@@ -519,14 +519,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainTutorial]Escape Key');
+        console.debug('[mainTutorial]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainTutorial]Back Key');
+        console.debug('[mainTutorial]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

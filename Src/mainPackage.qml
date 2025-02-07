@@ -225,14 +225,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainPackage]Escape Key');
+        console.debug('[mainPackage]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainPackage]Back Key');
+        console.debug('[mainPackage]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

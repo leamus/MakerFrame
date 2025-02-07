@@ -123,8 +123,8 @@ Item {
                     let musicInfo = '音乐状态：' + ((game.gd['$sys_sound'] & 0b1) ? '开' : '关');
                     let soundInfo = '音效状态：' + ((game.gd['$sys_sound'] & 0b10) ? '开' : '关');
                     //全局音乐
-                    //let musicInfo = '音乐状态：' + (/*GameMakerGlobal.settings.value('$PauseMusic')*/game.cd['$PauseMusic'] ? '开' : '关');
-                    //let soundInfo = '音效状态：' + (/*GameMakerGlobal.settings.value('$PauseSound')*/game.cd['$PauseSound'] ? '开' : '关');
+                    //let musicInfo = '音乐状态：' + ((game.cd['$sys_sound'] & 0b1) ? '开' : '关');
+                    //let soundInfo = '音效状态：' + ((game.cd['$sys_sound'] & 0b10) ? '开' : '关');
 
                     let c = yield game.menu('设 置', [musicInfo, soundInfo, '关闭']);
                     switch(c) {
@@ -143,7 +143,8 @@ Item {
                         /*
                         //全局音乐
                         //if(GameMakerGlobal.settings.value('$PauseMusic')) {
-                        if(game.cd['$PauseMusic']) {
+                        //if(game.cd['$PauseMusic']) {
+                        if(game.cd['$sys_sound'] & 0b1) {
                             //itemBackgroundMusic.resume(true);
                             game.resumemusic(true);
                             yield game.msg('打开音乐');
@@ -170,7 +171,8 @@ Item {
                         /*
                         //全局音效
                         //if(GameMakerGlobal.settings.value('$PauseSound')) {
-                        if(game.cd['$PauseSound']) {
+                        //if(game.cd['$PauseSound']) {
+                        if(game.cd['$sys_sound'] & 0b10) {
                             //rootSoundEffect.resume(true);
                             game.resumesoundeffect(true);
                             yield game.msg('打开音效');

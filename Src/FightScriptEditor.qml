@@ -38,7 +38,7 @@ Item {
         if(fightScriptName) {
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScriptName + GameMakerGlobal.separator + 'fight_script.js';
             //let data = File.read(filePath);
-            //console.debug('[GameFightScript]filePath：', filePath);
+            //console.debug('[FightScriptEditor]filePath：', filePath);
 
             let data = FrameManager.sl_fileRead(filePath);
 
@@ -483,29 +483,29 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameFightScript]Escape Key');
+        console.debug('[FightScriptEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameFightScript]Back Key');
+        console.debug('[FightScriptEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameFightScript]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[FightScriptEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameFightScript]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[FightScriptEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameFightScript]Component.onCompleted');
+        console.debug('[FightScriptEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameFightScript]Component.onDestruction');
+        console.debug('[FightScriptEditor]Component.onDestruction');
     }
 }

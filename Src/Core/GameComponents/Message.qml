@@ -146,6 +146,7 @@ Notepad {
     //textArea.enabled: false
     textArea.readOnly: true
     textArea.color: 'white'
+    //textArea.color: Global.style.foreground
     textArea.selectByKeyboard: false
     textArea.selectByMouse: false
     textArea.wrapMode: TextArea.WrapAnywhere

@@ -156,7 +156,7 @@ Item {
                 return false;
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            rootWindow.aliasGlobal.l_list.open({
+            rootWindow.aliasGlobal.list.open({
                 RemoveButtonVisible: false,
                 Data: Object.keys(menuJS.plugins),
                 OnClicked: (index, item)=>{
@@ -205,7 +205,7 @@ Item {
                                             return;
 
                                         //itemExtendsRoot.forceActiveFocus();
-                                        //rootWindow.aliasGlobal.l_list.visible = false;
+                                        //rootWindow.aliasGlobal.list.visible = false;
 
                                     }
                                     catch(e) {
@@ -245,7 +245,7 @@ Item {
                                             }
 
                                             //itemExtendsRoot.forceActiveFocus();
-                                            //rootWindow.aliasGlobal.l_list.visible = false;
+                                            //rootWindow.aliasGlobal.list.visible = false;
 
                                         }
                                         catch(e) {
@@ -351,11 +351,11 @@ Item {
                         },
                     });
 
-                    //rootWindow.aliasGlobal.l_list.visible = false;
+                    //rootWindow.aliasGlobal.list.visible = false;
                     //root.forceActiveFocus();
                 },
                 OnCanceled: ()=>{
-                    rootWindow.aliasGlobal.l_list.visible = false;
+                    rootWindow.aliasGlobal.list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -367,18 +367,18 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        rootWindow.aliasGlobal.l_list.visible = false;
+        rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
-        console.debug('[PluginsDownload]Escape Key');
+        console.debug('[PluginsDownload]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        rootWindow.aliasGlobal.l_list.visible = false;
+        rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
-        console.debug('[PluginsDownload]Back Key');
+        console.debug('[PluginsDownload]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

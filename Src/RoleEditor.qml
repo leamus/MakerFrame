@@ -310,17 +310,17 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                        rootWindow.aliasGlobal.l_list.open({
+                        rootWindow.aliasGlobal.list.open({
                             Data: path,
                             CustomData: this,
                             OnClicked: (index, item, customData)=>{
                                 text = item;
 
-                                rootWindow.aliasGlobal.l_list.visible = false;
+                                rootWindow.aliasGlobal.list.visible = false;
                                 customData.forceActiveFocus();
                             },
                             OnCanceled: (customData)=>{
-                                rootWindow.aliasGlobal.l_list.visible = false;
+                                rootWindow.aliasGlobal.list.visible = false;
                                 customData.forceActiveFocus();
                             },
                         });
@@ -760,16 +760,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.imageResourcePath();
 
-                                rootWindow.aliasGlobal.l_list.open({
+                                rootWindow.aliasGlobal.list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -3132,12 +3132,12 @@ function $refresh(index, imageAnimate, path) {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        console.debug('[RoleEditor]Escape Key');
+        console.debug('[RoleEditor]Keys.onEscapePressed');
         _private.close();
         event.accepted = true;
     }
     Keys.onBackPressed: {
-        console.debug('[RoleEditor]Back Key');
+        console.debug('[RoleEditor]Keys.onBackPressed');
         _private.close();
         event.accepted = true;
     }

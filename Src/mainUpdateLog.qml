@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -122,14 +123,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainUpdateLog]Escape Key');
+        console.debug('[mainUpdateLog]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainUpdateLog]Back Key');
+        console.debug('[mainUpdateLog]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
@@ -154,13 +155,15 @@ Item {
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；
-2、其他：优化调整很多代码和细节，修复一些Bugs；
+2、修复：一些文本中背景和文字一个颜色；
+3、修改：保存窗口状态；
+4、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/1/1：发布 1.15.1.250101 版本（Updater 1.5.17.250101版本，框架 1.6.4.250101版本）
 1、修改：Updater的一些细节（避免了升级后载入内核有概率自动退出的问题）；
 2、新增：OpenSSL库的一些常用函数（RSA密钥对生成、RSA加解密、RSA验证、MD5摘要、SHA256摘要、DES对称加解密）；
 3、修改：将SQLITECIPHER密码加密后放到Config.cfg，这样可以做自己的本地加密Sqlite；
-4、新增：拖动文件夹到鹰歌可以打包为zip；
+4、新增：拖动文件夹到鹰歌可以压缩为zip；
 5、修改：sl_compressFile、sl_compressFiles、sl_compressDir新增了参数；
 6、新增：sl_compressFileEx、sl_compressFilesEx、sl_extractDirEx加密zip操作函数；
 7、修复：game.playvideo播放时报错、结束时无法退出的问题；
@@ -172,7 +175,7 @@ Item {
 13、修改：将ScriptEditor抽出为系统组件；
 14、修改：修改了地图编辑器、角色编辑器、特效编辑器等的代码编辑器；
 15、修改：修改了很多组件的名字；
-16、修改：增强通用文件中 fontSize 和 $minWidth、$maxWidth 的功能；
+16、修改：增强（并兼容）通用文件中 各种fontSize 和 $minWidth、$maxWidth 的功能；
 17、增强：优化网络插件、加解密插件，增强插件下载和管理；
 18、修改：将2个战斗脚本队列合并为1个；
 19、发布：linux的deb新版包；

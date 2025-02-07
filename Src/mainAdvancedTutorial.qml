@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             //textArea.enabled: false
             //textArea.readOnly: true
 
@@ -122,14 +123,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainAdvancedTutorial]Escape Key');
+        console.debug('[mainAdvancedTutorial]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainAdvancedTutorial]Back Key');
+        console.debug('[mainAdvancedTutorial]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
@@ -152,9 +153,9 @@ Item {
     FrameManager.preciseTimer.sl_stop();
 2、多线程   //~~~~~~~
     示例：
-    let taskID = FrameManager.sl_insertScriptTask('console.info(0)', 0, function(params){console.info(999, params)}, 2);
+    let taskID = FrameManager.sl_insertScriptTask('console.info(0)', 0, 2, function(params){console.info(999, params)});
     或：
-    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, function(params){console.info('params:', params);console.info(999, params.$toJson())}, -1);
+    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, -1, function(params){console.info('params:', params);console.info(999, params.$toJson())});
 
     FrameManager.sl_setThreadMaxCount(2);
     let taskParam = FrameManager.sl_getScriptTask(taskID);

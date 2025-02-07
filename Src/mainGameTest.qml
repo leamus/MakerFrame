@@ -423,14 +423,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainGameTest]Escape Key');
+        console.debug('[mainGameTest]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainGameTest]Back Key');
+        console.debug('[mainGameTest]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

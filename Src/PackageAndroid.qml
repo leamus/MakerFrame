@@ -222,7 +222,7 @@ Item {
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
-            textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             //textArea.readOnly: true
             textArea.selectByMouse: false
 
@@ -386,11 +386,11 @@ Item {
             res = reg.exec(content);
             textGameName.text = res[1];
 
-            reg = /property string tds_ClientID: '(\w*)'/g;
+            reg = /property string strTDSClientID: '(\w*)'/g;
             res = reg.exec(content);
             textTapClientID.text = res[1];
 
-            reg = /property string tds_ClientToken: '(\w*)'/g;
+            reg = /property string strTDSClientToken: '(\w*)'/g;
             res = reg.exec(content);
             textTapClientToken.text = res[1];
 
@@ -426,10 +426,10 @@ Item {
                 reg = /(category: ')\S*(')/g;
                 content = content.replace(reg, '$1' + textGameName.text + '$2');
 
-                reg = /(property string tds_ClientID: ')\w*(')/g;
+                reg = /(property string strTDSClientID: ')\w*(')/g;
                 content = content.replace(reg, '$1' + textTapClientID.text + '$2');
 
-                reg = /(property string tds_ClientToken: ')\w*(')/g;
+                reg = /(property string strTDSClientToken: ')\w*(')/g;
                 content = content.replace(reg, '$1' + textTapClientToken.text + '$2');
 
 
@@ -663,14 +663,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[PackageAndroid]Escape Key');
+        console.debug('[PackageAndroid]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[PackageAndroid]Back Key');
+        console.debug('[PackageAndroid]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

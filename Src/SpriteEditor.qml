@@ -2280,12 +2280,12 @@ function $refresh(index, imageAnimate, path) {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        console.debug('[SpriteEditor]Escape Key');
+        console.debug('[SpriteEditor]Keys.onEscapePressed');
         _private.close();
         event.accepted = true;
     }
     Keys.onBackPressed: {
-        console.debug('[SpriteEditor]Back Key');
+        console.debug('[SpriteEditor]Keys.onBackPressed');
         _private.close();
         event.accepted = true;
     }

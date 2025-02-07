@@ -3,10 +3,68 @@
 function *loadResources() {
     console.debug('[GameScene]loadResources');
 
+
+    /*function observe(obj, callback, prefix='') {
+        return new Proxy(obj, {
+            set(target, prop, value) {
+                //监视嵌套对象
+                if (typeof value === 'object' && value !== null) {
+                    value = observe(value, callback, prefix + '/' + prop); // 递归代理嵌套对象
+                }
+
+                const isNew = !(prop in target);
+                const oldValue = target[prop];
+                const result = Reflect.set(target, prop, value);
+                if (result) {
+                    callback({
+                        type: isNew ? 'add' : 'update',
+                        prop,
+                        oldValue,
+                        newValue: value,
+                        prefix: prefix,
+                        target: target,
+                    });
+                }
+                return result;
+            },
+            deleteProperty(target, prop) {
+                const hadProp = prop in target;
+                const oldValue = target[prop];
+                const result = Reflect.deleteProperty(target, prop);
+                if (hadProp && result) {
+                    callback({
+                        type: 'delete',
+                        prop,
+                        oldValue,
+                        prefix: prefix,
+                        target: target,
+                    });
+                }
+                return result;
+            }
+        });
+    }
+    let targetObj = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName, {});
+    //if(!targetObj)
+    //    targetObj = {};
+    if(targetObj['$sys_sound'] === undefined)
+        targetObj['$sys_sound'] = 0b11;
+    game.cd = observe(targetObj, (change) => {
+        console.debug('变化类型:', change.type);
+        console.debug('属性名:', change.prop);
+        console.debug('旧值:', change.oldValue);
+        console.debug('新值:', change.newValue);
+        console.debug('前缀:', change.prefix);
+        console.debug('对象:', change.target);
+    });
+    */
+
     //读取引擎变量
-    game.cd = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName);
-    if(!game.cd)
-        game.cd = {};
+    game.cd = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName, {});
+    //if(!game.cd)
+    //    game.cd = {};
+    if(game.cd['$sys_sound'] === undefined)
+        game.cd['$sys_sound'] = 0b11;
 
 
 
@@ -1503,7 +1561,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 
 //载入特效，返回特效对象
-//spriteEffectParams是 特效的资源名（会读取对应特效的信息）或 特效的信息（不会再次读取）；
+//spriteEffectParams是 特效的资源名（会读取对应特效的信息）或 特效的原信息（使用GameSceneJS.getSpriteResource读取过的）；
 //如果 spriteEffectComp 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
 function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
     //console.debug('[FightScene]loadSpriteEffect0');
@@ -1640,7 +1698,7 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, pa
         return spriteEffectComp;
     }
     else {
-        console.exception('[!GameScene]loadSpriteEffect Fail:', spriteEffectParams);
+        console.exception('[!GameScene]loadSpriteEffect FAIL:', spriteEffectParams);
     }
 
     return null;
@@ -1649,7 +1707,7 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, pa
 function unloadSpriteEffect(spriteEffectComp) {
     //spriteEffectComp.destroy();
     if(!spriteEffectComp) {
-        console.warn('[!GameScene]unloadSpriteEffect Fail:', spriteEffectComp);
+        console.warn('[!GameScene]unloadSpriteEffect FAIL:', spriteEffectComp);
         return;
     }
     _private.cacheSprites.put(spriteEffectComp);
@@ -1772,7 +1830,7 @@ function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRo
         return roleComp;
     }
     else {
-        console.exception('[!GameScene]loadRole Fail:', roleParams);
+        console.exception('[!GameScene]loadRole FAIL:', roleParams);
     }
 
     return null;

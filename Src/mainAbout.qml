@@ -70,6 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -122,14 +123,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainAbout]Escape Key');
+        console.debug('[mainAbout]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainAbout]Back Key');
+        console.debug('[mainAbout]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

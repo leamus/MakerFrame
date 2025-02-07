@@ -28,50 +28,54 @@ let data = (function() {
             command: ['载入地图', 'yield game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
             params: [
                 ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
-                ['载入一张地图', 'label'],
+                ['载入一张地图（长按编辑框可选择）。', 'label'],
             ],
         },
         '信息': {
             command: ['显示信息', 'yield game.msg(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
             params: [
-                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', 'game.gf["变量名1"]', '${game.gd["变量名1"]}', 'game.cd["变量名1"]', '${变量名1}']], 'green'],
+                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', '${game.gf["变量名1"]}', '${game.gd["变量名1"]}', '${game.cd["变量名1"]}', '${变量名1}']], 'green'],
                 ['文字间隔', 'number', '60', 0, '60', 'blue'],
                 ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                 ['持续时间', 'number', '1000', 0, '', 'lightblue'],
                 ['显示效果', 'number', '3', 2, [['固定大小', '自适应高度', '自适应宽度', '自适应宽高'], ['0', '2', '1', '3'], '3'], 'lightblue'],
                 //['是否暂停游戏', 'bool', 'true', 0, '', 'darkblue'],
+                ['场景中央显示一段信息（使用HTML富文本格式；支持显示变量，格式：${变量名}）。', 'label'],
             ],
         },
         '多行文本信息': {
             command: ['显示多行文本信息', 'yield game.msg(GlobalLibraryJS.convertToHTML(%1, [" ", "\\n"]),%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
             params: [
-                ['*@信息', 'text', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', 'game.gf["变量名1"]', '${game.gd["变量名1"]}', 'game.cd["变量名1"]', '${变量名1}']], 'green'],
+                ['*@信息', 'text', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', '${game.gf["变量名1"]}', '${game.gd["变量名1"]}', '${game.cd["变量名1"]}', '${变量名1}']], 'green'],
                 ['文字间隔', 'number', '60', 0, '60', 'blue'],
                 ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                 ['持续时间', 'number', '1000', 0, '', 'lightblue'],
                 ['显示效果', 'number', '3', 2, [['固定大小', '自适应高度', '自适应宽度', '自适应宽高'], ['0', '2', '1', '3'], '3'], 'lightblue'],
                 //['是否暂停游戏', 'bool', 'true', 0, '', 'darkblue'],
+                ['场景中央显示一段多行文字信息（支持HTML富文本格式，会自动将空格和回车替换；文字支持显示变量，格式：${变量名}）。', 'label'],
             ],
         },
         '对话': {
             command: ['对话', 'yield game.talk(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
             params: [
                 ['角色名', 'string', undefined, 0, '', 'darkgreen'],
-                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', 'game.gf["变量名1"]', '${game.gd["变量名1"]}', 'game.cd["变量名1"]', '${变量名1}']], 'green'],
+                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', '${game.gf["变量名1"]}', '${game.gd["变量名1"]}', '${game.cd["变量名1"]}', '${变量名1}']], 'green'],
                 ['文字间隔', 'number', '60', 0, '', 'blue'],
                 ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                 ['持续时间', 'number', '1000', 0, '', 'lightblue'],
                 //['是否暂停游戏', 'bool', 'true', 2, [['是', '否'], ['true', 'false']], , 'darkblue'],
+                ['在场景下方显示一段对话信息（长按编辑框可选择）；能根据角色名显示头像和名称（可省略角色名）。', 'label'],
             ],
         },
         '说话': {
             command: ['说话', 'game.say(%1,%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
             params: [
                 ['*角色名/id', 'string', true, 0, '', 'darkgreen'],
-                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', 'game.gf["变量名1"]', '${game.gd["变量名1"]}', 'game.cd["变量名1"]', '${变量名1}']], 'green'],
+                ['*@信息', 'string', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', '${game.gf["变量名1"]}', '${game.gd["变量名1"]}', '${game.cd["变量名1"]}', '${变量名1}']], 'green'],
                 ['文字间隔', 'number', '60', 0, '', 'blue'],
                 ['预定义文字', 'string', '``', 0, '', 'lightblue'],
                 ['持续时间', 'number', '1000', 0, '', 'lightblue'],
+                ['角色上方显示一段文字（长按编辑框可选择）。', 'label'],
             ],
         },
         '菜单': {
@@ -80,7 +84,7 @@ let data = (function() {
                 ['标题', 'string', '``', 0, '标题', 'green'],
                 ['*菜单内容', 'json', true, 0, '[]', 'blue'],
                 //['@是否暂停游戏', 'bool', 'true', 2, [['是', '否'], ['true', 'false']], 'darkblue'],
-                ['菜单内容 是字符串数组；<br>命令返回的数据是 $index（选择的第几项，0起始） 和 $value（选择的值） 变量', 'label'],
+                ['菜单内容 是字符串数组；<br>该命令返回的数据是 $index（选择的第几项，0起始） 和 $value（选择项的值） 变量。', 'label'],
             ],
         },
         '输入文本': {
@@ -89,7 +93,7 @@ let data = (function() {
                 ['标题', 'string', true, 0, '标题', 'green'],
                 ['预设值', 'string', '``', 0, '', 'blue'],
                 //['@是否暂停游戏', 'bool', 'true', 2, [['是', '否'], ['true', 'false']], 'darkblue'],
-                ['命令返回的文本是 $value 变量', 'label'],
+                ['该命令返回的数据是 $value（输入文本） 变量。', 'label'],
             ],
         },
         '创建主角': {
@@ -97,14 +101,14 @@ let data = (function() {
             params: [
                 ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                 ['主角名/id', 'string', undefined, 0, '', 'darkgreen'],
-                ['主角名/id 为标识，操作和特定事件名使用，不可重复；如果省略，系统会自动使用随机标识；<br>命令返回主角组件对象', 'label'],
+                ['主角名/id 为标识，操作和特定事件名使用，不可重复；如果省略，系统会自动使用随机标识；<br>命令返回主角组件对象。', 'label'],
             ],
         },
         '主角对象': {
             command: ['主角对象', 'game.hero(%1)', '主角对象', 0, false, 'red', 'white'],
             params: [
                 ['*@主角名/id', 'string|number', true, 2, [['全部', '角色名'], ['-1', ''], ''], 'green'],
-                ['命令返回主角组件对象', 'label'],
+                ['命令返回主角组件对象。', 'label'],
             ],
         },
         '修改主角': {
@@ -112,13 +116,14 @@ let data = (function() {
             params: [
                 ['*@主角名/id', 'string', true, 2, [['角色名'], [''], ''], 'green'],
                 ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
-                ['命令返回主角组件对象', 'label'],
+                ['命令返回主角组件对象。', 'label'],
             ],
         },
         '删除主角': {
             command: ['删除主角', 'game.delhero(%1);', '删除主角', 0, true, 'red', 'white'],
             params: [
                 ['*@主角名/id', 'string|number', true, 2, [['全部', '角色名'], ['-1', ''], ''], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '移动主角': {
@@ -129,14 +134,16 @@ let data = (function() {
             ],
         },
         '创建NPC': {
-            command: ['创建NPC', 'game.createrole({RID: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5});', '', 0, true, 'red', 'white'],
+            command: ['创建NPC', 'game.createrole({RID: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5, $start: %6, $direction: %7});', '', 0, true, 'red', 'white'],
             params: [
                 ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                 ['NPC名/id', 'string', undefined, 0, '', 'darkgreen'],
                 ['*地图块x', 'number', true, 0, '', 'blue'],
                 ['*地图块y', 'number', true, 0, '', 'blue'],
-                ['@动作', 'number', '1', 2, [['移动', '禁止'], ['1', '-1']], 'green'],
-                ['NPC名/id 为标识，操作和特定事件名使用，不可重复；如果省略，系统会自动使用随机标识；<br>命令返回NPC组件对象', 'label'],
+                ['@移动', 'number', '1', 2, [['随机', '禁止'], ['1', '-1']], 'green'],
+                ['@动作', 'bool', false, 2, [['播放', '禁止'], [true, false]], 'green'],
+                ['@面向', 'number', '2', 2, [['上', '右', '下', '左'], ['0', '1', '2', '3']], 'green'],
+                ['NPC名/id 为标识，操作和特定事件名使用，不可重复；如果省略，系统会自动使用随机标识；<br>命令返回NPC组件对象。', 'label'],
             ],
         },
         '移动NPC': {
@@ -151,7 +158,8 @@ let data = (function() {
             command: ['NPC对象', 'game.role(%1)', 'NPC对象', 0, false, 'red', 'white'],
             params: [
                 ['*@NPC名/id', 'string|number', true, 2, [['全部', 'NPC名'], ['-1', ''], ''], 'green'],
-                ['命令返回NPC组件对象', 'label'],
+                ['命令返回NPC组件对象；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '修改NPC': {
@@ -159,13 +167,15 @@ let data = (function() {
             params: [
                 ['*@NPC名/id', 'string', true, 2, [['NPC名'], [''], ''], 'green'],
                 ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
-                ['命令返回NPC组件对象', 'label'],
+                ['命令返回NPC组件对象；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '删除NPC': {
             command: ['删除NPC', 'game.delrole(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['*@NPC名/id', 'string|number', true, 2, [['全部', 'NPC名'], ['-1', ''], ''], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -174,6 +184,7 @@ let data = (function() {
             command: ['播放音乐', 'game.playmusic(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['*@音乐资源名', 'string', true, 1, GameMakerGlobal.musicResourcePath(), 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '停止音乐': {
@@ -197,6 +208,7 @@ let data = (function() {
             params: [
                 ['*@视频资源名', 'string', true, 1, GameMakerGlobal.videoResourcePath(), 'green'],
                 ['属性', 'json', '{}', 0, '{}', 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -297,13 +309,13 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '场景缩放': {
             command: ['场景缩放', 'game.scale(%1);', '', 0, true, 'red', 'white'],
             params: [
-                ['*倍数', 'number', true, 0, '1', 'green'],
+                ['*倍数（支持小数）', 'number', true, 0, '1', 'green'],
             ],
         },
         '暂停游戏': {
             command: ['暂停游戏', 'game.pause();', '', 0, true, 'red', 'white'],
             params: [
-                ['暂停游戏主定时器', 'label'],
+                ['暂停游戏主定时器，不会暂停事件队列。', 'label'],
             ],
         },
         '继续游戏': {
@@ -316,7 +328,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['延时', 'yield game.wait(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['*毫秒', 'number', true, 0, '', 'green'],
-                ['只是延时事件队列', 'label'],
+                ['只是延时事件队列。', 'label'],
             ],
         },
 
@@ -324,7 +336,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['游戏刷新率', 'game.interval(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['*刷新率', 'number', true, 0, '16', 'green'],
-                ['刷新率只是参考值，并不是严格准确的（因为qml的定时器不准确）', 'label'],
+                ['刷新率只是参考值，因为定时器本身并不准确。', 'label'],
             ],
         },
         '存档': {
@@ -352,12 +364,14 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['创建战斗主角', 'game.createfighthero(%1);', '创建战斗主角', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '删除战斗主角': {
             command: ['删除战斗主角', 'game.delfighthero(%1);', '删除战斗主角', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）', '全部'], ['', '-1']], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '战斗主角对象': {
@@ -365,6 +379,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）', '全部'], ['', '-1']], 'darkgreen'],
                 ['@方式', 'number', '0', 2, [['返回对象', '返回名字'], ['0', '1'], '0'], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '获得技能': {
@@ -373,6 +388,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@技能名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@位置', 'number', true, 2, [['追加', '替换(输入数字下标)'], ['-1', ''], '-1'], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '移除技能': {
@@ -381,6 +397,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@技能名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '技能对象': {
@@ -389,7 +406,8 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@技能资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
-                ['注意：命令返回的是所有为 技能资源名 的技能对象数组', 'label'],
+                ['注意：命令返回的是所有为 技能资源名 的技能对象数组；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '修改战斗角色属性': {
@@ -399,6 +417,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@属性', 'name', true, 2, [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'], ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']], 'darkgreen'],
                 ['*值', 'number', true, 0, undefined, 'darkgreen'],
                 ['*@恢复方式', 'number', true, 2, [['增加数值', '倍率', '赋值', '满值（多段）'], ['1', '2', '3', '0'], '1'], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '升级': {
@@ -406,6 +425,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*级别', 'number', true, 0, '1', 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -414,7 +434,8 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['*个数', 'number', true, 0, '1', 'darkgreen'],
-                ['命令返回背包内此道具的总数', 'label'],
+                ['命令返回背包内此道具的总数；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -423,6 +444,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['*个数', 'number', true, 0, '1', 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -431,13 +453,15 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@道具', 'string|number', true, 2, [['道具资源名或下标（数字）', '所有'], ['', '-1'], '-1'], 'darkgreen'],
                 ['筛选', 'json', '{}', 0, '{}', 'darkgreen'],
-                ['注意：命令返回的是道具对象数组', 'label'],
+                ['注意：命令返回的是道具对象数组；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '道具个数': {
             command: ['道具个数', 'game.getgoods(%1,0)', '道具个数', 0, false, 'red', 'white'],
             params: [
                 ['*@道具', 'string|number', true, 2, [['道具资源名或下标（数字）'], ['']], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '使用道具': {
@@ -445,7 +469,8 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
-                ['注意：只是调用道具的 $commons.$useScript 脚本', 'label'],
+                ['注意：只是调用道具的 $commons.$useScript 脚本；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '装备道具': {
@@ -453,6 +478,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '卸下装备': {
@@ -460,6 +486,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@部位', 'string', true, 2, [['武器', '头戴', '身穿', '鞋子'], ['武器', '头戴', '身穿', '鞋子']], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '装备对象': {
@@ -467,7 +494,8 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['@部位', 'string', '``', 2, [['武器', '头戴', '身穿', '鞋子', '所有'], ['武器', '头戴', '身穿', '鞋子', '']], 'darkgreen'],
-                ['命令返回 战斗角色 的 部位 的 装备；如果部位为空，则返回所有装备的数组', 'label'],
+                ['命令返回 战斗角色 的 部位 的 装备；如果部位为空，则返回所有装备的数组；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '交易': {
@@ -475,14 +503,15 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*道具列表', 'json', true, 0, '[]', 'darkgreen'],
                 ['回调函数', 'code', undefined, 0, 'function*(){}', 'darkgreen'],
-                ['注意：道具列表 是道具资源名的数组（也可以是道具对象）', 'label'],
+                ['注意：道具列表 是道具资源名的数组（也可以是道具对象）；', 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '获得金钱': {
             command: ['获得金钱', 'game.money(%1);', '获得金钱', 0, true, 'red', 'white'],
             params: [
                 ['金钱', 'number', '0', 0, '', 'green'],
-                ['命令返回金钱总数', 'label'],
+                ['命令返回金钱总数。', 'label'],
             ],
         },
 
@@ -491,6 +520,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗脚本资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                 ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '开启随机战斗': {
@@ -500,6 +530,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                 ['几率(百分之)', 'number', '5', 0, '5', 'darkgreen'],
                 ['@方式', 'number', '3', 2, [['全部开启', '主角静止时遇敌', '主角行动时遇敌'], ['3', '2', '1'], '3'], 'darkgreen'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '关闭随机战斗': {
@@ -514,6 +545,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@名字', 'string', true, 2, [['定时器1', '定时器2', '定时器3'], ['定时器1', '定时器2', '定时器3'], ''], 'darkgreen'],
                 ['间隔', 'number', '1000', 0, '1000', 'darkgreen'],
                 ['次数', 'number', '-1', 0, '-1', 'darkgreen'],
+                ['注意：切换地图后失效；<br>长按编辑框可选择。', 'label'],
             ],
         },
         '删除地图定时器': {
@@ -528,6 +560,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['*@名字', 'string', true, 2, [['全局定时器1', '全局定时器2', '全局定时器3'], ['全局定时器1', '全局定时器2', '全局定时器3'], ''], 'darkgreen'],
                 ['间隔', 'number', '1000', 0, '1000', 'darkgreen'],
                 ['次数', 'number', '-1', 0, '-1', 'darkgreen'],
+                ['注意：游戏中一直有效；<br>长按编辑框可选择。', 'label'],
             ],
         },
         '删除全局定时器': {
@@ -583,24 +616,28 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['地图变量', 'game.d[%1]', '地图变量', 0, false, 'red', 'white'],
             params: [
                 ['*@变量名', 'string', true, 2, [['地图变量1', '地图变量2', '地图变量3', '地图变量4', '地图变量5', '地图变量6', '地图变量7', '地图变量8', '地图变量9'], ['地图变量名1', '地图变量名2', '地图变量名3', '地图变量名4', '地图变量名5', '地图变量名6', '地图变量名7', '地图变量名8', '地图变量名9']], 'green'],
+                ['注意：地图变量在当前地图中可用，切换地图时清空；<br>长按编辑框可选择。', 'label'],
             ],
         },
         '全局变量': {
             command: ['全局变量', 'game.gf[%1]', '全局变量', 0, false, 'red', 'white'],
             params: [
                 ['*@变量名', 'string', true, 2, [['全局变量1', '全局变量2', '全局变量3', '全局变量4', '全局变量5', '全局变量6', '全局变量7', '全局变量8', '全局变量9'], ['全局变量名1', '全局变量名2', '全局变量名3', '全局变量名4', '全局变量名5', '全局变量名6', '全局变量名7', '全局变量名8', '全局变量名9']], 'green'],
+                ['注意：全局变量在游戏中一直可用；长按编辑框可选择。', 'label'],
             ],
         },
         '存档变量': {
             command: ['存档变量', 'game.gd[%1]', '存档变量', 0, false, 'red', 'white'],
             params: [
                 ['*@变量名', 'string', true, 2, [['存档变量1', '存档变量2', '存档变量3', '存档变量4', '存档变量5', '存档变量6', '存档变量7', '存档变量8', '存档变量9'], ['存档变量名1', '存档变量名2', '存档变量名3', '存档变量名4', '存档变量名5', '存档变量名6', '存档变量名7', '存档变量名8', '存档变量名9']], 'green'],
+                ['注意：全局变量在游戏中一直可用，且会自动存档读档；长按编辑框可选择。', 'label'],
             ],
         },
         '引擎变量': {
             command: ['引擎变量', 'game.cd[%2]', '引擎变量', 0, false, 'red', 'white'],
             params: [
                 ['*@变量名', 'string', true, 2, [['引擎变量1', '引擎变量2', '引擎变量3', '引擎变量4', '引擎变量5', '引擎变量6', '引擎变量7', '引擎变量8', '引擎变量9'], ['引擎变量名1', '引擎变量名2', '引擎变量名3', '引擎变量名4', '引擎变量名5', '引擎变量名6', '引擎变量名7', '引擎变量名8', '引擎变量名9']], 'green'],
+                ['注意：引擎变量在整个游戏中一直可用，不会自动清除（新游戏、读档都不会清除）；长按编辑框可选择。', 'label'],
             ],
         },
         '判断': {
@@ -609,18 +646,21 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
                 ['@变量1', 'name', false, 2, [['地图变量1', '全局变量1', '存档变量1', '引擎变量1', '普通变量1', '当前地图名', '金钱'], ['game.d["变量名1"]', 'game.gf["变量名1"]', 'game.gd["变量名1"]', 'game.cd["变量名1"]', '变量名1', 'game.gd["$sys_map"].$name', 'game.money()']], 'green'],
                 ['*@符号', 'name', true, 2, [['等于（及类型）', '不等于（及类型）', '等于', '不等于', '大于', '小于', '大于等于', '小于等于'], ['===', '!==', '==', '!=', '>', '<', '>=', '<=']], 'blue'],
                 ['*@值/变量', 'name', true, 2, [['未定义', '空', '真', '假'], ['undefined', 'null', 'true', 'false']], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '与或非': {
             command: ['与或非', '%1', '与或非', 0, false, 'red', 'white'],
             params: [
                 ['*@与或非', 'name', true, 2, [['与', '或', '非'], ['&&', '||', '!']], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '运算符': {
             command: ['运算符', '%1', '运算符', 0, false, 'red', 'white'],
             params: [
                 ['*@运算符', 'name', true, 2, [['加', '减', '乘', '除', '取余', '取反', '赋值'], ['+', '-', '*', '/', '%', '~', '=']], 'green'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
         '运算': {
@@ -640,6 +680,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
 <font color="red">普通变量</font>：就是JS的var（函数作用域）和let（块作用域）变量；<br>
 `
                 , 'label'],
+                ['长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -649,7 +690,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@名称', 'name', true, 2, [['开始事件', '事件1', '事件2', '事件3', '事件4', '事件5', '事件6'], ['*$start', '*事件1', '*事件2', '*事件3', '*事件4', '*事件5', '*事件6']], 'green'],
                 ['参数(,号分隔)', 'name', '', 0, '', 'blue'],
-                [`<br>
+                [`<font color="red">注意</font>：名称要符合变量命名（支持中文）；名称前面加*号表示是<font color="red">生成器</font>，反之为<font color="red">普通函数</font>；<br>
 <font color="red">$start</font>：表示载入事件（地图载入或游戏载入）；<br>
 <font color="red">$end</font>：表示离开地图事件；<br>
 <font color="red">$地图块事件名</font>：表示主角进入地图事件块时的事件（对应的角色脚本事件函数名是：$地图块事件名_map）；<br>
@@ -670,26 +711,28 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*名称', 'name', true, 0, '名称', 'green'],
                 ['优先级', 'number', '-1', 0, '-1', 'blue'],
-                ['手动将一个 函数/生成器/生成器对象 放入事件队列中运行', 'label'],
+                ['手动将一个 函数/生成器/生成器对象 放入事件队列中运行。', 'label'],
             ],
         },
         '函数/生成器结束': {
             command: ['函数/生成器结束', 'return %1;', '函数/生成器结束', 0, true, 'red', 'white'],
             params: [
                 ['值', 'name', undefined, 0, '', 'green'],
+                ['结束可返回一个值。', 'label'],
             ],
         },
         '生成器中断': {
             command: ['生成器中断', 'yield %1;', '生成器中断', 0, true, 'red', 'white'],
              params: [
                 ['值', 'name', undefined, 0, '', 'green'],
+                ['只能用于生成器；中断生成器并返回一个值，下次调用会从中断地方继续执行。', 'label'],
             ],
         },
         '协程': {
             command: ['协程', 'game.async(%1);', '协程', 0, true, 'red', 'white'],
             params: [
                 ['*名称', 'name', true, 0, '名称', 'green'],
-                [' 协程运行 生成器/生成器对象（和game.run的区别是立刻运行，不会放入事件队列）；', 'label'],
+                [' 用协程运行 函数、生成器函数、生成器对象（和game.run的区别是会立即运行，不会放入事件队列）。', 'label'],
             ],
         },
 
@@ -697,11 +740,13 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '当前地图名': {
             command: ['当前地图名', 'game.gd["$sys_map"].$name', '当前地图名', 0, false, 'red', 'white'],
             params: [
+                ['返回当前地图名。', 'label'],
             ],
         },
         '金钱': {
             command: ['金钱', 'game.money()', '金钱', 0, false, 'red', 'white'],
             params: [
+                ['返回当前金钱数。', 'label'],
             ],
         },
         '战斗角色属性': {
@@ -709,6 +754,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@属性', 'name', true, 2, [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'], ['HP[0]','HP[1]','HP[2]','MP[0]','MP[1]','attack','defense','speed','luck','power']], 'darkgreen'],
+                ['返回某战斗角色的某个属性；<br>长按编辑框可选择。', 'label'],
             ],
         },
 
@@ -737,6 +783,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['自定义', '%1', '自定义指令', 0, false, 'red', 'white'],
             params: [
                 ['*代码', 'code', true, 0, '', 'green'],
+                ['注意：代码不会自动换行，所以注意手动换行。', 'label'],
             ],
         },
     })

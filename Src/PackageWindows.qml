@@ -71,7 +71,7 @@ Item {
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
-            textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             //textArea.readOnly: true
             textArea.selectByMouse: false
 
@@ -101,14 +101,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[PackageWindows]Escape Key');
+        console.debug('[PackageWindows]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[PackageWindows]Back Key');
+        console.debug('[PackageWindows]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

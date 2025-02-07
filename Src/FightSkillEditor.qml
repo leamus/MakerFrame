@@ -38,22 +38,22 @@ Item {
         if(fightSkillName) {
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.js';
             //let data = File.read(filePath);
-            //console.debug('[GameFightSkill]filePath：', filePath);
+            //console.debug('[FightSkillEditor]filePath：', filePath);
 
             let data = FrameManager.sl_fileRead(filePath);
 
             if(data) {
                 //console.debug('data', data);
                 _private.strSavedName = textFightSkillName.text = fightSkillName;
-                notepadGameFightSkillScript.setPlainText(data);
-                notepadGameFightSkillScript.toBegin();
+                notepadFightSkillScript.setPlainText(data);
+                notepadFightSkillScript.toBegin();
 
                 return;
             }
         }
 
         _private.strSavedName = textFightSkillName.text = '';
-        notepadGameFightSkillScript.setPlainText("
+        notepadFightSkillScript.setPlainText("
 //闭包写法
 let data = (function() {
 
@@ -196,7 +196,7 @@ let data = (function() {
 
 "
         );
-        notepadGameFightSkillScript.toBegin();
+        notepadFightSkillScript.toBegin();
 
     }
 
@@ -235,7 +235,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGameFightSkillScript.textDocument));
+                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadFightSkillScript.textDocument));
 
                     if(e) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -317,7 +317,7 @@ let data = (function() {
 
 
             Notepad {
-                id: notepadGameFightSkillScript
+                id: notepadFightSkillScript
 
                 Layout.preferredWidth: parent.width
 
@@ -407,8 +407,8 @@ let data = (function() {
             }
 
             function onSg_compile(code) {
-                notepadGameFightSkillScript.setPlainText(code);
-                notepadGameFightSkillScript.toBegin();
+                notepadFightSkillScript.setPlainText(code);
+                notepadFightSkillScript.toBegin();
             }
         }
     }
@@ -457,7 +457,7 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadGameFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
+                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
@@ -527,29 +527,29 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameFightSkill]Escape Key');
+        console.debug('[FightSkillEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameFightSkill]Back Key');
+        console.debug('[FightSkillEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameFightSkill]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[FightSkillEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameFightSkill]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[FightSkillEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameFightSkill]Component.onCompleted');
+        console.debug('[FightSkillEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameFightSkill]Component.onDestruction');
+        console.debug('[FightSkillEditor]Component.onDestruction');
     }
 }

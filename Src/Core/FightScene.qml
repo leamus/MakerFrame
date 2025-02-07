@@ -2098,7 +2098,7 @@ Item {
 
     //战场上的调试按钮
     Row {
-        visible: GameMakerGlobal.config.debug
+        visible: GameMakerGlobal.config.bDebug
 
         ColorButton {
             text: '调试'
@@ -2280,13 +2280,13 @@ Item {
         //FightSceneJS.fightOver(-1);
         event.accepted = true;
 
-        console.debug('[FightScene]Escape Key');
+        console.debug('[FightScene]Keys.onEscapePressed');
     }
     Keys.onBackPressed: {
         //FightSceneJS.fightOver(-1);
         event.accepted = true;
 
-        console.debug('[FightScene]Back Key');
+        console.debug('[FightScene]Keys.onBackPressed');
     }
 
 

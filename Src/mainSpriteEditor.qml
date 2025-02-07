@@ -82,7 +82,7 @@ Item {
                 return false;
 
             //if(item === '..') {
-            //    rootWindow.aliasGlobal.l_list.visible = false;
+            //    rootWindow.aliasGlobal.list.visible = false;
             //    return;
             //}
 
@@ -245,14 +245,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainSpriteEditor]Escape Key');
+        console.debug('[mainSpriteEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainSpriteEditor]Back Key');
+        console.debug('[mainSpriteEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

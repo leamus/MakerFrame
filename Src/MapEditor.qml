@@ -3584,7 +3584,7 @@ Item {
 
         event.accepted = true;
 
-        console.debug('[MapEditor]Escape Key');
+        console.debug('[MapEditor]Keys.onEscapePressed');
     }
     Keys.onBackPressed: {
         _private.close();
@@ -3595,7 +3595,7 @@ Item {
         //menuEsc.hide();
         event.accepted = true;
 
-        console.debug('[MapEditor]Back Key');
+        console.debug('[MapEditor]Keys.onBackPressed');
     }
     Keys.onPressed: {
         console.debug('[MapEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);

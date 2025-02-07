@@ -417,14 +417,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainMusicEditor]Escape Key');
+        console.debug('[mainMusicEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainMusicEditor]Back Key');
+        console.debug('[mainMusicEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

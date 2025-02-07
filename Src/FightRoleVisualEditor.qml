@@ -117,16 +117,16 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                        rootWindow.aliasGlobal.l_list.open({
+                        rootWindow.aliasGlobal.list.open({
                             Data: path,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                rootWindow.aliasGlobal.l_list.visible = false;
+                                rootWindow.aliasGlobal.list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.l_list.visible = false;
+                                rootWindow.aliasGlobal.list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -423,16 +423,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.imageResourcePath();
 
-                                rootWindow.aliasGlobal.l_list.open({
+                                rootWindow.aliasGlobal.list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -505,16 +505,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                rootWindow.aliasGlobal.l_list.open({
+                                rootWindow.aliasGlobal.list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -546,16 +546,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                rootWindow.aliasGlobal.l_list.open({
+                                rootWindow.aliasGlobal.list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -587,16 +587,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                rootWindow.aliasGlobal.l_list.open({
+                                rootWindow.aliasGlobal.list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.l_list.visible = false;
+                                        rootWindow.aliasGlobal.list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -782,16 +782,16 @@ Item {
                                         onPressAndHold: {
                                             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                                            rootWindow.aliasGlobal.l_list.open({
+                                            rootWindow.aliasGlobal.list.open({
                                                 Data: path,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    rootWindow.aliasGlobal.l_list.visible = false;
+                                                    rootWindow.aliasGlobal.list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    rootWindow.aliasGlobal.l_list.visible = false;
+                                                    rootWindow.aliasGlobal.list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                             });
@@ -1194,14 +1194,14 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[FightRoleVisualEditor]Escape Key');
+        console.debug('[FightRoleVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[FightRoleVisualEditor]Back Key');
+        console.debug('[FightRoleVisualEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

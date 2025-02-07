@@ -80,8 +80,8 @@ Item {
             }
 
 
-            //rootWindow.aliasGlobal.l_list.visible = true;
-            //rootWindow.aliasGlobal.l_list.forceActiveFocus();
+            //rootWindow.aliasGlobal.list.visible = true;
+            //rootWindow.aliasGlobal.list.forceActiveFocus();
             _private.refresh();
         }
 
@@ -92,14 +92,14 @@ Item {
         Keys.onEscapePressed: {
             close();
 
-            console.debug('[PluginsManager1]Escape Key');
+            console.debug('[PluginsManager]Keys.onEscapePressed:itemExtendsRoot');
             event.accepted = true;
             //Qt.quit();
         }
         Keys.onBackPressed: {
             close();
 
-            console.debug('[PluginsManager1]Back Key');
+            console.debug('[PluginsManager]Keys.onBackPressed:itemExtendsRoot');
             event.accepted = true;
             //Qt.quit();
         }
@@ -155,8 +155,8 @@ Item {
                 root.forceActiveFocus();
 
 
-                //rootWindow.aliasGlobal.l_list.visible = true;
-                //rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                //rootWindow.aliasGlobal.list.visible = true;
+                //rootWindow.aliasGlobal.list.forceActiveFocus();
                 _private.refresh();
             }
             else if(status === Loader.Loading) {
@@ -186,7 +186,7 @@ Item {
                 visible = true;
 
 
-                rootWindow.aliasGlobal.l_list.visible = false;
+                rootWindow.aliasGlobal.list.visible = false;
             }
             catch(e) {
                 throw e;
@@ -200,14 +200,14 @@ Item {
         Keys.onEscapePressed: {
             close();
 
-            console.debug('[PluginsManager2]Escape Key');
+            console.debug('[PluginsManager]Keys.onEscapePressed:loaderExtends');
             event.accepted = true;
             //Qt.quit();
         }
         Keys.onBackPressed: {
             close();
 
-            console.debug('[PluginsManager2]Back Key');
+            console.debug('[PluginsManager]Keys.onBackPressed:loaderExtends');
             event.accepted = true;
             //Qt.quit();
         }
@@ -293,7 +293,7 @@ Item {
 
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            rootWindow.aliasGlobal.l_list.open({
+            rootWindow.aliasGlobal.list.open({
                 RemoveButtonVisible: true,
                 Data: arrPluginsShowName,
                 OnClicked: (index, item)=>{
@@ -310,7 +310,7 @@ Item {
                             }
 
                             itemExtendsRoot.forceActiveFocus();
-                            rootWindow.aliasGlobal.l_list.visible = false;
+                            rootWindow.aliasGlobal.list.visible = false;
 
                             return 1;
                         }
@@ -320,7 +320,8 @@ Item {
                         }
                     }
                     else if(FrameManager.sl_fileExists(GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.qml'))) {
-                        loaderExtends.source = GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml');
+                        //loaderExtends.source = GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml');
+                        loaderExtends.setSource(GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml'));
 
                         return 2;
                     }
@@ -330,19 +331,19 @@ Item {
                         Msg: '扩展不能运行',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.list.forceActiveFocus();
                         },
                     });
 
-                    //rootWindow.aliasGlobal.l_list.visible = false;
+                    //rootWindow.aliasGlobal.list.visible = false;
                     //root.forceActiveFocus();
                     return 0;
                 },
                 OnCanceled: ()=>{
-                    rootWindow.aliasGlobal.l_list.visible = false;
+                    rootWindow.aliasGlobal.list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -393,7 +394,7 @@ Item {
                                             return;
 
                                         //itemExtendsRoot.forceActiveFocus();
-                                        //rootWindow.aliasGlobal.l_list.visible = false;
+                                        //rootWindow.aliasGlobal.list.visible = false;
 
                                     }
                                     catch(e) {
@@ -402,14 +403,14 @@ Item {
                                     }
                                 }
 
-                                rootWindow.aliasGlobal.l_list.removeItem(index);
+                                rootWindow.aliasGlobal.list.removeItem(index);
                                 _private.refresh();
 
-                                //rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                                //rootWindow.aliasGlobal.list.forceActiveFocus();
                             }, 'remove plugin');
                         },
                         OnRejected: ()=>{
-                            rootWindow.aliasGlobal.l_list.forceActiveFocus();
+                            rootWindow.aliasGlobal.list.forceActiveFocus();
                         },
                     });
 
@@ -422,18 +423,18 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: {
-        rootWindow.aliasGlobal.l_list.visible = false;
+        rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
-        console.debug('[PluginsManager]Escape Key');
+        console.debug('[PluginsManager]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
-        rootWindow.aliasGlobal.l_list.visible = false;
+        rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
-        console.debug('[PluginsManager]Back Key');
+        console.debug('[PluginsManager]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

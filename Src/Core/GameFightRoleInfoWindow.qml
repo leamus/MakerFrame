@@ -253,6 +253,7 @@ Item {
 
             textArea.selectByMouse: false
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             textArea.font.pointSize: 16
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap
@@ -360,6 +361,7 @@ Item {
             textArea.readOnly: true
             textArea.selectByMouse: false
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             textArea.font.pointSize: 16
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap

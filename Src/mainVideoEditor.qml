@@ -480,14 +480,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainVideoEditor]Escape Key');
+        console.debug('[mainVideoEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainVideoEditor]Back Key');
+        console.debug('[mainVideoEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

@@ -1181,8 +1181,11 @@ Item {
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+
                     removeItem(index);
-                    //_private.loadModule('');
+
+                    GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
+                    _private.changeProject('');
 
                     l_listProjects.forceActiveFocus();
                 },
@@ -1407,6 +1410,7 @@ Item {
 
 
                     textArea.color: 'white'
+                    //textArea.color: Global.style.foreground
                     //textArea.enabled: false
                     textArea.readOnly: true
                     textArea.selectByMouse: false
@@ -1513,15 +1517,18 @@ Item {
 
 
         //切换工程，转移和检查工程引擎变量
-        function changeProject(newProject, oldProject=null) {
+        function changeProject(newProject='', oldProject=null) {
+            newProject = newProject.trim();
+            GameMakerGlobal.config.strCurrentProjectName = newProject;
+            if(newProject.length === 0)
+                return;
+
             if(oldProject !== null) {
-                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject));
+                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject, {}));
                 GameMakerGlobal.settings.setValue('Projects/' + oldProject, undefined);
             }
-            if(GameMakerGlobal.settings.value('Projects/' + newProject) === undefined)
-                GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
-
-            GameMakerGlobal.config.strCurrentProjectName = newProject;
+            //if(GameMakerGlobal.settings.value('Projects/' + newProject) === undefined)
+            //    GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
         }
 
 
@@ -2198,14 +2205,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainGameMaker]Escape Key');
+        console.debug('[mainGameMaker]Keys.onEscapePressed');
         event.accepted = false;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainGameMaker]Back Key');
+        console.debug('[mainGameMaker]Keys.onBackPressed');
         event.accepted = false;
         //Qt.quit();
     }
@@ -2219,20 +2226,20 @@ Item {
 
     Component.onCompleted: {
         console.debug('[mainGameMaker]---------------Test------------------');
-        console.debug('[mainGameMaker]运行环境:', GameMakerGlobal.config.debug);
+        console.debug('[mainGameMaker]运行环境:', GameMakerGlobal.config.bDebug);
 
 
 
         _private.jsGameVisualScript = _private.jsEngine.load(Qt.resolvedUrl('GameVisualScript.js'));
 
 
-        //if(!GameMakerGlobal.settings.$RunTimes) {
-        if(GameMakerGlobal.settings.value('$RunTimes') === 0) {
+        if(GameMakerGlobal.settings.$RunTimes === 0) {
+        //if(GameMakerGlobal.settings.value('$RunTimes', 0) === 0) {
             rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
             //GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else {
-            //GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes')) + 1);
+            //GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes', 0)) + 1);
         }
         ++GameMakerGlobal.settings.$RunTimes;
 

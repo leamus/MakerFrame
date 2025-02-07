@@ -81,7 +81,7 @@ Item {
                 return false;
 
             //if(item === '..') {
-            //    rootWindow.aliasGlobal.l_list.visible = false;
+            //    rootWindow.aliasGlobal.list.visible = false;
             //    return;
             //}
 
@@ -247,14 +247,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainFightRoleEditor]Escape Key');
+        console.debug('[mainFightRoleEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainFightRoleEditor]Back Key');
+        console.debug('[mainFightRoleEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

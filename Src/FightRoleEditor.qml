@@ -431,29 +431,29 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GameFightRole]Escape Key');
+        console.debug('[FightRoleEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GameFightRole]Back Key');
+        console.debug('[FightRoleEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[GameFightRole]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        console.debug('[FightRoleEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: {
-        console.debug('[GameFightRole]Keys.onReleased:', event.key, event.isAutoRepeat);
+        console.debug('[FightRoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
 
     Component.onCompleted: {
-        console.debug('[GameFightRole]Component.onCompleted');
+        console.debug('[FightRoleEditor]Component.onCompleted');
     }
     Component.onDestruction: {
-        console.debug('[GameFightRole]Component.onDestruction');
+        console.debug('[FightRoleEditor]Component.onDestruction');
     }
 }

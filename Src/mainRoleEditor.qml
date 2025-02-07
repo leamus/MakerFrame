@@ -245,14 +245,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainRoleEditor]Escape Key');
+        console.debug('[mainRoleEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainRoleEditor]Back Key');
+        console.debug('[mainRoleEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

@@ -207,14 +207,14 @@ function *$start() {
     /*Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[StartScriptEditor]Escape Key');
+        console.debug('[StartScriptEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[StartScriptEditor]Back Key');
+        console.debug('[StartScriptEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

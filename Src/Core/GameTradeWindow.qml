@@ -304,6 +304,7 @@ Item {
             textArea.verticalAlignment: Text.AlignVCenter
 
             textArea.color: 'white'
+            //textArea.color: Global.style.foreground
             textArea.font.pointSize: 16
             textArea.font.bold: true
             //textArea.enabled: false

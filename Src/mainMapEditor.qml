@@ -889,14 +889,14 @@ Item {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainMapEditor]Escape Key');
+        console.debug('[mainMapEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainMapEditor]Back Key');
+        console.debug('[mainMapEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

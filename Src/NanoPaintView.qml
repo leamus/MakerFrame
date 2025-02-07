@@ -240,19 +240,19 @@ Rectangle {
     Keys.onEscapePressed: {
         sg_close();
 
-        console.debug('[mainGameAbout]:Escape Key');
+        console.debug('[NanoPaintView]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         sg_close();
 
-        console.debug('[mainGameAbout]:Back Key');
+        console.debug('[NanoPaintView]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onPressed: {
-        console.debug('[mainGameAbout]:key:', event, event.key, event.text)
+        console.debug('[NanoPaintView]Keys.onPressed:', event, event.key, event.text)
     }
 
 

@@ -2203,14 +2203,14 @@ function $readSavesInfo(count=3) {
     /*Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[CommonScriptEditor]Escape Key');
+        console.debug('[CommonScriptEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[CommonScriptEditor]Back Key');
+        console.debug('[CommonScriptEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }

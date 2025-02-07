@@ -16,8 +16,15 @@ import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 QtObject {
 
+    //引擎版本
+    property string version: '1.15.2.250202'
+
+    property string separator: Platform.sl_separator(true)
+
+
+
     //可存储配置
-    //  目前存储：Projects/工程名（game.cd引擎变量，用到了$PauseMusic、$PauseSound）、$RunTimes、$RunDuration
+    //  目前存储：Projects/工程名（game.cd引擎变量，用到了$sys_sound）、$RunTimes、$RunDuration
     property Settings settings: Settings {
         id: settings
         category: 'GameMaker'    //类别
@@ -25,33 +32,24 @@ QtObject {
         //fileName: parseInt(FrameManager.sl_configValue('RunType')) === 0 ? '' : 'GameMaker.ini'
 
         //当前工程
-        property string $strCurrentProjectName: ''  //'Project'
+        property string $CurrentProjectName: ''  //'Project'
         property int $RunTimes: 0
         property int $RunDuration: 0
     }
 
 
 
-    property string separator: Platform.sl_separator(true)
-
-    property url urlGameMakerCorePath: Qt.resolvedUrl('.')
-
-
-    //引擎版本
-    property string version: '1.15.2.250202'
-
-
     //配置
     property QtObject config: QtObject {
         //调试（显示一些调试功能）
-        //property bool debug: Global.frameConfig.$sys.debug === 0 ? false : true
-        //property bool debug: parseInt(FrameManager.config.Debug) === 0 ? false : true
-        //property bool debug: parseInt(FrameManager.sl_configValue('Debug', 0)) === 0 ? false : true
-        property bool debug: true
+        //property bool bDebug: Global.frameConfig.$sys.nDebug === 0 ? false : true
+        //property bool bDebug: parseInt(FrameManager.config.Debug) === 0 ? false : true
+        //property bool bDebug: parseInt(FrameManager.sl_configValue('Debug', 0)) === 0 ? false : true
+        property bool bDebug: true
 
 
         //当前项目名称
-        property alias strCurrentProjectName: settings.$strCurrentProjectName    //'Project'
+        property alias strCurrentProjectName: settings.$CurrentProjectName    //'Project'
 
         //引擎工作目录
         property string strWorkPath: {
@@ -89,6 +87,8 @@ QtObject {
             }
         }
 
+        property url urlGameMakerCorePath: Qt.resolvedUrl('.')
+
 
         //数据文件存储 目录名
         property string strMapDirName: 'Maps'
@@ -111,32 +111,32 @@ QtObject {
 
         //!!!兼容旧代码!!!
         property string strRoleResourceDirName: strResourceDirName + separator + 'Sprites'
+
+
+        //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
+        //readonly property string strTDSClientID: ''
+        //readonly property string strTDSClientToken: ''
     }
-
-
-    //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
-    //readonly property string tds_ClientID: ''
-    //readonly property string tds_ClientToken: ''
 
 
 
     //下面函数是返回 某类型资源 的绝对路径（参数都是可选）
 
-    property var mapResourceURL: filepath=>GlobalJS.toURL(mapResourcePath(filepath))
+    function mapResourceURL(filepath) {return GlobalJS.toURL(mapResourcePath(filepath));}
     function mapResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMapResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
-    property var spriteResourceURL: filepath=>GlobalJS.toURL(spriteResourcePath(filepath))
+    function spriteResourceURL(filepath) {return GlobalJS.toURL(spriteResourcePath(filepath));}
     function spriteResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSpriteResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
-    property var goodsResourceURL: filepath=>GlobalJS.toURL(goodsResourcePath(filepath))
+    function goodsResourceURL(filepath) {return GlobalJS.toURL(goodsResourcePath(filepath));}
     function goodsResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strGoodsResourceDirName;
         if(filepath)
@@ -145,7 +145,7 @@ QtObject {
     }
 
 
-    property var soundResourceURL: filepath=>GlobalJS.toURL(soundResourcePath(filepath))
+    function soundResourceURL(filepath) {return GlobalJS.toURL(soundResourcePath(filepath));}
     function soundResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
@@ -162,7 +162,7 @@ QtObject {
         }
     }
 
-    property var musicResourceURL: filepath=>GlobalJS.toURL(musicResourcePath(filepath))
+    function musicResourceURL(filepath) {return GlobalJS.toURL(musicResourcePath(filepath));}
     function musicResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
@@ -179,7 +179,7 @@ QtObject {
         }
     }
 
-    property var imageResourceURL: filepath=>GlobalJS.toURL(imageResourcePath(filepath))
+    function imageResourceURL(filepath) {return GlobalJS.toURL(imageResourcePath(filepath));}
     function imageResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
@@ -196,7 +196,7 @@ QtObject {
         }
     }
 
-    property var videoResourceURL: filepath=>GlobalJS.toURL(videoResourcePath(filepath))
+    function videoResourceURL(filepath) {return GlobalJS.toURL(videoResourcePath(filepath));}
     function videoResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
@@ -214,7 +214,7 @@ QtObject {
     }
 
     //!!!兼容旧代码!!!
-    property var roleResourceURL: filepath=>GlobalJS.toURL(roleResourcePath(filepath))
+    function roleResourceURL(filepath) {return GlobalJS.toURL(roleResourcePath(filepath));}
     function roleResourcePath(filepath) {
         let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strRoleResourceDirName;
         if(filepath)
@@ -273,8 +273,8 @@ QtObject {
 
         if(Platform.compileType === 'release') {
             let userID = '', account = '', nickname = '';
-            if(Global.frameSettings.$userData) {
-                let userData = JSON.parse(FrameManager.sl_uncompress(Global.frameSettings.$userData, 1).toString());
+            if(Global.frameSettings.$UserData) {
+                let userData = JSON.parse(FrameManager.sl_uncompress(Global.frameSettings.$UserData, 1).toString());
                 userID = userData.info.id;
                 account = userData.info.account;
                 nickname = userData.info.nickname;
@@ -301,7 +301,7 @@ QtObject {
 
 
 
-        FrameManager.sl_addImportPath(urlGameMakerCorePath);
+        FrameManager.sl_addImportPath(config.urlGameMakerCorePath);
 
 
 

@@ -521,14 +521,14 @@ let data = (function() {
     Keys.onEscapePressed: {
         _private.close();
 
-        console.debug('[GoodsEditor]Escape Key');
+        console.debug('[GoodsEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
     Keys.onBackPressed: {
         _private.close();
 
-        console.debug('[GoodsEditor]Back Key');
+        console.debug('[GoodsEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
