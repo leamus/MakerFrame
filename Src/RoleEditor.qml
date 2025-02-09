@@ -2063,7 +2063,7 @@ Item {
             //loader.forceActiveFocus();
 
 
-            console.debug('[RoleEditor]You chose: ' + fileUrl, fileUrls);
+            console.debug('[RoleEditor]You chose:', fileUrl, fileUrls);
 
 
             if(Qt.platform.os === 'android')
@@ -2082,7 +2082,7 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            //console.log('You chose: ' + fileDialog.fileUrls);
+            //console.log('You chose:', fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {

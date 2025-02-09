@@ -133,7 +133,7 @@ game.goon();
 
         property string strTemplate: `
 //鹰：可以包含其他文件：
-//.import 'XXX.js' as JsName
+//.import 'Xxx.js' as JsName
 //console.debug(JsName.aaa);
 
 

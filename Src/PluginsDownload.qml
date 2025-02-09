@@ -77,7 +77,7 @@ Item {
             //loader.forceActiveFocus();
             //rootGameMaker.forceActiveFocus();
 
-            console.debug('[PluginsDownload]You chose: ' + fileUrl, fileUrls);
+            console.debug('[PluginsDownload]You chose:', fileUrl, fileUrls);
 
 
             rootWindow.aliasGlobal.dialogCommon.show({

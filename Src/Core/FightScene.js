@@ -64,7 +64,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
     //if(i >= repeaterMyCombatants.count)
     //    break;
-    //console.debug('!!!', fight.myCombatants, i, fightRole, JSON.stringify(fightRole));
+    //console.debug('', fight.myCombatants, i, fightRole, JSON.stringify(fightRole));
 
     //fightRole.$$fightData.$actionData = {};
     //fightRole.$$fightData.$buffs = {};
@@ -270,7 +270,7 @@ function choicedSkillOrGoods(used, type) {
     combatant.$$fightData.$choice.$attack = used;
 
 
-    //console.debug('!!!1', JSON.stringify(used))
+    //console.debug('1', JSON.stringify(used))
 
     //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
     if(type === 3 || type === 2) {
@@ -706,7 +706,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 //combatantSpriteEffect.x = position.x + combatantSpriteEffect.x;
                 //combatantSpriteEffect.y = position.y + combatantSpriteEffect.y;
 
-                //console.debug('!!!', position, combatantSpriteEffect.x, position.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
+                //console.debug('', position, combatantSpriteEffect.x, position.x + combatantSpriteEffect.x, AnimatedSprite.Infinite);
 
                 break;
 
@@ -867,7 +867,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                     //spriteEffect.x = position.x + spriteEffect.x;
                     //spriteEffect.y = position.y + spriteEffect.y;
 
-                    //console.debug('!!!', position, spriteEffect.x, position.x + spriteEffect.x, AnimatedSprite.Infinite);
+                    //console.debug('', position, spriteEffect.x, position.x + spriteEffect.x, AnimatedSprite.Infinite);
 
                     break;
 
@@ -1106,7 +1106,7 @@ function *fnRound() {
             continue;
         }
 
-        /*console.debug('!!!!!', JSON.stringify(combatant, function(k, v) {
+        /*console.debug('', JSON.stringify(combatant, function(k, v) {
             if(k.indexOf('$$') === 0)
                 return undefined;
             return v;
@@ -1158,7 +1158,7 @@ function *fnRound() {
                     //执行技能脚本
                     //fightSkillInfo = fightSkillInfo.$commons.$playScript(combatant.$$fightData.$teams, combatant.$$fightData.$index, role2.$$fightData.$teams, role2.$$fightData.$index, SkillEffects);
 
-                    //console.debug('!!!', SkillEffects);
+                    //console.debug('', SkillEffects);
 
                     //得到技能生成器函数
                     let genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
@@ -1193,7 +1193,7 @@ function *fnRound() {
 
 
 
-                        //console.debug('!!!1', tCombatantActionSpriteData);
+                        //console.debug('1', tCombatantActionSpriteData);
                         if(!tCombatantActionSpriteData)  //如果是其他yield（比如msg）
                             continue;
 
@@ -1210,15 +1210,15 @@ function *fnRound() {
                         //let tRepeaterSpriteEffect1 = repeaterSpriteEffect1;
                         //let tRepeaterSpriteEffect2 = repeaterSpriteEffect2;
 
-                        //console.debug('!!!0', tCombatantActionSpriteData.SkillEffect);
+                        //console.debug('0', tCombatantActionSpriteData.SkillEffect);
                         //if(tCombatantActionSpriteData.SkillEffect)
-                        //    console.debug('!!!1', tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
+                        //    console.debug('1', tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
 
-                        //console.debug('!!!2', JSON.stringify(tSkillEffect));
-                        //console.debug('!!!33', tSkillEffect);
+                        //console.debug('2', JSON.stringify(tSkillEffect));
+                        //console.debug('33', tSkillEffect);
                         //if(tSkillEffect)
-                        //    console.debug('!!!3', tSkillEffect, tSkillEffect.roleIndex2)
-                        //console.debug('!!!4', tRoleSpriteEffect2, tRole2)
+                        //    console.debug('3', tSkillEffect, tSkillEffect.roleIndex2)
+                        //console.debug('4', tRoleSpriteEffect2, tRole2)
 
 
 

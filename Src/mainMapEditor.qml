@@ -460,7 +460,7 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
 
-            console.debug('[mainMapEditor]You chose: ' + fileUrl, fileUrls);
+            console.debug('[mainMapEditor]You chose:', fileUrl, fileUrls);
 
 
             if(Qt.platform.os === 'android')
@@ -484,7 +484,7 @@ Item {
             ////canvasMapBlock.requestPaint(); //重新绘图
 
 
-            //console.log('You chose: ' + fileDialog.fileUrls);
+            //console.log('You chose:', fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {

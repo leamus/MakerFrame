@@ -128,7 +128,11 @@ Item {
 
 
         textGoodsInfo.text = textGoodsInfo.strPreText;
-        let moneyName = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$money'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$money'));
+        let moneyName = GlobalLibraryJS.shortCircuit(0b1,
+            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$money'),
+            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$money'),
+            game.$gameMakerGlobalJS.$config.$names.$money,
+            );
         textMoney.text = moneyName + ':' + game.gd['$sys_money'];
 
 

@@ -44,9 +44,9 @@ function *loadResources() {
             }
         });
     }
-    let targetObj = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName, {});
-    //if(!targetObj)
-    //    targetObj = {};
+    let targetObj = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName/*, {}* /); //只有没有值（存undefined也算有值）的时候才返回默认值
+    if(!targetObj)
+        targetObj = {};
     if(targetObj['$sys_sound'] === undefined)
         targetObj['$sys_sound'] = 0b11;
     game.cd = observe(targetObj, (change) => {
@@ -60,9 +60,9 @@ function *loadResources() {
     */
 
     //读取引擎变量
-    game.cd = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName, {});
-    //if(!game.cd)
-    //    game.cd = {};
+    game.cd = GameMakerGlobal.settings.value('Projects/' + GameMakerGlobal.config.strCurrentProjectName/*, {}*/); //只有没有值（存undefined也算有值）的时候才返回默认值
+    if(!game.cd)
+        game.cd = {};
     if(game.cd['$sys_sound'] === undefined)
         game.cd['$sys_sound'] = 0b11;
 
@@ -250,12 +250,24 @@ function *loadResources() {
 //读取配置：
 
     //是否提前载入所有资源
-    _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'), 0);
+    _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'),
+        game.$gameMakerGlobalJS.$config.$game.$loadAllResources,
+        0);
     //万向移动
-    _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'), true);
+    _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'),
+        game.$gameMakerGlobalJS.$config.$game.$walkAllDirections,
+        true);
 
     //地图遮挡透明度
-    itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'), 0.6);
+    itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'),
+        game.$gameMakerGlobalJS.$config.$map.$opacity,
+        0.6);
 
 
     //安卓配置
@@ -266,7 +278,11 @@ function *loadResources() {
         _private.lastOrient = Platform.sl_getScreenOrientation();
 
         //旋转配置
-        Platform.sl_setScreenOrientation(GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$android', '$orient'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$android', '$orient'), 4));
+        Platform.sl_setScreenOrientation(GlobalLibraryJS.shortCircuit(0b1,
+            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$android', '$orient'),
+            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$android', '$orient'),
+            game.$gameMakerGlobalJS.$config.$android.$orient,
+            4));
 
     } while(0);
 
@@ -314,8 +330,9 @@ function *loadResources() {
     };*/
 
     //摇杆 配置
-    const joystickDefaultConfig = GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick');
-    const joystickConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), /*GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick'), */joystickDefaultConfig);
+    //const joystickDefaultConfig = GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick');
+    const joystickDefaultConfig = game.$gameMakerGlobalJS.$config.$joystick;
+    const joystickConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), joystickDefaultConfig);
 
     joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * rootWindow.aliasGlobal.Screen.pixelDensity;
     joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * rootWindow.aliasGlobal.Screen.pixelDensity;
@@ -333,7 +350,11 @@ function *loadResources() {
 
     //按键配置
     do {
-        const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'), null);
+        const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1,
+            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'),
+            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'),
+            game.$gameMakerGlobalJS.$config.$buttons,
+            null);
         if(!buttonsConfig)
             break;
 
@@ -444,10 +465,26 @@ function *loadResources() {
 
 
 
-    game.$sys.protoObjects.fightRole = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightRole'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightRole'));
-    game.$sys.protoObjects.goods = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$goods'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$goods'));
-    game.$sys.protoObjects.skill = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$skill'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$skill'));
-    game.$sys.protoObjects.fightScript = GlobalLibraryJS.shortCircuit(0b1111, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightScript'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightScript'));
+    game.$sys.protoObjects.fightRole = GlobalLibraryJS.shortCircuit(0b1111,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightRole'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightRole'),
+        game.$gameMakerGlobalJS.$config.$protoObjects.$fightRole,
+        );
+    game.$sys.protoObjects.goods = GlobalLibraryJS.shortCircuit(0b1111,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$goods'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$goods'),
+        game.$gameMakerGlobalJS.$config.$protoObjects.$goods,
+        );
+    game.$sys.protoObjects.skill = GlobalLibraryJS.shortCircuit(0b1111,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$skill'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$skill'),
+        game.$gameMakerGlobalJS.$config.$protoObjects.$skill,
+        );
+    game.$sys.protoObjects.fightScript = GlobalLibraryJS.shortCircuit(0b1111,
+        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightScript'),
+        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightScript'),
+        game.$gameMakerGlobalJS.$config.$protoObjects.$fightScript,
+        );
 
 
 
@@ -1906,7 +1943,7 @@ function openMap(mapName, forceRepaint=false) {
 
     //使用Component（太麻烦）
     //let scriptComp = Qt.createComponent(GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'));
-    //console.debug('!!!999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'), scriptComp)
+    //console.debug('999', GlobalJS.toURL(filePath + GameMakerGlobal.separator + 'map.qml'), scriptComp)
     //let script = scriptComp.createObject({}, rootGameScene);
 
     //let script = Qt.createQmlObject('import QtQuick 2.14;import 'map.js' as Script;Item {property var script: Script}', rootGameScene, GlobalJS.toURL(filePath + GameMakerGlobal.separator));
@@ -2369,7 +2406,7 @@ function onTriggered() {
                     else
                         continue;
 
-                    //console.debug('!!!ok, getup')
+                    //console.debug('ok, getup')
                 }
                 break;
             } while(1);
@@ -2735,7 +2772,7 @@ function onTriggered() {
                     else
                         continue;
 
-                    //console.debug('!!!ok, getup')
+                    //console.debug('ok, getup')
                 }
                 break;
             } while(1);
@@ -3024,7 +3061,7 @@ function onTriggered() {
         timer.interval = _private.config.nInterval + _private.config.nInterval - runinterval;
     }
 
-    //console.debug('!!!runinterval', runinterval, timer.interval);
+    //console.debug('runinterval', runinterval, timer.interval);
     */
 
     //timer.nLastTime = timer.nLastTime + realinterval;

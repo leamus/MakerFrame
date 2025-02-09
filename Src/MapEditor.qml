@@ -2831,7 +2831,7 @@ Item {
             root.forceActiveFocus();
 
 
-            //console.debug('You chose: ' + fileUrl, fileUrls);
+            //console.debug('You chose:', fileUrl, fileUrls);
             _private.exportMap(fileUrl);
         }
         onRejected: {

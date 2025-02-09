@@ -634,7 +634,9 @@ Item {
                     mainRole.$$mapEventsTriggering = {};
                     if(GlobalLibraryJS.shortCircuit(0b1,
                         GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$changeMapStopAction'),
-                        GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$changeMapStopAction'), true)
+                        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$changeMapStopAction'),
+                        game.$gameMakerGlobalJS.$config.$game.$changeMapStopAction,
+                        true)
                     )
                         _private.stopMove(0); //加上可以让主角停止，重新操作才可以移动
 
@@ -882,8 +884,8 @@ Item {
             //样式
             if(!style)
                 style = {};
-            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$say') || {};
             const styleSystem = game.$gameMakerGlobalJS.$config.$role.$say;
+            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$say') || styleSystem;
             let tn;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -1312,7 +1314,7 @@ Item {
                 if(props.$realSize !== undefined) {
                     heroComp.width1 = props.$realSize[0];
                     heroComp.height1 = props.$realSize[1];
-                    //console.debug('!!!', props.$realSize)
+                    //console.debug('', props.$realSize)
                 }
 
 
@@ -1706,7 +1708,7 @@ Item {
                 if(props.$realSize !== undefined) {
                     roleComp.width1 = props.$realSize[0];
                     roleComp.height1 = props.$realSize[1];
-                    //console.debug('!!!', props.$realSize)
+                    //console.debug('', props.$realSize)
                 }
 
 
@@ -4816,7 +4818,7 @@ Item {
                     scriptProps.Path = game.$projectpath;
                 vScript = GlobalJS.toPath(scriptProps.Path + GameMakerGlobal.separator + vScript.trim());
 
-                //console.debug('!!vScript:', vScript);
+                //console.debug('vScript:', vScript);
 
                 //vScript = GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName + Platform.sl_separator(true) + vScript;
                 //此脚本所在路径 注入到全局上下文环境（如果使用evaluateFile只能这样全局上下文环境，目前再没有给evaluate传递上下文环境的办法）
@@ -5243,7 +5245,10 @@ Item {
 
         clip: true
 
-        bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'), true)
+        bSmooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$smooth'),
+                    //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$smooth'),
+                    game.$gameMakerGlobalJS.$config.$map.$smooth,
+                    true)
 
 
         //mouseArea.hoverEnabled: true
@@ -5570,12 +5575,18 @@ Item {
             }
         }
         onSg_show: {
-            let show = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show');
+            let show = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$show'),
+                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$show'),
+                game.$gameMakerGlobalJS.$config.$window.$show, );
             if(show)
                 show(newFlags, windowFlags);
         }
         onSg_hide: {
-            let hide = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide');
+            let hide = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$window', '$hide'),
+                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$window', '$hide'),
+                game.$gameMakerGlobalJS.$config.$window.$hide, );
             if(hide)
                 hide(newFlags, windowFlags);
         }
@@ -6059,7 +6070,7 @@ Item {
                 audioBackgroundMusic.pause();
 
 
-            //console.debug('!!!pause', nPauseTimes)
+            //console.debug('pause', nPauseTimes)
         }
 
         function resume(name='$user') {
@@ -6096,7 +6107,7 @@ Item {
             if(audioBackgroundMusic.playbackState === Audio.PausedState)
                 itemBackgroundMusic.play();
 
-            //console.debug('!!!resume', nPauseTimes, bPlay)
+            //console.debug('resume', nPauseTimes, bPlay)
 
         }
 
@@ -6231,7 +6242,7 @@ Item {
             else
                 return false;
 
-            //console.debug('!!!pause', nPauseTimes);
+            //console.debug('pause:', nPauseTimes);
 
 
             for(let tse of arrCacheSoundEffects) {
@@ -6281,7 +6292,7 @@ Item {
             else
                 return false;
 
-            //console.debug('!!!resume', nPauseTimes, bPlay);
+            //console.debug('resume', nPauseTimes, bPlay);
 
 
             for(let tse of arrCacheSoundEffects) {
@@ -7038,8 +7049,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || styleSystem;
                 let tn;
 
 
@@ -7318,8 +7329,8 @@ Item {
                     style = {};
 
 
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$msg') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$msg;
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$msg') || styleSystem;
                 let tn;
 
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -7569,8 +7580,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || styleSystem;
                 let tn;
 
                 maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -7761,8 +7772,8 @@ Item {
                 //样式
                 if(style === undefined || style === null)
                     style = {};
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || styleSystem;
                 let tn;
 
                 rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -8372,8 +8383,8 @@ Item {
                 //console.debug('[GameScene]Role Component.onCompleted');
 
 
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role') || {};
                 let styleSystem = game.$gameMakerGlobalJS.$config.$role;
+                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role') || styleSystem;
                 let tn;
 
                 bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(styleUser, '$smooth'), GlobalLibraryJS.getObjectValue(styleSystem, '$smooth'), true);
@@ -8499,7 +8510,11 @@ Item {
 
 
             Component.onCompleted: {
-                smooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$image', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$image', '$smooth'), true);
+                smooth = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$image', '$smooth'),
+                    //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$image', '$smooth'),
+                    game.$gameMakerGlobalJS.$config.$image.$smooth,
+                    true);
             }
         }
     }
@@ -8587,7 +8602,11 @@ Item {
             }
 
             Component.onCompleted: {
-                smooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true);
+                smooth = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
+                    //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
+                    game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
+                    true);
             }
         }
     }
@@ -8616,16 +8635,28 @@ Item {
                 _private.arrPressedKeys = [];
                 //mainRole.$$nMoveDirectionFlag = 0;
 
-                itemBackgroundMusic.resume('$sys_inactive');
-                rootSoundEffect.resume('$sys_inactive');
+                if(!GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$inactiveBackgroundMusic'),
+                    game.$gameMakerGlobalJS.$config.$game.$inactiveBackgroundMusic,
+                    false))
+                    itemBackgroundMusic.resume('$sys_inactive');
+                if(!GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$inactiveSoundEffect'),
+                    game.$gameMakerGlobalJS.$config.$game.$inactiveSoundEffect,
+                    false))
+                    rootSoundEffect.resume('$sys_inactive');
 
                 break;
             case Qt.ApplicationInactive:    //每次窗口非激活时触发
                 _private.arrPressedKeys = [];
                 //mainRole.$$nMoveDirectionFlag = 0;
 
-                itemBackgroundMusic.pause('$sys_inactive');
-                rootSoundEffect.pause('$sys_inactive');
+                if(!GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$inactiveBackgroundMusic'),
+                    game.$gameMakerGlobalJS.$config.$game.$inactiveBackgroundMusic,
+                    false))
+                    itemBackgroundMusic.pause('$sys_inactive');
+                if(!GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$inactiveSoundEffect'),
+                    game.$gameMakerGlobalJS.$config.$game.$inactiveSoundEffect,
+                    false))
+                    rootSoundEffect.pause('$sys_inactive');
 
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
@@ -8757,7 +8788,11 @@ Item {
             break;
 
         default:
-            const fn = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key), null);
+            const fn = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key),
+                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key),
+                game.$gameMakerGlobalJS.$config.$keys[event.key],
+                null);
             if(fn)
                 game.run(fn(true, event) ?? null, 'Keys.onPressed:' + event.key);
             else {
@@ -8803,7 +8838,11 @@ Item {
             break;
 
         default:
-            const fn = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key), null);
+            const fn = GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$keys', event.key),
+                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$keys', event.key),
+                game.$gameMakerGlobalJS.$config.$keys[event.key],
+                null);
             if(fn)
                 game.run(fn(false, event) ?? null, 'Keys.onReleased:' + event.key);
 
@@ -8827,8 +8866,8 @@ Item {
 
     Component.onDestruction: {
         //release();
-        //console.warn('!!!', Object.keys(_private.config.objPauseNames));
-        //console.warn('!!!3', _private.scriptQueue.getScriptInfos().$toJson());
+        //console.warn('', Object.keys(_private.config.objPauseNames));
+        //console.warn('3', _private.scriptQueue.getScriptInfos().$toJson());
 
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；

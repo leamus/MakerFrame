@@ -1061,7 +1061,7 @@ Item {
             //loader.forceActiveFocus();
 
 
-            console.debug('[SpriteEditor]You chose: ' + fileUrl, fileUrls);
+            console.debug('[SpriteEditor]You chose:', fileUrl, fileUrls);
 
 
             if(Qt.platform.os === 'android')
@@ -1080,7 +1080,7 @@ Item {
             checkboxSaveSpriteImageResource.enabled = false;
 
 
-            //console.log('You chose: ' + fileDialog.fileUrls);
+            //console.log('You chose:', fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {
@@ -1436,7 +1436,7 @@ Item {
             //loader.forceActiveFocus();
 
 
-            console.debug('[SpriteEditor]You chose: ' + fileUrl, fileUrls);
+            console.debug('[SpriteEditor]You chose:', fileUrl, fileUrls);
 
 
             if(Qt.platform.os === 'android')
@@ -1455,7 +1455,7 @@ Item {
             checkboxSaveSpriteSoundResource.enabled = false;
 
 
-            //console.log('You chose: ' + fileDialog.fileUrls);
+            //console.log('You chose:', fileDialog.fileUrls);
             //Qt.quit();
         }
         onRejected: {

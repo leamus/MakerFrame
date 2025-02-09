@@ -72,7 +72,11 @@ Item {
 
         //装备
 
-        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, conbatant['$equipReservedSlots'], GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'), []);
+        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, conbatant['$equipReservedSlots'],
+            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'),
+            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'),
+            game.$gameMakerGlobalJS.$config.$names.$equipReservedSlots,
+            []);
         root.arrEquipmentPositions = [];
         let arrEquipment = [];  //显示的
 

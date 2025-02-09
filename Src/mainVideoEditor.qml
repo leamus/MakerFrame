@@ -344,7 +344,7 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            console.debug('[mainVideoEditor]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[mainVideoEditor]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {

@@ -34,8 +34,8 @@ Item {
         let newFlags = 0;
 
         if((flags & 0b1) && !(nShowWindowFlags & 0b1)) {
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$main') || {};
             let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$main;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$main') || styleSystem;
 
             maskMainMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||
@@ -98,8 +98,8 @@ Item {
             newFlags |= 0b100;
         }
         if((flags & 0b1000) && !(nShowWindowFlags & 0b1000)) {
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$system') || {};
             let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$system;
+            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$system') || styleSystem;
 
             containerSystemMenu.maskSystemMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||

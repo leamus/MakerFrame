@@ -324,7 +324,7 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            console.debug('[mainImageEditor]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[mainImageEditor]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {

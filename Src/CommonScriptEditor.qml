@@ -58,6 +58,8 @@ let $config = {
         $loadAllResources: 0,   //提前载入所有资源
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
         $changeMapStopAction: true,   //切换地图后停止主角动作
+        $inactiveBackgroundMusic: false, //窗口非激活状态时是否继续背景音乐
+        $inactiveSoundEffect: false, //窗口非激活状态时是否继续背景音效
     },
     //地图
     $map: {

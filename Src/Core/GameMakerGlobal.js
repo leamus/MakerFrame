@@ -6,12 +6,14 @@
 //  注意：
 //    1、fontSize为正数，表示用pointSize；为负数，表示用pixelSize；
 //    2、$minHeight和$maxHeight；>0且<1，表示高度为 值*屏幕大小；为小数（包括字符串）表示 值*行数；为整数表示像素；null表示默认；
-let $config = {
+const $config = {
     //游戏
     $game: {
         $loadAllResources: 0,   //提前载入所有资源
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
         $changeMapStopAction: true,   //切换地图后停止主角动作
+        $inactiveBackgroundMusic: false, //窗口非激活状态时是否继续背景音乐
+        $inactiveSoundEffect: false, //窗口非激活状态时是否继续背景音效
     },
     //地图
     $map: {
@@ -2889,7 +2891,7 @@ function combatantChoiceSkillOrGoods(combatant) {
             //roleSpriteEffect2 = repeaterSpriteEffect2.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
         }
 
-        //console.debug('!!!', combatant.$$fightData.$choice.$targets)
+        //console.debug('', combatant.$$fightData.$choice.$targets)
     }
 
     //单人，己方
@@ -2920,7 +2922,7 @@ function combatantChoiceSkillOrGoods(combatant) {
             //roleSpriteEffect2 = repeaterSpriteEffect1.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
         }
 
-        //console.debug('!!!', combatant.$$fightData.$choice.$targets)
+        //console.debug('', combatant.$$fightData.$choice.$targets)
     }
 
     */

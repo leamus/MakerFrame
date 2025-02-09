@@ -1219,7 +1219,7 @@ Item {
             //rootGameMaker.focus = true;
             //rootGameMaker.forceActiveFocus();
 
-            console.debug('[mainGameMaker]You chose: ' + fileUrl, fileUrls);
+            console.debug('[mainGameMaker]You chose:', fileUrl, fileUrls);
 
             let fUrl;
             if(Qt.platform.os === 'android')
@@ -1524,11 +1524,11 @@ Item {
                 return;
 
             if(oldProject !== null) {
-                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject, {}));
+                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject/*, {}*/)); //只有没有值（存undefined也算有值）的时候才返回默认值
                 GameMakerGlobal.settings.setValue('Projects/' + oldProject, undefined);
             }
-            //if(GameMakerGlobal.settings.value('Projects/' + newProject) === undefined)
-            //    GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
+            if(!GameMakerGlobal.settings.value('Projects/' + newProject))
+                GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
         }
 
 

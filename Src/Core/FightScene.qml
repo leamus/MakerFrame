@@ -200,7 +200,11 @@ Item {
 
 
         //读取配置
-        _private.config.fightRoleBarConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$combatant_bars'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$fight', '$combatant_bars'));
+        _private.config.fightRoleBarConfig = GlobalLibraryJS.shortCircuit(0b1,
+            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$combatant_bars'),
+            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$fight', '$combatant_bars'),
+            game.$gameMakerGlobalJS.$config.$fight.$combatant_bars,
+            );
 
 
         //按钮
@@ -243,8 +247,8 @@ Item {
         //样式
         //if(!style)
         //    style = {};
-        let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || {};
         let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
+        let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || styleSystem;
 
         //maskMenu.color = style.MaskColor || '#7FFFFFFF';
         menuSkillsOrGoods.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -692,7 +696,7 @@ Item {
 
         //换背景图
         readonly property var background: function(image='') {
-            //console.debug('!!!!image:::', image, GameMakerGlobal.imageResourceURL(image));
+            //console.debug('image:::', image, GameMakerGlobal.imageResourceURL(image));
             imageBackground.source = GameMakerGlobal.imageResourceURL(image);
         }
 
@@ -1130,7 +1134,11 @@ Item {
     Component {
         id: compSpriteEffect
         SpriteEffect {
-            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1,
+                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
+                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
+                game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
+                true)
 
             onSg_playEffect: {
                 game.playsoundeffect(soundeffectSource, -1);
@@ -1330,7 +1338,11 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
-                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+                        smooth: GlobalLibraryJS.shortCircuit(0b1,
+                            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
+                            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
+                            game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
+                            true)
 
                         //bTest: false
 
@@ -1366,8 +1378,8 @@ Item {
                                     //样式
                                     //if(!style)
                                     //    style = {};
-                                    let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || {};
                                     let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
+                                    let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || styleSystem;
 
                                     //maskMenu.color = style.MaskColor || '#7FFFFFFF';
                                     menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -1583,7 +1595,11 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
-                        smooth: GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'), true)
+                        smooth: GlobalLibraryJS.shortCircuit(0b1,
+                            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
+                            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
+                            game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
+                            true)
 
                         //bTest: false
 

@@ -290,7 +290,7 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            console.debug('[mainMusicEditor]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[mainMusicEditor]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {

@@ -261,7 +261,7 @@ Item {
             //rootGameMaker.focus = true;
             //rootGameMaker.forceActiveFocus();
 
-            console.debug('[AndroidConfigure]You chose: ' + fileUrl, fileUrls);
+            console.debug('[AndroidConfigure]You chose:', fileUrl, fileUrls);
 
 
             let fUrl;
@@ -304,7 +304,7 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            console.debug('[AndroidConfigure]You chose: ' + fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[AndroidConfigure]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {

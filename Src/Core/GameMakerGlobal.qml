@@ -17,7 +17,7 @@ import 'GameMakerGlobal.js' as GameMakerGlobalJS
 QtObject {
 
     //引擎版本
-    property string version: '1.15.2.250202'
+    property string version: '1.15.3.250209'
 
     property string separator: Platform.sl_separator(true)
 
@@ -272,30 +272,11 @@ QtObject {
 
 
         if(Platform.compileType === 'release') {
-            let userID = '', account = '', nickname = '';
-            if(Global.frameSettings.$UserData) {
-                let userData = JSON.parse(FrameManager.sl_uncompress(Global.frameSettings.$UserData, 1).toString());
-                userID = userData.info.id;
-                account = userData.info.account;
-                nickname = userData.info.nickname;
-            }
-
             //提交访问信息
-            GlobalLibraryJS.request({
-                Url: 'http://MakerFrame.Leamus.cn/api/v1/client/usage',
-                Method: 'POST',
-                Data: {
-                    client: `${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType})`,
-                    product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}`,
-                    serial: `${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}`,
-                    timestamp: Number(new Date()), UserID: userID, Account_: account, Nickname_: nickname,
-                    times: settings.$RunTimes, duration: settings.$RunDuration,
-                },
-                //`client=${Platform.sysInfo.prettyProductName}_${Platform.sysInfo.currentCpuArchitecture}(${Platform.compileType})&product=${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}&serial=${Platform.sysInfo.machineUniqueId}${Qt.platform.os==='android'?'_'+Platform.sl_getSerialNumber():''}&timestamp=${Number(new Date())}&UserID=${userID}&Account_=${account}&Nickname_=${nickname}&times=${settings.$RunTimes}&duration=${settings.$RunDuration}`
-                Gzip: [1, 1024],
-                //Headers: {},
-            }).$then((xhr)=>{
-            }).$catch((xhr)=>{
+            GlobalJS.sendUsage({
+                Times: settings.$RunTimes,
+                Duration: settings.$RunDuration,
+                Product: `${settings.category}_${Platform.sysInfo.buildCpuArchitecture}_${version}(${Platform.compileType})`,
             });
         }
 

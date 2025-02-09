@@ -561,7 +561,7 @@ Item {
   game.$globalJS：一些公共方法；
   game.$gameMakerGlobal：Maker的公共对象；
   game.$gameMakerGlobalJS：一些Maker的相关方法；
-  game.$config：项目配置；
+  game.$config：项目配置（实际上是 GameMakerGlobal.config）；
   game.$plugins：所有的插件对象；
 
 
