@@ -370,7 +370,7 @@ Item {
             let error = 0;
 
             let content;
-            let reg;
+            let regExp;
             let res;
 
             imageIcon.source = GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
@@ -382,16 +382,16 @@ Item {
                 ++error;
             }
 
-            reg = /category: '(\S*)'/g;
-            res = reg.exec(content);
+            regExp = /category: '(\S*)'/g;
+            res = regExp.exec(content);
             textGameName.text = res[1];
 
-            reg = /property string strTDSClientID: '(\w*)'/g;
-            res = reg.exec(content);
+            regExp = /property string strTDSClientID: '(\w*)'/g;
+            res = regExp.exec(content);
             textTapClientID.text = res[1];
 
-            reg = /property string strTDSClientToken: '(\w*)'/g;
-            res = reg.exec(content);
+            regExp = /property string strTDSClientToken: '(\w*)'/g;
+            res = regExp.exec(content);
             textTapClientToken.text = res[1];
 
 
@@ -401,8 +401,8 @@ Item {
                 ++error;
             }
 
-            reg = /package="(\S*)"/g;
-            res = reg.exec(content);
+            regExp = /package="(\S*)"/g;
+            res = regExp.exec(content);
             textPackageName.text = res[1];
 
 
@@ -413,7 +413,7 @@ Item {
         //修改配置文件（GameMakerGlobal.qml、AndroidManifest.xml）
         function modifyConfig() {
             let content;
-            let reg;
+            let regExp;
             let res;
 
             textResult.text = '';
@@ -423,14 +423,14 @@ Item {
             if(!content)
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
             else {
-                reg = /(category: ')\S*(')/g;
-                content = content.replace(reg, '$1' + textGameName.text + '$2');
+                regExp = /(category: ')\S*(')/g;
+                content = content.replace(regExp, '$1' + textGameName.text + '$2');
 
-                reg = /(property string strTDSClientID: ')\w*(')/g;
-                content = content.replace(reg, '$1' + textTapClientID.text + '$2');
+                regExp = /(property string strTDSClientID: ')\w*(')/g;
+                content = content.replace(regExp, '$1' + textTapClientID.text + '$2');
 
-                reg = /(property string strTDSClientToken: ')\w*(')/g;
-                content = content.replace(reg, '$1' + textTapClientToken.text + '$2');
+                regExp = /(property string strTDSClientToken: ')\w*(')/g;
+                content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
                 res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
@@ -446,54 +446,54 @@ Item {
             if(!content)
                 textResult.text += '读取 AndroidManifest.xml 失败\r\n';
             else {
-                reg = /(android:label=")\S*(")/g;
-                content = content.replace(reg, '$1' + textGameName.text + '$2');
+                regExp = /(android:label=")\S*(")/g;
+                content = content.replace(regExp, '$1' + textGameName.text + '$2');
 
 
-                reg = /(package=")\S*(")/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
+                regExp = /(package=")\S*(")/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
 
-                reg = /(android:name=")\S*(\.openadsdk.permission.TT_PANGOLIN)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
+                regExp = /(android:name=")\S*(\.openadsdk.permission.TT_PANGOLIN)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
 
-                reg = /(android:name=")\S*(\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
+                regExp = /(android:name=")\S*(\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
 
-                reg = /(android:authorities=")\S*(\.TTFileProvider)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.TTMultiProvider)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.com\.tds\.ad\.fileprovider)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.com\.tapsdk\.tapad\.okdownload)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                //reg = /(android:authorities=")\S*(\.tap_config\.provider)/g;
-                //content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                //reg = /(android:authorities=")\S*(\.tap_user\.provider)/g;
-                //content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.servermanager\.downloader\.com\.bytedance\.sdk\.openadsdk\.adhost)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.servermanager\.main)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.provider\.proxy\.main)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.fileprovider)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.bytedance\.android\.openliveplugin\.process\.server\.LiveServerManager)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.servermanager\.bytelive\.com\.byted\.live\.lite)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.pangle\.servermanager\.push\.com\.byted\.live\.lite)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.androidx-startup)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.TapTapKitInitProvider)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
-                reg = /(android:authorities=")\S*(\.themisLite)/g;
-                content = content.replace(reg, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.TTFileProvider)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.TTMultiProvider)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.com\.tds\.ad\.fileprovider)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.com\.tapsdk\.tapad\.okdownload)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                //regExp = /(android:authorities=")\S*(\.tap_config\.provider)/g;
+                //content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                //regExp = /(android:authorities=")\S*(\.tap_user\.provider)/g;
+                //content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.servermanager\.downloader\.com\.bytedance\.sdk\.openadsdk\.adhost)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.servermanager\.main)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.provider\.proxy\.main)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.fileprovider)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.bytedance\.android\.openliveplugin\.process\.server\.LiveServerManager)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.servermanager\.bytelive\.com\.byted\.live\.lite)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.pangle\.servermanager\.push\.com\.byted\.live\.lite)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.androidx-startup)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.TapTapKitInitProvider)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
+                regExp = /(android:authorities=")\S*(\.themisLite)/g;
+                content = content.replace(regExp, '$1' + textPackageName.text + '$2');
 
-                reg = /\$\{applicationId\}/g;
-                content = content.replace(reg, textPackageName.text);
+                regExp = /\$\{applicationId\}/g;
+                content = content.replace(regExp, textPackageName.text);
 
 
                 res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
