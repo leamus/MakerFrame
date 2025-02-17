@@ -567,7 +567,7 @@ Item {
 
         for(let tSpriteEffectIndex in _private.mapSpriteEffectsTemp) {
             //_private.mapSpriteEffectsTemp[tSpriteEffectIndex].destroy();
-            game.$sys.unloadSpriteEffect(_private.mapSpriteEffectsTemp[tSpriteEffectIndex]);
+            game.$sys.putSpriteEffect(_private.mapSpriteEffectsTemp[tSpriteEffectIndex]);
         }
         _private.mapSpriteEffectsTemp = {};
 

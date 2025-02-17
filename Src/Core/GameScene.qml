@@ -1084,7 +1084,7 @@ Item {
             }
 
 
-            const roleComp = GameSceneJS.loadRole(role.$rid, mainRole, role, itemViewPort.itemRoleContainer);
+            const roleComp = GameSceneJS.createRole(role.$rid, mainRole, role, itemViewPort.itemRoleContainer);
             if(!roleComp) {
                 return false;
             }
@@ -1522,7 +1522,7 @@ Item {
                 return false;
 
 
-            let roleComp = GameSceneJS.loadRole(role.$rid, null, role, itemViewPort.itemRoleContainer);
+            let roleComp = GameSceneJS.createRole(role.$rid, null, role, itemViewPort.itemRoleContainer);
             if(!roleComp) {
                 return false;
             }
@@ -3741,7 +3741,7 @@ Item {
                 return false;
             }
             //刷新特效属性
-            sprite = GameSceneJS.loadSpriteEffect(spriteInfo, sprite, spriteParams, null);
+            sprite = GameSceneJS.getSpriteEffect(spriteInfo, sprite, spriteParams, null);
             if(sprite === null)
                 return false;
 
@@ -5058,9 +5058,9 @@ Item {
             getRoleResource: GameSceneJS.getRoleResource,
             getMapResource: GameSceneJS.getMapResource,
 
-            loadSpriteEffect: GameSceneJS.loadSpriteEffect,
-            unloadSpriteEffect: GameSceneJS.unloadSpriteEffect,
-            loadRole: GameSceneJS.loadRole,
+            getSpriteEffect: GameSceneJS.getSpriteEffect,
+            putSpriteEffect: GameSceneJS.putSpriteEffect,
+            createRole: GameSceneJS.createRole,
 
             delay: GlobalLibraryJS.runNextEventLoop,
             timeout: GlobalLibraryJS.setTimeout,
@@ -6586,13 +6586,9 @@ Item {
                 return o;
             },
             //初始化回调
-            $init: function(o, p) {
-                o.visible = true;
-                o.parent=p;
-                return o;
-            },
+            $init: function(o, p){o.visible = true; o.parent = p; return o;},
             //释放回调
-            $release: function(o){o.visible = false; o.sprite.stop();return o;},
+            $release: function(o){o.visible = false; o.sprite.stop(); return o;},
             //销毁回调
             $destroy: function(o){o.destroy();},
         })
@@ -8040,7 +8036,7 @@ Item {
                 if(GlobalLibraryJS.isString(data))
                     data = {RID: data};
 
-                GameSceneJS.loadSpriteEffect(data, rootRole.customSprite, {Loops: data.$loops ?? 1});
+                GameSceneJS.getSpriteEffect(data, rootRole.customSprite, {Loops: data.$loops ?? 1});
 
                 if(GlobalLibraryJS.isValidNumber(data.$width))
                     rootRole.customSprite.width = data.$width;
@@ -8067,7 +8063,7 @@ Item {
                 rootRole.sprite.visible = false;
                 game.showsprite(data, '$Sprite');
                 //let sprite = compCacheSpriteEffect.createObject(null);
-                //GameSceneJS.loadSpriteEffect(data, sprite, {Loops: data.$loops ?? 1});
+                //GameSceneJS.getSpriteEffect(data, sprite, {Loops: data.$loops ?? 1});
             }
 
             function startAction(actionName, loops) {

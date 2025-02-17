@@ -1597,11 +1597,11 @@ function getFightScriptObject(fightscript, forceNew=true) {
 
 
 
-//载入特效，返回特效对象
+//载入特效，返回特效对象；
 //spriteEffectParams是 特效的资源名（会读取对应特效的信息）或 特效的原信息（使用GameSceneJS.getSpriteResource读取过的）；
-//如果 spriteEffectComp 为null，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）
-function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
-    //console.debug('[FightScene]loadSpriteEffect0');
+//注意：如果 spriteEffectComp 为空，则 从缓存获取1个 SpriteEffect 组件并返回（这个一般用在 角色动作上）；
+function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
+    //console.debug('[FightScene]getSpriteEffect0');
 
     /*if(GlobalLibraryJS.isString(spriteEffectParams))
         spriteEffectParams = {RID: spriteEffectParams};
@@ -1735,16 +1735,16 @@ function loadSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, pa
         return spriteEffectComp;
     }
     else {
-        console.exception('[!GameScene]loadSpriteEffect FAIL:', spriteEffectParams);
+        console.exception('[!GameScene]getSpriteEffect FAIL:', spriteEffectParams);
     }
 
     return null;
 }
 
-function unloadSpriteEffect(spriteEffectComp) {
+function putSpriteEffect(spriteEffectComp) {
     //spriteEffectComp.destroy();
     if(!spriteEffectComp) {
-        console.warn('[!GameScene]unloadSpriteEffect FAIL:', spriteEffectComp);
+        console.warn('[!GameScene]putSpriteEffect FAIL:', spriteEffectComp);
         return;
     }
     _private.cacheSprites.put(spriteEffectComp);
@@ -1754,8 +1754,8 @@ function unloadSpriteEffect(spriteEffectComp) {
 //载入角色，返回角色对象；
 //roleParams是 角色的资源名（会读取对应角色的信息）或 角色的信息（不会再次读取）；
 //如果 roleComp 为null，则 创建1个 roleComp 组件并返回；
-function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
-    //console.debug('[GameScene]loadRole:', roleParams);
+function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
+    //console.debug('[GameScene]createRole:', roleParams);
 
     /*let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleParams + GameMakerGlobal.separator + 'role.json');
     //console.debug('[FightScene]filePath2：', filePath);
@@ -1867,7 +1867,7 @@ function loadRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRo
         return roleComp;
     }
     else {
-        console.exception('[!GameScene]loadRole FAIL:', roleParams);
+        console.exception('[!GameScene]createRole FAIL:', roleParams);
     }
 
     return null;

@@ -747,7 +747,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         break;
 
     case 20: {   //Sprite
-            let spriteEffect = game.$sys.loadSpriteEffect(combatantActionSpriteData.Name, null, {Loops: combatantActionSpriteData.Loops}, fightScene);
+            let spriteEffect = game.$sys.getSpriteEffect(combatantActionSpriteData.Name, null, {Loops: combatantActionSpriteData.Loops}, fightScene);
 
             if(spriteEffect === null)
                 break;
@@ -757,7 +757,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             //检测ID是否重复
             if(_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID] !== undefined) {
-                game.$sys.unloadSpriteEffect(_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID]);
+                game.$sys.putSpriteEffect(_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID]);
                 //_private.mapSpriteEffectsTemp[combatantActionSpriteData.ID].destroy();
                 delete _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID];
             }
@@ -766,7 +766,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID] = spriteEffect;
             let _finished = function() {
                 if(GlobalLibraryJS.isComponent(spriteEffect)) {
-                    game.$sys.unloadSpriteEffect(spriteEffect);
+                    game.$sys.putSpriteEffect(spriteEffect);
                     //spriteEffect.destroy();
                 }
                 delete _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID];
@@ -1038,7 +1038,7 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 
     let spriteEffect = fightrole.$$fightData.$info.$spriteEffect;
 
-    if(!game.$sys.loadSpriteEffect(actions[action], spriteEffect, {Loops: loop})) {
+    if(!game.$sys.getSpriteEffect(actions[action], spriteEffect, {Loops: loop})) {
         console.warn('[!FightScene]载入战斗精灵动作失败：' + action);
         return false;
     }
