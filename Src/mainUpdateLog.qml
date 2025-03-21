@@ -157,7 +157,21 @@ Item {
 1、增加：底层加入加载Qt插件（可以用Qt插件和QML插件来扩展功能了）；
 2、增加：各种字符转换函数；
 *3、修改：修改函数名 loadSpriteEffect 为 getSpriteEffect，unloadSpriteEffect 为 putSpriteEffect，loadRole 为 createRole；
-4、其他：优化调整很多代码和细节，修复一些Bugs；
+4、修改：将SCodes、QNanoPainter、Libhv、SerialPort、QZXing、Lua、SDL、QtWebAPP改为Qt插件，框架引擎不再依赖它们，可以热插拔使用；
+5、增加：给异步增加$context和$defer功能；
+6、增加：QML-Push库；
+7、增加：应用程序的一些相关函数；
+8、增加：关闭音效game.stopsoundeffect函数；
+9、增加：game.showimage和game.showsprite的坐标功能；
+10、修改：增强sl_fileRead和sl_fileWrite二进制读写功能；
+11、增强：game.usegoods功能；
+**12、修改：game.usegoods、game.equip、game.unload的实现流程和方式（所有道具脚本的$equipScript需要修改）；
+**13、修改：game.equip和game.unload为异步，调用时加yield，且道具脚本中新增和修改了相关函数；
+*14、修改：地图和角色的RID和名称分开；
+15、新增：文件/缓存的文本/二进制高级读写（包括QIODevice、QBuffer、QFile、QFileDevice、QFileInfo、QDataStream、QTextStream类的封装）；
+16、新增：游戏加速功能；
+17、修复：多窗口时风格问题；
+18、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

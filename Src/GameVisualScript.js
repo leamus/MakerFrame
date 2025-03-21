@@ -290,7 +290,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         },
 
         '挂载动画': {   //targets: %1; target: %1; 这种绑定，如果动画正在运行时 父组件被释放就会有警告，所以不用绑定；
-            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14; PropertyAnimation {property: "%2"; from: %3; to: %4; duration: %5; running: false; easing {type: %6; period: %7; amplitude: %8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); Component.onCompleted: {target = %1; start();} %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
+            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14; PropertyAnimation {property: "%2"; from: %3; to: %4; duration: %5; running: false; easing {type: %6; period: %7; amplitude: %8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); Component.onCompleted: {target = FrameManager.sl_objectParent(this); start();} %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
             params: [
                 ['*父组件', 'name', true, 0, '', 'green'],
                 ['*@动画属性', 'unformatted', true, 2, [['x', 'y', '宽', '高', '透明度', '缩放', '角度', '颜色',], ['x', 'y', 'width', 'height', 'opacity', 'scale', 'rotation', 'color',], ''], ''],
@@ -449,10 +449,9 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         },
 
         '道具对象': {
-            command: ['道具对象', 'game.goods(%1,%2)', '道具对象', 0, false, 'red', 'white'],
+            command: ['道具对象', 'game.goods(%1)', '道具对象', 0, false, 'red', 'white'],
             params: [
-                ['*@道具', 'string|number', true, 2, [['道具资源名或下标（数字）', '所有'], ['', '-1'], '-1'], 'darkgreen'],
-                ['筛选', 'json', '{}', 0, '{}', 'darkgreen'],
+                ['*@道具筛选', 'string|number', true, 2, [['道具id或下标（数字）', '过滤条件', '所有'], ['', '{$rid: xx, $id: xx, $name: xx}', '-1'], '-1'], 'darkgreen'],
                 ['注意：命令返回的是道具对象数组；', 'label'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -474,7 +473,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '装备道具': {
-            command: ['装备道具', 'game.equip(%1,%2);', '装备道具', 0, true, 'red', 'white'],
+            command: ['装备道具', 'yield game.equip(%1,%2);', '装备道具', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
@@ -643,7 +642,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '判断': {
             command: ['判断', '%1 %2 %3', '判断', 0, false, 'red', 'white'],
             params: [
-                ['@变量1', 'name', false, 2, [['地图变量1', '全局变量1', '存档变量1', '引擎变量1', '普通变量1', '当前地图名', '金钱'], ['game.d["变量名1"]', 'game.gf["变量名1"]', 'game.gd["变量名1"]', 'game.cd["变量名1"]', '变量名1', 'game.gd["$sys_map"].$name', 'game.money()']], 'green'],
+                ['@变量1', 'name', false, 2, [['地图变量1', '全局变量1', '存档变量1', '引擎变量1', '普通变量1', '当前地图名', '金钱'], ['game.d["变量名1"]', 'game.gf["变量名1"]', 'game.gd["变量名1"]', 'game.cd["变量名1"]', '变量名1', 'game.d["$sys_map"].$name', 'game.money()']], 'green'],
                 ['*@符号', 'name', true, 2, [['等于（及类型）', '不等于（及类型）', '等于', '不等于', '大于', '小于', '大于等于', '小于等于'], ['===', '!==', '==', '!=', '>', '<', '>=', '<=']], 'blue'],
                 ['*@值/变量', 'name', true, 2, [['未定义', '空', '真', '假'], ['undefined', 'null', 'true', 'false']], 'green'],
                 ['长按编辑框可选择。', 'label'],
@@ -738,7 +737,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
 
 
         '当前地图名': {
-            command: ['当前地图名', 'game.gd["$sys_map"].$name', '当前地图名', 0, false, 'red', 'white'],
+            command: ['当前地图名', 'game.d["$sys_map"].$name', '当前地图名', 0, false, 'red', 'white'],
             params: [
                 ['返回当前地图名。', 'label'],
             ],

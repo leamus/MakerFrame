@@ -67,6 +67,7 @@ game.goon();
             RelativePath: _private.strMainJSName,
             ChoiceButton: 0b0,
             PathText: 0b0,
+            RunButton: 0b0,
             Default: defaultCode,
         });
 

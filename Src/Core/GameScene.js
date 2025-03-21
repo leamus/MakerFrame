@@ -249,25 +249,20 @@ function *loadResources() {
 
 //读取配置：
 
-    //是否提前载入所有资源
-    _private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1,
+    /*_private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1,
         GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'),
         //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'),
         game.$gameMakerGlobalJS.$config.$game.$loadAllResources,
         0);
+    */
+    //是否提前载入所有资源
+    _private.config.nLoadAllResources = getCommonScriptResource('$config', '$game', '$loadAllResources') ?? 0;
     //万向移动
-    _private.config.bWalkAllDirections = GlobalLibraryJS.shortCircuit(0b1,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$walkAllDirections'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$walkAllDirections'),
-        game.$gameMakerGlobalJS.$config.$game.$walkAllDirections,
-        true);
+    _private.config.bWalkAllDirections = getCommonScriptResource('$config', '$game', '$walkAllDirections') ?? true;
+    _private.config.rGameSpeed = getCommonScriptResource('$config', '$game', '$speed') ?? 1;
 
     //地图遮挡透明度
-    itemViewPort.rMapOpacity = GlobalLibraryJS.shortCircuit(0b1,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$map', '$opacity'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$map', '$opacity'),
-        game.$gameMakerGlobalJS.$config.$map.$opacity,
-        0.6);
+    itemViewPort.rMapOpacity = getCommonScriptResource('$config', '$map', '$opacity') ?? 0.6;
 
 
     //安卓配置
@@ -278,11 +273,7 @@ function *loadResources() {
         _private.lastOrient = Platform.sl_getScreenOrientation();
 
         //旋转配置
-        Platform.sl_setScreenOrientation(GlobalLibraryJS.shortCircuit(0b1,
-            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$android', '$orient'),
-            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$android', '$orient'),
-            game.$gameMakerGlobalJS.$config.$android.$orient,
-            4));
+        Platform.sl_setScreenOrientation(getCommonScriptResource('$config', '$android', '$orient') ?? 4);
 
     } while(0);
 
@@ -350,11 +341,7 @@ function *loadResources() {
 
     //按键配置
     do {
-        const buttonsConfig = GlobalLibraryJS.shortCircuit(0b1,
-            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$buttons'),
-            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$buttons'),
-            game.$gameMakerGlobalJS.$config.$buttons,
-            null);
+        const buttonsConfig = getCommonScriptResource('$config', '$buttons') ?? null;
         if(!buttonsConfig)
             break;
 
@@ -419,20 +406,20 @@ function *loadResources() {
             button.anchors.rightMargin = tConfig.$right * rootWindow.aliasGlobal.Screen.pixelDensity;
             button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasGlobal.Screen.pixelDensity;
 
-            if(tConfig.$pressed)
+            if(tConfig.$pressed)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 button.sg_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     game.async(tConfig.$pressed.call(button) ?? null, 'ButtonPressed');  //也可以用game.run
                 });
             //！！！兼容旧代码
-            else if(tConfig.$clicked)
+            else if(tConfig.$clicked)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 button.sg_pressed.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     game.async(tConfig.$clicked.call(button) ?? null, 'ButtonClicked');  //也可以用game.run
                 });
-            if(tConfig.$released)
+            if(tConfig.$released)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 button.sg_released.connect(function() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
@@ -792,7 +779,10 @@ function *loadResources() {
     //console.debug('_private.objMusic', JSON.stringify(_private.objMusic))
 
 
-    for(let i = 0; i < 10; ++i)
+    //音效通道个数
+    let soundEffectChannelCount = getCommonScriptResource('$config', '$game', '$soundEffectChannelCount');
+    //创建音效通道
+    for(let i = 0; i < soundEffectChannelCount; ++i)
         rootSoundEffect.arrCacheSoundEffects[i] = compCacheSoundEffect.createObject(rootGameScene, {});
 
 
@@ -828,12 +818,12 @@ function *loadResources() {
                 _private.objPlugins[tc0][tc1] = ts;
 
 
-                if(ts.$load && ts.$autoLoad !== false) {
+                if(ts.$load && ts.$autoLoad !== false) { //GlobalLibraryJS.checkCallable
                     try {
                         //ts.$load();
                         //game.run(ts.$load() ?? null, 'plugin_load:' + tc0 + tc1);
-                        const r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
-                        if(GlobalLibraryJS.isGenerator(r))yield* r;
+                        let r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
+                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
                     } catch(e) {
                         GlobalLibraryJS.printException(e);
                         console.warn('[!GameScene]插件$load函数调用错误：', tc0, tc1);
@@ -859,19 +849,21 @@ function *unloadResources() {
 
     //卸载扩展 插件、组件
     for(let tc in _private.objPlugins)
-        for(let tp in _private.objPlugins[tc])
-            if(_private.objPlugins[tc][tp].$unload && _private.objPlugins[tc][tp].$autoLoad !== false) {
+        for(let tp in _private.objPlugins[tc]) {
+            const plugin = _private.objPlugins[tc][tp];
+            if(plugin.$unload && plugin.$autoLoad !== false) { //GlobalLibraryJS.checkCallable
                 try {
-                    //_private.objPlugins[tc][tp].$unload();
-                    //game.run(_private.objPlugins[tc][tp].$unload() ?? null, 'plugin_unload:' + tc + tp);
-                    const r = _private.objPlugins[tc][tp].$unload();
-                    if(GlobalLibraryJS.isGenerator(r))yield* r;
+                    //plugin.$unload();
+                    //game.run(plugin.$unload() ?? null, 'plugin_unload:' + tc + tp);
+                    let r = plugin.$unload();
+                    if(GlobalLibraryJS.isGenerator(r))r = yield* r;
                 } catch(e) {
                     GlobalLibraryJS.printException(e);
                     console.warn('[!GameScene]插件$unload函数调用错误：', tc, tp);
                     //throw err;
                 }
             }
+        }
 
 
     loaderFightScene.unload();
@@ -1342,6 +1334,7 @@ function getGoodsObject(goods, forceNew=true) {
                 */
                 retGoods = {};
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, goods/*, true*/);
+                retGoods.$location = 0;
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retGoods, forceNew/*, true*/);
                 retGoods.__proto__ = resGoods;
@@ -1358,7 +1351,7 @@ function getGoodsObject(goods, forceNew=true) {
                 return null;
             }
 
-            retGoods = {$rid: goods.RID, $count: 0};
+            retGoods = {$rid: goods.RID, $count: 1};
             if(resGoods.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retGoods, resGoods.$createData(goods.Params));
             //delete goods.RID;
@@ -1496,8 +1489,10 @@ function getFightRoleObject(fightrole, forceNew=true) {
         let tGoods = [];
         for(let tt in retFightRole.$goods) {
             let t = GameSceneJS.getGoodsObject(retFightRole.$goods[tt], forceNew);
-            if(t)
+            if(t) {
+                t.$location = 3;
                 tGoods.push(t);
+            }
         }
         retFightRole.$goods = tGoods;
     }
@@ -1508,8 +1503,10 @@ function getFightRoleObject(fightrole, forceNew=true) {
         let tequipment = {};
         for(let tt in retFightRole.$equipment) {
             let t = GameSceneJS.getGoodsObject(retFightRole.$equipment[tt], forceNew);
-            if(t)
+            if(t) {
+                t.$location = 2;
                 tequipment[t.$position] = t;
+            }
         }
         retFightRole.$equipment = tequipment;
     }
@@ -1876,18 +1873,19 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
 
 
 //打开地图
-function openMap(mapName, forceRepaint=false) {
+function openMap(mapRID, forceRepaint=false) {
     game.d['$sys_map'] = {};
 
-    let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName;
+    let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID;
 
     //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
-    if(forceRepaint || game.gd['$sys_map'].$name !== mapName || !itemViewPort.mapInfo) {
+    if(forceRepaint || game.gd['$sys_map'].$rid !== mapRID || !itemViewPort.mapInfo) {
 
-        if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapName))) {
-            game.gd['$sys_map'].$name = null;
+        if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapRID))) {
+            game.gd['$sys_map'].$rid = null;
 
             game.d['$sys_map'].$info = {};
+            game.d['$sys_map'].$rid = null;
             game.d['$sys_map'].$name = null;
             game.d['$sys_map'].$columns = 0;
             game.d['$sys_map'].$rows = 0;
@@ -1897,20 +1895,22 @@ function openMap(mapName, forceRepaint=false) {
 
             //!!!兼容旧代码
             game.gd['$sys_map'].$$info = {};
+            //game.gd['$sys_map'].$$name = null;
             game.gd['$sys_map'].$$columns = 0;
             game.gd['$sys_map'].$$rows = 0;
             game.gd['$sys_map'].$$obstacles = [];
 
 
-            //console.warn('[!GameScene]Map Load Error:', mapName, mapPath);
+            //console.warn('[!GameScene]Map Load Error:', mapRID, mapPath);
             return false;
         }
     }
 
     //game.$sys_map.$name = itemViewPort.mapInfo.MapName;
-    game.gd['$sys_map'].$name = itemViewPort.mapInfo.MapName;
+    game.gd['$sys_map'].$rid = mapRID;
 
     game.d['$sys_map'].$info = itemViewPort.mapInfo;
+    game.d['$sys_map'].$rid = mapRID;
     game.d['$sys_map'].$name = itemViewPort.mapInfo.MapName;
     game.d['$sys_map'].$columns = itemViewPort.mapInfo.MapSize[0];
     game.d['$sys_map'].$rows = itemViewPort.mapInfo.MapSize[1];
@@ -1926,6 +1926,7 @@ function openMap(mapName, forceRepaint=false) {
 
     //!!!兼容旧代码
     game.gd['$sys_map'].$$info = itemViewPort.mapInfo;
+    //game.gd['$sys_map'].$$name = itemViewPort.mapInfo.MapName;
     game.gd['$sys_map'].$$columns = itemViewPort.mapInfo.MapSize[0];
     game.gd['$sys_map'].$$rows = itemViewPort.mapInfo.MapSize[1];
     game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
@@ -1951,7 +1952,7 @@ function openMap(mapName, forceRepaint=false) {
 
     //let ts = _private.jsEngine.load(GlobalJS.toURL(mapPath + GameMakerGlobal.separator + 'map.js'));
     //itemViewPort.mapScript = ts;
-    itemViewPort.mapScript = _private.mapsResource[mapName].$script;
+    itemViewPort.mapScript = _private.mapsResource[mapRID].$script;
 
     //GlobalLibraryJS.copyPropertiesToObject(game.f, itemViewPort.mapScript/*, true*/);
     Object.assign(game.f, itemViewPort.mapScript);
@@ -1962,6 +1963,7 @@ function openMap(mapName, forceRepaint=false) {
 
     return itemViewPort.mapInfo;
 }
+
 
 
 
@@ -2066,7 +2068,7 @@ function buttonAClicked() {
                     break;
             } while(0);
 
-            if(tScript) {
+            if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 game.run(tScript.call(role, role) ?? null, '$interactive:' + role.$data.$id);
                 //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(role.$data.$id));
 
@@ -2105,7 +2107,7 @@ function mapEvent(eventName, role) {
             break;
     } while(0);
 
-    if(tScript)
+    if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:' + role.$data.$id + '_' + eventName + '_map', );
         //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:' + role.$data.$id + '_' + eventName + '_map'}, );
     //game.run(tScript() ?? null, '地图事件:' + eventName);
@@ -2113,7 +2115,7 @@ function mapEvent(eventName, role) {
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map'];
-    if(tScript)
+    if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:map_' + eventName, );
         //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
 
@@ -2146,7 +2148,7 @@ function mapEventCanceled(eventName, role) {
             break;
     } while(0);
 
-    if(tScript)
+    if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave', );
         //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:' + role.$data.$id + '_' + eventName + '_map_leave'}, );
     //game.run(tScript() ?? null, '地图事件离开:' + eventName + '_leave');
@@ -2154,7 +2156,7 @@ function mapEventCanceled(eventName, role) {
 
     //调用总事件处理
     tScript = game.gf['$' + eventName + '_map_leave'];
-    if(tScript)
+    if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:map_leave_' + eventName, );
         //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
 
@@ -2206,7 +2208,7 @@ function roleClickEvent(role, dx, dy) {
             break;
     } while(0);
 
-    if(tScript) {
+    if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
         game.run(tScript.call(role, role) ?? null, eventName);
         //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(_private.objRoles[r].$name));
 
@@ -2235,15 +2237,16 @@ function onTriggered() {
     let realinterval = new Date().getTime() - timer.nLastTime;
     timer.nLastTime = timer.nLastTime + realinterval;
 
-    game.$frameDuration = realinterval;
-
-
+    //计算FPS
     ++timer.nFrameCount;
     timer.nDuration += realinterval;
     if(timer.nDuration > 1000) {
         textFPS.text = 'FPS:' + Math.round(timer.nFrameCount / timer.nDuration * 1000);
         timer.nDuration = timer.nFrameCount = 0;
     }
+
+
+    realinterval = game.$frameDuration = realinterval * _private.config.rGameSpeed;
 
 
     //定时器操作
@@ -2277,15 +2280,19 @@ function onTriggered() {
                     break;
             } while(0);
 
-            if(objTimer[2] & 0b10) {
-                const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '全局定时器事件1:' + tt, );
-                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
-                //game.run(tScript() ?? null, tt);
-                //GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
+            if(tScript) { //GlobalLibraryJS.checkCallable(fn, 0b11)
+                if(objTimer[2] & 0b10) {
+                    const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '全局定时器事件1:' + tt, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
+                    //game.run(tScript() ?? null, tt);
+                    //GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
+                }
+                else
+                    //也可以用game.run
+                    game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '全局定时器事件:' + tt, );
             }
             else
-                //也可以用game.run
-                game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '全局定时器事件:' + tt, );
+                console.warn('[!GameScene]未定义定时器函数：', tt);
 
 
             //如果次数完毕
@@ -2322,15 +2329,18 @@ function onTriggered() {
                     break;
             } while(0);
 
-            if(objTimer[2] & 0b10) {
-                const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '定时器事件1:' + tt, );
-                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
-                //game.run(tScript() ?? null, tt);
-                //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
-            }
+            if(tScript) { //GlobalLibraryJS.checkCallable(fn, 0b11)
+                if(objTimer[2] & 0b10) {
+                    const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '定时器事件1:' + tt, );
+                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
+                    //game.run(tScript() ?? null, tt);
+                    //GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
+                }
+                else
+                    //也可以用game.run
+                    game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '定时器事件:' + tt, );}
             else
-                //也可以用game.run
-                game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '定时器事件:' + tt, );
+                console.warn('[!GameScene]未定义定时器函数：', tt);
 
 
             //如果次数完毕
@@ -2398,7 +2408,7 @@ function onTriggered() {
                                 break;
                         } while(0);
 
-                        if(tScript)
+                        if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                             /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, eventName, );
                             //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: eventName}, );
                             //game.run(tScript() ?? null, role.$name);
@@ -2555,7 +2565,7 @@ function onTriggered() {
                     Qt.rect(_private.objRoles[r].x + _private.objRoles[r].x1, _private.objRoles[r].y + _private.objRoles[r].y1, _private.objRoles[r].width1, _private.objRoles[r].height1),
                 )
             ) {
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     let keep = 0;   //是否是持续碰撞；
                     if(role.$$collideRoles[key] !== undefined) {
                         keep = 1;
@@ -2570,7 +2580,7 @@ function onTriggered() {
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.objRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
@@ -2609,7 +2619,7 @@ function onTriggered() {
                 )
             ) {
                 let keep = 0;   //是否是持续碰撞；
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     if(role.$$collideRoles[key] !== undefined) {
                         keep = 1;
                         collideRoles[key] = role.$$collideRoles[key] + realinterval;
@@ -2622,21 +2632,21 @@ function onTriggered() {
 
 
                 //主角脚本
-                if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {
+                if(_private.arrMainRoles[r].$script && (tScript = _private.arrMainRoles[r].$script['$collide'])) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
             }
             //这次没有碰撞 且 上次有碰撞
             else if(key in role.$$collideRoles) {
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, _private.arrMainRoles[r], role, -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
@@ -2650,7 +2660,7 @@ function onTriggered() {
 
                 //调用总事件处理
                 tScript = game.gf['$collide'];
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
@@ -2764,7 +2774,7 @@ function onTriggered() {
                                 break;
                         } while(0);
 
-                        if(tScript)
+                        if(tScript)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                             /*const ret1 = */_private.scriptQueue.create(tScript.call(mainRole, mainRole) ?? null, -1, true, eventName, );
                             //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(mainRole, mainRole) ?? null, Tips: eventName}, );
                             //game.run(tScript() ?? null, mainRole.$name);
@@ -3113,7 +3123,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
                     break;
             } while(0);
 
-            if(tScript) {
+            if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 const ret1 = _private.scriptQueue.create(tScript.call(role, role, collideObstacle, keep) ?? null, -1, true, eventName, );
                 //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, keep) ?? null, Tips: eventName}, );
             }
@@ -3122,7 +3132,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
             //调用总事件处理
             if(role.$$type === 1) {
                 tScript = game.gf['$collide_obstacle'];
-                if(tScript) {
+                if(tScript) {  //GlobalLibraryJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(role, role, collideObstacle, 0) ?? null, -1, true, eventName, );
                     //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: eventName}, );
                 }

@@ -72,11 +72,7 @@ Item {
 
         //装备
 
-        let equipReservedSlots = GlobalLibraryJS.shortCircuit(0b1, conbatant['$equipReservedSlots'],
-            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$equipReservedSlots'),
-            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$equipReservedSlots'),
-            game.$gameMakerGlobalJS.$config.$names.$equipReservedSlots,
-            []);
+        let equipReservedSlots = conbatant['$equipReservedSlots'] ?? game.$sys.getCommonScriptResource('$config', '$names', '$equipReservedSlots') ?? [];
         root.arrEquipmentPositions = [];
         let arrEquipment = [];  //显示的
 
@@ -320,14 +316,16 @@ Item {
                     if(root.arrEquipmentPositions[index] === undefined)
                         return;
 
-                    //let hero = game.gd[strTeamName][0];
-                    game.getgoods(game.unload(root.nFightRoleIndex, root.arrEquipmentPositions[index]));
+                    game.run(function*(){
+                        //let hero = game.gd[strTeamName][0];
+                        game.getgoods(yield game.unload(root.nFightRoleIndex, root.arrEquipmentPositions[index]));
 
-                    root.refresh();
-                    sg_refreshBagWindow();
+                        root.refresh();
+                        sg_refreshBagWindow();
 
-                    //textGoodsInfo.text = textGoodsInfo.strPreText;
-                    //rectGoods.showGoods(rectGoods.nlastShowType);
+                        //textGoodsInfo.text = textGoodsInfo.strPreText;
+                        //rectGoods.showGoods(rectGoods.nlastShowType);
+                    });
                 }
             }
 

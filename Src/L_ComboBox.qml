@@ -70,7 +70,10 @@ Item {
                 //忽略没有的信号
                 ignoreUnknownSignals: true
 
-                onPressedChanged: canvas.requestPaint()
+                //onPressedChanged: canvas.requestPaint()
+                function onPressedChanged() {
+                    canvas.requestPaint();
+                }
             }
 
             onPaint: {

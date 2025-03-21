@@ -200,11 +200,7 @@ Item {
 
 
         //读取配置
-        _private.config.fightRoleBarConfig = GlobalLibraryJS.shortCircuit(0b1,
-            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$combatant_bars'),
-            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$fight', '$combatant_bars'),
-            game.$gameMakerGlobalJS.$config.$fight.$combatant_bars,
-            );
+        _private.config.fightRoleBarConfig = game.$sys.getCommonScriptResource('$config', '$fight', '$combatant_bars');
 
 
         //按钮
@@ -436,10 +432,11 @@ Item {
 
 
         //初始化脚本
-        if(game.$sys.resources.commonScripts['fight_init_script']) {
-            const r = game.$sys.resources.commonScripts['fight_init_script']([fight.myCombatants, fight.enemies], fight.fightScript);
-            if(GlobalLibraryJS.isGenerator(r))yield* r;
-            //yield fight.run(game.$sys.resources.commonScripts['fight_init_script']([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight_init_script'});
+        const fightInitScript = game.$sys.resources.commonScripts['fight_init_script'];
+        if(fightInitScript) { //GlobalLibraryJS.checkCallable
+            let r = fightInitScript([fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            //yield fight.run(fightInitScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight_init_script'});
         }
 
 
@@ -502,10 +499,11 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        if(game.$sys.resources.commonScripts['fight_start_script']) {
-            const r = game.$sys.resources.commonScripts['fight_start_script']([fight.myCombatants, fight.enemies], fight.fightScript);
-            if(GlobalLibraryJS.isGenerator(r))yield* r;
-            //yield fight.run(game.$sys.resources.commonScripts['fight_start_script']([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
+        const fightStartScript = game.$sys.resources.commonScripts['fight_start_script'];
+        if(fightStartScript) { //GlobalLibraryJS.checkCallable
+            let r = fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            //yield fight.run(fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
         }
 
 
@@ -763,11 +761,11 @@ Item {
         //flag：0b1为行动时遇敌，0b10为静止时遇敌；
         //params是给战斗脚本$createData的参数；
         //会覆盖之前的fighton；
-        function fighton(fightScript, probability=5, interval=1000, flag=3) {
+        function fighton(fightScript, probability=5, interval=1000, flag=0b11) {
             game.gd['$sys_random_fight'] = [fightScript, probability, flag, interval];
 
             game.deltimer('$sys_random_fight_timer', true);
-            game.addtimer('$sys_random_fight_timer', interval, -1, true);
+            game.addtimer('$sys_random_fight_timer', interval, -1, 0b11);
             game.gf['$sys_random_fight_timer'] = function() {
 
                 //判断行动或静止状态
@@ -1338,11 +1336,7 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
-                        smooth: GlobalLibraryJS.shortCircuit(0b1,
-                            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
-                            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
-                            game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
-                            true)
+                        smooth: game.$sys.getCommonScriptResource('$config', '$spriteEffect', '$smooth') ?? true;
 
                         //bTest: false
 
@@ -1595,11 +1589,7 @@ Item {
                         //width: strSource ? implicitWidth : 60
                         //height: strSource ? implicitHeight : 60
 
-                        smooth: GlobalLibraryJS.shortCircuit(0b1,
-                            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
-                            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
-                            game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
-                            true)
+                        smooth: game.$sys.getCommonScriptResource('$config', '$spriteEffect', '$smooth') ?? true;
 
                         //bTest: false
 

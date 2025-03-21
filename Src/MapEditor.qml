@@ -103,6 +103,10 @@ Item {
 
 
 
+    function init(mapRID) {
+        //textMapRID.text = _private.strMapRID = mapRID;
+    }
+
     //创建新地图
     function newMap(cfg) {
         _private.readConfig(cfg);
@@ -120,11 +124,12 @@ Item {
     }
 
     //打开地图
-    function openMap(cfg) {
+    function openMap(cfg, mapRID) {
+        textMapRID.text = _private.strMapRID = mapRID;
         _private.readConfig(cfg);
 
 
-        console.debug('[MapEditor]openMap', imageMapBlock1.source, imageMapBlock1.sourceSize.width, imageMapBlock1.sourceSize.height);
+        console.debug('[MapEditor]openMap:', imageMapBlock1.source, imageMapBlock1.sourceSize.width, imageMapBlock1.sourceSize.height);
 
 
         //读取 地图数据
@@ -232,7 +237,7 @@ Item {
                 if(cfg.MapEventList.indexOf(cfg.MapEventData[i]) < 0)
                     cfg.MapEventList.push(cfg.MapEventData[i]);
             }
-            console.debug('兼容OK');
+            console.debug('[MapEditor]兼容OK');
         }
         //读取事件数据，创建事件
         for(let i in cfg.MapEventList) {
@@ -251,7 +256,7 @@ Item {
         listviewCanvasMap.currentIndex = listmodelCanvasMap.count - 1;
 
 
-        _private.loadScript(_private.strMapName);
+        _private.loadScript(_private.strMapRID);
     }
 
 
@@ -426,7 +431,7 @@ Item {
                     //scriptEditor.text = objSystemEventsData['$1'] || '';
                     //scriptEditor.editor.setPlainText(objSystemEventsData['$1'] || '');
 
-                    if(!_private.strMapName) {
+                    if(!_private.strMapRID) {
                         rootWindow.aliasGlobal.dialogCommon.show({
                               Msg: '请先保存地图',
                               Buttons: Dialog.Yes,
@@ -442,7 +447,7 @@ Item {
                     }
 
 
-                    //_private.loadScript(_private.strMapName);
+                    //_private.loadScript(_private.strMapRID);
 
 
                     scriptEditor.visible = true;
@@ -463,7 +468,7 @@ Item {
                 font.pointSize: _config.nFontPointSize
                 text: '测试'
                 onClicked: {
-                    //loaderTestMap.item.init({Map: _private.strMapName});
+                    //loaderTestMap.item.init({Map: _private.strMapRID});
                     //loaderTestMap.show();
                     hotLoader.reload(Qt.resolvedUrl('mainGameTest.qml'));
                 }
@@ -531,7 +536,8 @@ Item {
                     //console.debug(arrMapData[canvasMapContainer.nCurrentCanvasMap][0][0]);
                     //console.debug(flickable.contentX, flickable.contentY,flickable.originX, flickable.originY);
 
-                    textMapName.text = _private.strMapName;
+                    textMapRID.text = _private.strMapRID;
+                    //textMapName.text = _private.strMapName;
                     //textMapScale.text = _private.nMapScaled;
                     dialogSave.open();
                 }
@@ -2575,23 +2581,25 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
+            textMapRID.text = textMapRID.text.trim();
             textMapName.text = textMapName.text.trim();
-            if(textMapName.text.length === 0) {
+            if(textMapRID.text.length === 0 || textMapName.text.length === 0) {
                 //Platform.sl_showToast('名称不能为空');
-                textDialogMsg.text = '名称不能为空';
+                textDialogMsg.text = '资源ID和名称不能为空';
                 open();
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
 
             function fnSave() {
                 if(_private.exportMap()) {
                     //第一次保存，重新刷新
-                    if(_private.strMapName === '')
-                        _private.loadScript(textMapName.text);
+                    if(_private.strMapRID === '')
+                        _private.loadScript(textMapRID.text);
 
-                    _private.strMapName = textMapName.text;
+                    _private.strMapRID = textMapRID.text;
+                    //_private.strMapName = textMapName.text;
 
                     textDialogMsg.text = '';
 
@@ -2603,7 +2611,7 @@ Item {
                 }
             }
 
-            if(textMapName.text !== _private.strMapName && FrameManager.sl_dirExists(path)) {
+            if(textMapRID.text !== _private.strMapRID && FrameManager.sl_dirExists(path)) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -2611,9 +2619,10 @@ Item {
                         fnSave();
                     },
                     OnRejected: ()=>{
-                        textMapName.text = _private.strMapName;
+                        textMapRID.text = _private.strMapRID;
 
                         textDialogMsg.text = '';
+
 
                         root.forceActiveFocus();
                     },
@@ -2629,7 +2638,7 @@ Item {
 
         }
         onRejected: {
-            textMapName.text = _private.strMapName;
+            textMapRID.text = _private.strMapRID;
 
             textDialogMsg.text = '';
 
@@ -2646,12 +2655,27 @@ Item {
 
             RowLayout {
                 Label {
+                    text: qsTr('地图资源名：')
+                }
+                TextField {
+                    id: textMapRID
+                    Layout.fillWidth: true
+                    placeholderText: '资源名RID'
+                    text: ''
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+                }
+            }
+            RowLayout {
+                Label {
                     text: qsTr('地图名：')
                 }
                 TextField {
                     id: textMapName
                     Layout.fillWidth: true
-                    placeholderText: 'map'
+                    placeholderText: '地图名'
                     text: ''
 
                     //selectByKeyboard: true
@@ -2920,7 +2944,7 @@ Item {
             //if(!FrameManager.sl_dirExists(path))
                 FrameManager.sl_dirCreate(path);
 
-            canvasExport.save(path + GameMakerGlobal.separator + _private.strMapName + '.png');
+            canvasExport.save(path + GameMakerGlobal.separator + textMapName.text.trim() + '.png');
             //FrameManager.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
             bExport = false;
@@ -2938,7 +2962,7 @@ Item {
         anchors.fill: parent
 
 
-        strTitle: `${_private.strMapName}(地图脚本)`
+        strTitle: `${_private.strMapRID}(${textMapName.text.trim()})(地图脚本)`
         /*fnAfterCompile: function(code) {return code;}*/
 
         visualScriptEditor.strTitle: strTitle
@@ -3036,7 +3060,7 @@ Item {
         id: hotLoader
 
 
-        property string strMapName
+        property string strMapRID
         property string strRoleName
         property var arrPosition
 
@@ -3062,7 +3086,7 @@ Item {
         }
 
         onSg_release: function(qmlObject) {
-            hotLoader.strMapName = qmlObject.textMapName;
+            hotLoader.strMapRID = qmlObject.textMapRID;
             hotLoader.strRoleName = qmlObject.textRoleName;
             arrPosition = [qmlObject.textMapBlockX, qmlObject.textMapBlockY];
 
@@ -3073,10 +3097,10 @@ Item {
             if(code === 1) {
                 Global.referenceComponent = rootTest;
 
-                qmlObject.init({Map: _private.strMapName, Role: strRoleName, Position: arrPosition});
+                qmlObject.init({Map: _private.strMapRID, Role: strRoleName, Position: arrPosition});
             }
             else if(code === 2) {
-                qmlObject.init({Map: strMapName, Role: strRoleName, Position: arrPosition});
+                qmlObject.init({Map: strMapRID, Role: strRoleName, Position: arrPosition});
                 qmlObject.start();
             }
             else {
@@ -3109,8 +3133,10 @@ Item {
         id: _private
 
 
-        //地图名 和 地图缩放倍数（暂存）
+        property string strMapRID: ''
+        //地图名
         property string strMapName: ''
+        //地图缩放倍数（暂存）
         //property real nMapScaled: 1
 
         //特殊图块信息
@@ -3124,7 +3150,7 @@ Item {
 
             //console.debug('init:', cfg.MapBlockSize, cfg.MapSize)
 
-            textMapName.text = _private.strMapName = cfg.MapName || '';
+            textMapName.text/* = _private.strMapName*/ = cfg.MapName || '';
             //_private.nMapScaled = cfg.MapScale || 1;
             textMapScale.text = cfg.MapScale || '1';
             textMapOfRole.text = cfg.MapOfRole || '2';
@@ -3187,21 +3213,22 @@ Item {
 
 
         //读取地图脚本
-        function loadScript(mapName) {
-            if(!mapName) {
+        function loadScript(mapRID) {
+            if(!mapRID) {
                 scriptEditor.text = ('function *$start(){ //地图载入事件 \r\n}');
                 scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
 
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator;
+            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator;
             //if(FrameManager.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
             scriptEditor.init({
                 BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
-                RelativePath: GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapName + GameMakerGlobal.separator + 'map.js',
+                RelativePath: GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator + 'map.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
+                RunButton: 0b0,
             });
             //scriptEditor.text = FrameManager.sl_fileRead(path + 'map.js') || ('function *$start(){ //地图载入事件 \r\n}');
             //scriptEditor.editor.setPlainText(data);
@@ -3282,16 +3309,16 @@ Item {
             if(_private.strRoleName === '') {
             }*/
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
             let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
         }
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
-            if(_private.strMapName !== '' && textMapName.text !== '' && _private.strMapName !== textMapName.text) {
-                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapName + GameMakerGlobal.separator + 'map.vjs';
+            if(_private.strMapRID !== '' && textMapRID.text !== '' && _private.strMapRID !== textMapRID.text) {
+                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapRID + GameMakerGlobal.separator + 'map.vjs';
                 if(FrameManager.sl_fileExists(oldFilePath)) {
-                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapName.text + GameMakerGlobal.separator + 'map.vjs';
+                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text + GameMakerGlobal.separator + 'map.vjs';
                     let ret = FrameManager.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3300,8 +3327,7 @@ Item {
         //导出地图
         function exportMap() {
 
-            let newName = textMapName.text;
-            let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + newName;
+            let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
 
             //if(!FrameManager.sl_dirExists(newPath))
                 FrameManager.sl_dirCreate(newPath);
@@ -3324,7 +3350,7 @@ Item {
 
             let outputData = {};
             outputData.Version = '0.6';
-            outputData.MapName = newName;
+            outputData.MapName = textMapName.text;
             outputData.MapType = 1; //地图类型
             outputData.MapScale = parseFloat(textMapScale.text) > 0 ? parseFloat(textMapScale.text) : 1;
             outputData.MapSize = [_config.sizeMapSize.width, _config.sizeMapSize.height];

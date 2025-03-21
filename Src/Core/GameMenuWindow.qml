@@ -579,7 +579,7 @@ Item {
 
 
                     //let hero = game.gd['$sys_fight_heros'][0];
-                    game.getgoods(game.unload(0, rectEquipInfo.positions[rectEquipInfo.choicePosition]));
+                    game.getgoods(yield game.unload(0, rectEquipInfo.positions[rectEquipInfo.choicePosition]));
                 }
             }
         }

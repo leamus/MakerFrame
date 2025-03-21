@@ -128,11 +128,7 @@ Item {
 
 
         textGoodsInfo.text = textGoodsInfo.strPreText;
-        let moneyName = GlobalLibraryJS.shortCircuit(0b1,
-            GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$names', '$money'),
-            //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$names', '$money'),
-            game.$gameMakerGlobalJS.$config.$names.$money,
-            );
+        let moneyName = game.$sys.getCommonScriptResource('$config', '$names', '$money');
         textMoney.text = moneyName + ':' + game.gd['$sys_money'];
 
 
@@ -510,22 +506,15 @@ Item {
 
                     //_private.close();
 
+                    let index = gameFightRoleMenu.nChoiceIndex;
                     let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
-
-                    if(goodsInfo.$commons.$equipScript) {
-                        let tfh;
-                        if(gameFightRoleMenu.nChoiceIndex < 0)
-                            tfh = null;
-                        else
-                            tfh = game.fighthero(gameFightRoleMenu.nChoiceIndex);
-
-                        game.run(goodsInfo.$commons.$equipScript(goods, tfh) ?? null);
-                        //game.run(goodsInfo.$commons.$equipScript(goods.$rid) ?? null);
-                    }
+                    //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
 
                     //脚本执行完毕后刷新背包
-                    game.run(function(){root.showGoods(root.nlastShowType);});
+                    game.run(function*() {
+                        yield game.equip(index, goods, null);
+                        root.showGoods(root.nlastShowType);
+                    });
                 }
             }
 

@@ -34,6 +34,8 @@ Item {
 
     signal sg_close();
     onSg_close: {
+        rectImage.visible = false;
+
         //spriteEffect.unload();
         spriteEffect.nSpriteType = 0;
 
@@ -1954,14 +1956,15 @@ Item {
 
 
 
-    Rectangle {
+    Mask {
         id: rectImage
-
-        anchors.fill: parent
 
         visible: false
 
-        color: 'black'
+        anchors.fill: parent
+
+        color: Global.style.backgroundColor
+        //opacity: 0
 
         Image {
             id: image
@@ -1977,9 +1980,9 @@ Item {
             font.pointSize: 16
         }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: rectImage.visible = false;
+        mouseArea.onClicked: {
+            rectImage.visible = false;
+            root.forceActiveFocus();
         }
     }
 
@@ -2031,6 +2034,7 @@ function $refresh(index, imageAnimate, path) {
         function showImage() {
             image.source = textSpriteImageURL.text;
             rectImage.visible = true;
+            rectImage.forceActiveFocus();
         }
 
 
@@ -2144,6 +2148,7 @@ function $refresh(index, imageAnimate, path) {
                 RelativePath: GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
+                RunButton: 0b0,
             });
             //scriptEditor.text = FrameManager.sl_fileRead(path + 'sprite.js') || '';
             //scriptEditor.editor.setPlainText(data);

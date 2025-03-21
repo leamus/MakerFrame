@@ -163,7 +163,7 @@ Item {
 
   安装教程
 1.Windows版本：将Qt环境（Qt_v5.15.12_win_x64）和框架引擎（MakerFrame_鹰歌框架引擎_win_x64_vXXX）解压并放在一起 ，双击“_运行鹰歌.bat”。
-2.安卓：安装运行 MakerFrame_鹰歌框架引擎_xxx_armeabi-v7a.apk 或 MakerFrame_鹰歌框架引擎_xxx_arm64-v8a.apk 即可。
+2.Android：安装运行 MakerFrame_鹰歌框架引擎_xxx_armeabi-v7a.apk 或 MakerFrame_鹰歌框架引擎_xxx_arm64-v8a.apk 即可。
 3.Linux：目前已在OpenKylin系统上打包DEB，并上架了其公司的应用商店（应该支持Debian、Ubuntu及衍生的操作系统）；
 4.苹果iOS、macOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布。
 5.打开软件后，进入GameMaker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了。
@@ -171,38 +171,38 @@ Item {
 
 
   功能和特色：
-1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、安卓（6.0及以上）、macOS、iOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin和UOS、Arm的树莓派）等操作系统上；
+1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、Android（6.0及以上）、MacOS、iOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin和UOS、Arm的树莓派）等操作系统上；
 2.全功能网络：支持 TCP、UDP、HTTP（XmlHttpRequest和QNetwork封装的两种方式，后者自由度高）、WebSocket（QML）、MQTT、串口（QextSerialPort）等多种常用协议的服务端和客户端开发，也可自己封装其他协议；API使用非常简单，支持异步函数的同步写法；支持互联网、局域网、蓝牙、NFC等通信方式；
 3.配套的后台服务软件和数据库：已有PHP开发的弱网系统（Workerman/Webman高并发服务），C++开发的联机系统（IOCP高并发模型），配套Redis、MySQL来做缓存和存储，支持注册登录、房间及管理、聊天、联机对战（帧同步）等功能，可万人同时在线；数据存储自由度高，支持JSON，各平台共享；
 4.多种发布形式：能生成对应平台的安装包exe、apk、bin、deb等（可发布在Steam、Tap、OpenKylin等平台），也能生成框架引擎能载入运行的游戏ROM包；资源和代码支持源文件形式，也支持压缩、打包、加密的形式，一定程度上可防逆向；ROM可以分发到各平台，或上传到官网，用链接、二维码、分享等形式来载入运行；
 5.热更新：框架底层采用我编写的 升级加载运行器，能运行时无感自动热更新框架引擎的所有核心库（so/dll、dex、rcc），不用繁琐的下载和重新安装；
 6.屏幕自适应：在任何分辨率，各种不同大小的屏幕下有相同的显示效果；开发时框架引擎还提供了不同的方式来解决各种屏幕的自适应效果（比如简单的按比例缩放、虚拟坐标、点坐标、布局方式等）；
 7.多层次的架构设计，能满足从小白到大神不同技术层次的玩家（见 架构设计）；
-8.简便易用的接口/API：用极少的JS代码就能调用各接口API和功能（比如Request网络、访问服务器、实名认证、接入穿山甲和Tap广告和扫描/生成二维码等）；
-9.能动态载入 C++编写的动态链接库、Java编写的安卓Dex库、QML资源RCC库，所以支持用Qt（C++）、QML（JavaScript）和Java（安卓）等语言来开发 动态链接库、Dex和组件/插件，封装接口给JavaScript，然后用鹰歌框架引擎来载入和调用（比如 震动、GPS等功能）；
+8.简便易用的接口/API：用极少的JS代码就能调用各接口API和功能（比如文件系统、网络Request、访问服务器、实名认证、接入穿山甲和Tap广告和扫描/生成二维码等）；
+9.可以动态载入 Qt插件和QML插件（自动载入，热插拔方式）、C++编写的动态链接库、Java编写的安卓Dex库、QML资源RCC库，所以支持用Qt（C++）、QML（JavaScript）和Java（Android）等语言来开发 动态链接库、Dex和组件/插件，封装接口给JavaScript，然后用鹰歌框架引擎来载入和调用（比如 震动、GPS等功能）；
 10.已封装3种线程（池），提供线程控制和并行运算；
 11.已封装 JS脚本引擎、异步脚本 AsyncScript（协程）、脚本/事件队列 ScriptQueue 来解决JavaScript脚本文件的载入和运行（QML的JavaScript版本是ECMA6，不支持async/await写法，但我已经封装了一种类似async/await的同步脚本写法，非常简单好用；QML本身对外部JavaScript的载入和运行机制也不太友好方便，但我已经解决了这个问题）；
 12.存储/数据库/缓存：可采用远程Redis、Mysql和本地的Sqlite（未加密）、SQLITECIPHER（加密）、JSON、XML及QML的LocalStorage等；
-13、引入了QML/JavaScript语言和所有基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
+13.引入了QML/JavaScript语言和所有基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
   a.采用最流行的 JavaScript脚本语言（和QML）开发的 游戏各编辑器、扩展和游戏脚本；JavaScript是优化过的谷歌v8（非H5）引擎，开发和运行效率都非常高；
   b.主流的图片、音乐和视频播放器；
-  c.安卓内置一个Webview浏览器内核，桌面端可以选带一个Webkit浏览器内核；
-14.集成其他库和SDK：
+  c.Android内置一个Webview浏览器内核，桌面端可以选带一个Webkit浏览器内核；
+14.集成其他三方库和SDK：
   已集成QML的QRC打包为RCC功能，支持解包；
   已集成Box2D-qml和Bacon2D库，QML可使用物理引擎来做插件、游戏等；
-  已集成qnanopainter库，基于opengl的QPaint方式绘图，绘图效率非常高，QML哪个组件效率低完全可以用它来替换；
   已集成Tap实名认证，完美支持上架Tap（侠道仙缘已上架到Tap和OpenKylin应用商店）；
   已集成Tap广告；
   已集成穿山甲广告；
-  已集成SDL3库（很不错的一款跨平台游戏开发库）；
-  已集成SCodes/QZXing库（支持 生成和扫描一维码及二维码）；
+  已集成OpenSSL库，支持RSA创建密钥对、RSA加解密和签名验证、sha256摘要、DES对称加解密等；
   已集成压缩、解压的zlib库和Quazip库（支持gzip，压缩、解压ZIP文件和目录等）；
   已集成SQLITECIPHER库（加密Sqlite）；
-  已集成libhv库（非常不错的一个网络库，支持使用TCP、UDP、HTTP、WebSocket、MQTT等协议开发网络服务端和客户端等）；
-  已集成QtWebApp库，支持做Web服务应用；
-  已集成Lua环境；
-  已集成QextSerialPort库；
-  已集成OpenSSL库，支持RSA创建密钥对、RSA加解密和签名验证、sha256摘要、DES对称加解密等；
+  已集成qnanopainter库，基于opengl的QPaint方式绘图，绘图效率非常高，QML哪个组件效率低完全可以用它来替换；
+  已集成SCodes/QZXing插件库（支持 生成和扫描一维码及二维码）；
+  已集成Lua插件库；
+  已集成libhv插件库（非常不错的一个网络库，支持使用TCP、UDP、HTTP、WebSocket、MQTT等协议开发网络服务端和客户端等）；
+  已集成QtWebApp插件库，支持做Web服务应用；
+  已集成QextSerialPort插件库；
+  已集成SDL3插件库（很不错的一款跨平台游戏开发库）；
   以上功能大都已封装完成并提供给QML或JavaScript来使用。感谢以上框架、库、SDK、扩展的作者、组织和公司。
 15.可开发类型：
   游戏：理论上几乎支持所有2D游戏类型(比如已有的RPG和放置、ARPG、AVG、即时战略、战棋、棋牌等等)的网络/单机游戏，3D的可用QML3D或opengl来自行学习和设计（但我对3D不熟悉）；
@@ -210,10 +210,11 @@ Item {
   软件：鹰歌框架引擎封装了很多基础和底层的功能（文件、网络等等），加上QML的易用性，所以也很适合开发各种行业应用软件、系统软件、工具、甚至爬虫；
   其他：还可以增强鹰歌本身的功能，比如用QML的插件机制来编写QML扩展、编写QML组件、游戏插件，还能载入用本地语言开发的动态链接库来调用系统功能等等；
 16.其他：
-  安卓端：
-    能使用文件管理器选择鹰歌打开任何文件（可以作为万能播放器使用），QML文件默认直接运行；
+  Android：
+    能使用文件管理器选择鹰歌打开任何文件（可以作为万能播放器使用）/夹，QML文件默认直接运行；
     能使用Scheme URL（比如用链接来传递数据）；
-    能分享到鹰歌来进一步处理；
+    能分享媒体到鹰歌来进一步处理；
+    支持安卓的一些本地功能，比如小窗/画中画、消息、服务等；
   Windows：
     支持拖动文件到窗口进行处理（可以作为万能播放器使用），QML文件默认直接运行；
 

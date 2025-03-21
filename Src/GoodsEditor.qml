@@ -70,10 +70,11 @@ let data = (function() {
             $name: '零食',
             $description: '好吃的（能刷钱），血+10',
 
-            $price: [20, 30],	//买卖金额，false表示不能买卖
-            $type: 2,	//1为装备；2为普通使用；3为战斗使用；4为剧情类
-            $position: false,	//装备位置；武器是特殊位置，普通攻击时会使用 武器 的 skills
-            $skills: false,	//道具带的技能（此时道具作为装备，且为 武器 时可用）
+            $price: [20, 30], //买卖金额，false表示不能买卖
+            $type: 2, //1为装备；2为普通使用；3为战斗使用；4为剧情类
+            $position: false, //装备位置；武器是特殊位置，普通攻击时会使用 武器 的 skills
+            $location: 0, //0为无位置；1为在背包；2为装备；3为持有
+            $skills: false, //道具带的技能（此时道具作为装备，且为 武器 时可用）
             $stackable: true,    //是否可叠加（注意：如果做 随机属性的道具，则最好设置为false，表示每个道具都是单独的，不会叠加）
 
             $fight: ['恢复血量'],    //战斗中点 使用 的 对应触发的技能（可以不用技能，只用脚本）
@@ -96,10 +97,10 @@ let data = (function() {
         $description: '好吃的（能刷钱），血+10',
         //get $description() {return this.xxx;},
 
-        $price: [20, 30],	//买卖金额，false表示不能买卖
-        $type: 2,	//1为装备；2为普通使用；3为战斗使用；4为剧情类
-        $position: false,	//装备位置；武器是特殊位置，普通攻击时会使用 武器 的 skills
-        $skills: false,	//道具带的技能（此时道具作为装备，且为 武器 时可用）
+        $price: [20, 30], //买卖金额，false表示不能买卖
+        $type: 2, //1为装备；2为普通使用；3为战斗使用；4为剧情类
+        $position: false, //装备位置；武器是特殊位置，普通攻击时会使用 武器 的 skills
+        $skills: false, //道具带的技能（此时道具作为装备，且为 武器 时可用）
         $stackable: true,    //是否可叠加（注意：如果做 随机属性的道具，则最好设置为false，表示每个道具都是单独的，不会叠加）
 
         $fight: ['恢复血量'],    //战斗中点 使用 的 对应触发的技能（可以不用技能，只用脚本）
@@ -118,34 +119,35 @@ let data = (function() {
         $equipEffectAlgorithm: null,
 
         //使用脚本
-        $useScript: function *(goods, combatant) {
-            if(combatant === undefined || combatant === null)
-                combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);	//选择角色
-
-            game.addprops(combatant, {HP: [10, 5]});
-
-            //yield game.msg('你用西瓜刀切了两片西瓜开始吆喝：好甜的西瓜啊，一斤2块5啦', 50);
-            //console.debug(goods.$rid, combatant);
-
-            game.removegoods(goods, 1);	//背包道具-1
-            return -1;
+        $useScript: function*(goods, combatant, params) {
+            params = function*(goods, combatant, params) {
+                //修改属性
+                //game.addprops(combatant, {HP: [10, 5]});
+                //yield game.msg('...', 50);
+            }
+            let r = game.$sys.getCommonScriptResource('$useScript')(goods, combatant, params);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            return r;
         },
         //这样写不会显示 使用 选项
         //$useScript: null,
 
         /*/装备脚本
-        $equipScript: function *(goods, combatant) {
-            if(combatant === undefined || combatant === null)
-                combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true);	//选择角色
-            game.getgoods(game.unload(combatant, goods.$position));	//脱下装备并放入背包
-            game.equip(combatant, goods, null);	//装备；使用 goodsId 的 position 属性来装备；
-            game.removegoods(goods, 1);	//背包道具-1
-
-            //yield game.msg('西瓜刀在手，打遍天下无敌手');
-            console.debug(goods, c);
+        $equipScript: function*(goods, combatant, params) {
+            let r = game.$sys.getCommonScriptResource('$equipScript')(goods, combatant, params);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            return r;
         },*/
         //这样写不会显示 装备 选项
         $equipScript: null,
+
+        /*/卸载装备脚本
+        $unloadScript: function*(goods, combatant, params) {
+            let r = game.$sys.getCommonScriptResource('$unloadScript')(goods, combatant, params);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            return r;
+        },*/
+        $unloadScript: null,
 
 
         //战斗脚本；分别是：选择道具脚本；检测是否可用；完成代码；
@@ -171,7 +173,7 @@ let data = (function() {
 
             //完成代码（收尾用）；skill的playScript执行完毕会执行它
             $completeScript: function *(goods, combatant) {
-                game.removegoods(goods, 1);	//背包道具-1
+                game.removegoods(goods, 1); //背包道具-1
                 //yield fight.msg('...');
                 return;
             },

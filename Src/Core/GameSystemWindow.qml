@@ -80,7 +80,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        yield game.save('存档' + c, game.gd['$sys_map'].$name, -1);
+                        yield game.save('存档' + c, game.d['$sys_map'].$name, -1);
                         yield game.msg('存档成功');
                         break;
                     default:

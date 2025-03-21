@@ -224,7 +224,7 @@ Item {
     //方式1：使用sl_addRoute添加路由，这种方式使用QML主线程来处理；
     httpService.sl_addRoute('POST', '/echo', function(body){return {code: 200, data: 'hello1'}});
     httpService.sl_addRoute('GET', '/user/:id', function(body){return {code: 200, data: 'hello2'}});
-    httpService.sl_addRoute('/echoAll', function(body){return {code: 200, data: 'hello1'}});
+    httpService.sl_addRoute('/echoAll', function(body){return {code: 200, data: 'hello3'}});
     //方式2：使用sl_addJSFileRoute添加JS文件的路由，这种方式使用 子线程+QJSEngine 来处理；
     httpService.sl_addJSFileRoute(GlobalJS.toPath(Qt.resolvedUrl('testHTTPServerRoute.js')));
     httpService.sl_static('/static/', 'd:/');
@@ -451,24 +451,34 @@ Item {
         示例：
         GlobalLibraryJS.asyncScript(function*() {
             //let as = new GlobalLibraryJS.AsyncScript();   //创建一个新的
-            let as = GlobalLibraryJS.$asyncScript;          //使用系统自带的
+            let as = GlobalLibraryJS.$asyncScript;          //使用系统创建的
+
+            console.info(this.$context, this.$defer); //如果运行的是Generator Function，则this有这两个属性
+            //this.$defer = function(){console.info('哈哈defer')}; //设置$defer
+            let oThis = yield; //使用 yield 返回undefined或null，则会将这个This对象返回（针对Generator对象无法注入变量设计）
+            console.info(oThis, this, oThis === this);
+
             console.info(1);
-            as.async(function*() {
+            as.async(function*() { //运行的是 Generator Function，则下个事件循环中运行）
                 console.info(2);
             });
+            console.info(3);
+            as.async(function*() { //运行的是 Generator，则立刻运行
+                console.info(4);
+            }());
+            console.info(5);
+
+            yield as.sleep(1000); //休眠1s，会让出cpu
+
             as.async(function*() {
-                console.info(3);
+                console.info(6);
             });
-            console.info(4);
-            yield as.sleep(1000);
-            as.async(function*() {
-                console.info(5);
-            });
-            console.info(6);
-            yield as.waitAll();
             console.info(7);
+            yield as.waitAll(); //等待 as 的所有生成器运行结束；
+            console.info(8);
         });
-        //输出 1,4,2,3,（等待1s）,6,5,7
+        //输出 1,3,4,5,2,（等待1s）,7,6,8
+
     注意：如果在游戏中，可以用 game.async 代替 GlobalLibraryJS.asyncScript。
 
 11、脚本队列
@@ -511,7 +521,18 @@ Item {
     cacheSprites.put(spriteEffectComp); //释放到缓存池
     cacheSprites.clear();   //清空缓冲池
 
-13、简单打包流程（详细见官网教程）
+13、文件高级操作：
+    //var f = FrameManager.sl_file('c:/1321.txt', 2);
+    //或：
+    var f = FrameManager.sl_file();
+    f.sl_setFileName('c:/1321.txt')
+    f.sl_open(2);
+    //读写：f.io、f.io.ts
+    f.io.sl_write('深林孤鹰');f.sl_flush();
+    f.io.ts.sl_write('深林孤鹰');f.io.ts.sl_flush();
+    f.sl_deleteLater();
+
+14、简单打包流程（详细见官网教程）
     1、win下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Win_xxxxxx.rar） 和 Qt框架库（QtEnv_Win_xxxxxx.rar），解压放在一起，将工程改名为Project复制到目录下即可；
     2、安卓下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Android_ALL_xxxxxx.rar） 和 Qt框架库（MakerFrame_Package_Android_ALL_xxxxxx.rar），解压放在特定目录下，将工程改名为Project复制到目录下，使用鹰歌的打包功能进行配置，然后用APKTools打包即可；
     3、如果是安卓打包apk，打开 APKTool M，找到第一步解压的文件夹，打开，点“编译此项目”，即可生成APK；
@@ -519,7 +540,7 @@ Item {
     5、配置：鹰歌自带的打包可以简单的配置诸如游戏名、应用名、图标等一些选项，如果要详细配置，可以手动修改GameMakerGlobal.qml、AndroidManifest.xml（包括 图标、包名、应用名、权限等）、Privacy.txt（隐私协议）、Config.cfg（框架配置）、LGlobal（框架配置）、GameRuntime（引擎核心文件）、隐私样式文件（privacy_button_shape.xml、privacy_dialog_shape.xml、privacy_activity_main.xml、privacy_dialog_show.xml）、手动打包x86或x64库 等，打包APK后还可以编辑信息（点击APK文件->快速编辑 或 详情）。
     APKTool M切换中文：右上角菜单->第一个选项->第一个菜单->倒数第5个 就是选语言。
 
-14、其他（详细见官网教程）
+15、其他（详细见官网教程）
     a、文件、文件夹操作；
     b、压缩解压（zip）操作；
     c、剪切板操作（FrameManager.sl_setClipboardText）；

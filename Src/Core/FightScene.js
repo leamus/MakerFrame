@@ -1383,9 +1383,12 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        //fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
-        let r = game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
-        if(GlobalLibraryJS.isGenerator(r))yield* r;
+        const fightInitScript = game.$sys.resources.commonScripts['fight_round_script'];
+        if(fightInitScript) { //GlobalLibraryJS.checkCallable
+            //fight.run(fightInitScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
+            let r = fightInitScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        }
 
 
         //等待脚本队列运行完毕，再继续执行：
@@ -1448,9 +1451,12 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        //fight.run(game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
-        r = game.$sys.resources.commonScripts['fight_round_script'](_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
-        if(GlobalLibraryJS.isGenerator(r))yield* r;
+        //const fightInitScript = game.$sys.resources.commonScripts['fight_round_script'];
+        if(fightInitScript) { //GlobalLibraryJS.checkCallable
+            //fight.run(fightInitScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
+            let r = fightInitScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
+            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        }
 
 
         //等待脚本队列运行完毕，再继续执行：
@@ -1531,8 +1537,8 @@ function *gfFighting() {
         /*/运行两个回合脚本（阶段3）
 
         //通用回合开始脚本
-        if(_private.scriptQueue.create(game.$sys.resources.commonScripts['fight_round_script'].call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
-        //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, game.$sys.resources.commonScripts['fight_round_script'].call({game, fight}, _private.nRound, 1)) === 0)
+        if(_private.scriptQueue.create(fightInitScript.call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
+        //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, fightInitScript.call({game, fight}, _private.nRound, 1)) === 0)
             _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
 
         //回合开始脚本

@@ -372,8 +372,15 @@ Item {
 //返回 false 表示错误。
 <font color='yellow'>game.removegoods(goods, count=1);</font>
 
-<font color='yellow'>game.goods(goods=-1, filterkey=null, filtervalue=null)</font>：获得道具列表中某项道具信息；goods为-1表示返回所有道具的数组（此时filters是道具属性的过滤条件）；goods为数字（下标），则返回单个道具信息的数组；goods为字符串（道具资源名），返回所有符合道具信息的数组（此时filters是道具属性的过滤条件）；返回格式：道具数组。
-<font color='yellow'>yield game.usegoods(goods, fighthero)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
+//获得道具列表中某项道具信息；
+//参数：
+//  goodsFilter为-1表示返回所有道具的数组；
+//  goodsFilter为数字（下标），则返回单个道具信息的数组；
+//  goodsFilter为字符串（道具$id），返回所有符合道具信息的数组；
+//  goodsFilter为对象：1、如果是道具对象，则查找是否在道具列表中，如果是普通对象，则goodsFilter为过滤条件（可判断$rid、$id、$name等所有道具属性）；
+//返回格式：道具数组、道具（goodsFilter为下标）、null（不存在）或false（错误）；
+<font color='yellow'>game.goods(goodsFilter=-1)</font>
+<font color='yellow'>yield game.usegoods(goods, fighthero, params)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
 
 //直接装备一个道具（不是从背包中）；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
@@ -382,7 +389,7 @@ Item {
 //copyedNewProps是 从goods复制的创建的新道具的属性（如果goods为道具对象，会复制一个新道具，然后再复制copyedNewProps属性，比如$count、$position）；
 //返回null表示错误；
 //注意：会将目标装备移除，需要保存则先unload到getgoods。
-<font color='yellow'>game.equip(fighthero, goods, newPosition=undefined, copyedNewProps={$count: 1});</font>
+<font color='yellow'>yield game.equip(fighthero, goods, newPosition=undefined, copyedNewProps={$count: 1});</font>
 
 <font color='yellow'>game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
 <font color='yellow'>game.equipment(fighthero, positionName=null)</font>：返回某 fighthero 的装备；如果positionName为null，则返回所有装备；fighthero为下标，或战斗角色的name，或战斗角色对象；返回格式：单个：装备对象，多个：单个的数组；错误返回null。
@@ -404,11 +411,17 @@ Item {
 
 <font color='yellow'>game.fightoff()</font>：关闭随机战斗。
 
-//加入定时器；
-//timerName：定时器名称；interval：定时器间隔；times：触发次数（-1为无限）；bGlobal：是否是全局定时器；
-//成功返回true。
-<font color='yellow'>game.addtimer(timerName, interval, times, bGlobal=false);</font>
-<font color='yellow'>game.deltimer(timerName, bGlobal=false)</font>：删除定时器。
+//创建定时器；
+//timerName：定时器名称；
+//interval：定时器间隔；times：触发次数（-1为无限）；
+//flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列里运行（否则在game.async）；
+//params为自定义参数（回调时传入）；
+//成功返回true；如果已经有定时器则返回false；
+<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, params=null);</font>
+//删除定时器；
+//flags：从右到左，是否是全局定时器（否则地图定时器）；
+//成功返回true；如果没有则返回false；
+<font color='yellow'>game.deltimer(timerName, flags=0b0)</font>：
   如果是局部定时器，则触发的脚本在 地图脚本 或 game.f[定时器名] 中定义；如果是全局，则触发的脚本在 game.gf[定时器名] 中定义。
 
 //播放音乐；
@@ -546,6 +559,7 @@ Item {
   game.math 或 Math：JS 的 Math对象。
 
   game.d['$sys_map']：当前地图信息
+    .$rid：当前地图资源名
     .$name：当前地图名
     .$columns：列数
     .$rows：行数
@@ -561,7 +575,7 @@ Item {
   game.$globalJS：一些公共方法；
   game.$gameMakerGlobal：Maker的公共对象；
   game.$gameMakerGlobalJS：一些Maker的相关方法；
-  game.$config：项目配置（实际上是 GameMakerGlobal.config）；
+  game.$gameMakerGlobal.config：项目配置（实际上是 GameMakerGlobal.config）；
   game.$plugins：所有的插件对象；
 
 

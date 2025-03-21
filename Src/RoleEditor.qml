@@ -39,7 +39,7 @@ Item {
         rectImage.visible = false;
 
 
-        _private.strRoleName = '';
+        _private.strRoleRID = '';
         _private.strTextBackupRoleImageURL = '';
         _private.strTextBackupRoleImageResourceName = '';
 
@@ -62,6 +62,7 @@ Item {
     function newRole() {
         comboType.currentIndex = 0;
 
+        textRoleRID.text = '';
         textRoleName.text = '';
 
         textRoleImageURL.text = '';
@@ -95,13 +96,13 @@ Item {
     }
 
 
-    function openRole(cfg) {
+    function openRole(cfg, roleRID) {
 
         console.debug('[RoleEditor]openRole:', JSON.stringify(cfg))
 
         //cfg.Version;
         //cfg.RoleType;
-        _private.strRoleName = textRoleName.text = cfg.RoleName.trim();
+        _private.strRoleRID = textRoleRID.text = roleRID;
 
         textRoleRealX.text = cfg.RealOffset[0].toString();
         textRoleRealY.text = cfg.RealOffset[1].toString();
@@ -110,8 +111,10 @@ Item {
         textRoleShadowOpacity.text = cfg.ShadowOpacity !== undefined ? cfg.ShadowOpacity.toString() : '0.3';
 
         textRoleSpeed.text = cfg.MoveSpeed !== undefined ? cfg.MoveSpeed.toString() : '0.1';
+        //checkboxPenetrate.checked = !!cfg.Penetrate ?? false;
         textPenetrate.text = cfg.Penetrate !== undefined ? cfg.Penetrate.toString() : '0';
-        textShowName.text = cfg.ShowName !== undefined ? cfg.ShowName.toString() : '1';
+        textRoleName.text = cfg.RoleName ?? roleRID ?? '';
+        checkboxShowName.checked = !!cfg.ShowName ?? true;
         textAvatar.text = cfg.Avatar !== undefined ? cfg.Avatar.toString() : '';
         textAvatarWidth.text = (cfg.AvatarSize && cfg.AvatarSize[0] !== undefined ? cfg.AvatarSize[0].toString() : '60');
         textAvatarHeight.text = (cfg.AvatarSize && cfg.AvatarSize[1] !== undefined ? cfg.AvatarSize[1].toString() : '60');
@@ -229,7 +232,7 @@ Item {
         _private.refreshRole();
 
 
-        _private.loadScript(textRoleName.text);
+        _private.loadScript(textRoleRID.text.trim());
     }
 
 
@@ -640,7 +643,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: '移动速度'
+                            text: '移速'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -674,6 +677,12 @@ Item {
                             font.pointSize: _config.nLabelFontSize
                         }
 
+                        /*CheckBox {
+                            id: checkboxPenetrate
+                            checked: false
+                        }
+                        */
+
                         TextField {
                             id: textPenetrate
 
@@ -700,18 +709,18 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: '显示名字'
+                            text: '名字'
                             font.pointSize: _config.nLabelFontSize
                         }
 
                         TextField {
-                            id: textShowName
+                            id: textRoleName
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
+                            Layout.preferredWidth: Math.max(contentWidth + 10, 50)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: _private.nColumnHeight
 
-                            text: '1'
+                            text: ''
                             font.pointSize: _config.nTextFontSize
 
                             //selectByKeyboard: true
@@ -719,11 +728,25 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onEditingFinished: {
-                                text = !isNaN(parseInt(text)) ? parseInt(text) : '1';
+                                //text = !isNaN(parseInt(text)) ? parseInt(text) : '1';
 
                                 //_private.refreshRole();
                             }
                         }
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: '显示'
+                            font.pointSize: _config.nLabelFontSize
+                        }
+
+                        CheckBox {
+                            id: checkboxShowName
+                            checked: true
+                        }
+
                     }
 
                     RowLayout {
@@ -1000,7 +1023,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: '偏移'
+                            text: '偏移和大小'
                             font.pointSize: _config.nLabelFontSize
                         }
 
@@ -1044,15 +1067,6 @@ Item {
 
                                 _private.refreshRole();
                             }
-                        }
-
-                        Label {
-                            //Layout.preferredWidth: 80
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            //Layout.preferredHeight: 10
-
-                            text: '大小'
-                            font.pointSize: _config.nLabelFontSize
                         }
 
                         TextField {
@@ -1590,7 +1604,7 @@ Item {
 
                         onClicked: {
 
-                            if(!_private.strRoleName) {
+                            if(!_private.strRoleRID) {
                                 rootWindow.aliasGlobal.dialogCommon.show({
                                       Msg: '请先保存角色',
                                       Buttons: Dialog.Yes,
@@ -1606,9 +1620,9 @@ Item {
                             }
 
 
-                            //_private.loadScript(textRoleName.text);
+                            //_private.loadScript(textRoleRID.text);
                             if(!scriptEditor.text &&
-                                    !FrameManager.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.js')) {
+                                    !FrameManager.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js')) {
                                 if(comboType.currentIndex === 1)
                                     scriptEditor.text = _private.strTemplateCode0;
                                 else
@@ -1842,7 +1856,7 @@ Item {
                     //名字
                     property Text textName: Text {
                         parent: role
-                        visible: parseInt(textShowName.text) !== 0
+                        visible: checkboxShowName.checked
                         width: parent.width
                         height: implicitHeight
                         anchors.bottom: parent.top
@@ -1931,7 +1945,7 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
-                    //_private.strRoleName = textRoleName.text;
+                    //_private.strRoleRID = textRoleRID.text;
 
                     dialogSaveRole.open();
                 }
@@ -1963,19 +1977,20 @@ Item {
                 onClicked: {
 
                     rootGameMaker.showMsg('
-  角色大小：游戏中显示的大小（宽和高），根据你游戏整体风格来设置；
-  X/Y轴缩放：表示在X、Y方向上放大或缩小多少倍，负数表示镜像（反转）；
-  影子偏移坐标和大小：影子表示角色的实际占位，会影响角色到障碍或边界的碰撞，一般斜视地图的效果是将影子放在角色下半身，正视地图的效果是角色全部；
-  影子透明度：值范围 0~1，阴影程度；
-  帧速度：你懂的，一般100；
-  帧宽高：将图片切割为每一帧的大小（填错会导致显示效果出问题）；
-  帧数：每个方向的行走图有多少帧；
-  上右下左：将一张图切割为 m列*n行 个帧，则角色的上、右、下、左的 第一个帧 分别是 哪列哪行（可以理解为x、y坐标，0开始）；
-  移动速度：角色在地图上的移动速度。这个值单位是 像素/毫秒（为了适应各种刷新率下速度一致），具体要根据图块大小来设置（一般设置为0.1-0.2即可）；
+  类型：支持3种类型，分别是”典型行走行列图“（一张图片内有相同大小的帧，包含了上右下左四个方向的集合）、序列图片文件（多张图片切换播放为动画，类似传奇的形式，功能过呢更多，但必须编辑脚本）、从特效选择（每个动作可以从一个特效选择）；
+  移速：角色在地图上的移动速度。这个值单位是 像素/毫秒（为了适应各种刷新率下速度一致），具体要根据图块大小来设置（一般设置为0.1-0.2即可）；
   可穿透：角色是否可以穿过角色或障碍（0b1为可穿透其他角色，0b10为可穿透障碍）；
-  显示名字：角色头顶是否显示名字（0或1）；
+  名字：游戏中显示的名字；
+  显示：角色头顶是否显示名字；
   头像和大小：使用对话命令的时候，会带有这个头像；
-
+  [影子]偏移和大小：影子表示角色的实际占位，会影响角色到障碍或边界的碰撞，一般斜视地图的效果是将影子放在角色下半身，正视地图的效果是角色全部；
+  [影子]透明度：值范围 0~1，阴影程度；
+  [角色]偏移和大小：游戏中显示的大小（宽和高），根据你游戏整体风格来设置；
+  [角色]X/Y轴缩放：表示在X、Y方向上放大或缩小多少倍，负数表示镜像（反转）；
+  [帧]宽高和帧数：将图片切割为每一帧的大小（填错会导致显示效果出问题）；
+  [帧]速度：帧切换速度，一般100；
+  上右下左方向：将一张图切割为 m列*n行 个帧，则角色的上、右、下、左的 第一个帧 分别是 哪列哪行（可以理解为x、y坐标，0开始）；
+  编辑脚本：可以编辑角色在游戏中的一些特殊脚本（比如角色动作时的回调；如果角色是”序列图片文件“类型，则必须在这里编辑图片的切换规则）；
 ')
                 }
             }
@@ -2014,7 +2029,7 @@ Item {
         anchors.fill: parent
 
 
-        strTitle: `${_private.strRoleName}(角色脚本)`
+        strTitle: `${_private.strRoleRID}(${textRoleName.text.trim()})(角色脚本)`
         /*fnAfterCompile: function(code) {return code;}*/
 
         visualScriptEditor.strTitle: strTitle
@@ -2432,25 +2447,25 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
-            textRoleName.text = textRoleName.text.trim();
-            if(textRoleName.text.length === 0) {
-                //Platform.sl_showToast('名称不能为空');
-                textDialogMsg.text = '名称不能为空';
+            textRoleRID.text = textRoleRID.text.trim();
+            if(textRoleRID.text.length === 0) {
+                //Platform.sl_showToast('资源名不能为空');
+                textDialogMsg.text = '资源名不能为空';
                 open();
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
 
             function fnSave() {
                 if(_private.exportRole()) {
                     //第一次保存，重新刷新
-                    if(_private.strRoleName === '') {
-                        _private.loadScript(textRoleName.text);
+                    if(_private.strRoleRID === '') {
+                        _private.loadScript(textRoleRID.text);
                         _private.refreshRole();
                     }
 
-                    _private.strRoleName = textRoleName.text;
+                    _private.strRoleRID = textRoleRID.text;
 
                     textDialogMsg.text = '';
 
@@ -2462,7 +2477,7 @@ Item {
                 }
             }
 
-            if(textRoleName.text !== _private.strRoleName && FrameManager.sl_dirExists(path)) {
+            if(textRoleRID.text !== _private.strRoleRID && FrameManager.sl_dirExists(path)) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -2470,7 +2485,7 @@ Item {
                         fnSave();
                     },
                     OnRejected: ()=>{
-                        textRoleName.text = _private.strRoleName;
+                        textRoleRID.text = _private.strRoleRID;
 
                         textDialogMsg.text = '';
 
@@ -2488,7 +2503,7 @@ Item {
 
         }
         onRejected: {
-            textRoleName.text = _private.strRoleName;
+            textRoleRID.text = _private.strRoleRID;
 
             textDialogMsg.text = '';
 
@@ -2506,10 +2521,10 @@ Item {
             RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr('角色名：')
+                    text: qsTr('角色资源名：')
                 }
                 TextField {
-                    id: textRoleName
+                    id: textRoleRID
 
                     Layout.fillWidth: true
                     placeholderText: '深林孤鹰'
@@ -2583,14 +2598,15 @@ Item {
 
 
 
-    Rectangle {
+    Mask {
         id: rectImage
-
-        anchors.fill: parent
 
         visible: false
 
-        color: 'black'
+        anchors.fill: parent
+
+        color: Global.style.backgroundColor
+        //opacity: 0
 
         Image {
             id: image
@@ -2606,9 +2622,9 @@ Item {
             font.pointSize: 16
         }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: rectImage.visible = false;
+        mouseArea.onClicked: {
+            rectImage.visible = false;
+            root.forceActiveFocus();
         }
     }
 
@@ -2620,7 +2636,7 @@ Item {
 
         property int nColumnHeight: 50
 
-        property string strRoleName: ''
+        property string strRoleRID: ''
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
@@ -2660,6 +2676,7 @@ function $refresh(index, imageAnimate, path) {
         function showImage() {
             image.source = textRoleImageURL.text;
             rectImage.visible = true;
+            rectImage.forceActiveFocus();
         }
 
 
@@ -2738,7 +2755,7 @@ function $refresh(index, imageAnimate, path) {
                 }
 
 
-                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text + GameMakerGlobal.separator + 'role.js';
+                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
                 if(FrameManager.sl_fileExists(jsPath)) {
                     _private.jsEngine.clear();
                     let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
@@ -2811,22 +2828,23 @@ function $refresh(index, imageAnimate, path) {
         }
 
 
-        function loadScript(roleName) {
-            if(!roleName) {
+        function loadScript(roleRID) {
+            if(!roleRID) {
                 //scriptEditor.text = _private.strTemplateCode0;
                 scriptEditor.text = '';
                 scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
 
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator;
+            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator;
             //if(FrameManager.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
             scriptEditor.init({
                 BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
-                RelativePath: GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.js',
+                RelativePath: GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator + 'role.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
+                RunButton: 0b0,
             });
             //scriptEditor.text = FrameManager.sl_fileRead(path + 'role.js') || '';
             //scriptEditor.editor.setPlainText(data);
@@ -2836,13 +2854,13 @@ function $refresh(index, imageAnimate, path) {
 
         function createJS() {
             //第一次保存js文件
-            if(_private.strRoleName === '') {
+            if(_private.strRoleRID === '') {
                 if(comboType.currentIndex === 1)    //序列图片文件
                     scriptEditor.text = _private.strTemplateCode0;
                 else
                     scriptEditor.text = '';
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text;
+                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
                 let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
             }
             else
@@ -2853,10 +2871,10 @@ function $refresh(index, imageAnimate, path) {
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
-            if(_private.strRoleName !== '' && textRoleName.text !== '' && _private.strRoleName !== textRoleName.text) {
-                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleName + GameMakerGlobal.separator + 'role.vjs';
+            if(_private.strRoleRID !== '' && textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) {
+                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.vjs';
                 if(FrameManager.sl_fileExists(oldFilePath)) {
-                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleName.text + GameMakerGlobal.separator + 'role.vjs';
+                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.vjs';
                     let ret = FrameManager.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -2865,8 +2883,8 @@ function $refresh(index, imageAnimate, path) {
         //导出角色
         function exportRole() {
 
-            let roleName = textRoleName.text;
-            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleName + GameMakerGlobal.separator + 'role.json';
+            //let roleName = textRoleName.text;
+            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!FrameManager.sl_dirExists(path))
                 FrameManager.sl_dirCreate(path);
@@ -2874,7 +2892,7 @@ function $refresh(index, imageAnimate, path) {
 
             let outputData = {};
             /*outputData.Version = '0.6';
-            outputData.RoleName = roleName;
+            //outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
             outputData.RoleSize = [role.implicitWidth, role.implicitHeight];
@@ -2888,7 +2906,7 @@ function $refresh(index, imageAnimate, path) {
             outputData.Image = role.strSource;
             */
             outputData.Version = '0.9';
-            outputData.RoleName = roleName;
+            outputData.RoleName = textRoleName.text;
             outputData.RoleType = 1; //角色类型
             //outputData.SpriteType = comboType.currentIndex + 1;
             switch(comboType.currentIndex) {
@@ -2909,8 +2927,9 @@ function $refresh(index, imageAnimate, path) {
             outputData.ShadowOpacity = parseFloat(textRoleShadowOpacity.text);
 
             outputData.MoveSpeed = parseFloat(textRoleSpeed.text);
+            //outputData.Penetrate = checkboxPenetrate.checked;
             outputData.Penetrate = parseInt(textPenetrate.text);
-            outputData.ShowName = parseInt(textShowName.text);
+            outputData.ShowName = checkboxShowName.checked;
 
             outputData.Avatar = textAvatar.text;
             outputData.AvatarSize = [parseInt(textAvatarWidth.text), parseInt(textAvatarHeight.text)];
@@ -3094,7 +3113,7 @@ function $refresh(index, imageAnimate, path) {
             }
         }
 
-        
+
 
         function close() {
             rootWindow.aliasGlobal.dialogCommon.show({

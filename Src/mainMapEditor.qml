@@ -102,8 +102,13 @@ Item {
                 dialogMapData.nCreateMapType = 1;
                 dialogMapData.open();
                 dialogMapData.forceActiveFocus();
+
+                _private.strMapRID = '';
+
                 return;
             }
+            else
+                _private.strMapRID = item;
 
 
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
@@ -787,15 +792,30 @@ Item {
             try {
                 //_private.refresh();
 
+
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                //focus = true;
+                forceActiveFocus();
+
+                //item.focus = true;
+                if(item.forceActiveFocus)
+                    item.forceActiveFocus();
+
+                if(item.init)
+                    item.init(_private.strMapRID);
+
+                visible = true;
+
+
                 //创建地图工作
 
                 if(dialogMapData.nCreateMapType === 1) {
                     //loader.setSource('./MapEditor.qml', {});
                     //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
                     loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
-                                                 MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
-                                                 MapBlockImage: [textMapBlockResourceName.text]
-                                             });
+                        MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
+                        MapBlockImage: [textMapBlockResourceName.text]
+                    });
 
                     //loader.item.testFresh();
 
@@ -808,7 +828,7 @@ Item {
                     dialogMapData.mapData.MapBlockSize[1] = textBlockHeight.text;
                     dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
 
-                    loader.item.openMap(dialogMapData.mapData);
+                    loader.item.openMap(dialogMapData.mapData, _private.strMapRID);
 
                 }
 
@@ -819,20 +839,6 @@ Item {
 
                 labelDialogTips.text = '';
 
-
-
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //focus = true;
-                forceActiveFocus();
-
-                //item.focus = true;
-                if(item.forceActiveFocus)
-                    item.forceActiveFocus();
-
-                if(item.init)
-                    item.init();
-
-                visible = true;
 
 
                 //console.debug('Ok clicked');
@@ -856,6 +862,8 @@ Item {
 
     QtObject {
         id: _private
+
+        property string strMapRID: ''
 
         function refresh() {
 

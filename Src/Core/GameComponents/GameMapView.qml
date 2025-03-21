@@ -40,6 +40,7 @@ Item {
         itemBackMapContainer.visible = false;
         itemFrontMapContainer.visible = false;
 
+        //如果需要载入
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
             tmapInfo = FrameManager.sl_fileRead(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));

@@ -115,7 +115,7 @@ Item {
             //console.debug('cfg', cfg);
             //loader.setSource('./MapEditor_1.qml', {});
 
-            loader.item.openRole(cfg);
+            loader.item.openRole(cfg, item);
         }
 
         onSg_removeClicked: {

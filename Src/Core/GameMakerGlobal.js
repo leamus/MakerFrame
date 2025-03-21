@@ -9,11 +9,13 @@
 const $config = {
     //游戏
     $game: {
+        $speed: 1,
         $loadAllResources: 0,   //提前载入所有资源
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
         $changeMapStopAction: true,   //切换地图后停止主角动作
         $inactiveBackgroundMusic: false, //窗口非激活状态时是否继续背景音乐
         $inactiveSoundEffect: false, //窗口非激活状态时是否继续背景音效
+        $soundEffectChannelCount: 6, //音效通道个数
     },
     //地图
     $map: {
@@ -320,7 +322,7 @@ function *$gameInit(newGame) {
 
 
     //每秒恢复事件
-    game.addtimer('resume_event', 1000, -1, true);
+    game.addtimer('resume_event', 1000, -1, 0b11);
     game.gf['resume_event'] = function() {
         for(let combatant of game.gd['$sys_fight_heros']) {
             if(combatant.$$propertiesWithExtra.HP[0] > 0)
@@ -377,7 +379,7 @@ function *$gameRelease(gameExit) {
 
 
     if(gameExit)
-        if(game.gd['$sys_map'].$name)
+        if(game.gd['$sys_map'].$rid)
             yield game.save();  //自动存档
 
     return null;
@@ -427,6 +429,107 @@ function *$afterLoadmap(mapName, userData) {
     */
 
     return null;
+}
+
+
+//使用道具通用函数
+function *$useScript(goods, combatant, params) {
+    if(combatant === undefined || combatant === null)
+        combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
+
+    if(GlobalLibraryJS.checkCallable(params)) {
+        //game.addprops(combatant, {HP: [10, 5]});
+        //yield game.msg('...', 50);
+        //console.debug(goods.$rid, combatant);
+
+        //yield *eval(`(function*(){${params}})()`);
+
+        let r = params(goods, combatant, params);
+        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+    }
+
+    //如果道具在背包中
+    if(goods.$location === 1) {
+        game.removegoods(goods, 1);	 //背包道具-1
+    }
+
+    return true;
+}
+
+//装备道具通用函数
+function *$equipScript(goods, combatant, params) {
+    if(combatant === undefined || combatant === null)
+        combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
+
+    let position = goods.$position;
+    let oldEquip = combatant.$equipment[position];
+
+    //如果道具在背包中
+    if(goods.$location === 1) {
+        game.removegoods(goods, 1);	 //背包道具-1
+    }
+    //如果goods的位置为非0，则新建一个goods，防止一个goods在多个位置出现；
+    if(goods.$location > 0)
+        goods = game.$sys.getGoodsObject(goods, {$count: 1});
+
+
+    /*/方案一：如果有旧装备，且有rid相同，且新旧都能叠加
+    if(oldEquip !== undefined && oldEquip.$rid === goods.$rid && oldEquip.$stackable && goods.$stackable) {
+        let newCount = oldEquip.$count + goods.$count;
+        if(newCount < 0) {
+            //return newCount;
+            //return null;
+            delete combatant.$equipment[position];
+        }
+        else if(newCount === 0) {
+            /*
+            if(_private.objCommonScripts['equip_reserved_slots'].indexOf(position) !== -1)
+                combatant.$equipment[position] = undefined;
+            else
+                delete combatant.$equipment[position];
+            * /
+            delete combatant.$equipment[position];
+        }
+        else
+            oldEquip.$count = newCount;
+
+        //return newCount;
+        return true;
+    }
+    */
+
+    //方案二：脱下原装备，装备新装备
+    game.getgoods(yield game.unload(combatant, position)); //脱下装备，放入背包
+    //if(oldEquip === undefined || oldEquip.$rid !== goods) {    //如果原来没有装备
+    //if(oldEquip)
+    //    oldEquip.$location = 0;
+
+    if(goods.$count > 0) { //如果有个数，正常装备
+        goods.$location = 2;
+        combatant.$equipment[position] = goods;
+    }
+
+
+    //yield game.msg('装备脚本信息');
+    //console.debug(goods, c);
+
+    return true;
+}
+
+//卸下装备通用函数
+function *$unloadScript(goods, combatant, params) {
+    let positionName = goods.$position;
+    /*
+    if(_private.objCommonScripts['equip_reserved_slots'].indexOf(positionName) !== -1)
+        combatant.$equipment[positionName] = undefined;
+    else
+        delete combatant.$equipment[positionName];
+    */
+    delete combatant.$equipment[positionName];
+
+    goods.$location = 0;
+
+    return goods;
 }
 
 
@@ -706,7 +809,7 @@ let $showGoodsName = function(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strGoodsDirName) + game.$gameMakerGlobal.separator;
+        //let goodsPath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$gameMakerGlobal.config.strGoodsDirName) + game.$gameMakerGlobal.separator;
 
         //game.$globalLibraryJS.showRichTextImage();
         tstr = ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
@@ -755,7 +858,7 @@ let $showGoodsName = function(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 let $showCombatantName = function(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$config.strFightRoleDirName) + game.$gameMakerGlobal.separator;
+    //let fightRolePath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$gameMakerGlobal.config.strFightRoleDirName) + game.$gameMakerGlobal.separator;
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
