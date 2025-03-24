@@ -563,7 +563,7 @@ Item {
             //1：只更新工程；2：全部更新；
             function continueScript(packageType) {
                 rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '请等待。。。',
+                    Msg: '请等待...',
                     Buttons: Dialog.NoButton,
                     OnAccepted: function() {
                         rootWindow.aliasGlobal.dialogCommon.open();
@@ -591,7 +591,7 @@ Item {
                             ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
                         }
 
-                        ret = FrameManager.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true);
+                        ret = FrameManager.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
                     } catch(e) {
                         GlobalLibraryJS.printException(e);
                         return;

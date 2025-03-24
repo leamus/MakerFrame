@@ -521,16 +521,33 @@ Item {
     cacheSprites.put(spriteEffectComp); //释放到缓存池
     cacheSprites.clear();   //清空缓冲池
 
-13、文件高级操作：
+13、IO高级操作
+  文件：
     //var f = FrameManager.sl_file('c:/1321.txt', 2);
     //或：
     var f = FrameManager.sl_file();
     f.sl_setFileName('c:/1321.txt')
     f.sl_open(2);
-    //读写：f.io、f.io.ts
+    //读写：f.io（QIODevice封装类）、f.io.ts（QTextStream封装类）、f.io.ds（QDataStream封装类）
     f.io.sl_write('深林孤鹰');f.sl_flush();
     f.io.ts.sl_write('深林孤鹰');f.io.ts.sl_flush();
+    g.io.ds.sl_write('1234');
     f.sl_deleteLater();
+  二进制（QBuffer）：
+    var b = FrameManager.sl_buffer();
+    b.io.sl_open(3);
+    //读写：b.io（QIODevice封装类）、b.io.ts（QTextStream封装类）、b.io.ds（QDataStream封装类）
+    b.io.sl_write('深林孤鹰');b.sl_flush();
+    b.io.ts.sl_write('深林孤鹰');b.io.ts.sl_flush();
+    b.io.ds.sl_write('1234');
+    b.sl_deleteLater();
+  二进制（QByteArray）：
+    var b = FrameManager.sl_byteArray();
+    //读写：b.ts（QTextStream封装类）、b.ds（QDataStream封装类）
+    b.sl_append('深林孤鹰');
+    b.ts.sl_write('深林孤鹰');b.ts.sl_flush();
+    b.ds.sl_write('1234');
+    b.sl_deleteLater();
 
 14、简单打包流程（详细见官网教程）
     1、win下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Win_xxxxxx.rar） 和 Qt框架库（QtEnv_Win_xxxxxx.rar），解压放在一起，将工程改名为Project复制到目录下即可；

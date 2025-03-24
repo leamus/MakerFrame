@@ -346,7 +346,7 @@ Item {
         game.pause('$release');
 
 
-        GlobalLibraryJS.$asyncScript.terminateAll();
+        GlobalLibraryJS.$asyncScript.terminateAll(1, null, 1);
         _private.scriptQueue.clear(5);
 
 
@@ -403,10 +403,10 @@ Item {
         //loaderGameMsg.item.stop();
         //messageRole.stop();
 
+        game.delhero(-1);
         game.delrole(-1);
         game.delimage();
         game.delsprite();
-        game.delhero(-1);
         game.stopvideo(-1);
         itemBackgroundMusic.stop();
         itemBackgroundMusic.arrMusicStack = [];
@@ -443,11 +443,11 @@ Item {
             itemGameInputs.children[ti].destroy();
         }
         //停止并触发所有定时器，让异步脚本/队列继续运行不要等待；
-        for(let ti in itemTimers.children) {
-            //itemTimers.children[ti].destroy();
-            itemTimers.children[ti].stop();
-            itemTimers.children[ti].triggered();
-            itemTimers.children[ti].destroy();
+        for(let ti in itemWaitTimers.children) {
+            //itemWaitTimers.children[ti].destroy();
+            itemWaitTimers.children[ti].stop();
+            itemWaitTimers.children[ti].triggered();
+            itemWaitTimers.children[ti].destroy();
         }
 
 
@@ -461,7 +461,18 @@ Item {
 
         _private.objRoles = {};
         _private.arrMainRoles = [];
-        _private.objTmpComponents = {};
+        if(_private.objTmpComponents.$keys.length > 0) {
+            console.warn('[!GameScene]存在未释放的组件：', _private.objTmpComponents.$keys);
+
+            for(let tc in _private.objTmpComponents) {
+                const c = _private.objTmpComponents[tc];
+                if(GlobalLibraryJS.isComponent(c)) {
+                    (c.$destroy ?? c.Destroy ?? c.destroy)();
+                }
+            }
+
+            _private.objTmpComponents = {};
+        }
 
 
         _private.objTimers = {};
@@ -623,15 +634,10 @@ Item {
                     for(let tc in _private.objTmpMapComponents) {
                         const c = _private.objTmpMapComponents[tc];
                         if(GlobalLibraryJS.isComponent(c)) {
-                            if(c.$destroy)
-                                c.$destroy();
-                            else if(c.Destroy)
-                                c.Destroy();
-                            else if(c.destroy)
-                                c.destroy();
+                            (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
-                    _private.objTmpMapComponents = [];
+                    _private.objTmpMapComponents = {};
 
                     game.delrole(-1);
 
@@ -1400,12 +1406,7 @@ Item {
                     for(let tc in tr.$tmpComponents) {
                         let c = tr.$tmpComponents[tc];
                         if(GlobalLibraryJS.isComponent(c)) {
-                            if(c.$destroy)
-                                c.$destroy();
-                            else if(c.Destroy)
-                                c.Destroy();
-                            else if(c.destroy)
-                                c.destroy();
+                            (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
                     tr.$tmpComponents = {};
@@ -1447,12 +1448,7 @@ Item {
             for(let tc in _private.arrMainRoles[index].$tmpComponents) {
                 const c = _private.arrMainRoles[index].$tmpComponents[tc];
                 if(GlobalLibraryJS.isComponent(c)) {
-                    if(c.$destroy)
-                        c.$destroy();
-                    else if(c.Destroy)
-                        c.Destroy();
-                    else if(c.destroy)
-                        c.destroy();
+                    (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
             _private.arrMainRoles[index].$tmpComponents = {};
@@ -1765,12 +1761,7 @@ Item {
                     for(let tc in _private.objRoles[r].$tmpComponents) {
                         let c = _private.objRoles[r].$tmpComponents[tc];
                         if(GlobalLibraryJS.isComponent(c)) {
-                            if(c.$destroy)
-                                c.$destroy();
-                            else if(c.Destroy)
-                                c.Destroy();
-                            else if(c.destroy)
-                                c.destroy();
+                            (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
 
@@ -1799,12 +1790,7 @@ Item {
             for(let tc in role.$tmpComponents) {
                 let c = role.$tmpComponents[tc];
                 if(GlobalLibraryJS.isComponent(c)) {
-                    if(c.$destroy)
-                        c.$destroy();
-                    else if(c.Destroy)
-                        c.Destroy();
-                    else if(c.destroy)
-                        c.destroy();
+                    (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
             role.destroy();
@@ -3117,6 +3103,7 @@ Item {
         //停止音乐；
         readonly property var stopmusic: function() {
             itemBackgroundMusic.stop();
+            itemBackgroundMusic.arrMusicStack = [];
         }
 
         //暂停音乐；
@@ -3151,6 +3138,15 @@ Item {
         //跳到播放进度（毫秒）；
         readonly property var seekmusic: function(offset=0) {
             return audioBackgroundMusic.seek(offset);
+        }
+        //音乐音量大小；
+        //volume为0~1的浮点数，如果非数字则不变；
+        //返回当前音量大小；
+        function musicvolume(volume=null) {
+            if(GlobalLibraryJS.isValidNumber(volume, 0b1))
+                audioBackgroundMusic.volume = parseFloat(volume);
+
+            return audioBackgroundMusic.volume;
         }
 
         //状态；
@@ -3193,6 +3189,16 @@ Item {
         //参数name为恢复名称；如果为true，表示引擎级恢复播放音效；如果为false，表示存档级恢复播放音效；如果为-1，打开全部强制恢复；
         function resumesoundeffect(name='$user') {
             rootSoundEffect.resume(name);
+        }
+
+        //音乐音量大小；
+        //volume为0~1的浮点数，如果非数字则不变；
+        //返回当前音量大小；
+        function soundeffectvolume(volume=null) {
+            if(GlobalLibraryJS.isValidNumber(volume, 0b1))
+                rootSoundEffect.rVolume = parseFloat(volume);
+
+            return rootSoundEffect.rVolume;
         }
 
         readonly property var soundeffectpausing: function() {
@@ -3433,7 +3439,7 @@ Item {
 
             let tmp = imageParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheImage.createObject(null);
             if(tmp && tmp.$componentType !== 1) {
-                console.exception('[!GameScene]组件类型错误：', tmp.$componentType);
+                console.exception('[!GameScene]组件类型错误：', tmp, tmp.$componentType);
                 return false;
             }
 
@@ -3776,16 +3782,11 @@ Item {
             }
 
 
-            if(idParams['$id'] === -1) {
-                for(let ti in objTmpComponents && objTmpComponents) {
+            if(idParams['$id'] === -1 && objTmpComponents) {
+                for(let ti in objTmpComponents) {
                     if(objTmpComponents[ti].$componentType === 1) {
                         //自定义 释放函数
-                        if(objTmpComponents[ti].$destroy)
-                            objTmpComponents[ti].$destroy();
-                        else if(objTmpComponents[ti].Destroy)
-                            objTmpComponents[ti].Destroy();
-                        else if(objTmpComponents[ti].destroy)
-                            objTmpComponents[ti].destroy();
+                        (objTmpComponents[ti].$destroy ?? objTmpComponents[ti].Destroy ?? objTmpComponents[ti].destroy)();
                         delete objTmpComponents[ti];
                     }
                 }
@@ -3795,12 +3796,7 @@ Item {
 
 
             if(tmpImage && tmpImage.$componentType === 1) {
-                if(tmpImage.$destroy)
-                    tmpImage.$destroy();
-                else if(tmpImage.Destroy)
-                    tmpImage.Destroy();
-                else if(tmpImage.destroy)
-                    tmpImage.destroy();
+                (tmpImage.$destroy ?? tmpImage.Destroy ?? tmpImage.destroy)();
 
                 if(objTmpComponents)
                     delete objTmpComponents[idParams.$id];
@@ -4287,12 +4283,7 @@ Item {
                 for(let ti in objTmpComponents) {
                     if(objTmpComponents[ti].$componentType === 2) {
                         //自定义 释放函数
-                        if(objTmpComponents[ti].$destroy)
-                            objTmpComponents[ti].$destroy();
-                        else if(objTmpComponents[ti].Destroy)
-                            objTmpComponents[ti].Destroy();
-                        else if(objTmpComponents[ti].destroy)
-                            objTmpComponents[ti].destroy();
+                        (objTmpComponents[ti].$destroy ?? objTmpComponents[ti].Destroy ?? objTmpComponents[ti].destroy)();
                         delete objTmpComponents[ti];
                     }
                 }
@@ -4302,12 +4293,7 @@ Item {
 
 
             if(tmpSprites && tmpSprites.$componentType === 2) {
-                if(tmpSprites.$destroy)
-                    tmpSprites.$destroy();
-                else if(tmpSprites.Destroy)
-                    tmpSprites.Destroy();
-                else if(tmpSprites.destroy)
-                    tmpSprites.destroy();
+                (tmpSprites.$destroy ?? tmpSprites.Destroy ?? tmpSprites.destroy)();
 
                 //_private.cacheSprites.put(tmpSprites);
                 if(objTmpComponents)
@@ -4467,7 +4453,7 @@ Item {
             else if(callback === 0)
                 return GlobalLibraryJS.asyncWait(ms);
             */
-            return GlobalLibraryJS.asyncSleep(ms, itemTimers);
+            return GlobalLibraryJS.asyncSleep(ms, itemWaitTimers);
 
             //！如果定义为生成器的写法：
             //return yield ret;
@@ -4545,9 +4531,9 @@ Item {
             //return yield ret;
         }
 
-        //检测存档是否存在且正确；
-        //data为字符串（本地存档文件路径）或对象；
-        //失败返回false，成功返回存档对象（包含Name和Data）。
+        //检测存档是否存在 且 验证是否正确；
+        //data为字符串（本地存档文件路径）或存档数据（对象，此时仅验证和解压Data字段）；
+        //失败返回false；成功返回 存档对象（包含Name和解压后的Data）。
         readonly property var checksave: function(data) {
             if(GlobalLibraryJS.isString(data)) {
                 data = data.trim();
@@ -4570,7 +4556,7 @@ Item {
                     }
                 }
             }
-            else if(GlobalLibraryJS.isObject(data)) { //如果是参数对象
+            else if(GlobalLibraryJS.isObject(data)) {
             }
             else {
                 return false;
@@ -4591,10 +4577,12 @@ Item {
                         return false;
                     }
 
+                    //兼容旧存档！！！
                     if(data.Data['$sys_map'].$rid === undefined && data.Data['$sys_map'].$name !== undefined) {
                         data.Data['$sys_map'].$rid = data.Data['$sys_map'].$name;
                         delete data.Data['$sys_map'].$name;
                     }
+
                     return data;
                 }
                 else {
@@ -4602,10 +4590,13 @@ Item {
                     if(GameMakerGlobal.config.bDebug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
                         return false;
                     }
+
+                    //兼容旧存档！！！
                     if(data.Data['$sys_map'].$rid === undefined && data.Data['$sys_map'].$name !== undefined) {
                         data.Data['$sys_map'].$rid = data.Data['$sys_map'].$name;
                         delete data.Data['$sys_map'].$name;
                     }
+
                     return data;
                 }
             }
@@ -4700,7 +4691,7 @@ Item {
 
 
                     //写入引擎变量
-                    GameMakerGlobal.settings.setValue('Projects/' + GameMakerGlobal.config.strCurrentProjectName, game.cd);
+                    //GameMakerGlobal.settings.setValue('Projects/' + GameMakerGlobal.config.strCurrentProjectName, game.cd);
 
 
 
@@ -4932,7 +4923,7 @@ Item {
 
         //异步脚本（协程运行）
         //readonly property var async: GlobalLibraryJS.asyncScript
-        readonly property var async: GlobalLibraryJS.$asyncScript.async
+        function async(...params) {return GlobalLibraryJS.$asyncScript.async(...params);}
 
         //将代码放入 系统脚本引擎（scriptQueue）中 等候执行；
         //参数：
@@ -5315,7 +5306,7 @@ Item {
 
             //组件 和 组件模板
             components: {
-                joystick: joystick,
+                /*joystick: joystick,
                 buttons: itemButtons,
                 fps: itemFPS,
                 map: [itemViewPort.canvasBackMap, itemViewPort.canvasFrontMap],
@@ -5323,10 +5314,12 @@ Item {
                 talks: itemRoleMsgs,
                 menus: itemGameMenus,
                 inputs: itemGameInputs,
+                timers: itemWaitTimers,
                 trade: dialogTrade,
                 window: gameMenuWindow,
                 video: itemVideo,
                 gamePad: itemGamePad,
+                */
 
                 compSprite: compCacheSpriteEffect,
                 compMsg: compGameMsg,
@@ -5334,7 +5327,8 @@ Item {
                 compMenu: compGameMenu,
                 compInput: compGameInput,
                 compRole: compRole,
-                compSound: compCacheSoundEffect,
+                compAudio: compCacheAudio,
+                compSoundEffect: compCacheSoundEffect,
                 compImage: compCacheImage,
                 compWordMove: compCacheWordMove,
             },
@@ -5372,27 +5366,43 @@ Item {
         //缓存
         readonly property QtObject $caches: QtObject {
             readonly property alias jsEngine: _private.jsEngine
+            readonly property alias asyncScript: _private.asyncScript
             readonly property alias scriptQueue: _private.scriptQueue
 
 
-            readonly property alias mainRoles: _private.arrMainRoles
-            readonly property alias roles: _private.objRoles
+            readonly property var map: [itemViewPort.canvasBackMap, itemViewPort.canvasFrontMap]
 
-            readonly property alias globalTimers: _private.objGlobalTimers
-            readonly property alias timers: _private.objTimers
+            readonly property alias msgs: itemGameMsgs
+            readonly property alias talks: itemRoleMsgs
+            readonly property alias menus: itemGameMenus
+            readonly property alias inputs: itemGameInputs
+            readonly property alias buttons: itemButtons
+
+            readonly property alias waitTimers: itemWaitTimers
+
+            readonly property alias trade: dialogTrade
+            readonly property alias window: gameMenuWindow
+            readonly property alias video: itemVideo
+            readonly property alias gamePad: itemGamePad
+            readonly property alias joystick: joystick
+            readonly property alias fps: itemFPS
 
 
-            readonly property alias cacheSoundEffects: _private.objCacheSoundEffects
-            readonly property alias cacheImages: _private.objCacheImages
+            /*readonly*/ property alias mainRoles: _private.arrMainRoles
+            /*readonly*/ property alias roles: _private.objRoles
 
+            /*readonly*/ property alias globalTimers: _private.objGlobalTimers
+            /*readonly*/ property alias timers: _private.objTimers
 
-            readonly property alias tmpComponents: _private.objTmpComponents
-            readonly property alias tmpMapComponents: _private.objTmpMapComponents
+            /*readonly*/ property alias cacheSoundEffects: _private.objCacheSoundEffects
+            /*readonly*/ property alias cacheImages: _private.objCacheImages
+
+            /*readonly*/ property alias tmpComponents: _private.objTmpComponents
+            /*readonly*/ property alias tmpMapComponents: _private.objTmpMapComponents
 
             //readonly property alias objImages: _private.objImages
             //readonly property alias objMusic: _private.objMusic
             //readonly property alias objVideos: _private.objVideos
-
         }
 
 
@@ -6026,7 +6036,7 @@ Item {
 
     //临时存放创建的定时器（wait命令创建的）
     Item {
-        id: itemTimers
+        id: itemWaitTimers
 
     }
 
@@ -6586,9 +6596,11 @@ Item {
 
 
 
-        property var arrCacheSoundEffects: ([])       //音效组件
+        property real rVolume: 1.0
 
-        property var objSoundEffectPause: ({})    //暂停类型
+        property var arrCacheSoundEffects: ([]) //音效组件
+
+        property var objSoundEffectPause: ({}) //暂停类型
 
 
 
@@ -6814,6 +6826,8 @@ Item {
         //property var objMusic: ({})         //{音乐名: 音乐路径}
         //property var objVideos: ({})         //{视频名: 视频路径}
 
+
+        readonly property var asyncScript: GlobalLibraryJS.$asyncScript
 
         //异步脚本（整个游戏的脚本队列系统）
         readonly property var scriptQueue: new GlobalLibraryJS.ScriptQueue()
@@ -8671,9 +8685,32 @@ Item {
     Component {
         id: compCacheSoundEffect
 
-        /*SoundEffect { //wav格式，实时性高
-            property bool isPlaying: playing
-        }*/
+        SoundEffect { //wav格式，实时性高
+            function isPlaying() {
+                return playing;
+            }
+
+
+            volume: rootSoundEffect.rVolume
+
+            property var fnPlayingCallback: null
+            property var fnStatusChangedCallback: null
+
+
+            //property bool isPlaying: playbackState === Audio.PlayingState
+            onPlayingChanged: {
+                if(fnPlayingCallback)
+                    fnPlayingCallback(playing);
+            }
+            onStatusChanged: {
+                if(fnStateChangedCallback)
+                    fnStateChangedCallback(status);
+            }
+        }
+    }
+    Component {
+        id: compCacheAudio
+
         Audio { //支持各种格式
             function isPlaying() {
                 return playbackState === Audio.PlayingState;
@@ -8685,10 +8722,14 @@ Item {
                 return playbackState === Audio.StoppedState;
             }
 
+
+            volume: rootSoundEffect.rVolume
+
             property var fnPlayingCallback: null
             property var fnStoppedCallback: null
             property var fnPausedCallback: null
             property var fnPlaybackStateChangedCallback: null
+
 
             //property bool isPlaying: playbackState === Audio.PlayingState
             onPlaying: {

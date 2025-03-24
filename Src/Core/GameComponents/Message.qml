@@ -99,8 +99,10 @@ Notepad {
     //停止显示；
     //type：1是全部显示出来，其他值为停止；
     function stop(type=0) {
-        if(type === 1)
+        if(type === 1) {
             textArea.text = _private.pretext + _private.textVar;
+            toEnd();
+        }
 
         timer.stop();
         timer.nStatus = -1;

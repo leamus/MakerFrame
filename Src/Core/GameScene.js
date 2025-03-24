@@ -783,7 +783,7 @@ function *loadResources() {
     let soundEffectChannelCount = getCommonScriptResource('$config', '$game', '$soundEffectChannelCount');
     //创建音效通道
     for(let i = 0; i < soundEffectChannelCount; ++i)
-        rootSoundEffect.arrCacheSoundEffects[i] = compCacheSoundEffect.createObject(rootGameScene, {});
+        rootSoundEffect.arrCacheSoundEffects[i] = compCacheAudio.createObject(rootGameScene, {});
 
 
     loaderFightScene.load();
@@ -1119,7 +1119,7 @@ function getSpriteResource(item, forceLoad=false) {
             if(_private.objCacheSoundEffects[info.Sound])
                 cacheSoundEffect = _private.objCacheSoundEffects[info.Sound];
             else {
-                cacheSoundEffect = compCacheSoundEffect.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(info.Sound)});
+                cacheSoundEffect = compCacheAudio.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(info.Sound)});
                 _private.objCacheSoundEffects[info.Sound] = cacheSoundEffect;
             }
         }

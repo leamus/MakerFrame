@@ -547,7 +547,7 @@ Item {
 
         fight.d = {};
 
-        _private.asyncScript.terminateAll();
+        _private.asyncScript.terminateAll(1, null, 1);
         _private.scriptQueue.clear(1);
         //_private.scriptQueueFighting.clear(3);
         ////numberanimationSpriteEffectX.stop();
@@ -927,17 +927,19 @@ Item {
 
 
             components: {
-                menuSkillsOrGoods: menuSkillsOrGoods,
-                menuFightRoleChoice: menuFightRoleChoice,
-
-                spriteEffectMyCombatants: repeaterMyCombatants,
-                spriteEffectEnemies: repeaterEnemies,
             },
             caches: {
                 scriptQueue: _private.scriptQueue,
                 //genFighting: _private.genFighting,
                 //scriptQueueFighting: _private.scriptQueueFighting,
                 genFightChoice: _private.genFightChoice,
+
+
+                menuSkillsOrGoods: menuSkillsOrGoods,
+                menuFightRoleChoice: menuFightRoleChoice,
+
+                spriteEffectMyCombatants: repeaterMyCombatants,
+                spriteEffectEnemies: repeaterEnemies,
             },
 
 

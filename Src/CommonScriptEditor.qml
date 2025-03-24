@@ -2056,10 +2056,10 @@ function $fightCombatantPositionAlgorithm(teamID, index) {
     //默认：/我方所有x坐标 = 屏幕宽 / 4。我方a的y坐标 = 屏幕高 * (a+1) / (我方人数+1)。
     let cols = 4;
     if(teamID === 0) {    //我方
-        return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.components.spriteEffectMyCombatants.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width / cols, fight.$sys.scene.height * (index + 1) / (fight.myCombatants.length/*fight.$sys.caches.spriteEffectMyCombatants.nCount*/ + 1));
     }
     else {  //敌方
-        return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height * (index + 1) / (fight.enemies.length/*fight.$sys.components.spriteEffectEnemies.nCount*/ + 1));
+        return Qt.point(fight.$sys.scene.width * (cols-1) / cols, fight.$sys.scene.height * (index + 1) / (fight.enemies.length/*fight.$sys.caches.spriteEffectEnemies.nCount*/ + 1));
     }
 }
 
