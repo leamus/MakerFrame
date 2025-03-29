@@ -2284,13 +2284,13 @@ Item {
 
 
 
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         //FightSceneJS.fightOver(-1);
         event.accepted = true;
 
         console.debug('[FightScene]Keys.onEscapePressed');
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         //FightSceneJS.fightOver(-1);
         event.accepted = true;
 

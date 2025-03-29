@@ -120,24 +120,24 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainUpdateLog]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainUpdateLog]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainUpdateLog]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainUpdateLog]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
@@ -170,8 +170,11 @@ Item {
 *14、修改：地图和角色的RID和名称分开；
 15、新增：文件/缓存的文本/二进制高级读写（包括QIODevice、QBuffer、QFile、QFileDevice、QFileInfo、QDataStream、QTextStream类的封装）；
 16、新增：游戏加速功能；
-17、修复：多窗口时风格问题；
-18、其他：优化调整很多代码和细节，修复一些Bugs；
+17、新增：音乐和音量大小函数：game.musicvolume、game.soundeffectvolume；
+**18、修改：将所有game.$sys.components中的组件对象移动在game.$sys.caches下，将所有fight.$sys.components中的组件对象移动在fight.$sys.caches下，game.$sys.components、fight.$sys.components只作为组件模板来创建组件对象，并改名所有的组件模板名称（去掉comp前缀并大写开头）；
+19、修复：鹰歌窗口切换时出现的焦点错误问题；
+20、修复：多窗口时风格问题；
+21、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

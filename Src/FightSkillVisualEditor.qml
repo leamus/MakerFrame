@@ -2079,24 +2079,24 @@ $$buffs$$
 
 
 
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         _private.close();
 
         console.debug('[FightSkillVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         _private.close();
 
         console.debug('[FightSkillVisualEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[FightSkillVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[FightSkillVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

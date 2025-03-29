@@ -2284,17 +2284,17 @@ function $refresh(index, imageAnimate, path) {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         console.debug('[SpriteEditor]Keys.onEscapePressed');
         _private.close();
         event.accepted = true;
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         console.debug('[SpriteEditor]Keys.onBackPressed');
         _private.close();
         event.accepted = true;
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         event.accepted = true;
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
@@ -2303,7 +2303,7 @@ function $refresh(index, imageAnimate, path) {
 
         console.debug('[SpriteEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         event.accepted = true;
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）

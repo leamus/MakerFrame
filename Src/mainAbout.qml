@@ -120,24 +120,24 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainAbout]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainAbout]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainAbout]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainAbout]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
@@ -150,7 +150,7 @@ Item {
 1.鹰歌MakerFrame软件框架 是一款由 Qt（C++）、QML（JavaScript）、JAVA（Android） 构建，供二次开发软件和游戏的开放式跨平台框架，它可以运行在Windows、Android、iOS、macOS、Linux（Debian、Ubuntu以及国产化的Openkylin、UOS）等主流平台上，并提供了上架应用商店、广告接口、网络（各种协议和下载）、资源整合打包、屏幕自适应、热更新、数据库、几种图形引擎、文件（夹）操作、压缩解压、进程、线程池、异步脚本（协程）、JS脚本引擎、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、以及各种三方库和SDK等丰富的底层功能和扩展，能满足各种软件开发和多种类型的引擎及游戏的一款超级APP；
 2.鹰歌游戏引擎 是基于 鹰歌MakerFrame软件框架 开发的一套开放式（支持RPG、ARPG、策略与战旗、文字AVG、放置类等几乎所有2D类型）游戏开发引擎和运行环境，主要由QML（JavaScript）编写，支持图形化编辑器（如 地图编辑器、角色编辑器、特效编辑器、道具编辑器、技能编辑器、战斗人物编辑器、战斗脚本编辑器、升级链编辑器、图片音乐视频管理、图形化脚本编程等）、代码或两者结合的方式来设计游戏和开发插件；
 
-  QQ群：654876441
+  QQ：85885245
 
 
   作者的话

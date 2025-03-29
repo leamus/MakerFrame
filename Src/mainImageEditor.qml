@@ -297,11 +297,11 @@ Item {
             transformOrigin: Item.Center
 
 
-            Keys.onEscapePressed: {
+            Keys.onEscapePressed: function(event) {
                 _private.setImageVisible(false);
                 event.accepted = true;
             }
-            Keys.onBackPressed: {
+            Keys.onBackPressed: function(event) {
                 _private.setImageVisible(false);
                 event.accepted = true;
             }
@@ -460,22 +460,22 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainImageEditor]Keys.onEscapePressed');
         event.accepted = true;
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainImageEditor]Keys.onBackPressed');
         event.accepted = true;
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainImageEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainImageEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

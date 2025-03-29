@@ -366,7 +366,7 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
@@ -374,7 +374,7 @@ Item {
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
@@ -382,10 +382,10 @@ Item {
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[PluginsDownload]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[PluginsDownload]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

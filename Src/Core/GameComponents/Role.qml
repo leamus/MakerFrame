@@ -465,7 +465,7 @@ Item {
 
 
 
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         switch(event.key) {
         case Qt.Key_Up:
             if(!root.changeAction('$Up')) {
@@ -498,7 +498,7 @@ Item {
         //console.debug('[Role]Keys.onPressed:', event.key);
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         switch(event.key) {
         case Qt.Key_Up:
         case Qt.Key_Right:

@@ -89,14 +89,14 @@ Item {
         anchors.fill: parent
 
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: function(event) {
             close();
 
             console.debug('[PluginsManager]Keys.onEscapePressed:itemExtendsRoot');
             event.accepted = true;
             //Qt.quit();
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: function(event) {
             close();
 
             console.debug('[PluginsManager]Keys.onBackPressed:itemExtendsRoot');
@@ -197,14 +197,14 @@ Item {
         }
 
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: function(event) {
             close();
 
             console.debug('[PluginsManager]Keys.onEscapePressed:loaderExtends');
             event.accepted = true;
             //Qt.quit();
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: function(event) {
             close();
 
             console.debug('[PluginsManager]Keys.onBackPressed:loaderExtends');
@@ -422,7 +422,7 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
@@ -430,7 +430,7 @@ Item {
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
 
@@ -438,10 +438,10 @@ Item {
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[PluginsManager]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[PluginsManager]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

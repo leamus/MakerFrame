@@ -242,24 +242,24 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainSpriteEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainSpriteEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainSpriteEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainSpriteEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

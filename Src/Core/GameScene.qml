@@ -3709,6 +3709,10 @@ Item {
         //删除图片；
         //idParams：-1：屏幕上的全部图片组件（包含图片和特效等）；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id（-1表示全部图片组件）和$parent属性（同showimage）；
         readonly property var delimage: function(idParams=-1) {
+            //暂存位置
+            let objTmpComponents;
+            let tmpImage;
+
             if(GlobalLibraryJS.isNumber(idParams)) {
                 idParams = {$id: idParams};
             }
@@ -3716,42 +3720,39 @@ Item {
                 idParams = {$id: idParams};
             }
             else if(GlobalLibraryJS.isObject(idParams)) {
-
+                tmpImage = idParams;
             }
             else
                 return false;
 
 
-            //暂存位置
-            let objTmpComponents;
-            let tmpImage;
             //游戏视窗
             if(idParams.$parent === 1) {
                 //idParams.$parent = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpImage = objTmpComponents[idParams.$id];
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
             //会改变大小
             else if(idParams.$parent === 2) {
                 //idParams.$parent = itemViewPort.gameScene;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpImage = objTmpComponents[idParams.$id];
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
             //会改变大小和随地图移动
             else if(idParams.$parent === 3) {
                 //idParams.$parent = itemViewPort.itemContainer;
 
                 objTmpComponents = _private.objTmpMapComponents;
-                tmpImage = objTmpComponents[idParams.$id];
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
             //会改变大小和随地图移动
             else if(idParams.$parent === 4) {
                 //idParams.$parent = itemViewPort.itemRoleContainer;
 
                 objTmpComponents = _private.objTmpMapComponents;
-                tmpImage = objTmpComponents[idParams.$id];
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
             //某角色上
             else if(GlobalLibraryJS.isString(idParams.$parent)) {
@@ -3762,7 +3763,7 @@ Item {
                     //idParams.$parent = role;
 
                     objTmpComponents = role.$tmpComponents;
-                    tmpImage = objTmpComponents[idParams.$id];
+                    tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
                 }
                 else
                     return false;
@@ -3778,11 +3779,11 @@ Item {
                 //idParams.$parent = rootGameScene;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpImage = objTmpComponents[idParams.$id];
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
 
 
-            if(idParams['$id'] === -1 && objTmpComponents) {
+            if(idParams.$id === -1 && objTmpComponents) {
                 for(let ti in objTmpComponents) {
                     if(objTmpComponents[ti].$componentType === 1) {
                         //自定义 释放函数
@@ -3798,7 +3799,7 @@ Item {
             if(tmpImage && tmpImage.$componentType === 1) {
                 (tmpImage.$destroy ?? tmpImage.Destroy ?? tmpImage.destroy)();
 
-                if(objTmpComponents)
+                if(objTmpComponents && idParams.$id !== undefined && idParams.$id !== null)
                     delete objTmpComponents[idParams.$id];
 
                 return true;
@@ -4205,6 +4206,10 @@ Item {
         //删除特效；
         //idParams：-1：屏幕上的全部特效组件（包含图片和特效等）；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id（-1表示全部特效组件）和$parent属性（同showsprite）；
         readonly property var delsprite: function(idParams=-1) {
+            //暂存位置
+            let objTmpComponents;
+            let tmpSprites;
+
             if(GlobalLibraryJS.isNumber(idParams)) {
                 idParams = {$id: idParams};
             }
@@ -4212,42 +4217,39 @@ Item {
                 idParams = {$id: idParams};
             }
             else if(GlobalLibraryJS.isObject(idParams)) {
-
+                tmpSprites = idParams;
             }
             else
                 return false;
 
 
-            //暂存位置
-            let objTmpComponents;
-            let tmpSprites;
             //游戏视窗
             if(idParams.$parent === 1) {
                 //idParams.$parent = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpSprites = objTmpComponents[idParams.$id];
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
             //会改变大小
             else if(idParams.$parent === 2) {
                 //idParams.$parent = itemViewPort.gameScene;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpSprites = objTmpComponents[idParams.$id];
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
             //会改变大小和随地图移动
             else if(idParams.$parent === 3) {
                 //idParams.$parent = itemViewPort.itemContainer;
 
                 objTmpComponents = _private.objTmpMapComponents;
-                tmpSprites = objTmpComponents[idParams.$id];
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
             //会改变大小和随地图移动
             else if(idParams.$parent === 4) {
                 //idParams.$parent = itemViewPort.itemContainer;
 
                 objTmpComponents = _private.objTmpMapComponents;
-                tmpSprites = objTmpComponents[idParams.$id];
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
             //某角色上
             else if(GlobalLibraryJS.isString(idParams.$parent)) {
@@ -4258,7 +4260,7 @@ Item {
                     //idParams.$parent = role;
 
                     objTmpComponents = role.$tmpComponents;
-                    tmpSprites = objTmpComponents[idParams.$id];
+                    tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
                 }
                 else
                     return false;
@@ -4275,11 +4277,11 @@ Item {
                 //idParams.$parent = rootGameScene;
 
                 objTmpComponents = _private.objTmpComponents;
-                tmpSprites = objTmpComponents[idParams.$id];
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
 
 
-            if(idParams['$id'] === -1 && objTmpComponents) {
+            if(idParams.$id === -1 && objTmpComponents) {
                 for(let ti in objTmpComponents) {
                     if(objTmpComponents[ti].$componentType === 2) {
                         //自定义 释放函数
@@ -4296,7 +4298,7 @@ Item {
                 (tmpSprites.$destroy ?? tmpSprites.Destroy ?? tmpSprites.destroy)();
 
                 //_private.cacheSprites.put(tmpSprites);
-                if(objTmpComponents)
+                if(objTmpComponents && idParams.$id !== undefined && idParams.$id !== null)
                     delete objTmpComponents[idParams.$id];
 
                 return true;
@@ -5321,16 +5323,16 @@ Item {
                 gamePad: itemGamePad,
                 */
 
-                compSprite: compCacheSpriteEffect,
-                compMsg: compGameMsg,
-                compRoleMsg: compRoleMsg,
-                compMenu: compGameMenu,
-                compInput: compGameInput,
-                compRole: compRole,
-                compAudio: compCacheAudio,
-                compSoundEffect: compCacheSoundEffect,
-                compImage: compCacheImage,
-                compWordMove: compCacheWordMove,
+                Sprite: compCacheSpriteEffect,
+                Msg: compGameMsg,
+                RoleMsg: compRoleMsg,
+                Menu: compGameMenu,
+                Input: compGameInput,
+                Role: compRole,
+                Audio: compCacheAudio,
+                SoundEffect: compCacheSoundEffect,
+                Image: compCacheImage,
+                WordMove: compCacheWordMove,
             },
 
             //资源
@@ -5474,6 +5476,22 @@ Item {
 
     focus: true
     clip: true
+
+    transform: [
+        Scale { //缩放，如果为负则是镜像
+            //origin { //缩放围绕的 原点坐标
+                //x: width / 2
+                //y: height / 2
+            //}
+            //xScale: 1
+            //yScale: 1
+        },
+        Rotation { //旋转
+        },
+        Translate { //平移
+        }
+    ]
+
 
     //color: 'black'
 
@@ -5804,7 +5822,7 @@ Item {
 
 
             if(GlobalLibraryJS.checkCallable(gameMenuWindow.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                game.run(gameMenuWindow.fCallback.call(gameMenuWindow, callback, gameMenuWindow) ?? null, 'GameMenuWindow callback');
+                game.async(gameMenuWindow.fCallback.call(gameMenuWindow, callback, gameMenuWindow) ?? null, 'GameMenuWindow callback');
             }
             else {   //默认回调函数
                 callback(gameMenuWindow);
@@ -5894,7 +5912,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(dialogTrade.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, 'Trade callback');
+                    game.async(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, 'Trade callback');
                 }
                 else {   //默认回调函数
                     callback(dialogTrade);
@@ -6099,7 +6117,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(itemVideo.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(itemVideo.fCallback.call(itemVideo, callback, code, itemVideo) ?? null, 'Video callback');
+                    game.async(itemVideo.fCallback.call(itemVideo, callback, code, itemVideo) ?? null, 'Video callback');
                 }
                 else {   //默认回调函数
                     callback(code, itemVideo);
@@ -6238,12 +6256,12 @@ Item {
             }
         }
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: function(event) {
             game.stopvideo(1);
             event.accepted = true;
             //Qt.quit();
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: function(event) {
             game.stopvideo(1);
             event.accepted = true;
             //Qt.quit();
@@ -7240,7 +7258,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(rootRoleMsg.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(rootRoleMsg.fCallback.call(rootRoleMsg, callback, code, rootRoleMsg) ?? null, 'Role message callback');
+                    game.async(rootRoleMsg.fCallback.call(rootRoleMsg, callback, code, rootRoleMsg) ?? null, 'Role message callback');
                 }
                 else {   //默认回调函数
                     callback(code, rootRoleMsg);
@@ -7270,11 +7288,6 @@ Item {
             }
 
             function show(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, _pauseGame=true, callback=true) {
-
-                rootRoleMsg.pauseGame = _pauseGame;
-                rootRoleMsg.fCallback = callback;
-
-
 
                 let name = '', avatar = '', avatarSize = null;
                 if(role && GlobalLibraryJS.isString(role)) {
@@ -7307,6 +7320,9 @@ Item {
                 }
 
 
+
+                rootRoleMsg.pauseGame = _pauseGame;
+                rootRoleMsg.fCallback = callback;
 
                 if(pauseGame === true)
                     pauseGame = '$talk';
@@ -7420,6 +7436,9 @@ Item {
             property var pauseGame: true
             //回调函数
             property var fCallback
+
+            property alias message: messageRole
+            property alias mask: maskMessageRole
 
 
             visible: false
@@ -7550,7 +7569,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(rootGameMsgDialog.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(rootGameMsgDialog.fCallback.call(rootGameMsgDialog, callback, code, rootGameMsgDialog) ?? null, 'Game message callback');
+                    game.async(rootGameMsgDialog.fCallback.call(rootGameMsgDialog, callback, code, rootGameMsgDialog) ?? null, 'Game message callback');
                 }
                 else {   //默认回调函数
                     callback(code, rootGameMsgDialog);
@@ -7580,6 +7599,7 @@ Item {
             }
 
             function show(msg='', interval=20, pretext='', keeptime=0, style={}, _pauseGame=true, callback=true) {
+
                 rootGameMsgDialog.pauseGame = _pauseGame;
                 rootGameMsgDialog.fCallback = callback;
 
@@ -7680,8 +7700,6 @@ Item {
 
 
 
-            //是否暂停了游戏
-            //property bool bPauseGame: true
             //显示完全后延时
             property int nKeepTime: 0
             //显示状态：-1：停止；0：显示完毕；1：正在显示
@@ -7693,6 +7711,9 @@ Item {
             property var pauseGame: true
             //回调函数
             property var fCallback
+
+            property alias message: messageGame
+            property alias mask: maskMessageGame
 
 
             visible: false
@@ -7824,7 +7845,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(rootGameMenu.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(rootGameMenu.fCallback.call(rootGameMenu, callback, index, rootGameMenu) ?? null, 'Game menu callback');
+                    game.async(rootGameMenu.fCallback.call(rootGameMenu, callback, index, rootGameMenu) ?? null, 'Game menu callback');
                 }
                 else {  //默认回调函数
                     callback(index, rootGameMenu);
@@ -7906,8 +7927,9 @@ Item {
             property var pauseGame: true
             property var fCallback   //点击后的回调函数，true为缺省
 
-            property alias maskMenu: maskMenu
-            property alias menuGame: menuGame
+            property alias mask: maskMenu
+            property alias menu: menuGame
+            property alias background: rectMenuGameBackground
 
 
             //anchors.fill: parent
@@ -7928,6 +7950,7 @@ Item {
             }
 
             Rectangle {
+                id: rectMenuGameBackground
                 //width: parent.width * 0.5
                 width: Screen.width > Screen.height ? parent.width * 0.6 : parent.width * 0.9
                 //height: parent.height * 0.5
@@ -8004,7 +8027,7 @@ Item {
 
 
                 if(GlobalLibraryJS.checkCallable(rootGameInput.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
-                    game.run(rootGameInput.fCallback.call(rootGameInput, callback, text, rootGameInput) ?? null, 'Game input callback');
+                    game.async(rootGameInput.fCallback.call(rootGameInput, callback, text, rootGameInput) ?? null, 'Game input callback');
                 }
                 else {   //默认回调函数
                     callback(text, rootGameInput);
@@ -8101,6 +8124,9 @@ Item {
             property var pauseGame
             //回调函数
             property var fCallback
+
+            property alias input: textGameInput
+            property alias mask: maskGameInput
 
 
             visible: false
@@ -8988,14 +9014,14 @@ Item {
 
     //Keys.forwardTo: [itemViewPort.itemContainer]
 
-    /*Keys.onEscapePressed: {
+    /*Keys.onEscapePressed: function(event) {
         //sg_close();
         _private.showExitDialog();
         event.accepted = true;
 
         console.debug('[GameScene]Keys.onEscapePressed');
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         //sg_close();
         _private.showExitDialog();
         event.accepted = true;
@@ -9016,7 +9042,7 @@ Item {
 
 
 
-    Keys.onPressed: {   //键盘按下
+    Keys.onPressed: function(event) {   //键盘按下
         console.debug('[GameScene]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
 
         //if(!_private.config.bKeyboard)
@@ -9083,7 +9109,7 @@ Item {
         }
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[GameScene]Keys.onReleased:', event.key, event.isAutoRepeat);
 
         //if(!_private.config.bKeyboard)
@@ -9136,7 +9162,7 @@ Item {
 
         //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject());
 
-        console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'));
+        console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'), game, FrameManager.sl_globalObject().game);
     }
 
     Component.onDestruction: {

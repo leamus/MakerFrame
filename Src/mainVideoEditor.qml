@@ -317,12 +317,12 @@ Item {
         }
 
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: function(event) {
             _private.stop();
             event.accepted = true;
             //Qt.quit();
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: function(event) {
             _private.stop();
             event.accepted = true;
             //Qt.quit();
@@ -477,24 +477,24 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainVideoEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainVideoEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainVideoEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainVideoEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

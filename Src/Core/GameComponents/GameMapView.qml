@@ -364,6 +364,22 @@ Item {
     clip: true
 
 
+    transform: [
+        Scale { //缩放，如果为负则是镜像
+            //origin { //缩放围绕的 原点坐标
+                //x: width / 2
+                //y: height / 2
+            //}
+            //xScale: 1
+            //yScale: 1
+        },
+        Rotation { //旋转
+        },
+        Translate { //平移
+        }
+    ]
+
+
 
     Component {
         id: compCanvasMask
@@ -491,8 +507,22 @@ Item {
 
         clip: true
         //缩放中心
-        transformOrigin: Item.TopLeft
-        //transformOrigin: Item.Center
+        transformOrigin: Item.TopLeft //Item.Center
+
+        transform: [
+            Scale { //缩放，如果为负则是镜像
+                //origin { //缩放围绕的 原点坐标
+                    //x: width / 2
+                    //y: height / 2
+                //}
+                //xScale: 1
+                //yScale: 1
+            },
+            Rotation { //旋转
+            },
+            Translate { //平移
+            }
+        ]
 
 
         //color: "black"
@@ -510,6 +540,22 @@ Item {
 
             //width: 800
             //height: 600
+
+
+            transform: [
+                Scale { //缩放，如果为负则是镜像
+                    //origin { //缩放围绕的 原点坐标
+                        //x: width / 2
+                        //y: height / 2
+                    //}
+                    //xScale: 1
+                    //yScale: 1
+                },
+                Rotation { //旋转
+                },
+                Translate { //平移
+                }
+            ]
 
 
 

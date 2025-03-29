@@ -3600,7 +3600,7 @@ Item {
 
 
     //Keys.forwardTo: [canvasMapContainer]
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         _private.close();
 
         //focus = false;
@@ -3612,7 +3612,7 @@ Item {
 
         console.debug('[MapEditor]Keys.onEscapePressed');
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         _private.close();
 
         //focus = false;
@@ -3623,10 +3623,10 @@ Item {
 
         console.debug('[MapEditor]Keys.onBackPressed');
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[MapEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[MapEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

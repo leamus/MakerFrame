@@ -1371,24 +1371,24 @@ $$equipEffectAlgorithm$$
 
 
 
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         _private.close();
 
         console.debug('[GoodsVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         _private.close();
 
         console.debug('[GoodsVisualEditor]Keys.onBackPressed');
         event.accepted = true;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[GoodsVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[GoodsVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 

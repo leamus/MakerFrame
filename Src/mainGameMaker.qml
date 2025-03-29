@@ -1056,7 +1056,7 @@ Item {
 
                 //width: parent.width
                 font.pointSize: 12
-                text: qsTr('Q群：654876441')
+                text: qsTr('QQ：85885245')
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
 
@@ -1356,13 +1356,13 @@ Item {
 
         //color: 'black'
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: function(event) {
             close();
 
             event.accepted = true;
             //Qt.quit();
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: function(event) {
             close();
 
             event.accepted = true;
@@ -2190,24 +2190,24 @@ Item {
 
 
     //Keys.forwardTo: []
-    Keys.onEscapePressed: {
+    Keys.onEscapePressed: function(event) {
         sg_close();
 
         console.debug('[mainGameMaker]Keys.onEscapePressed');
         event.accepted = false;
         //Qt.quit();
     }
-    Keys.onBackPressed: {
+    Keys.onBackPressed: function(event) {
         sg_close();
 
         console.debug('[mainGameMaker]Keys.onBackPressed');
         event.accepted = false;
         //Qt.quit();
     }
-    Keys.onPressed: {
+    Keys.onPressed: function(event) {
         console.debug('[mainGameMaker]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
-    Keys.onReleased: {
+    Keys.onReleased: function(event) {
         console.debug('[mainGameMaker]Keys.onReleased:', event.key, event.isAutoRepeat);
     }
 
