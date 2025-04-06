@@ -139,6 +139,9 @@ Item {
     function currentFrame() {
         return nCurrentFrame;
     }
+    function setCurrentFrame(index) {
+        return nCurrentFrame = index;
+    }
 
 
     function colorOverlayStart(colors=undefined, index=1) {
@@ -163,7 +166,7 @@ Item {
             return;
 
         if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
-            fnRefresh = fnRefresh(imageAnimate, strSource);
+            genRefresh = fnRefresh(imageAnimate, strSource);
         else
             genRefresh = null;
     }
@@ -216,7 +219,7 @@ Item {
     property var fnRefresh
     onFnRefreshChanged: {
         if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
-            fnRefresh = fnRefresh(imageAnimate, strSource);
+            genRefresh = fnRefresh(imageAnimate, strSource);
         else
             genRefresh = null;
     }
@@ -468,13 +471,13 @@ Item {
 
             //console.debug('timerInterval Triggerd:', strSource);
             if(bTest)
-                console.debug('!!!timerInterval onTriggered', interval, root.nCurrentFrame);
+                console.debug('[DirSpriteEffect]timerInterval onTriggered:', interval, root.nCurrentFrame);
 
         }
 
         onRunningChanged: {
             if(bTest)
-                console.debug('!!!RunningChanged:', running, strSource);
+                console.debug('[DirSpriteEffect]RunningChanged:', running, strSource);
         }
 
     }
@@ -590,5 +593,7 @@ Item {
 
     Component.onDestruction: {
         //root.unload();
+
+        console.debug('[DirSpriteEffect]Component.onDestruction:', Qt.resolvedUrl('.'));
     }
 }

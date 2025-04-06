@@ -238,21 +238,24 @@ Rectangle {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[NanoPaintView]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[NanoPaintView]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
-        console.debug('[NanoPaintView]Keys.onPressed:', event, event.key, event.text)
+        console.debug('[NanoPaintView]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
+    }
+    Keys.onReleased: function(event) {
+        console.debug('[NanoPaintView]Keys.onReleased:', event, event.key, event.text);
+        event.accepted = true;
     }
 
 

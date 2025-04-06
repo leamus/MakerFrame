@@ -219,7 +219,7 @@ Item {
                 //Layout.preferredWidth: 80
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
-                text: 'X'
+                text: '*'
             }
 
             TextField {
@@ -421,24 +421,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainGameTest]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainGameTest]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainGameTest]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainGameTest]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

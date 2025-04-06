@@ -98,7 +98,7 @@ Item {
 
     function openRole(cfg, roleRID) {
 
-        console.debug('[RoleEditor]openRole:', JSON.stringify(cfg))
+        console.debug('[RoleEditor]openRole:', JSON.stringify(cfg));
 
         //cfg.Version;
         //cfg.RoleType;
@@ -352,7 +352,7 @@ Item {
                     visible: bShowDelete
                     implicitWidth: 30
 
-                    text: 'x'
+                    text: 'X'
 
                     onClicked: {
                         for(let tc in layoutAction2.arrCacheComponent) {
@@ -364,6 +364,8 @@ Item {
                         tRoot.destroy();
 
                         _private.refreshRole();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -504,7 +506,7 @@ Item {
                     visible: bShowDelete
                     implicitWidth: 30
 
-                    text: 'x'
+                    text: 'X'
 
                     onClicked: {
                         for(let tc in layoutAction1.arrCacheComponent) {
@@ -516,6 +518,8 @@ Item {
                         tRoot.destroy();
 
                         _private.refreshRole();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -589,7 +593,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '类型：'
+                            text: '类型:'
                         }
 
                         ComboBox {
@@ -1889,7 +1893,13 @@ Item {
                 Layout.preferredWidth: parseInt(textAvatarWidth.text)
                 Layout.preferredHeight: parseInt(textAvatarHeight.text)
 
-                source: textAvatar.text ? GameMakerGlobal.imageResourceURL(textAvatar.text) : ''
+                source: {
+                    if(textAvatar.text.length === 0)
+                        return '';
+                    if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                        return '';
+                    return GameMakerGlobal.imageResourceURL(textAvatar.text);
+                }
             }
 
             Item {
@@ -2099,14 +2109,10 @@ Item {
 
 
             //console.log('You chose:', fileDialog.fileUrls);
-            //Qt.quit();
         }
         onRejected: {
+            console.debug('[RoleEditor]onRejected');
             //root.forceActiveFocus();
-
-            console.debug('[RoleEditor]onRejected')
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -2141,7 +2147,7 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 Label {
-                    text: qsTr('路径：')
+                    text: qsTr('路径:')
                 }
 
                 TextField {
@@ -2419,7 +2425,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[RoleEditor]删除：' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
+                    console.debug('[RoleEditor]删除:' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listRoleResource.forceActiveFocus();
@@ -2522,7 +2528,7 @@ Item {
             RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr('角色资源名：')
+                    text: qsTr('角色资源名:')
                 }
                 TextField {
                     id: textRoleRID
@@ -2539,7 +2545,7 @@ Item {
             /*RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr('地图缩放：')
+                    text: qsTr('地图缩放:')
                 }
                 TextField {
                     id: textMapScale
@@ -2884,8 +2890,8 @@ function $refresh(index, imageAnimate, path) {
         //导出角色
         function exportRole() {
 
-            //let roleName = textRoleName.text;
-            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.json';
+            let roleName = textRoleName.text;
+            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!FrameManager.sl_dirExists(path))
                 FrameManager.sl_dirCreate(path);
@@ -2907,7 +2913,7 @@ function $refresh(index, imageAnimate, path) {
             outputData.Image = role.strSource;
             */
             outputData.Version = '0.9';
-            outputData.RoleName = textRoleName.text;
+            outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型
             //outputData.SpriteType = comboType.currentIndex + 1;
             switch(comboType.currentIndex) {
@@ -3153,39 +3159,37 @@ function $refresh(index, imageAnimate, path) {
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
         console.debug('[RoleEditor]Keys.onEscapePressed');
-        _private.close();
         event.accepted = true;
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
         console.debug('[RoleEditor]Keys.onBackPressed');
-        _private.close();
         event.accepted = true;
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
+        console.debug('[RoleEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
         event.accepted = true;
+
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
 
         _private.doAction(1, event.key);
-
-
-
-        console.debug('[RoleEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: function(event) {
+        console.debug('[RoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        //console.debug(role.objActionsData);
+        //console.debug(textRoleFangXiangIndex.text.split(','));
         event.accepted = true;
+
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
 
         _private.stopAction(1, event.key);
-
-
-        console.debug('[RoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
-
-        //console.debug(role.objActionsData);
-        //console.debug(textRoleFangXiangIndex.text.split(','));
     }
 
 

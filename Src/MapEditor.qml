@@ -2785,7 +2785,7 @@ Item {
                 //_private.createEvent(textEventName.text, scriptEditor.text);
                 _private.createEvent(textEventName.text);
                 //scriptEditor.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
-                scriptEditor.editor.appendText('\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                scriptEditor.editor.append('\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 //scriptEditor.editor.setPlainText(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 //scriptEditor.editor.toBegin();
             }
@@ -2859,11 +2859,8 @@ Item {
             _private.exportMap(fileUrl);
         }
         onRejected: {
-            root.forceActiveFocus();
-
-
             //console.log('Canceled');
-            //Qt.quit();
+            root.forceActiveFocus();
         }
         Component.onCompleted: {
         }
@@ -3601,6 +3598,10 @@ Item {
 
     //Keys.forwardTo: [canvasMapContainer]
     Keys.onEscapePressed: function(event) {
+        console.debug('[MapEditor]Keys.onEscapePressed');
+        event.accepted = true;
+
+
         _private.close();
 
         //focus = false;
@@ -3608,26 +3609,26 @@ Item {
         //loader.focus = false;
         //menuEsc.hide();
 
-        event.accepted = true;
-
-        console.debug('[MapEditor]Keys.onEscapePressed');
     }
     Keys.onBackPressed: function(event) {
+        console.debug('[MapEditor]Keys.onBackPressed');
+        event.accepted = true;
+
+
         _private.close();
 
         //focus = false;
         //loader.visible = false;
         //loader.focus = false;
         //menuEsc.hide();
-        event.accepted = true;
-
-        console.debug('[MapEditor]Keys.onBackPressed');
     }
     Keys.onPressed: function(event) {
         console.debug('[MapEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[MapEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

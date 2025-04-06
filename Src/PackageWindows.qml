@@ -99,24 +99,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[PackageWindows]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[PackageWindows]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[PackageWindows]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[PackageWindows]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

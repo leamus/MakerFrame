@@ -144,6 +144,9 @@ Item {
     function currentFrame() {
         return nCurrentFrame;
     }
+    function setCurrentFrame(index) {
+        return nCurrentFrame = index;
+    }
 
 
     function colorOverlayStart(colors=undefined, index=1) {

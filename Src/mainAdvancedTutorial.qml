@@ -121,24 +121,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainAdvancedTutorial]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainAdvancedTutorial]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainAdvancedTutorial]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainAdvancedTutorial]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

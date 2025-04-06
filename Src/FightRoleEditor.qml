@@ -429,24 +429,24 @@ let data = (function() {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        _private.close();
-
         console.debug('[FightRoleEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
-        _private.close();
-
         console.debug('[FightRoleEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
         console.debug('[FightRoleEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[FightRoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

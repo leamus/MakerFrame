@@ -1625,7 +1625,7 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, par
             [spriteEffectComp, bNew] = _private.cacheSprites.get(parent);
             spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
         }
-        else {//if(spriteEffectComp.bRunning === true)
+        else { //if(spriteEffectComp.bRunning === true)
             spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
             spriteEffectComp.sprite.stop();
         }
@@ -1901,7 +1901,7 @@ function openMap(mapRID, forceRepaint=false) {
             game.gd['$sys_map'].$$obstacles = [];
 
 
-            //console.warn('[!GameScene]Map Load Error:', mapRID, mapPath);
+            //console.warn('[!GameScene]Map load ERROR:', mapRID, mapPath);
             return false;
         }
     }

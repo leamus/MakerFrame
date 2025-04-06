@@ -616,12 +616,13 @@ Item {
                     //game.run(function*() {
 
                     //执行之前地图的 $end 函数
-                    if(game.d['$sys_map'] && game.d['$sys_map'].$name) {
-                        const ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$name + GameMakerGlobal.separator + 'map.js'));
-                        if(ts.$end) { //GlobalLibraryJS.checkCallable
-                            let r = ts.$end(userData);
+                    if(game.d['$sys_map'] && game.d['$sys_map'].$rid) {
+                        //const ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$rid + GameMakerGlobal.separator + 'map.js'));
+                        //if(ts.$end) { //GlobalLibraryJS.checkCallable
+                        if(itemViewPort.mapScript && itemViewPort.mapScript.$end) {
+                            let r = itemViewPort.mapScript.$end(userData);
                             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                            //game.run(ts.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
+                            //game.run(itemViewPort.mapScript.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
                         }
                     }
 
@@ -676,16 +677,17 @@ Item {
                     //let priority = 0;
 
 
-                    if(itemViewPort.mapScript.$start) { //GlobalLibraryJS.checkCallable
-                        let r = itemViewPort.mapScript.$start(userData);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                        //game.run(itemViewPort.mapScript.$start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
-                    }
-                    else if(itemViewPort.mapScript.start) { //GlobalLibraryJS.checkCallable
-                        let r = itemViewPort.mapScript.start(userData);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                        //game.run(itemViewPort.mapScript.start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
-                    }
+                    if(itemViewPort.mapScript)
+                        if(itemViewPort.mapScript.$start) { //GlobalLibraryJS.checkCallable
+                            let r = itemViewPort.mapScript.$start(userData);
+                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            //game.run(itemViewPort.mapScript.$start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
+                        }
+                        else if(itemViewPort.mapScript.start) { //GlobalLibraryJS.checkCallable
+                            let r = itemViewPort.mapScript.start(userData);
+                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            //game.run(itemViewPort.mapScript.start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
+                        }
 
 
                     //载入after_loadmap脚本
@@ -1951,8 +1953,8 @@ Item {
 
 
             let newFightRole = GameSceneJS.getFightRoleObject(fightrole, true);
-
-
+            if(newFightRole === null)
+                return false;
             //newFightRole.$rid = fightRoleRID;
             newFightRole.$index = game.gd['$sys_fight_heros'].length;
             game.gd['$sys_fight_heros'].push(newFightRole);
@@ -4934,6 +4936,7 @@ Item {
         //  scriptProps：
         //    如果为数字，表示优先级Priority；
         //      Type默认为0，Running默认为1，Value默认为无；
+        //    如果为字符串，则为Tips；
         //    如果为对象，则有以下参数：
         //      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾（默认）；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
         //      Type为运行类型（如果为0（默认），表示为代码，否则表示vScript为JS文件名，而scriptProps.Path为路径）；
@@ -6257,14 +6260,12 @@ Item {
         }
 
         Keys.onEscapePressed: function(event) {
-            game.stopvideo(1);
             event.accepted = true;
-            //Qt.quit();
+            game.stopvideo(1);
         }
         Keys.onBackPressed: function(event) {
-            game.stopvideo(1);
             event.accepted = true;
-            //Qt.quit();
+            game.stopvideo(1);
         }
 
         Component.onCompleted: {
@@ -8317,7 +8318,7 @@ Item {
 
 
             //返回各种坐标
-            function pos(tPos) {
+            function pos(tPos=null) {
                 return game.rolepos(rootRole, tPos);
             }
 

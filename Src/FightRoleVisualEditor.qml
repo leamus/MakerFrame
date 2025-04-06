@@ -11,8 +11,8 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 import 'qrc:/QML'
@@ -29,14 +29,17 @@ Item {
     id: root
 
 
-    signal sg_compile(string code);
     signal sg_close();
     onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
         _private.arrCacheComponent = [];
+
+        _private.jsEngine.clear();
     }
+
+    signal sg_compile(string code);
 
 
     function init(filePath) {
@@ -100,7 +103,7 @@ Item {
                 }
 
                 TextField {
-                    id: ttextParams
+                    id: ttextSpriteName
 
                     objectName: 'SpriteName'
 
@@ -134,11 +137,20 @@ Item {
                 }
 
                 Button {
+                    implicitWidth: 30
+                    text: 'P'
+                    onClicked: {
+                        rectSpriteEffectBackground.visible = true;
+                        _private.refreshSpriteEffect(ttextSpriteName.text);
+                    }
+                }
+
+                Button {
                     id: tbutton
 
                     implicitWidth: 30
 
-                    text: 'x'
+                    text: 'X'
 
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
@@ -149,6 +161,8 @@ Item {
 
                         }
                         tRoot.destroy();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -220,7 +234,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '名字：'
+                            text: '名字:'
                         }
 
                         TextField {
@@ -243,7 +257,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'HP：'
+                            text: 'HP:'
                         }
 
                         TextField {
@@ -266,7 +280,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: 'MP：'
+                            text: 'MP:'
                         }
 
                         TextField {
@@ -289,7 +303,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '攻击'
+                            text: '攻击:'
                         }
 
                         TextField {
@@ -312,7 +326,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '防御：'
+                            text: '防御:'
                         }
 
                         TextField {
@@ -335,7 +349,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '灵力：'
+                            text: '灵力:'
                         }
 
                         TextField {
@@ -358,7 +372,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '速度：'
+                            text: '速度:'
                         }
 
                         TextField {
@@ -381,7 +395,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '幸运：'
+                            text: '幸运:'
                         }
 
                         TextField {
@@ -404,7 +418,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@头像（主角）：'
+                            text: '@头像:'
                         }
 
                         TextField {
@@ -413,7 +427,7 @@ Item {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            text: '6'
+                            text: ''
                             placeholderText: '@头像'
 
                             //selectByKeyboard: true
@@ -442,7 +456,8 @@ Item {
                         TextField {
                             id: textAvatarWidth
 
-                            Layout.preferredWidth: 50
+                            Layout.preferredWidth: 30
+                            //Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 30
 
@@ -462,12 +477,12 @@ Item {
                             text: '*'
                             //font.pointSize: _config.nLabelFontSize
                         }
-
                         //头像高
                         TextField {
                             id: textAvatarHeight
 
-                            Layout.preferredWidth: 50
+                            Layout.preferredWidth: 30
+                            //Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 30
 
@@ -479,6 +494,19 @@ Item {
                             selectByMouse: true
                             //wrapMode: TextEdit.Wrap
                         }
+
+                        Image {
+                            visible: source.length !== 0
+                            Layout.preferredWidth: 36
+                            Layout.preferredHeight: 36
+                            source: {
+                                if(textAvatar.text.length === 0)
+                                    return '';
+                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                                    return '';
+                                return GameMakerGlobal.imageResourceURL(textAvatar.text);
+                            }
+                        }
                     }
 
                     RowLayout {
@@ -486,7 +514,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '*@拥有技能：'
+                            text: '*@拥有技能:'
                         }
 
                         TextField {
@@ -527,7 +555,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@装备：'
+                            text: '@装备:'
                         }
 
                         TextField {
@@ -568,7 +596,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@携带道具（敌）：'
+                            text: '@携带道具（敌）:'
                         }
 
                         TextField {
@@ -609,7 +637,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '携带金钱（敌）：'
+                            text: '携带金钱（敌）:'
                         }
 
                         TextField {
@@ -738,7 +766,7 @@ Item {
 
                                     Label {
                                         visible: false
-                                        text: '*动作名：'
+                                        text: '*动作名:'
                                     }
 
                                     TextField {
@@ -767,6 +795,7 @@ Item {
                                     }
 
                                     TextField {
+                                        id: textSpriteName
                                         objectName: 'SpriteName'
 
                                         Layout.fillWidth: true
@@ -795,6 +824,14 @@ Item {
                                                     root.forceActiveFocus();
                                                 },
                                             });
+                                        }
+                                    }
+                                    Button {
+                                        implicitWidth: 30
+                                        text: 'P'
+                                        onClicked: {
+                                            rectSpriteEffectBackground.visible = true;
+                                            _private.refreshSpriteEffect(textSpriteName.text);
                                         }
                                     }
                                 }
@@ -875,6 +912,62 @@ Item {
 
 
 
+    Rectangle {
+        id: rectSpriteEffectBackground
+        visible: false
+        anchors.fill: parent
+
+        color: '#7F000000'
+
+        Rectangle {
+            id: rectSprite
+
+            width: spriteEffectComp.width
+            height: spriteEffectComp.height
+            implicitWidth: spriteEffectComp.implicitWidth
+            implicitHeight: spriteEffectComp.implicitHeight
+            anchors.centerIn: parent
+
+            color: 'transparent'
+            border {
+                width: 1
+                color: '#FFFFFF'
+            }
+
+            SpriteEffect {
+                id: spriteEffectComp
+
+
+                //anchors.centerIn: parent
+                //anchors.fill: parent
+                //width: 37;
+                //height: 58;
+
+
+                bTest: true
+                nType: 1
+
+                //sizeFrame: Qt.size(37, 58);
+                /*nFrameCount: 3;
+                interval: 100;*/
+
+                /*onSg_clicked: {
+                    root.forceActiveFocus();
+                }*/
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                spriteEffectComp.stop();
+                rectSpriteEffectBackground.visible = false;
+            }
+        }
+    }
+
+
+
     //配置
     QtObject {
         id: _config
@@ -884,6 +977,119 @@ Item {
 
     QtObject {
         id: _private
+
+
+        //刷新特效；
+        function refreshSpriteEffect(spriteName) {
+            //console.debug('[FightScene]getSpriteEffect0');
+
+            //读特效信息
+            let spriteDirPath = GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
+
+            let spriteResourceInfo = FrameManager.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
+            if(spriteResourceInfo)
+                spriteResourceInfo = JSON.parse(spriteResourceInfo);
+            else
+                return false;
+
+            let script;
+
+            if(FrameManager.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
+                _private.jsEngine.clear();
+                script = _private.jsEngine.load(GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
+            }
+
+
+            spriteEffectComp.nSpriteType = spriteResourceInfo.SpriteType;
+            spriteEffectComp.sprite.stop();
+
+
+            //spriteEffectComp.$info = spriteResourceInfo;
+            //spriteEffectComp.$script = spriteResourceInfo.$script;
+
+
+            /*switch(spriteResourceInfo.SpriteType) {
+            case 1:
+                spriteEffectComp.sourceComponent = compSpriteEffect;
+                break;
+            case 2:
+                spriteEffectComp.sourceComponent = compDirSpriteEffect;
+                break;
+            }
+            */
+
+
+            spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(spriteResourceInfo.Image);
+
+            //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
+            //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
+            spriteEffectComp.rXOffset = spriteResourceInfo.XOffset ?? 0;
+            spriteEffectComp.rYOffset = spriteResourceInfo.YOffset ?? 0;
+            spriteEffectComp.opacity = spriteResourceInfo.Opacity ?? 1;
+            spriteEffectComp.rXScale = spriteResourceInfo.XScale ?? 1;
+            spriteEffectComp.rYScale = spriteResourceInfo.YScale ?? 1;
+
+            spriteEffectComp.strSoundeffectName = spriteResourceInfo.Sound ?? '';
+
+            spriteEffectComp.nSoundeffectDelay = spriteResourceInfo.SoundDelay ?? 0;
+
+            spriteEffectComp.nLoops = -1;
+            //spriteEffectComp.restart();
+
+            let t = spriteResourceInfo.SpriteSize;
+            spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
+            spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
+
+
+            //！！！兼容旧代码
+            if(spriteEffectComp.nSpriteType === 1) {
+                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
+                0);
+                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
+                0);
+
+                //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
+                let t = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
+                );
+                spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
+
+                t = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
+                );
+                spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
+            }
+            else if(spriteEffectComp.nSpriteType === 2) {
+                let t = spriteResourceInfo.FrameData;
+
+                //！！！兼容旧代码
+                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
+                0);
+                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
+                0);
+                spriteEffectComp.sprite.nFrameStartIndex = GlobalLibraryJS.shortCircuit(0b1,
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
+                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
+                0);
+
+
+                if(script)
+                    spriteEffectComp.sprite.fnRefresh = script.$refresh;
+            }
+            spriteEffectComp.start();
+
+            return true;
+        }
 
 
         function saveData() {
@@ -931,7 +1137,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[FightRoleVisualEditor]filePath：', filePath);
+            console.debug('[FightRoleVisualEditor]filePath:', filePath);
             //console.exception('????')
 
             if(data) {
@@ -1122,6 +1328,9 @@ Item {
 
 
 
+        property var jsEngine: new GlobalJS.JSEngine(root)
+
+
         //创建的组件缓存
         property var arrCacheComponent: []
 
@@ -1192,24 +1401,24 @@ let data = (function() {
 
 
     Keys.onEscapePressed: function(event) {
-        _private.close();
-
         console.debug('[FightRoleVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
-        _private.close();
-
         console.debug('[FightRoleVisualEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
         console.debug('[FightRoleVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[FightRoleVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

@@ -34,20 +34,21 @@ Item {
     id: rootItemViewPort
 
 
-    //打开地图
+    //打开地图；tmapInfo如果为空，则从map.json载入，否则是已经载入过的json对象；
+    //  尽量用GameSceneJS.getMapResource给tmapInfo，因为还会载入js文件，而这里不会；
     function openMap(mapPath, tmapInfo=null) {
 
         itemBackMapContainer.visible = false;
         itemFrontMapContainer.visible = false;
 
-        //如果需要载入
+        //如果需要载入（这里其实可以废弃了）
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
             tmapInfo = FrameManager.sl_fileRead(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
             //console.debug("cfg", cfg, mapPath);
 
             if(!tmapInfo) {
-                console.warn('[!GameMapView]Map Load Error:', mapPath);
+                console.warn('[!GameMapView]Map load ERROR:', mapPath);
                 return false;
             }
             tmapInfo = JSON.parse(tmapInfo);

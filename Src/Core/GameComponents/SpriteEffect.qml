@@ -195,7 +195,11 @@ Loader {
     }
     function currentFrame() {
         if(item)
-            return item.status();
+            return item.currentFrame();
+    }
+    function setCurrentFrame(index) {
+        if(item)
+            return item.setCurrentFrame(index);
     }
 
 

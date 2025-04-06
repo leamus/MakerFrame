@@ -216,6 +216,8 @@ Item {
                     MenuItem {
                         text: '新建工程'
                         height: _config.nMenuItemHeight
+                        //focusPolicy: Qt.NoFocus
+                        //hoverEnabled: false
                         onClicked: {
                             _private.newProject();
                         }
@@ -277,6 +279,11 @@ Item {
                             _private.future();
                         }
                     }
+                    /* 貌似和MenuItem一样
+                    Action { text: "Cut" }
+                    Action { text: "Copy" }
+                    Action { text: "Paste" }
+                    */
                 }
             }
 
@@ -1232,13 +1239,11 @@ Item {
             _private.unzipProjectPackage(fUrl);
         }
         onRejected: {
+            console.debug('[mainGameMaker]onRejected');
             //rootGameMaker.forceActiveFocus();
 
 
             //sg_close();
-            console.debug('[mainGameMaker]onRejected');
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -1357,16 +1362,22 @@ Item {
         //color: 'black'
 
         Keys.onEscapePressed: function(event) {
-            close();
-
             event.accepted = true;
-            //Qt.quit();
+
+            close();
         }
         Keys.onBackPressed: function(event) {
-            close();
-
             event.accepted = true;
-            //Qt.quit();
+
+            close();
+        }
+        Keys.onPressed: function(event) {
+            console.debug('[mainGameMaker]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+            //event.accepted = true;
+        }
+        Keys.onReleased: function(event) {
+            console.debug('[mainGameMaker]Keys.onReleased:', event.key, event.isAutoRepeat);
+            //event.accepted = true;
         }
 
 
@@ -2191,24 +2202,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainGameMaker]Keys.onEscapePressed');
-        event.accepted = false;
-        //Qt.quit();
+        event.accepted = true;
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainGameMaker]Keys.onBackPressed');
-        event.accepted = false;
-        //Qt.quit();
+        event.accepted = true;
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainGameMaker]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainGameMaker]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

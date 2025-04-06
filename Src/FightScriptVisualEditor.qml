@@ -2,6 +2,7 @@
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 import QtGraphicalEffects 1.14
+import QtMultimedia 5.14
 
 
 //import cn.Leamus.MakerFrame 1.0
@@ -29,14 +30,17 @@ Item {
     id: root
 
 
-    signal sg_compile(string code);
     signal sg_close();
     onSg_close: {
         for(let tc of _private.arrCacheComponent) {
             tc.destroy();
         }
         _private.arrCacheComponent = [];
+
+        mediaPlayer.stop();
     }
+
+    signal sg_compile(string code);
 
 
     function init(filePath) {
@@ -74,7 +78,7 @@ Item {
                 Label {
                     //id: tlable
                     visible: false
-                    text: '*@敌人：'
+                    text: '*@敌人:'
                 }
 
                 TextField {
@@ -131,7 +135,7 @@ Item {
 
                     implicitWidth: 30
 
-                    text: 'x'
+                    text: 'X'
 
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
@@ -142,6 +146,8 @@ Item {
 
                         }
                         tRoot.destroy();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -213,7 +219,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@背景图：'
+                            text: '@背景图:'
                         }
 
                         TextField {
@@ -233,7 +239,7 @@ Item {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'images.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = FrameManager.sl_fileRead(filePath);
-                                //console.debug('[mainImageEditor]filePath：', filePath);
+                                //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
                                     return false;
@@ -256,6 +262,19 @@ Item {
                                 });
                             }
                         }
+
+                        Image {
+                            visible: source.length !== 0
+                            Layout.preferredWidth: 60
+                            Layout.preferredHeight: 60
+                            source: {
+                                if(textBackground.text.length === 0)
+                                    return '';
+                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
+                                    return '';
+                                return GameMakerGlobal.imageResourceURL(textBackground.text);
+                            }
+                        }
                     }
 
                     RowLayout {
@@ -263,7 +282,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@背景音乐：'
+                            text: '@背景音乐:'
                         }
 
                         TextField {
@@ -283,7 +302,7 @@ Item {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'music.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = FrameManager.sl_fileRead(filePath);
-                                //console.debug('[mainImageEditor]filePath：', filePath);
+                                //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
                                     return false;
@@ -304,6 +323,16 @@ Item {
                                 });
                             }
                         }
+                        Button {
+                            implicitWidth: 30
+                            text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? 'S' : 'P'
+                            onClicked: {
+                                if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                                    mediaPlayer.stop();
+                                else
+                                    mediaPlayer.play();
+                            }
+                        }
                     }
 
                     RowLayout {
@@ -311,7 +340,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '*@逃跑率：'
+                            text: '*@逃跑率:'
                         }
 
                         TextField {
@@ -353,7 +382,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '*@敌人数：'
+                            text: '*@敌人数:'
                         }
 
                         TextField {
@@ -479,7 +508,7 @@ Item {
 
                                     Label {
                                         visible: false
-                                        text: '*@敌人：'
+                                        text: '*@敌人:'
                                     }
 
                                     TextField {
@@ -607,6 +636,23 @@ Item {
     }
 
 
+    MediaPlayer {
+        id: mediaPlayer
+
+        source: {
+            if(textMusic.text.length === 0)
+                return '';
+            if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
+                return '';
+            return GameMakerGlobal.musicResourceURL(textMusic.text)
+        }
+        //loops: MediaPlayer.Infinite
+        loops: 1
+        notifyInterval: 200
+        //playbackRate: 0.1
+    }
+
+
 
     //配置
     QtObject {
@@ -650,7 +696,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[FightScriptVisualEditor]filePath：', filePath);
+            console.debug('[FightScriptVisualEditor]filePath:', filePath);
             //console.exception('????')
 
             if(data) {
@@ -760,7 +806,7 @@ Item {
             //let filePath = 'fight_script.tpl';
 
             /*let data = File.read(filePath);
-            console.debug('filePath：', filePath);
+            console.debug('filePath:', filePath);
             console.debug('data:', data);
             */
 
@@ -939,24 +985,24 @@ $$enemiesData$$
 
 
     Keys.onEscapePressed: function(event) {
-        _private.close();
-
         console.debug('[FightScriptVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
-        _private.close();
-
         console.debug('[FightScriptVisualEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
         console.debug('[FightScriptVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[FightScriptVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

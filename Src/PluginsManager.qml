@@ -90,18 +90,24 @@ Item {
 
 
         Keys.onEscapePressed: function(event) {
-            close();
-
             console.debug('[PluginsManager]Keys.onEscapePressed:itemExtendsRoot');
             event.accepted = true;
-            //Qt.quit();
+
+            close();
         }
         Keys.onBackPressed: function(event) {
-            close();
-
             console.debug('[PluginsManager]Keys.onBackPressed:itemExtendsRoot');
             event.accepted = true;
-            //Qt.quit();
+
+            close();
+        }
+        Keys.onPressed: function(event) {
+            console.debug('[PluginsManager]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+            //event.accepted = true;
+        }
+        Keys.onReleased: function(event) {
+            console.debug('[PluginsManager]Keys.onReleased:', event.key, event.isAutoRepeat);
+            //event.accepted = true;
         }
     }
     //用来载入main.qml
@@ -198,18 +204,24 @@ Item {
 
 
         Keys.onEscapePressed: function(event) {
-            close();
-
             console.debug('[PluginsManager]Keys.onEscapePressed:loaderExtends');
             event.accepted = true;
-            //Qt.quit();
+
+            close();
         }
         Keys.onBackPressed: function(event) {
-            close();
-
             console.debug('[PluginsManager]Keys.onBackPressed:loaderExtends');
             event.accepted = true;
-            //Qt.quit();
+
+            close();
+        }
+        Keys.onPressed: function(event) {
+            console.debug('[PluginsManager]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+            //event.accepted = true;
+        }
+        Keys.onReleased: function(event) {
+            console.debug('[PluginsManager]Keys.onReleased:', event.key, event.isAutoRepeat);
+            //event.accepted = true;
         }
     }
 
@@ -423,26 +435,26 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        rootWindow.aliasGlobal.list.visible = false;
-        sg_close();
-
         console.debug('[PluginsManager]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
-    }
-    Keys.onBackPressed: function(event) {
+
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
-
+    }
+    Keys.onBackPressed: function(event) {
         console.debug('[PluginsManager]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        rootWindow.aliasGlobal.list.visible = false;
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[PluginsManager]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[PluginsManager]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

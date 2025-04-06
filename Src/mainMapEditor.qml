@@ -490,16 +490,13 @@ Item {
 
 
             //console.log('You chose:', fileDialog.fileUrls);
-            //Qt.quit();
         }
         onRejected: {
+            console.debug('[mainMapEditor]onRejected');
             //root.forceActiveFocus();
 
 
             //sg_close();
-            console.debug('[mainMapEditor]onRejected')
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -895,24 +892,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainMapEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainMapEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainMapEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainMapEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

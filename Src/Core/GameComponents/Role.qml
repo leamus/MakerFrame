@@ -466,6 +466,9 @@ Item {
 
 
     Keys.onPressed: function(event) {
+        //console.debug('[Role]Keys.onPressed:', event.key);
+        event.accepted = true;
+
         switch(event.key) {
         case Qt.Key_Up:
             if(!root.changeAction('$Up')) {
@@ -493,20 +496,18 @@ Item {
             break;
         }
         spriteEffect.start();
-
-        event.accepted = true;
-        //console.debug('[Role]Keys.onPressed:', event.key);
     }
 
     Keys.onReleased: function(event) {
+        //console.debug('[Role]Keys.onReleased:', event.key);
+        event.accepted = true;
+
         switch(event.key) {
         case Qt.Key_Up:
         case Qt.Key_Right:
         case Qt.Key_Left:
         case Qt.Key_Down:
             spriteEffect.stop();
-            event.accepted = true;
-            //console.debug('[Role]Keys.onReleased:', event.key);
             break;
         }
 

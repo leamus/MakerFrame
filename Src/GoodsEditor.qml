@@ -521,24 +521,16 @@ let data = (function() {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        _private.close();
-
         console.debug('[GoodsEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
-        _private.close();
-
         console.debug('[GoodsEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
-    }
-    Keys.onPressed: function(event) {
-        console.debug('[GoodsEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
-    }
-    Keys.onReleased: function(event) {
-        console.debug('[GoodsEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+
+        _private.close();
     }
 
 

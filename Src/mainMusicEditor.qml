@@ -350,10 +350,8 @@ Item {
         }
 
         onRejected: {
+            console.debug('[mainVideoEditor]onRejected');
             //gameMap.forceActiveFocus();
-
-            console.debug('[mainMusicEditor]onRejected')
-            //Qt.quit();
         }
         Component.onCompleted: {
             //visible = true;
@@ -415,24 +413,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainMusicEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainMusicEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainMusicEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainMusicEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

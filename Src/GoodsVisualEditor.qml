@@ -146,7 +146,7 @@ Item {
 
                     implicitWidth: 30
 
-                    text: 'x'
+                    text: 'X'
 
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
@@ -157,6 +157,8 @@ Item {
 
                         }
                         tRoot.destroy();
+
+                        root.forceActiveFocus();
                     }
                 }
             }
@@ -226,7 +228,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '类型：'
+                            text: '类型:'
                         }
 
                         ComboBox {
@@ -274,7 +276,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '名字：'
+                            text: '名字:'
                         }
 
                         TextField {
@@ -294,10 +296,10 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        //Layout.preferredHeight: 30
+                        Layout.preferredHeight: 30
 
                         Label {
-                            text: '描述：'
+                            text: '描述:'
                         }
 
                         TextArea {
@@ -320,7 +322,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '价格：'
+                            text: '价格:'
                         }
 
                         TextField {
@@ -344,7 +346,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '类型：'
+                            text: '类型:'
                         }
 
                         TextField {
@@ -393,7 +395,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@战斗使用/投掷技能：'
+                            text: '@战斗使用/投掷技能:'
                         }
 
                         TextField {
@@ -434,7 +436,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@文字颜色：'
+                            text: '@文字颜色:'
                         }
 
                         TextField {
@@ -445,6 +447,7 @@ Item {
 
                             text: 'white'
                             placeholderText: '@文字颜色'
+                            color: text
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -474,7 +477,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@图像：'
+                            text: '@图像:'
                         }
 
                         TextField {
@@ -506,20 +509,12 @@ Item {
                                 });
                             }
                         }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '图像大小：'
-                        }
 
                         TextField {
                             id: textImageWidth
 
-                            Layout.fillWidth: true
+                            //Layout.fillWidth: true
+                            Layout.preferredWidth: 30
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '50'
@@ -529,10 +524,19 @@ Item {
                             selectByMouse: true
                             //wrapMode: TextEdit.Wrap
                         }
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: 10
+
+                            text: '*'
+                            //font.pointSize: _config.nLabelFontSize
+                        }
                         TextField {
                             id: textImageHeight
 
-                            Layout.fillWidth: true
+                            //Layout.fillWidth: true
+                            Layout.preferredWidth: 30
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: '50'
@@ -542,7 +546,30 @@ Item {
                             selectByMouse: true
                             //wrapMode: TextEdit.Wrap
                         }
+
+                        Image {
+                            visible: source.length !== 0
+                            Layout.preferredWidth: 36
+                            Layout.preferredHeight: 36
+                            source: {
+                                if(textImage.text.length === 0)
+                                    return '';
+                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImage.text)))
+                                    return '';
+                                return GameMakerGlobal.imageResourceURL(textImage.text);
+                            }
+                        }
                     }
+
+                    /*RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+
+                        Label {
+                            text: '图像大小:'
+                        }
+                    }
+                    */
 
                     RowLayout {
                         id: layoutFightSkill
@@ -551,7 +578,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@战斗技能：'
+                            text: '@战斗技能:'
                         }
 
                         TextField {
@@ -594,7 +621,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@使用函数：'
+                            text: '@使用函数:'
                         }
 
                         TextField {
@@ -636,7 +663,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '*@装备位置：'
+                            text: '*@装备位置:'
                         }
 
                         TextField {
@@ -678,7 +705,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@附加技能：'
+                            text: '@附加技能:'
                         }
 
                         TextField {
@@ -927,7 +954,7 @@ Item {
 
             //let data = File.read(filePath);
             let data = FrameManager.sl_fileRead(filePath);
-            console.debug('[GoodsVisualEditor]filePath：', filePath);
+            console.debug('[GoodsVisualEditor]filePath:', filePath);
             //console.exception('????')
 
             if(data) {
@@ -1372,24 +1399,24 @@ $$equipEffectAlgorithm$$
 
 
     Keys.onEscapePressed: function(event) {
-        _private.close();
-
         console.debug('[GoodsVisualEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
-        _private.close();
-
         console.debug('[GoodsVisualEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
         console.debug('[GoodsVisualEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[GoodsVisualEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

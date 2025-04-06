@@ -123,13 +123,11 @@ Item {
             });
         }
         onRejected: {
+            console.debug('[PluginsDownload]onRejected');
             //rootGameMaker.forceActiveFocus();
 
 
             //sg_close();
-            console.debug('[PluginsDownload]onRejected')
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -367,26 +365,26 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        rootWindow.aliasGlobal.list.visible = false;
-        sg_close();
-
         console.debug('[PluginsDownload]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
-    }
-    Keys.onBackPressed: function(event) {
+
         rootWindow.aliasGlobal.list.visible = false;
         sg_close();
-
+    }
+    Keys.onBackPressed: function(event) {
         console.debug('[PluginsDownload]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        rootWindow.aliasGlobal.list.visible = false;
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[PluginsDownload]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[PluginsDownload]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

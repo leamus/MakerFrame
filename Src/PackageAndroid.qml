@@ -277,13 +277,11 @@ Item {
             root.forceActiveFocus();
         }
         onRejected: {
+            console.debug('[AndroidConfigure]onRejected');
             //rootGameMaker.forceActiveFocus();
 
 
             //sg_close();
-            console.debug('[AndroidConfigure]onRejected');
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -333,10 +331,9 @@ Item {
         }
 
         onRejected: {
-            //gameMap.forceActiveFocus();
+            console.debug('[AndroidConfigure]onRejected');
 
-            console.debug('[AndroidConfigure]onRejected')
-            //Qt.quit();
+            //gameMap.forceActiveFocus();
         }
         Component.onCompleted: {
             //visible = true;
@@ -661,24 +658,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[PackageAndroid]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[PackageAndroid]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[PackageAndroid]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[PackageAndroid]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

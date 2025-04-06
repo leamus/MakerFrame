@@ -318,14 +318,22 @@ Item {
 
 
         Keys.onEscapePressed: function(event) {
-            _private.stop();
             event.accepted = true;
-            //Qt.quit();
+
+            _private.stop();
         }
         Keys.onBackPressed: function(event) {
-            _private.stop();
             event.accepted = true;
-            //Qt.quit();
+
+            _private.stop();
+        }
+        Keys.onPressed: function(event) {
+            console.debug('[mainVideoEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+            //event.accepted = true;
+        }
+        Keys.onReleased: function(event) {
+            console.debug('[mainVideoEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+            //event.accepted = true;
         }
     }
 
@@ -404,10 +412,8 @@ Item {
         }
 
         onRejected: {
+            console.debug('[mainVideoEditor]onRejected');
             //gameMap.forceActiveFocus();
-
-            console.debug('[mainVideoEditor]onRejected')
-            //Qt.quit();
         }
         Component.onCompleted: {
             //visible = true;
@@ -478,24 +484,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainVideoEditor]Keys.onEscapePressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainVideoEditor]Keys.onBackPressed');
         event.accepted = true;
-        //Qt.quit();
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainVideoEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainVideoEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

@@ -384,10 +384,8 @@ Item {
         }
 
         onRejected: {
+            console.debug('[mainImageEditor]onRejected');
             //gameMap.forceActiveFocus();
-
-            console.debug('[mainImageEditor]onRejected')
-            //Qt.quit();
         }
         Component.onCompleted: {
             //visible = true;
@@ -461,22 +459,24 @@ Item {
 
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
-        sg_close();
-
         console.debug('[mainImageEditor]Keys.onEscapePressed');
         event.accepted = true;
+
+        sg_close();
     }
     Keys.onBackPressed: function(event) {
-        sg_close();
-
         console.debug('[mainImageEditor]Keys.onBackPressed');
         event.accepted = true;
+
+        sg_close();
     }
     Keys.onPressed: function(event) {
         console.debug('[mainImageEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
+        event.accepted = true;
     }
     Keys.onReleased: function(event) {
         console.debug('[mainImageEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
+        event.accepted = true;
     }
 
 

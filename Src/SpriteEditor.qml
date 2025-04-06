@@ -46,6 +46,8 @@ Item {
         _private.strTextBackupSpriteSoundURL = '';
         _private.strTextBackupSpriteSoundResourceName = '';
 
+
+        _private.jsEngine.clear();
     }
 
 
@@ -86,7 +88,7 @@ Item {
 
     function openSprite(cfg) {
 
-        console.debug('[SpriteEditor]openSprite:', JSON.stringify(cfg))
+        console.debug('[SpriteEditor]openSprite:', JSON.stringify(cfg));
 
         //cfg.Version;
         _private.strSpriteName = textSpriteName.text = cfg.SpriteName.trim();
@@ -223,7 +225,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '类型：'
+                            text: '类型:'
                         }
 
                         ComboBox {
@@ -837,12 +839,12 @@ Item {
 
 
                     //anchors.fill: parent
+                    //width: 37;
+                    //height: 58;
+
 
                     bTest: true
                     nType: 1
-
-                    //width: 37;
-                    //height: 58;
 
                     //sizeFrame: Qt.size(37, 58);
                     /*nFrameCount: 3;
@@ -1083,14 +1085,10 @@ Item {
 
 
             //console.log('You chose:', fileDialog.fileUrls);
-            //Qt.quit();
         }
         onRejected: {
+            console.debug('[SpriteEditor]onRejected');
             //root.forceActiveFocus();
-
-            console.debug('[SpriteEditor]onRejected')
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -1124,7 +1122,7 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 Label {
-                    text: qsTr('路径：')
+                    text: qsTr('路径:')
                 }
 
                 TextField {
@@ -1400,7 +1398,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[SpriteEditor]删除：' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
+                    console.debug('[SpriteEditor]删除:' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listSpriteImageResource.forceActiveFocus();
@@ -1458,14 +1456,10 @@ Item {
 
 
             //console.log('You chose:', fileDialog.fileUrls);
-            //Qt.quit();
         }
         onRejected: {
+            console.debug('[SpriteEditor]onRejected');
             //root.forceActiveFocus();
-
-            console.debug('[SpriteEditor]onRejected')
-            //Qt.quit()
-
         }
         Component.onCompleted: {
             //visible = true;
@@ -1499,7 +1493,7 @@ Item {
                 Layout.maximumWidth: parent.width
 
                 Label {
-                    text: qsTr('路径：')
+                    text: qsTr('路径:')
                 }
 
                 TextField {
@@ -1779,7 +1773,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[SpriteEditor]删除：' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
+                    console.debug('[SpriteEditor]删除:' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listSpriteSoundResource.forceActiveFocus();
@@ -1879,7 +1873,7 @@ Item {
             RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr('特效名：')
+                    text: qsTr('特效名:')
                 }
                 TextField {
                     id: textSpriteName
@@ -1896,7 +1890,7 @@ Item {
             /*RowLayout {
                 width: parent.width
                 Label {
-                    text: qsTr('地图缩放：')
+                    text: qsTr('地图缩放:')
                 }
                 TextField {
                     id: textMapScale
@@ -2286,34 +2280,31 @@ function $refresh(index, imageAnimate, path) {
     //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
         console.debug('[SpriteEditor]Keys.onEscapePressed');
-        _private.close();
         event.accepted = true;
+
+        _private.close();
     }
     Keys.onBackPressed: function(event) {
         console.debug('[SpriteEditor]Keys.onBackPressed');
-        _private.close();
         event.accepted = true;
+
+        _private.close();
     }
     Keys.onPressed: function(event) {
+        console.debug('[SpriteEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
         event.accepted = true;
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
-
-
-        console.debug('[SpriteEditor]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
     }
     Keys.onReleased: function(event) {
+        console.debug('[SpriteEditor]Keys.onReleased', event.key, event.isAutoRepeat);
+        //console.debug(objActionsData);
+        //console.debug(textSpriteFangXiangIndex.text.split(','));
         event.accepted = true;
 
         if(event.isAutoRepeat === true) //如果是按住不放的事件，则返回（只记录第一次按）
             return;
-
-
-        console.debug('[SpriteEditor]Keys.onReleased', event.key, event.isAutoRepeat);
-
-        //console.debug(objActionsData);
-        //console.debug(textSpriteFangXiangIndex.text.split(','));
     }
 
 
