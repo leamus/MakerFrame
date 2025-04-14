@@ -3,12 +3,24 @@ import QtQuick.Layouts 1.14
 import QtQuick.Window 2.14
 
 
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
 //import GameComponents 1.0
 import 'GameComponents'
+
+
+//import 'qrc:/QML'
+
+
+import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -72,8 +84,7 @@ Item {
             case 0:
 
                 continueScript = function*() {
-                    let readSavesInfo = game.$userscripts.$readSavesInfo || game.$gameMakerGlobalJS.$readSavesInfo;
-                    let s = readSavesInfo();
+                    let s = game.$sys.getCommonScriptResource('$readSavesInfo')();
                     s.push('取消');
                     let c = yield game.menu('选择存档', s);
                     switch(c) {
@@ -93,15 +104,14 @@ Item {
             case 1:
 
                 continueScript = function*() {
-                    let readSavesInfo = game.$userscripts.$readSavesInfo || game.$gameMakerGlobalJS.$readSavesInfo;
-                    let s = readSavesInfo();
+                    let s = game.$sys.getCommonScriptResource('$readSavesInfo')();
                     s.push('取消');
                     let c = yield game.menu('选择存档', s);
                     switch(c) {
                     case 0:
                     case 1:
                     case 2:
-                        ////game.$globalLibraryJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
+                        ////GlobalLibraryJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
                         let ret = yield game.load('存档' + c);
                         if(ret) {
                             yield game.msg('读档成功');

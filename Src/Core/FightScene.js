@@ -4,7 +4,7 @@ function saveLast(combatant=true) {
     if(combatant === true) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
-            if(game.$sys.resources.commonScripts['combatant_is_valid'](tc)) {
+            if(game.$sys.resources.commonScripts.$combatantIsValid(tc)) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
                 tc.$$fightData.$lastChoice = {};
                 GlobalLibraryJS.copyPropertiesToObject(tc.$$fightData.$lastChoice, tc.$$fightData.$choice, {arrayRecursion: false, objectRecursion: 0});
@@ -29,7 +29,7 @@ function loadLast(combatant=true, type=0) {
         for(let tc of fight.myCombatants) {
         //for(let i = 0; i < fight.myCombatants.length; ++i) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            if(game.$sys.resources.commonScripts['combatant_is_valid'](tc)) {
+            if(game.$sys.resources.commonScripts.$combatantIsValid(tc)) {
                 if(type === 1 && tc.$$fightData.$choice.$type !== -1) {   //已经有选择
                     continue;
                 }
@@ -60,7 +60,7 @@ function loadLast(combatant=true, type=0) {
 //重置刷新战斗人物（创建时调用）
 function resetFightRole(fightRole, fightRoleComp, index, teamID) {
 
-    game.$gameMakerGlobalJS.resetFightRole(fightRole, index, teamID, fight.myCombatants, fight.enemies);
+    GameMakerGlobalJS.resetFightRole(fightRole, index, teamID, fight.myCombatants, fight.enemies);
 
     //if(i >= repeaterMyCombatants.count)
     //    break;
@@ -81,7 +81,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
     fightRole.$$fightData.$info.$comp = fightRoleComp;
     fightRole.$$fightData.$info.$spriteEffect = fightRoleComp.spriteEffect;
 
-    //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
+    //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$fightCombatantChoice'))
 
     //fightRole.$$fightData.$choice.$type = -1;
     ////fightRole.$$fightData.$lastChoice.$type = -1;
@@ -137,7 +137,7 @@ function showSkillsOrGoods(type, value) {
     //普通攻击
     if(type === 0) {
 
-        [arrNames, arrData] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [0]);
+        [arrNames, arrData] = GameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [0]);
 
         //menuSkillsOrGoods.nType = 0;
 
@@ -178,7 +178,7 @@ function showSkillsOrGoods(type, value) {
     //技能
     else if(type === 1) {
 
-        [arrNames, arrData] = game.$gameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [1]);
+        [arrNames, arrData] = GameMakerGlobalJS.getCombatantSkills(fight.myCombatants[_private.nChoiceFightRoleIndex], [1]);
 
         if(!GlobalLibraryJS.isNumber(value)) {
             //if(arrData.length === 1) {
@@ -219,7 +219,7 @@ function showSkillsOrGoods(type, value) {
             //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
             if(goods.$commons.$fightScript) {
                 arrData.push(goods);
-                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                arrNames.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
             }
         }
 
@@ -274,7 +274,7 @@ function choicedSkillOrGoods(used, type) {
 
     //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
     if(type === 3 || type === 2) {
-        let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](used, combatant, 0);
+        let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(used, combatant, 0);
         if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
             fight.msg(checkSkill || '不能选择', 50);
             return;
@@ -341,18 +341,18 @@ function choicedSkillOrGoods(used, type) {
     if(!_private.genFightChoice) {
         //单人技能 且 目标敌方
         if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}});
+            _private.genFightChoice = GameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts.$combatantIsValid(targetCombatant);}});
         }
 
         //目标己方
         else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}});
+            _private.genFightChoice = GameMakerGlobalJS.gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){return game.$sys.resources.commonScripts.$combatantIsValid(targetCombatant);}});
         }
 
         //不选（全体）
         //if(skill.$targetFlag === 0) {
         else if(skill.$targetCount <= 0) {
-            _private.genFightChoice = game.$gameMakerGlobalJS.gfNoChoiceSkill(skill, combatant);
+            _private.genFightChoice = GameMakerGlobalJS.gfNoChoiceSkill(skill, combatant);
         }
         else {   //不可用
             fight.msg('不能使用', 50);
@@ -394,7 +394,7 @@ function skillStepChoiced(type, value) {
             //    return;
 
             //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
-            let checkSkill = game.$sys.resources.commonScripts['common_check_skill'](skillOrGoods, combatant, 1);
+            let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(skillOrGoods, combatant, 1);
             if(GlobalLibraryJS.isString(checkSkill)) {   //如果技能不可用
                 fight.msg(checkSkill || '不能使用', 50);
                 return;
@@ -499,7 +499,7 @@ function skillStepGetReadyToChoice(params, combatant) {
 //combatant：正在进行选择的战斗人物，有可能为null
 function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
     if(!filter)
-        filter = function(targetCombatant, combatant){return game.$sys.resources.commonScripts['combatant_is_valid'](targetCombatant);}
+        filter = function(targetCombatant, combatant){return game.$sys.resources.commonScripts.$combatantIsValid(targetCombatant);}
 
     if(enabled) {
         if(teamFlags & 0b1) {
@@ -530,7 +530,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
                 //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
+                if(game.$sys.resources.commonScripts.$combatantIsValid(fight.myCombatants[i])) {
                     repeaterMyCombatants.itemAt(i).setEnable(false);
                 }
             }
@@ -539,7 +539,7 @@ function setTeamReadyToChoice(teamFlags, filter, enabled, combatant) {
             //全部取消闪烁
             for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
                 //if(repeaterEnemies.itemAt(i).opacity !== 0) {
-                if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.enemies[i])) {
+                if(game.$sys.resources.commonScripts.$combatantIsValid(fight.enemies[i])) {
                     repeaterEnemies.itemAt(i).setEnable(false);
                 }
             }
@@ -556,7 +556,7 @@ function checkToFight() {
 
     //遍历，判断target
     for(let i = 0; i < fight.myCombatants.length; ++i) {
-        if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
+        if(game.$sys.resources.commonScripts.$combatantIsValid(fight.myCombatants[i])) {
         //if(repeaterEnemies.itemAt(i).opacity !== 0) {
             //如果 没选择 且 有技能
             if(fight.myCombatants[i].$$fightData.$choice.$type === -1 && fight.myCombatants[i].$skills.length > 0) {
@@ -615,7 +615,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         //break;
 
     case 3:    //调用战斗技能算法
-        SkillEffectResult = game.$sys.resources.commonScripts['fight_skill_algorithm'](combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
+        SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatantOrTeamIndex, combatantActionSpriteData.Params);
         //SkillEffectResult = (doSkillEffect(role1.$$fightData.$teams, role1.$$fightData.$index, role2.$$fightData.$teams, role2.$$fightData.$index, tSkillEffect));
 
         return SkillEffectResult;
@@ -681,7 +681,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             switch(combatantActionSpriteData.Run) {
             case 0:
                 //位置
-                position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                 combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                 combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                 //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
@@ -689,7 +689,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 break;
 
             case 1:
-                position = game.$sys.resources.commonScripts['fight_combatant_melee_position_algorithm'](combatant, targetCombatantOrTeamIndex);
+                position = game.$sys.resources.commonScripts.$fightCombatantMeleePositionAlgorithm(combatant, targetCombatantOrTeamIndex);
                 /*let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
                 //x偏移一下
@@ -711,7 +711,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 break;
 
             case 2:
-                position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                 combatantComp.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                 combatantComp.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                 //combatantSpriteEffect.numberanimationSpriteEffectX.to = position.x - combatantSpriteEffect.width / 2 + offset[0];
@@ -811,18 +811,18 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 let position;
                 switch(combatantActionSpriteData.Position) {
                 case 0:
-                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
                     break;
                 case 1:
-                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
 
                     break;
                 case 2:
-                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                    position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                     spriteEffect.x = position.x - spriteEffect.width / 2;
                     spriteEffect.y = position.y - spriteEffect.height / 2;
 
@@ -847,13 +847,13 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                 let position;
                 switch(combatantActionSpriteData.Run) {
                 case 0:
-                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+                    position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
                     spriteEffect.numberanimationSpriteEffectX.to = position.x - spriteEffect.width / 2 + offset[0];
                     spriteEffect.numberanimationSpriteEffectY.to = position.y - spriteEffect.height / 2 + offset[1];
                     break;
 
                 case 1:
-                    position = game.$sys.resources.commonScripts['fight_skill_melee_position_algorithm'](targetCombatantOrTeamIndex, spriteEffect);
+                    position = game.$sys.resources.commonScripts.$fightSkillMeleePositionAlgorithm(targetCombatantOrTeamIndex, spriteEffect);
                     /*
                     let targetCombatantSpriteEffect = targetCombatantOrTeamIndex.$$fightData.$info.$spriteEffect;
 
@@ -872,7 +872,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
                     break;
 
                 case 2:
-                    position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
+                    position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[targetCombatantOrTeamIndex], -1);
                     spriteEffect.numberanimationSpriteEffectX.to = position.x - combatantComp.width / 2 + offset[0];
                     spriteEffect.numberanimationSpriteEffectY.to = position.y - combatantComp.height / 2 + offset[1];
                     break;
@@ -974,14 +974,14 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             let position;
             switch(combatantActionSpriteData.Position) {
             case 1:
-                /*position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](role2.$$fightData.$teamsID, role2.$$fightData.$index);
+                /*position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(role2.$$fightData.$teamsID, role2.$$fightData.$index);
                 wordmove.x = position.x - wordmove.width / 2;
                 wordmove.y = position.y - wordmove.height / 2;
                 */
 
                 break;
             case 4:
-                /*position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](role1.$$fightData.$teamsID, role1.$$fightData.$index);
+                /*position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(role1.$$fightData.$teamsID, role1.$$fightData.$index);
                 wordmove.x = position.x - wordmove.width / 2;
                 wordmove.y = position.y - wordmove.height / 2;
                 */
@@ -989,7 +989,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             }
         }
         else {
-            let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
+            let position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(combatant.$$fightData.$info.$teamsID[0], combatant.$$fightData.$info.$index);
             wordmove.x = position.x - wordmove.width / 2;
             wordmove.y = position.y - wordmove.height / 2;
         }
@@ -1053,14 +1053,14 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
 //重置所有Roles位置
 function resetRolesPosition() {
     for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
-        let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](0, i);
+        let position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(0, i);
         let tRoleSpriteEffect = repeaterMyCombatants.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
         tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
     }
 
     for(let i = 0; i < fight.enemies.length /*repeaterEnemies.nCount*/; ++i) {
-        let position = game.$sys.resources.commonScripts['fight_combatant_position_algorithm'](1, i);
+        let position = game.$sys.resources.commonScripts.$fightCombatantPositionAlgorithm(1, i);
         let tRoleSpriteEffect = repeaterEnemies.itemAt(i);
         tRoleSpriteEffect.x = position.x - tRoleSpriteEffect.width / 2;
         tRoleSpriteEffect.y = position.y - tRoleSpriteEffect.height / 2;
@@ -1073,7 +1073,7 @@ function resetRolesPosition() {
 //一个回合
 //yield：0表示进行动画播放，需要等待；1：战斗人物回合之间需要等待；
 //return：undefined表示没有结束；否则（返回对象）战斗结束
-function *fnRound() {
+function* fnRound() {
 
 
     /*/敌人 选择防御
@@ -1086,7 +1086,7 @@ function *fnRound() {
 
 
     //!!!开始循环每一角色的攻击
-    let genFightRolesRound = game.$sys.resources.commonScripts['fight_roles_round'](_private.nRound);
+    let genFightRolesRound = game.$sys.resources.commonScripts.$fightRolesRound(_private.nRound);
     //返回战斗人物数组，或 暂停时间（数字）
     for(let tValue of genFightRolesRound) {
     ////for(let combatant of _private.arrTempLoopedAllFightRoles) {
@@ -1118,7 +1118,7 @@ function *fnRound() {
             //战斗人物回合脚本
             yield* runCombatantRoundScript(combatant, 1);
 
-            ret = game.$gameMakerGlobalJS.combatantChoiceSkillOrGoods(combatant);
+            ret = GameMakerGlobalJS.combatantChoiceSkillOrGoods(combatant);
 
             yield* runCombatantRoundScript(combatant, 2);
 
@@ -1329,7 +1329,7 @@ function *fnRound() {
 
 
         yield* runCombatantRoundScript(combatant, 3);
-        //game.$sys.resources.commonScripts['fight_combatant_set_choice'](combatant, -1, false);
+        //game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, -1, false);
 
     }   //for
 
@@ -1340,7 +1340,7 @@ function *fnRound() {
 //战斗主逻辑，战斗回合循环
 //yield：<0同fnRound；10、11：等待选择 或 等待下一个事件循环
 //return：战斗结果
-function *gfFighting() {
+function* gfFighting() {
     console.debug('[FightScene]gfFighting');
 
     let fightResult;
@@ -1383,10 +1383,10 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        const fightInitScript = game.$sys.resources.commonScripts['fight_round_script'];
-        if(fightInitScript) { //GlobalLibraryJS.checkCallable
-            //fight.run(fightInitScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
-            let r = fightInitScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
+        const fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript;
+        if(fightRoundScript) { //GlobalLibraryJS.checkCallable
+            //fight.run(fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
+            let r = fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
         }
 
@@ -1415,7 +1415,7 @@ function *gfFighting() {
             yield 11;
 
         if(_private.nRunAwayFlag !== 0) {
-            const ret = yield *runAway();
+            const ret = yield* runAway();
             if(ret === true) {
                 fight.over(-2);
                 return ret;
@@ -1451,10 +1451,10 @@ function *gfFighting() {
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        //const fightInitScript = game.$sys.resources.commonScripts['fight_round_script'];
-        if(fightInitScript) { //GlobalLibraryJS.checkCallable
-            //fight.run(fightInitScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
-            let r = fightInitScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
+        //const fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript;
+        if(fightRoundScript) { //GlobalLibraryJS.checkCallable
+            //fight.run(fightRoundScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
+            let r = fightRoundScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
         }
 
@@ -1510,8 +1510,8 @@ function *gfFighting() {
         for(let tcombatant of fight.myCombatants) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts['fight_combatant_set_choice'](tcombatant, -1, false);
+                //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$fightCombatantChoice'))
+                game.$sys.resources.commonScripts.$fightCombatantSetChoice(tcombatant, -1, false);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
                 //tcombatant.$$fightData.$choice.$attack = undefined;
@@ -1522,8 +1522,8 @@ function *gfFighting() {
         for(let tcombatant of fight.enemies) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-                game.$sys.resources.commonScripts['fight_combatant_set_choice'](tcombatant, -1, true);
+                //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$fightCombatantChoice'))
+                game.$sys.resources.commonScripts.$fightCombatantSetChoice(tcombatant, -1, true);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
                 //tcombatant.$$fightData.$choice.$attack = undefined;
@@ -1537,8 +1537,8 @@ function *gfFighting() {
         /*/运行两个回合脚本（阶段3）
 
         //通用回合开始脚本
-        if(_private.scriptQueue.create(fightInitScript.call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
-        //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, fightInitScript.call({game, fight}, _private.nRound, 1)) === 0)
+        if(_private.scriptQueue.create(fightRoundScript.call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
+        //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, fightRoundScript.call({game, fight}, _private.nRound, 1)) === 0)
             _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
 
         //回合开始脚本
@@ -1562,9 +1562,9 @@ function *gfFighting() {
 
 //战斗人物回合脚本
 //stage：0为大回合开始前；1为战斗人物行动前(我方选择完毕）；2为战斗人物行动前（我方和敌方选择和验证完毕）；3为战斗人物行动后；
-function *runCombatantRoundScript(combatant, stage) {
+function* runCombatantRoundScript(combatant, stage) {
     //执行 战斗人物回合 脚本
-    let combatantRoundScript = game.$sys.resources.commonScripts['combatant_round_script'](combatant, _private.nRound, stage);
+    let combatantRoundScript = game.$sys.resources.commonScripts.$combatantRoundScript(combatant, _private.nRound, stage);
 
     if(combatantRoundScript === null) {
         return null;
@@ -1595,7 +1595,7 @@ function *runCombatantRoundScript(combatant, stage) {
 
 
 //逃跑处理
-function *runAway() {
+function* runAway() {
     //if(flag === null)
     //    return _private.nRunAwayFlag;
 
@@ -1629,7 +1629,7 @@ function *runAway() {
 
     //如果是true，则调用通用逃跑算法
     if(_private.runAwayPercent === true) {
-        if(game.$sys.resources.commonScripts['common_run_away_algorithm'](fight.myCombatants, -1)) {
+        if(game.$sys.resources.commonScripts.$commonRunAwayAlgorithm(fight.myCombatants, -1)) {
             return true;
         }
     }
@@ -1644,10 +1644,10 @@ function *runAway() {
 
     //全部设置为 休息
     for(let i = 0; i < fight.myCombatants.length; ++i) {
-        if(game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[i])) {
+        if(game.$sys.resources.commonScripts.$combatantIsValid(fight.myCombatants[i])) {
         //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$fightCombatantChoice'))
-            game.$sys.resources.commonScripts['fight_combatant_set_choice'](fight.myCombatants[i], 1, false);
+            //let fightCombatantChoice = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$fightCombatantChoice'))
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(fight.myCombatants[i], 1, false);
             //fight.myCombatants[i].$$fightData.$choice.$type = 1;
             //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
             //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;
@@ -1679,7 +1679,7 @@ function fightOver(result, force=false) {
         //    fight.run(_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end');
         //}
 
-        fight.run(game.$sys.resources.commonScripts['fight_end_script'](result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 2, Tips: 'fight end2'});
+        fight.run(game.$sys.resources.commonScripts.$commonFightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 2, Tips: 'fight end2'});
     //}
 }
 
@@ -1829,7 +1829,7 @@ function doSkillEffect(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     let role1 = team1[roleIndex1];
     let role2 = team2[roleIndex2];
 
-    let skillEffectResult = game.$sys.resources.commonScripts['fight_skill_algorithm'](team1, roleIndex1, team2, roleIndex2, skillEffect);
+    let skillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(team1, roleIndex1, team2, roleIndex2, skillEffect);
     //for(let t in skillEffectResult) {
     //}
     return skillEffectResult;
@@ -1879,13 +1879,13 @@ function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Global.frameData.arrayEnemyPets[0].$$fightData.attackProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
     //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Math.floor(GameCore.socketInfo.getRandomNumber(!GameCore.netPlay) * 5)
 
-    msgbox.textArea.append(name1 + '使用【' + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + '】攻击');
-    msgbox.textArea.append(name1 + '使用【' + game.$gameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + '】防御');
+    msgbox.textArea.append(name1 + '使用【' + GameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + '】攻击');
+    msgbox.textArea.append(name1 + '使用【' + GameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + '】防御');
     //msgbox.textArea.append(name2 + '使用' + role2.$$fightData.attackProp + '攻击');
     //msgbox.textArea.append(name2 + '使用' + role2.$$fightData.defenseProp + '防御');
 
 
-    harm = game.$sys.resources.commonScripts['fight_skill_algorithm'](team1, roleIndex1, team2, roleIndex2, skillEffect);
+    harm = game.$sys.resources.commonScripts.$fightSkillAlgorithm(team1, roleIndex1, team2, roleIndex2, skillEffect);
 
 
     str = '属性使用';

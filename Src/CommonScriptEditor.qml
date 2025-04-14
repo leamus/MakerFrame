@@ -41,10 +41,12 @@ Item {
         console.debug('[CommonScriptEditor]filePath:', path);
 
         const defaultCode = "
-//注意：GlobalLibraryJS
-
-//.import 'level_chain.js' as JSLevelChain       //导入另一个js文件
-//let jsLevelChain = JSLevelChain;    //让外部可访问
+//导入：
+//.import 'main.js' as JSMain //导入另一个js文件
+//.import 'level_chain.js' as JSLevelChain //导入另一个js文件
+//让外部可访问：
+//let $start = JSMain.$start ?? JSMain.start;
+//let jsLevelChain = JSLevelChain;
 
 
 
@@ -329,12 +331,12 @@ const $config = {
 
 
 //游戏初始化（游戏开始和载入存档时调用）
-function *$gameInit(newGame) {
+function* $gameInit(newGame) {
     game.gf.$plugins = {};
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
-    if(FrameManager.sl_fileExists(game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js'))) {
-        let gameJS = game.$sys.caches.jsEngine.load(game.$globalJS.toURL(game.$projectpath + game.$gameMakerGlobal.separator + 'game.js'));
+    if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'game.js'))) {
+        let gameJS = game.$sys.caches.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'game.js'));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
             if(gameJS.$init) {
@@ -350,9 +352,9 @@ function *$gameInit(newGame) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
             game.gf.$plugins[tp0][tp1] = {};
-            let gameJSPath = game.$projectpath + game.$gameMakerGlobal.separator + 'Plugins' + game.$gameMakerGlobal.separator + tp0 + game.$gameMakerGlobal.separator + tp1 + game.$gameMakerGlobal.separator + 'Components';
-            if(FrameManager.sl_fileExists(game.$globalJS.toPath(gameJSPath + game.$gameMakerGlobal.separator + 'game.js'))) {
-                let gameJS = game.$sys.caches.jsEngine.load(game.$globalJS.toURL(gameJSPath + game.$gameMakerGlobal.separator + 'game.js'));
+            let gameJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
+            if(FrameManager.sl_fileExists(GlobalJS.toPath(gameJSPath + GameMakerGlobal.separator + 'game.js'))) {
+                let gameJS = game.$sys.caches.jsEngine.load(GlobalJS.toURL(gameJSPath + GameMakerGlobal.separator + 'game.js'));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
                     if(gameJS.$init) {
@@ -385,7 +387,7 @@ function *$gameInit(newGame) {
             //简单走
             //game.hero(0, {$action: 2, $targetBx: bx, $targetBy: by});
             //A*算法走
-            game.hero(hero, {$action: 2, $targetBlocks: game.$gameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
+            game.hero(hero, {$action: 2, $targetBlocks: GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [bx, by])});
         }
         return null;
     }
@@ -402,7 +404,7 @@ function *$gameInit(newGame) {
 }
 
 //游戏退出
-function *$gameRelease(gameExit) {
+function* $gameRelease(gameExit) {
     //调用项目的 game.js 的 $release
     if(game.gf.$release) {
         let r = game.gf.$release(gameExit);
@@ -433,29 +435,29 @@ function *$gameRelease(gameExit) {
 
 
 //存档前调用
-function *$beforeSave() {
+function* $beforeSave() {
     //game.gd['save_datetime'] = Date.now();
     return null;
 }
 
 //读档前调用
-function *$beforeLoad() {
+function* $beforeLoad() {
     return null;
 }
 
 //存档后调用
-function *$afterSave() {
+function* $afterSave() {
     return null;
 }
 
 //读档后调用
-function *$afterLoad() {
+function* $afterLoad() {
     return null;
 }
 
 
 //打开地图前调用
-function *$beforeLoadmap(mapName, userData) {
+function* $beforeLoadmap(mapName, userData) {
     /*if(GlobalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
@@ -467,7 +469,7 @@ function *$beforeLoadmap(mapName, userData) {
 }
 
 //打开地图后调用
-function *$afterLoadmap(mapName, userData) {
+function* $afterLoadmap(mapName, userData) {
     /*if(GlobalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
@@ -479,7 +481,7 @@ function *$afterLoadmap(mapName, userData) {
 
 
 //使用道具通用函数
-function *$useScript(goods, combatant, params) {
+function* $useScript(goods, combatant, params) {
     if(combatant === undefined || combatant === null)
         combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
 
@@ -488,7 +490,7 @@ function *$useScript(goods, combatant, params) {
         //yield game.msg('...', 50);
         //console.debug(goods.$rid, combatant);
 
-        //yield *eval(`(function*(){${params}})()`);
+        //yield* eval(`(function*(){${params}})()`);
 
         let r = params.call(goods, goods, combatant, params);
         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -503,7 +505,7 @@ function *$useScript(goods, combatant, params) {
 }
 
 //装备道具通用函数
-function *$equipScript(goods, combatant, params) {
+function* $equipScript(goods, combatant, params) {
     if(combatant === undefined || combatant === null)
         combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
 
@@ -529,7 +531,7 @@ function *$equipScript(goods, combatant, params) {
         }
         else if(newCount === 0) {
             /*
-            if(_private.objCommonScripts['equip_reserved_slots'].indexOf(position) !== -1)
+            if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(position) !== -1)
                 combatant.$equipment[position] = undefined;
             else
                 delete combatant.$equipment[position];
@@ -563,10 +565,10 @@ function *$equipScript(goods, combatant, params) {
 }
 
 //卸下装备通用函数
-function *$unloadScript(goods, combatant, params) {
+function* $unloadScript(goods, combatant, params) {
     let positionName = goods.$position;
     /*
-    if(_private.objCommonScripts['equip_reserved_slots'].indexOf(positionName) !== -1)
+    if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(positionName) !== -1)
         combatant.$equipment[positionName] = undefined;
     else
         delete combatant.$equipment[positionName];
@@ -772,12 +774,12 @@ let $showGoodsName = function(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$gameMakerGlobal.config.strGoodsDirName) + game.$gameMakerGlobal.separator;
+        //let goodsPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
 
         //GlobalLibraryJS.showRichTextImage();
         tstr = ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(goodsPath + goods.$rid + game.$gameMakerGlobal.separator + goods.$image).
-            arg(game.$gameMakerGlobal.imageResourceURL(goods.$image)).
+            //arg(goodsPath + goods.$rid + GameMakerGlobal.separator + goods.$image).
+            arg(GameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -821,7 +823,7 @@ let $showGoodsName = function(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 let $showCombatantName = function(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = game.$globalJS.toPath(game.$projectpath + game.$gameMakerGlobal.separator + game.$gameMakerGlobal.config.strFightRoleDirName) + game.$gameMakerGlobal.separator;
+    //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -829,8 +831,8 @@ let $showCombatantName = function(combatant, flags=null) {
     if(flags['avatar'] && combatant.$avatar) {
         //GlobalLibraryJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(fightRolePath + combatant.$rid + game.$gameMakerGlobal.separator + combatant.$avatar).
-            arg(game.$gameMakerGlobal.imageResourceURL(combatant.$avatar)).
+            //arg(fightRolePath + combatant.$rid + GameMakerGlobal.separator + combatant.$avatar).
+            arg(GameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -881,7 +883,7 @@ function levelUp(combatant, level=0, refresh=true) {
             levelupscript = JSLevelChain.commonLevelUpScript;
         }
         catch(e) {
-            levelupscript = game.$gameMakerGlobalJS.commonLevelUpScript;
+            levelupscript = GameMakerGlobalJS.commonLevelUpScript;
         }
     }
 
@@ -890,7 +892,7 @@ function levelUp(combatant, level=0, refresh=true) {
             levelalgorithm = JSLevelChain.commonLevelAlgorithm;
         }
         catch(e) {
-            levelalgorithm = game.$gameMakerGlobalJS.commonLevelAlgorithm;
+            levelalgorithm = GameMakerGlobalJS.commonLevelAlgorithm;
         }
     }
 
@@ -1002,7 +1004,7 @@ function $combatantIsValid(combatant) {
 
 
 //游戏结束脚本
-function *$gameOverScript(params) {
+function* $gameOverScript(params) {
     if(params === -1) {
         yield game.msg('游戏结束', 60, '', 0, 0b11);
         yield* game.$sys.release(false);
@@ -1024,9 +1026,9 @@ function $commonRunAwayAlgorithm(team, index) {
 //一个战斗回合内，返回每次回合的战斗人物数组
 //返回数字表示延迟多久ms再继续
 //返回null表示战斗回合结束
-function *$fightRolesRound(round) {
+function* $fightRolesRound(round) {
     //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
-    //yield* game.$gameMakerGlobalJS.fightRolesRound1(round, '$speed');
+    //yield* GameMakerGlobalJS.fightRolesRound1(round, '$speed');
 
 
     //所有的战斗人物
@@ -1467,7 +1469,7 @@ function $combatantRoundScript(combatant, round, stage) {
 
 //战斗人物回合脚本（主要是剧情和Buff）；
 //参数同 $combatantRoundScript；
-function *combatantRoundEffects(combatant, round, stage) {
+function* combatantRoundEffects(combatant, round, stage) {
     /*/可以加一些东西，比如加气血等
     if(stage === 1) {
         game.addprops(combatant, {'HP,0': 10, 'MP,0': 10});
@@ -1737,7 +1739,7 @@ function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesCom
 //下面4个函数的teams：teams[0]表示我方队伍，teams[1]表示敌方队伍
 
 //战斗初始化脚本；
-function *$commonFightInitScript(teams, fightData) {
+function* $commonFightInitScript(teams, fightData) {
 
     //game.pause('$fight');
     //game.stage(1);
@@ -1823,7 +1825,7 @@ function *$commonFightInitScript(teams, fightData) {
 }
 
 //战斗开始通用脚本；
-function *$commonFightStartScript(teams, fightData) {
+function* $commonFightStartScript(teams, fightData) {
     //let game = this.game;
     //let fight = this.fight;
 
@@ -1854,7 +1856,7 @@ function *$commonFightStartScript(teams, fightData) {
 //战斗回合通用脚本；
 //step：0，回合开始；1，选择完毕
 //team：0下标为我方，1下标为敌方
-function *$commonFightRoundScript(round, step, teams, fightData) {
+function* $commonFightRoundScript(round, step, teams, fightData) {
     //let game = this.game;
     //let fight = this.fight;
 
@@ -1924,7 +1926,7 @@ function *$commonFightRoundScript(round, step, teams, fightData) {
 
 //战斗结束通用脚本；
 //res中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
-function *$commonFightEndScript(res, teams, fightData) {
+function* $commonFightEndScript(res, teams, fightData) {
     //这里的res，可能会被 战斗脚本修改
     //res中包含：result（战斗结果）、money和exp
 

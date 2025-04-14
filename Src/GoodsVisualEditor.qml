@@ -1364,7 +1364,7 @@ $$equipEffectAlgorithm$$
     //战斗脚本；分别是：选择道具脚本；检测是否可用；完成代码；
     $$fightScript: {
         //选择道具时脚本；如果为null自动调用 goods.$$fight[0] 的
-        /*$$choiceScript: function *(goods, combatant) {
+        /*$$choiceScript: function*(goods, combatant) {
             //调用技能的
             let skill = goods.$$fight[0];
             yield* skill.$$choiceScript(skill, combatant);
@@ -1383,7 +1383,7 @@ $$equipEffectAlgorithm$$
         },
 
         //完成代码（收尾用）；skill的playScript执行完毕会执行它
-        $$completeScript: function *(goods, combatant) {
+        $$completeScript: function*(goods, combatant) {
             game.removegoods(goods, 1); //背包道具-1
             //yield fight.msg('...');
             return;

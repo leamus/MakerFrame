@@ -937,15 +937,15 @@ $$enemiesData$$
         $$ExtraProperties$$,
 
 
-        $fightInitScript: function *(teams, fightData) {
+        $fightInitScript: function*(teams, fightData) {
             //yield fight.msg('战斗初始化事件', 0);
         },
 
-        $fightStartScript: function *(teams, fightData) {
+        $fightStartScript: function*(teams, fightData) {
             //yield fight.msg('战斗开始事件');
         },
 
-        $fightRoundScript: function *(round, step, teams, fightData) {
+        $fightRoundScript: function*(round, step, teams, fightData) {
             switch(step) {  //step：0，回合开始；1，选择完毕
             case 0:
                 //yield fight.msg('第%1回合'.arg(round));
@@ -955,7 +955,7 @@ $$enemiesData$$
             }
         },
 
-        $fightEndScript: function *(r, step, teams, fightData) {
+        $fightEndScript: function*(r, step, teams, fightData) {
             //step：为0是战斗结束时调用；为1时返回地图时调用
             //r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
             //  这里可以修改r，然后会传递给 通用战斗结束函数

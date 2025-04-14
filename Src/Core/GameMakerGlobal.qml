@@ -4,13 +4,20 @@ import QtQuick 2.14
 import Qt.labs.settings 1.1
 
 
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
+//import _Global.Button 1.0
 
 
 import 'qrc:/QML'
 
 
 import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -268,6 +275,7 @@ QtObject {
         }
 
         FrameManager.sl_globalObject().GameMakerGlobal = GameMakerGlobal;
+        FrameManager.sl_globalObject().GameMakerGlobalJS = GameMakerGlobalJS;
 
 
 
@@ -298,6 +306,7 @@ QtObject {
             return;
         }
 
+        delete FrameManager.sl_globalObject().GameMakerGlobalJS;
         delete FrameManager.sl_globalObject().GameMakerGlobal;
 
         console.debug('[GameMakerGlobal]Component.onDestruction');

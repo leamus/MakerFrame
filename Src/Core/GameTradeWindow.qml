@@ -4,12 +4,24 @@ import QtQuick.Controls 2.14
 import QtQuick.Window 2.14
 
 
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
 //import GameComponents 1.0
 import 'GameComponents'
+
+
+//import 'qrc:/QML'
+
+
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -51,7 +63,7 @@ Item {
 
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
             arrShowSaleGoods.push(tgoodsName);
         }
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
@@ -65,7 +77,7 @@ Item {
 
                 //let goodsInfo = _private.goodsResource[g.$rid];
                 let tgoods = game.$sys.getGoodsObject(g, false);
-                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](g, {Image: true, Color: true, Count: true, Price: 1})));
+                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: true, Price: 1})));
                 arrMyGoods.push(g);
             }
         }

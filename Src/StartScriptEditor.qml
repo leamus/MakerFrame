@@ -97,7 +97,7 @@ game.goon();
         strTitle: '游戏开始脚本'
         fnAfterCompile: function(code) {
             //console.debug(code);
-            if(code.indexOf('function *$start() {') < 0 && code.indexOf('function *start() {') < 0) {
+            if(code.indexOf('function* $start() {') < 0 && code.indexOf('function* start() {') < 0) {
                 code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
             }
             return code;
@@ -140,7 +140,7 @@ game.goon();
 
 
 //游戏开始脚本（开始时调用）
-function *$start() {
+function* $start() {
 
     game.playmusic('');
 
@@ -163,22 +163,21 @@ function *$start() {
                         arrSave.push('空');
                 }*/
 
-                let readSavesInfo = game.$userscripts.$readSavesInfo || game.$gameMakerGlobalJS.$readSavesInfo;
-                let arrSave = readSavesInfo();
+                let arrSave = game.$sys.getCommonScriptResource('$readSavesInfo')();
 
                 c = yield game.menu('载入存档', [...arrSave,'自动存档','取消']);
                 switch(c) {
                     case 0:
                     case 1:
                     case 2:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
+                        //GlobalLibraryJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
                         if(yield game.load('存档' + c))
                             break;
                         else
                             yield game.msg('读取失败');
                         continue;
                     case 3:
-                        //game.$globalLibraryJS.runNextEventLoop(function() {yield game.load('autosave')},);
+                        //GlobalLibraryJS.runNextEventLoop(function() {yield game.load('autosave')},);
                         if(yield game.load('autosave'))
                             break;
                         else

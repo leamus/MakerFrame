@@ -1854,25 +1854,25 @@ Item {
                 switch(parseInt(typeTextFields[tt].text)) {
                 case 0:
                     let ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
-                    buffs += `game.$userscripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
+                    buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 1:
-                    buffs += `game.$userscripts.getBuff(targetCombatant, 2, {BuffName: '乱', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 2, {BuffName: '乱', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'orange', Text: '乱', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 2:
-                    buffs += `game.$userscripts.getBuff(targetCombatant, 3, {BuffName: '封', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 3, {BuffName: '封', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'yellow', Text: '封', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
                     break;
                 case 3:
-                    buffs += `game.$userscripts.getBuff(targetCombatant, 4, {BuffName: '眠', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
+                    buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 4, {BuffName: '眠', Round: game.rnd(${tRound[0]}, ${tRound[1]})});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'blue', Text: '眠', FontSize: 20, Combatant: targetCombatant});`;
                     buffs += '\r\n';
@@ -1881,31 +1881,31 @@ Item {
                     ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
                     switch(parseInt(typeTextFields[tt].text)) {
                     case 4:
-                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 5:
-                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '防', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['defense', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '防', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['defense', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '防', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 6:
-                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '速', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['speed', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '速', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['speed', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '速', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 7:
-                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '灵', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['power', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '灵', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['power', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '灵', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
                         break;
                     case 8:
-                        buffs += `game.$userscripts.getBuff(targetCombatant, 5, {BuffName: '幸', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['luck', ${tvalue}, ${ttype}]]});`;
+                        buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '幸', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['luck', ${tvalue}, ${ttype}]]});`;
                         buffs += '\r\n';
                         buffs += `yield ({Type: 30, Interval: 500, Color: 'white', Text: '幸', FontSize: 20, Combatant: targetCombatant});`;
                         buffs += '\r\n';
@@ -2060,7 +2060,7 @@ let data = (function() {
 
 
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
-        /*$choiceScript: function *(skill, combatant) {
+        /*$choiceScript: function*(skill, combatant) {
             //选择敌方
             //let r = yield* fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
@@ -2069,7 +2069,7 @@ let data = (function() {
         $choiceScript: null,
 
         //技能产生的效果 和 动画
-        $playScript: function *(skill, combatant) {
+        $playScript: function*(skill, combatant) {
 
 $$playScript$$
 

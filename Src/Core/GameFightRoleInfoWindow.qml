@@ -3,12 +3,24 @@ import QtQuick.Layouts 1.14
 import QtQuick.Window 2.14
 
 
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
 //import GameComponents 1.0
 import 'GameComponents'
+
+
+//import 'qrc:/QML'
+
+
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -52,8 +64,8 @@ Item {
 
     function refresh() {
         let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
-        //let fightRolePath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
-        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_combatant_name'](conbatant, {avatar: true, color: true}));
+        //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(conbatant, {avatar: true, color: true}));
 
 
         /*textFightRoleInfo.text = 'HP：' + conbatant.$$propertiesWithExtra.remainHP + '/' + conbatant.$$propertiesWithExtra.healthHP + '/' + conbatant.$$propertiesWithExtra.HP + ' ' +
@@ -67,7 +79,7 @@ Item {
             '级别：' + conbatant.$properties.level;
         */
 
-        textFightRoleInfo.text = game.$sys.resources.commonScripts['combatant_info'](conbatant);
+        textFightRoleInfo.text = game.$sys.resources.commonScripts.$combatantInfo(conbatant);
 
 
         //装备
@@ -85,7 +97,7 @@ Item {
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](conbatant.$equipment[position], {Image: true, Color: true}));
+            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(conbatant.$equipment[position], {Image: true, Color: true}));
             if(tIndex > -1) {
                 //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
                 arrEquipment[tIndex] = '<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName);

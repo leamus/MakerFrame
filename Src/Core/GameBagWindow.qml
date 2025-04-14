@@ -3,12 +3,24 @@ import QtQuick.Layouts 1.14
 import QtQuick.Window 2.14
 
 
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
+
+
 import _Global 1.0
 import _Global.Button 1.0
 
 
 //import GameComponents 1.0
 import 'GameComponents'
+
+
+//import 'qrc:/QML'
+
+
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -21,11 +33,11 @@ Item {
     function init() {
 
         //let fightheros = game.fighthero(-1, 1);
-        //let fightRolePath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+        //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
         let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
-            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_combatant_name'](tf, {avatar: true, color: true})));
+            arrFightHerosName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(tf, {avatar: true, color: true})));
         }
         gameFightRoleMenu.show(arrFightHerosName);
         if(arrFightHerosName.length > 0)
@@ -49,7 +61,7 @@ Item {
     //按类型 显示道具
     //type：-1，所有；1，可用；2，可装；3，战时；4，可卖；5，剧情类
     function showGoods(type=undefined) {
-        //let goodsPath = game.$globalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
+        //let goodsPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
 
         if(type === undefined || type === null)
             type = nlastShowType;
@@ -64,7 +76,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$useScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
@@ -75,7 +87,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$equipScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
                 }
             }
 
@@ -86,7 +98,7 @@ Item {
                 let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goodsInfo.$commons.$fightScript) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -97,7 +109,7 @@ Item {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$price && goods.$price[1] !== undefined) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -108,7 +120,7 @@ Item {
                 //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
                 if(goods.$type === 4) {
                     gameGoodsMenu.arrGoods.push(goods);
-                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                    arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
                 }
             }
             break;
@@ -117,7 +129,7 @@ Item {
         default:
             gameGoodsMenu.arrGoods = game.gd['$sys_goods'];
             for(let goods of game.gd['$sys_goods']) {
-                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts['show_goods_name'](goods, {Image: true, Color: true, Count: true})));
+                arrGoodsName.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(goods, {Image: true, Color: true, Count: true})));
             }
 
             break;

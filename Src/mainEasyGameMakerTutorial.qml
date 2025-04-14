@@ -569,13 +569,13 @@ Item {
 
 
   game.$projectpath：项目根目录。
-  game.$userscripts：//用户脚本（用户 common_scripts.js，如果没有则指向 GameMakerGlobalJS）
-  game.$globalLibraryJS：一些JS公共方法；
-  game.$global：提供跨平台、自适应的一些方法；
-  game.$globalJS：一些公共方法；
-  game.$gameMakerGlobal：Maker的公共对象；
-  game.$gameMakerGlobalJS：一些Maker的相关方法；
-  game.$gameMakerGlobal.config：项目配置（实际上是 GameMakerGlobal.config）；
+  game.$userscripts：//用户脚本（用户 common_scripts.js，如果没有则为 GameMakerGlobalJS）
+  game.$globalLibraryJS（GlobalLibraryJS）：一些JS公共方法；
+  game.$global（Global）：提供跨平台、自适应的一些方法；
+  game.$globalJS（GlobalJS）：一些公共方法；
+  game.$gameMakerGlobal（GameMakerGlobal）：Maker的公共对象；
+  game.$gameMakerGlobalJS（GameMakerGlobalJS）：一些Maker的相关方法；
+  game.$gameMakerGlobal.config（GameMakerGlobal.config）：项目配置；
   game.$plugins：所有的插件对象；
 
 
@@ -702,8 +702,8 @@ NPC事件的四种写法（前两种支持同步调用）：
 
 关于脚本的编写方式和几点说明：
   1、地图脚本：
-    function *start()：载入地图时触发的脚本；
-    function *其他()：其他为 某角色、某地图事件或某定时器 的脚本；
+    function* start()：载入地图时触发的脚本；
+    function* 其他()：其他为 某角色、某地图事件或某定时器 的脚本；
       注意：这些也可以定义 在start脚本中的 game.f 中，但上面function的优先级高；
   2、道具脚本：
     解释：
@@ -725,7 +725,7 @@ NPC事件的四种写法（前两种支持同步调用）：
     格式：
       let $createData = function(){return {RID: 'killer2', $name: '敌人1', $properties: {HP: 5, healthHP: 5, remainHP: 5, EXP: 5}, $skills: [{RID: 'fight'}], $goods: [{RID: '西瓜刀'}], $money: 5};}
         在战斗脚本中可以修改覆盖这些属性。
-      function *$levelUpScript(combatant)：角色单独升级链
+      function* $levelUpScript(combatant)：角色单独升级链
         如果不定义，则使用通用的升级链算法；
       function $levelAlgorithm(combatant, targetLevel) {
         级别对应的 各项属性 算法（升级时会设置，可选；注意：只增不减）；
@@ -751,22 +751,22 @@ NPC事件的四种写法（前两种支持同步调用）：
         $fightEndEvent：结束事件；
   6、通用脚本：
     //游戏结束脚本
-    function *$gameOverScript(params) {
+    function* $gameOverScript(params) {
     //通用逃跑算法
     function $runAwayAlgorithm(team, roleIndex) {
     //战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
     function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //战斗开始通用脚本；
-    function *$commonFightStartScript() {
+    function* $commonFightStartScript() {
     //战斗回合通用脚本；
-    function *$commonFightRoundScript(round) {
+    function* $commonFightRoundScript(round) {
     //战斗结束通用脚本；
-    function *$commonFightEndScript(r, exp, money) {
+    function* $commonFightEndScript(r, exp, money) {
     //恢复算法
     function $resumeEventScript(combatant) {
   7、通用升级链算法（集成在了通用脚本里）：
     格式：
-        function *commonLevelUpScript(combatant) {//升级脚本
+        function* commonLevelUpScript(combatant) {//升级脚本
         function commonLevelAlgorithm(combatant, targetLevel) {    //级别对应的 各项属性 算法（升级时会设置，可选；注意：只增不减）
     注意：如果没有单独的战斗人物升级链，则使用通用的。
 

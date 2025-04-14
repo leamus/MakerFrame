@@ -1,6 +1,6 @@
 ﻿
 //载入资源
-function *loadResources() {
+function* loadResources() {
     console.debug('[GameScene]loadResources');
 
 
@@ -68,172 +68,38 @@ function *loadResources() {
 
 
 
-    //读通用算法脚本
-    let tCommoncript;
+    //读通用脚本
     if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'common_script.js')))
-        tCommoncript = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'common_script.js'));
-    if(tCommoncript) {
-        _private.objCommonScripts['game_init'] = tCommoncript.$gameInit;
-        _private.objCommonScripts['game_release'] = tCommoncript.$gameRelease;
-        _private.objCommonScripts['before_save'] = tCommoncript.$beforeSave;
-        _private.objCommonScripts['before_load'] = tCommoncript.$beforeLoad;
-        _private.objCommonScripts['after_save'] = tCommoncript.$afterSave;
-        _private.objCommonScripts['after_load'] = tCommoncript.$afterLoad;
-        _private.objCommonScripts['combatant_class'] = tCommoncript.$Combatant;
-        _private.objCommonScripts['combatant_info'] = tCommoncript.$combatantInfo;
-        _private.objCommonScripts['show_goods_name'] = tCommoncript.$showGoodsName;
-        _private.objCommonScripts['show_combatant_name'] = tCommoncript.$showCombatantName;
-        _private.objCommonScripts['refresh_combatant'] = tCommoncript.$refreshCombatant;
-        _private.objCommonScripts['combatant_is_valid'] = tCommoncript.$combatantIsValid;
-        _private.objCommonScripts['game_over_script'] = tCommoncript.$gameOverScript;
-        //_private.objCommonScripts['resume_event_script'] = tCommoncript.$resumeEventScript;
-        //_private.objCommonScripts['get_goods_script'] = tCommoncript.commonGetGoodsScript;
-        //_private.objCommonScripts['use_goods_script'] = tCommoncript.commonUseGoodsScript;
-
-        //_private.objCommonScripts['events'] = tCommoncript.$events;
-        //_private.objCommonScripts['get_buff'] = tCommoncript.$getBuff;
-
-        game.$userscripts = tCommoncript;
-    }
-    else
-        game.$userscripts = GameMakerGlobalJS;
-
-    /*data = game.loadjson('common_algorithm.json');
-    if(data) {
-        let ret = GlobalJS._eval(data['FightAlgorithm']);
-        _private.objCommonScripts['game_over_script'] = ret.$gameOverScript;
-        _private.objCommonScripts['common_run_away_algorithm'] = ret.$commonRunAwayAlgorithm;
-        _private.objCommonScripts['fight_skill_algorithm'] = ret.$fightSkillAlgorithm;
-        _private.objCommonScripts['fight_role_choice_skills_or_goods_algorithm'] = ret.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-        _private.objCommonScripts['fight_start_script'] = ret.$commonFightStartScript;
-        _private.objCommonScripts['fight_round_script'] = ret.$commonFightRoundScript;
-        _private.objCommonScripts['fight_end_script'] = ret.$commonFightEndScript;
-        //_private.objCommonScripts['resume_event_script'] = ret.$resumeEventScript;
-        _private.objCommonScripts['get_goods_script'] = ret.commonGetGoodsScript;
-        _private.objCommonScripts['use_goods_script'] = ret.commonUseGoodsScript;
-    }*/
-    if(!_private.objCommonScripts['game_init']) {
-        _private.objCommonScripts['game_init'] = GameMakerGlobalJS.$gameInit;
-        console.debug('[GameScene]!载入系统游戏初始化脚本');
-    }
-    else
-        console.debug('[GameScene]载入游戏初始化脚本OK');
-
-    if(!_private.objCommonScripts['game_release']) {
-        _private.objCommonScripts['game_release'] = GameMakerGlobalJS.$gameRelease;
-        console.debug('[GameScene]!载入系统游戏结束脚本');
-    }
-    else
-        console.debug('[GameScene]载入游戏结束脚本OK');
-
-    if(!_private.objCommonScripts['before_save']) {
-        _private.objCommonScripts['before_save'] = GameMakerGlobalJS.$beforeSave;
-        console.debug('[GameScene]!载入系统存档前脚本');
-    }
-    else
-        console.debug('[GameScene]载入存档前脚本OK');
-
-    if(!_private.objCommonScripts['before_load']) {
-        _private.objCommonScripts['before_load'] = GameMakerGlobalJS.$beforeLoad;
-        console.debug('[GameScene]!载入系统读档前脚本');
-    }
-    else
-        console.debug('[GameScene]载入读档前脚本OK');
-
-    if(!_private.objCommonScripts['after_save']) {
-        _private.objCommonScripts['after_save'] = GameMakerGlobalJS.$afterSave;
-        console.debug('[GameScene]!载入系统存档后脚本');
-    }
-    else
-        console.debug('[GameScene]载入存档后脚本OK');
-
-    if(!_private.objCommonScripts['after_load']) {
-        _private.objCommonScripts['after_load'] = GameMakerGlobalJS.$afterLoad;
-        console.debug('[GameScene]!载入系统读档后脚本');
-    }
-    else
-        console.debug('[GameScene]载入读档后脚本OK');
-
-
-    if(!_private.objCommonScripts['combatant_class']) {
-        _private.objCommonScripts['combatant_class'] = GameMakerGlobalJS.$Combatant;
-        console.debug('[GameScene]!载入系统创建战斗角色脚本');
-    }
-    else
-        console.debug('[GameScene]载入创建战斗角色脚本OK');
-
-    if(!_private.objCommonScripts['refresh_combatant']) {
-        _private.objCommonScripts['refresh_combatant'] = GameMakerGlobalJS.$refreshCombatant;
-        console.debug('[GameScene]!载入系统计算属性脚本');
-    }
-    else
-        console.debug('[GameScene]载入计算属性脚本OK');
-
-    if(!_private.objCommonScripts['combatant_is_valid']) {
-        _private.objCommonScripts['combatant_is_valid'] = GameMakerGlobalJS.$combatantIsValid;
-        console.debug('[GameScene]!载入系统战斗人物可用脚本');
-    }
-    else
-        console.debug('[GameScene]载入战斗人物可用脚本OK');
-
-    if(!_private.objCommonScripts['game_over_script']) {
-        _private.objCommonScripts['game_over_script'] = GameMakerGlobalJS.$gameOverScript;
-        console.debug('[GameScene]!载入系统游戏结束脚本');
-    }
-    else
-        console.debug('[GameScene]载入游戏结束脚本OK');
-
-    /*if(!_private.objCommonScripts['resume_event_script']) {
-        _private.objCommonScripts['resume_event_script'] = GameMakerGlobalJS.$resumeEventScript;
-        console.debug('[GameScene]!载入系统恢复脚本');
-    }
-    else
-        console.debug('[GameScene]载入恢复算法脚本OK');  //, _private.objCommonScripts['resume_timer'], data, eval('()=>{}'));
-    */
-
-    /*if(!_private.objCommonScripts['get_goods_script']) {
-        _private.objCommonScripts['get_goods_script'] = GameMakerGlobalJS.commonGetGoodsScript;
-        console.debug('[GameScene]!载入系统通用获得道具脚本');
-    }
-    else
-        console.debug('[GameScene]载入通用获得道具脚本OK');
-    if(!_private.objCommonScripts['use_goods_script']) {
-        _private.objCommonScripts['use_goods_script'] = GameMakerGlobalJS.commonUseGoodsScript;
-        console.debug('[GameScene]!载入系统通用使用道具脚本');
-    }
-    else
-        console.debug('[GameScene]载入通用使用道具脚本OK');
-    */
-
-    if(!_private.objCommonScripts['combatant_info']) {
-        _private.objCommonScripts['combatant_info'] = GameMakerGlobalJS.$combatantInfo;
-        console.debug('[GameScene]!载入系统战斗人物信息');
-    }
-    else
-        console.debug('[GameScene]载入战斗人物信息OK');
-
-    if(!_private.objCommonScripts['show_goods_name']) {
-        _private.objCommonScripts['show_goods_name'] = GameMakerGlobalJS.$showGoodsName;
-        console.debug('[GameScene]!载入系统显示道具名称信息');
-    }
-    else
-        console.debug('[GameScene]载入显示道具名称信息OK');
-
-    if(!_private.objCommonScripts['show_combatant_name']) {
-        _private.objCommonScripts['show_combatant_name'] = GameMakerGlobalJS.$showCombatantName;
-        console.debug('[GameScene]!载入系统显示战斗人物名称信息');
-    }
-    else
-        console.debug('[GameScene]载入显示战斗人物名称信息OK');
-
-    /*
-    if(!_private.objCommonScripts['events']) {
-        _private.objCommonScripts['events'] = GameMakerGlobalJS.$events;
-        console.debug('[GameScene]!载入系统通用events');
-    }
-    else
-        console.debug('[GameScene]载入通用eventsOK');
+        game.$userscripts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'common_script.js'));
+    if(game.$userscripts) {
+        _private.objCommonScripts = Object.assign({}, GameMakerGlobalJS, game.$userscripts);
+        /*
+        _private.objCommonScripts.$config = game.$userscripts.$config || GameMakerGlobalJS.$config;
+        _private.objCommonScripts.$combatantInfo = game.$userscripts.$combatantInfo || GameMakerGlobalJS.$combatantInfo;
+        _private.objCommonScripts.$showGoodsName = game.$userscripts.$showGoodsName || GameMakerGlobalJS.$showGoodsName;
+        _private.objCommonScripts.$showCombatantName = game.$userscripts.$showCombatantName || GameMakerGlobalJS.$showCombatantName;
+        _private.objCommonScripts.$fightMenus = game.$userscripts.$fightMenus || GameMakerGlobalJS.$fightMenus;
+        _private.objCommonScripts.$fightButtons = game.$userscripts.$fightButtons || GameMakerGlobalJS.$fightButtons;
         */
+        //_private.objCommonScripts.$fightSkillAlgorithm = _private.objCommonScripts.$fightSkillAlgorithm || game.$userscripts.$skillEffectAlgorithm || GameMakerGlobalJS.$skillEffectAlgorithm;
+    }
+    else
+        _private.objCommonScripts = Object.assign({}, game.$userscripts = GameMakerGlobalJS);
+
+    //起始脚本
+    /*if(!_private.objCommonScripts['$gameStart']) */{
+        let ts;
+        if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'main.js'))) {
+            ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'main.js'));
+        }
+        //!!!兼容旧代码
+        else if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'start.js'))) {
+            ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'start.js'));
+        }
+        if(ts) {
+            _private.objCommonScripts['$gameStart'] = ts.$start || ts.start;
+        }
+    }
 
 
 
@@ -250,9 +116,9 @@ function *loadResources() {
 //读取配置：
 
     /*_private.config.nLoadAllResources = GlobalLibraryJS.shortCircuit(0b1,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$game', '$loadAllResources'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$game', '$loadAllResources'),
-        game.$gameMakerGlobalJS.$config.$game.$loadAllResources,
+        GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$game', '$loadAllResources'),
+        //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$game', '$loadAllResources'),
+        GameMakerGlobalJS.$config.$game.$loadAllResources,
         0);
     */
     //是否提前载入所有资源
@@ -321,9 +187,9 @@ function *loadResources() {
     };*/
 
     //摇杆 配置
-    //const joystickDefaultConfig = GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$joystick');
-    const joystickDefaultConfig = game.$gameMakerGlobalJS.$config.$joystick;
-    const joystickConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$joystick'), joystickDefaultConfig);
+    //const joystickDefaultConfig = GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$joystick');
+    const joystickDefaultConfig = GameMakerGlobalJS.$config.$joystick;
+    const joystickConfig = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$joystick'), joystickDefaultConfig);
 
     joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * rootWindow.aliasGlobal.Screen.pixelDensity;
     joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * rootWindow.aliasGlobal.Screen.pixelDensity;
@@ -453,45 +319,25 @@ function *loadResources() {
 
 
     game.$sys.protoObjects.fightRole = GlobalLibraryJS.shortCircuit(0b1111,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightRole'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightRole'),
-        game.$gameMakerGlobalJS.$config.$protoObjects.$fightRole,
+        GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$fightRole'),
+        //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$protoObjects', '$fightRole'),
+        GameMakerGlobalJS.$config.$protoObjects.$fightRole,
         );
     game.$sys.protoObjects.goods = GlobalLibraryJS.shortCircuit(0b1111,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$goods'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$goods'),
-        game.$gameMakerGlobalJS.$config.$protoObjects.$goods,
+        GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$goods'),
+        //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$protoObjects', '$goods'),
+        GameMakerGlobalJS.$config.$protoObjects.$goods,
         );
     game.$sys.protoObjects.skill = GlobalLibraryJS.shortCircuit(0b1111,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$skill'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$skill'),
-        game.$gameMakerGlobalJS.$config.$protoObjects.$skill,
+        GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$skill'),
+        //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$protoObjects', '$skill'),
+        GameMakerGlobalJS.$config.$protoObjects.$skill,
         );
     game.$sys.protoObjects.fightScript = GlobalLibraryJS.shortCircuit(0b1111,
-        GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$protoObjects', '$fightScript'),
-        //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$protoObjects', '$fightScript'),
-        game.$gameMakerGlobalJS.$config.$protoObjects.$fightScript,
+        GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$fightScript'),
+        //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$protoObjects', '$fightScript'),
+        GameMakerGlobalJS.$config.$protoObjects.$fightScript,
         );
-
-
-
-    //起始脚本
-    {
-        let ts;
-        if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'main.js'))) {
-            ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'main.js'));
-        }
-        //!!!兼容旧代码
-        else if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'start.js'))) {
-            ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'start.js'));
-        }
-        if(ts) {
-            _private.objCommonScripts['game_start'] = ts.$start || ts.start;
-            //_private.objCommonScripts['game_init'] = ts.$init || ts.init;
-            //_private.objCommonScripts['game_save_script'] = ts.$save || ts.save;
-            //_private.objCommonScripts['game_load_script'] = ts.$load || ts.load;
-        }
-    }
 
 
 
@@ -730,15 +576,10 @@ function *loadResources() {
 
 
 
-
-    /*if(!_private.objCommonScripts['get_buff']) {
-        _private.objCommonScripts['get_buff'] = GameMakerGlobalJS.$getBuff;
-        console.debug('[GameScene]!载入系统通用获得Buff脚本');
-    }
-    else
-        console.debug('[GameScene]载入通用获得Buff脚本OK');
-    */
-
+    /*data = game.loadjson('common_algorithm.json');
+    if(data) {
+        let ret = GlobalJS._eval(data['FightAlgorithm']);
+    }*/
 
 
     /*/读升级链
@@ -747,31 +588,31 @@ function *loadResources() {
     if(FrameManager.sl_fileExists(filePath + 'level_chain.js'))
         tlevelChainScript = _private.jsEngine.load(GlobalJS.toURL(filePath + 'level_chain.js'));
     if(tlevelChainScript) {
-        _private.objCommonScripts['levelup_script'] = tlevelChainScript.$commonLevelUpScript;
-        _private.objCommonScripts['level_Algorithm'] = tlevelChainScript.$commonLevelAlgorithm;
+        _private.objCommonScripts.$commonLevelUpScript = tlevelChainScript.$commonLevelUpScript;
+        _private.objCommonScripts.$commonLevelAlgorithm = tlevelChainScript.$commonLevelAlgorithm;
     }*/
 
     /*info = game.loadjson('level_chain.json');
     if(info) {
         let ret = GlobalJS._eval(info['LevelChainScript']);
-        _private.objCommonScripts['levelup_script'] = ret.$commonLevelUpScript;
-        _private.objCommonScripts['level_Algorithm'] = ret.$commonLevelAlgorithm;
+        _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelUpScript;
+        _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelAlgorithm;
     }
 
-    if(!_private.objCommonScripts['levelup_script']) {
-        _private.objCommonScripts['levelup_script'] = GameMakerGlobalJS.$commonLevelUpScript;
+    if(!_private.objCommonScripts.$commonLevelUpScript) {
+        _private.objCommonScripts.$commonLevelUpScript = GameMakerGlobalJS.$commonLevelUpScript;
         console.debug('[GameScene]!载入系统升级脚本');
     }
     else
-        console.debug('[GameScene]载入升级脚本OK');  //, _private.objCommonScripts['levelup_script'], info, eval('()=>{}'));
+        console.debug('[GameScene]载入升级脚本OK');  //, _private.objCommonScripts.$commonLevelUpScript, info, eval('()=>{}'));
 
 
-    if(!_private.objCommonScripts['level_Algorithm']) {
-        _private.objCommonScripts['level_Algorithm'] = GameMakerGlobalJS.$commonLevelAlgorithm;
+    if(!_private.objCommonScripts.$commonLevelAlgorithm) {
+        _private.objCommonScripts.$commonLevelAlgorithm = GameMakerGlobalJS.$commonLevelAlgorithm;
         console.debug('[GameScene]!载入系统升级算法');
     }
     else
-        console.debug('[GameScene]载入升级算法OK');  //, _private.objCommonScripts['level_Algorithm'], info, eval('()=>{}'));
+        console.debug('[GameScene]载入升级算法OK');  //, _private.objCommonScripts.$commonLevelAlgorithm, info, eval('()=>{}'));
     */
 
 
@@ -844,7 +685,7 @@ function *loadResources() {
 
 
 //卸载资源
-function *unloadResources() {
+function* unloadResources() {
     console.debug('[GameScene]unloadResources');
 
     //卸载扩展 插件、组件
@@ -871,7 +712,7 @@ function *unloadResources() {
 
     if(Qt.platform.os === 'android') {
         Platform.sl_setScreenOrientation(_private.lastOrient);
-        //if(game.$userscripts.$config && game.$userscripts.$config.$android)
+        //if(game.$sys.getCommonScriptResource('$config') && game.$sys.getCommonScriptResource('$config', '$android'))
     }
 
 
@@ -937,7 +778,7 @@ function *unloadResources() {
 //返回 通用脚本中的某个函数或变量，如果没有则返回系统的
 function getCommonScriptResource(...names) {
     let flags = 0b1;
-    return GlobalLibraryJS.shortCircuit(flags, GlobalLibraryJS.getObjectValue(game, '$userscripts', ...names), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', ...names));
+    return GlobalLibraryJS.shortCircuit(flags, GlobalLibraryJS.getObjectValue(game.$userscripts, ...names), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, ...names));
 }
 
 
@@ -1416,7 +1257,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
 
         //创建战斗人物
         retFightRole = {$rid: fightrole, $id: fightrole};
-        GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts['combatant_class'](fightrole));
+        GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts.$Combatant(fightrole));
         if(resFightRole.$createData)
             GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData());
         if(GlobalLibraryJS.isObject(forceNew))
@@ -1433,7 +1274,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
                 //return fightrole;
             }
             else {
-                retFightRole = new _private.objCommonScripts['combatant_class'](fightrole.$rid);
+                retFightRole = new _private.objCommonScripts.$Combatant(fightrole.$rid);
                 //if(resFightRole.$createData)
                 //    GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData());
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, fightrole, {filterExcept: {$$fightData: undefined, Params: undefined}}/*, true*/);
@@ -1454,7 +1295,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
             }
             //创建战斗人物
             retFightRole = {$rid: fightrole.RID};
-            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts['combatant_class'](fightrole.RID));
+            GlobalLibraryJS.copyPropertiesToObject(retFightRole, new _private.objCommonScripts.$Combatant(fightrole.RID));
             if(resFightRole.$createData)
                 GlobalLibraryJS.copyPropertiesToObject(retFightRole, resFightRole.$createData(fightrole.Params));
             //delete fightrole.RID;
@@ -1515,7 +1356,7 @@ function getFightRoleObject(fightrole, forceNew=true) {
 
 
     //刷新
-    _private.objCommonScripts['refresh_combatant'](retFightRole, false);
+    _private.objCommonScripts.$refreshCombatant(retFightRole, false);
 
 
     return retFightRole;
@@ -1555,7 +1396,7 @@ function getFightScriptObject(fightscript, forceNew=true) {
                     retFightScript = {};
                 */
                 retFightScript = {};
-                //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts['combatant_class'](fightscript.$rid));
+                //GlobalLibraryJS.copyPropertiesToObject(retFightScript, new _private.objCommonScripts.$Combatant(fightscript.$rid));
                 GlobalLibraryJS.copyPropertiesToObject(retFightScript, fightscript/*, true*/);
                 if(GlobalLibraryJS.isObject(forceNew))
                     GlobalLibraryJS.copyPropertiesToObject(retFightScript, forceNew/*, true*/);
@@ -2855,8 +2696,8 @@ function onTriggered() {
         //mainRole.x = roleNewX;
         //mainRole.y = roleNewY;
 
-        game.gd['$sys_main_roles'][tIndex].$x = mainRole.x;
-        game.gd['$sys_main_roles'][tIndex].$y = mainRole.y;
+        game.gd['$sys_main_roles'][tIndex].$x = mainRole.x + mainRole.x1 + parseInt(mainRole.width1 / 2);
+        game.gd['$sys_main_roles'][tIndex].$y = mainRole.y + mainRole.y1 + parseInt(mainRole.height1 / 2);
 
 
 

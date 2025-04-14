@@ -421,7 +421,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '升级': {
-            command: ['升级', 'game.$userscripts.levelup(%1,%2);', '升级', 0, true, 'red', 'white'],
+            command: ['升级', 'game.$sys.resources.commonScripts.levelUp(%1,%2);', '升级', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*级别', 'number', true, 0, '1', 'darkgreen'],

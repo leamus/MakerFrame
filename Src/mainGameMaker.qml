@@ -2091,12 +2091,12 @@ Item {
                 //Headers: {},
                 FilePath: filePath,
                 //Params: ,
-            }, 2).$then(function(xhr) {
+            }, 2).$$then(function(xhr) {
                 rootWindow.aliasGlobal.dialogCommon.close();
 
                 if(successCallback)
                     successCallback();
-            }).$catch(function(e) {
+            }).$$catch(function(e) {
                 //rootWindow.aliasGlobal.dialogCommon.close();
 
                 rootWindow.aliasGlobal.dialogCommon.show({

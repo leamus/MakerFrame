@@ -23,7 +23,7 @@ import 'GameComponents'
 import 'qrc:/QML'
 
 
-//import 'GameMakerGlobal.js' as GameMakerGlobalJS
+import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 import 'FightScene.js' as FightSceneJS
 //import 'File.js' as File
@@ -58,153 +58,14 @@ Item {
         console.debug('[FightScene]load');
 
 
-        let tCommoncript = game.$userscripts;
-        let objCommonScripts = game.$resources.commonScripts;
-
-
-        objCommonScripts['common_run_away_algorithm'] = tCommoncript.$commonRunAwayAlgorithm;
-        objCommonScripts['fight_skill_algorithm'] = tCommoncript.$fightSkillAlgorithm || tCommoncript.$skillEffectAlgorithm;
-        objCommonScripts['fight_role_choice_skills_or_goods_algorithm'] = tCommoncript.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-        objCommonScripts['fight_init_script'] = tCommoncript.$commonFightInitScript;
-        objCommonScripts['fight_start_script'] = tCommoncript.$commonFightStartScript;
-        objCommonScripts['fight_round_script'] = tCommoncript.$commonFightRoundScript;
-        objCommonScripts['fight_end_script'] = tCommoncript.$commonFightEndScript;
-        objCommonScripts['fight_combatant_position_algorithm'] = tCommoncript.$fightCombatantPositionAlgorithm;
-        objCommonScripts['fight_combatant_melee_position_algorithm'] = tCommoncript.$fightCombatantMeleePositionAlgorithm;
-        objCommonScripts['fight_skill_melee_position_algorithm'] = tCommoncript.$fightSkillMeleePositionAlgorithm;
-        objCommonScripts['fight_combatant_set_choice'] = tCommoncript.$fightCombatantSetChoice;
-        objCommonScripts['fight_menus'] = tCommoncript.$fightMenus;
-        objCommonScripts['fight_buttons'] = tCommoncript.$fightButtons;
-        objCommonScripts['fight_roles_round'] = tCommoncript.$fightRolesRound;
-        objCommonScripts['combatant_round_script'] = tCommoncript.$combatantRoundScript;
-        objCommonScripts['check_all_combatants'] = tCommoncript.$checkAllCombatants;
-        objCommonScripts['common_check_skill'] = tCommoncript.$commonCheckSkill;
-
-        if(!objCommonScripts['common_run_away_algorithm']) {
-            objCommonScripts['common_run_away_algorithm'] = game.$gameMakerGlobalJS.$commonRunAwayAlgorithm;
-            console.debug('[FightScene]!载入系统逃跑算法');
-        }
-        else
-            console.debug('[FightScene]载入逃跑算法OK');
-
-        if(!objCommonScripts['fight_skill_algorithm']) {
-            objCommonScripts['fight_skill_algorithm'] = game.$gameMakerGlobalJS.$fightSkillAlgorithm;
-            console.debug('[FightScene]!载入系统战斗算法');
-        }
-        else
-            console.debug('[FightScene]载入战斗算法OK');  //, objCommonScripts['fight_skill_algorithm'], data, eval('()=>{}'));
-
-        if(!objCommonScripts['fight_role_choice_skills_or_goods_algorithm']) {
-            objCommonScripts['fight_role_choice_skills_or_goods_algorithm'] = game.$gameMakerGlobalJS.$fightRoleChoiceSkillsOrGoodsAlgorithm;
-            console.debug('[FightScene]!载入系统战斗人物选择技能或物品算法');
-        }
-        else
-            console.debug('[FightScene]载入战斗人物选择技能或物品算法OK');
-
-
-        if(!objCommonScripts['fight_init_script']) {
-            objCommonScripts['fight_init_script'] = game.$gameMakerGlobalJS.$commonFightInitScript;
-            console.debug('[FightScene]!载入系统战斗初始化脚本');
-        }
-        else
-            console.debug('[FightScene]载入战斗初始化脚本OK');
-        if(!objCommonScripts['fight_start_script']) {
-            objCommonScripts['fight_start_script'] = game.$gameMakerGlobalJS.$commonFightStartScript;
-            console.debug('[FightScene]!载入系统战斗开始脚本');
-        }
-        else
-            console.debug('[FightScene]载入战斗开始脚本OK');
-        if(!objCommonScripts['fight_round_script']) {
-            objCommonScripts['fight_round_script'] = game.$gameMakerGlobalJS.$commonFightRoundScript;
-            console.debug('[FightScene]!载入系统战斗回合脚本');
-        }
-        else
-            console.debug('[FightScene]载入战斗回合脚本OK');
-        if(!objCommonScripts['fight_end_script']) {
-            objCommonScripts['fight_end_script'] = game.$gameMakerGlobalJS.$commonFightEndScript;
-            console.debug('[FightScene]!载入系统战斗结束脚本');
-        }
-        else
-            console.debug('[FightScene]载入战斗结束脚本OK');
-
-        if(!objCommonScripts['fight_combatant_position_algorithm']) {
-            objCommonScripts['fight_combatant_position_algorithm'] = game.$gameMakerGlobalJS.$fightCombatantPositionAlgorithm;
-            console.debug('[FightScene]!载入系统战斗坐标算法');
-        }
-        else
-            console.debug('[FightScene]载入战斗坐标算法OK');
-
-        if(!objCommonScripts['fight_combatant_melee_position_algorithm']) {
-            objCommonScripts['fight_combatant_melee_position_algorithm'] = game.$gameMakerGlobalJS.$fightCombatantMeleePositionAlgorithm;
-            console.debug('[FightScene]!载入系统战斗近战坐标算法');
-        }
-        else
-            console.debug('[FightScene]载入战斗近战坐标算法OK');
-
-        if(!objCommonScripts['fight_skill_melee_position_algorithm']) {
-            objCommonScripts['fight_skill_melee_position_algorithm'] = game.$gameMakerGlobalJS.$fightSkillMeleePositionAlgorithm;
-            console.debug('[FightScene]!载入系统战斗特效坐标算法');
-        }
-        else
-            console.debug('[FightScene]载入战斗特效坐标算法OK');
-
-        if(!objCommonScripts['fight_combatant_set_choice']) {
-            objCommonScripts['fight_combatant_set_choice'] = game.$gameMakerGlobalJS.$fightCombatantSetChoice;
-            console.debug('[FightScene]!载入系统设置 战斗人物的 初始化 或 休息');
-        }
-        else
-            console.debug('[FightScene]载入设置 战斗人物的 初始化 或 休息OK');
-
-        if(!objCommonScripts['fight_menus']) {
-            objCommonScripts['fight_menus'] = game.$gameMakerGlobalJS.$fightMenus;
-            console.debug('[FightScene]!载入系统战斗菜单');
-        }
-        else
-            console.debug('[FightScene]载入战斗菜单OK');
-
-        if(!objCommonScripts['fight_buttons']) {
-            objCommonScripts['fight_buttons'] = game.$gameMakerGlobalJS.$fightButtons;
-            console.debug('[FightScene]!载入系统战斗按钮');
-        }
-        else
-            console.debug('[FightScene]载入战斗按钮OK');
-
-        if(!objCommonScripts['fight_roles_round']) {
-            objCommonScripts['fight_roles_round'] = game.$gameMakerGlobalJS.$fightRolesRound;
-            console.debug('[FightScene]!载入系统战斗人物回合顺序');
-        }
-        else
-            console.debug('[FightScene]载入战斗人物回合顺序OK');
-
-        if(!objCommonScripts['combatant_round_script']) {
-            objCommonScripts['combatant_round_script'] = game.$gameMakerGlobalJS.$combatantRoundScript;
-            console.debug('[FightScene]!载入系统通用Buff脚本');
-        }
-        else
-            console.debug('[FightScene]载入通用Buff脚本OK');
-
-        if(!objCommonScripts['check_all_combatants']) {
-            objCommonScripts['check_all_combatants'] = game.$gameMakerGlobalJS.$checkAllCombatants;
-            console.debug('[FightScene]!载入系统计算属性脚本');
-        }
-        else
-            console.debug('[FightScene]载入计算属性脚本OK');
-
-        if(!objCommonScripts['common_check_skill']) {
-            objCommonScripts['common_check_skill'] = game.$gameMakerGlobalJS.$commonCheckSkill;
-            console.debug('[FightScene]!载入系统通用检查技能脚本');
-        }
-        else
-            console.debug('[FightScene]载入通用检查技能脚本OK');
-
-
 
         //读取配置
         _private.config.fightRoleBarConfig = game.$sys.getCommonScriptResource('$config', '$fight', '$combatant_bars');
 
 
         //按钮
-        for(let tb of game.$sys.resources.commonScripts['fight_buttons']) {
+        let fightButtons = game.$sys.getCommonScriptResource('$fightButtons');
+        for(let tb of fightButtons) {
             //let compButtons1 = Qt.createComponent('qrc:/QML/_Global/Button/ColorButton.qml');
             //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
             let button = compButtons.createObject(rowlayoutButtons);
@@ -243,8 +104,8 @@ Item {
         //样式
         //if(!style)
         //    style = {};
-        let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
-        let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || styleSystem;
+        let styleSystem = GameMakerGlobalJS.$config.$fight.$styles.$menu;
+        let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
 
         //maskMenu.color = style.MaskColor || '#7FFFFFFF';
         menuSkillsOrGoods.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -305,7 +166,7 @@ Item {
 
 
     //初始化
-    function *init(fightScriptData) {
+    function* init(fightScriptData) {
         console.debug('[FightScene]init:', fightScriptData);
 
         fight.d = {};
@@ -432,11 +293,10 @@ Item {
 
 
         //初始化脚本
-        const fightInitScript = game.$sys.resources.commonScripts['fight_init_script'];
-        if(fightInitScript) { //GlobalLibraryJS.checkCallable
-            let r = fightInitScript([fight.myCombatants, fight.enemies], fight.fightScript);
+        if(game.$sys.resources.commonScripts.$commonFightInitScript) { //GlobalLibraryJS.checkCallable
+            let r = game.$sys.resources.commonScripts.$commonFightInitScript([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-            //yield fight.run(fightInitScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight_init_script'});
+            //yield fight.run(game.$sys.resources.commonScripts.$commonFightInitScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: '$commonFightInitScript'});
         }
 
 
@@ -499,11 +359,10 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        const fightStartScript = game.$sys.resources.commonScripts['fight_start_script'];
-        if(fightStartScript) { //GlobalLibraryJS.checkCallable
-            let r = fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript);
+        if(game.$sys.resources.commonScripts.$commonFightStartScript) { //GlobalLibraryJS.checkCallable
+            let r = game.$sys.resources.commonScripts.$commonFightStartScript([fight.myCombatants, fight.enemies], fight.fightScript);
             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-            //yield fight.run(fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
+            //yield fight.run(game.$sys.resources.commonScripts.$commonFightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
         }
 
 
@@ -597,10 +456,10 @@ Item {
             //计算新属性
             //for(let tfh of fight.myCombatants)
             for(let tfh of game.gd['$sys_fight_heros'])
-                game.$resources.commonScripts['refresh_combatant'](tfh);
+                game.$resources.commonScripts.$refreshCombatant(tfh);
             //刷新战斗时人物数据
             //fight.$sys.refreshCombatant(-1);
-        }, {Running: 1, Tips: 'FightScene release refresh_combatant'});
+        }, {Running: 1, Tips: 'FightScene release $refreshCombatant'});
 
         console.debug('[FightScene]release over');
     }
@@ -811,7 +670,7 @@ Item {
             else if(GlobalLibraryJS.isObject(result))
                 FightSceneJS.fightOver(result, true);
             else {
-                let fightResult = game.$sys.resources.commonScripts['check_all_combatants'](fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
+                let fightResult = game.$sys.resources.commonScripts.$checkAllCombatants(fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
                 if(result !== null) {
                     fightResult.result = result;
                     FightSceneJS.fightOver(fightResult);
@@ -838,10 +697,10 @@ Item {
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
             checkToFight: FightSceneJS.checkToFight,
 
-            getCombatantSkills: game.$gameMakerGlobalJS.getCombatantSkills,
+            getCombatantSkills: GameMakerGlobalJS.getCombatantSkills,
 
-            gfChoiceSingleCombatantSkill: game.$gameMakerGlobalJS.gfChoiceSingleCombatantSkill,
-            gfNoChoiceSkill: game.$gameMakerGlobalJS.gfNoChoiceSkill,
+            gfChoiceSingleCombatantSkill: GameMakerGlobalJS.gfChoiceSingleCombatantSkill,
+            gfNoChoiceSkill: GameMakerGlobalJS.gfNoChoiceSkill,
 
             saveLast: FightSceneJS.saveLast,
             loadLast: FightSceneJS.loadLast,
@@ -884,7 +743,7 @@ Item {
             refreshCombatant: function(combatant=-1) {
                 let refresh = function(combatant) {
                     if(combatant.$$fightData && combatant.$$fightData.$info && combatant.$$fightData.$info.$comp) {
-                        game.$sys.resources.commonScripts['refresh_combatant'](combatant, false);
+                        game.$sys.resources.commonScripts.$refreshCombatant(combatant, false);
                         combatant.$$fightData.$info.$comp.refresh(combatant);
                         //repeaterMyCombatants.itemAt(i).propertyBar.refresh(fight.myCombatants[i].$$propertiesWithExtra.HP);
                     }
@@ -1135,9 +994,9 @@ Item {
         id: compSpriteEffect
         SpriteEffect {
             animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1,
-                GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$spriteEffect', '$smooth'),
-                //GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$spriteEffect', '$smooth'),
-                game.$gameMakerGlobalJS.$config.$spriteEffect.$smooth,
+                GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$spriteEffect', '$smooth'),
+                //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$spriteEffect', '$smooth'),
+                GameMakerGlobalJS.$config.$spriteEffect.$smooth,
                 true)
 
             onSg_playEffect: {
@@ -1354,7 +1213,7 @@ Item {
                                 //if(_private.nStep === 1) {
 
                                     //没血的跳过
-                                    if(!game.$sys.resources.commonScripts['combatant_is_valid'](fight.myCombatants[modelData]))
+                                    if(!game.$sys.resources.commonScripts.$combatantIsValid(fight.myCombatants[modelData]))
                                         return;
 
 
@@ -1374,8 +1233,8 @@ Item {
                                     //样式
                                     //if(!style)
                                     //    style = {};
-                                    let styleSystem = game.$gameMakerGlobalJS.$config.$fight.$styles.$menu;
-                                    let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$fight', '$styles', '$menu') || styleSystem;
+                                    let styleSystem = GameMakerGlobalJS.$config.$fight.$styles.$menu;
+                                    let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
 
                                     //maskMenu.color = style.MaskColor || '#7FFFFFFF';
                                     menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -1391,7 +1250,7 @@ Item {
                                     menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                                     menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
                                     //menuFightRoleChoice.show(_private.arrMenu);
-                                    menuFightRoleChoice.show(game.$sys.resources.commonScripts['fight_menus'].$menus);
+                                    menuFightRoleChoice.show(game.$sys.getCommonScriptResource('$fightMenus').$menus);
                                 }
                                 else if(tRootMyCombatantComp.bCanClick === true) {
                                     FightSceneJS.skillStepChoiced(1, fight.myCombatants[modelData]);
@@ -1782,7 +1641,7 @@ Item {
             //hide();
             menuFightRoleChoice.visible = false;
 
-            game.$sys.resources.commonScripts['fight_menus'].$actions[index](_private.nChoiceFightRoleIndex);
+            game.$sys.getCommonScriptResource('$fightMenus').$actions[index](_private.nChoiceFightRoleIndex);
             return;
 
 

@@ -386,6 +386,7 @@ Item {
                             GlobalLibraryJS.asyncScript(function*() {
                                 console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), FrameManager.sl_dirExists(pluginDirPath));
 
+                                let removeFlag = false;
                                 let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
                                 if(FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                     try {
@@ -400,7 +401,7 @@ Item {
 
                                         if(ret === undefined || ret === null) {
                                             //console.debug('删除', pluginDirPath);
-                                            FrameManager.sl_removeRecursively(pluginDirPath);
+                                            removeFlag = true;
                                         }
                                         else if(ret === false)
                                             return;
@@ -408,15 +409,21 @@ Item {
                                         //itemExtendsRoot.forceActiveFocus();
                                         //rootWindow.aliasGlobal.list.visible = false;
 
+                                        console.debug('[PluginsManager]ret:', ret);
                                     }
                                     catch(e) {
                                         console.error('[!PluginsManager]', e);
                                         //return -1;
                                     }
                                 }
+                                else
+                                    removeFlag = true;
 
-                                rootWindow.aliasGlobal.list.removeItem(index);
-                                _private.refresh();
+                                if(removeFlag) {
+                                    FrameManager.sl_removeRecursively(pluginDirPath);
+                                    rootWindow.aliasGlobal.list.removeItem(index);
+                                    _private.refresh();
+                                }
 
                                 //rootWindow.aliasGlobal.list.forceActiveFocus();
                             }, 'remove plugin');

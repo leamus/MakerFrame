@@ -1369,7 +1369,7 @@ let data = (function() {
 
         /*
         //角色单独的升级链脚本
-        function *levelUpScript(combatant) {
+        function* levelUpScript(combatant) {
         }
 
         //targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）

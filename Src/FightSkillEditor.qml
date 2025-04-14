@@ -96,7 +96,7 @@ let data = (function() {
 
 
         //选择道具时脚本；如果为null则根据 $targetFlag 和 $targetCount 自动调用 系统定义 的
-        /*$choiceScript: function *(skill, combatant) {
+        /*$choiceScript: function*(skill, combatant) {
             //选择敌方
             //let r = yield* fight.$sys.gfChoiceSingleCombatantSkill(goods, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             //return r;
@@ -105,7 +105,7 @@ let data = (function() {
         $choiceScript: null,
 
         //技能产生的效果 和 动画
-        $playScript: function *(skill, combatant) {
+        $playScript: function*(skill, combatant) {
 
             //使用的技能对象（可以用技能的数据）
             //let skill = combatant.$$fightData.$choice.$attack;

@@ -76,43 +76,40 @@ import 'GameScene.js' as GameSceneJS
     game.gd['$sys_scale']: 当前缩放大小
     game.gd['$sys_random_fight']：随机战斗
 
-    _private.objCommonScripts['game_start'] = *$start;
-    _private.objCommonScripts['game_init'] = tCommoncript.$gameInit;
-    _private.objCommonScripts['game_release'] = tCommoncript.$gameRelease;
-    _private.objCommonScripts['before_save'] = tCommoncript.$beforeSave;
-    _private.objCommonScripts['before_load'] = tCommoncript.$beforeLoad;
-    _private.objCommonScripts['after_save'] = tCommoncript.$afterSave;
-    _private.objCommonScripts['after_load'] = tCommoncript.$afterLoad;
-    _private.objCommonScripts['combatant_class'] = tCommoncript.$Combatant;
-    _private.objCommonScripts['refresh_combatant'] = tCommoncript.$refreshCombatant;
-    _private.objCommonScripts['combatant_is_valid'] = tCommoncript.$combatantIsValid;
-    _private.objCommonScripts['check_all_combatants'] = tCommoncript.$checkAllCombatants;
-    _private.objCommonScripts['fight_skill_algorithm']：战斗算法
-    _private.objCommonScripts['fight_role_choice_skills_or_goods_algorithm']：战斗人物选择技能或物品算法
-    _private.objCommonScripts['game_over_script'];   //游戏结束脚本
-    _private.objCommonScripts['common_run_away_algorithm']：逃跑算法
-    _private.objCommonScripts['fight_start_script']：战斗开始通用脚本
-    _private.objCommonScripts['fight_round_script']：战斗回合通用脚本
-    _private.objCommonScripts['fight_end_script']：战斗结束通用脚本（升级经验、获得金钱）
-    _private.objCommonScripts['fight_combatant_position_algorithm']：//获取 某战斗角色 中心位置
-    _private.objCommonScripts['fight_combatant_melee_position_algorithm']：//战斗角色近战 坐标
-    _private.objCommonScripts['fight_skill_melee_position_algorithm']//特效在战斗角色的 坐标
-    _private.objCommonScripts['fight_combatant_set_choice'] //设置 战斗人物的 初始化 或 休息
-    _private.objCommonScripts['fight_menus']//战斗菜单
-    //_private.objCommonScripts['resume_event_script']
-    //_private.objCommonScripts['get_goods_script']
-    //_private.objCommonScripts['use_goods_script']
-    _private.objCommonScripts['fight_roles_round']   //一个大回合内 每次返回一个战斗人物的回合
-    _private.objCommonScripts['combatant_info']
-    _private.objCommonScripts['show_goods_name']
-    _private.objCommonScripts['show_combatant_name']
-    _private.objCommonScripts['common_check_skill']
-    _private.objCommonScripts['combatant_round_script']
-    //_private.objCommonScripts['events']
+      .$gameStart = *$start;
+      .$gameInit;
+      .$gameRelease;
+      .$beforeSave;
+      .$beforeLoad;
+      .$afterSave;
+      .$afterLoad;
+      .$Combatant;
+      .$refreshCombatant;
+      .$combatantIsValid;
+      .$gameOverScript //游戏结束脚本
+      .$combatantInfo
+      .$showGoodsName
+      .$showCombatantName
 
+      .$commonRunAwayAlgorithm：逃跑算法
+      .$fightSkillAlgorithm：战斗算法
+      .$fightRoleChoiceSkillsOrGoodsAlgorithm：战斗人物选择技能或物品算法
+      .$commonFightInitScript
+      .$commonFightStartScript：战斗开始通用脚本
+      .$commonFightRoundScript：战斗回合通用脚本
+      .$commonFightEndScript：战斗结束通用脚本（升级经验、获得金钱）
+      .$fightCombatantPositionAlgorithm：获取 某战斗角色 中心位置
+      .$fightCombatantMeleePositionAlgorithm：战斗角色近战 坐标
+      .$fightSkillMeleePositionAlgorithm：特效在战斗角色的 坐标
+      .$fightCombatantSetChoice：//设置 战斗人物的 初始化 或 休息
+      .$fightMenus：战斗菜单
+      .$fightRolesRound：一个大回合内 每次返回一个战斗人物的回合
+      .$combatantRoundScript
+      .$checkAllCombatants;
+      .$commonCheckSkill
 
-    //_private.objCommonScripts['levelup_script']：升级脚本（经验等条件达到后升级和结果）
-    //_private.objCommonScripts['level_Algorithm']：升级算法（直接升级对经验等条件的影响）
+    //_private.objCommonScripts.$commonLevelUpScript：升级脚本（经验等条件达到后升级和结果）
+    //_private.objCommonScripts.$commonLevelAlgorithm：升级算法（直接升级对经验等条件的影响）
 
 */
 
@@ -129,9 +126,9 @@ Item {
 
     function init(startScript=true, bLoadResources=true, gameData=null) {
 
-        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
         _private.scriptQueue.clear(5);
-        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
 
 
         //scriptQueue.runNextEventLoop('init');
@@ -148,7 +145,7 @@ Item {
     //startScript为true，则载入start.js；为函数/生成器，则直接运行startScript；为false则不执行；
     //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）；
     //必须用yield*标记来让它运行完毕（第一次使用则不必）；
-    function *_init(startScript=true, bLoadResources=true, gameData=null) {
+    function* _init(startScript=true, bLoadResources=true, gameData=null) {
         console.debug('[GameScene]init:', startScript, bLoadResources, gameData);
 
         //game.run(function*() {
@@ -167,9 +164,6 @@ Item {
 
         if(bLoadResources)
             yield* GameSceneJS.loadResources();
-
-
-        //game.gf['$sys'] = _private.objCommonScripts;
 
 
         //恢复游戏数据
@@ -191,7 +185,7 @@ Item {
 
         //计算新属性
         for(let tfh of game.gd['$sys_fight_heros'])
-            _private.objCommonScripts['refresh_combatant'](tfh);
+            _private.objCommonScripts.$refreshCombatant(tfh);
         //刷新战斗时人物数据
         //fight.$sys.refreshCombatant(-1);
 
@@ -214,12 +208,11 @@ Item {
 
 
 
-        const gameInit = _private.objCommonScripts['game_init'];
-        if(gameInit) { //GlobalLibraryJS.checkCallable
+        if(_private.objCommonScripts.$gameInit) { //GlobalLibraryJS.checkCallable
             try {
-                //game.run(gameInit(bLoadResources) ?? null,
-                //    {Priority: priority++, Type: 0, Running: 1, Tips: 'game_init'});
-                let r = gameInit(bLoadResources);
+                //game.run(_private.objCommonScripts.$gameInit(bLoadResources) ?? null,
+                //    {Priority: priority++, Type: 0, Running: 1, Tips: '$gameInit'});
+                let r = _private.objCommonScripts.$gameInit(bLoadResources);
                 if(GlobalLibraryJS.isGenerator(r))r = yield* r;
             } catch(e) {
                 GlobalLibraryJS.printException(e);
@@ -279,7 +272,7 @@ Item {
                 _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
             */
 
-            const gameStart = _private.objCommonScripts['game_start'];
+            let gameStart = /*game.$sys.getCommonScriptResource('$start') || */_private.objCommonScripts['$gameStart'];
             if(gameStart) { //GlobalLibraryJS.checkCallable
                 //game.run(function*() {
                     try {
@@ -331,7 +324,7 @@ Item {
 
     //释放所有资源
     //必须用yield标记来让它运行完毕
-    function *release(bUnloadResources=true) {
+    function* release(bUnloadResources=true) {
         console.debug('[GameScene]release');
 
         //scriptQueue.runNextEventLoop('release');
@@ -381,10 +374,9 @@ Item {
             }
 
 
-        const gameRelease = _private.objCommonScripts['game_release'];
-        if(gameRelease) { //GlobalLibraryJS.checkCallable
+        if(_private.objCommonScripts.$gameRelease) { //GlobalLibraryJS.checkCallable
             try {
-                let r = gameRelease(bUnloadResources);
+                let r = _private.objCommonScripts.$gameRelease(bUnloadResources);
                 if(GlobalLibraryJS.isGenerator(r))r = yield* r;
             } catch(e) {
                 GlobalLibraryJS.printException(e);
@@ -461,8 +453,8 @@ Item {
 
         _private.objRoles = {};
         _private.arrMainRoles = [];
-        if(_private.objTmpComponents.$keys.length > 0) {
-            console.warn('[!GameScene]存在未释放的组件：', _private.objTmpComponents.$keys);
+        if(_private.objTmpComponents.$$keys.length > 0) {
+            console.warn('[!GameScene]存在未释放的组件：', _private.objTmpComponents.$$keys);
 
             for(let tc in _private.objTmpComponents) {
                 const c = _private.objTmpComponents[tc];
@@ -499,10 +491,10 @@ Item {
 
 
 
-        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
         //_private.scriptQueue.clear(0);
         ///_private.scriptQueue.clear(4);
-        //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+        //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
 
         console.debug('[GameScene]release over');
     }
@@ -520,9 +512,7 @@ Item {
             return false;
 
 
-        let targetX;
-        let targetY;
-        [targetX, targetY] = itemViewPort.getMapBlockPos(bx, by);
+        let [targetX, targetY] = itemViewPort.getMapBlockPos(bx, by);
 
         //设置角色坐标
 
@@ -557,12 +547,12 @@ Item {
         //setSceneToRole(_private.sceneRole);
         if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
-        game.gd['$sys_main_roles'][index].$x = mainRole.x;
-        game.gd['$sys_main_roles'][index].$y = mainRole.y;
+        game.gd['$sys_main_roles'][index].$x = mainRole.x + mainRole.x1 + parseInt(mainRole.width1 / 2);
+        game.gd['$sys_main_roles'][index].$y = mainRole.y + mainRole.y1 + parseInt(mainRole.height1 / 2);
     }
 
     //场景移动到某角色
-    function setSceneToRole(role) {
+    function setSceneToRole(role=_private.sceneRole) {
         if(!role)
             return;
 
@@ -894,8 +884,8 @@ Item {
             //样式
             if(!style)
                 style = {};
-            const styleSystem = game.$gameMakerGlobalJS.$config.$role.$say;
-            const styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role', '$say') || styleSystem;
+            const styleSystem = GameMakerGlobalJS.$config.$role.$say;
+            const styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$role', '$say') || styleSystem;
             let tn;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -1050,7 +1040,7 @@ Item {
         //    RID为要创建的角色资源名；
         //    $id为角色对象id（默认为$name值），id存在则会复用组件；$name为游戏显示名（默认为RID值）；
         //    $showName为是否头顶显示名字；$scale为缩放倍率数组（横竖坐标轴方向）；$speed为移动速度；$penetrate为是否可穿透；$realSize为影子大小；$avatar为头像文件名；$avatarSize为头像大小；这几个属性会替换已设置好的角色资源的属性；
-        //    $x、$y是像素坐标；$bx、$by是地图块坐标（像素坐标和块坐标设置二选一）；
+        //    $x、$y是像素坐标；$bx、$by是地图块坐标（像素坐标和块坐标设置二选一）；此种坐标设置自动会将角色阴影的中心点放在对应坐标上；
         //    $direction表示面向方向（0、1、2、3分别表示上右下左）；
         //    $action：
         //      为0表示暂时静止；为1表示随机移动；为-1表示禁止移动和操作；
@@ -1118,8 +1108,8 @@ Item {
 
 
             role.$index = index;
-            role.$x = role.$x ?? role.x ?? roleComp.x;
-            role.$y = role.$y ?? role.y ?? roleComp.y;
+            //role.$x = role.$x ?? role.x ?? roleComp.x;
+            //role.$y = role.$y ?? role.y ?? roleComp.y;
 
             role.$speed = role.$speed ?? parseFloat(roleComp.$info.MoveSpeed);
             role.$scale = role.$scale ?? [((roleComp.$info.Scale && roleComp.$info.Scale[0] !== undefined) ? roleComp.$info.Scale[0] : 1), ((roleComp.$info.Scale && roleComp.$info.Scale[1] !== undefined) ? roleComp.$info.Scale[1] : 1)];
@@ -1304,13 +1294,14 @@ Item {
                 if(props.$bx || props.$by)
                     setMainRolePos(parseInt(props.$bx), parseInt(props.$by), hero.$index);
 
-                if(props.$x !== undefined)   //修改x坐标
-                    hero.$x = heroComp.x = props.$x;
-                if(props.$y !== undefined)   //修改y坐标
-                    hero.$y = heroComp.y = props.$y;
-
-                if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
-                    if(heroComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
+                if(props.$x !== undefined) { //修改x坐标
+                    hero.$x = props.$x;
+                    heroComp.x = props.$x - heroComp.x1 - heroComp.width1 / 2;
+                }
+                if(props.$y !== undefined) { //修改y坐标
+                    hero.$y = props.$y;
+                    heroComp.y = props.$y - heroComp.y1 - heroComp.height1 / 2;
+                }
 
 
                 if(props.$direction !== undefined)
@@ -1338,9 +1329,12 @@ Item {
                     for(let tp of Object.keys(props)) {
                         if(usedProps.indexOf(tp) >= 0)
                             continue;
-                        hero[tp] = props[tp];
+                        heroComp[tp]/* = hero[tp]*/ = props[tp];
                     }
                 }
+
+                //if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
+                    if(heroComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
 
                 if(props.$start === true) {
@@ -1538,8 +1532,8 @@ Item {
             _private.objRoles[role.$id] = roleComp;
 
 
-            role.$x = role.$x ?? role.x; // ?? roleComp.x;
-            role.$y = role.$y ?? role.y; // ?? roleComp.y;
+            //role.$x = role.$x ?? role.x; // ?? roleComp.x;
+            //role.$y = role.$y ?? role.y; // ?? roleComp.y;
 
             //roleComp.$name = role.$name;
             role.$speed = role.$speed ?? parseFloat(roleComp.$info.MoveSpeed);
@@ -1693,13 +1687,12 @@ Item {
                     setRolePos(props.$bx, props.$by, roleComp);
                     //moverole(roleComp, bx, by);
 
-                if(props.$x !== undefined)   //修改x坐标
-                    roleComp.x = props.$x;
-                if(props.$y !== undefined)   //修改y坐标
-                    roleComp.y = props.$y;
-
-                if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
-                    if(roleComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
+                if(props.$x !== undefined) { //修改x坐标
+                    roleComp.x = props.$x - roleComp.x1 - roleComp.width1 / 2;
+                }
+                if(props.$y !== undefined) { //修改y坐标
+                    roleComp.y = props.$y - roleComp.y1 - roleComp.height1 / 2;
+                }
 
 
                 if(props.$direction !== undefined)
@@ -1727,9 +1720,12 @@ Item {
                     for(let tp of Object.keys(props)) {
                         if(usedProps.indexOf(tp) >= 0)
                             continue;
-                        role[tp] = props[tp];
+                        roleComp[tp]/* = role[tp]*/ = props[tp];
                     }
                 }
+
+                //if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
+                    if(roleComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
 
 
                 if(props.$start === true) {
@@ -2000,7 +1996,7 @@ Item {
         }
 
         /*readonly property var createfightenemy: function(name) {
-            loaderFightScene.enemies.push(new _private.objCommonScripts['combatant_class'](name));
+            loaderFightScene.enemies.push(new _private.objCommonScripts.$Combatant(name));
 
         }*/
 
@@ -2272,7 +2268,7 @@ Item {
 
             //先刷新一次（主要是$$propertiesWithExtra）
             if(flags & 0b1)
-                _private.objCommonScripts['refresh_combatant'](fighthero, false);
+                _private.objCommonScripts.$refreshCombatant(fighthero, false);
 
             //参考属性（乘以比例时的参考属性）
             let properties2;
@@ -2306,7 +2302,7 @@ Item {
 
             //再刷新一次
             if(flags & 0b1)
-                _private.objCommonScripts['refresh_combatant'](fighthero, !!(flags & 0b10));
+                _private.objCommonScripts.$refreshCombatant(fighthero, !!(flags & 0b10));
 
 
             return fighthero;
@@ -2655,7 +2651,7 @@ Item {
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
-                        _private.objCommonScripts['refresh_combatant'](fighthero);
+                        _private.objCommonScripts.$refreshCombatant(fighthero);
                         //刷新战斗时人物数据
                         //fight.$sys.refreshCombatant(-1);
 
@@ -2669,7 +2665,7 @@ Item {
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
-                            _private.objCommonScripts['refresh_combatant'](fighthero);
+                            _private.objCommonScripts.$refreshCombatant(fighthero);
                             //刷新战斗时人物数据
                             //fight.$sys.refreshCombatant(-1);
 
@@ -2781,7 +2777,7 @@ Item {
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
-                        _private.objCommonScripts['refresh_combatant'](fighthero);
+                        _private.objCommonScripts.$refreshCombatant(fighthero);
                         //刷新战斗时人物数据
                         //fight.$sys.refreshCombatant(-1);
 
@@ -2795,7 +2791,7 @@ Item {
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
-                            _private.objCommonScripts['refresh_combatant'](fighthero);
+                            _private.objCommonScripts.$refreshCombatant(fighthero);
                             //刷新战斗时人物数据
                             //fight.$sys.refreshCombatant(-1);
 
@@ -2856,7 +2852,7 @@ Item {
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
-                        _private.objCommonScripts['refresh_combatant'](fighthero);
+                        _private.objCommonScripts.$refreshCombatant(fighthero);
                         //刷新战斗时人物数据
                         //fight.$sys.refreshCombatant(-1);
 
@@ -2870,7 +2866,7 @@ Item {
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
-                            _private.objCommonScripts['refresh_combatant'](fighthero);
+                            _private.objCommonScripts.$refreshCombatant(fighthero);
                             //刷新战斗时人物数据
                             //fight.$sys.refreshCombatant(-1);
 
@@ -4555,7 +4551,7 @@ Item {
                         data = JSON.parse(data);
                     }
                     catch(e) {
-                        console.warn('[!GameScene]checksave:', data, data.$typeName, e);
+                        console.warn('[!GameScene]checksave:', data, data.$$type, e);
                         return false;
                     }
                 }
@@ -4634,12 +4630,11 @@ Item {
 
 
                     //game.run(function*() {
-                    //载入before_save脚本
-                    const beforeSave = _private.objCommonScripts['before_save'];
-                    if(beforeSave) { //GlobalLibraryJS.checkCallable
-                        let r = beforeSave();
+                    //载入beforeSave脚本
+                    if(_private.objCommonScripts.$beforeSave) { //GlobalLibraryJS.checkCallable
+                        let r = _private.objCommonScripts.$beforeSave();
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                        //game.run(beforeSave() ?? null, {Priority: -3, Type: 0, Running: 1, Tips: 'before_save'});
+                        //game.run(_private.objCommonScripts.$beforeSave() ?? null, {Priority: -3, Type: 0, Running: 1, Tips: '$beforeSave'});
                     }
 
 
@@ -4699,12 +4694,11 @@ Item {
 
 
 
-                    //载入after_save脚本
-                    const afterSave = _private.objCommonScripts['after_save'];
-                    if(afterSave) { //GlobalLibraryJS.checkCallable
-                        let r = afterSave(ret);
+                    //载入afterSave脚本
+                    if(_private.objCommonScripts.$afterSave) { //GlobalLibraryJS.checkCallable
+                        let r = _private.objCommonScripts.$afterSave(ret);
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                        //game.run(afterSave() ?? null, {Priority: -1, Type: 0, Running: 1, Tips: 'after_save'});
+                        //game.run(_private.objCommonScripts.$afterSave() ?? null, {Priority: -1, Type: 0, Running: 1, Tips: '$afterSave'});
                     }
 
 
@@ -4727,7 +4721,7 @@ Item {
             //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->GlobalLibraryJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _load = function(resolve, reject) {
-                //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
+                //这里用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 GlobalLibraryJS.asyncScript(function*() {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -4756,12 +4750,11 @@ Item {
 
                     //game.run(function*() {
 
-                    //载入after_load脚本
-                    const afterSave = _private.objCommonScripts['before_load'];
-                    if(afterSave) { //GlobalLibraryJS.checkCallable
-                        let r = afterSave();
+                    //载入beforeLoad脚本
+                    if(_private.objCommonScripts.$beforeLoad) { //GlobalLibraryJS.checkCallable
+                        let r = _private.objCommonScripts.$beforeLoad();
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                        //game.run(afterSave() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'before_load'});
+                        //game.run(_private.objCommonScripts.$beforeLoad() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: '$beforeLoad'});
                     }
 
 
@@ -4769,7 +4762,7 @@ Item {
 
 
                     yield* release(false);
-                    game.run(function*() {   //这样写是因为要把下面代码放入系统scriptQueue中运行（不是必须但我建议这样），且放在队列最前面，运行完毕后再进行下一个脚本（因为要求load要运行完毕）；
+                    game.run(function*() { //这样写是因为要把下面代码放入系统scriptQueue中运行（不是必须但我建议这样），且放在队列最前面，运行完毕后再进行下一个脚本（因为要求load要运行完毕）；
                         yield* _init(false, false, ret['Data']);
 
 
@@ -4785,12 +4778,11 @@ Item {
                             yield game.loadmap(game.gd['$sys_map'].$rid, null, true);
 
 
-                        //载入after_load脚本
-                        const afterSave = _private.objCommonScripts['after_load'];
-                        if(afterSave) { //GlobalLibraryJS.checkCallable
-                            let r = afterSave();
+                        //载入afterLoad脚本
+                        if(_private.objCommonScripts.$afterLoad) { //GlobalLibraryJS.checkCallable
+                            let r = _private.objCommonScripts.$afterLoad();
                             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                            //game.run(afterSave() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'after_load'});
+                            //game.run(_private.objCommonScripts.$afterLoad() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: '$afterLoad'});
                         }
                     }(), {Priority: -2, Type: 0, Running: 0, Tips: 'load2'});   //鹰：Priority为0也可以，只是会黑屏一下体验不太好，因为在下一个事件循环中执行代码了
 
@@ -4818,13 +4810,12 @@ Item {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
-                    //game.run(_private.objCommonScripts['game_over_script'](...params) ?? null,
+                    //game.run(_private.objCommonScripts.$gameOverScript(...params) ?? null,
                     //    {Priority: -1, Type: 0, Running: 1, Tips: 'gameover'});
 
 
-                    const gameOverScript = GameSceneJS.getCommonScriptResource('$game_over_script');
-                    if(gameOverScript) { //GlobalLibraryJS.checkCallable
-                        let r = gameOverScript(...params);
+                    if(_private.objCommonScripts.$gameOverScript) { //GlobalLibraryJS.checkCallable
+                        let r = _private.objCommonScripts.$gameOverScript(...params);
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
                     }
 
@@ -5246,7 +5237,7 @@ Item {
                     if(tfh) {
                         tfh = GameSceneJS.getFightRoleObject(tfh, true);
                         game.gd['$sys_fight_heros'].push(tfh);
-                        _private.objCommonScripts['refresh_combatant'](tfh);
+                        _private.objCommonScripts.$refreshCombatant(tfh);
                     }
                     else {
                         console.warn('[!GameScene]跳过错误的战斗人物：', tfh);
@@ -5254,10 +5245,10 @@ Item {
 
 
                     /*let t = game.gd['$sys_fight_heros'][tIndex];
-                    game.gd['$sys_fight_heros'][tIndex] = new _private.objCommonScripts['combatant_class'](t.$rid, t.$name);
+                    game.gd['$sys_fight_heros'][tIndex] = new _private.objCommonScripts.$Combatant(t.$rid, t.$name);
                     GlobalLibraryJS.copyPropertiesToObject(game.gd['$sys_fight_heros'][tIndex], t);
 
-                    //game.gd['$sys_fight_heros'][tIndex].__proto__ = _private.objCommonScripts['combatant_class'].prototype;
+                    //game.gd['$sys_fight_heros'][tIndex].__proto__ = _private.objCommonScripts.$Combatant.prototype;
                     //game.gd['$sys_fight_heros'][tIndex].$$fightData = {};
                     //game.gd['$sys_fight_heros'][tIndex].$$fightData.$buffs = {};
                     */
@@ -6832,7 +6823,7 @@ Item {
         property var rolesResource: ({})       //所有角色信息；格式：key为 角色资源名
         property var mapsResource: ({})       //所有地图信息；格式：key为 角色资源名
 
-        property var objCommonScripts: ({})     //系统用到的 通用脚本（外部脚本优先，如果没有使用 GameMakerGlobal.js的）
+        property var objCommonScripts: ({})     //系统 和 用户 合并后的 通用脚本（用户脚本优先，没有的使用 GameMakerGlobal.js，注意只包含函数和var变量，不包含let/const变量）；
 
         //所有插件脚本
         property var objPlugins: ({})
@@ -7198,9 +7189,9 @@ Item {
                         JSON.stringify(_private.scriptQueue.getScriptInfos(), function(k, v){switch(k){case 'Script': case 'Running': case 'Args': case 'EscapeValue': if(typeof v === 'object')return undefined;}return v;})
                     );
 
-                    //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+                    //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
                     //_private.scriptQueue.clear(0);
-                    //console.debug(_private.scriptQueue.getScriptInfos().$toJson());
+                    //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
 
 
                     sg_close();
@@ -7342,15 +7333,15 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$talk;
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk') || styleSystem;
+                let styleSystem = GameMakerGlobalJS.$config.$styles.$talk;
+                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk') || styleSystem;
                 let tn;
 
 
                 let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
                 let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
-                //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$name'));
-                //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(game, '$gameMakerGlobalJS', '$config', '$styles', '$talk', '$avatar'));
+                //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$styles', '$talk', '$name'));
+                //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$styles', '$talk', '$avatar'));
                 if(name && bShowName)
                     pretext = name + '：' + pretext;
                 if(avatar && bShowAvatar)
@@ -7626,8 +7617,8 @@ Item {
                     style = {};
 
 
-                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$msg;
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$msg') || styleSystem;
+                let styleSystem = GameMakerGlobalJS.$config.$styles.$msg;
+                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$msg') || styleSystem;
                 let tn;
 
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -7878,8 +7869,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$menu;
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$menu') || styleSystem;
+                let styleSystem = GameMakerGlobalJS.$config.$styles.$menu;
+                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$menu') || styleSystem;
                 let tn;
 
                 maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -8072,8 +8063,8 @@ Item {
                 //样式
                 if(style === undefined || style === null)
                     style = {};
-                let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$input;
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$input') || styleSystem;
+                let styleSystem = GameMakerGlobalJS.$config.$styles.$input;
+                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$input') || styleSystem;
                 let tn;
 
                 rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -8686,8 +8677,8 @@ Item {
                 //console.debug('[GameScene]Role Component.onCompleted');
 
 
-                let styleSystem = game.$gameMakerGlobalJS.$config.$role;
-                let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$role') || styleSystem;
+                let styleSystem = GameMakerGlobalJS.$config.$role;
+                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$role') || styleSystem;
                 let tn;
 
                 bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(styleUser, '$smooth'), GlobalLibraryJS.getObjectValue(styleSystem, '$smooth'), true);
@@ -9169,7 +9160,7 @@ Item {
     Component.onDestruction: {
         //release();
         //console.warn('', Object.keys(_private.config.objPauseNames));
-        //console.warn('3', _private.scriptQueue.getScriptInfos().$toJson());
+        //console.warn('3', _private.scriptQueue.getScriptInfos().$$toJson());
 
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；

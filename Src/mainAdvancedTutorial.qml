@@ -155,11 +155,11 @@ Item {
     示例：
     let taskID = FrameManager.sl_insertScriptTask('console.info(0)', 0, 2, function(params){console.info(999, params)});
     或：
-    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, -1, function(params){console.info('params:', params);console.info(999, params.$toJson())});
+    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, -1, function(params){console.info('params:', params);console.info(999, params.$$toJson())});
 
     FrameManager.sl_setThreadMaxCount(2);
     let taskParam = FrameManager.sl_getScriptTask(taskID);
-    //console.info('taskParam', taskParam, taskParam.$toJson());
+    //console.info('taskParam', taskParam, taskParam.$$toJson());
     console.info(taskParam.Running.sl_isFinished(), taskParam.Running.sl_isRunning());
     FrameManager.sl_cancelScriptTask(taskID);
     //taskParam.Running.sl_terminate();
@@ -189,10 +189,10 @@ Item {
             //Headers: {},
             //FilePath: path,
             //Params: ,
-        }, 2).$then((xhr)=>{
-            console.info(xhr.$toString());
-        }).$catch((e)=>{
-            console.info(e.$params.$toString());
+        }, 2).$$then((xhr)=>{
+            console.info(xhr.$$toString());
+        }).$$catch((e)=>{
+            console.info(e.$params.$$toString());
         });
       或：
         GlobalLibraryJS.asyncScript(function*() {
@@ -208,7 +208,7 @@ Item {
                 }, 2);
                 console.info(res.response);
             } catch(e) {
-                console.info(e.$params.$toString());
+                console.info(e.$params.$$toString());
             }
         });
 4、HTTPServer    //~~~~~~

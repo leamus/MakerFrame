@@ -183,7 +183,7 @@ Item {
                             else
                                 jsPath = false;
 
-                            function *remove() {
+                            function* remove() {
                                 if(jsPath && FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
                                     try {
                                         const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
@@ -213,7 +213,7 @@ Item {
                                 }
                             }
 
-                            function *setup() {
+                            function* setup() {
                                 yield* remove();
 
                                 let ret = FrameManager.sl_extractDir(zipPath, projectPath);
@@ -277,11 +277,11 @@ Item {
                                 //Headers: {},
                                 FilePath: zipPath,
                                 //Params: ,
-                            }, 2).$then(function(xhr) {
+                            }, 2).$$then(function(xhr) {
                                 rootWindow.aliasGlobal.dialogCommon.close();
 
                                 GlobalLibraryJS.asyncScript(setup(), 'setup');
-                            }).$catch(function(e) {
+                            }).$$catch(function(e) {
                                 //rootWindow.aliasGlobal.dialogCommon.close();
 
                                 rootWindow.aliasGlobal.dialogCommon.show({

@@ -2784,9 +2784,9 @@ Item {
             if(nEventIndex === -1) {    //新建事件
                 //_private.createEvent(textEventName.text, scriptEditor.text);
                 _private.createEvent(textEventName.text);
-                //scriptEditor.text += '\r\n\r\nfunction *%1(){ //地图事件 \r\n}'.arg(textEventName.text);
-                scriptEditor.editor.append('\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
-                //scriptEditor.editor.setPlainText(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction *$%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                //scriptEditor.text += '\r\n\r\nfunction* %1(){ //地图事件 \r\n}'.arg(textEventName.text);
+                scriptEditor.editor.append('\r\n\r\nfunction* $%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                //scriptEditor.editor.setPlainText(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction* $%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 //scriptEditor.editor.toBegin();
             }
             //else if(nEventIndex === -2) {  //新建系统事件
@@ -3212,7 +3212,7 @@ Item {
         //读取地图脚本
         function loadScript(mapRID) {
             if(!mapRID) {
-                scriptEditor.text = ('function *$start(){ //地图载入事件 \r\n}');
+                scriptEditor.text = ('function* $start(){ //地图载入事件 \r\n}');
                 scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
@@ -3227,7 +3227,7 @@ Item {
                 PathText: 0b0,
                 RunButton: 0b0,
             });
-            //scriptEditor.text = FrameManager.sl_fileRead(path + 'map.js') || ('function *$start(){ //地图载入事件 \r\n}');
+            //scriptEditor.text = FrameManager.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();
             //scriptEditor.visualScriptEditor.loadData(path + 'map.vjs');

@@ -1,7 +1,10 @@
-
 import QtQuick 2.14
 import QtQuick.Layouts 1.14
 import QtQuick.Window 2.14
+
+
+//引入Qt定义的类
+//import cn.Leamus.MakerFrame 1.0
 
 
 import _Global 1.0
@@ -10,6 +13,14 @@ import _Global.Button 1.0
 
 //import GameComponents 1.0
 import 'GameComponents'
+
+
+//import 'qrc:/QML'
+
+
+import 'GameMakerGlobal.js' as GameMakerGlobalJS
+
+//import 'File.js' as File
 
 
 
@@ -34,8 +45,8 @@ Item {
         let newFlags = 0;
 
         if((flags & 0b1) && !(nShowWindowFlags & 0b1)) {
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$main;
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$main') || styleSystem;
+            let styleSystem = GameMakerGlobalJS.$config.$styles.$main;
+            let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$main') || styleSystem;
 
             maskMainMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||
@@ -98,8 +109,8 @@ Item {
             newFlags |= 0b100;
         }
         if((flags & 0b1000) && !(nShowWindowFlags & 0b1000)) {
-            let styleSystem = game.$gameMakerGlobalJS.$config.$styles.$system;
-            let styleUser = GlobalLibraryJS.getObjectValue(game, '$userscripts', '$config', '$styles', '$system') || styleSystem;
+            let styleSystem = GameMakerGlobalJS.$config.$styles.$system;
+            let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$system') || styleSystem;
 
             containerSystemMenu.maskSystemMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||
