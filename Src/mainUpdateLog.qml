@@ -158,7 +158,7 @@ Item {
 2、增加：各种字符转换函数；
 *3、修改：修改函数名 loadSpriteEffect 为 getSpriteEffect，unloadSpriteEffect 为 putSpriteEffect，loadRole 为 createRole；
 4、修改：将SCodes、QNanoPainter、Libhv、SerialPort、QZXing、Lua、SDL、QtWebAPP改为Qt插件，框架引擎不再依赖它们，可以热插拔使用；
-5、增加：给异步增加$context和$defer功能；
+5、增加：给 异步 增加$context（上下文）和$defer（结束时回调函数）功能；
 6、增加：QML-Push库；
 7、增加：应用程序的一些相关函数；
 8、增加：关闭音效game.stopsoundeffect函数；
@@ -167,7 +167,7 @@ Item {
 11、增强：game.usegoods功能；
 **12、修改：game.usegoods、game.equip、game.unload的实现流程和方式（所有道具脚本的$equipScript需要修改）；
 **13、修改：game.equip和game.unload为异步，调用时加yield，且道具脚本中新增和修改了相关函数；
-*14、修改：地图和角色的RID和名称分开；
+*14、修改：地图和角色的RID和名称分离；
 15、新增：文件/缓存的文本/二进制高级读写（包括QIODevice、QBuffer、QFile、QFileDevice、QFileInfo、QDataStream、QTextStream类的封装）；
 16、新增：游戏加速功能；
 17、新增：音乐和音量大小函数：game.musicvolume、game.soundeffectvolume；
@@ -175,11 +175,14 @@ Item {
 *19、修改：角色坐标的$x、$y含义改变为中心点放在这个坐标上（影响命令：createhero、hero、createrole、role）；
 *20、修改：角色的其他属性改变的是组件属性，而非data属性；
 *21、修改：将我自己给特定对象定义的一些便捷属性/方法的名字，前面改为 $$ 开头（比如$$type、$$json、$$then、$$catch等），防止和引擎中一些对象的属性冲突；
-22、修复：鹰歌窗口切换时出现的焦点错误问题；
-23、修复：多窗口时风格问题；
-24、修复：Async异步的一个Bug，并作优化；
-25、修复：无法删除旧插件的Bug；
-26、其他：优化调整很多代码和细节，修复一些Bugs；
+**22、修改：将game.over改为game.restart（重启游戏），对应通用脚本需要改变，运行机制也有改变；
+23、新增：Pymo（AVG游戏引擎）工程兼容插件；
+24、新增：BBKRPG脚本兼容插件；
+25、修复：鹰歌窗口切换时出现的焦点错误问题；
+26、修复：多窗口时风格问题；
+27、修复：Async异步的一个Bug，并作优化；
+28、修复：无法删除旧插件的Bug；
+29、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

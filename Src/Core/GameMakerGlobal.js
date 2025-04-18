@@ -1038,20 +1038,6 @@ function $combatantIsValid(combatant) {
 
 
 
-//游戏结束脚本
-function* $gameOverScript(params) {
-    if(params === -1) {
-        yield game.msg('游戏结束', 60, '', 0, 0b11);
-        yield* game.$sys.release(false);
-        //yield* game.$sys.init(true, false);
-        game.run(function*(){yield* game.$sys.init(true, false);}, {Priority: -2, Type: 0, Running: 0, Tips: '$gameOverScript'});
-    }
-
-    return null;
-}
-
-
-
 //通用逃跑算法（目前是整体逃跑，所以 index为 -1）
 function $commonRunAwayAlgorithm(team, index) {
     return GlobalLibraryJS.randTarget(1,2);
@@ -2059,8 +2045,10 @@ function* $commonFightEndScript(res, teams, fightData) {
         }
 
 
-        if(res.result === -1)
-            yield game.gameover(-1);
+        if(res.result === -1) {
+            yield game.msg('游戏结束', 60, '', 0, 0b11);
+            game.restart();
+        }
 
         //game.stage(0);
         //game.goon('$fight');

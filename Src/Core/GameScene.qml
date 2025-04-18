@@ -4799,34 +4799,30 @@ Item {
             return new Promise(_load);
         }
 
-        //游戏结束（调用游戏结束脚本）；
-        readonly property var gameover: function(...params) {
-            //scriptQueue.runNextEventLoop('gameover');
+        //重新开始游戏；
+        function restart() {
+            //scriptQueue.runNextEventLoop('restart');
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
-            const _gameover = function(resolve, reject) {
+            //const _restart = function(resolve, reject) {
                 //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 GlobalLibraryJS.asyncScript(function*() {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
-                    //game.run(_private.objCommonScripts.$gameOverScript(...params) ?? null,
-                    //    {Priority: -1, Type: 0, Running: 1, Tips: 'gameover'});
+                    yield* release(false);
+                    //yield* game.$sys.init(true, false);
+                    game.run(function*() {
+                        yield* _init(true, false);
+                    }, {Priority: -2, Type: 0, Running: 0, Tips: 'restart'});
 
+                    //return resolve(true);
 
-                    if(_private.objCommonScripts.$gameOverScript) { //GlobalLibraryJS.checkCallable
-                        let r = _private.objCommonScripts.$gameOverScript(...params);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
-                    }
+                }(), 'restart');
+                //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'restart'});
+            //};
 
-
-                    return resolve(true);
-
-                }(), 'gameover');
-                //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'gameover'});
-            };
-
-            return new Promise(_gameover);
+            //return new Promise(_restart);
         }
 
 
