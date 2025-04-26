@@ -364,7 +364,7 @@ Item {
 //背包内 获得 count个道具；返回背包中 改变后 道具个数，返回false表示错误。
 //goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
 //count为0表示使用goods内的$count；
-<font color='yellow'>game.getgoods(goods, count=0);</font>
+<font color='yellow'>game.getgoods(goods, count);</font>
 
 //背包内 减去count个道具，返回背包中 改变后 道具个数；
 //goods可以为 道具资源名、道具对象 和 下标；
@@ -400,16 +400,16 @@ Item {
 //载入 fightScript 脚本 并进入战斗；
 //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
 //params是给战斗脚本$createData的参数。
-<font color='yellow'>game.fighting(fightScript);</font>
+<font color='yellow'>fight.fighting(fightScript);</font>
 
 //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
 //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
 //flag：0b1为行动时遇敌，0b10为静止时遇敌；
 //params是给战斗脚本$createData的参数；
 //会覆盖之前的fighton；
-<font color='yellow'>game.fighton(fightScript, probability=5, flag=3, interval=1000);</font>
+<font color='yellow'>fight.fighton(fightScript, probability=5, flag=3, interval=1000);</font>
 
-<font color='yellow'>game.fightoff()</font>：关闭随机战斗。
+<font color='yellow'>fight.fightoff()</font>：关闭随机战斗。
 
 //创建定时器；
 //timerName：定时器名称；

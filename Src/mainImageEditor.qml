@@ -430,8 +430,10 @@ Item {
                 let rX = root.width / imageReview.sourceSize.width;
                 let rY = root.height / imageReview.sourceSize.height;
 
-                if(Math.min(rX, rY) < 1)
+                if(Math.min(rX, rY) < 1) //如果 原图尺寸大于屏幕尺寸，则缩小图片适应屏幕
                     imageReview.scale = Math.min(rX, rY);
+                //else //恢复尺寸
+                //    imageReview.scale = 1;
 
                 imageReview.anchors.centerIn = imageReview.parent;
                 imageReview.anchors.centerIn = null;

@@ -1150,7 +1150,7 @@ function* fnRound() {
             if(fightSkills) {
                 for(let fightSkill of fightSkills) {
 
-                    let fightSkillInfo = game.$sys.getSkillResource(fightSkill.$rid);
+                    const fightSkillInfo = game.$sys.getSkillResource(fightSkill.$rid);
 
 
                     let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
@@ -1161,20 +1161,114 @@ function* fnRound() {
                     //console.debug('', SkillEffects);
 
                     //得到技能生成器函数
-                    let genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
+                    const genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
                     //const ret1 = _private.scriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript', );
                     ///GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
+                    if(GlobalLibraryJS.isGenerator(genActionAndSprite)) {
+                        //循环 技能（或者 道具技能）包含的特效
+                        while(1) {
 
-                    //循环 技能（或者 道具技能）包含的特效
-                    while(GlobalLibraryJS.isGenerator(genActionAndSprite)) {
+                            //一个技能生成器
+                            let tCombatantActionSpriteData;
+
+                            /*/方案1：
+                            let [tCombatantActionSpriteData] = _private.scriptQueue.run(SkillEffectResult);
+
+                            //如果动画结束
+                            if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
+                                break;
+                            }
+                            else
+                                tCombatantActionSpriteData = tCombatantActionSpriteData.value;
+                            */
+
+
+                            //方案2：新的 Generator来执行
+                            tCombatantActionSpriteData = genActionAndSprite.next(SkillEffectResult);
+                            if(tCombatantActionSpriteData.done === true)
+                                break;
+                            else
+                                tCombatantActionSpriteData = tCombatantActionSpriteData.value;
+
+
+
+                            //console.debug('1', tCombatantActionSpriteData);
+                            if(!tCombatantActionSpriteData)  //如果是其他yield（比如msg）
+                                continue;
+
+
+
+                            //重新指定 team1、team2、tRole1、tRole2、tRoleSpriteEffect1、2
+
+                            //let tTeam1 = team1;
+                            //let tTeam2 = team2;
+                            //let tRoleSpriteEffect1 = roleSpriteEffect1;
+                            //let tRoleSpriteEffect2 = roleSpriteEffect2;
+                            //let tRole1 = role1;
+                            //let tRole2 = role2;
+                            //let tRepeaterSpriteEffect1 = repeaterSpriteEffect1;
+                            //let tRepeaterSpriteEffect2 = repeaterSpriteEffect2;
+
+                            //console.debug('0', tCombatantActionSpriteData.SkillEffect);
+                            //if(tCombatantActionSpriteData.SkillEffect)
+                            //    console.debug('1', tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
+
+                            //console.debug('2', JSON.stringify(tSkillEffect));
+                            //console.debug('33', tSkillEffect);
+                            //if(tSkillEffect)
+                            //    console.debug('3', tSkillEffect, tSkillEffect.roleIndex2)
+                            //console.debug('4', tRoleSpriteEffect2, tRole2)
+
+
+
+                            //!!!!!!注意：这里soundeffect如果同时载入很多时，Win下会非常卡（安卓貌似不会）
+
+
+                            console.time('SkillSprite');
+                            SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
+                            console.timeEnd('SkillSprite');
+
+                            if(SkillEffectResult === 1)
+                                yield 0;
+                            else if(SkillEffectResult === 0) {
+
+                            }
+                            else {
+
+                            }
+
+                        } //while
+                    }
+                }
+            }
+
+
+            //道具 播放 $completeScript 收尾脚本
+            if(goods) {
+
+
+                let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
+
+                //得到生成器函数
+                let genActionAndSprite;
+                if(goodsInfo.$commons.$fightScript['$completeScript'])
+                    genActionAndSprite = goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant);
+                else if(goodsInfo.$commons.$fightScript['$overScript']) //!!兼容旧代码
+                    genActionAndSprite = goodsInfo.$commons.$fightScript['$overScript'](goods, combatant);
+                else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
+                    genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
+                //const ret1 = _private.scriptQueue.create(genActionAndSprite ?? null, -1, true, '$completeScript', );
+                //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: genActionAndSprite ?? null, Tips: '$completeScript'}, );
+
+                if(GlobalLibraryJS.isGenerator(genActionAndSprite)) {
+                    while(1) {
 
                         //一个技能生成器
                         let tCombatantActionSpriteData;
 
                         /*/方案1：
                         let [tCombatantActionSpriteData] = _private.scriptQueue.run(SkillEffectResult);
-
                         //如果动画结束
                         if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
                             break;
@@ -1198,36 +1292,9 @@ function* fnRound() {
                             continue;
 
 
-
-                        //重新指定 team1、team2、tRole1、tRole2、tRoleSpriteEffect1、2
-
-                        //let tTeam1 = team1;
-                        //let tTeam2 = team2;
-                        //let tRoleSpriteEffect1 = roleSpriteEffect1;
-                        //let tRoleSpriteEffect2 = roleSpriteEffect2;
-                        //let tRole1 = role1;
-                        //let tRole2 = role2;
-                        //let tRepeaterSpriteEffect1 = repeaterSpriteEffect1;
-                        //let tRepeaterSpriteEffect2 = repeaterSpriteEffect2;
-
-                        //console.debug('0', tCombatantActionSpriteData.SkillEffect);
-                        //if(tCombatantActionSpriteData.SkillEffect)
-                        //    console.debug('1', tCombatantActionSpriteData.SkillEffect, tCombatantActionSpriteData.SkillEffect.roleIndex1)
-
-                        //console.debug('2', JSON.stringify(tSkillEffect));
-                        //console.debug('33', tSkillEffect);
-                        //if(tSkillEffect)
-                        //    console.debug('3', tSkillEffect, tSkillEffect.roleIndex2)
-                        //console.debug('4', tRoleSpriteEffect2, tRole2)
-
-
-
-                        //!!!!!!注意：这里soundeffect如果同时载入很多时，Win下会非常卡（安卓貌似不会）
-
-
-                        console.time('SkillSprite');
+                        console.time('SkillSprite2');
                         SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-                        console.timeEnd('SkillSprite');
+                        console.timeEnd('SkillSprite2');
 
                         if(SkillEffectResult === 1)
                             yield 0;
@@ -1238,59 +1305,7 @@ function* fnRound() {
 
                         }
 
-                    }//while
-                }
-            }
-
-
-            //道具 播放 $completeScript 收尾脚本
-            if(goods) {
-
-
-                let SkillEffectResult;      //技能效果结算结果（技能脚本 使用）
-
-                //得到技能生成器函数
-                //let genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
-                //if(goodsInfo.$commons.$fightScript['$playScript'])
-                //    _private.scriptQueue.create(goodsInfo.$commons.$fightScript['$playScript'](goods, combatant), '$playScript', -1);
-
-                if(goodsInfo.$commons.$fightScript['$completeScript'])
-                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, -1, true, '$completeScript', );
-                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$completeScript'](goods, combatant) ?? null, Tips: '$completeScript'}, );
-                else if(goodsInfo.$commons.$fightScript['$overScript'])
-                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, -1, true, '$overScript', );
-                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript['$overScript'](goods, combatant) ?? null, Tips: '$overScript'}, );
-                else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
-                    /*const ret1 = */_private.scriptQueue.create(goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, -1, true, '$overScript', );
-                    //GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: goodsInfo.$commons.$fightScript[2](goods, combatant) ?? null, Tips: '$overScript'}, );
-
-                while(1) {
-
-                    //一个特效
-                    let [tCombatantActionSpriteData] = _private.scriptQueue.run(SkillEffectResult);
-                    //如果动画结束
-                    if(tCombatantActionSpriteData === undefined || tCombatantActionSpriteData === null || !tCombatantActionSpriteData || tCombatantActionSpriteData.done === true) {
-                        break;
-                    }
-                    else
-                        tCombatantActionSpriteData = tCombatantActionSpriteData.value;
-                    if(!tCombatantActionSpriteData)  //如果是其他yield（比如msg）
-                        continue;
-
-
-                    console.time('SkillSprite');
-                    SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
-                    console.timeEnd('SkillSprite');
-
-                    if(SkillEffectResult === 1)
-                        yield 0;
-                    else if(SkillEffectResult === 0) {
-
-                    }
-                    else {
-
-                    }
-
+                    } //while
                 }
             }
 
@@ -1400,7 +1415,7 @@ function* gfFighting() {
 
         //方案二：使用Promise
         /*yield new Promise(
-            function (resolved, reject) {
+            function(resolved, reject) {
                 fight.run(function() {resolved();});
         });*/
         //yield fight.run(0);
@@ -1468,7 +1483,7 @@ function* gfFighting() {
 
         //方案二：使用Promise
         /*yield new Promise(
-            function (resolved, reject) {
+            function(resolved, reject) {
                 fight.run(function() {resolved();});
         });*/
         //yield fight.run(0);

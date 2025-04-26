@@ -64,7 +64,7 @@ Item {
 
 
         //按钮
-        let fightButtons = game.$sys.getCommonScriptResource('$fightButtons');
+        let fightButtons = game.$sys.resources.commonScripts.$fightButtons;
         for(let tb of fightButtons) {
             //let compButtons1 = Qt.createComponent('qrc:/QML/_Global/Button/ColorButton.qml');
             //console.warn(compButtons1, compButtons1.status, compButtons1.errorString() )
@@ -79,13 +79,6 @@ Item {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     _private.asyncScript.async(tb.$clicked.call(button, button), 'FightScene button clicked');
-                });
-            //！！！兼容旧代码
-            else if(tb.$action)
-                button.sg_clicked.connect(function() {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                    //    return;
-                    _private.asyncScript.async(tb.$action.call(button, button), 'FightScene button action');
                 });
             GlobalLibraryJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
         }
@@ -308,7 +301,7 @@ Item {
 
         //我方
         //repeaterMyCombatants.model =
-        repeaterMyCombatants.nCount = fight.myCombatants.length;
+        //repeaterMyCombatants.nCount = fight.myCombatants.length;
         for(i = 0; i < fight.myCombatants.length; ++i) {
             if(repeaterMyCombatants.model.count <= i)
                 repeaterMyCombatants.model.append({modelData: i});
@@ -330,8 +323,8 @@ Item {
 
 
         //敌方
-        //repeaterEnemies.model = fight.enemies.length = enemyCount;
-        repeaterEnemies.nCount = fight.enemies.length;
+        //repeaterEnemies.model
+        //repeaterEnemies.nCount = fight.enemies.length;
         for(i = 0; i < fight.enemies.length; ++i) {
             if(repeaterEnemies.model.count <= i)
                 repeaterEnemies.model.append({modelData: i});
@@ -475,10 +468,6 @@ Item {
         property var fightScript: null
 
 
-        //!!兼容旧代码
-        readonly property var saveLast: FightSceneJS.saveLast
-        readonly property var loadLast: FightSceneJS.loadLast
-        readonly property var refreshCombatant: fight.$sys.refreshCombatant
         property alias nAutoAttack: _private.nAutoAttack
 
 
@@ -823,7 +812,7 @@ Item {
                     for(; index < fight.myCombatants.length; ++index)
                         fight.myCombatants[index].$$fightData.$info.$index = index;
 
-                    ++repeaterMyCombatants.nCount;
+                    //++repeaterMyCombatants.nCount;
 
                     break;
                 case 1:
@@ -837,7 +826,7 @@ Item {
                     for(; index < fight.enemies.length; ++index)
                         fight.enemies[index].$$fightData.$info.$index = index;
 
-                    ++repeaterEnemies.nCount;
+                    //++repeaterEnemies.nCount;
 
                     break;
                 }
@@ -865,7 +854,7 @@ Item {
                     for(; index < fight.myCombatants.length; ++index)
                         fight.myCombatants[index].$$fightData.$info.$index = index;
 
-                    --repeaterMyCombatants.nCount;
+                    //--repeaterMyCombatants.nCount;
 
                     break;
                 case 1:
@@ -880,7 +869,7 @@ Item {
                     for(; index < fight.enemies.length; ++index)
                         fight.enemies[index].$$fightData.$info.$index = index;
 
-                    --repeaterEnemies.nCount;
+                    //--repeaterEnemies.nCount;
 
                     break;
                 }
@@ -1084,7 +1073,7 @@ Item {
                 id: repeaterMyCombatants
 
                 //!!兼容旧代码
-                property int nCount: 0
+                //property int nCount: 0
 
 
                 //model: 0
@@ -1119,8 +1108,8 @@ Item {
                             else if(bar.$type === 2) {
                                 let obj = compBar.createObject(tMyCombatantColumnLayout);
                                 obj.color = bar.$colors[2] || 'transparent';
-                                obj.bar1.color = bar.$colors[1] || 'white';
-                                obj.bar2.color = bar.$colors[0] || 'black';
+                                obj.bar1.color = bar.$colors[1] || 'black';
+                                obj.bar2.color = bar.$colors[0] || 'white';
                                 obj.height = bar.$height;
                                 obj.Layout.bottomMargin = bar.$spacing;
                                 cacheComponents.push(obj);
@@ -1250,7 +1239,7 @@ Item {
                                     menuFightRoleChoice.colorTitleFontColor = style.TitleFontColor || style.FontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
                                     menuFightRoleChoice.colorItemBorderColor = style.ItemBorderColor || style.BorderColor || styleUser.$itemBorderColor || styleSystem.$itemBorderColor;
                                     //menuFightRoleChoice.show(_private.arrMenu);
-                                    menuFightRoleChoice.show(game.$sys.getCommonScriptResource('$fightMenus').$menus);
+                                    menuFightRoleChoice.show(game.$sys.resources.commonScripts.$fightMenus.$menus);
                                 }
                                 else if(tRootMyCombatantComp.bCanClick === true) {
                                     FightSceneJS.skillStepChoiced(1, fight.myCombatants[modelData]);
@@ -1337,7 +1326,7 @@ Item {
                 id: repeaterEnemies
 
                 //!!兼容旧代码
-                property int nCount: 0
+                //property int nCount: 0
 
 
                 //model: 0
@@ -1641,7 +1630,7 @@ Item {
             //hide();
             menuFightRoleChoice.visible = false;
 
-            game.$sys.getCommonScriptResource('$fightMenus').$actions[index](_private.nChoiceFightRoleIndex);
+            game.$sys.resources.commonScripts.$fightMenus.$actions[index](_private.nChoiceFightRoleIndex);
             return;
 
 

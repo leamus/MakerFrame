@@ -211,7 +211,7 @@ Item {
                 console.info(e.$params.$$toString());
             }
         });
-4、HTTPServer    //~~~~~~
+4、HTTPServer(Libhv)    //~~~~~~
     示例：
     HTTPServer {
         id: httpServer
@@ -228,7 +228,7 @@ Item {
     //方式2：使用sl_addJSFileRoute添加JS文件的路由，这种方式使用 子线程+QJSEngine 来处理；
     httpService.sl_addJSFileRoute(GlobalJS.toPath(Qt.resolvedUrl('testHTTPServerRoute.js')));
     httpService.sl_static('/static/', 'd:/');
-    httpServer.port = 8899;
+    httpServer.port = 8999;
     httpServer.sl_run();
     ...
     httpServer.sl_stop();

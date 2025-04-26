@@ -84,7 +84,7 @@ Item {
             case 0:
 
                 continueScript = function*() {
-                    let s = game.$sys.getCommonScriptResource('$readSavesInfo')();
+                    let s = game.$sys.resources.commonScripts.$readSavesInfo();
                     s.push('取消');
                     let c = yield game.menu('选择存档', s);
                     switch(c) {
@@ -104,7 +104,7 @@ Item {
             case 1:
 
                 continueScript = function*() {
-                    let s = game.$sys.getCommonScriptResource('$readSavesInfo')();
+                    let s = game.$sys.resources.commonScripts.$readSavesInfo();
                     s.push('取消');
                     let c = yield game.menu('选择存档', s);
                     switch(c) {

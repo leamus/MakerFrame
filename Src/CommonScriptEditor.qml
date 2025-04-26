@@ -45,7 +45,7 @@ Item {
 //.import 'main.js' as JSMain //导入另一个js文件
 //.import 'level_chain.js' as JSLevelChain //导入另一个js文件
 //让外部可访问：
-//let $start = JSMain.$start ?? JSMain.start;
+//var $start = JSMain.$start ?? JSMain.start;
 //let jsLevelChain = JSLevelChain;
 
 
@@ -54,7 +54,7 @@ Item {
 //  注意：
 //    1、fontSize为正数，表示用pointSize；为负数，表示用pixelSize；
 //    2、$minHeight和$maxHeight；>0且<1，表示高度为 值*屏幕大小；为小数（包括字符串）表示 值*行数；为整数表示像素；null表示默认；
-const $config = {
+var $config = {
     //游戏
     $game: {
         $speed: 1,
@@ -531,7 +531,7 @@ function* $equipScript(goods, combatant, params) {
         }
         else if(newCount === 0) {
             /*
-            if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(position) !== -1)
+            if($config.$names.$equipReservedSlots.indexOf(position) !== -1)
                 combatant.$equipment[position] = undefined;
             else
                 delete combatant.$equipment[position];
@@ -568,7 +568,7 @@ function* $equipScript(goods, combatant, params) {
 function* $unloadScript(goods, combatant, params) {
     let positionName = goods.$position;
     /*
-    if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(positionName) !== -1)
+    if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
         combatant.$equipment[positionName] = undefined;
     else
         delete combatant.$equipment[positionName];
@@ -684,6 +684,27 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 
 
 
+//系统显示 和 真实属性 对应
+//中文属性索引
+const mappingCombatantProperty = {
+    '血量': ['HP', 0],
+    '血量1': ['HP', 1],
+    '血量2': ['HP', 2],
+
+    '魔法': ['MP', 0],
+    '魔法1': ['MP', 1],
+
+    '攻击': 'attack',
+    '防御': 'defense',
+    '灵力': 'power',
+    '幸运': 'luck',
+    '速度': 'speed',
+
+    '经验': 'EXP',
+    '级别': 'level',
+};
+
+
 function 属性(p, n=0) {
     let ret;
     if(GlobalLibraryJS.isValidNumber(n, 0b1)) {
@@ -720,33 +741,9 @@ $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
 
 
-//系统显示 和 真实属性 对应
-//中文属性索引
-let mappingCombatantProperty = {
-    //系统用到的
-    '血量': ['HP', 2],
-    '血量1': ['HP', 1],
-    '血量2': ['HP', 0],
-
-
-    //其他
-    '魔法': ['MP', 1],
-    '魔法2': ['MP', 0],
-
-    '攻击': 'attack',
-    '防御': 'defense',
-    '灵力': 'power',
-    '幸运': 'luck',
-    '速度': 'speed',
-
-    '经验': 'EXP',
-    '级别': 'level',
-};
-
-
 
 //显示战斗人物详细信息
-let $combatantInfo = function(combatant) {
+function $combatantInfo(combatant) {
     let tinfo = '';
     for(let tp in mappingCombatantProperty) {
         //多段值
@@ -764,7 +761,7 @@ let $combatantInfo = function(combatant) {
 
 //显示的道具名格式
 //flags：Image、Color、Count、Price分别表示是否显示图像、颜色和数量（数量只有可叠加的才显示）、价格（0、1、2）；
-let $showGoodsName = function(goods, flags=null) {
+function $showGoodsName(goods, flags=null) {
     if(flags === undefined || flags === null)
         flags = {Image: true, Color: true, Count: true, Price: 0};
 
@@ -821,7 +818,7 @@ let $showGoodsName = function(goods, flags=null) {
 
 //显示的战斗人物名格式
 //flags：avatar、color分别表示是否显示头像、颜色
-let $showCombatantName = function(combatant, flags=null) {
+function $showCombatantName(combatant, flags=null) {
     let name = '';
     //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
 
@@ -1264,7 +1261,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b1000,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1294,7 +1291,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0100,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1323,7 +1320,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0010,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1350,7 +1347,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0001,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1375,7 +1372,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b10000,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: function (combatant, objBuff) {
+            buffPropertiesEffect: function(combatant, objBuff) {
                 let properties = combatant.$properties;
                 let propertiesWithExtra = combatant.$$propertiesWithExtra;
                 for(let tp of params.Properties) {
@@ -1943,7 +1940,7 @@ function* $commonFightEndScript(res, teams, fightData) {
     for(let t of res.goods) {
         if(game.rnd(0,100) < 60) {
             msgGoods += ('<BR>' + t.$name);
-            game.getgoods(t, 1);
+            game.getgoods(t/*, 1*/);
             bGetGoods = true;
         }
     }
@@ -2108,7 +2105,7 @@ function $fightCombatantSetChoice(combatant, type, bSaveLast) {
 
 
 //战斗菜单
-let $fightMenus = {
+var $fightMenus = {
     $menus: ['普通攻击', '技能', '物品', '信息', '休息'],
     $actions: [
         function(combatantIndex) {
@@ -2142,7 +2139,7 @@ let $fightMenus = {
 };
 
 //战斗按钮
-let $fightButtons = [
+var $fightButtons = [
     {
         $text: '重复上次',
         $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],

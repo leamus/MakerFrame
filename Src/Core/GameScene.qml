@@ -584,11 +584,15 @@ Item {
         //参数：userData是用户传入数据，后期调用的钩子函数会传入；
         //  forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
-        //示例：yield game.loadmap('地图资源名');
+        //示例：yield game.loadmap('地图资源名')；
         function loadmap(mapRID, userData, forceRepaint=false) {
+            let _resolve, _reject;
+
             //！如果使用生成器方式，则将 resolve 和 reject 删除即可，再用return返回数据；
             //！使用async是因为返回的是Promise（脚本队列必须等待Promise才能继续执行，如果用game.run则互相等造成死锁，下同）；
             const _loadmap = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
@@ -644,7 +648,7 @@ Item {
 
 
                     //载入beforeLoadmap脚本
-                    const beforeLoadmap = GameSceneJS.getCommonScriptResource('$beforeLoadmap');
+                    const beforeLoadmap = _private.objCommonScripts.$beforeLoadmap;
                     if(beforeLoadmap) { //GlobalLibraryJS.checkCallable
                         let r = beforeLoadmap(mapRID, userData);
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -681,7 +685,7 @@ Item {
 
 
                     //载入after_loadmap脚本
-                    const afterLoadmap = GameSceneJS.getCommonScriptResource('$afterLoadmap');
+                    const afterLoadmap = _private.objCommonScripts.$afterLoadmap;
                     if(afterLoadmap) { //GlobalLibraryJS.checkCallable
                         let r = afterLoadmap(mapRID, userData);
                         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -698,7 +702,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'loadmap'});
             };
 
-            return new Promise(_loadmap);
+            let ret = new Promise(_loadmap);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         /*readonly property var map: {
@@ -716,7 +722,8 @@ Item {
         //  callback是结束时回调函数，如果为非函数则表示让系统默认处理（销毁组件并继续游戏）；
         //    如果是自定义函数，参数为cb, ...params，cb表示系统默认处理（销毁组件并继续游戏），请在合适的地方调用 cb(...params)；
         //      params为code, rootGameMsgDialog；
-        //  buttonNum为按钮数量（0-2，目前没用）。
+        ////  buttonNum为按钮数量（0-2，目前没用）；
+        //  p为父组件，默认挂在系统提供的组件上（itemGameMsgs）；
         //返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //示例：yield game.msg('你好，鹰歌')；
         function msg(msg='', interval=20, pretext='', keeptime=0, style={}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
@@ -751,9 +758,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -764,6 +773,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -771,6 +781,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemGameMsg;
 
                 itemGameMsg.show(msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
@@ -795,6 +806,7 @@ Item {
         //    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、最小/大高度（为小数则百分比）、是否显示名字、是否显示头像；
         //  pauseGame同命令msg的参数；
         //  callback同命令msg的参数；回调函数的params为code, rootRoleMsg；
+        //  p为父组件，默认挂在系统提供的组件上（itemRoleMsgs）；
         //返回：同命令msg的返回值；
         //示例：yield game.talk('你好，鹰歌')；
         function talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null) {
@@ -817,9 +829,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -830,6 +844,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -837,6 +852,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemRoleMsg;
 
                 itemRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
@@ -913,6 +929,7 @@ Item {
         //  style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
         //  pauseGame同命令msg的参数；
         //  callback同命令msg的参数；回调函数的params为index, rootGameMenu；
+        //  p为父组件，默认挂在系统提供的组件上（itemGameMenus）；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为选择的下标，0起始；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])；
         function menu(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
@@ -940,9 +957,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -953,6 +972,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -960,6 +980,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemMenu;
 
                 itemMenu.show(title, items, style, pauseGame, callback);
@@ -978,6 +999,7 @@ Item {
         //  style为自定义样式；
         //  pauseGame同msg的参数；
         //  callback同命令msg的参数；回调函数的params为text, rootGameInput；
+        //  p为父组件，默认挂在系统提供的组件上（itemGameInputs）；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为输入的字符串；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //示例：let inputText = yield game.input('标题')；
         function input(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
@@ -1000,9 +1022,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -1013,6 +1037,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -1020,6 +1045,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemGameInput;
 
                 itemGameInput.show(title, pretext, style, pauseGame, callback);
@@ -1047,12 +1073,12 @@ Item {
         //      为2表示定向移动；此时（用其中一个即可）：
         //        $targetBx、$targetBy为定向的地图块坐标
         //        $targetX、$targetY为定向的像素坐标；
-        //        $targetBlocks为定向的地图块坐标数组;
-        //        $targetPositions为定向的像素坐标数组;
+        //        $targetBlocks为定向的地图块坐标数组；
+        //        $targetPositions为定向的像素坐标数组；
         //        $targetBlockAuto为定向的地图块自动寻路坐标数组；
         //    $start表示角色是否自动动作（true或false)；
-        //返回：成功为组件对象，失败为false。
-        //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性});
+        //返回：成功为组件对象，失败为false；
+        //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性})；
         //  let h = game.createhero('角色资源名');   //全部使用默认属性；
         function createhero(role={}) {
             if(GlobalLibraryJS.isString(role)) {
@@ -1161,8 +1187,8 @@ Item {
         //参数：hero可以是下标，或字符串（主角的$id），或主角组件对象，-1表示返回所有主角组件对象数组；
         //  props：hero不是-1时，为修改单个主角的属性，同 createhero 的第二个参数对象；
         //返回：经过props修改的 主角 或 所有主角的列表；如果没有则返回null；出错返回false；
-        //示例：let h = game.hero('主角名');
-        //  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
+        //示例：let h = game.hero('主角名')；
+        //  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})；
         function hero(hero=-1, props={}) {
             if(hero === -1)
                 return _private.arrMainRoles;
@@ -2311,7 +2337,7 @@ Item {
         //从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误。
         //goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
         //  如果为 下标，则直接加减；如果为 字符串（默认1个数量）、对象（数量要提供），则获取道具对象后，从这个对象中转移；
-        //count为>0表示转移个数，为0表示返回数量；<0表示将goods的$count全部转移（默认）。
+        //count为>0表示转移个数，为0表示返回数量；<0（或非数字）表示将goods的$count全部转移（默认）。
         readonly property var getgoods: function(goods, count) {
             if(!GlobalLibraryJS.isNumber(count))
                 count = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(goods, '$count'), -1);
@@ -2554,9 +2580,14 @@ Item {
         //goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
         //params是给$useScript的自定义参数；
         //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
+        //示例：yield usegoods();
         function usegoods(fighthero, goods, params) {
+            let _resolve, _reject;
+
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _usegoods = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
                     //let copyedNewProps;
@@ -2641,8 +2672,8 @@ Item {
                         fighthero = null;
                     else
                         fighthero = game.fighthero(fighthero);
-                    //if(!fighthero)
-                    //    return false;
+                    if(!fighthero)
+                        return resolve(false);
 
 
                     if(GlobalLibraryJS.checkCallable(goodsInfo.$commons.$useScript)) {
@@ -2658,7 +2689,7 @@ Item {
                         return resolve(r);
                     }
                     else {
-                        const useScript = GameSceneJS.getCommonScriptResource('$useScript');
+                        const useScript = _private.objCommonScripts.$useScript;
                         if(useScript) { //GlobalLibraryJS.checkCallable
                             let r = useScript(goods, fighthero, params);
                             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -2680,7 +2711,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'usegoods'});
             };
 
-            return new Promise(_usegoods);
+            let ret = new Promise(_usegoods);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         //装备道具（会执行道具的$equipScript）；
@@ -2688,10 +2721,14 @@ Item {
         //goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
         //params是给$useScript的自定义参数；
         //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
+        //示例：yield equip();
         function equip(fighthero, goods, params) {
+            let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _equip = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
                     //let copyedNewProps;
@@ -2763,8 +2800,8 @@ Item {
                         fighthero = null;
                     else
                         fighthero = game.fighthero(fighthero);
-                    //if(!fighthero)
-                    //    return false;
+                    if(!fighthero)
+                        return resolve(false);
 
 
                     if(!GlobalLibraryJS.isObject(fighthero.$equipment))
@@ -2784,7 +2821,7 @@ Item {
                         return resolve(r);
                     }
                     else {
-                        const equipScript = GameSceneJS.getCommonScriptResource('$equipScript');
+                        const equipScript = _private.objCommonScripts.$equipScript;
                         if(equipScript) { //GlobalLibraryJS.checkCallable
                             let r = equipScript(goods, fighthero, params);
                             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -2807,7 +2844,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'equip'});
             };
 
-            return new Promise(_equip);
+            let ret = new Promise(_equip);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         //卸下某装备（所有个数）；
@@ -2815,10 +2854,14 @@ Item {
         //positionName为部位名称；
         //params是给$useScript的自定义参数；
         //返回：脚本的返回值（默认为旧装备或undefined）；false表示错误；null表示脚本不存在；
+        //示例：yield unload();
         function unload(fighthero, positionName, params) {
+            let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _unload = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
                     if(fighthero < 0)
@@ -2859,7 +2902,7 @@ Item {
                         return resolve(r);
                     }
                     else {
-                        const unloadScript = GameSceneJS.getCommonScriptResource('$unloadScript');
+                        const unloadScript = _private.objCommonScripts.$unloadScript;
                         if(unloadScript) { //GlobalLibraryJS.checkCallable
                             let r = unloadScript(oldEquip, fighthero, params);
                             if(GlobalLibraryJS.isGenerator(r))r = yield* r;
@@ -2881,7 +2924,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'unload'});
             };
 
-            return new Promise(_unload);
+            let ret = new Promise(_unload);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         //返回某 fighthero 的 positionName 部位的 装备；如果positionName为null，则返回所有装备的数组；
@@ -2939,9 +2984,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -2952,6 +2999,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -2959,6 +3007,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = dialogTrade;
 
                 dialogTrade.show(goods, mygoodsinclude, pauseGame, callback);
@@ -2978,21 +3027,6 @@ Item {
             if(m)
                 game.gd['$sys_money'] += m;
             return game.gd['$sys_money'];
-        }
-
-
-        //兼容旧代码！！！
-
-        readonly property var fighting: function(fightScript) {
-            fight.fighting(fightScript);
-        }
-
-        readonly property var fighton: function(fightScript, probability=5, flag=3, interval=1000) {
-            fight.fighton(fightScript, probability, interval, flag);
-        }
-
-        readonly property var fightoff: function() {
-            fight.fightoff();
         }
 
 
@@ -3283,9 +3317,11 @@ Item {
 
 
 
+            let _resolve, _reject;
             //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
             if(GlobalLibraryJS.isFunction(itemVideo.fCallback)) {
                 ret = new Promise(function(resolve, reject) {
+                    _resolve = resolve; _reject = reject;
                     const fcallback = itemVideo.fCallback;
                     itemVideo.fCallback = (cb, ...params)=>{
                         fcallback(cb, ...params);
@@ -3296,6 +3332,7 @@ Item {
             }
             else {// if(videoParams.$callback === true || videoParams.$callback === undefined) {
                 ret = new Promise(function(resolve, reject) {
+                    _resolve = resolve; _reject = reject;
                     itemVideo.fCallback = (cb, ...params)=>{
                         cb(...params);
                         resolve(params[0]);
@@ -3303,6 +3340,7 @@ Item {
                     }
                 });
             }
+            ret.$resolve = _resolve; ret.$reject = _reject;
             ret.$params = itemVideo;
 
 
@@ -4451,7 +4489,7 @@ Item {
             /*if(callback === true || callback === 1)
                 _private.scriptQueue.wait(ms);
             else if(callback === 0)
-                return GlobalLibraryJS.asyncWait(ms);
+                return GlobalLibraryJS.asyncSleep(ms);
             */
             return GlobalLibraryJS.asyncSleep(ms, itemWaitTimers);
 
@@ -4497,9 +4535,11 @@ Item {
                     }
                 */
 
+                let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
                 if(GlobalLibraryJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         const fcallback = callback;
                         callback = (cb, ...params)=>{
                             fcallback(cb, ...params);
@@ -4510,6 +4550,7 @@ Item {
                 }
                 else {// if(callback === true) {
                     ret = new Promise(function(resolve, reject) {
+                        _resolve = resolve; _reject = reject;
                         callback = (cb, ...params)=>{
                             cb(...params);
                             resolve(params[0]);
@@ -4517,6 +4558,7 @@ Item {
                         }
                     });
                 }
+                ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = gameMenuWindow;
 
                 gameMenuWindow.show(params.$id, params.$value, style, pauseGame, callback);
@@ -4611,8 +4653,12 @@ Item {
         readonly property var save: function(fileName='autosave', showName='', compressionLevel=-1) {
             //scriptQueue.runNextEventLoop('save');
 
+            let _resolve, _reject;
+
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _save = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
@@ -4711,16 +4757,22 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'save'});
             };
 
-            return new Promise(_save);
+            let ret = new Promise(_save);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         //读档（读取数据到 game.gd）；
         //data为字符串（本地存档文件路径）或对象；
         //成功返回true（生成器返回true），失败返回false。
         readonly property var load: function(data='autosave') {
+            let _resolve, _reject;
+
             //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->GlobalLibraryJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _load = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //这里用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 GlobalLibraryJS.asyncScript(function*() {
                 //game.run(function*() {
@@ -4769,7 +4821,7 @@ Item {
 
                         /*/写在钩子函数里了
                         if(game.gd['$sys_random_fight']) {
-                            game.fighton(...game.gd['$sys_random_fight']);
+                            fight.fighton(...game.gd['$sys_random_fight']);
                         }
                         */
 
@@ -4796,7 +4848,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'load'});
             };
 
-            return new Promise(_load);
+            let ret = new Promise(_load);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
         //重新开始游戏；
@@ -4829,8 +4883,12 @@ Item {
         //返回插件
         //参数0是组织/开发者名，参数1是插件名
         readonly property var plugin: function(...params) {
+            let _resolve, _reject;
+
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _plugin = function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
+
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
@@ -4877,7 +4935,9 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'plugin'});
             };
 
-            return new Promise(_plugin);
+            let ret = new Promise(_plugin);
+            ret.$resolve = _resolve; ret.$reject = _reject;
+            return ret;
         }
 
 
@@ -4991,7 +5051,7 @@ Item {
             //返回1个Promise对象；队列运行结束时，会将这个Promise激活；作用：可以实现两个ScriptQueue互等；
             else if(GlobalLibraryJS.isNumber(vScript)) {
                 return new Promise(
-                    function (resolve, reject) {
+                    function(resolve, reject) {
                         function __next() {
                             if(vScript <= 0)
                                 resolve(scriptQueue.lastEscapeValue);
@@ -5424,19 +5484,6 @@ Item {
         }
         readonly property var http: XMLHttpRequest
 
-
-
-        //资源（!!!鹰：过时：兼容旧代码）
-        readonly property alias objGoods: _private.goodsResource
-        readonly property alias objFightRoles: _private.fightRolesResource
-        readonly property alias objSkills: _private.skillsResource
-        readonly property alias objFightScripts: _private.fightScriptsResource
-        readonly property alias objSprites: _private.spritesResource
-
-        readonly property alias objCommonScripts: _private.objCommonScripts
-
-        readonly property alias objCacheSoundEffects: _private.objCacheSoundEffects
-        readonly property alias objCacheImages: _private.objCacheImages
     }
 
 
@@ -6464,12 +6511,15 @@ Item {
                 se.play();
             }
 
+            let _resolve, _reject;
             const res = new Promise(function(resolve, reject) {
+                _resolve = resolve; _reject = reject;
                 se.fnStoppedCallback = function() {
                     resolve(se.source);
                     se.source = '';
                 }
             });
+            res.$resolve = _resolve; res.$reject = _reject;
             res.$params = se;
             return res;
         }
@@ -7229,7 +7279,7 @@ Item {
                 let callback = function(code, itemMsg) {
 
                     itemMsg.visible = false;
-                    //itemMsg.destroy();
+                    itemMsg.destroy();
 
                     //game.pause(true)[pauseGame]
                     if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {

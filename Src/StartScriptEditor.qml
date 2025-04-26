@@ -42,9 +42,9 @@ Item {
             _private.strMainJSName = 'main.js';
         }
         //!!!兼容旧代码
-        else if(FrameManager.sl_fileExists(path + 'start.js')) {
-            _private.strMainJSName = 'start.js';
-        }
+        //else if(FrameManager.sl_fileExists(path + 'start.js')) {
+        //    _private.strMainJSName = 'start.js';
+        //}
         else {
             _private.strMainJSName = 'main.js';
         }
@@ -163,7 +163,7 @@ function* $start() {
                         arrSave.push('空');
                 }*/
 
-                let arrSave = game.$sys.getCommonScriptResource('$readSavesInfo')();
+                let arrSave = game.$sys.resources.commonScripts.$readSavesInfo();
 
                 c = yield game.menu('载入存档', [...arrSave,'自动存档','取消']);
                 switch(c) {

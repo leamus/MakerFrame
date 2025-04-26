@@ -80,7 +80,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.9
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 
@@ -106,7 +106,7 @@ Item {
 
         Button {
             //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
+            Layout.preferredWidth: parent.width * 0.9
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.preferredHeight: 50
 

@@ -116,9 +116,6 @@ QtObject {
         property string strSoundResourceDirName: strResourceDirName + separator + 'Sounds'
         property string strVideoResourceDirName: strResourceDirName + separator + 'Videos'
 
-        //!!!兼容旧代码!!!
-        property string strRoleResourceDirName: strResourceDirName + separator + 'Sprites'
-
 
         //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
         //readonly property string strTDSClientID: ''
@@ -218,15 +215,6 @@ QtObject {
                 return ret + separator + filepath;
             return ret;
         }
-    }
-
-    //!!!兼容旧代码!!!
-    function roleResourceURL(filepath) {return GlobalJS.toURL(roleResourcePath(filepath));}
-    function roleResourcePath(filepath) {
-        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strRoleResourceDirName;
-        if(filepath)
-            return ret + separator + filepath;
-        return ret;
     }
 
 

@@ -202,9 +202,9 @@ Item {
             wrapMode: Label.Wrap
             text: {
                 if(Qt.platform.os === 'android')
-                    return '<font color="red">注意：Android 下打包，需要安装 Apktool M 或 MT 软件辅助</font>'
+                    return '<font color="red">注意：Android下需要安装 Apktool M 或 MT 软件辅助打包</font>'
                 else if(Qt.platform.os === 'windows')
-                    return '<font color="red">注意：Windows 下打包，需要安装 Java 环境 和 Apktools 软件辅助</font>'
+                    return '<font color="red">注意：Windows下需要安装 Java 环境 和 Apktools 软件辅助打包</font>'
             }
         }
 
@@ -636,7 +636,7 @@ Item {
             }
             else {
                 rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '找到：' + zipFiles.join(',') + '是否继续？',
+                    Msg: '找到：<font color="red">' + zipFiles.join(',') + '</font>，是否继续？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
                         continueScript(2);

@@ -75,9 +75,6 @@ function* loadResources() {
         _private.objCommonScripts = Object.assign({}, GameMakerGlobalJS, game.$userscripts);
         /*
         _private.objCommonScripts.$config = game.$userscripts.$config || GameMakerGlobalJS.$config;
-        _private.objCommonScripts.$combatantInfo = game.$userscripts.$combatantInfo || GameMakerGlobalJS.$combatantInfo;
-        _private.objCommonScripts.$showGoodsName = game.$userscripts.$showGoodsName || GameMakerGlobalJS.$showGoodsName;
-        _private.objCommonScripts.$showCombatantName = game.$userscripts.$showCombatantName || GameMakerGlobalJS.$showCombatantName;
         _private.objCommonScripts.$fightMenus = game.$userscripts.$fightMenus || GameMakerGlobalJS.$fightMenus;
         _private.objCommonScripts.$fightButtons = game.$userscripts.$fightButtons || GameMakerGlobalJS.$fightButtons;
         */
@@ -91,10 +88,6 @@ function* loadResources() {
         let ts;
         if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'main.js'))) {
             ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'main.js'));
-        }
-        //!!!兼容旧代码
-        else if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'start.js'))) {
-            ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'start.js'));
         }
         if(ts) {
             _private.objCommonScripts['$gameStart'] = ts.$start || ts.start;
@@ -277,13 +270,6 @@ function* loadResources() {
                     //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     game.async(tConfig.$pressed.call(button) ?? null, 'ButtonPressed');  //也可以用game.run
-                });
-            //！！！兼容旧代码
-            else if(tConfig.$clicked)  //GlobalLibraryJS.checkCallable(fn, 0b11)
-                button.sg_pressed.connect(function() {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
-                    //    return;
-                    game.async(tConfig.$clicked.call(button) ?? null, 'ButtonClicked');  //也可以用game.run
                 });
             if(tConfig.$released)  //GlobalLibraryJS.checkCallable(fn, 0b11)
                 button.sg_released.connect(function() {
@@ -777,8 +763,7 @@ function* unloadResources() {
 
 //返回 通用脚本中的某个函数或变量，如果没有则返回系统的
 function getCommonScriptResource(...names) {
-    let flags = 0b1;
-    return GlobalLibraryJS.shortCircuit(flags, GlobalLibraryJS.getObjectValue(game.$userscripts, ...names), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, ...names));
+    return GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(game.$userscripts, ...names), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, ...names));
 }
 
 
@@ -1734,14 +1719,6 @@ function openMap(mapRID, forceRepaint=false) {
             game.d['$sys_map'].$obstacles = [];
 
 
-            //!!!兼容旧代码
-            game.gd['$sys_map'].$$info = {};
-            //game.gd['$sys_map'].$$name = null;
-            game.gd['$sys_map'].$$columns = 0;
-            game.gd['$sys_map'].$$rows = 0;
-            game.gd['$sys_map'].$$obstacles = [];
-
-
             //console.warn('[!GameScene]Map load ERROR:', mapRID, mapPath);
             return false;
         }
@@ -1763,14 +1740,6 @@ function openMap(mapRID, forceRepaint=false) {
         }
     }
     game.d['$sys_map'].$specials = itemViewPort.mapInfo.MapBlockSpecialData;
-
-
-    //!!!兼容旧代码
-    game.gd['$sys_map'].$$info = itemViewPort.mapInfo;
-    //game.gd['$sys_map'].$$name = itemViewPort.mapInfo.MapName;
-    game.gd['$sys_map'].$$columns = itemViewPort.mapInfo.MapSize[0];
-    game.gd['$sys_map'].$$rows = itemViewPort.mapInfo.MapSize[1];
-    game.gd['$sys_map'].$$obstacles = game.d['$sys_map'].$obstacles;
 
 
 

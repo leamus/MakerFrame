@@ -6,7 +6,7 @@
 //  注意：
 //    1、fontSize为正数，表示用pointSize；为负数，表示用pixelSize；
 //    2、$minHeight和$maxHeight；>0且<1，表示高度为 值*屏幕大小；为小数（包括字符串）表示 值*行数；为整数表示像素；null表示默认；
-const $config = {
+var $config = {
     //游戏
     $game: {
         $speed: 1,
@@ -483,7 +483,7 @@ function* $equipScript(goods, combatant, params) {
         }
         else if(newCount === 0) {
             /*
-            if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(position) !== -1)
+            if($config.$names.$equipReservedSlots.indexOf(position) !== -1)
                 combatant.$equipment[position] = undefined;
             else
                 delete combatant.$equipment[position];
@@ -520,7 +520,7 @@ function* $equipScript(goods, combatant, params) {
 function* $unloadScript(goods, combatant, params) {
     let positionName = goods.$position;
     /*
-    if(game.$sys.getCommonScriptResource('equip_reserved_slots').indexOf(positionName) !== -1)
+    if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
         combatant.$equipment[positionName] = undefined;
     else
         delete combatant.$equipment[positionName];
@@ -719,6 +719,27 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 
 
 
+//系统显示 和 真实属性 对应
+//中文属性索引
+const mappingCombatantProperty = {
+    '血量': ['HP', 0],
+    '血量1': ['HP', 1],
+    '血量2': ['HP', 2],
+
+    '魔法': ['MP', 0],
+    '魔法1': ['MP', 1],
+
+    '攻击': 'attack',
+    '防御': 'defense',
+    '灵力': 'power',
+    '幸运': 'luck',
+    '速度': 'speed',
+
+    '经验': 'EXP',
+    '级别': 'level',
+};
+
+
 function 属性(p, n=0) {
     let ret;
     if(GlobalLibraryJS.isValidNumber(n, 0b1)) {
@@ -755,33 +776,9 @@ $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
 
 
-//系统显示 和 真实属性 对应
-//中文属性索引
-let mappingCombatantProperty = {
-    //系统用到的
-    '血量': ['HP', 2],
-    '血量1': ['HP', 1],
-    '血量2': ['HP', 0],
-
-
-    //其他
-    '魔法': ['MP', 1],
-    '魔法2': ['MP', 0],
-
-    '攻击': 'attack',
-    '防御': 'defense',
-    '灵力': 'power',
-    '幸运': 'luck',
-    '速度': 'speed',
-
-    '经验': 'EXP',
-    '级别': 'level',
-};
-
-
 
 //显示战斗人物详细信息
-let $combatantInfo = function(combatant) {
+function $combatantInfo(combatant) {
     let tinfo = '';
     for(let tp in mappingCombatantProperty) {
         //多段值
@@ -799,7 +796,7 @@ let $combatantInfo = function(combatant) {
 
 //显示的道具名格式
 //flags：Image、Color、Count、Price分别表示是否显示图像、颜色和数量（数量只有可叠加的才显示）、价格（0、1、2）；
-let $showGoodsName = function(goods, flags=null) {
+function $showGoodsName(goods, flags=null) {
     if(flags === undefined || flags === null)
         flags = {Image: true, Color: true, Count: true, Price: 0};
 
@@ -856,7 +853,7 @@ let $showGoodsName = function(goods, flags=null) {
 
 //显示的战斗人物名格式
 //flags：avatar、color分别表示是否显示头像、颜色
-let $showCombatantName = function(combatant, flags=null) {
+function $showCombatantName(combatant, flags=null) {
     let name = '';
     //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
 
@@ -1299,7 +1296,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b1000,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1329,7 +1326,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0100,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1358,7 +1355,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0010,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1385,7 +1382,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b0001,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: false,    //function (combatant, objBuff){}
+            buffPropertiesEffect: false,    //function(combatant, objBuff){}
         }
         break;
 
@@ -1410,7 +1407,7 @@ function getBuff(combatant, buffCode, params={}) {
             //标记（毒乱封眠 类型，也可以表示buff名，其实就是决定什么时候运行脚本）
             flags: flags || 0b10000,
             //buff属性效果（只有属性buff有）
-            buffPropertiesEffect: function (combatant, objBuff) {
+            buffPropertiesEffect: function(combatant, objBuff) {
                 let properties = combatant.$properties;
                 let propertiesWithExtra = combatant.$$propertiesWithExtra;
                 for(let tp of params.Properties) {
@@ -1978,7 +1975,7 @@ function* $commonFightEndScript(res, teams, fightData) {
     for(let t of res.goods) {
         if(game.rnd(0,100) < 60) {
             msgGoods += ('<BR>' + t.$name);
-            game.getgoods(t, 1);
+            game.getgoods(t/*, 1*/);
             bGetGoods = true;
         }
     }
@@ -2143,7 +2140,7 @@ function $fightCombatantSetChoice(combatant, type, bSaveLast) {
 
 
 //战斗菜单
-let $fightMenus = {
+var $fightMenus = {
     $menus: ['普通攻击', '技能', '物品', '信息', '休息'],
     $actions: [
         function(combatantIndex) {
@@ -2177,7 +2174,7 @@ let $fightMenus = {
 };
 
 //战斗按钮
-let $fightButtons = [
+var $fightButtons = [
     {
         $text: '重复上次',
         $colors: ['lightgreen', 'lightblue', 'lightsteelblue'],
@@ -2264,107 +2261,6 @@ function $readSavesInfo(count=3) {
             arrSave.push('空');
     }
     return arrSave;
-}
-
-
-
-
-
-
-/*/得到道具通用脚本
-function* commonGetGoodsScript(goodsName) {
-    //let game = this.game;
-
-    //yield game.msg('得到【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
-    yield game.msg('得到【%1】'.arg(goodsName), 100, true);
-}
-
-
-//使用道具通用脚本
-function* commonUseGoodsScript(goodsName, type) {
-    //let game = this.game;
-
-    switch(type) {
-    case 0:
-        //yield game.msg('不能使用【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
-        yield game.msg('得到【%1】'.arg(goodsName), 100, true);
-        break;
-    default:
-    }
-}
-*/
-
-
-
-//升级脚本
-function* commonLevelUpScript(combatant) {
-
-    //升级
-    while(1) {
-
-        //升级条件是否通过
-        let bConditions = true;
-        //下一级所需条件
-        let nextLevelConditions = commonLevelAlgorithm(combatant, combatant.$properties.level + 1);
-        //循环所有条件
-        for(let tc in nextLevelConditions) {
-            //如果有一条不符合
-            if(combatant.$properties[tc] < nextLevelConditions[tc]) {
-                bConditions = false;
-                break;
-            }
-        }
-
-        //不符合，则退出
-        if(!bConditions)
-            break;
-
-
-
-        ++combatant.$properties.level;
-
-        combatant.$properties.HP[0] = combatant.$properties.HP[1] = combatant.$properties.HP[2] = parseInt(combatant.$properties.HP[2] * 1.1);
-        combatant.$properties.MP[0] = combatant.$properties.MP[1] = parseInt(combatant.$properties.MP[1] * 1.1);
-        combatant.$properties.attack = parseInt(combatant.$properties.attack * 1.1);
-        combatant.$properties.defense = parseInt(combatant.$properties.defense * 1.1);
-        combatant.$properties.power = parseInt(combatant.$properties.power * 1.1);
-        combatant.$properties.luck = parseInt(combatant.$properties.luck * 1.1);
-        combatant.$properties.speed = parseInt(combatant.$properties.speed * 1.1);
-
-
-        /*game.run(
-            'yield game.msg(\"%1升为%2级\");'.arg(combatant.$name).arg(combatant.$properties.level)
-        );*/
-        yield game.msg('%1升为%2级'.arg(combatant.$name).arg(combatant.$properties.level), 20, '', 0, 0b11);
-
-
-        if(combatant.$name === 'killer') {
-            switch(combatant.$properties.level) {
-            case 1:
-                game.getskill(combatant, '恢复血量');
-                yield game.msg('%1 获得技能 %2'.arg(combatant.$name).arg('恢复血量'), 20, '', 0, 0b11);
-                break;
-            }
-        }
-    }
-
-    return combatant.$properties.level;
-}
-
-//targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）
-function commonLevelAlgorithm(combatant, targetLevel) {
-    if(targetLevel <= 0)
-        return null;
-
-    let level = 1;  //级别
-    let exp = 10;   //级别的经验
-
-    while(level < targetLevel) {
-        exp = exp * 2;
-        ++level;
-    }
-
-    return {EXP: exp};
 }
 
 
@@ -3217,6 +3113,108 @@ function* fightRolesRound1(round, speedProp='$speed') {
 
 
 
+
+
+
+//升级脚本（示例）
+function* commonLevelUpScript(combatant) {
+
+    //升级
+    while(1) {
+
+        //升级条件是否通过
+        let bConditions = true;
+        //下一级所需条件
+        let nextLevelConditions = commonLevelAlgorithm(combatant, combatant.$properties.level + 1);
+        //循环所有条件
+        for(let tc in nextLevelConditions) {
+            //如果有一条不符合
+            if(combatant.$properties[tc] < nextLevelConditions[tc]) {
+                bConditions = false;
+                break;
+            }
+        }
+
+        //不符合，则退出
+        if(!bConditions)
+            break;
+
+
+
+        ++combatant.$properties.level;
+
+        combatant.$properties.HP[0] = combatant.$properties.HP[1] = combatant.$properties.HP[2] = parseInt(combatant.$properties.HP[2] * 1.1);
+        combatant.$properties.MP[0] = combatant.$properties.MP[1] = parseInt(combatant.$properties.MP[1] * 1.1);
+        combatant.$properties.attack = parseInt(combatant.$properties.attack * 1.1);
+        combatant.$properties.defense = parseInt(combatant.$properties.defense * 1.1);
+        combatant.$properties.power = parseInt(combatant.$properties.power * 1.1);
+        combatant.$properties.luck = parseInt(combatant.$properties.luck * 1.1);
+        combatant.$properties.speed = parseInt(combatant.$properties.speed * 1.1);
+
+
+        /*game.run(
+            'yield game.msg(\"%1升为%2级\");'.arg(combatant.$name).arg(combatant.$properties.level)
+        );*/
+        yield game.msg('%1升为%2级'.arg(combatant.$name).arg(combatant.$properties.level), 20, '', 0, 0b11);
+
+
+        /*if(combatant.$name === 'killer') {
+            switch(combatant.$properties.level) {
+            case 1:
+                game.getskill(combatant, '恢复血量');
+                yield game.msg('%1 获得技能 %2'.arg(combatant.$name).arg('恢复血量'), 20, '', 0, 0b11);
+                break;
+            }
+        }
+        */
+    }
+
+    return combatant.$properties.level;
+}
+
+//targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）（示例）
+function commonLevelAlgorithm(combatant, targetLevel) {
+    if(targetLevel <= 0)
+        return null;
+
+    let level = 1;  //级别
+    let exp = 10;   //级别的经验
+
+    while(level < targetLevel) {
+        exp = exp * 2;
+        ++level;
+    }
+
+    return {EXP: exp};
+}
+
+
+
+
+
+
+/*/得到道具通用脚本
+function* commonGetGoodsScript(goodsName) {
+    //let game = this.game;
+
+    //yield game.msg('得到【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
+    yield game.msg('得到【%1】'.arg(goodsName), 100, true);
+}
+
+
+//使用道具通用脚本
+function* commonUseGoodsScript(goodsName, type) {
+    //let game = this.game;
+
+    switch(type) {
+    case 0:
+        //yield game.msg('不能使用【%1】'.arg(game.$sys.getGoodsResource(goodsRID).$properties.$name), 100, true);
+        yield game.msg('得到【%1】'.arg(goodsName), 100, true);
+        break;
+    default:
+    }
+}
+*/
 
 
 

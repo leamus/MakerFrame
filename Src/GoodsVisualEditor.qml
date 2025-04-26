@@ -1248,7 +1248,7 @@ let data = (function() {
 
     //独立属性，用 goods 来引用；会保存到存档中；
     //params：使用对象{RID:xxx, Params: 。。。}创建道具时的对象参数。
-    let $createData = function (params) {
+    let $createData = function(params) {
 
         return {
             /*
@@ -1317,20 +1317,20 @@ let data = (function() {
 
     //装备效果
     //  注意：$$$$propertiesWithExtra为临时增加，$$properties为永久增加，所以可以用$$properties作为参考，来修改$$$$propertiesWithExtra）；
-    $$equipEffectAlgorithm: function (goods, combatant) {
+    $$equipEffectAlgorithm: function(goods, combatant) {
 $$equipEffectAlgorithm$$
     },
 
     //装备脚本
     $$equipScript: function*(goods, combatant, params) {
-        let r = game.$sys.getCommonScriptResource('$equipScript')(goods, combatant, params);
+        let r = game.$sys.resources.commonScripts.$equipScript(goods, combatant, params);
         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
         return r;
     },
 
     /*/卸载装备脚本
     $unloadScript: function*(goods, combatant, params) {
-        let r = game.$sys.getCommonScriptResource('$unloadScript')(goods, combatant, params);
+        let r = game.$sys.resources.commonScripts.$unloadScript(goods, combatant, params);
         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
         return r;
     },*/
@@ -1349,7 +1349,7 @@ $$equipEffectAlgorithm$$
         params = function*(goods, combatant, params) {
             $$useEffect$$
         }
-        let r = game.$sys.getCommonScriptResource('$useScript')(goods, combatant, params);
+        let r = game.$sys.resources.commonScripts.$useScript(goods, combatant, params);
         if(GlobalLibraryJS.isGenerator(r))r = yield* r;
         return r;
     },
@@ -1376,7 +1376,7 @@ $$equipEffectAlgorithm$$
         */
         $$choiceScript: null,
         //是否可用；如果为null自动调用 goods.$$fight[0] 的
-        $$check: function (goods, combatant, stage) {
+        $$check: function(goods, combatant, stage) {
             //调用技能的
             let skill = goods.$$fight[0];
             return skill.$$check(skill, combatant, stage);

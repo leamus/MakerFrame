@@ -60,7 +60,7 @@ let data = (function() {
 
 
     //独立属性，用 skill 来引用；会保存到存档中；
-    let $createData = function (params) {
+    let $createData = function(params) {
         return {
             $name: '普通攻击',
             $description: '跑上去打对方一下',

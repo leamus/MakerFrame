@@ -237,7 +237,8 @@ Item {
                     }
 
                     game.gd['$sys_money'] -= arrData[index].$price[0];
-                    game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, arrData[index]), 1);
+                    //game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, arrData[index]), 1);
+                    game.getgoods(game.$sys.getGoodsObject(arrData[index], {$count: 1}));
                     root.refresh();
                     */
                 }
@@ -502,7 +503,8 @@ Item {
                             if(goods.$count > 0)
                                 goods.$count -= count;
                             game.gd['$sys_money'] -= (goods.$price[0] * count);
-                            game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, goods), count);
+                            //game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, goods), count);
+                            game.getgoods(game.$sys.getGoodsObject(goods, {$count: count}));
                             root.refresh();
                         }
                         //卖
