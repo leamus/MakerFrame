@@ -38,7 +38,7 @@ Item {
         arrSaleGoods = [];
 
         for(let g of goods) {
-            if(GlobalLibraryJS.isString(g))
+            if($CommonLibJS.isString(g))
                 g = {RID: g, $count: -1};
             let tgoods = game.$sys.getGoodsObject(g, true);
             if(!tgoods)
@@ -58,12 +58,12 @@ Item {
 
     //刷新（主要是背包的道具）
     function refresh() {
-        textMoney.text = '金钱：￥ ' + game.gd['$sys_money'];
+        textMoney.text = game.$sys.getCommonScriptResource('$config', '$names', '$money') + '：' + game.gd['$sys_money'];
 
 
         let arrShowSaleGoods = [];  //显示的名称（道具）
         for(let g of arrSaleGoods) {
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
+            let tgoodsName = $CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: (g.$count >= 0 ? true : false), Price: 0}));
             arrShowSaleGoods.push(tgoodsName);
         }
         gamemenuSaleGoods.show(arrShowSaleGoods, arrSaleGoods);
@@ -73,11 +73,11 @@ Item {
         let arrMyGoods = [];    //道具名
         for(let g of game.gd['$sys_goods']) {
             if(mygoodsinclude === true ||
-                    (GlobalLibraryJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
+                    ($CommonLibJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
 
                 //let goodsInfo = _private.goodsResource[g.$rid];
                 let tgoods = game.$sys.getGoodsObject(g, false);
-                arrShowMyGoods.push(GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: true, Price: 1})));
+                arrShowMyGoods.push($CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(g, {Image: true, Color: true, Count: true, Price: 1})));
                 arrMyGoods.push(g);
             }
         }
@@ -192,19 +192,23 @@ Item {
                     //let goodsInfo = _private.goodsResource[arrData[index]];
 
                     let description = arrData[index].$description;
-                    if(GlobalLibraryJS.isFunction(description))
+                    if($CommonLibJS.isFunction(description))
                         description = description(arrData[index]);
                     goodsDetail.text = description;
                 }
                 onSg_doubleChoice: {
                     if(arrData[index].$price) {
+                        let maxCount = parseInt(game.gd['$sys_money'] / arrData[index].$price[0]);
+                        if(arrData[index].$count >= 0)
+                            maxCount = Math.max(arrData[index].$count, maxCount);
+
                         itemCountBox.tradeData.type = 1;
                         itemCountBox.tradeData.goods = arrData[index];
 
-                        textCountBoxCount.text = 1;
-                        sliderCount.value = 1;
-                        sliderCount.from = 1;
-                        sliderCount.to = arrData[index].$count >= 0 ? arrData[index].$count : 99;
+                        sliderCount.from = Math.min(1, maxCount);
+                        //sliderCount.to = arrData[index].$count >= 0 ? arrData[index].$count : 99;
+                        sliderCount.to = maxCount;
+                        textCountBoxCount.text = sliderCount.value = Math.min(1, maxCount);
 
                         _private.refreshTradeInfoBox();
 
@@ -237,7 +241,7 @@ Item {
                     }
 
                     game.gd['$sys_money'] -= arrData[index].$price[0];
-                    //game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, arrData[index]), 1);
+                    //game.getgoods($CommonLibJS.copyPropertiesToObject({}, arrData[index]), 1);
                     game.getgoods(game.$sys.getGoodsObject(arrData[index], {$count: 1}));
                     root.refresh();
                     */
@@ -259,19 +263,18 @@ Item {
                 onSg_choice: {
                     //let goodsInfo = _private.goodsResource[game.gd['$sys_goods'][index].$rid];
                     let description = game.gd['$sys_goods'][index].$description;
-                    if(GlobalLibraryJS.isFunction(description))
+                    if($CommonLibJS.isFunction(description))
                         description = description(game.gd['$sys_goods'][index]);
                     goodsDetail.text = description;
                 }
                 onSg_doubleChoice: {
-                    if(arrData[index].$price && GlobalLibraryJS.isValidNumber(arrData[index].$price[1])) {
+                    if(arrData[index].$price && $CommonLibJS.isValidNumber(arrData[index].$price[1])) {
                         itemCountBox.tradeData.type = 2;
                         itemCountBox.tradeData.goods = arrData[index];
 
-                        textCountBoxCount.text = 1;
-                        sliderCount.value = 1;
                         sliderCount.from = 1;
                         sliderCount.to = arrData[index].$count;
+                        textCountBoxCount.text = sliderCount.value = 1;
 
                         _private.refreshTradeInfoBox();
 
@@ -290,7 +293,7 @@ Item {
                     ////let goodsInfo = game.gd['$sys_goods'][index];
 
                     /*
-                    if(arrData[index].$price && GlobalLibraryJS.isValidNumber(arrData[index].$price[1])) {
+                    if(arrData[index].$price && $CommonLibJS.isValidNumber(arrData[index].$price[1])) {
                         game.removegoods(arrData[index], 1);
                         game.gd['$sys_money'] += arrData[index].$price[1];
                         root.refresh();
@@ -486,7 +489,7 @@ Item {
                         if(itemCountBox.tradeData.type === 1) {
                             if(game.gd['$sys_money'] < goods.$price[0] * count) {
                                 //game.run(function() {
-                                    game.msg('金钱不足', 20, '', 0, {Type: 0b10}, false);
+                                    game.msg(game.$sys.getCommonScriptResource('$config', '$names', '$money') + '不足!', 20, '', 0, {Type: 0b10}, false);
                                 //    return false;
                                 //});
                                 return;
@@ -503,7 +506,7 @@ Item {
                             if(goods.$count > 0)
                                 goods.$count -= count;
                             game.gd['$sys_money'] -= (goods.$price[0] * count);
-                            //game.getgoods(GlobalLibraryJS.copyPropertiesToObject({}, goods), count);
+                            //game.getgoods($CommonLibJS.copyPropertiesToObject({}, goods), count);
                             game.getgoods(game.$sys.getGoodsObject(goods, {$count: count}));
                             root.refresh();
                         }

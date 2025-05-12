@@ -491,7 +491,6 @@ Item {
 
 <font color='yellow'>[yield] game.wait(time)</font>：暂停time毫秒。
 <font color='yellow'>game.rnd(start, end)</font>：返回start~end之间的随机整数（包含start，不包含end）。
-<font color='yellow'>game.toast(msg)</font>：显示msg提示。
 
 //显示窗口；
 //params：
@@ -569,19 +568,20 @@ Item {
 
 
   game.$projectpath：项目根目录。
-  game.$userscripts：//用户脚本（用户 common_scripts.js，如果没有则为 GameMakerGlobalJS）
-  game.$globalLibraryJS（GlobalLibraryJS）：一些JS公共方法；
-  game.$global（Global）：提供跨平台、自适应的一些方法；
-  game.$globalJS（GlobalJS）：一些公共方法；
-  game.$gameMakerGlobal（GameMakerGlobal）：Maker的公共对象；
-  game.$gameMakerGlobalJS（GameMakerGlobalJS）：一些Maker的相关方法；
-  game.$gameMakerGlobal.config（GameMakerGlobal.config）：项目配置；
+  game.$userscripts：//用户脚本（用户 common_scripts.js，如果没有则为 $GameMakerGlobalJS）
   game.$plugins：所有的插件对象；
 
 
   fight.d：用户自定义战斗变量集合（战斗结束后清空）。
   fight.myCombatants：我方数组。
   fight.enemies：敌方数组。
+
+
+  $CommonLibJS：一些JS公共方法；
+  $Global：提供跨平台、自适应的一些方法；
+  $GlobalJS：一些公共方法；
+  $GameMakerGlobal：Maker的公共对象；
+  $GameMakerGlobalJS：一些Maker的相关方法；
 
 
 
@@ -780,7 +780,7 @@ NPC事件的四种写法（前两种支持同步调用）：
     a、经不准确测试，地图编辑器最多支持1920*1920像素（32位armv7）和3200*3200像素（64位armv8），太大有可能导致绘制卡顿或报错、黑屏等问题，这是由于引擎使用了QML的Canvas组件，效率比较低，后期如果用nano/opengl库会好很多（目前只是集成还没有替换）；
   5、想起来再说。
 `
-        msgBox.text = GlobalLibraryJS.convertToHTML(t);
+        msgBox.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainEasyGameMakerTutorial]Component.onCompleted');
     }

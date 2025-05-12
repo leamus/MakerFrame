@@ -86,24 +86,24 @@ Item {
                 OnAccepted: function() {
                     let fUrl;
                     if(Qt.platform.os === 'android')
-                        fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
+                        fUrl = $Platform.sl_getRealPathFromURI(fileUrl.toString());
                     else
-                        fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
+                        fUrl = $Frame.sl_urlDecode(fileUrl.toString());
 
                     //console.error('!!!', fUrl, fileUrl)
 
-                    //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                    //const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
+                    //const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
                     const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
-                    //FrameManager.sl_dirCreate(projectPath);
-                    let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
+                    //$Frame.sl_dirCreate(projectPath);
+                    let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
 
 
                     if(ret.length > 0) {
-                        //GameMakerGlobal.config.strCurrentProjectName = FrameManager.sl_completeBaseName(fUrl);
-                        //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
+                        //GameMakerGlobal.config.strCurrentProjectName = $Frame.sl_completeBaseName(fUrl);
+                        //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl));
                     }
 
                     rootWindow.aliasGlobal.dialogCommon.show({
@@ -144,11 +144,11 @@ Item {
 
     QtObject {
         id: _private
-        property var jsEngine: new GlobalJS.JSEngine(root)
+        property var jsLoader: new $GlobalJS.JSLoader(root)
 
         function refresh() {
 
-            let menuJS = jsEngine.load('http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js');
+            let menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js');
 
             if(!menuJS)
                 return false;
@@ -158,7 +158,7 @@ Item {
                 RemoveButtonVisible: false,
                 Data: Object.keys(menuJS.plugins),
                 OnClicked: (index, item)=>{
-                    if(!GlobalLibraryJS.isObject(menuJS.plugins[item])) {
+                    if(!$CommonLibJS.isObject(menuJS.plugins[item])) {
                         filedialog.open();
                         return;
                     }
@@ -184,12 +184,12 @@ Item {
                                 jsPath = false;
 
                             function* remove() {
-                                if(jsPath && FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
+                                if(jsPath && $Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                     try {
-                                        const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                        const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                         let ret;
 
-                                        if(GlobalLibraryJS.isFunction(ts.$uninstall)) {
+                                        if($CommonLibJS.isFunction(ts.$uninstall)) {
                                             ret = ts.$uninstall();
                                         }
                                         else
@@ -197,7 +197,7 @@ Item {
 
                                         if(ret === undefined || ret === null) {
                                             //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
-                                            FrameManager.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                            $Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
                                         }
                                         else if(ret === false)
                                             return;
@@ -216,19 +216,19 @@ Item {
                             function* setup() {
                                 yield* remove();
 
-                                let ret = FrameManager.sl_extractDir(zipPath, projectPath);
+                                let ret = $Frame.sl_extractDir(zipPath, projectPath);
 
                                 let msg;
                                 if(ret.length > 0) {
-                                    //console.debug(ret, projectPath, fileUrl, FrameManager.sl_absolutePath(fileUrl));
+                                    //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl));
                                     msg = '安装成功';
 
-                                    if(jsPath && FrameManager.sl_fileExists(GlobalJS.toPath(jsPath))) {
+                                    if(jsPath && $Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                         try {
-                                            const ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                                            const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                             let ret;
 
-                                            if(GlobalLibraryJS.isFunction(ts.$install)) {
+                                            if($CommonLibJS.isFunction(ts.$install)) {
                                                 ret = ts.$install();
                                             }
                                             else
@@ -236,7 +236,7 @@ Item {
 
                                             if(ret === false) {
                                                 //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
-                                                //FrameManager.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
+                                                //$Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.plugins[item]['Path'].trim());
                                                 yield* remove();
 
                                                 return;
@@ -269,7 +269,7 @@ Item {
 
 
                             //方法一：
-                            /*const httpReply = */GlobalLibraryJS.request({
+                            /*const httpReply = */$CommonLibJS.request({
                                 Url: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']),
                                 Method: 'GET',
                                 //Data: {},
@@ -280,7 +280,7 @@ Item {
                             }, 2).$$then(function(xhr) {
                                 rootWindow.aliasGlobal.dialogCommon.close();
 
-                                GlobalLibraryJS.asyncScript(setup(), 'setup');
+                                $CommonLibJS.asyncScript(setup(), 'setup');
                             }).$$catch(function(e) {
                                 //rootWindow.aliasGlobal.dialogCommon.close();
 
@@ -297,13 +297,13 @@ Item {
                             });
 
                             /*/方法二：
-                            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
+                            const httpReply = $Frame.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.plugins[item]['File']), zipPath);
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
-                                const code = FrameManager.sl_objectProperty('Code', networkReply);
-                                console.debug('[PluginsDownload]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+                                const code = $Frame.sl_objectProperty('Code', networkReply);
+                                console.debug('[PluginsDownload]下载完毕', httpReply, networkReply, code, $Frame.sl_objectProperty('Data', networkReply));
 
-                                FrameManager.sl_deleteLater(httpReply);
+                                $Frame.sl_deleteLater(httpReply);
 
 
                                 rootWindow.aliasGlobal.dialogCommon.close();

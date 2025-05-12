@@ -121,9 +121,9 @@ Item {
         imageAnimate.rXOffset = root.rXOffset;    // + parseInt(tx);
         imageAnimate.rYOffset = root.rYOffset;      // + parseInt(ty);
 
-        if(GlobalLibraryJS.isFunction(fnRefresh))
+        if($CommonLibJS.isFunction(fnRefresh))
             fnRefresh(root.nCurrentFrame + root.nFrameStartIndex, imageAnimate, strSource);
-        else if(GlobalLibraryJS.isGenerator(genRefresh))
+        else if($CommonLibJS.isGenerator(genRefresh))
             genRefresh.next(root.nCurrentFrame + root.nFrameStartIndex);
     }
 
@@ -165,7 +165,7 @@ Item {
         if(strSource === '')
             return;
 
-        if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
+        if($CommonLibJS.isGeneratorFunction(fnRefresh))
             genRefresh = fnRefresh(imageAnimate, strSource);
         else
             genRefresh = null;
@@ -209,7 +209,7 @@ Item {
         let data = request.responseText;
         * /
 
-        let data = FrameManager.sl_fileRead(path);
+        let data = $Frame.sl_fileRead(path);
         if(data)
             return data.split('\r\n');
         return null;
@@ -218,7 +218,7 @@ Item {
     //外部读取的刷新函数
     property var fnRefresh
     onFnRefreshChanged: {
-        if(GlobalLibraryJS.isGeneratorFunction(fnRefresh))
+        if($CommonLibJS.isGeneratorFunction(fnRefresh))
             genRefresh = fnRefresh(imageAnimate, strSource);
         else
             genRefresh = null;

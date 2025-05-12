@@ -148,20 +148,20 @@ Item {
 
 1、精确定时器 //~~~~~~~
     示例：
-    FrameManager.preciseTimer.sg_triggered.connect(function(interval){console.info(interval)});
-    FrameManager.preciseTimer.sl_start(1);
-    FrameManager.preciseTimer.sl_stop();
+    $Frame.preciseTimer.sg_triggered.connect(function(interval){console.info(interval)});
+    $Frame.preciseTimer.sl_start(1);
+    $Frame.preciseTimer.sl_stop();
 2、多线程   //~~~~~~~
     示例：
-    let taskID = FrameManager.sl_insertScriptTask('console.info(0)', 0, 2, function(params){console.info(999, params)});
+    let taskID = $Frame.sl_insertScriptTask('console.info(0)', 0, 2, function(params){console.info(999, params)});
     或：
-    let taskID = FrameManager.sl_insertScriptTask('test.mjs', 666, -1, function(params){console.info('params:', params);console.info(999, params.$$toJson())});
+    let taskID = $Frame.sl_insertScriptTask('test.mjs', 666, -1, function(params){console.info('params:', params);console.info(999, params.$$toJson())});
 
-    FrameManager.sl_setThreadMaxCount(2);
-    let taskParam = FrameManager.sl_getScriptTask(taskID);
+    $Frame.sl_setThreadMaxCount(2);
+    let taskParam = $Frame.sl_getScriptTask(taskID);
     //console.info('taskParam', taskParam, taskParam.$$toJson());
     console.info(taskParam.Running.sl_isFinished(), taskParam.Running.sl_isRunning());
-    FrameManager.sl_cancelScriptTask(taskID);
+    $Frame.sl_cancelScriptTask(taskID);
     //taskParam.Running.sl_terminate();
     //taskParam.Running.sl_isFinished();
     //taskParam.Running.sl_isRunning();
@@ -169,19 +169,19 @@ Item {
 3、QML 访问网络/下载文件 //~~~~~~~
   a、使用封装底层的C++方案：
     示例：
-    const httpReply = FrameManager.sl_request(url, baVerb, baPostData, mapHeaders);
-    const httpReply = FrameManager.sl_downloadFile(url, filepath);
+    const httpReply = $Frame.sl_request(url, baVerb, baPostData, mapHeaders);
+    const httpReply = $Frame.sl_downloadFile(url, filepath);
     if(httpReply)
         httpReply.sg_finished.connect(function(httpReply) {
             const networkReply = httpReply.networkReply;
-            //FrameManager.sl_objectProperty('属性', networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
-            //console.debug(httpReply, FrameManager.sl_objectProperty('Data', httpReply.networkReply), Object.keys(httpReply.networkReply));
+            //$Frame.sl_objectProperty('属性', networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
+            //console.debug(httpReply, $Frame.sl_objectProperty('Data', httpReply.networkReply), Object.keys(httpReply.networkReply));
 
-            FrameManager.sl_deleteLater(httpReply);
+            $Frame.sl_deleteLater(httpReply);
         });
   b、使用封装的异步/协程方案：
     示例：
-        GlobalLibraryJS.request({
+        $CommonLibJS.request({
             Url: url,
             Method: 'GET',
             //Data: {},
@@ -195,9 +195,9 @@ Item {
             console.info(e.$params.$$toString());
         });
       或：
-        GlobalLibraryJS.asyncScript(function*() {
+        $CommonLibJS.asyncScript(function*() {
             try {
-                let res = yield GlobalLibraryJS.request({
+                let res = yield $CommonLibJS.request({
                     Url: url,
                     Method: 'GET',
                     //Data: {},
@@ -226,7 +226,7 @@ Item {
     httpService.sl_addRoute('GET', '/user/:id', function(body){return {code: 200, data: 'hello2'}});
     httpService.sl_addRoute('/echoAll', function(body){return {code: 200, data: 'hello3'}});
     //方式2：使用sl_addJSFileRoute添加JS文件的路由，这种方式使用 子线程+QJSEngine 来处理；
-    httpService.sl_addJSFileRoute(GlobalJS.toPath(Qt.resolvedUrl('testHTTPServerRoute.js')));
+    httpService.sl_addJSFileRoute($GlobalJS.toPath(Qt.resolvedUrl('testHTTPServerRoute.js')));
     httpService.sl_static('/static/', 'd:/');
     httpServer.port = 8999;
     httpServer.sl_run();
@@ -364,7 +364,7 @@ Item {
     。。。
     udpSocket.sl_connectToHost('127.0.0.1', 8899);
 8、载入动态链接库和调用函数  //~~~~~~~
-    let lib = FrameManager.sl_loadLibrary(libName);
+    let lib = $Frame.sl_loadLibrary(libName);
     if(lib !== null) {
         //运行Qt函数（参数是QVariant类型）
         let res = lib.sl_runQtFunction('func', args);
@@ -384,8 +384,8 @@ Item {
         //      注意：如果都设置，则在回调中会正确处理（连续调用）；
         //        初始化调用一次即可（可调用多次但无效），载入广告和播放广告必须每次都调用；
         //        Flags可以初始化时使用 0b1，后期直接用b110播放 也行；也可以每次 0b111；
-        Platform.Tap.ad({     //Tap广告
-        //Platform.CSJ.ad({   //CSJ广告
+        $Platform.Tap.ad({     //Tap广告
+        //$Platform.CSJ.ad({   //CSJ广告
             Callback: function(adData, customData) {
                 console.info(adData, customData);
                 if(adData.Flags & 0b11) {
@@ -420,12 +420,12 @@ Item {
         });
 
     示例2（协程用法）：
-        const adData = yield Platform.Tap.ad({。。。});  //此时可以省略Callback和CustomData
-        const adData = yield Platform.CSJ.ad({。。。});  //此时可以省略Callback和CustomData
+        const adData = yield $Platform.Tap.ad({。。。});  //此时可以省略Callback和CustomData
+        const adData = yield $Platform.CSJ.ad({。。。});  //此时可以省略Callback和CustomData
 
 10、协程（已经被我封装的用法类似async/await）   //~~~~~~~
     用法一（函数形式，简单使用）：
-      GlobalLibraryJS.asyncScript(func, tips, ...params)；
+      $CommonLibJS.asyncScript(func, tips, ...params)；
       参数：func为函数、生成器函数或生成器（区别：函数和生成器函数在下一个事件循环中运行，而生成器直接运行）；tips是字符串；params是给func的参数；
       如果是生成器函数或生成器：
         function*() {
@@ -443,15 +443,15 @@ Item {
           如果是Promise或函数（函数是新增的，类似Promise构造函数的参数，两者的区别是Promise的then是在下次事件循环的微任务中运行，函数是立刻运行，不过我已经用runNextEventLoop处理成和Promise一样的了）；
           如果是函数，则类似 Promise 一样立刻调用，参数是 resolve(res)、reject(error) 两个函数，生成器暂停，直到调用这两个函数其中之一则继续。
           如果是其他，则作为 返回值 传递给生成器（res1、res2）继续向下执行；
-      GlobalLibraryJS.asyncSleep(ms, parent);
+      $CommonLibJS.asyncSleep(ms, parent);
       等待ms后再继续运行；
 
     用法二（对象形式，功能更多）：
       使用AsyncScript产生一个对象来运行，这个对象除了有用法一的功能外，还可以使用waitAll函数等待它的所有生成器运行完毕；
         示例：
-        GlobalLibraryJS.asyncScript(function*() {
-            //let as = new GlobalLibraryJS.AsyncScript();   //创建一个新的
-            let as = GlobalLibraryJS.$asyncScript;          //使用系统创建的
+        $CommonLibJS.asyncScript(function*() {
+            //let as = new $CommonLibJS.AsyncScript();   //创建一个新的
+            let as = $CommonLibJS.$asyncScript;          //使用系统创建的
 
             console.info(this.$context, this.$defer); //如果运行的是Generator Function，则this有这两个属性
             //this.$defer = function(){console.info('哈哈defer')}; //设置$defer
@@ -479,13 +479,13 @@ Item {
         });
         //输出 1,3,4,5,2,（等待1s）,7,6,8
 
-    注意：如果在游戏中，可以用 game.async 代替 GlobalLibraryJS.asyncScript。
+    注意：如果在游戏中，可以用 game.async 代替 $CommonLibJS.asyncScript。
 
 11、脚本队列
     游戏中已经封装了一个 主脚本队列，用game.run(vScript, scriptProps=-1, ...params)来运行，具体见命令教程；
     另一种底层用法：
-      scriptQueue = new GlobalLibraryJS.ScriptQueue();  //创建一个脚本队列
-      //GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
+      scriptQueue = new $CommonLibJS.ScriptQueue();  //创建一个脚本队列
+      //$GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       const ret = scriptQueue.create(genfunc(...) ?? null, -1, true, 'tips', ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       scriptQueue.clear(5);     //清空脚本队列；参数不同效果不同；
       scriptQueue.run(value);   //运行一次脚本队列；参数为给脚本中断的yield返回值；
@@ -495,7 +495,7 @@ Item {
 
 12、缓存池
     示例：
-    let cacheSprites = new GlobalLibraryJS.Cache({
+    let cacheSprites = new $CommonLibJS.Cache({
         //创建时回调
         $create: function(p) {
             let o = compCacheSpriteEffect.createObject(p);
@@ -523,9 +523,9 @@ Item {
 
 13、IO高级操作
   文件：
-    //var f = FrameManager.sl_file('c:/1321.txt', 2);
+    //var f = $Frame.sl_file('c:/1321.txt', 2);
     //或：
-    var f = FrameManager.sl_file();
+    var f = $Frame.sl_file();
     f.sl_setFileName('c:/1321.txt')
     f.sl_open(2);
     //读写：f.io（QIODevice封装类）、f.io.ts（QTextStream封装类）、f.io.ds（QDataStream封装类）
@@ -534,7 +534,7 @@ Item {
     g.io.ds.sl_write('1234');
     f.sl_deleteLater();
   二进制（QBuffer）：
-    var b = FrameManager.sl_buffer();
+    var b = $Frame.sl_buffer();
     b.io.sl_open(3);
     //读写：b.io（QIODevice封装类）、b.io.ts（QTextStream封装类）、b.io.ds（QDataStream封装类）
     b.io.sl_write('深林孤鹰');b.sl_flush();
@@ -542,7 +542,7 @@ Item {
     b.io.ds.sl_write('1234');
     b.sl_deleteLater();
   二进制（QByteArray）：
-    var b = FrameManager.sl_byteArray();
+    var b = $Frame.sl_byteArray();
     //读写：b.ts（QTextStream封装类）、b.ds（QDataStream封装类）
     b.sl_append('深林孤鹰');
     b.ts.sl_write('深林孤鹰');b.ts.sl_flush();
@@ -560,8 +560,8 @@ Item {
 15、其他（详细见官网教程）
     a、文件、文件夹操作；
     b、压缩解压（zip）操作；
-    c、剪切板操作（FrameManager.sl_setClipboardText）；
-    d、动态载入卸载QRC资源：FrameManager.sl_registerResource、FrameManager.sl_unRegisterResource；
+    c、剪切板操作（$Frame.sl_setClipboardText）；
+    d、动态载入卸载QRC资源：$Frame.sl_registerResource、$Frame.sl_unRegisterResource；
     e、登录、联机、弱网等；
     f、本地系统功能（二维码、摄像头、GPS、屏幕旋转、屏幕常量、请求权限等）；
     g、播放音频视频；
@@ -570,7 +570,7 @@ Item {
         其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、封装了部分QObject方法、给QML发送队列事件；
     j、扩展自定义可视化命令；
 `;
-        msgBox.text = GlobalLibraryJS.convertToHTML(t);
+        msgBox.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainAdvancedTutorial]Component.onCompleted');
     }

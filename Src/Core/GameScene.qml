@@ -23,7 +23,7 @@ import 'GameComponents'
 import 'qrc:/QML'
 
 
-import 'GameMakerGlobal.js' as GameMakerGlobalJS
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 import 'GameScene.js' as GameSceneJS
 //import 'File.js' as File
@@ -48,11 +48,11 @@ import 'GameScene.js' as GameSceneJS
     gameScene是视窗，itemContainer是整个地图、特效的容器，角色移动时，itemContainer也在移动，一直会将角色移动在最中央。
 
   脚本设计：
-    1、game.run、game.async、GlobalLibraryJS.asyncScript 的区别：
+    1、game.run、game.async、$CommonLibJS.asyncScript 的区别：
       game.run：系统脚本队列，只能按顺序执行；
       game.async：异步脚本对象，可以运行生成器，无顺序限制，可以控制所有的生成器（waitAll和terminateAll）；
-      GlobalLibraryJS.asyncScript：异步脚本函数，类似game.async，但不能控制所有生成器；
-      上面3个可以任意组合使用，但：游戏事件尽量放在game.run里运行；GlobalLibraryJS.asyncScript必须运行带有release的生成器（因为里面有清空 系统脚本队列 和 异步脚本对象 的代码）；
+      $CommonLibJS.asyncScript：异步脚本函数，类似game.async，但不能控制所有生成器；
+      上面3个可以任意组合使用，但：游戏事件尽量放在game.run里运行；$CommonLibJS.asyncScript必须运行带有release的生成器（因为里面有清空 系统脚本队列 和 异步脚本对象 的代码）；
     2、loadmap、usegoods、save、load、gameover、plugin 这些命令有脚本的，必须要立即运行，所以可以用 game.run 的 -2，也可以使用 game.async，但最好不要用 异步脚本函数（因为release不能清空它）；
     3、很多命令返回Promise对象，除了上述还有6+1个（msg、talk、menu、input、window、trade、wait）：
       所以这些命令用yield都有暂停效果，loadmap、usegoods等这些命令要立即运行代码并完成才能激活Promise对象，而msg、talk等这些是通过交互后调用回调函数来激活Promise对象）；
@@ -142,7 +142,7 @@ Item {
     }
 
     //游戏初始化脚本
-    //startScript为true，则载入start.js；为函数/生成器，则直接运行startScript；为false则不执行；
+    //startScript为true，则载入main.js；为函数/生成器，则直接运行startScript；为false则不执行；
     //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）；
     //必须用yield*标记来让它运行完毕（第一次使用则不必）；
     function* _init(startScript=true, bLoadResources=true, gameData=null) {
@@ -168,7 +168,7 @@ Item {
 
         //恢复游戏数据
         if(gameData)
-            GlobalLibraryJS.copyPropertiesToObject(game.gd, gameData);
+            $CommonLibJS.copyPropertiesToObject(game.gd, gameData);
         //game.gd = ret['Data'];
 
 
@@ -208,14 +208,14 @@ Item {
 
 
 
-        if(_private.objCommonScripts.$gameInit) { //GlobalLibraryJS.checkCallable
+        if(_private.objCommonScripts.$gameInit) { //$CommonLibJS.checkCallable
             try {
                 //game.run(_private.objCommonScripts.$gameInit(bLoadResources) ?? null,
                 //    {Priority: priority++, Type: 0, Running: 1, Tips: '$gameInit'});
                 let r = _private.objCommonScripts.$gameInit(bLoadResources);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
             } catch(e) {
-                GlobalLibraryJS.printException(e);
+                $CommonLibJS.printException(e);
                 console.warn('[!GameScene]游戏init函数调用错误');
                 //throw err;
             }
@@ -226,14 +226,14 @@ Item {
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc]) {
                 const plugin = _private.objPlugins[tc][tp];
-                if(plugin.$init && plugin.$autoLoad !== false) { //GlobalLibraryJS.checkCallable
+                if(plugin.$init && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
                     try {
                         //console.warn(plugin.$init)
                         //plugin.$init();
                         let r = plugin.$init();
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                     } catch(e) {
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         console.warn('[!GameScene]插件$init函数调用错误：', tc, tp);
                         //throw err;
                     }
@@ -242,12 +242,12 @@ Item {
 
 
         //钩子函数调用
-        for(let vfInit in game.$sys.hooks.init) { //GlobalLibraryJS.checkCallable
+        for(let vfInit in game.$sys.hooks.init) { //$CommonLibJS.checkCallable
             try {
                 let r = game.$sys.hooks.init[vfInit](bLoadResources);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
             } catch(e) {
-                GlobalLibraryJS.printException(e);
+                $CommonLibJS.printException(e);
                 console.warn('[!GameScene]钩子init函数调用错误：', vfInit);
                 //throw err;
             }
@@ -259,27 +259,27 @@ Item {
 
 
         //game.run(function*() {
-        //读取 start.js 脚本
+        //读取 main.js 脚本
         if(startScript === true) {
             /*
-            let filePath = game.$projectpath + GameMakerGlobal.separator + 'start.js';
+            let filePath = game.$projectpath + GameMakerGlobal.separator + 'main.js';
             //let cfg = File.read(filePath);
-            let data = FrameManager.sl_fileRead(GlobalJS.toPath(filePath));
+            let data = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
             //if(!data)
             //    return false;
             if(_private.scriptQueue.create(eval(data) ?? null, 0, true, '', ) === 0)
-            //if(GlobalJS.createScript(_private.scriptQueue, 0, 0, eval(data)) === 0)
+            //if($GlobalJS.createScript(_private.scriptQueue, 0, 0, eval(data)) === 0)
                 _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
             */
 
             let gameStart = /*game.$sys.getCommonScriptResource('$start') || */_private.objCommonScripts['$gameStart'];
-            if(gameStart) { //GlobalLibraryJS.checkCallable
+            if(gameStart) { //$CommonLibJS.checkCallable
                 //game.run(function*() {
                     try {
                         let r = gameStart();
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                     } catch(e) {
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         console.warn('[!GameScene]游戏start函数调用错误');
                         //throw err;
                     }
@@ -290,13 +290,13 @@ Item {
         }
         else if(startScript === null) {
         }
-        else {  //GlobalLibraryJS.checkCallable
+        else {  //$CommonLibJS.checkCallable
             //game.run(function*() {
                 try {
                     let r = startScript();
-                    if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                    if($CommonLibJS.isGenerator(r))r = yield* r;
                 } catch(e) {
-                    GlobalLibraryJS.printException(e);
+                    $CommonLibJS.printException(e);
                     console.warn('[!GameScene]游戏start函数调用错误2');
                     //throw err;
                 }
@@ -312,7 +312,7 @@ Item {
 
         //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
         //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
-        //GlobalLibraryJS.setTimeout(function() {
+        //$CommonLibJS.setTimeout(function() {
         //        setSceneToRole(_private.sceneRole);
         //    },10,rootGameScene
         //);
@@ -339,17 +339,17 @@ Item {
         game.pause('$release');
 
 
-        GlobalLibraryJS.$asyncScript.terminateAll(1, null, 1);
+        $CommonLibJS.$asyncScript.terminateAll(1, null, 1);
         _private.scriptQueue.clear(5);
 
 
         //钩子函数调用
-        for(let vfRelease in game.$sys.hooks.release) { //GlobalLibraryJS.checkCallable
+        for(let vfRelease in game.$sys.hooks.release) { //$CommonLibJS.checkCallable
             try {
                 let r = game.$sys.hooks.release[vfRelease](bUnloadResources);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
             } catch(e) {
-                GlobalLibraryJS.printException(e);
+                $CommonLibJS.printException(e);
                 console.warn('[!GameScene]钩子release函数调用错误：', vfRelease);
                 //throw err;
             }
@@ -360,13 +360,13 @@ Item {
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc]) {
                 const plugin = _private.objPlugins[tc][tp];
-                if(plugin.$release && plugin.$autoLoad !== false) { //GlobalLibraryJS.checkCallable
+                if(plugin.$release && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
                     try {
                         //plugin.$release();
                         let r = plugin.$release();
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                     } catch(e) {
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         console.warn('[!GameScene]插件$release函数调用错误：', tc, tp);
                         //throw err;
                     }
@@ -374,12 +374,12 @@ Item {
             }
 
 
-        if(_private.objCommonScripts.$gameRelease) { //GlobalLibraryJS.checkCallable
+        if(_private.objCommonScripts.$gameRelease) { //$CommonLibJS.checkCallable
             try {
                 let r = _private.objCommonScripts.$gameRelease(bUnloadResources);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
             } catch(e) {
-                GlobalLibraryJS.printException(e);
+                $CommonLibJS.printException(e);
                 console.warn('[!GameScene]游戏release函数调用错误');
                 //throw err;
             }
@@ -400,12 +400,13 @@ Item {
         game.delimage();
         game.delsprite();
         game.stopvideo(-1);
-        itemBackgroundMusic.stop();
-        itemBackgroundMusic.arrMusicStack = [];
-        itemBackgroundMusic.objMusicPause = {};
+        game.stopmusic();
+        game.resumemusic(null);
+        game.stopsoundeffect(-1);
+        game.resumesoundeffect(-1);
 
 
-        //FrameManager.goon();
+        //$Frame.goon();
 
 
         gameMenuWindow.closeWindow(-1);
@@ -458,7 +459,7 @@ Item {
 
             for(let tc in _private.objTmpComponents) {
                 const c = _private.objTmpComponents[tc];
-                if(GlobalLibraryJS.isComponent(c)) {
+                if($CommonLibJS.isComponent(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -611,11 +612,11 @@ Item {
 
                     //执行之前地图的 $end 函数
                     if(game.d['$sys_map'] && game.d['$sys_map'].$rid) {
-                        //const ts = _private.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$rid + GameMakerGlobal.separator + 'map.js'));
-                        //if(ts.$end) { //GlobalLibraryJS.checkCallable
+                        //const ts = _private.jsLoader.load($GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$rid + GameMakerGlobal.separator + 'map.js'));
+                        //if(ts.$end) { //$CommonLibJS.checkCallable
                         if(itemViewPort.mapScript && itemViewPort.mapScript.$end) {
                             let r = itemViewPort.mapScript.$end(userData);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                             //game.run(itemViewPort.mapScript.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
                         }
                     }
@@ -628,7 +629,7 @@ Item {
 
                     for(let tc in _private.objTmpMapComponents) {
                         const c = _private.objTmpMapComponents[tc];
-                        if(GlobalLibraryJS.isComponent(c)) {
+                        if($CommonLibJS.isComponent(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -649,9 +650,9 @@ Item {
 
                     //载入beforeLoadmap脚本
                     const beforeLoadmap = _private.objCommonScripts.$beforeLoadmap;
-                    if(beforeLoadmap) { //GlobalLibraryJS.checkCallable
+                    if(beforeLoadmap) { //$CommonLibJS.checkCallable
                         let r = beforeLoadmap(mapRID, userData);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
                     }
 
@@ -672,23 +673,23 @@ Item {
 
 
                     if(itemViewPort.mapScript)
-                        if(itemViewPort.mapScript.$start) { //GlobalLibraryJS.checkCallable
+                        if(itemViewPort.mapScript.$start) { //$CommonLibJS.checkCallable
                             let r = itemViewPort.mapScript.$start(userData);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                             //game.run(itemViewPort.mapScript.$start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
                         }
-                        else if(itemViewPort.mapScript.start) { //GlobalLibraryJS.checkCallable
+                        else if(itemViewPort.mapScript.start) { //$CommonLibJS.checkCallable
                             let r = itemViewPort.mapScript.start(userData);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                             //game.run(itemViewPort.mapScript.start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
                         }
 
 
                     //载入after_loadmap脚本
                     const afterLoadmap = _private.objCommonScripts.$afterLoadmap;
-                    if(afterLoadmap) { //GlobalLibraryJS.checkCallable
+                    if(afterLoadmap) { //$CommonLibJS.checkCallable
                         let r = afterLoadmap(mapRID, userData);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(afterLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'afterLoadmap'});
                     }
 
@@ -760,7 +761,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -831,7 +832,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -879,9 +880,9 @@ Item {
             if(!role)
                 return false;
 
-            if(GlobalLibraryJS.isNumber(role))
+            if($CommonLibJS.isNumber(role))
                 role = role.toString();
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 do {
                     const roleName = role;
                     role = game.hero(roleName);
@@ -894,14 +895,14 @@ Item {
                 } while(0);
 
             }
-            else if(!GlobalLibraryJS.isComponent(role))
+            else if(!$CommonLibJS.isComponent(role))
                 return false;
 
             //样式
             if(!style)
                 style = {};
-            const styleSystem = GameMakerGlobalJS.$config.$role.$say;
-            const styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$role', '$say') || styleSystem;
+            const styleSystem = $GameMakerGlobalJS.$config.$role.$say;
+            const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$role', '$say') || styleSystem;
             let tn;
 
             role.message.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -916,7 +917,7 @@ Item {
             role.message.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
             //role.message.visible = true;
-            role.message.show(GlobalLibraryJS.convertToHTML(msg.toString()), GlobalLibraryJS.convertToHTML(pretext.toString()), interval, keeptime, 0b11);
+            role.message.show($CommonLibJS.convertToHTML(msg.toString()), $CommonLibJS.convertToHTML(pretext.toString()), interval, keeptime, 0b11);
 
 
             return role;
@@ -959,7 +960,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -1024,7 +1025,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -1081,7 +1082,7 @@ Item {
         //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性})；
         //  let h = game.createhero('角色资源名');   //全部使用默认属性；
         function createhero(role={}) {
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 role = {RID: role, $id: role};
             }
             role.$rid = role.RID ?? role.RId;
@@ -1090,7 +1091,7 @@ Item {
                 if(role.$name)
                     role.$id = role.$name;
                 else
-                    role.$id = role.$rid + GlobalLibraryJS.randomString(6, 6, '0123456789');
+                    role.$id = role.$rid + $CommonLibJS.randomString(6, 6, '0123456789');
             }
             /*if(!role.$name) {
                 role.$name = role.$id;
@@ -1147,7 +1148,7 @@ Item {
 
             role.__proto__ = roleComp.$info;
 
-            //GlobalLibraryJS.copyPropertiesToObject(trole, role, {objectRecursion: 0});
+            //$CommonLibJS.copyPropertiesToObject(trole, role, {objectRecursion: 0});
 
             if(game.gd['$sys_main_roles'][index] === undefined) {
                 //roleComp.$name = role.$name;
@@ -1161,7 +1162,7 @@ Item {
                     game.gd['$sys_main_roles'][index].$avatarSize = [];
                 */
 
-                GlobalLibraryJS.copyPropertiesToObject(role, game.gd['$sys_main_roles'][index], {objectRecursion: 0});
+                $CommonLibJS.copyPropertiesToObject(role, game.gd['$sys_main_roles'][index], {objectRecursion: 0});
             }
             game.gd['$sys_main_roles'][index] = role;
 
@@ -1197,25 +1198,25 @@ Item {
             //找到index
 
             let index = -1;
-            if(GlobalLibraryJS.isString(hero)) {
+            if($CommonLibJS.isString(hero)) {
                 for(index = 0; index < _private.arrMainRoles.length; ++index) {
                     if(_private.arrMainRoles[index].$data.$id === hero) {
                         break;
                     }
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(hero)) {
+            else if($CommonLibJS.isValidNumber(hero)) {
                 index = hero;
             }
-            else if(GlobalLibraryJS.isObject(hero)) {
+            else if($CommonLibJS.isObject(hero)) {
                 //如果是组件直接用
-                if(GlobalLibraryJS.isComponent(hero))
+                if($CommonLibJS.isComponent(hero))
                     index = hero.$data.$index;
                 else {
                     //找出符合过滤条件的
                     let tret = [];
                     for(let tr of game.gd['$sys_main_roles']) {
-                        if(GlobalLibraryJS.filterObject(tr, hero))
+                        if($CommonLibJS.filterObject(tr, hero))
                             tret.push(tr);
                     }
                     if(tret.length === 0)
@@ -1239,14 +1240,14 @@ Item {
             hero = game.gd['$sys_main_roles'][index];
             const heroComp = _private.arrMainRoles[index];
 
-            if(!GlobalLibraryJS.objectIsEmpty(props)) {
+            if(!$CommonLibJS.objectIsEmpty(props)) {
                 //修改属性
-                //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
+                //$CommonLibJS.copyPropertiesToObject(hero, props, true);
 
                 //!!!后期想办法把reset去掉
                 //mainRole.reset();
 
-                //GlobalLibraryJS.copyPropertiesToObject(hero, props, true);
+                //$CommonLibJS.copyPropertiesToObject(hero, props, true);
                 if(props.$name !== undefined)   //修改名字
                     hero.$name = heroComp.textName.text = props.$name;
                 if(props.$showName !== undefined)   //名字可见
@@ -1288,12 +1289,12 @@ Item {
                         props.$targetY = -1;
                     heroComp.$$targetsPos = [Qt.point(props.$targetX, props.$targetY)];
                 }
-                if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
+                if($CommonLibJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
                     let rolePos = heroComp.pos();
-                    //heroComp.$$targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
-                    props.$targetBlocks = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    //heroComp.$$targetsPos = $GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    props.$targetBlocks = $GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
-                if(GlobalLibraryJS.isArray(props.$targetBlocks)) {
+                if($CommonLibJS.isArray(props.$targetBlocks)) {
                     heroComp.$$targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
                         let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
@@ -1305,7 +1306,7 @@ Item {
                         heroComp.$$targetsPos.push(Qt.point(tPos[0], tPos[1]));
                     }
                 }
-                if(GlobalLibraryJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
+                if($CommonLibJS.isArray(props.$targetPositions) && props.$targetPositions.length > 0) {
                     heroComp.$$targetsPos = props.$targetPositions;
                 }
 
@@ -1333,7 +1334,7 @@ Item {
                 if(props.$direction !== undefined)
                     heroComp.changeAction(props.$direction);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
-                    GlobalLibraryJS.setTimeout(function() {
+                    $CommonLibJS.setTimeout(function() {
                             if(heroComp)
                                 heroComp.start(props.$direction, null);
                         },20,rootGameScene
@@ -1365,11 +1366,11 @@ Item {
 
                 if(props.$start === true) {
                     /*
-                    GlobalLibraryJS.setTimeout(function() {
+                    $CommonLibJS.setTimeout(function() {
                         roleComp.start();
                     }, 1, rootGameScene, 'fight.continueFight');
 
-                    GlobalLibraryJS.runNextEventLoop(function() {
+                    $CommonLibJS.runNextEventLoop(function() {
                         roleComp.start();
                         }, 'game.run1');
                     */
@@ -1427,7 +1428,7 @@ Item {
 
                     for(let tc in tr.$tmpComponents) {
                         let c = tr.$tmpComponents[tc];
-                        if(GlobalLibraryJS.isComponent(c)) {
+                        if($CommonLibJS.isComponent(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -1443,16 +1444,16 @@ Item {
             //找到index
 
             let index = -1;
-            if(GlobalLibraryJS.isString(hero)) {
+            if($CommonLibJS.isString(hero)) {
                 for(index = 0; index < _private.arrMainRoles.length; ++index) {
                     if(_private.arrMainRoles[index].$data.$id === hero) {
                         break;
                     }
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(hero))
+            else if($CommonLibJS.isValidNumber(hero))
                 index = hero;
-            else if(GlobalLibraryJS.isObject(hero)) {
+            else if($CommonLibJS.isObject(hero)) {
                 index = hero.$data.$index;
             }
             else {
@@ -1469,7 +1470,7 @@ Item {
             _private.arrMainRoles[index].visible = false;
             for(let tc in _private.arrMainRoles[index].$tmpComponents) {
                 const c = _private.arrMainRoles[index].$tmpComponents[tc];
-                if(GlobalLibraryJS.isComponent(c)) {
+                if($CommonLibJS.isComponent(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -1524,7 +1525,7 @@ Item {
         //成功为组件对象，失败为false。
         function createrole(role={}) {
 
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 role = {RID: role, $id: role};
             }
             role.$rid = role.RID ?? role.RId;
@@ -1533,7 +1534,7 @@ Item {
                 if(role.$name)
                     role.$id = role.$name;
                 else
-                    role.$id = role.$rid + GlobalLibraryJS.randomString(6, 6, '0123456789');
+                    role.$id = role.$rid + $CommonLibJS.randomString(6, 6, '0123456789');
             }
             /*if(!role.$name) {
                 role.$name = role.$id;
@@ -1600,22 +1601,22 @@ Item {
 
             let roleComp;
 
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 roleComp = _private.objRoles[role];
                 if(roleComp === undefined)
                     return null;
             }
-            else if(GlobalLibraryJS.isValidNumber(role))
+            else if($CommonLibJS.isValidNumber(role))
                 return false;
-            else if(GlobalLibraryJS.isObject(role)) {
+            else if($CommonLibJS.isObject(role)) {
                 //如果是组件直接用
-                if(GlobalLibraryJS.isComponent(role))
+                if($CommonLibJS.isComponent(role))
                     roleComp = role;
                 else {
                     //找出符合过滤条件的
                     let tret = [];
                     for(let tr of _private.objRoles) {
-                        if(GlobalLibraryJS.filterObject(tr, role))
+                        if($CommonLibJS.filterObject(tr, role))
                             tret.push(tr);
                     }
                     if(tret.length === 0)
@@ -1632,9 +1633,9 @@ Item {
             role = roleComp.$data;
 
 
-            if(!GlobalLibraryJS.objectIsEmpty(props)) {
+            if(!$CommonLibJS.objectIsEmpty(props)) {
                 //修改属性
-                //GlobalLibraryJS.copyPropertiesToObject(roleComp, props, true);
+                //$CommonLibJS.copyPropertiesToObject(roleComp, props, true);
 
                 //!!!后期想办法把reset去掉
                 //roleComp.reset();
@@ -1680,12 +1681,12 @@ Item {
                         props.$targetY = -1;
                     roleComp.$$targetsPos = [Qt.point(props.$targetX, props.$targetY)];
                 }
-                if(GlobalLibraryJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
+                if($CommonLibJS.isArray(props.$targetBlockAuto) && props.$targetBlockAuto.length === 2) {
                     let rolePos = roleComp.pos();
-                    //roleComp.$$targetsPos = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
-                    props.$targetBlocks = GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    //roleComp.$$targetsPos = $GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
+                    props.$targetBlocks = $GameMakerGlobalJS.computePath([rolePos.bx, rolePos.by], [props.$targetBlockAuto[0], props.$targetBlockAuto[1]]);
                 }
-                if(GlobalLibraryJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
+                if($CommonLibJS.isArray(props.$targetBlocks) && props.$targetBlocks.length > 0) {
                     roleComp.$$targetsPos = [];
                     for(let targetBlock of props.$targetBlocks) {
                         let tPos = itemViewPort.getMapBlockPos(targetBlock[0], targetBlock[1]);
@@ -1697,7 +1698,7 @@ Item {
                         roleComp.$$targetsPos.push(Qt.point(tPos[0], tPos[1]));
                     }
                 }
-                if(GlobalLibraryJS.isArray(props.$targetPositions)) {
+                if($CommonLibJS.isArray(props.$targetPositions)) {
                     roleComp.$$targetsPos = props.$targetPositions;
                 }
 
@@ -1724,7 +1725,7 @@ Item {
                 if(props.$direction !== undefined)
                     roleComp.changeAction(props.$direction);
                     /*/貌似必须10ms以上才可以使其转向（鹰：使用AnimatedSprite就不用延时了）
-                    GlobalLibraryJS.setTimeout(function() {
+                    $CommonLibJS.setTimeout(function() {
                             if(roleComp)
                                 roleComp.start(props.$direction, null);
                         },20,rootGameScene
@@ -1756,11 +1757,11 @@ Item {
 
                 if(props.$start === true) {
                     /*
-                    GlobalLibraryJS.setTimeout(function() {
+                    $CommonLibJS.setTimeout(function() {
                         roleComp.start();
                     }, 1, rootGameScene, 'fight.continueFight');
 
-                    GlobalLibraryJS.runNextEventLoop(function() {
+                    $CommonLibJS.runNextEventLoop(function() {
                         roleComp.start();
                         }, 'game.run1');
                     */
@@ -1784,7 +1785,7 @@ Item {
                 for(let r in _private.objRoles) {
                     for(let tc in _private.objRoles[r].$tmpComponents) {
                         let c = _private.objRoles[r].$tmpComponents[tc];
-                        if(GlobalLibraryJS.isComponent(c)) {
+                        if($CommonLibJS.isComponent(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -1798,14 +1799,14 @@ Item {
 
 
 
-            if(GlobalLibraryJS.isNumber(role))
+            if($CommonLibJS.isNumber(role))
                 role = role.toString();
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 role = _private.objRoles[role];
                 if(role === undefined)
                     return false;
             }
-            else if(!GlobalLibraryJS.isComponent(role))
+            else if(!$CommonLibJS.isComponent(role))
                 return false;
 
 
@@ -1813,7 +1814,7 @@ Item {
 
             for(let tc in role.$tmpComponents) {
                 let c = role.$tmpComponents[tc];
-                if(GlobalLibraryJS.isComponent(c)) {
+                if($CommonLibJS.isComponent(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -1829,14 +1830,14 @@ Item {
         //示例：game.moverole('NPC的$id',6,6);
         function moverole(role, bx, by) {
 
-            if(GlobalLibraryJS.isNumber(role))
+            if($CommonLibJS.isNumber(role))
                 role = role.toString();
-            if(GlobalLibraryJS.isString(role)) {
+            if($CommonLibJS.isString(role)) {
                 role = _private.objRoles[role];
                 if(role === undefined)
                     return false;
             }
-            else if(!GlobalLibraryJS.isComponent(role))
+            else if(!$CommonLibJS.isComponent(role))
                 return false;
 
 
@@ -1887,7 +1888,7 @@ Item {
         //  pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
         //返回：如果是判断，返回true或false；如果返回是坐标，则包括bx、by（地图块坐标）、cx、cy（或x、y，中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
         function rolepos(role, pos=null) {
-            if(GlobalLibraryJS.isValidNumber(role)) {
+            if($CommonLibJS.isValidNumber(role)) {
                 role = mainRole;
             }
             else if(!role)
@@ -2052,7 +2053,7 @@ Item {
             }
 
 
-            if(GlobalLibraryJS.isString(fighthero)) {
+            if($CommonLibJS.isString(fighthero)) {
                 for(let fightheroIndex = 0; fightheroIndex < game.gd['$sys_fight_heros'].length; ++fightheroIndex) {
                     if(game.gd['$sys_fight_heros'][fightheroIndex].$id === fighthero) {
                         fighthero = game.gd['$sys_fight_heros'][fightheroIndex];
@@ -2060,11 +2061,11 @@ Item {
                     }
                 }
             }
-            if(GlobalLibraryJS.isObject(fighthero)) {
+            if($CommonLibJS.isObject(fighthero)) {
                 //fightHero = fighthero;
                 //fightheroIndex = fighthero.$index;
             }
-            else if(GlobalLibraryJS.isValidNumber(fighthero)) {
+            else if($CommonLibJS.isValidNumber(fighthero)) {
                 if(fighthero >= game.gd['$sys_fight_heros'].length)
                     return false;
                 else if(fighthero < 0)
@@ -2148,7 +2149,7 @@ Item {
 
 
             //如果直接是 字符串或全部，则 按 过滤条件 找出所有
-            if(GlobalLibraryJS.isString(skill) || skill === -1) {
+            if($CommonLibJS.isString(skill) || skill === -1) {
                 let deletedSkills = [];
                 let tSkills = fighthero.$skills;
                 fighthero.$skills = [];
@@ -2156,7 +2157,7 @@ Item {
                 //循环每个技能
                 for(let tskill of tSkills) {
                     //如果找到技能rid
-                    if(GlobalLibraryJS.isString(skill) && tskill.$rid !== skill) {
+                    if($CommonLibJS.isString(skill) && tskill.$rid !== skill) {
                         fighthero.$skills.push(tskill);
                         continue;
                     }
@@ -2183,7 +2184,7 @@ Item {
                     return false;
                 return deletedSkills;
             }
-            else if(GlobalLibraryJS.isValidNumber(skill)) {
+            else if($CommonLibJS.isValidNumber(skill)) {
                 if(skill < 0 || skill >= fighthero.$skills.length)
                     return false;
                 else {
@@ -2225,20 +2226,20 @@ Item {
 
 
             //如果直接是 字符串或全部，则 按 过滤条件 找出所有
-            if(GlobalLibraryJS.isString(skill) || skill === -1) {
+            if($CommonLibJS.isString(skill) || skill === -1) {
 
                 let tSkills = [];
 
                 //循环每个技能
                 for(let tskill of fighthero.$skills) {
                     //如果找到技能rid
-                    if(GlobalLibraryJS.isString(skill) && tskill.$id !== skill) {
+                    if($CommonLibJS.isString(skill) && tskill.$id !== skill) {
                         //fighthero.$skills.push(tskill);
                         continue;
                     }
 
                     //有筛选
-                    if(filters && GlobalLibraryJS.filterObject(tskill, filters)) {
+                    if(filters && $CommonLibJS.filterObject(tskill, filters)) {
                         tSkills.push(tskill);
                     }
                 }
@@ -2247,7 +2248,7 @@ Item {
                     return null;
                 return tSkills;
             }
-            else if(GlobalLibraryJS.isValidNumber(skill)) {
+            else if($CommonLibJS.isValidNumber(skill)) {
                 if(skill >= fighthero.$skills.length)
                     return null;
                 else if(skill < 0)
@@ -2258,7 +2259,7 @@ Item {
                     //return tSkill ? tSkill : null;
                 }
             }
-            else if(GlobalLibraryJS.isObject(skill)) { //如果直接是对象
+            else if($CommonLibJS.isObject(skill)) { //如果直接是对象
                 //循环每个技能
                 for(let tskill of fighthero.$skills) {
                     //如果找到技能
@@ -2298,7 +2299,7 @@ Item {
 
             //参考属性（乘以比例时的参考属性）
             let properties2;
-            if(GlobalLibraryJS.isNumber(type)) {
+            if($CommonLibJS.isNumber(type)) {
                 properties2 = fighthero.$$propertiesWithExtra;
             }
             else {
@@ -2310,7 +2311,7 @@ Item {
                 type = type[0];
             }
 
-            GameMakerGlobalJS.addProps(fighthero.$properties, props, type, properties2);
+            $GameMakerGlobalJS.addProps(fighthero.$properties, props, type, properties2);
 
             /*if(fighthero.$properties.healthHP > fighthero.$$propertiesWithExtra.HP)
                 fighthero.$properties.healthHP = fighthero.$$propertiesWithExtra.HP;
@@ -2339,10 +2340,10 @@ Item {
         //  如果为 下标，则直接加减；如果为 字符串（默认1个数量）、对象（数量要提供），则获取道具对象后，从这个对象中转移；
         //count为>0表示转移个数，为0表示返回数量；<0（或非数字）表示将goods的$count全部转移（默认）。
         readonly property var getgoods: function(goods, count) {
-            if(!GlobalLibraryJS.isNumber(count))
-                count = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(goods, '$count'), -1);
+            if(!$CommonLibJS.isNumber(count))
+                count = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(goods, '$count'), -1);
 
-            if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
+            if($CommonLibJS.isObject(goods)) { //如果直接是对象
                 if(count > 0 && goods.$count === undefined)
                     goods.$count = count;
                 goods = GameSceneJS.getGoodsObject(goods, false);
@@ -2355,14 +2356,14 @@ Item {
                 }*/
 
             }
-            else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
+            else if($CommonLibJS.isString(goods)) { //如果直接是字符串
                 goods = GameSceneJS.getGoodsObject(goods, count > 0 ? {$count: count} : undefined);
 
                 if(!goods.$count)
                     goods.$count = 0;
 
             }
-            else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
+            else if($CommonLibJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd['$sys_goods'].length)
                     return false;
 
@@ -2370,7 +2371,7 @@ Item {
                 if(goods.$count + count > 0)
                     goods.$count += count;
                 //if(goodsProps)
-                //    GlobalLibraryJS.copyPropertiesToObject(goods, goodsProps/*, true*/);  //!!更改对象属性
+                //    $CommonLibJS.copyPropertiesToObject(goods, goodsProps/*, true*/);  //!!更改对象属性
 
                 return goods.$count;
             }
@@ -2430,11 +2431,11 @@ Item {
         //如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
         //返回 false 表示错误；
         readonly property var removegoods: function(goods, count=1) {
-            if(!GlobalLibraryJS.isValidNumber(count) || count < 0)   //如果直接是数字
+            if(!$CommonLibJS.isValidNumber(count) || count < 0)   //如果直接是数字
                 return false;
 
 
-            if(GlobalLibraryJS.isObject(goods)) { //如果是 道具对象
+            if($CommonLibJS.isObject(goods)) { //如果是 道具对象
                 if(count === true)
                     count = goods.$count;
 
@@ -2455,7 +2456,7 @@ Item {
                 }
                 return false;
             }
-            else if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
+            else if($CommonLibJS.isValidNumber(goods)) { //如果直接是数字
                 if(goods < 0 || goods >= game.gd['$sys_goods'].length)
                     return false;
 
@@ -2472,7 +2473,7 @@ Item {
 
                 return newCount;
             }
-            else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
+            else if($CommonLibJS.isString(goods)) { //如果直接是字符串
             }
             else
                 return false;
@@ -2531,7 +2532,7 @@ Item {
             if(goodsFilter === -1)
                 return game.gd['$sys_goods'];
             //如果是对象
-            else if(GlobalLibraryJS.isObject(goodsFilter)) {
+            else if($CommonLibJS.isObject(goodsFilter)) {
                 //如果已经是道具对象，则判断是否存在
                 if(goodsFilter.$rid && GameSceneJS.getGoodsResource(goodsFilter.$rid)) {
                     for(let tg of game.gd['$sys_goods']) {
@@ -2542,7 +2543,7 @@ Item {
                 }
             }
             //如果是数字，则为下标
-            else if(GlobalLibraryJS.isValidNumber(goodsFilter)) {
+            else if($CommonLibJS.isValidNumber(goodsFilter)) {
                 if(goodsFilter >= game.gd['$sys_goods'].length)
                     return null;
                 else if(goodsFilter < 0)
@@ -2555,7 +2556,7 @@ Item {
                 //    return game.gd['$sys_goods'];
             }
             //如果直接是 字符串，则为id
-            else if(GlobalLibraryJS.isString(goodsFilter)) {
+            else if($CommonLibJS.isString(goodsFilter)) {
                 goodsFilter = {$id: goodsFilter};
             }
             else
@@ -2566,7 +2567,7 @@ Item {
 
             for(let tg of game.gd['$sys_goods']) {
                 //有筛选
-                if(!GlobalLibraryJS.objectIsEmpty(goodsFilter) && GlobalLibraryJS.filterObject(tg, goodsFilter))
+                if(!$CommonLibJS.objectIsEmpty(goodsFilter) && $CommonLibJS.filterObject(tg, goodsFilter))
                     ret.push(tg);
             }
 
@@ -2591,15 +2592,15 @@ Item {
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
                     //let copyedNewProps;
-                    //if(GlobalLibraryJS.isObject(params)) {
+                    //if($CommonLibJS.isObject(params)) {
                         //copyedNewProps = params.NewProps ?? {$count: 1};
                     //}
 
                     //如果已经是道具对象，则直接使用
-                    if(GlobalLibraryJS.isObject(goods) && goods.$rid && GameSceneJS.getGoodsResource(goods.$rid)) {
+                    if($CommonLibJS.isObject(goods) && goods.$rid && GameSceneJS.getGoodsResource(goods.$rid)) {
                     }
                     //创建道具对象
-                    else if(GlobalLibraryJS.isObject(goods) && (goods.RID ?? goods.RId) !== undefined) {
+                    else if($CommonLibJS.isObject(goods) && (goods.RID ?? goods.RId) !== undefined) {
                         goods = GameSceneJS.getGoodsObject(goods);
                     }
                     //否则从背包中查找
@@ -2614,7 +2615,7 @@ Item {
                             goods = goods[0];
                     }
                     /*
-                    if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
+                    if($CommonLibJS.isValidNumber(goods)) { //如果直接是数字
                         if(goods < 0 || goods >= game.gd['$sys_goods'].length) {
                             //scriptQueue.runNextEventLoop('usegoods');
                             //return reject(false);
@@ -2629,10 +2630,10 @@ Item {
                         goods = GameSceneJS.getGoodsObject(goods, false/*, copyedNewProps* /);
                     }
                     */
-                    /*else if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
+                    /*else if($CommonLibJS.isObject(goods)) { //如果直接是对象
                         goodsInfo = GameSceneJS.getGoodsResource(goods.$rid);
                     }
-                    else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
+                    else if($CommonLibJS.isString(goods)) { //如果直接是字符串
                         goodsInfo = GameSceneJS.getGoodsResource(goods);
                         goods = GameSceneJS.getGoodsObject(goods);
                     }
@@ -2676,9 +2677,9 @@ Item {
                         return resolve(false);
 
 
-                    if(GlobalLibraryJS.checkCallable(goodsInfo.$commons.$useScript)) {
+                    if($CommonLibJS.checkCallable(goodsInfo.$commons.$useScript)) {
                         let r = goodsInfo.$commons.$useScript(goods, fighthero, params);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2690,9 +2691,9 @@ Item {
                     }
                     else {
                         const useScript = _private.objCommonScripts.$useScript;
-                        if(useScript) { //GlobalLibraryJS.checkCallable
+                        if(useScript) { //$CommonLibJS.checkCallable
                             let r = useScript(goods, fighthero, params);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2732,15 +2733,15 @@ Item {
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
                     //let copyedNewProps;
-                    //if(GlobalLibraryJS.isObject(params)) {
+                    //if($CommonLibJS.isObject(params)) {
                         //copyedNewProps = params.NewProps ?? {$count: 1};
                     //}
 
                     //如果已经是道具对象，则直接使用
-                    if(GlobalLibraryJS.isObject(goods) && goods.$rid && GameSceneJS.getGoodsResource(goods.$rid)) {
+                    if($CommonLibJS.isObject(goods) && goods.$rid && GameSceneJS.getGoodsResource(goods.$rid)) {
                     }
                     //创建道具对象
-                    else if(GlobalLibraryJS.isObject(goods) && (goods.RID ?? goods.RId) !== undefined) {
+                    else if($CommonLibJS.isObject(goods) && (goods.RID ?? goods.RId) !== undefined) {
                         goods = GameSceneJS.getGoodsObject(goods);
                     }
                     //否则从背包中查找
@@ -2754,7 +2755,7 @@ Item {
                         else
                             goods = goods[0];
                     }
-                    /*if(GlobalLibraryJS.isValidNumber(goods)) { //如果直接是数字
+                    /*if($CommonLibJS.isValidNumber(goods)) { //如果直接是数字
                         if(goods < 0 || goods >= game.gd['$sys_goods'].length) {
                             //scriptQueue.runNextEventLoop('equip');
                             //return reject(false);
@@ -2769,10 +2770,10 @@ Item {
                         goods = GameSceneJS.getGoodsObject(goods, false/*, copyedNewProps* /);
                     }
                     */
-                    /*else if(GlobalLibraryJS.isObject(goods)) { //如果直接是对象
+                    /*else if($CommonLibJS.isObject(goods)) { //如果直接是对象
                         goodsInfo = GameSceneJS.getGoodsResource(goods.$rid);
                     }
-                    else if(GlobalLibraryJS.isString(goods)) { //如果直接是字符串
+                    else if($CommonLibJS.isString(goods)) { //如果直接是字符串
                         goodsInfo = GameSceneJS.getGoodsResource(goods);
                         goods = GameSceneJS.getGoodsObject(goods);
                     }
@@ -2804,13 +2805,13 @@ Item {
                         return resolve(false);
 
 
-                    if(!GlobalLibraryJS.isObject(fighthero.$equipment))
+                    if(!$CommonLibJS.isObject(fighthero.$equipment))
                         fighthero.$equipment = {};
 
 
-                    if(GlobalLibraryJS.checkCallable(goodsInfo.$commons.$equipScript)) {
+                    if($CommonLibJS.checkCallable(goodsInfo.$commons.$equipScript)) {
                         let r = goodsInfo.$commons.$equipScript(goods, fighthero, params);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2822,9 +2823,9 @@ Item {
                     }
                     else {
                         const equipScript = _private.objCommonScripts.$equipScript;
-                        if(equipScript) { //GlobalLibraryJS.checkCallable
+                        if(equipScript) { //$CommonLibJS.checkCallable
                             let r = equipScript(goods, fighthero, params);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2873,7 +2874,7 @@ Item {
                         return resolve(false);
 
 
-                    if(!GlobalLibraryJS.isObject(fighthero.$equipment))
+                    if(!$CommonLibJS.isObject(fighthero.$equipment))
                         fighthero.$equipment = {};
 
 
@@ -2889,9 +2890,9 @@ Item {
                         return resolve(false);
                     }
 
-                    if(GlobalLibraryJS.checkCallable(goodsInfo.$commons.$unloadScript)) {
+                    if($CommonLibJS.checkCallable(goodsInfo.$commons.$unloadScript)) {
                         let r = goodsInfo.$commons.$unloadScript(oldEquip, fighthero, params);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
 
                         //计算新属性
                         //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2903,9 +2904,9 @@ Item {
                     }
                     else {
                         const unloadScript = _private.objCommonScripts.$unloadScript;
-                        if(unloadScript) { //GlobalLibraryJS.checkCallable
+                        if(unloadScript) { //$CommonLibJS.checkCallable
                             let r = unloadScript(oldEquip, fighthero, params);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
 
                             //计算新属性
                             //for(let fighthero of game.gd['$sys_fight_heros'])
@@ -2943,7 +2944,7 @@ Item {
                 return false;
 
 
-            if(!GlobalLibraryJS.isObject(fighthero.$equipment))
+            if(!$CommonLibJS.isObject(fighthero.$equipment))
                 fighthero.$equipment = {};
 
 
@@ -2986,7 +2987,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -3097,10 +3098,10 @@ Item {
         //    $callback为状态回调函数；
         //成功返回true；
         readonly property var playmusic: function(musicParams) {
-            if(GlobalLibraryJS.isString(musicParams)) {
+            if($CommonLibJS.isString(musicParams)) {
                 musicParams = {RID: musicParams};
             }
-            else if(GlobalLibraryJS.isObject(musicParams)) {
+            else if($CommonLibJS.isObject(musicParams)) {
 
             }
             else {
@@ -3111,7 +3112,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.musicResourceURL(musicParams.$rid);
-            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
+            //if(!$Frame.sl_fileExists($GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', video, fileURL)
             //    return false;
             //}
@@ -3175,7 +3176,7 @@ Item {
         //volume为0~1的浮点数，如果非数字则不变；
         //返回当前音量大小；
         function musicvolume(volume=null) {
-            if(GlobalLibraryJS.isValidNumber(volume, 0b1))
+            if($CommonLibJS.isValidNumber(volume, 0b1))
                 audioBackgroundMusic.volume = parseFloat(volume);
 
             return audioBackgroundMusic.volume;
@@ -3187,7 +3188,7 @@ Item {
         }
         readonly property var musicpausing: function() {
             //return itemBackgroundMusic.objMusicPause[$name] !== undefined;
-            if(GlobalLibraryJS.objectIsEmpty(itemBackgroundMusic.objMusicPause) &&
+            if($CommonLibJS.objectIsEmpty(itemBackgroundMusic.objMusicPause) &&
                 //!GameMakerGlobal.settings.value('$PauseMusic') &&
                 (game.cd['$sys_sound'] & 0b1) &&
                 (game.gd['$sys_sound'] & 0b1)
@@ -3227,7 +3228,7 @@ Item {
         //volume为0~1的浮点数，如果非数字则不变；
         //返回当前音量大小；
         function soundeffectvolume(volume=null) {
-            if(GlobalLibraryJS.isValidNumber(volume, 0b1))
+            if($CommonLibJS.isValidNumber(volume, 0b1))
                 rootSoundEffect.rVolume = parseFloat(volume);
 
             return rootSoundEffect.rVolume;
@@ -3235,7 +3236,7 @@ Item {
 
         readonly property var soundeffectpausing: function() {
             //return _private.config.nSoundConfig !== 0;
-            if(GlobalLibraryJS.objectIsEmpty(rootSoundEffect.objSoundEffectPause) &&
+            if($CommonLibJS.objectIsEmpty(rootSoundEffect.objSoundEffectPause) &&
                 //!GameMakerGlobal.settings.value('$PauseSound') &&
                 (game.cd['$sys_sound'] & 0b10) &&
                 (game.gd['$sys_sound'] & 0b10)
@@ -3254,10 +3255,10 @@ Item {
         readonly property var playvideo: function(videoParams, pauseGame=true) {
             let ret = videoOutput;
 
-            if(GlobalLibraryJS.isString(videoParams)) {
+            if($CommonLibJS.isString(videoParams)) {
                 videoParams = {RID: videoParams};
             }
-            else if(GlobalLibraryJS.isObject(videoParams)) {
+            else if($CommonLibJS.isObject(videoParams)) {
 
             }
             else
@@ -3270,7 +3271,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.videoResourceURL(videoParams.$rid);
-            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
+            //if(!$Frame.sl_fileExists($GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', videoParams.$rid, fileURL)
             //    return false;
             //}
@@ -3288,7 +3289,7 @@ Item {
                 videoOutput.width = Qt.binding(function(){return videoOutput.implicitWidth});
             else if(videoParams.$width === -1)
                 videoOutput.width = rootGameScene.width;
-            else if(GlobalLibraryJS.isValidNumber(videoParams.$width)) {
+            else if($CommonLibJS.isValidNumber(videoParams.$width)) {
                 videoOutput.width = videoParams.$width * Screen.pixelDensity;
             }
 
@@ -3296,15 +3297,15 @@ Item {
                 videoOutput.height = Qt.binding(function(){return videoOutput.implicitHeight});
             else if(videoParams.$height === -1)
                 videoOutput.height = rootGameScene.height;
-            else if(GlobalLibraryJS.isValidNumber(videoParams.$height)) {
+            else if($CommonLibJS.isValidNumber(videoParams.$height)) {
                 videoOutput.height = videoParams.$height * Screen.pixelDensity;
             }
 
 
             mediaPlayer.source = fileURL;
 
-            GlobalLibraryJS.copyPropertiesToObject(videoOutput, videoParams.$videoOutput, {onlyCopyExists: true});
-            GlobalLibraryJS.copyPropertiesToObject(mediaPlayer, videoParams.$mediaPlayer, {onlyCopyExists: true});
+            $CommonLibJS.copyPropertiesToObject(videoOutput, videoParams.$videoOutput, {onlyCopyExists: true});
+            $CommonLibJS.copyPropertiesToObject(mediaPlayer, videoParams.$mediaPlayer, {onlyCopyExists: true});
             /*
             let tKeys = Object.keys(videoOutput);
             for(let tp in videoParams)
@@ -3319,7 +3320,7 @@ Item {
 
             let _resolve, _reject;
             //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-            if(GlobalLibraryJS.isFunction(itemVideo.fCallback)) {
+            if($CommonLibJS.isFunction(itemVideo.fCallback)) {
                 ret = new Promise(function(resolve, reject) {
                     _resolve = resolve; _reject = reject;
                     const fcallback = itemVideo.fCallback;
@@ -3374,10 +3375,10 @@ Item {
         //  $id为标识（用来控制、删除和重用）；
         //  $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
         readonly property var showimage: function(imageParams, id=undefined) { //id可以删掉，直接用$id
-            if(GlobalLibraryJS.isString(imageParams)) {
+            if($CommonLibJS.isString(imageParams)) {
                 imageParams = {RID: imageParams};
             }
-            else if(GlobalLibraryJS.isObject(imageParams)) {
+            else if($CommonLibJS.isObject(imageParams)) {
 
             }
             else
@@ -3387,7 +3388,7 @@ Item {
 
 
             let fileURL = GameMakerGlobal.imageResourceURL(imageParams.$rid);
-            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
+            //if(!$Frame.sl_fileExists($GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]image no exist：', imageParams.$rid, fileURL)
             //    return false;
             //}
@@ -3440,7 +3441,7 @@ Item {
                 objTmpComponents = _private.objTmpMapComponents;
             }
             //某角色上
-            else if(GlobalLibraryJS.isString(imageParams.$parent)) {
+            else if($CommonLibJS.isString(imageParams.$parent)) {
                 let role = game.hero(imageParams.$parent);
                 if(!role)
                     role = game.role(imageParams.$parent);
@@ -3455,7 +3456,7 @@ Item {
                     return false;
                 }
             }
-            else if(GlobalLibraryJS.isObject(imageParams.$parent)) {
+            else if($CommonLibJS.isObject(imageParams.$parent)) {
                 parentComp = imageParams.$parent;
 
                 //不一定存在
@@ -3473,7 +3474,7 @@ Item {
             id = id ?? imageParams.$id ?? imageParams.$rid;
 
 
-            let tmp = imageParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheImage.createObject(null);
+            let tmp = imageParams.$component || $CommonLibJS.getObjectValue(objTmpComponents, 'id') || compCacheImage.createObject(null);
             if(tmp && tmp.$componentType !== 1) {
                 console.exception('[!GameScene]组件类型错误：', tmp, tmp.$componentType);
                 return false;
@@ -3530,7 +3531,7 @@ Item {
             //父组件宽
             else if(imageParams.$width === -1)
                 tmp.width = Qt.binding(function(){return parentComp.width});
-            else if(GlobalLibraryJS.isArray(imageParams.$width)) {
+            else if($CommonLibJS.isArray(imageParams.$width)) {
                 switch(imageParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
@@ -3557,7 +3558,7 @@ Item {
                     tmp.width = imageParams.$width[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(imageParams.$width)) {
+            else if($CommonLibJS.isValidNumber(imageParams.$width)) {
                 tmp.width = imageParams.$width * Screen.pixelDensity;
             }
 
@@ -3567,7 +3568,7 @@ Item {
             //父组件高
             else if(imageParams.$height === -1)
                 tmp.height = Qt.binding(function(){return parentComp.height});
-            else if(GlobalLibraryJS.isArray(imageParams.$height)) {
+            else if($CommonLibJS.isArray(imageParams.$height)) {
                 switch(imageParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
@@ -3594,7 +3595,7 @@ Item {
                     tmp.height = imageParams.$height[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(imageParams.$height)) {
+            else if($CommonLibJS.isValidNumber(imageParams.$height)) {
                 tmp.height = imageParams.$height * Screen.pixelDensity;
             }
 
@@ -3612,7 +3613,7 @@ Item {
             else if(imageParams.$x === -1)
                 tmp.x = Qt.binding(function(){return (parentComp.width - tmp.width) / 2});
                 //tmp.x = (parentComp.width - tmp.width) / 2;
-            else if(GlobalLibraryJS.isArray(imageParams.$x)) {
+            else if($CommonLibJS.isArray(imageParams.$x)) {
                 switch(imageParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
@@ -3655,7 +3656,7 @@ Item {
                     tmp.x = imageParams.$x[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(imageParams.$x)) {
+            else if($CommonLibJS.isValidNumber(imageParams.$x)) {
                 tmp.x = imageParams.$x * Screen.pixelDensity;
             }
 
@@ -3666,7 +3667,7 @@ Item {
             else if(imageParams.$y === -1)
                 tmp.y = Qt.binding(function(){return (parentComp.height - tmp.height) / 2});
                 //tmp.y = (parentComp.height - tmp.height) / 2;
-            else if(GlobalLibraryJS.isArray(imageParams.$y)) {
+            else if($CommonLibJS.isArray(imageParams.$y)) {
                 switch(imageParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
@@ -3709,18 +3710,18 @@ Item {
                     tmp.y = imageParams.$y[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(imageParams.$y)) {
+            else if($CommonLibJS.isValidNumber(imageParams.$y)) {
                 tmp.y = imageParams.$y * Screen.pixelDensity;
             }
 
 
             if(imageParams.$clicked === null)
-                tmp.clicked = function(image){game.delimage(image.$id)};
+                tmp.clicked = function(image){game.delimage(image)};
             else// if(imageParams.$clicked !== undefined)
                 tmp.clicked = imageParams.$clicked;
 
             if(imageParams.$doubleClicked === null)
-                tmp.doubleClicked = function(image){game.delimage(image.$id)};
+                tmp.doubleClicked = function(image){game.delimage(image)};
             else// if(imageParams.$doubleClicked !== undefined)
                 tmp.doubleClicked = imageParams.$doubleClicked;
 
@@ -3737,7 +3738,7 @@ Item {
 
 
 
-            GlobalLibraryJS.copyPropertiesToObject(tmp, imageParams, {onlyCopyExists: true, objectRecursion: 0});
+            $CommonLibJS.copyPropertiesToObject(tmp, imageParams, {onlyCopyExists: true, objectRecursion: 0});
 
 
             return tmp;
@@ -3749,13 +3750,13 @@ Item {
             let objTmpComponents;
             let tmpImage;
 
-            if(GlobalLibraryJS.isNumber(idParams)) {
+            if($CommonLibJS.isNumber(idParams)) {
                 idParams = {$id: idParams};
             }
-            else if(GlobalLibraryJS.isString(idParams)) {
+            else if($CommonLibJS.isString(idParams)) {
                 idParams = {$id: idParams};
             }
-            else if(GlobalLibraryJS.isObject(idParams)) {
+            else if($CommonLibJS.isObject(idParams)) {
                 tmpImage = idParams;
             }
             else
@@ -3791,7 +3792,7 @@ Item {
                 tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
             }
             //某角色上
-            else if(GlobalLibraryJS.isString(idParams.$parent)) {
+            else if($CommonLibJS.isString(idParams.$parent)) {
                 let role = game.hero(idParams.$parent);
                 if(!role)
                     role = game.role(idParams.$parent);
@@ -3804,7 +3805,7 @@ Item {
                 else
                     return false;
             }
-            else if(GlobalLibraryJS.isObject(idParams.$parent)) {
+            else if($CommonLibJS.isObject(idParams.$parent)) {
                 //不一定存在
                 objTmpComponents = idParams.$parent.$tmpComponents;
 
@@ -3857,10 +3858,10 @@ Item {
         //  $id为标识（用来控制、删除和重用）；
         //  $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
         readonly property var showsprite: function(spriteParams, id=undefined) { //id可以删掉，直接用$id
-            if(GlobalLibraryJS.isString(spriteParams)) {
+            if($CommonLibJS.isString(spriteParams)) {
                 spriteParams = {RID: spriteParams};
             }
-            else if(GlobalLibraryJS.isObject(spriteParams)) {
+            else if($CommonLibJS.isObject(spriteParams)) {
 
             }
             else
@@ -3870,7 +3871,7 @@ Item {
 
 
             //let fileURL = GameMakerGlobal.imageResourceURL(spriteParams.$rid);
-            //if(!FrameManager.sl_fileExists(GlobalJS.toPath(fileURL))) {
+            //if(!$Frame.sl_fileExists($GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]sprite no exist：', spriteParams.$rid, fileURL)
             //    return false;
             //}
@@ -3924,7 +3925,7 @@ Item {
                 objTmpComponents = _private.objTmpMapComponents;
             }
             //某角色上
-            else if(GlobalLibraryJS.isString(spriteParams.$parent)) {
+            else if($CommonLibJS.isString(spriteParams.$parent)) {
                 let role = game.hero(spriteParams.$parent);
                 if(!role)
                     role = game.role(spriteParams.$parent);
@@ -3939,7 +3940,7 @@ Item {
                     return false;
                 }
             }
-            else if(GlobalLibraryJS.isObject(spriteParams.$parent)) {
+            else if($CommonLibJS.isObject(spriteParams.$parent)) {
                 parentComp = spriteParams.$parent;
 
                 //不一定存在
@@ -3958,7 +3959,7 @@ Item {
 
 
             let spriteInfo = GameSceneJS.getSpriteResource(spriteParams.$rid);
-            let sprite = spriteParams.$component || (objTmpComponents ? objTmpComponents[id] : null) || compCacheSpriteEffect.createObject(null);
+            let sprite = spriteParams.$component || $CommonLibJS.getObjectValue(objTmpComponents, 'id') || compCacheSpriteEffect.createObject(null);
             if(sprite && sprite.$componentType !== 2) {
                 console.exception('[!GameScene]组件类型错误：', sprite.$componentType);
                 return false;
@@ -3992,7 +3993,7 @@ Item {
             else if(spriteParams.$width === -1)
                 sprite.width = Qt.binding(function(){return parentComp.width});
                 //sprite.width = spriteInfo.SpriteSize[0];
-            else if(GlobalLibraryJS.isArray(spriteParams.$width)) {
+            else if($CommonLibJS.isArray(spriteParams.$width)) {
                 switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
@@ -4019,7 +4020,7 @@ Item {
                     sprite.width = spriteParams.$width[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(spriteParams.$width)) {
+            else if($CommonLibJS.isValidNumber(spriteParams.$width)) {
                 sprite.width = spriteParams.$width * Screen.pixelDensity;
             }
 
@@ -4030,7 +4031,7 @@ Item {
             else if(spriteParams.$height === -1)
                 sprite.height = Qt.binding(function(){return parentComp.height});
                 //sprite.height = spriteInfo.SpriteSize[1];
-            else if(GlobalLibraryJS.isArray(spriteParams.$height)) {
+            else if($CommonLibJS.isArray(spriteParams.$height)) {
                 switch(spriteParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
@@ -4057,7 +4058,7 @@ Item {
                     sprite.height = spriteParams.$height[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(spriteParams.$height)) {
+            else if($CommonLibJS.isValidNumber(spriteParams.$height)) {
                 sprite.height = spriteParams.$height * Screen.pixelDensity;
             }
 
@@ -4075,7 +4076,7 @@ Item {
             else if(spriteParams.$x === -1)
                 sprite.x = Qt.binding(function(){return (parentComp.width - sprite.width) / 2});
                 //sprite.x = (parentComp.width - sprite.width) / 2;
-            else if(GlobalLibraryJS.isArray(spriteParams.$x)) {
+            else if($CommonLibJS.isArray(spriteParams.$x)) {
                 switch(spriteParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
@@ -4118,7 +4119,7 @@ Item {
                     sprite.x = spriteParams.$x[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(spriteParams.$x)) {
+            else if($CommonLibJS.isValidNumber(spriteParams.$x)) {
                 sprite.x = spriteParams.$x * Screen.pixelDensity;
             }
 
@@ -4129,7 +4130,7 @@ Item {
             else if(spriteParams.$y === -1)
                 sprite.y = Qt.binding(function(){return (parentComp.height - sprite.height) / 2});
                 //sprite.y = (parentComp.height - sprite.height) / 2;
-            else if(GlobalLibraryJS.isArray(spriteParams.$y)) {
+            else if($CommonLibJS.isArray(spriteParams.$y)) {
                 switch(spriteParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
@@ -4172,18 +4173,18 @@ Item {
                     sprite.y = spriteParams.$y[0];
                 }
             }
-            else if(GlobalLibraryJS.isValidNumber(spriteParams.$y)) {
+            else if($CommonLibJS.isValidNumber(spriteParams.$y)) {
                 sprite.y = spriteParams.$y * Screen.pixelDensity;
             }
 
 
             if(spriteParams.$clicked === null)
-                sprite.clicked = function(sprite){game.delsprite(sprite.$id)};
+                sprite.clicked = function(sprite){game.delsprite(sprite)};
             else// if(spriteParams.$clicked !== undefined)
                 sprite.clicked = spriteParams.$clicked;
 
             if(spriteParams.$doubleClicked === null)
-                sprite.doubleClicked = function(sprite){game.delsprite(sprite.$id)};
+                sprite.doubleClicked = function(sprite){game.delsprite(sprite)};
             else// if(spriteParams.$doubleClicked !== undefined)
                 sprite.doubleClicked = spriteParams.$doubleClicked;
 
@@ -4193,13 +4194,13 @@ Item {
 
 
             if(spriteParams.$looped === null)
-                //sprite.looped = function(sprite){game.delsprite(sprite.$id)};
+                //sprite.looped = function(sprite){game.delsprite(sprite)};
                 sprite.looped = null;
             else// if(spriteParams.$looped !== undefined)
                 sprite.looped = spriteParams.$looped;
 
             if(spriteParams.$finished === null)
-                //sprite.finished = function(sprite){game.delsprite(sprite.$id)};
+                //sprite.finished = function(sprite){game.delsprite(sprite)};
                 sprite.finished = null;
             else// if(spriteParams.$finished !== undefined)
                 sprite.finished = spriteParams.$finished;
@@ -4213,7 +4214,7 @@ Item {
 
 
 
-            GlobalLibraryJS.copyPropertiesToObject(sprite, spriteParams, {onlyCopyExists: true, objectRecursion: 0});
+            $CommonLibJS.copyPropertiesToObject(sprite, spriteParams, {onlyCopyExists: true, objectRecursion: 0});
             /*/复制属性
             let tKeys = Object.keys(sprite);
             for(let tp in spriteParams)
@@ -4246,13 +4247,13 @@ Item {
             let objTmpComponents;
             let tmpSprites;
 
-            if(GlobalLibraryJS.isNumber(idParams)) {
+            if($CommonLibJS.isNumber(idParams)) {
                 idParams = {$id: idParams};
             }
-            else if(GlobalLibraryJS.isString(idParams)) {
+            else if($CommonLibJS.isString(idParams)) {
                 idParams = {$id: idParams};
             }
-            else if(GlobalLibraryJS.isObject(idParams)) {
+            else if($CommonLibJS.isObject(idParams)) {
                 tmpSprites = idParams;
             }
             else
@@ -4288,7 +4289,7 @@ Item {
                 tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
             }
             //某角色上
-            else if(GlobalLibraryJS.isString(idParams.$parent)) {
+            else if($CommonLibJS.isString(idParams.$parent)) {
                 let role = game.hero(idParams.$parent);
                 if(!role)
                     role = game.role(idParams.$parent);
@@ -4302,7 +4303,7 @@ Item {
                     return false;
 
             }
-            else if(GlobalLibraryJS.isObject(idParams.$parent)) {
+            else if($CommonLibJS.isObject(idParams.$parent)) {
                 //不一定存在
                 objTmpComponents = idParams.$parent.$tmpComponents;
 
@@ -4353,7 +4354,7 @@ Item {
                 return itemGamePad;
 
             if(config && config.$gamepad !== undefined) {
-                if(GlobalLibraryJS.isNumber(config.$gamepad)) {
+                if($CommonLibJS.isNumber(config.$gamepad)) {
                     itemGamePad.enabled = config.$gamepad & 0b1;
                     itemGamePad.visible = config.$gamepad & 0b10;
                 }
@@ -4365,7 +4366,7 @@ Item {
                 }
             }
             if(config && config.$keyboard !== undefined) {
-                if(GlobalLibraryJS.isNumber(config.$keyboard)) {
+                if($CommonLibJS.isNumber(config.$keyboard)) {
                     _private.config.bKeyboard = config.$keyboard & 0b1;
                 }
                 else if(config.$keyboard.$enabled !== undefined)
@@ -4386,7 +4387,7 @@ Item {
         readonly property var setscenerole: function(r=0.2) {
             let role;
 
-            if(GlobalLibraryJS.isString(r)) {
+            if($CommonLibJS.isString(r)) {
                 role = game.hero(r);
                 if(!role)
                     role = game.role(r);
@@ -4396,11 +4397,11 @@ Item {
                 _private.sceneRole = role;
                 setSceneToRole(_private.sceneRole);
             }
-            else if(GlobalLibraryJS.isNumber(r)) {
+            else if($CommonLibJS.isNumber(r)) {
                 _private.sceneRole = null;
                 _private.config.rSceneMoveSpeed = r;
             }
-            else if(GlobalLibraryJS.isObject(r)) {
+            else if($CommonLibJS.isObject(r)) {
                 _private.sceneRole = r;
             }
             else
@@ -4410,7 +4411,7 @@ Item {
         //暂停游戏。
         readonly property var pause: function(name='$user_pause', times=1) {
             if(name === undefined || name === null)
-                return !GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames);
+                return !$CommonLibJS.objectIsEmpty(_private.config.objPauseNames);
             if(name === true)
                 return _private.config.objPauseNames;
 
@@ -4458,7 +4459,7 @@ Item {
             }
 
 
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 timer.start();
                 //_private.config.bPauseGame = false;
             }
@@ -4471,7 +4472,7 @@ Item {
 
         //设置游戏刷新率（interval毫秒）。
         readonly property var interval: function(interval=16) {
-            if(GlobalLibraryJS.isValidNumber(interval)) {
+            if($CommonLibJS.isValidNumber(interval)) {
                 _private.config.nInterval = interval;
             }
             else
@@ -4489,9 +4490,9 @@ Item {
             /*if(callback === true || callback === 1)
                 _private.scriptQueue.wait(ms);
             else if(callback === 0)
-                return GlobalLibraryJS.asyncSleep(ms);
+                return $CommonLibJS.asyncSleep(ms);
             */
-            return GlobalLibraryJS.asyncSleep(ms, itemWaitTimers);
+            return $CommonLibJS.asyncSleep(ms, itemWaitTimers);
 
             //！如果定义为生成器的写法：
             //return yield ret;
@@ -4499,11 +4500,7 @@ Item {
 
         //返回start~end之间的随机整数（包含start，不包含end）。
         readonly property var rnd: function(start, end) {
-            return GlobalLibraryJS.random(start, end);
-        }
-        //显示msg提示。
-        readonly property var toast: function(msg) {
-            Platform.sl_showToast(msg);
+            return $CommonLibJS.random(start, end);
         }
 
         //显示窗口；
@@ -4515,7 +4512,7 @@ Item {
         //pauseGame同msg的参数；
         //callback同命令msg的参数；回调函数的params为gameMenuWindow；
         readonly property var window: function(params=null, style={}, pauseGame=true, callback=true) {
-            if(GlobalLibraryJS.isValidNumber(params))
+            if($CommonLibJS.isValidNumber(params))
                 params = {$id: params, $visible: true};
             else if(!params) {
                 params = {$id: 0b1111, $visible: true};
@@ -4537,7 +4534,7 @@ Item {
 
                 let _resolve, _reject;
                 //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if(GlobalLibraryJS.isFunction(callback)) {
+                if($CommonLibJS.isFunction(callback)) {
                     ret = new Promise(function(resolve, reject) {
                         _resolve = resolve; _reject = reject;
                         const fcallback = callback;
@@ -4577,13 +4574,13 @@ Item {
         //data为字符串（本地存档文件路径）或存档数据（对象，此时仅验证和解压Data字段）；
         //失败返回false；成功返回 存档对象（包含Name和解压后的Data）。
         readonly property var checksave: function(data) {
-            if(GlobalLibraryJS.isString(data)) {
+            if($CommonLibJS.isString(data)) {
                 data = data.trim();
-                let filePath = GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + data + '.json');
-                if(!FrameManager.sl_fileExists(filePath))
+                let filePath = $GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + data + '.json');
+                if(!$Frame.sl_fileExists(filePath))
                     return false;
 
-                data = FrameManager.sl_fileRead(filePath);
+                data = $Frame.sl_fileRead(filePath);
                 //let cfg = File.read(filePath);
                 //console.debug('musicInfo', filePath, musicInfo)
                 //console.debug('cfg', cfg, filePath);
@@ -4598,7 +4595,7 @@ Item {
                     }
                 }
             }
-            else if(GlobalLibraryJS.isObject(data)) {
+            else if($CommonLibJS.isObject(data)) {
             }
             else {
                 return false;
@@ -4613,7 +4610,7 @@ Item {
                         return false;
                     }
                     try {
-                        data.Data = JSON.parse(FrameManager.sl_uncompress(data.Data, 1).toString());
+                        data.Data = JSON.parse($Frame.sl_uncompress(data.Data, 1).toString());
                     }
                     catch(e) {
                         return false;
@@ -4662,7 +4659,7 @@ Item {
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
-                    if(GlobalLibraryJS.isString(fileName)) {
+                    if($CommonLibJS.isString(fileName)) {
                         fileName = fileName.trim();
                         if(!fileName)
                             fileName = 'autosave';
@@ -4677,9 +4674,9 @@ Item {
 
                     //game.run(function*() {
                     //载入beforeSave脚本
-                    if(_private.objCommonScripts.$beforeSave) { //GlobalLibraryJS.checkCallable
+                    if(_private.objCommonScripts.$beforeSave) { //$CommonLibJS.checkCallable
                         let r = _private.objCommonScripts.$beforeSave();
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(_private.objCommonScripts.$beforeSave() ?? null, {Priority: -3, Type: 0, Running: 1, Tips: '$beforeSave'});
                     }
 
@@ -4698,10 +4695,10 @@ Item {
                     outputData.Version = '0.6';
                     outputData.Name = showName;
                     outputData.Type = compressionLevel === 0 ? 0 : 1;
-                    outputData.Time = GlobalLibraryJS.formatDate();
+                    outputData.Time = $CommonLibJS.formatDate();
                     if(compressionLevel !== 0) {    //压缩
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
-                        outputData.Data = FrameManager.sl_compress(GlobalDataString, compressionLevel, 1).toString();
+                        outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 1).toString();
                         outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + outputData.Data);
                         fileData = JSON.stringify(outputData, fSaveFilter);
                     }
@@ -4714,13 +4711,13 @@ Item {
 
 
                     let ret;
-                    if(GlobalLibraryJS.isString(fileName)) {
+                    if($CommonLibJS.isString(fileName)) {
                         const filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
 
                         //!!!导出为文件
                         //console.debug(JSON.stringify(outputData));
                         //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-                        ret = FrameManager.sl_fileWrite(fileData, GlobalJS.toPath(filePath), 0);
+                        ret = $Frame.sl_fileWrite(fileData, $GlobalJS.toPath(filePath), 0);
                         //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
                         if(ret < 0) {
                             console.warn('[!GameScene]save ERROR:', fileName, ret);
@@ -4741,9 +4738,9 @@ Item {
 
 
                     //载入afterSave脚本
-                    if(_private.objCommonScripts.$afterSave) { //GlobalLibraryJS.checkCallable
+                    if(_private.objCommonScripts.$afterSave) { //$CommonLibJS.checkCallable
                         let r = _private.objCommonScripts.$afterSave(ret);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(_private.objCommonScripts.$afterSave() ?? null, {Priority: -1, Type: 0, Running: 1, Tips: '$afterSave'});
                     }
 
@@ -4768,22 +4765,22 @@ Item {
         readonly property var load: function(data='autosave') {
             let _resolve, _reject;
 
-            //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->GlobalLibraryJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
+            //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->$CommonLibJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _load = function(resolve, reject) {
                 _resolve = resolve; _reject = reject;
 
                 //这里用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
-                GlobalLibraryJS.asyncScript(function*() {
+                $CommonLibJS.asyncScript(function*() {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
-                    if(GlobalLibraryJS.isString(data)) {
+                    if($CommonLibJS.isString(data)) {
                         data = data.trim();
                         if(!data)
                             data = 'autosave';
                     }
-                    else if(GlobalLibraryJS.isObject(data)) { //如果是参数对象
+                    else if($CommonLibJS.isObject(data)) { //如果是参数对象
                     }
                     else
                         return resolve(false);
@@ -4803,9 +4800,9 @@ Item {
                     //game.run(function*() {
 
                     //载入beforeLoad脚本
-                    if(_private.objCommonScripts.$beforeLoad) { //GlobalLibraryJS.checkCallable
+                    if(_private.objCommonScripts.$beforeLoad) { //$CommonLibJS.checkCallable
                         let r = _private.objCommonScripts.$beforeLoad();
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(_private.objCommonScripts.$beforeLoad() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: '$beforeLoad'});
                     }
 
@@ -4831,9 +4828,9 @@ Item {
 
 
                         //载入afterLoad脚本
-                        if(_private.objCommonScripts.$afterLoad) { //GlobalLibraryJS.checkCallable
+                        if(_private.objCommonScripts.$afterLoad) { //$CommonLibJS.checkCallable
                             let r = _private.objCommonScripts.$afterLoad();
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                             //game.run(_private.objCommonScripts.$afterLoad() ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: '$afterLoad'});
                         }
                     }(), {Priority: -2, Type: 0, Running: 0, Tips: 'load2'});   //鹰：Priority为0也可以，只是会黑屏一下体验不太好，因为在下一个事件循环中执行代码了
@@ -4860,7 +4857,7 @@ Item {
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             //const _restart = function(resolve, reject) {
                 //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
-                GlobalLibraryJS.asyncScript(function*() {
+                $CommonLibJS.asyncScript(function*() {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
@@ -4899,18 +4896,18 @@ Item {
 
 
                     //const plugin = _private.objPlugins[params[0]][params[1]];
-                    const plugin = GlobalLibraryJS.getObjectValue(_private.objPlugins, params[0], params[1]);
+                    const plugin = $CommonLibJS.getObjectValue(_private.objPlugins, params[0], params[1]);
                     if(plugin && plugin.$autoLoad === false) {
                         plugin.$autoLoad = true;
 
                         //game.run(function*() {
-                        if(plugin.$load) { //GlobalLibraryJS.checkCallable
+                        if(plugin.$load) { //$CommonLibJS.checkCallable
                             let r = plugin.$load(params[0] + GameMakerGlobal.separator + params[1]);
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                         }
-                        if(plugin.$init) { //GlobalLibraryJS.checkCallable
+                        if(plugin.$init) { //$CommonLibJS.checkCallable
                             let r = plugin.$init();
-                            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
                         }
 
                         return resolve(plugin);
@@ -4958,11 +4955,11 @@ Item {
                 return null;
 
             if(!filePath)
-                filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + fileName);
+                filePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + fileName);
             else
-                filePath = GlobalJS.toPath(filePath + GameMakerGlobal.separator + fileName);
+                filePath = $GlobalJS.toPath(filePath + GameMakerGlobal.separator + fileName);
 
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
 
             if(!data) {
                 console.warn('[!GameScene]loadjson FAIL:', filePath);
@@ -4973,8 +4970,8 @@ Item {
 
 
         //异步脚本（协程运行）
-        //readonly property var async: GlobalLibraryJS.asyncScript
-        function async(...params) {return GlobalLibraryJS.$asyncScript.async(...params);}
+        //readonly property var async: $CommonLibJS.asyncScript
+        function async(...params) {return $CommonLibJS.$asyncScript.async(...params);}
 
         //将代码放入 系统脚本引擎（scriptQueue）中 等候执行；
         //参数：
@@ -5002,17 +4999,17 @@ Item {
 
             //参数
             let priority = -1, runType = 0, running = -1, value, scriptQueue, autoRunNext = true, tips;
-            if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
+            if($CommonLibJS.isValidNumber(scriptProps)) {   //如果是数字，则默认是优先级
                 scriptProps = {Priority: scriptProps};
             }
-            else if(GlobalLibraryJS.isString(scriptProps)) {   //如果是数字，则默认是Tips
+            else if($CommonLibJS.isString(scriptProps)) {   //如果是数字，则默认是Tips
                 scriptProps = {Tips: scriptProps};
             }
-            if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
+            if($CommonLibJS.isObject(scriptProps)) { //如果是参数对象
                 scriptQueue = scriptProps.ScriptQueue || _private.scriptQueue;
-                priority = GlobalLibraryJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : priority;
-                runType = GlobalLibraryJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : runType;
-                running = GlobalLibraryJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : running;
+                priority = $CommonLibJS.isValidNumber(scriptProps.Priority) ? scriptProps.Priority : priority;
+                runType = $CommonLibJS.isValidNumber(scriptProps.Type) ? scriptProps.Type : runType;
+                running = $CommonLibJS.isValidNumber(scriptProps.Running) ? scriptProps.Running : running;
                 value = Object.keys(scriptProps).indexOf('Value') < 0 ? scriptQueue.lastEscapeValue : scriptProps.Value;
                 autoRunNext = scriptProps.AutoRunNext ?? autoRunNext;
                 tips = scriptProps.Tips ?? 'game.run';
@@ -5031,7 +5028,7 @@ Item {
             }
             //下次js循环运行
             else if(vScript === true) {
-                /*GlobalLibraryJS.runNextEventLoop(function() {
+                /*$CommonLibJS.runNextEventLoop(function() {
                     //game.goon('$event');
                         scriptQueue.run(scriptQueue.lastEscapeValue);
                     }, 'game.run1');
@@ -5042,21 +5039,21 @@ Item {
                 return 2;
             }
             //!!兼容旧代码
-            else if(GlobalLibraryJS.isArray(vScript) && vScript[0] !== undefined) {
+            else if($CommonLibJS.isArray(vScript) && vScript[0] !== undefined) {
                 tips = vScript[1] ?? tips;
                 vScript = vScript[0];
             }
-            //else if(GlobalLibraryJS.isString(vScript)) {
+            //else if($CommonLibJS.isString(vScript)) {
             //}
             //返回1个Promise对象；队列运行结束时，会将这个Promise激活；作用：可以实现两个ScriptQueue互等；
-            else if(GlobalLibraryJS.isNumber(vScript)) {
+            else if($CommonLibJS.isNumber(vScript)) {
                 return new Promise(
                     function(resolve, reject) {
                         function __next() {
                             if(vScript <= 0)
                                 resolve(scriptQueue.lastEscapeValue);
                             else
-                                GlobalLibraryJS.setTimeout(function() {   //鹰：可以延时
+                                $CommonLibJS.setTimeout(function() {   //鹰：可以延时
                                     resolve(scriptQueue.lastEscapeValue);
                                 }, vScript, rootGameScene, 'Promise resolve');
                         }
@@ -5082,18 +5079,18 @@ Item {
 
                     //方案1：做简单的异常处理，且提前执行可以绑定环境上下文
                     ///vScript = '(function*(){' + vScript + '})()';
-                    //vScript = '(function*(){try{' + vScript + '}catch(e){GlobalLibraryJS.printException(e);}})';
+                    //vScript = '(function*(){try{' + vScript + '}catch(e){$CommonLibJS.printException(e);}})';
                     /*try {
                         vScript = eval(vScript);
                     }
                     catch(e) {
                         console.warn(data);
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         return false;
                     }*/
 
                     //方案2：或使用这个：
-                    vScript = GlobalLibraryJS._eval(vScript);
+                    vScript = $CommonLibJS._eval(vScript);
                     if(!vScript)
                         return -2;
 
@@ -5103,17 +5100,17 @@ Item {
             else {  //vScript是文件名
                 if(!scriptProps.Path)
                     scriptProps.Path = game.$projectpath;
-                vScript = GlobalJS.toPath(scriptProps.Path + GameMakerGlobal.separator + vScript.trim());
+                vScript = $GlobalJS.toPath(scriptProps.Path + GameMakerGlobal.separator + vScript.trim());
 
                 //console.debug('vScript:', vScript);
 
-                //vScript = GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName + Platform.sl_separator(true) + vScript;
+                //vScript = GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName + $Platform.sl_separator(true) + vScript;
                 //此脚本所在路径 注入到全局上下文环境（如果使用evaluateFile只能这样全局上下文环境，目前再没有给evaluate传递上下文环境的办法）
-                FrameManager.sl_globalObject().evaluateFilePath = FrameManager.sl_absolutePath(vScript);
+                $Frame.sl_globalObject().evaluateFilePath = $Frame.sl_absolutePath(vScript);
                 //执行脚本，必须返回3种类型之一
-                vScript = FrameManager.sl_evaluateFile(vScript); //!!用这个好处是自带提供错误的文件路径（我做的Eval也可以了）
+                vScript = $Frame.sl_evaluateFile(vScript); //!!用这个好处是自带提供错误的文件路径（我做的Eval也可以了）
 
-                //vScript = _evalFile(vScript, {evaluateFilePath: FrameManager.sl_absolutePath(vScript)});//!!用这个好处是有 导入此JS的QML的 上下文环境
+                //vScript = _evalFile(vScript, {evaluateFilePath: $Frame.sl_absolutePath(vScript)});//!!用这个好处是有 导入此JS的QML的 上下文环境
             }
 
             //如果是当前脚本，则立即运行，否则等正在执行脚本完毕
@@ -5123,7 +5120,7 @@ Item {
 
             //可以立刻执行
             let ret = scriptQueue.create(vScript, priority, autoRunNext, tips, ...params);
-            //let ret = GlobalJS.createScript(scriptQueue, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params);
+            //let ret = $GlobalJS.createScript(scriptQueue, {Type: runType, Priority: priority, Script: vScript, Tips: tips}, ...params);
             if(ret === 0) {
                 //暂停游戏主Timer，否则有可能会Timer先超时并运行game.run(false)，导致执行两次
                 //game.pause('$event');
@@ -5148,8 +5145,8 @@ Item {
                     return 1;
                 }
                 else if(running === 2) {
-                    //GlobalLibraryJS.setTimeout(function() {
-                    /*GlobalLibraryJS.runNextEventLoop(function() {
+                    //$CommonLibJS.setTimeout(function() {
+                    /*$CommonLibJS.runNextEventLoop(function() {
                         //game.goon('$event');
                             scriptQueue.run(scriptQueue.lastEscapeValue);
                         }, 'game.run');
@@ -5179,7 +5176,7 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            if(GlobalJS.createScript(_private.scriptQueue, {Type: 1, Priority: priority, Script: filePath, Tips: filePath}, ) === 0)
+            if($GlobalJS.createScript(_private.scriptQueue, {Type: 1, Priority: priority, Script: filePath, Tips: filePath}, ) === 0)
                 return _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
         }
         */
@@ -5192,7 +5189,7 @@ Item {
         //运行代码；
         //在这里执行会有上下文环境
         readonly property var evalcode: function(data, filePath='', envs={}) {
-            return GlobalLibraryJS._eval(data, filePath, envs);
+            return $CommonLibJS._eval(data, filePath, envs);
         }
 
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
@@ -5203,25 +5200,25 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            GlobalLibraryJS._evalFile(filePath, envs);
+            $CommonLibJS._evalFile(filePath, envs);
         }
 
         //用C++执行脚本；已注入game和fight环境
         readonly property var evaluate: function(program, filePath='', lineNumber = 1) {
-            return FrameManager.sl_evaluate(program, filePath, lineNumber);
+            return $Frame.sl_evaluate(program, filePath, lineNumber);
         }
         readonly property var evaluateFile: function(file, path, lineNumber = 1) {
             if(path === undefined) {
-                if(FrameManager.sl_globalObject().evaluateFilePath === undefined)
-                    FrameManager.sl_globalObject().evaluateFilePath = game.$projectpath;
-                path = FrameManager.sl_globalObject().evaluateFilePath;
+                if($Frame.sl_globalObject().evaluateFilePath === undefined)
+                    $Frame.sl_globalObject().evaluateFilePath = game.$projectpath;
+                path = $Frame.sl_globalObject().evaluateFilePath;
             }
             else
-                FrameManager.sl_globalObject().evaluateFilePath = path;
-            return FrameManager.sl_evaluateFile(path + GameMakerGlobal.separator + file, lineNumber);
+                $Frame.sl_globalObject().evaluateFilePath = path;
+            return $Frame.sl_evaluateFile(path + GameMakerGlobal.separator + file, lineNumber);
         }
         readonly property var importModule: function(filePath) {
-            return FrameManager.sl_importModule(filePath);
+            return $Frame.sl_importModule(filePath);
         }
 
 
@@ -5243,19 +5240,21 @@ Item {
         property string $projectpath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
 
 
-        //用户脚本（用户 common_script.js，如果没有则指向 GameMakerGlobalJS）
+        //用户脚本（用户 common_script.js，如果没有则指向 $GameMakerGlobalJS）
         property var $userscripts: null
 
 
-        //几个脚本（需要重新定义变量指向，否则外部qml和js无法使用）
-        readonly property var $globalLibraryJS: GlobalLibraryJS
+        //！！！兼容旧代码
+        /*/几个脚本（需要重新定义变量指向，否则外部qml和js无法使用）
+        readonly property var $commonLibJS: $CommonLibJS
         readonly property var $global: Global
-        readonly property var $globalJS: GlobalJS
+        readonly property var $globalJS: $GlobalJS
         readonly property var $gameMakerGlobal: GameMakerGlobal
-        readonly property var $gameMakerGlobalJS: GameMakerGlobalJS
+        readonly property var $gameMakerGlobalJS: $GameMakerGlobalJS
         //readonly property var $config: GameMakerGlobal.config
+        */
 
-        //!!兼容旧代码；插件（直接访问，不推荐）
+        //！！！兼容旧代码；插件（直接访问，不推荐）
         readonly property alias $plugins: _private.objPlugins
 
 
@@ -5302,7 +5301,7 @@ Item {
 
                     /*let t = game.gd['$sys_fight_heros'][tIndex];
                     game.gd['$sys_fight_heros'][tIndex] = new _private.objCommonScripts.$Combatant(t.$rid, t.$name);
-                    GlobalLibraryJS.copyPropertiesToObject(game.gd['$sys_fight_heros'][tIndex], t);
+                    $CommonLibJS.copyPropertiesToObject(game.gd['$sys_fight_heros'][tIndex], t);
 
                     //game.gd['$sys_fight_heros'][tIndex].__proto__ = _private.objCommonScripts.$Combatant.prototype;
                     //game.gd['$sys_fight_heros'][tIndex].$$fightData = {};
@@ -5352,8 +5351,8 @@ Item {
 
             equip: GameSceneJS.equip,
 
-            delay: GlobalLibraryJS.runNextEventLoop,
-            timeout: GlobalLibraryJS.setTimeout,
+            delay: $CommonLibJS.runNextEventLoop,
+            timeout: $CommonLibJS.setTimeout,
 
 
             //组件 和 组件模板
@@ -5417,7 +5416,8 @@ Item {
 
         //缓存
         readonly property QtObject $caches: QtObject {
-            readonly property alias jsEngine: _private.jsEngine
+            readonly property alias jsLoader: _private.jsLoader
+            readonly property alias jsEngine: _private.jsLoader //！！！兼容旧代码
             readonly property alias asyncScript: _private.asyncScript
             readonly property alias scriptQueue: _private.scriptQueue
 
@@ -5476,9 +5476,9 @@ Item {
         readonly property var date: ()=>{return new Date();}
         readonly property var math: Math
         function request(params={}, verifyType=0, type=1) {
-            return GlobalLibraryJS.requestEx(params, verifyType, type).catch((e)=>{
+            return $CommonLibJS.requestEx(params, verifyType, type).catch((e)=>{
                 //throw e;
-                GlobalLibraryJS.printException(e);
+                $CommonLibJS.printException(e);
                 return e.$params;
             });
         }
@@ -5644,7 +5644,7 @@ Item {
 
 
             onPressedChanged: {
-                if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                     return;
 
                 if(pressed === false) {
@@ -5658,7 +5658,7 @@ Item {
                 //if(pointInput === Qt.point(0,0))
                 //    return;
 
-                if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                     return;
 
                 if(!pressed)    //如果没按下
@@ -5709,7 +5709,7 @@ Item {
             color: 'red'
 
             onSg_pressed: {
-                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 game.run(buttonClicked() ?? null);
             }
@@ -5745,7 +5745,7 @@ Item {
             color: 'blue'
 
             onSg_pressed: {
-                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 game.run(buttonClicked() ?? null);
             }
@@ -5810,7 +5810,7 @@ Item {
             if(pauseGame === true)
                 pauseGame = '$menu_window';
             //是否暂停游戏
-            if(GlobalLibraryJS.isString(pauseGame)) {
+            if($CommonLibJS.isString(pauseGame)) {
                 //loaderGameMsg.bPauseGame = true;
                 game.pause(pauseGame);
             }
@@ -5845,7 +5845,7 @@ Item {
                 itemWindow.visible = false;
 
                 //game.pause(true)[pauseGame]
-                if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                     //如果没有使用yield来中断代码，可以不要game.run(true)
                     game.goon(pauseGame);
                     //game.run(true);
@@ -5858,7 +5858,7 @@ Item {
             }
 
 
-            if(GlobalLibraryJS.checkCallable(gameMenuWindow.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+            if($CommonLibJS.checkCallable(gameMenuWindow.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                 game.async(gameMenuWindow.fCallback.call(gameMenuWindow, callback, gameMenuWindow) ?? null, 'GameMenuWindow callback');
             }
             else {   //默认回调函数
@@ -5880,7 +5880,7 @@ Item {
                 }*/
 
 
-                ////FrameManager.goon();
+                ////$Frame.goon();
             }
         }
         onSg_show: {
@@ -5911,7 +5911,7 @@ Item {
                 pauseGame = '$trade';
 
             //是否暂停游戏
-            if(GlobalLibraryJS.isString(pauseGame)) {
+            if($CommonLibJS.isString(pauseGame)) {
                 //loaderGameMsg.bPauseGame = true;
                 game.pause(pauseGame);
 
@@ -5935,7 +5935,7 @@ Item {
                     //itemTrade.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true);
@@ -5948,7 +5948,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(dialogTrade.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(dialogTrade.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(dialogTrade.fCallback.call(dialogTrade, callback, dialogTrade) ?? null, 'Trade callback');
                 }
                 else {   //默认回调函数
@@ -5970,7 +5970,7 @@ Item {
                     }*/
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             }
 
@@ -6106,7 +6106,7 @@ Item {
                 pauseGame = '$video';
 
             //是否暂停游戏
-            if(GlobalLibraryJS.isString(pauseGame)) {
+            if($CommonLibJS.isString(pauseGame)) {
                 //loaderGameMsg.bPauseGame = true;
                 game.pause(pauseGame);
 
@@ -6140,7 +6140,7 @@ Item {
                     //itemMsg.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true);
@@ -6153,7 +6153,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(itemVideo.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(itemVideo.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(itemVideo.fCallback.call(itemVideo, callback, code, itemVideo) ?? null, 'Video callback');
                 }
                 else {   //默认回调函数
@@ -6175,7 +6175,7 @@ Item {
                     }*/
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             //}
 
@@ -6320,7 +6320,7 @@ Item {
 
         function play(musicURL=undefined, loops=undefined, force=false) {
             if(musicURL !== undefined) {
-                if(!FrameManager.sl_fileExists(GlobalJS.toPath(musicURL))) {
+                if(!$Frame.sl_fileExists($GlobalJS.toPath(musicURL))) {
                     console.warn('[!GameScene]音乐文件不存在：', musicURL);
                     return false;
                 }
@@ -6357,7 +6357,7 @@ Item {
             else if(name === false) { //存档
                 game.gd['$sys_sound'] &= ~0b1;
             }
-            else if(name && GlobalLibraryJS.isString(name)) {
+            else if(name && $CommonLibJS.isString(name)) {
                 //if(objMusicPause[name] === 1)
                 //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
                 objMusicPause[name] = (objMusicPause[name] ? objMusicPause[name] + 1 : 1);
@@ -6385,7 +6385,7 @@ Item {
             else if(name === null) {    //清空
                 objMusicPause = {};
             }
-            else if(name && GlobalLibraryJS.isString(name)) {
+            else if(name && $CommonLibJS.isString(name)) {
                 if(objMusicPause[name]) {
                     --objMusicPause[name];
                     if(objMusicPause[name] === 0)
@@ -6476,7 +6476,7 @@ Item {
         //播放音效；
         //参数：完整URL；index为通道（目前0~9，-1为随机挑选没有播放的通道，如果没有则返回；-2为随机挑选没有播放的通道，如果没有则随机强制选择一个）；
         function play(playSoundEffectURL=undefined, index=-1, loops=1) {
-            if(!FrameManager.sl_fileExists(GlobalJS.toPath(playSoundEffectURL))) {
+            if(!$Frame.sl_fileExists($GlobalJS.toPath(playSoundEffectURL))) {
                 console.warn('[!GameScene]音效文件不存在：', playSoundEffectURL);
                 return -1;
             }
@@ -6495,7 +6495,7 @@ Item {
                 return -2;
             //如果如果index < -1，且都在播放，则任选一个强制播放
             else if(index < -1)
-                index = GlobalLibraryJS.random(0, arrCacheSoundEffects.length);
+                index = $CommonLibJS.random(0, arrCacheSoundEffects.length);
 
             const se = arrCacheSoundEffects[index];
             if(!se)
@@ -6556,7 +6556,7 @@ Item {
             else if(name === false) { //存档
                 game.gd['$sys_sound'] &= ~0b10;
             }
-            else if(GlobalLibraryJS.isNumber(name) && name >= 0 && name < arrCacheSoundEffects.length) {
+            else if($CommonLibJS.isNumber(name) && name >= 0 && name < arrCacheSoundEffects.length) {
                 const se = arrCacheSoundEffects[name];
                 if(!se)
                     return false;
@@ -6564,7 +6564,7 @@ Item {
                     se.pause();
                 return true;
             }
-            else if(name && GlobalLibraryJS.isString(name)) {
+            else if(name && $CommonLibJS.isString(name)) {
                 //if(objSoundEffectPause[name] === 1)
                 //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
                 objSoundEffectPause[name] = (objSoundEffectPause[name] ? objSoundEffectPause[name] + 1 : 1);
@@ -6596,7 +6596,7 @@ Item {
             else if(name === null) {    //清空
                 objSoundEffectPause = {};
             }
-            else if(GlobalLibraryJS.isNumber(name) && name >= 0 && name < arrCacheSoundEffects.length) {
+            else if($CommonLibJS.isNumber(name) && name >= 0 && name < arrCacheSoundEffects.length) {
                 const se = arrCacheSoundEffects[name];
                 if(!se)
                     return false;
@@ -6604,7 +6604,7 @@ Item {
                     se.play();
                 return true;
             }
-            else if(name && GlobalLibraryJS.isString(name)) {
+            else if(name && $CommonLibJS.isString(name)) {
                 if(objSoundEffectPause[name]) {
                     --objSoundEffectPause[name];
                     if(objSoundEffectPause[name] === 0)
@@ -6675,11 +6675,11 @@ Item {
     Rectangle {
         id: itemFPS
 
-        ///width: Platform.compileType === 'debug' ? rootGameScene.width / 3 : rootGameScene.width / 2
+        ///width: $Platform.compileType === 'debug' ? rootGameScene.width / 3 : rootGameScene.width / 2
         //width: GameMakerGlobal.config.bDebug === true ? rootGameScene.width / 3 : rootGameScene.width / 2
         //width: textFPS.width + textPos.width
         width: 150
-        //height: Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
+        //height: $Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
         height: GameMakerGlobal.config.bDebug === true ? textFPS.implicitHeight : textFPS.implicitHeight
 
         color: '#90FFFFFF'
@@ -6703,7 +6703,7 @@ Item {
                 //width: contentWidth + 50
                 height: textFPS.implicitHeight
 
-                ///visible: Platform.compileType === 'debug'
+                ///visible: $Platform.compileType === 'debug'
                 //visible: GameMakerGlobal.config.bDebug === true
             }
         }
@@ -6715,7 +6715,7 @@ Item {
             width: 120
             height: 15
 
-            //visible: Platform.compileType === 'debug'
+            //visible: $Platform.compileType === 'debug'
             visible: GameMakerGlobal.config.bDebug === true
         }
 
@@ -6763,7 +6763,7 @@ Item {
             //gameMap.focus = true;
             rootGameScene.forceActiveFocus();
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
+            //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;
@@ -6875,7 +6875,7 @@ Item {
         property var objPlugins: ({})
 
         //JS引擎，用来载入外部JS文件
-        readonly property var jsEngine: new GlobalJS.JSEngine(rootGameScene)
+        readonly property var jsLoader: new $GlobalJS.JSLoader(rootGameScene)
 
         //媒体列表 信息
         //property var objImages: ({})         //{图片名: 图片路径}
@@ -6883,10 +6883,10 @@ Item {
         //property var objVideos: ({})         //{视频名: 视频路径}
 
 
-        readonly property var asyncScript: GlobalLibraryJS.$asyncScript
+        readonly property var asyncScript: $CommonLibJS.$asyncScript
 
         //异步脚本（整个游戏的脚本队列系统）
-        readonly property var scriptQueue: new GlobalLibraryJS.ScriptQueue()
+        readonly property var scriptQueue: new $CommonLibJS.ScriptQueue()
 
 
         //创建的 主角 和 角色NPC 组件容器
@@ -6909,7 +6909,7 @@ Item {
 
         //特效缓存类
         //  目前只有战斗的特效使用，地图场景的特效因为会挂载到 对应对象的tmp缓存中，和其他组件混在一起，只能使用destroy来释放，所以不适用。
-        readonly property var cacheSprites: new GlobalLibraryJS.Cache({
+        readonly property var cacheSprites: new $CommonLibJS.Cache({
             //创建时回调
             $create: function(p) {
                 let o = compCacheSpriteEffect.createObject(p);
@@ -7213,10 +7213,10 @@ Item {
         function exitGame(force=false) {
             if(!force) {
                 ///！！放在下一次执行（因为exitGame有可能在事件队列中运行，此时 _private.scriptQueue.clear(6) 会导致生成器重入，所以必须跳出事件队列）。
-                //GlobalLibraryJS.runNextEventLoop(function() {
+                //$CommonLibJS.runNextEventLoop(function() {
 
                 //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
-                GlobalLibraryJS.asyncScript(function*() {
+                $CommonLibJS.asyncScript(function*() {
                 //game.run(function*() {
                 //game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
@@ -7226,7 +7226,7 @@ Item {
                         yield* release();
                     }
                     catch(e) {
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         console.warn('[!GameScene]游戏退出报错');
                         //throw err;
                     }
@@ -7282,7 +7282,7 @@ Item {
                     itemMsg.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true);
@@ -7295,7 +7295,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(rootRoleMsg.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(rootRoleMsg.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(rootRoleMsg.fCallback.call(rootRoleMsg, callback, code, rootRoleMsg) ?? null, 'Role message callback');
                 }
                 else {   //默认回调函数
@@ -7317,7 +7317,7 @@ Item {
                     }*/
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             }
 
@@ -7328,7 +7328,7 @@ Item {
             function show(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, _pauseGame=true, callback=true) {
 
                 let name = '', avatar = '', avatarSize = null;
-                if(role && GlobalLibraryJS.isString(role)) {
+                if(role && $CommonLibJS.isString(role)) {
                     do {
                         let roleName = role;
                         role = game.hero(roleName);
@@ -7365,7 +7365,7 @@ Item {
                 if(pauseGame === true)
                     pauseGame = '$talk';
                 //是否暂停游戏
-                if(GlobalLibraryJS.isString(pauseGame)) {
+                if($CommonLibJS.isString(pauseGame)) {
                     //loaderGameMsg.bPauseGame = true;
                     game.pause(pauseGame);
 
@@ -7379,19 +7379,19 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = GameMakerGlobalJS.$config.$styles.$talk;
-                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk') || styleSystem;
+                let styleSystem = $GameMakerGlobalJS.$config.$styles.$talk;
+                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk') || styleSystem;
                 let tn;
 
 
-                let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
-                let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
-                //let bShowName = GlobalLibraryJS.shortCircuit(0b1, style.Name, GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$name'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$styles', '$talk', '$name'));
-                //let bShowAvatar = GlobalLibraryJS.shortCircuit(0b1, style.Avatar, GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$avatar'), GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$styles', '$talk', '$avatar'));
+                let bShowName = $CommonLibJS.shortCircuit(0b1, style.Name, styleUser.$name, styleSystem.$name);
+                let bShowAvatar = $CommonLibJS.shortCircuit(0b1, style.Avatar, styleUser.$avatar, styleSystem.$avatar);
+                //let bShowName = $CommonLibJS.shortCircuit(0b1, style.Name, $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$name'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$styles', '$talk', '$name'));
+                //let bShowAvatar = $CommonLibJS.shortCircuit(0b1, style.Avatar, $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk', '$avatar'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$styles', '$talk', '$avatar'));
                 if(name && bShowName)
                     pretext = name + '：' + pretext;
                 if(avatar && bShowAvatar)
-                    pretext = GlobalLibraryJS.showRichTextImage(GameMakerGlobal.imageResourceURL(avatar), avatarSize[0], avatarSize[1]) + pretext;
+                    pretext = $CommonLibJS.showRichTextImage(GameMakerGlobal.imageResourceURL(avatar), avatarSize[0], avatarSize[1]) + pretext;
 
 
                 messageRole.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -7405,13 +7405,13 @@ Item {
                 messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
-                //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
+                //let type = $CommonLibJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
                 tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageRole.nMinWidth;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.width;
                 messageRole.nMinWidth = tn;
                 tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageRole.nMaxWidth;
-                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
                     messageRole.nMaxWidth = Qt.binding(()=>parent.width);
                 }
                 else {
@@ -7426,7 +7426,7 @@ Item {
                     tn = parseInt((messageRole.textArea.contentHeight) / messageRole.textArea.lineCount) * parseFloat(tn) + messageRole.textArea.nPadding * 2;
                 messageRole.nMinHeight = tn;
                 tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageRole.nMaxHeight;
-                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
                     messageRole.nMaxHeight = Qt.binding(()=>parent.height);
                 }
                 else {
@@ -7447,8 +7447,8 @@ Item {
                 //touchAreaRoleMsg.enabled = false;
 
 
-                messageRole.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, keeptime, 0b10);
-                //FrameManager.wait(-1);
+                messageRole.show($CommonLibJS.convertToHTML(msg), $CommonLibJS.convertToHTML(pretext), interval, keeptime, 0b10);
+                //$Frame.wait(-1);
 
             }
 
@@ -7593,7 +7593,7 @@ Item {
                     itemMsg.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true);
@@ -7606,7 +7606,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(rootGameMsgDialog.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(rootGameMsgDialog.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(rootGameMsgDialog.fCallback.call(rootGameMsgDialog, callback, code, rootGameMsgDialog) ?? null, 'Game message callback');
                 }
                 else {   //默认回调函数
@@ -7628,7 +7628,7 @@ Item {
                     }*/
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             }
 
@@ -7644,7 +7644,7 @@ Item {
                 if(pauseGame === true)
                     pauseGame = '$msg_' + itemGameMsgs.nIndex;
                 //是否暂停游戏
-                if(GlobalLibraryJS.isString(pauseGame)) {
+                if($CommonLibJS.isString(pauseGame)) {
                     //loaderGameMsg.bPauseGame = true;
                     game.pause(pauseGame);
 
@@ -7659,12 +7659,12 @@ Item {
                 //样式
                 if(style === undefined || style === null)
                     style = {};
-                else if(GlobalLibraryJS.isValidNumber(style))
+                else if($CommonLibJS.isValidNumber(style))
                     style = {};
 
 
-                let styleSystem = GameMakerGlobalJS.$config.$styles.$msg;
-                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$msg') || styleSystem;
+                let styleSystem = $GameMakerGlobalJS.$config.$styles.$msg;
+                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$msg') || styleSystem;
                 let tn;
 
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -7678,13 +7678,13 @@ Item {
                 messageGame.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
-                //let type = GlobalLibraryJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
+                //let type = $CommonLibJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
                 tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageGame.nMinWidth;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.width;
                 messageGame.nMinWidth = tn;
                 tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageGame.nMaxWidth;
-                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
                     messageGame.nMaxWidth = Qt.binding(()=>parent.width);
                 }
                 else {
@@ -7699,7 +7699,7 @@ Item {
                     tn = parseInt((messageGame.textArea.contentHeight) / messageGame.textArea.lineCount) * parseFloat(tn) + messageGame.textArea.nPadding * 2;
                 messageGame.nMinHeight = tn;
                 tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageGame.nMaxHeight;
-                if(!GlobalLibraryJS.isValidNumber(tn, 0b1) || tn <= 0) {
+                if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
                     messageGame.nMaxHeight = Qt.binding(()=>parent.height);
                 }
                 else {
@@ -7720,8 +7720,8 @@ Item {
                 //touchAreaGameMsg.enabled = false;
 
 
-                messageGame.show(GlobalLibraryJS.convertToHTML(msg), GlobalLibraryJS.convertToHTML(pretext), interval, rootGameMsgDialog.nKeepTime, 0b11);
-                //FrameManager.wait(-1);
+                messageGame.show($CommonLibJS.convertToHTML(msg), $CommonLibJS.convertToHTML(pretext), interval, rootGameMsgDialog.nKeepTime, 0b11);
+                //$Frame.wait(-1);
 
             }
 
@@ -7869,7 +7869,7 @@ Item {
                     itemMenu.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true, {Value: index});
@@ -7882,7 +7882,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(rootGameMenu.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(rootGameMenu.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(rootGameMenu.fCallback.call(rootGameMenu, callback, index, rootGameMenu) ?? null, 'Game menu callback');
                 }
                 else {  //默认回调函数
@@ -7893,7 +7893,7 @@ Item {
                     //rootGameMenu.destroy();
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             }
 
@@ -7904,7 +7904,7 @@ Item {
                 if(pauseGame === true)
                     pauseGame = '$menu_' + itemGameMenus.nIndex;
                 //是否暂停游戏
-                if(GlobalLibraryJS.isString(pauseGame)) {
+                if($CommonLibJS.isString(pauseGame)) {
                     //loaderGameMsg.bPauseGame = true;
                     game.pause(pauseGame);
                 }
@@ -7915,8 +7915,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = GameMakerGlobalJS.$config.$styles.$menu;
-                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$menu') || styleSystem;
+                let styleSystem = $GameMakerGlobalJS.$config.$styles.$menu;
+                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$menu') || styleSystem;
                 let tn;
 
                 maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -8051,7 +8051,7 @@ Item {
                     //itemInput.destroy();
 
                     //game.pause(true)[pauseGame]
-                    if(GlobalLibraryJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
+                    if($CommonLibJS.isString(pauseGame) && pauseGame && _private.config.objPauseNames[pauseGame] !== undefined) {
                         //如果没有使用yield来中断代码，可以不要game.run(true)
                         game.goon(pauseGame);
                         //game.run(true, {Value: text});
@@ -8064,7 +8064,7 @@ Item {
                 };
 
 
-                if(GlobalLibraryJS.checkCallable(rootGameInput.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
+                if($CommonLibJS.checkCallable(rootGameInput.fCallback, 0b11)) {   //用户自定义回调函数，参数为callback和它所需要的参数
                     game.async(rootGameInput.fCallback.call(rootGameInput, callback, text, rootGameInput) ?? null, 'Game input callback');
                 }
                 else {   //默认回调函数
@@ -8086,7 +8086,7 @@ Item {
                     }*/
 
 
-                    ////FrameManager.goon();
+                    ////$Frame.goon();
                 }
             }
 
@@ -8097,7 +8097,7 @@ Item {
                 if(pauseGame === true)
                     pauseGame = '$input';
                 //是否暂停游戏
-                if(GlobalLibraryJS.isString(pauseGame)) {
+                if($CommonLibJS.isString(pauseGame)) {
                     //loaderGameMsg.bPauseGame = true;
                     game.pause(pauseGame);
                 }
@@ -8109,8 +8109,8 @@ Item {
                 //样式
                 if(style === undefined || style === null)
                     style = {};
-                let styleSystem = GameMakerGlobalJS.$config.$styles.$input;
-                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$input') || styleSystem;
+                let styleSystem = $GameMakerGlobalJS.$config.$styles.$input;
+                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$input') || styleSystem;
                 let tn;
 
                 rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -8377,14 +8377,14 @@ Item {
 
             /*/播放一个动作
             function playSprite(data) {
-                if(GlobalLibraryJS.isString(data))
+                if($CommonLibJS.isString(data))
                     data = {RID: data};
 
                 GameSceneJS.getSpriteEffect(data, rootRole.customSprite, {Loops: data.$loops ?? 1});
 
-                if(GlobalLibraryJS.isValidNumber(data.$width))
+                if($CommonLibJS.isValidNumber(data.$width))
                     rootRole.customSprite.width = data.$width;
-                if(GlobalLibraryJS.isValidNumber(data.$height))
+                if($CommonLibJS.isValidNumber(data.$height))
                     rootRole.customSprite.height = data.$height;
                 rootRole.customSprite.x = data.$x ?? 0;
                 rootRole.customSprite.y = data.$y ?? 0;
@@ -8393,7 +8393,7 @@ Item {
             }
             */
             function playSprite(data) {
-                if(GlobalLibraryJS.isString(data))
+                if($CommonLibJS.isString(data))
                     data = {RID: data};
 
                 data.$parent ?? (data.$parent = rootRole.$data.$id);
@@ -8584,8 +8584,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_refreshed: {
@@ -8609,8 +8609,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, currentFrame, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_looped: {
@@ -8634,8 +8634,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_finished: {
@@ -8659,8 +8659,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_paused: {
@@ -8684,8 +8684,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
             sprite.onSg_stoped: {
@@ -8709,8 +8709,8 @@ Item {
                         break;
                 } while(0);
 
-                if(tScript) //GlobalLibraryJS.checkCallable(tScript, 0b11)
-                    game.run(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
+                if(tScript) //$CommonLibJS.checkCallable(tScript, 0b11)
+                    game.async(tScript.call(rootRole, strActionName, rootRole) ?? null, eventName);
             }
 
 
@@ -8723,23 +8723,23 @@ Item {
                 //console.debug('[GameScene]Role Component.onCompleted');
 
 
-                let styleSystem = GameMakerGlobalJS.$config.$role;
-                let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$role') || styleSystem;
+                let styleSystem = $GameMakerGlobalJS.$config.$role;
+                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$role') || styleSystem;
                 let tn;
 
-                bSmooth = GlobalLibraryJS.shortCircuit(0b1, GlobalLibraryJS.getObjectValue(styleUser, '$smooth'), GlobalLibraryJS.getObjectValue(styleSystem, '$smooth'), true);
+                bSmooth = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(styleUser, '$smooth'), $CommonLibJS.getObjectValue(styleSystem, '$smooth'), true);
 
 
-                textName.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$fontColor') ?? styleSystem.$name.$fontColor;
-                tn = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$fontSize') ?? styleSystem.$name.$fontSize;
+                textName.color = $CommonLibJS.getObjectValue(styleUser, '$name', '$fontColor') ?? styleSystem.$name.$fontColor;
+                tn = $CommonLibJS.getObjectValue(styleUser, '$name', '$fontSize') ?? styleSystem.$name.$fontSize;
                 if(tn < 0)
                     textName.font.pixelSize = -tn;
                 else
                     textName.font.pixelSize = tn * Global.rFontPointRatio;
                     //textName.font.pointSize = tn;
 
-                rectName.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$backgroundColor') ?? styleSystem.$name.$backgroundColor;
-                rectName.border.color = GlobalLibraryJS.getObjectValue(styleUser, '$name', '$borderColor') ?? styleSystem.$name.$borderColor;
+                rectName.color = $CommonLibJS.getObjectValue(styleUser, '$name', '$backgroundColor') ?? styleSystem.$name.$backgroundColor;
+                rectName.border.color = $CommonLibJS.getObjectValue(styleUser, '$name', '$borderColor') ?? styleSystem.$name.$borderColor;
             }
         }
     }
@@ -8847,29 +8847,29 @@ Item {
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
 
                 onPressed: {
-                    if(parent.pressed) //GlobalLibraryJS.checkCallable(parent.pressed, 0b11)
-                        game.run(parent.pressed.call(parent, parent) ?? null, 'Image onPressed', );
+                    if(parent.pressed) //$CommonLibJS.checkCallable(parent.pressed, 0b11)
+                        game.async(parent.pressed.call(parent, parent) ?? null, 'Image onPressed', );
                 }
 
                 onReleased: {
-                    if(parent.released) //GlobalLibraryJS.checkCallable(parent.released, 0b11)
-                        game.run(parent.released.call(parent, parent) ?? null, 'Image onReleased', );
+                    if(parent.released) //$CommonLibJS.checkCallable(parent.released, 0b11)
+                        game.async(parent.released.call(parent, parent) ?? null, 'Image onReleased', );
                 }
 
                 onPressAndHold: {
-                    if(parent.pressAndHold) //GlobalLibraryJS.checkCallable(parent.pressAndHold, 0b11)
-                        game.run(parent.pressAndHold.call(parent, parent) ?? null, 'Image onPressAndHold', );
+                    if(parent.pressAndHold) //$CommonLibJS.checkCallable(parent.pressAndHold, 0b11)
+                        game.async(parent.pressAndHold.call(parent, parent) ?? null, 'Image onPressAndHold', );
                 }
 
                 onClicked: {
-                    if(parent.clicked) //GlobalLibraryJS.checkCallable(parent.clicked, 0b11)
-                        game.run(parent.clicked.call(parent, parent) ?? null, 'Image onClicked', );
+                    if(parent.clicked) //$CommonLibJS.checkCallable(parent.clicked, 0b11)
+                        game.async(parent.clicked.call(parent, parent) ?? null, 'Image onClicked', );
                 }
 
                 onDoubleClicked: {
-                    //game.delimage(parent.$id);
-                    if(parent.doubleClicked) //GlobalLibraryJS.checkCallable(parent.doubleClicked, 0b11)
-                        game.run(parent.doubleClicked.call(parent, parent) ?? null, 'Image onDoubleClicked', );
+                    //game.delimage(parent);
+                    if(parent.doubleClicked) //$CommonLibJS.checkCallable(parent.doubleClicked, 0b11)
+                        game.async(parent.doubleClicked.call(parent, parent) ?? null, 'Image onDoubleClicked', );
                 }
             }
 
@@ -8916,41 +8916,41 @@ Item {
                 acceptedButtons: Qt.AllButtons  /*Qt.LeftButton | Qt.RightButton*/
 
                 onPressed: {
-                    if(parent.pressed) //GlobalLibraryJS.checkCallable(parent.pressed, 0b11)
-                        game.run(parent.pressed.call(parent, parent) ?? null, 'SpriteEffect onPressed', );
+                    if(parent.pressed) //$CommonLibJS.checkCallable(parent.pressed, 0b11)
+                        game.async(parent.pressed.call(parent, parent) ?? null, 'SpriteEffect onPressed', );
                 }
 
                 onReleased: {
-                    if(parent.released) //GlobalLibraryJS.checkCallable(parent.released, 0b11)
-                        game.run(parent.released.call(parent, parent) ?? null, 'SpriteEffect onReleased', );
+                    if(parent.released) //$CommonLibJS.checkCallable(parent.released, 0b11)
+                        game.async(parent.released.call(parent, parent) ?? null, 'SpriteEffect onReleased', );
                 }
 
                 onPressAndHold: {
-                    if(parent.pressAndHold) //GlobalLibraryJS.checkCallable(parent.pressAndHold, 0b11)
-                        game.run(parent.pressAndHold.call(parent, parent) ?? null, 'SpriteEffect onPressAndHold', );
+                    if(parent.pressAndHold) //$CommonLibJS.checkCallable(parent.pressAndHold, 0b11)
+                        game.async(parent.pressAndHold.call(parent, parent) ?? null, 'SpriteEffect onPressAndHold', );
                 }
 
                 onClicked: {
-                    if(parent.clicked) //GlobalLibraryJS.checkCallable(parent.clicked, 0b11)
-                        game.run(parent.clicked.call(parent, parent) ?? null, 'SpriteEffect onClicked', );
+                    if(parent.clicked) //$CommonLibJS.checkCallable(parent.clicked, 0b11)
+                        game.async(parent.clicked.call(parent, parent) ?? null, 'SpriteEffect onClicked', );
                 }
 
                 onDoubleClicked: {
-                    //game.delsprite(parent.$id);
-                    if(parent.doubleClicked) //GlobalLibraryJS.checkCallable(parent.doubleClicked, 0b11)
-                        game.run(parent.doubleClicked.call(parent, parent) ?? null, 'SpriteEffect onDoubleClicked', );
+                    //game.delsprite(parent);
+                    if(parent.doubleClicked) //$CommonLibJS.checkCallable(parent.doubleClicked, 0b11)
+                        game.async(parent.doubleClicked.call(parent, parent) ?? null, 'SpriteEffect onDoubleClicked', );
                 }
             }
 
             onSg_looped: {
-                if(looped) //GlobalLibraryJS.checkCallable(looped, 0b11)
-                    game.run(looped.call(this, this) ?? null, 'SpriteEffect onSg_looped', );
+                if(looped) //$CommonLibJS.checkCallable(looped, 0b11)
+                    game.async(looped.call(this, this) ?? null, 'SpriteEffect onSg_looped', );
             }
 
             onSg_finished: {
-                //game.delsprite(parent.$id);
-                if(finished) //GlobalLibraryJS.checkCallable(finished, 0b11)
-                    game.run(finished.call(this, this) ?? null, 'SpriteEffect onSg_finished', );
+                //game.delsprite(parent);
+                if(finished) //$CommonLibJS.checkCallable(finished, 0b11)
+                    game.async(finished.call(this, this) ?? null, 'SpriteEffect onSg_finished', );
                 else
                     visible = false;
             }
@@ -8994,6 +8994,7 @@ Item {
                     itemBackgroundMusic.resume('$sys_inactive');
                 if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? false))
                     rootSoundEffect.resume('$sys_inactive');
+                mediaPlayer.muted = false;
 
                 break;
             case Qt.ApplicationInactive:    //每次窗口非激活时触发
@@ -9004,6 +9005,7 @@ Item {
                     itemBackgroundMusic.pause('$sys_inactive');
                 if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? false))
                     rootSoundEffect.pause('$sys_inactive');
+                mediaPlayer.muted = true;
 
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
@@ -9106,7 +9108,7 @@ Item {
                 return;
 
 
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 //mainRole.$$nActionType = 1;
 
                 _private.startMove(1, event.key);
@@ -9126,7 +9128,7 @@ Item {
                 return;
 
 
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                 GameSceneJS.buttonAClicked();
 
 
@@ -9136,8 +9138,8 @@ Item {
 
         default:
             const fn = GameSceneJS.getCommonScriptResource('$config', '$keys', event.key) ?? null;
-            if(fn) //GlobalLibraryJS.checkCallable(fn, 0b11)
-                game.run(fn(true, event) ?? null, 'Keys.onPressed:' + event.key);
+            if(fn) //$CommonLibJS.checkCallable(fn, 0b11)
+                game.async(fn(true, event) ?? null, 'Keys.onPressed:' + event.key);
             else {
                 if(event.key === Qt.Key_Escape || event.key === Qt.Key_Back)
                     _private.exitGame();
@@ -9172,7 +9174,7 @@ Item {
                 return;
 
 
-            if(GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames)) {
+            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 _private.stopMove(1, event.key);
             }
 
@@ -9182,8 +9184,8 @@ Item {
 
         default:
             const fn = GameSceneJS.getCommonScriptResource('$config', '$keys', event.key) ?? null;
-            if(fn) //GlobalLibraryJS.checkCallable(fn, 0b11)
-                game.run(fn(false, event) ?? null, 'Keys.onReleased:' + event.key);
+            if(fn) //$CommonLibJS.checkCallable(fn, 0b11)
+                game.async(fn(false, event) ?? null, 'Keys.onReleased:' + event.key);
 
             event.accepted = true;
         }
@@ -9195,12 +9197,12 @@ Item {
 
 
     Component.onCompleted: {
-        FrameManager.sl_globalObject().game = game;
-        FrameManager.sl_globalObject().g = game;
+        $Frame.sl_globalObject().game = game;
+        $Frame.sl_globalObject().g = game;
 
-        //console.debug('[GameScene]sl_globalObject：', FrameManager.sl_globalObject());
+        //console.debug('[GameScene]sl_globalObject：', $Frame.sl_globalObject());
 
-        console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'), game, FrameManager.sl_globalObject().game);
+        console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'), game, $Frame.sl_globalObject().game);
     }
 
     Component.onDestruction: {
@@ -9210,9 +9212,9 @@ Item {
 
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
-        if(FrameManager.sl_globalObject().game === game) {
-            delete FrameManager.sl_globalObject().game;
-            delete FrameManager.sl_globalObject().g;
+        if($Frame.sl_globalObject().game === game) {
+            delete $Frame.sl_globalObject().game;
+            delete $Frame.sl_globalObject().g;
         }
 
         console.debug('[GameScene]Component.onDestruction:', Qt.resolvedUrl('.'));

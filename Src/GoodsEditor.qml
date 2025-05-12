@@ -40,7 +40,7 @@ Item {
             //let data = File.read(filePath);
             //console.debug('[GoodsEditor]filePath：', filePath);
 
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
 
             if(data) {
                 //data = JSON.parse(data);
@@ -126,7 +126,7 @@ let data = (function() {
                 //yield game.msg('...', 50);
             }
             let r = game.$sys.resources.commonScripts.$useScript(goods, combatant, params);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },
         //这样写不会显示 使用 选项
@@ -135,7 +135,7 @@ let data = (function() {
         /*/装备脚本
         $equipScript: function*(goods, combatant, params) {
             let r = game.$sys.resources.commonScripts.$equipScript(goods, combatant, params);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },*/
         //这样写不会显示 装备 选项
@@ -144,7 +144,7 @@ let data = (function() {
         /*/卸载装备脚本
         $unloadScript: function*(goods, combatant, params) {
             let r = game.$sys.resources.commonScripts.$unloadScript(goods, combatant, params);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },*/
         $unloadScript: null,
@@ -230,7 +230,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = GlobalJS.checkJSCode(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument));
+                    let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadGoodsScript.textDocument));
 
                     if(e) {
                         rootWindow.aliasGlobal.dialogCommon.show({
@@ -453,13 +453,13 @@ let data = (function() {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
             function fnSave() {
-                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
+                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
-                    if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_fileExists(oldFilePath)) {
-                        ret = FrameManager.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
+                    if(textGoodsName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
+                        ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
                     }
                 }
 
@@ -469,7 +469,7 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            if(textGoodsName.text !== _private.strSavedName && FrameManager.sl_dirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
+            if(textGoodsName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

@@ -105,7 +105,7 @@ Item {
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'sprite.json';
             console.debug('[mainSpriteEditor]filePath:', filePath);
 
-            let cfg = FrameManager.sl_fileRead(filePath);
+            let cfg = $Frame.sl_fileRead(filePath);
             //let cfg = File.read(filePath);
 
             if(!cfg)
@@ -125,7 +125,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[mainSpriteEditor]删除:' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainSpriteEditor]删除:' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listSprite.forceActiveFocus();
@@ -231,7 +231,7 @@ Item {
         id: _private
 
         function refresh() {
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, [], 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, [], 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建特效】');
             l_listSprite.removeButtonVisible = {0: false, '-1': true};
             l_listSprite.show(list);

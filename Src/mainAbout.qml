@@ -270,7 +270,7 @@ Item {
 12.池 模型；
 13.生产、消费者模型；
 14.随系统启动、奔溃重启；
-15.QML（包括一些算法、JSEngine库、 Async异步脚本队列、队列信号事件调用、QQuickPaintedItem、C++执行脚本 等实现）、；
+15.QML（包括一些算法、JSLoader库、 Async异步脚本队列、队列信号事件调用、QQuickPaintedItem、C++执行脚本 等实现）、；
 16.各种三方库（比如qnanopainter库，基于opengl的QPaint方式绘图，绘图效率非常高！）的编译和集成；
 17.多媒体播放（包括精灵、图片、音频、视频）；
 18.手机浏览器；
@@ -292,7 +292,7 @@ Item {
 30.CRC16、CRC32；
 31.读写Excel；
 `;
-        msgBox.text = GlobalLibraryJS.convertToHTML(t);
+        msgBox.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainAbout]Component.onCompleted');
     }

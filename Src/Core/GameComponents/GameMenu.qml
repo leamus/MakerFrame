@@ -186,8 +186,8 @@ Rectangle {
     property alias textMenuTitle: textMenuTitle
 
 
-    property alias column1: columnRoot
-    property alias column2: columnChoices
+    //property alias column1: columnRoot
+    property alias choiceMenus: columnChoices
 
 
     color: '#CF6699FF'

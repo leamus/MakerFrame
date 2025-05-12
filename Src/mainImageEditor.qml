@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrImages = FrameManager.sl_dirList(GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrImages = $Frame.sl_dirList(GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();
     }
@@ -109,7 +109,7 @@ Item {
                     OnAccepted: function() {
                         root.forceActiveFocus();
 
-                        FrameManager.sl_fileDelete(GameMakerGlobal.imageResourcePath(item));
+                        $Frame.sl_fileDelete(GameMakerGlobal.imageResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -193,9 +193,9 @@ Item {
                                 rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename(GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
                                     console.error('[!mainImageEditor]RenameFile ERROR:', GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
@@ -225,7 +225,7 @@ Item {
 
                     //console.debug('image:', textImageName.text, imageReview.source);
                     //console.debug('resolve:', Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
-                    //console.debug('file:', GameMakerGlobal.imageResourceURL(textImageName.text), FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
+                    //console.debug('file:', GameMakerGlobal.imageResourceURL(textImageName.text), $Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
                 }
             }
         }
@@ -250,13 +250,13 @@ Item {
             anchors.fill: parent
             maximumTouchPoints: 1
             onPressed: {
-                console.log('[mainImageEditor]onPressed', touchPoints);
+                console.debug('[mainImageEditor]onPressed', touchPoints);
             }
             onUpdated: {
-                console.log('[mainImageEditor]onUpdated', touchPoints);
+                console.debug('[mainImageEditor]onUpdated', touchPoints);
             }
             onTouchUpdated: {
-                console.log('[mainImageEditor]onTouchUpdated', touchPoints);
+                console.debug('[mainImageEditor]onTouchUpdated', touchPoints);
             }
 
 
@@ -277,6 +277,7 @@ Item {
             onClicked: {
                 _private.setImageVisible(false);
             }
+            drag.target: imageReview
             onWheel: {
                 if(wheel.angleDelta.y > 0) {
                     imageReview.scale *= 1.2;
@@ -344,9 +345,9 @@ Item {
 
             let path;
             if(Qt.platform.os === 'android')
-                path = Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf('/');
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
@@ -368,10 +369,10 @@ Item {
                         rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     }
                     else {
-                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
+                            $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();

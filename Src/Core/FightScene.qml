@@ -23,7 +23,7 @@ import 'GameComponents'
 import 'qrc:/QML'
 
 
-import 'GameMakerGlobal.js' as GameMakerGlobalJS
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 import 'FightScene.js' as FightSceneJS
 //import 'File.js' as File
@@ -76,11 +76,11 @@ Item {
             }
             if(tb.$clicked)
                 button.sg_clicked.connect(function() {
-                    //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                    //if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                     //    return;
                     _private.asyncScript.async(tb.$clicked.call(button, button), 'FightScene button clicked');
                 });
-            GlobalLibraryJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
+            $CommonLibJS.copyPropertiesToObject(button, tb.$properties, {onlyCopyExists: true,});
         }
 
 
@@ -97,8 +97,8 @@ Item {
         //样式
         //if(!style)
         //    style = {};
-        let styleSystem = GameMakerGlobalJS.$config.$fight.$styles.$menu;
-        let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
+        let styleSystem = $GameMakerGlobalJS.$config.$fight.$styles.$menu;
+        let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
 
         //maskMenu.color = style.MaskColor || '#7FFFFFFF';
         menuSkillsOrGoods.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -197,11 +197,11 @@ Item {
         let data;
         if(fightScriptData) {
 
-            let filePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + 'fight_script.json');
+            let filePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + 'fight_script.json');
             //let data = File.read(filePath);
             //console.debug('[GameFightScript]filePath：', filePath);
 
-            data = FrameManager.sl_fileRead(filePath);
+            data = $Frame.sl_fileRead(filePath);
             if(!data)
                 return;
             data = JSON.parse(data);
@@ -218,7 +218,7 @@ Item {
         //    return;
 
 
-        //data = GlobalJS._eval(data.FightScript);
+        //data = $GlobalJS._eval(data.FightScript);
         //let data = game.$sys.getFightScriptResource(fightScriptName);
         //_private.fightInfo = data;
         //_private.fightRoundScript = fightScript.$commons.$fightRoundScript || '';
@@ -226,10 +226,10 @@ Item {
         //_private.fightEndScript = fightScript.$commons.$fightEndScript || '';
 
         /*try {
-            data = GlobalJS._eval(data.FightScript);
+            data = $GlobalJS._eval(data.FightScript);
         }
         catch(e) {
-            GlobalLibraryJS.printException(e);
+            $CommonLibJS.printException(e);
             return false;
         }*/
 
@@ -251,11 +251,11 @@ Item {
         let enemyRandom = false;    //随机排列
 
         //如果是数组
-        if(GlobalLibraryJS.isArray(fight.fightScript.$enemyCount)) {
+        if($CommonLibJS.isArray(fight.fightScript.$enemyCount)) {
             if(fight.fightScript.$enemyCount.length === 1)
                 enemyCount = fight.fightScript.$enemyCount[0];
             else
-                enemyCount = GlobalLibraryJS.random(fight.fightScript.$enemyCount[0], fight.fightScript.$enemyCount[1] + 1);
+                enemyCount = $CommonLibJS.random(fight.fightScript.$enemyCount[0], fight.fightScript.$enemyCount[1] + 1);
 
             enemyRandom = true;
         }
@@ -271,7 +271,7 @@ Item {
         for(let i = 0; i < fight.enemies.length; ++i) {
             let tIndex;
             if(enemyRandom) //随机
-                tIndex = GlobalLibraryJS.random(0, fight.fightScript.$enemiesData.length);
+                tIndex = $CommonLibJS.random(0, fight.fightScript.$enemiesData.length);
             else    //顺序
                 tIndex = i % fight.fightScript.$enemiesData.length;
 
@@ -286,9 +286,9 @@ Item {
 
 
         //初始化脚本
-        if(game.$sys.resources.commonScripts.$commonFightInitScript) { //GlobalLibraryJS.checkCallable
+        if(game.$sys.resources.commonScripts.$commonFightInitScript) { //$CommonLibJS.checkCallable
             let r = game.$sys.resources.commonScripts.$commonFightInitScript([fight.myCombatants, fight.enemies], fight.fightScript);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             //yield fight.run(game.$sys.resources.commonScripts.$commonFightInitScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: '$commonFightInitScript'});
         }
 
@@ -352,14 +352,14 @@ Item {
         FightSceneJS.resetRolesPosition();
 
 
-        if(game.$sys.resources.commonScripts.$commonFightStartScript) { //GlobalLibraryJS.checkCallable
+        if(game.$sys.resources.commonScripts.$commonFightStartScript) { //$CommonLibJS.checkCallable
             let r = game.$sys.resources.commonScripts.$commonFightStartScript([fight.myCombatants, fight.enemies], fight.fightScript);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             //yield fight.run(game.$sys.resources.commonScripts.$commonFightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -2, Tips: 'fight start1'});
         }
 
 
-        //GlobalLibraryJS.setTimeout(function() {
+        //$CommonLibJS.setTimeout(function() {
             //战斗起始脚本
             //if(_private.fightStartScript) {
             //    fight.run(_private.fightStartScript([fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Priority: -1, Tips: 'fight start2'});
@@ -373,11 +373,11 @@ Item {
         //const ret1 = _private.scriptQueueFighting.create(FightSceneJS.gfFighting() ?? null, -1, true, '$gfFighting', );
         //_private.genFighting = FightSceneJS.gfFighting();
         fight.run(FightSceneJS.gfFighting());
-        ////GlobalJS.createScript(_private.genFighting, {Type: 0, Priority: -1, Script: FightSceneJS.gfFighting(), Tips: '$gfFighting'}, );
+        ////$GlobalJS.createScript(_private.genFighting, {Type: 0, Priority: -1, Script: FightSceneJS.gfFighting(), Tips: '$gfFighting'}, );
 
         //fight.$sys.continueFight(1);
         //_private.genFighting.next();
-        //GlobalLibraryJS.runNextEventLoop(function() {
+        //$CommonLibJS.runNextEventLoop(function() {
         //    _private.genFighting.next();
         //}, 'fight init');
 
@@ -476,7 +476,7 @@ Item {
         readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}/*, buttonNum=0*/, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
-            if(GlobalLibraryJS.isFunction(callback) || !callback) {
+            if($CommonLibJS.isFunction(callback) || !callback) {
             }
             //设置默认回调函数
             else {
@@ -498,7 +498,7 @@ Item {
         readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
-            if(GlobalLibraryJS.isFunction(callback) || !callback) {
+            if($CommonLibJS.isFunction(callback) || !callback) {
             }
             //设置默认回调函数
             else {
@@ -518,7 +518,7 @@ Item {
         readonly property var menu: function(title, items, style={}, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
-            if(GlobalLibraryJS.isFunction(callback) || !callback) {
+            if($CommonLibJS.isFunction(callback) || !callback) {
             }
             //设置默认回调函数
             else {
@@ -549,13 +549,13 @@ Item {
 
         //参数同 game.run
         readonly property var run: function(vScript, scriptProps=-1, ...params) {
-            if(GlobalLibraryJS.isObject(scriptProps)) { //如果是参数对象
+            if($CommonLibJS.isObject(scriptProps)) { //如果是参数对象
                 scriptProps.ScriptQueue = _private.scriptQueue;
             }
-            else if(GlobalLibraryJS.isValidNumber(scriptProps)) {   //如果是数字
+            else if($CommonLibJS.isValidNumber(scriptProps)) {   //如果是数字
                 scriptProps = {ScriptQueue: _private.scriptQueue, Priority: scriptProps};
             }
-            else if(GlobalLibraryJS.isString(scriptProps)) {   //如果是字符串
+            else if($CommonLibJS.isString(scriptProps)) {   //如果是字符串
                 scriptProps = {ScriptQueue: _private.scriptQueue, Tips: scriptProps};
             }
             return game.run(vScript, scriptProps, ...params);
@@ -631,7 +631,7 @@ Item {
                 }
 
 
-                if(GlobalLibraryJS.randTarget(probability, 100) === 1) {
+                if($CommonLibJS.randTarget(probability, 100) === 1) {
                     //game.createfightenemy();
                     fight.fighting(fightScript);
                 }
@@ -656,7 +656,7 @@ Item {
             }
             else if(result === true)
                 FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2}, true);
-            else if(GlobalLibraryJS.isObject(result))
+            else if($CommonLibJS.isObject(result))
                 FightSceneJS.fightOver(result, true);
             else {
                 let fightResult = game.$sys.resources.commonScripts.$checkAllCombatants(fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
@@ -686,10 +686,10 @@ Item {
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
             checkToFight: FightSceneJS.checkToFight,
 
-            getCombatantSkills: GameMakerGlobalJS.getCombatantSkills,
+            getCombatantSkills: $GameMakerGlobalJS.getCombatantSkills,
 
-            gfChoiceSingleCombatantSkill: GameMakerGlobalJS.gfChoiceSingleCombatantSkill,
-            gfNoChoiceSkill: GameMakerGlobalJS.gfNoChoiceSkill,
+            gfChoiceSingleCombatantSkill: $GameMakerGlobalJS.gfChoiceSingleCombatantSkill,
+            gfNoChoiceSkill: $GameMakerGlobalJS.gfNoChoiceSkill,
 
             saveLast: FightSceneJS.saveLast,
             loadLast: FightSceneJS.loadLast,
@@ -707,7 +707,7 @@ Item {
 
                         //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
                         //  否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
-                        GlobalLibraryJS.setTimeout(function() {
+                        $CommonLibJS.setTimeout(function() {
                             //开始运行
                             //_private.scriptQueueFighting.run();
                             _private.genFighting.next();
@@ -738,7 +738,7 @@ Item {
                     }
                 }
 
-                if(GlobalLibraryJS.isNumber(combatant)) {
+                if($CommonLibJS.isNumber(combatant)) {
                     if(combatant === -1 || combatant === 0)
                         for(let i = 0; i < fight.myCombatants.length /*repeaterMyCombatants.nCount*/; ++i) {
                             refresh(fight.myCombatants[i]);
@@ -982,10 +982,10 @@ Item {
     Component {
         id: compSpriteEffect
         SpriteEffect {
-            animatedsprite.smooth: GlobalLibraryJS.shortCircuit(0b1,
-                GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$spriteEffect', '$smooth'),
-                //GlobalLibraryJS.getObjectValue(GameMakerGlobalJS, '$config', '$spriteEffect', '$smooth'),
-                GameMakerGlobalJS.$config.$spriteEffect.$smooth,
+            animatedsprite.smooth: $CommonLibJS.shortCircuit(0b1,
+                $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$spriteEffect', '$smooth'),
+                //$CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$spriteEffect', '$smooth'),
+                $GameMakerGlobalJS.$config.$spriteEffect.$smooth,
                 true)
 
             onSg_playEffect: {
@@ -1128,10 +1128,10 @@ Item {
                         for(let ti in _private.config.fightRoleBarConfig) {
                             let bar = _private.config.fightRoleBarConfig[ti];
                             if(bar.$type === 1) {
-                                cacheComponents[ti].text = GlobalLibraryJS.getObjectValue(combatant, ...bar.$property);
+                                cacheComponents[ti].text = $CommonLibJS.getObjectValue(combatant, ...bar.$property);
                             }
                             else if(bar.$type === 2) {
-                                cacheComponents[ti].refresh(GlobalLibraryJS.getObjectValue(combatant, ...bar.$property));
+                                cacheComponents[ti].refresh($CommonLibJS.getObjectValue(combatant, ...bar.$property));
                             }
                         }
                     }
@@ -1222,8 +1222,8 @@ Item {
                                     //样式
                                     //if(!style)
                                     //    style = {};
-                                    let styleSystem = GameMakerGlobalJS.$config.$fight.$styles.$menu;
-                                    let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
+                                    let styleSystem = $GameMakerGlobalJS.$config.$fight.$styles.$menu;
+                                    let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$fight', '$styles', '$menu') || styleSystem;
 
                                     //maskMenu.color = style.MaskColor || '#7FFFFFFF';
                                     menuFightRoleChoice.border.color = style.BorderColor || styleUser.$borderColor || styleSystem.$borderColor;
@@ -1381,10 +1381,10 @@ Item {
                         for(let ti in _private.config.fightRoleBarConfig) {
                             let bar = _private.config.fightRoleBarConfig[ti];
                             if(bar.$type === 1) {
-                                cacheComponents[ti].text = GlobalLibraryJS.getObjectValue(combatant, ...bar.$property);
+                                cacheComponents[ti].text = $CommonLibJS.getObjectValue(combatant, ...bar.$property);
                             }
                             else if(bar.$type === 2) {
-                                cacheComponents[ti].refresh(GlobalLibraryJS.getObjectValue(combatant, ...bar.$property));
+                                cacheComponents[ti].refresh($CommonLibJS.getObjectValue(combatant, ...bar.$property));
                             }
                         }
                     }
@@ -1842,7 +1842,7 @@ Item {
                         if(ret.value === 1) {   //1个回合结束
                             if(_private.fightRoundScript) {
                                 //console.debug('运行回合事件!!!', _private.nRound)
-                                GlobalJS.runScript(_private.scriptQueue, 0, _private.fightRoundScript, _private.nRound);
+                                $GlobalJS.runScript(_private.scriptQueue, 0, _private.fightRoundScript, _private.nRound);
                                 ++_private.nRound;
                             }
                             break;
@@ -1853,12 +1853,12 @@ Item {
                     }
                     else {  //战斗结束
                         if(_private.fightEndScript)
-                            GlobalJS.runScript(_private.scriptQueue, 0, _private.fightEndScript, ret.value);
+                            $GlobalJS.runScript(_private.scriptQueue, 0, _private.fightEndScript, ret.value);
                         if(ret.value === 1) {
-                            GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, '', 100, 1);sg_fightOver();');
+                            $GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗胜利获得XX经验！`, '', 100, 1);sg_fightOver();');
                         }
                         else
-                            GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, '', 100, 1);sg_fightOver();');
+                            $GlobalJS.runScript(_private.scriptQueue, 0, 'yield dialogFightMsg.show(`战斗失败<BR>获得  你妹的经验...`, '', 100, 1);sg_fightOver();');
                     }
                     break;
                 }*/
@@ -2003,9 +2003,9 @@ Item {
         onAccepted: {
             //gameMap.focus = true;
             rootFightScene.forceActiveFocus();
-            //GlobalJS._eval(textScript.text);
+            //$GlobalJS._eval(textScript.text);
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
+            //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;
@@ -2075,12 +2075,12 @@ Item {
 
         //战斗脚本（只用来运行gfFighting；所以也可以直接用Generator对象）
         //property var genFighting
-        //readonly property var scriptQueueFighting: new GlobalLibraryJS.ScriptQueue()
+        //readonly property var scriptQueueFighting: new $CommonLibJS.ScriptQueue()
 
-        readonly property var asyncScript: new GlobalLibraryJS.AsyncScript();
+        readonly property var asyncScript: new $CommonLibJS.AsyncScript();
 
         //异步脚本（播放特效、事件等）
-        readonly property var scriptQueue: new GlobalLibraryJS.ScriptQueue()
+        readonly property var scriptQueue: new $CommonLibJS.ScriptQueue()
         //property var scriptQueue: game.$caches.scriptQueue
 
         //战斗选择 异步脚本
@@ -2160,7 +2160,7 @@ Item {
         */
 
 
-        FrameManager.sl_globalObject().fight = fight;
+        $Frame.sl_globalObject().fight = fight;
 
         console.debug('[FightScene]Component.onCompleted');
     }
@@ -2168,8 +2168,8 @@ Item {
     Component.onDestruction: {
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
-        //if(FrameManager.sl_globalObject().fight === fight)
-        //    delete FrameManager.sl_globalObject().fight;
+        //if($Frame.sl_globalObject().fight === fight)
+        //    delete $Frame.sl_globalObject().fight;
 
         console.debug('[FightScene]Component.onDestruction');
     }

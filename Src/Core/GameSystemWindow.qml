@@ -18,7 +18,7 @@ import 'GameComponents'
 //import 'qrc:/QML'
 
 
-import 'GameMakerGlobal.js' as GameMakerGlobalJS
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 //import 'File.js' as File
 
@@ -111,7 +111,7 @@ Item {
                     case 0:
                     case 1:
                     case 2:
-                        ////GlobalLibraryJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
+                        ////$CommonLibJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
                         let ret = yield game.load('存档' + c);
                         if(ret) {
                             yield game.msg('读档成功');

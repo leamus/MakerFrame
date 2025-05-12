@@ -148,7 +148,7 @@ Item {
         if(root.nSpriteType === 0) {
             //读特效信息
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-            //let info = FrameManager.sl_fileRead(GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + 'sprite.json'));
+            //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + 'sprite.json'));
             //if(info)
             //    info = JSON.parse(info);
             //else
@@ -164,14 +164,14 @@ Item {
             spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(info.Image);
 
             if(spriteEffect.nSpriteType === 1) {
-                spriteEffect.nFrameCount = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameCount') ?? info.FrameCount;
-                spriteEffect.nInterval = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameInterval') ?? info.FrameInterval;
+                spriteEffect.nFrameCount = $CommonLibJS.getObjectValue(info.FrameData, 'FrameCount') ?? info.FrameCount;
+                spriteEffect.nInterval = $CommonLibJS.getObjectValue(info.FrameData, 'FrameInterval') ?? info.FrameInterval;
 
                 //注意这个放在 spriteEffect.sprite.width 和 spriteEffect.sprite.height 之前
-                let t = GlobalLibraryJS.getObjectValue(info.FrameData, 'FrameSize') ?? info.FrameSize;
+                let t = $CommonLibJS.getObjectValue(info.FrameData, 'FrameSize') ?? info.FrameSize;
                 spriteEffect.sprite.sizeFrame = Qt.size(t[0], t[1]);
 
-                t = GlobalLibraryJS.getObjectValue(info.FrameData, 'OffsetIndex') ?? info.OffsetIndex;
+                t = $CommonLibJS.getObjectValue(info.FrameData, 'OffsetIndex') ?? info.OffsetIndex;
                 spriteEffect.sprite.pointOffsetIndex = Qt.point(t[0], t[1]);
             }
             else if(spriteEffect.nSpriteType === 2) {

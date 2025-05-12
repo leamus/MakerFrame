@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrVideos = FrameManager.sl_dirList(GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrVideos = $Frame.sl_dirList(GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainVideoEditor]_private.arrVideos', JSON.stringify(_private.arrVideos))
         _private.refresh();
     }
@@ -107,7 +107,7 @@ Item {
                     OnAccepted: function() {
                         root.forceActiveFocus();
 
-                        FrameManager.sl_fileDelete(GameMakerGlobal.videoResourcePath(item));
+                        $Frame.sl_fileDelete(GameMakerGlobal.videoResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -191,9 +191,9 @@ Item {
                                 rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
                                     console.error('[!mainVideoEditor]RenameFile ERROR:', GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
                                     return;
                                 }
@@ -372,9 +372,9 @@ Item {
 
             let path;
             if(Qt.platform.os === 'android')
-                path = Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf('/');
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
@@ -396,10 +396,10 @@ Item {
                         rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     }
                     else {
-                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainVideoEditor]Copy ERROR:', fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
+                            $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                            console.error('[!mainVideoEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -471,7 +471,7 @@ Item {
 
             //console.debug('video:', textVideoName.text, mediaPlayer.source);
             //console.debug('resolve:', Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
-            //console.debug('file:', GameMakerGlobal.videoResourceURL(textVideoName.text), FrameManager.sl_fileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
+            //console.debug('file:', GameMakerGlobal.videoResourceURL(textVideoName.text), $Frame.sl_fileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
         }
     }
 

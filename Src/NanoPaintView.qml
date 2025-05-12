@@ -222,9 +222,9 @@ Rectangle {
         onAccepted: {
             //gameMap.focus = true;
             root.forceActiveFocus();
-            //GlobalJS.Eval(textScript.text);
+            //$GlobalJS.Eval(textScript.text);
             console.debug(eval(textScript.text));
-            //GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
+            //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }
         onRejected: {
             //gameMap.focus = true;

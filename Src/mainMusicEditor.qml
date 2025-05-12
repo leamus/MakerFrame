@@ -39,7 +39,7 @@ Item {
 
 
     function init() {
-        //_private.arrMusic = FrameManager.sl_dirList(GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrMusic = $Frame.sl_dirList(GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainMusicEditor]_private.arrMusic', JSON.stringify(_private.arrMusic))
         _private.refresh();
     }
@@ -107,7 +107,7 @@ Item {
                     OnAccepted: function() {
                         root.forceActiveFocus();
 
-                        FrameManager.sl_fileDelete(GameMakerGlobal.musicResourcePath(item));
+                        $Frame.sl_fileDelete(GameMakerGlobal.musicResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -222,9 +222,9 @@ Item {
                                 rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                             }
                             else {
-                                let ret = FrameManager.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
                                     console.error('[!mainMusicEditor]RenameFile ERROR:', GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
                                     return;
                                 }
@@ -310,9 +310,9 @@ Item {
 
             let path;
             if(Qt.platform.os === 'android')
-                path = Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl);
 
             let tIndex = path.lastIndexOf('/');
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
@@ -334,10 +334,10 @@ Item {
                         rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
                     }
                     else {
-                        let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
                         if(ret <= 0) {
-                            Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainMusicEditor]Copy ERROR:', fileUrl, path, GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
+                            $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                            console.error('[!mainMusicEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -399,7 +399,7 @@ Item {
 
             //console.debug('mediaPlayer:', textMusicName.text, mediaPlayer.source);
             //console.debug('resolve:', Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
-            //console.debug('file:', GameMakerGlobal.musicResourceURL(textMusicName.text), FrameManager.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
+            //console.debug('file:', GameMakerGlobal.musicResourceURL(textMusicName.text), $Frame.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
     }
 

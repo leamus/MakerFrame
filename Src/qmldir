@@ -1,4 +1,5 @@
 module GameMaker
+#module名字可以随意取（识别主要是含qmldir的文件夹名）
 
 
 

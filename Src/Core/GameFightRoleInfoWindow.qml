@@ -36,7 +36,7 @@ Item {
     function init(params) {
         let n = 0, teamName='$sys_fight_heros';
 
-        if(GlobalLibraryJS.isArray(params)) {   //多参数
+        if($CommonLibJS.isArray(params)) {   //多参数
             n = params[0] || 0;
             teamName = params[1] || '$sys_fight_heros';
         }
@@ -64,8 +64,8 @@ Item {
 
     function refresh() {
         let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
-        //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
-        textFightRoleName.text = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(conbatant, {avatar: true, color: true}));
+        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+        textFightRoleName.text = $CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(conbatant, {avatar: true, color: true}));
 
 
         /*textFightRoleInfo.text = 'HP：' + conbatant.$$propertiesWithExtra.remainHP + '/' + conbatant.$$propertiesWithExtra.healthHP + '/' + conbatant.$$propertiesWithExtra.HP + ' ' +
@@ -97,7 +97,7 @@ Item {
                 continue;
 
             let tIndex = equipReservedSlots.indexOf(position);
-            let tgoodsName = GlobalLibraryJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(conbatant.$equipment[position], {Image: true, Color: true}));
+            let tgoodsName = $CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showGoodsName(conbatant.$equipment[position], {Image: true, Color: true}));
             if(tIndex > -1) {
                 //arrEquipment[tIndex] = '%1：%2'.arg(position).arg(game.$sys.getGoodsResource(conbatant.$equipment[position].$rid).$properties.name);
                 arrEquipment[tIndex] = '<td style="vertical-align:middle;">%1：</td><td>%2</td>'.arg(position).arg(tgoodsName);
@@ -319,7 +319,7 @@ Item {
                     //msgDetail.text = game.$sys.getGoodsResource(hero.$equipment[position].$rid).$properties.description;
 
                     let description = combatant.$equipment[position].$description;
-                    if(GlobalLibraryJS.isFunction(description))
+                    if($CommonLibJS.isFunction(description))
                         description = description(combatant.$equipment[position]);
                     msgDetail.text = description;
                 }
@@ -351,7 +351,7 @@ Item {
                     //msgDetail.text = game.$sys.getSkillResource(combatant.$skills[index].$rid).$properties.description;
 
                     let description = combatant.$skills[index].$description;
-                    if(GlobalLibraryJS.isFunction(description))
+                    if($CommonLibJS.isFunction(description))
                         description = description(combatant.$skills[index]);
                     msgDetail.text = description;
                 }

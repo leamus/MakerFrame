@@ -25,6 +25,8 @@ import 'qrc:/QML'
 import './Core'
 
 
+//import '../../_Global/CommonLib.js' as CommonLibJS
+//import '../../_Global/Global.js' as GlobalJS
 //import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
@@ -64,7 +66,7 @@ Item {
 
             //visualScriptEditor.strTitle: strTitle
 
-            visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+            visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
             visualScriptEditor.nLoadType: 1
 
             //visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
@@ -992,7 +994,7 @@ Item {
 
                     text: '关于'
                     onClicked: {
-                        if(Platform.compileType === 'debug') {
+                        if($Platform.compileType === 'debug') {
                             _private.loadModule('mainAbout.qml');
                             //userMainProject.source = 'mainAbout.qml';
                         }
@@ -1187,7 +1189,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ?',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
 
                     removeItem(index);
 
@@ -1230,11 +1232,11 @@ Item {
 
             let fUrl;
             if(Qt.platform.os === 'android')
-                fUrl = Platform.sl_getRealPathFromURI(fileUrl.toString());
+                fUrl = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                fUrl = FrameManager.sl_urlDecode(fileUrl.toString());
+                fUrl = $Frame.sl_urlDecode(fileUrl.toString());
 
-            //console.error('!!!', fUrl, fileUrl, FrameManager.sl_absolutePath(fileUrl))
+            //console.error('!!!', fUrl, fileUrl, $Frame.sl_absolutePath(fileUrl))
 
             _private.unzipProjectPackage(fUrl);
         }
@@ -1342,7 +1344,7 @@ Item {
         //显示信息
         function showMsg(msg) {
             //替换一些常用的字符为HTML代码
-            textHelpInfo.text = GlobalLibraryJS.convertToHTML(msg);
+            textHelpInfo.text = $CommonLibJS.convertToHTML(msg);
 
             rectHelpWindow.visible = true;
             rectHelpWindow.forceActiveFocus();
@@ -1501,13 +1503,18 @@ Item {
             //if(module.length !== 0 && !checkCurrentProjectName())
             //    return false;
 
+            //if(loader.status === Loader.Loading) {
+            //    console.warn('[!mainGameMaker]loader status is Loading');
+            //    return false;
+            //}
+
 
             //loader.visible = true;
             //loader.focus = true;
             //loader.forceActiveFocus();
 
             loader.vParams = params;
-            if(GlobalLibraryJS.isObject(module)) {
+            if($CommonLibJS.isObject(module)) {
                 loader.sourceComponent = module;
             }
             else {
@@ -1550,7 +1557,7 @@ Item {
                 Input: '新建工程',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
                         rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
@@ -1567,7 +1574,7 @@ Item {
                     _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input);
 
                     let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-                    FrameManager.sl_dirCreate(projectPath);
+                    $Frame.sl_dirCreate(projectPath);
 
 
                     rootWindow.aliasGlobal.dialogCommon.show({
@@ -1597,8 +1604,8 @@ Item {
                                     },
                                 });
 
-                                //FrameManager.sl_dirCreate(projectPath);
-                                let ret = FrameManager.sl_extractDir(resTemplate, projectPath);
+                                //$Frame.sl_dirCreate(projectPath);
+                                let ret = $Frame.sl_extractDir(resTemplate, projectPath);
 
                                 if(ret.length > 0) {
                                     //_private.changeProject('Leamus');
@@ -1620,7 +1627,7 @@ Item {
 
                             //enabled = false;
 
-                            if(!FrameManager.sl_fileExists(resTemplate)) {
+                            if(!$Frame.sl_fileExists(resTemplate)) {
                                 //https://qiniu.leamus.cn/$资源模板.zip
 
                                 downloadFile('http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip', resTemplate,
@@ -1665,7 +1672,7 @@ Item {
                 Input: GameMakerGlobal.config.strCurrentProjectName,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
                         rootWindow.aliasGlobal.dialogCommon.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
@@ -1679,11 +1686,11 @@ Item {
                         return;
                     }
 
-                    if(FrameManager.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input) > 0) {
+                    if($Frame.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input) > 0) {
                         _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
                     }
                     else {
-                        if(FrameManager.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
+                        if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
                             rootWindow.aliasGlobal.dialogCommon.show({
                                 Msg: '重命名失败，请检查名称',
                                 Buttons: Dialog.Yes,
@@ -1708,7 +1715,7 @@ Item {
         }
 
         function mapEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainMapEditor.qml');
                 //userMainProject.source = 'mainMapEditor.qml';
             }
@@ -1718,7 +1725,7 @@ Item {
             }
         }
         function roleEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainRoleEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
@@ -1728,7 +1735,7 @@ Item {
             }
         }
         function spriteEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainSpriteEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
@@ -1738,7 +1745,7 @@ Item {
             }
         }
         function goodsEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainGoodsEditor.qml');
                 //userMainProject.source = 'mainGoodsEditor.qml';
             }
@@ -1748,7 +1755,7 @@ Item {
             }
         }
         function fightRoleEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainFightRoleEditor.qml');
                 //userMainProject.source = 'mainFightRoleEditor.qml';
             }
@@ -1758,7 +1765,7 @@ Item {
             }
         }
         function fightSkillEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainFightSkillEditor.qml');
                 //userMainProject.source = 'mainFightSkillEditor.qml';
             }
@@ -1768,7 +1775,7 @@ Item {
             }
         }
         function fightScriptEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainFightScriptEditor.qml');
                 //userMainProject.source = 'mainFightScriptEditor.qml';
             }
@@ -1778,7 +1785,7 @@ Item {
             }
         }
         function startScriptEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('StartScriptEditor.qml');
                 //userMainProject.source = 'StartScriptEditor.qml';
             }
@@ -1788,7 +1795,7 @@ Item {
             }
         }
         function commonScriptEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('CommonScriptEditor.qml');
                 //userMainProject.source = 'CommonScriptEditor.qml';
             }
@@ -1798,7 +1805,7 @@ Item {
             }
         }
         function scriptEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule(compScriptEditor, {
                     BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName,
                     //RelativePath: '',
@@ -1822,7 +1829,7 @@ Item {
             }
         }
         function pluginsManage() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainPlugins.qml');
                 //userMainProject.source = 'mainPlugins.qml';
             }
@@ -1832,7 +1839,7 @@ Item {
             }
         }
         function imageEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainImageEditor.qml');
                 //userMainProject.source = 'mainImageEditor.qml';
             }
@@ -1842,7 +1849,7 @@ Item {
             }
         }
         function musicEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainMusicEditor.qml');
                 //userMainProject.source = 'mainMusicEditor.qml';
             }
@@ -1852,7 +1859,7 @@ Item {
             }
         }
         function videoEditor() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainVideoEditor.qml');
                 //userMainProject.source = 'mainVideoEditor.qml';
             }
@@ -1867,7 +1874,7 @@ Item {
         }
 
         function pluginsManager() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('PluginsManager.qml');
                 //userMainProject.source = 'PluginsManager.qml';
             }
@@ -1878,7 +1885,7 @@ Item {
         }
 
         function pluginsDownload() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('PluginsDownload.qml');
                 //userMainProject.source = 'PluginsDownload.qml';
             }
@@ -1889,7 +1896,7 @@ Item {
         }
 
         function gameStart() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('Core/GameScene.qml');
                 //userMainProject.source = 'Core/GameScene.qml';
             }
@@ -1899,7 +1906,7 @@ Item {
             }
         }
         function gameTest() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainGameTest.qml');
                 //userMainProject.source = 'mainGameTest.qml';
             }
@@ -1909,7 +1916,7 @@ Item {
             }
         }
         function gamePackage() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainPackage.qml');
                 //userMainProject.source = 'mainPackage.qml';
             }
@@ -1951,7 +1958,7 @@ Item {
             });
 
             let destPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-            let ret = FrameManager.sl_compressDir(
+            let ret = $Frame.sl_compressDir(
                 destPath + '.zip',
                 destPath
             );
@@ -1990,16 +1997,16 @@ Item {
                         },
                     });
 
-                    //FrameManager.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + FrameManager.sl_completeBaseName(fUrl);
-                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, FrameManager.sl_completeBaseName(fUrl))
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
+                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, $Frame.sl_completeBaseName(fUrl))
 
-                    FrameManager.sl_dirCreate(projectPath);
-                    let ret = FrameManager.sl_extractDir(GlobalJS.toPath(fUrl), projectPath);
+                    $Frame.sl_dirCreate(projectPath);
+                    let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
 
                     if(ret.length > 0) {
-                        _private.changeProject(FrameManager.sl_completeBaseName(fUrl));
+                        _private.changeProject($Frame.sl_completeBaseName(fUrl));
 
                         //console.debug('[mainGameMaker]', ret, projectPath);
                     }
@@ -2048,8 +2055,8 @@ Item {
                             },
                         });
 
-                        FrameManager.sl_dirCreate(projectPath);
-                        let ret = FrameManager.sl_extractDir(projectPath + '.zip', projectPath);
+                        $Frame.sl_dirCreate(projectPath);
+                        let ret = $Frame.sl_extractDir(projectPath + '.zip', projectPath);
 
                         if(ret.length > 0) {
                             _private.changeProject('$Leamus');
@@ -2083,7 +2090,7 @@ Item {
 
         function downloadFile(url, filePath, successCallback, failCallback) {
             //方法一：
-            /*const httpReply = */GlobalLibraryJS.request({
+            /*const httpReply = */$CommonLibJS.request({
                 Url: url,
                 Method: 'GET',
                 //Data: {},
@@ -2115,13 +2122,13 @@ Item {
             });
 
             /*/方法二：
-            const httpReply = FrameManager.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip', resTemplate);
+            const httpReply = $Frame.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/$资源模板.zip', resTemplate);
             httpReply.sg_finished.connect(function(httpReply) {
                 const networkReply = httpReply.networkReply;
-                const code = FrameManager.sl_objectProperty('Code', networkReply);
-                console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, FrameManager.sl_objectProperty('Data', networkReply));
+                const code = $Frame.sl_objectProperty('Code', networkReply);
+                console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, $Frame.sl_objectProperty('Data', networkReply));
 
-                FrameManager.sl_deleteLater(httpReply);
+                $Frame.sl_deleteLater(httpReply);
 
 
                 rootWindow.aliasGlobal.dialogCommon.close();
@@ -2160,7 +2167,7 @@ Item {
         }
 
         function tutorial() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainTutorial.qml');
                 //userMainProject.source = 'mainTutorial.qml';
             }
@@ -2170,7 +2177,7 @@ Item {
             }
         }
         function agreement() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainAgreement.qml');
                 //userMainProject.source = 'mainAgreement.qml';
             }
@@ -2180,7 +2187,7 @@ Item {
             }
         }
         function updateLog() {
-            if(Platform.compileType === 'debug') {
+            if($Platform.compileType === 'debug') {
                 _private.loadModule('mainUpdateLog.qml');
                 //userMainProject.source = 'mainUpdateLog.qml';
             }
@@ -2191,8 +2198,8 @@ Item {
         }
 
 
-        //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsEngine延迟加载
-        readonly property var jsEngine: new GlobalJS.JSEngine(rootGameMaker)
+        //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
+        readonly property var jsLoader: new $GlobalJS.JSLoader(rootGameMaker)
         property var jsGameVisualScript: null
 
         property var fnBackupOpenFile: null
@@ -2229,7 +2236,7 @@ Item {
 
 
 
-        _private.jsGameVisualScript = _private.jsEngine.load(Qt.resolvedUrl('GameVisualScript.js'));
+        _private.jsGameVisualScript = _private.jsLoader.load(Qt.resolvedUrl('GameVisualScript.js'));
 
 
         if(GameMakerGlobal.settings.$RunTimes === 0) {
@@ -2247,19 +2254,19 @@ Item {
 
 
 
-        //FrameManager.sl_globalObject().GameMakerGlobal = GameMakerGlobal;
+        //$Frame.sl_globalObject().$GameMakerGlobal = GameMakerGlobal;
 
 
 
         _private.fnBackupOpenFile = rootWindow.fnOpenFile;
         rootWindow.fnOpenFile = (url, type)=>{
             //如果是文件夹
-            if(FrameManager.sl_isDir(GlobalJS.toPath(url))) {
+            if($Frame.sl_isDir($GlobalJS.toPath(url))) {
                 return false;
             }
 
 
-            const fileExtName = FrameManager.sl_completeSuffix(url).toLowerCase();
+            const fileExtName = $Frame.sl_completeSuffix(url).toLowerCase();
             if(fileExtName === 'zip') {
                 _private.unzipProjectPackage(url);
 
@@ -2281,7 +2288,7 @@ Item {
         rootWindow.fnOpenFile = _private.fnBackupOpenFile;
 
 
-        //delete FrameManager.sl_globalObject().GameMakerGlobal;
+        //delete $Frame.sl_globalObject().$GameMakerGlobal;
 
 
         console.debug('[mainGameMaker]Component.onDestruction:', Qt.resolvedUrl('.'));

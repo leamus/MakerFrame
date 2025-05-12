@@ -296,7 +296,7 @@ Item {
             try {
                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
                 //let cfg = File.read(filePath);
-                let cfg = FrameManager.sl_fileRead(filePath);
+                let cfg = $Frame.sl_fileRead(filePath);
                 //console.debug('cfg', cfg, filePath);
 
                 if(!cfg)

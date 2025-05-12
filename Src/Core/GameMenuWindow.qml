@@ -18,7 +18,7 @@ import 'GameComponents'
 //import 'qrc:/QML'
 
 
-import 'GameMakerGlobal.js' as GameMakerGlobalJS
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 //import 'File.js' as File
 
@@ -45,8 +45,8 @@ Item {
         let newFlags = 0;
 
         if((flags & 0b1) && !(nShowWindowFlags & 0b1)) {
-            let styleSystem = GameMakerGlobalJS.$config.$styles.$main;
-            let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$main') || styleSystem;
+            let styleSystem = $GameMakerGlobalJS.$config.$styles.$main;
+            let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$main') || styleSystem;
 
             maskMainMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||
@@ -109,8 +109,8 @@ Item {
             newFlags |= 0b100;
         }
         if((flags & 0b1000) && !(nShowWindowFlags & 0b1000)) {
-            let styleSystem = GameMakerGlobalJS.$config.$styles.$system;
-            let styleUser = GlobalLibraryJS.getObjectValue(game.$userscripts, '$config', '$styles', '$system') || styleSystem;
+            let styleSystem = $GameMakerGlobalJS.$config.$styles.$system;
+            let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$system') || styleSystem;
 
             containerSystemMenu.maskSystemMenu.color = style.MaskColor ||
                     styleUser.$maskColor ||

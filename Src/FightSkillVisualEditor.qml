@@ -36,7 +36,7 @@ Item {
         }
         _private.arrCacheComponent = [];
 
-        _private.jsEngine.clear();
+        _private.jsLoader.clear();
     }
 
     signal sg_compile(string code);
@@ -839,7 +839,7 @@ Item {
                                 let c = compBuff.createObject(layoutBuff);
                                 _private.arrCacheComponent.push(c);
 
-                                GlobalLibraryJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout(function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
                                     }, 1, root, '');
@@ -914,7 +914,7 @@ Item {
                                 let c = compEffect.createObject(layoutEffect);
                                 _private.arrCacheComponent.push(c);
 
-                                GlobalLibraryJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout(function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
                                     }, 1, root, '');
@@ -1270,7 +1270,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[FightSkillVisualEditor]compile:', _private.filepath, jsScript);
@@ -1383,9 +1383,9 @@ Item {
             //console.debug('[FightScene]getSpriteEffect0');
 
             //读特效信息
-            let spriteDirPath = GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
+            let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
 
-            let spriteResourceInfo = FrameManager.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
+            let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
             if(spriteResourceInfo)
                 spriteResourceInfo = JSON.parse(spriteResourceInfo);
             else
@@ -1393,9 +1393,9 @@ Item {
 
             let script;
 
-            if(FrameManager.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
-                _private.jsEngine.clear();
-                script = _private.jsEngine.load(GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
+            if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
+                _private.jsLoader.clear();
+                script = _private.jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
             }
 
 
@@ -1442,25 +1442,25 @@ Item {
 
             //！！！兼容旧代码
             if(spriteEffectComp.nSpriteType === 1) {
-                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
+                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
                 0);
-                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
+                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
                 0);
 
                 //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
-                let t = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
+                let t = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
                 );
                 spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
 
-                t = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
+                t = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
                 );
                 spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
             }
@@ -1468,17 +1468,17 @@ Item {
                 let t = spriteResourceInfo.FrameData;
 
                 //！！！兼容旧代码
-                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
+                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
                 0);
-                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
+                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
                 0);
-                spriteEffectComp.sprite.nFrameStartIndex = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
+                spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
                 0);
 
 
@@ -1510,10 +1510,10 @@ Item {
         function saveData() {
             let buffs = [];
 
-            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
-            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
-            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
-            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
+            let typeTextFields = $Frame.sl_findChildren(layoutBuff, 'Type');
+            let effectTextFields = $Frame.sl_findChildren(layoutBuff, 'Effect');
+            let roundTextFields = $Frame.sl_findChildren(layoutBuff, 'Round');
+            let probabilityTextFields = $Frame.sl_findChildren(layoutBuff, 'Probability');
 
             for(let tt in typeTextFields) {
                 buffs.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(), roundTextFields[tt].text.trim(), probabilityTextFields[tt].text.trim()])
@@ -1522,11 +1522,11 @@ Item {
 
             let effects = [];
 
-            typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
-            //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'RequiredMP');
-            effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
-            let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
+            typeTextFields = $Frame.sl_findChildren(layoutEffect, 'Type');
+            //let requiredMPTextFields = $Frame.sl_findChildren(layoutEffect, 'RequiredMP');
+            effectTextFields = $Frame.sl_findChildren(layoutEffect, 'Effect');
+            let combatantTextFields = $Frame.sl_findChildren(layoutEffect, 'Combatant');
+            let propertyTextFields = $Frame.sl_findChildren(layoutEffect, 'Property');
 
             for(let tt in typeTextFields) {
                 effects.push([typeTextFields[tt].text.trim(), effectTextFields[tt].text.trim(),
@@ -1547,7 +1547,7 @@ Item {
             data.Effects = effects;
             //data.Attack = textAttack.text.trim();
 
-            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1556,7 +1556,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
             console.debug('[FightSkillVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -1578,10 +1578,10 @@ Item {
                 let buff = compBuff.createObject(layoutBuff);
                 _private.arrCacheComponent.push(buff);
 
-                let typeTextFields = FrameManager.sl_findChild(buff, 'Type');
-                let effectTextFields = FrameManager.sl_findChild(buff, 'Effect');
-                let roundTextFields = FrameManager.sl_findChild(buff, 'Round');
-                let probabilityTextFields = FrameManager.sl_findChild(buff, 'Probability');
+                let typeTextFields = $Frame.sl_findChild(buff, 'Type');
+                let effectTextFields = $Frame.sl_findChild(buff, 'Effect');
+                let roundTextFields = $Frame.sl_findChild(buff, 'Round');
+                let probabilityTextFields = $Frame.sl_findChild(buff, 'Probability');
 
                 typeTextFields.text = data.Buffs[tt][0];
                 effectTextFields.text = data.Buffs[tt][1];
@@ -1605,11 +1605,11 @@ Item {
                 let effect = compEffect.createObject(layoutEffect);
                 _private.arrCacheComponent.push(effect);
 
-                let typeTextField = FrameManager.sl_findChild(effect, 'Type');
-                //let requiredMPTextFields = FrameManager.sl_findChildren(effect, 'RequiredMP');
-                let effectTextField = FrameManager.sl_findChild(effect, 'Effect');
-                let combatantTextField = FrameManager.sl_findChild(effect, 'Combatant');
-                let propertyTextField = FrameManager.sl_findChild(effect, 'Property');
+                let typeTextField = $Frame.sl_findChild(effect, 'Type');
+                //let requiredMPTextFields = $Frame.sl_findChildren(effect, 'RequiredMP');
+                let effectTextField = $Frame.sl_findChild(effect, 'Effect');
+                let combatantTextField = $Frame.sl_findChild(effect, 'Combatant');
+                let propertyTextField = $Frame.sl_findChild(effect, 'Property');
 
                 typeTextField.text = data.Effects[tt][0] || '';
                 //requiredMPTextFields.text = data.Effects[tt][1];
@@ -1636,10 +1636,10 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
-                let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
-                let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
-                let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
+                let typeTextFields = $Frame.sl_findChildren(layoutBuff, 'Type');
+                let effectTextFields = $Frame.sl_findChildren(layoutBuff, 'Effect');
+                let roundTextFields = $Frame.sl_findChildren(layoutBuff, 'Round');
+                let probabilityTextFields = $Frame.sl_findChildren(layoutBuff, 'Probability');
 
                 //console.debug(actionTextFields);
                 for(let tt in typeTextFields) {
@@ -1667,10 +1667,10 @@ Item {
                     }
 
                     //技能效果
-                    let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
-                    let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
-                    let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
-                    let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
+                    let typeTextFields = $Frame.sl_findChildren(layoutEffect, 'Type');
+                    let effectTextFields = $Frame.sl_findChildren(layoutEffect, 'Effect');
+                    let combatantTextFields = $Frame.sl_findChildren(layoutEffect, 'Combatant');
+                    let propertyTextFields = $Frame.sl_findChildren(layoutEffect, 'Property');
 
                     for(let tt in typeTextFields) {
                         let typeTextField = typeTextFields[tt];
@@ -1732,41 +1732,41 @@ Item {
                 else {
                     playScript = strTemplate1playScript;
                 }
-                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
+                playScript = $CommonLibJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
 
                 break;
 
             case 1:
                 type = '1';
                 check = _private.strTemplate2check;
-                check = GlobalLibraryJS.replaceAll(check, '$$MP$$', requiredMP);
+                check = $CommonLibJS.replaceAll(check, '$$MP$$', requiredMP);
 
                 //全体
                 if(targetCount === '-1') {
 
                     playScript = strTemplate4playScript;
                     if(targetFlag === 1)
-                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$targetTeam$$', '0');
+                        playScript = $CommonLibJS.replaceAll(playScript, '$$targetTeam$$', '0');
                     else if(targetFlag === 2)
-                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$targetTeam$$', '1');
+                        playScript = $CommonLibJS.replaceAll(playScript, '$$targetTeam$$', '1');
                     else
-                        playScript = GlobalLibraryJS.replaceAll(playScript, '$$targetTeam$$', '1');
+                        playScript = $CommonLibJS.replaceAll(playScript, '$$targetTeam$$', '1');
                 }
                 //单体
                 else {
                     playScript = strTemplate3playScript;
                 }
-                playScript = GlobalLibraryJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
+                playScript = $CommonLibJS.replaceAll(playScript, '$$skilleffect$$', textSkillEffect.text.trim());
                 //playScript = playScript.replace(/\$\$property\$\$/g, textSkillEffect.text.trim());
                 //playScript = playScript.replace(/\$\$effect\$\$/g, textSkillEffect.text.trim());
 
 
                 //技能效果
-                let typeTextFields = FrameManager.sl_findChildren(layoutEffect, 'Type');
-                //let requiredMPTextFields = FrameManager.sl_findChildren(layoutEffect, 'RequiredMP');
-                let effectTextFields = FrameManager.sl_findChildren(layoutEffect, 'Effect');
-                let combatantTextFields = FrameManager.sl_findChildren(layoutEffect, 'Combatant');
-                let propertyTextFields = FrameManager.sl_findChildren(layoutEffect, 'Property');
+                let typeTextFields = $Frame.sl_findChildren(layoutEffect, 'Type');
+                //let requiredMPTextFields = $Frame.sl_findChildren(layoutEffect, 'RequiredMP');
+                let effectTextFields = $Frame.sl_findChildren(layoutEffect, 'Effect');
+                let combatantTextFields = $Frame.sl_findChildren(layoutEffect, 'Combatant');
+                let propertyTextFields = $Frame.sl_findChildren(layoutEffect, 'Property');
 
                 let props = '';
                 for(let tt in typeTextFields) {
@@ -1809,7 +1809,7 @@ Item {
                         props += '\r\n';
                     }
                 }
-                playScript = GlobalLibraryJS.replaceAll(playScript, '$$addprops$$', props);
+                playScript = $CommonLibJS.replaceAll(playScript, '$$addprops$$', props);
 
 
                 break;
@@ -1832,10 +1832,10 @@ Item {
             let buffs = '';
 
 
-            let typeTextFields = FrameManager.sl_findChildren(layoutBuff, 'Type');
-            let effectTextFields = FrameManager.sl_findChildren(layoutBuff, 'Effect');
-            let roundTextFields = FrameManager.sl_findChildren(layoutBuff, 'Round');
-            let probabilityTextFields = FrameManager.sl_findChildren(layoutBuff, 'Probability');
+            let typeTextFields = $Frame.sl_findChildren(layoutBuff, 'Type');
+            let effectTextFields = $Frame.sl_findChildren(layoutBuff, 'Effect');
+            let roundTextFields = $Frame.sl_findChildren(layoutBuff, 'Round');
+            let probabilityTextFields = $Frame.sl_findChildren(layoutBuff, 'Probability');
 
             for(let tt in typeTextFields) {
                 let tRound = roundTextFields[tt].text.trim().split(',');
@@ -1918,7 +1918,7 @@ Item {
 
             //全体
             if(targetCount === '-1') {
-                buffs = GlobalLibraryJS.replaceAll(strTemplate4Buffs, '$$buffs$$', buffs);
+                buffs = $CommonLibJS.replaceAll(strTemplate4Buffs, '$$buffs$$', buffs);
             }
             //单体
             else {
@@ -1928,21 +1928,21 @@ Item {
 
 
             let data = strTemplate;
-            data = GlobalLibraryJS.replaceAll(data, '$$name$$', textName.text);
-            data = GlobalLibraryJS.replaceAll(data, '$$description$$', GlobalLibraryJS.convertToHTML(textDescription.text));
-            data = GlobalLibraryJS.replaceAll(data, '$$type$$', type);
-            data = GlobalLibraryJS.replaceAll(data, '$$targetFlag$$', targetFlag);
-            data = GlobalLibraryJS.replaceAll(data, '$$targetCount$$', targetCount);
-            data = GlobalLibraryJS.replaceAll(data, '$$ExtraProperties$$', textExtraProperties.text.trim() || 'undefined');
-            data = GlobalLibraryJS.replaceAll(data, '$$playScript$$', playScript);
-            data = GlobalLibraryJS.replaceAll(data, '$$buffs$$', buffs);
-            /*data = GlobalLibraryJS.replaceAll(data, '$$check$$', textLuck.text.trim());
-            data = GlobalLibraryJS.replaceAll(data, '$$speed$$', textSpeed.text.trim());
-            data = GlobalLibraryJS.replaceAll(data, '$$EXP$$', textEXP.text.trim());
-            data = GlobalLibraryJS.replaceAll(data, '$$skills$$', GlobalLibraryJS.array2string(textSkills.text.trim().split(',')));
-            data = GlobalLibraryJS.replaceAll(data, '$$goods$$', GlobalLibraryJS.array2string(textGoods.text.trim().split(',')));
+            data = $CommonLibJS.replaceAll(data, '$$name$$', textName.text);
+            data = $CommonLibJS.replaceAll(data, '$$description$$', $CommonLibJS.convertToHTML(textDescription.text));
+            data = $CommonLibJS.replaceAll(data, '$$type$$', type);
+            data = $CommonLibJS.replaceAll(data, '$$targetFlag$$', targetFlag);
+            data = $CommonLibJS.replaceAll(data, '$$targetCount$$', targetCount);
+            data = $CommonLibJS.replaceAll(data, '$$ExtraProperties$$', textExtraProperties.text.trim() || 'undefined');
+            data = $CommonLibJS.replaceAll(data, '$$playScript$$', playScript);
+            data = $CommonLibJS.replaceAll(data, '$$buffs$$', buffs);
+            /*data = $CommonLibJS.replaceAll(data, '$$check$$', textLuck.text.trim());
+            data = $CommonLibJS.replaceAll(data, '$$speed$$', textSpeed.text.trim());
+            data = $CommonLibJS.replaceAll(data, '$$EXP$$', textEXP.text.trim());
+            data = $CommonLibJS.replaceAll(data, '$$skills$$', $CommonLibJS.array2string(textSkills.text.trim().split(',')));
+            data = $CommonLibJS.replaceAll(data, '$$goods$$', $CommonLibJS.array2string(textGoods.text.trim().split(',')));
             */
-            data = GlobalLibraryJS.replaceAll(data, '$$check$$', check);
+            data = $CommonLibJS.replaceAll(data, '$$check$$', check);
 
             console.debug(data);
 
@@ -1981,7 +1981,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();
@@ -2003,7 +2003,7 @@ Item {
 
 
 
-        property var jsEngine: new GlobalJS.JSEngine(root)
+        property var jsLoader: new $GlobalJS.JSLoader(root)
 
 
         //创建的组件缓存

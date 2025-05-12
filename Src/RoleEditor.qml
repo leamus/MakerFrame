@@ -1559,7 +1559,7 @@ Item {
                                 let c = compActions2.createObject(layoutAction2);
                                 layoutAction2.arrCacheComponent.push(c);
 
-                                GlobalLibraryJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout(function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
                                     }, 1, root, '');
@@ -1626,7 +1626,7 @@ Item {
 
                             //_private.loadScript(textRoleRID.text);
                             if(!scriptEditor.text &&
-                                    !FrameManager.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js')) {
+                                    !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js')) {
                                 if(comboType.currentIndex === 1)
                                     scriptEditor.text = _private.strTemplateCode0;
                                 else
@@ -1671,7 +1671,7 @@ Item {
                                     let c = compActions1.createObject(layoutAction1);
                                     layoutAction1.arrCacheComponent.push(c);
 
-                                    GlobalLibraryJS.setTimeout(function() {
+                                    $CommonLibJS.setTimeout(function() {
                                         if(flickable.contentHeight > flickable.height)
                                             flickable.contentY = flickable.contentHeight - flickable.height;
                                         }, 1, root, '');
@@ -1896,7 +1896,7 @@ Item {
                 source: {
                     if(textAvatar.text.length === 0)
                         return '';
-                    if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                    if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
                         return '';
                     return GameMakerGlobal.imageResourceURL(textAvatar.text);
                 }
@@ -2007,7 +2007,7 @@ Item {
             }
 
             Button {
-                visible: Platform.compileType === 'debug' ? true : false
+                visible: $Platform.compileType === 'debug' ? true : false
                 //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 50
@@ -2045,7 +2045,7 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
         visualScriptEditor.nLoadType: 1
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
@@ -2093,9 +2093,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textRoleImageURL.text = Platform.sl_getRealPathFromURI(fileUrl);
+                textRoleImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                textRoleImageURL.text = FrameManager.sl_urlDecode(fileUrl);
+                textRoleImageURL.text = $Frame.sl_urlDecode(fileUrl);
 
             textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
 
@@ -2244,24 +2244,24 @@ Item {
                 open();
                 //visible = true;
                 labelDialogTips.text = '路径不能为空';
-                Platform.sl_showToast('路径不能为空');
+                $Platform.sl_showToast('路径不能为空');
                 return;
             }*/
             if(textRoleImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = '资源名不能为空';
-                Platform.sl_showToast('资源名不能为空');
+                $Platform.sl_showToast('资源名不能为空');
                 return;
             }
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
+                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
-                    Platform.sl_showToast('拷贝资源失败，是否重名或目录不可写？');
+                    $Platform.sl_showToast('拷贝资源失败，是否重名或目录不可写？');
                     //console.debug('[RoleEditor]Copy ERROR:', textRoleImageURL.text);
 
                     //root.forceActiveFocus();
@@ -2281,20 +2281,20 @@ Item {
 
 
             if(comboType.currentIndex === 0) {
-                if(!FrameManager.sl_fileExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!$Frame.sl_fileExists($GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = '路径错误或文件不存在:' + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.sl_showToast('路径错误或文件不存在' + GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件不存在:' + $GlobalJS.toPath(textRoleImageURL.text);
+                    $Platform.sl_showToast('路径错误或文件不存在' + $GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
             else if(comboType.currentIndex === 1) {
-                if(!FrameManager.sl_dirExists(GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!$Frame.sl_dirExists($GlobalJS.toPath(textRoleImageURL.text))) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = '路径错误或文件夹不存在:' + GlobalJS.toPath(textRoleImageURL.text);
-                    Platform.sl_showToast('路径错误或文件夹不存在' + GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件夹不存在:' + $GlobalJS.toPath(textRoleImageURL.text);
+                    $Platform.sl_showToast('路径错误或文件夹不存在' + $GlobalJS.toPath(textRoleImageURL.text));
                     return;
                 }
             }
@@ -2398,7 +2398,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl);
-            //let cfg = FrameManager.sl_fileRead(fileUrl);
+            //let cfg = $Frame.sl_fileRead(fileUrl);
 
 
             visible = false;
@@ -2425,7 +2425,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[RoleEditor]删除:' + filepath, Qt.resolvedUrl(filepath), FrameManager.sl_fileExists(filepath), FrameManager.sl_fileDelete(filepath));
+                    console.debug('[RoleEditor]删除:' + filepath, Qt.resolvedUrl(filepath), $Frame.sl_fileExists(filepath), $Frame.sl_fileDelete(filepath));
                     removeItem(index);
 
                     l_listRoleResource.forceActiveFocus();
@@ -2456,7 +2456,7 @@ Item {
         onAccepted: {
             textRoleRID.text = textRoleRID.text.trim();
             if(textRoleRID.text.length === 0) {
-                //Platform.sl_showToast('资源名不能为空');
+                //$Platform.sl_showToast('资源名不能为空');
                 textDialogMsg.text = '资源名不能为空';
                 open();
                 return;
@@ -2484,7 +2484,7 @@ Item {
                 }
             }
 
-            if(textRoleRID.text !== _private.strRoleRID && FrameManager.sl_dirExists(path)) {
+            if(textRoleRID.text !== _private.strRoleRID && $Frame.sl_dirExists(path)) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -2647,7 +2647,7 @@ Item {
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
-        property var jsEngine: new GlobalJS.JSEngine(root)
+        property var jsLoader: new $GlobalJS.JSLoader(root)
 
         property string strTemplateCode0: `
 //保存坐标偏移数据
@@ -2657,7 +2657,7 @@ let imageFixPositions;
 function $refresh(index, imageAnimate, path) {
     if(imageFixPositions === undefined) {
         //读取坐标偏移文件并保存
-        imageFixPositions = FrameManager.sl_fileRead(GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
+        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
@@ -2746,10 +2746,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 role.objActionsData = {};
-                let actionNames = FrameManager.sl_findChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = FrameManager.sl_findChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = FrameManager.sl_findChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = FrameManager.sl_findChildren(layoutAction1, 'FrameInterval');
+                let actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -2763,9 +2763,9 @@ function $refresh(index, imageAnimate, path) {
 
 
                 const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
-                if(FrameManager.sl_fileExists(jsPath)) {
-                    _private.jsEngine.clear();
-                    let ts = _private.jsEngine.load(GlobalJS.toURL(jsPath));
+                if($Frame.sl_fileExists(jsPath)) {
+                    _private.jsLoader.clear();
+                    let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                     role.sprite.sprite.fnRefresh = ts.$refresh;
                 }
             }
@@ -2774,8 +2774,8 @@ function $refresh(index, imageAnimate, path) {
                 //role.implicitHeight = parseInt(textRoleHeight.text);
 
                 role.objActionsData = {};
-                let actionNames = FrameManager.sl_findChildren(layoutAction2, 'ActionName');
-                let SpriteNames = FrameManager.sl_findChildren(layoutAction2, 'SpriteName');
+                let actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
+                let SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
@@ -2784,16 +2784,16 @@ function $refresh(index, imageAnimate, path) {
                         //];
 
                         let spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
-                        let info = FrameManager.sl_fileRead(GlobalJS.toPath(spritePath + GameMakerGlobal.separator + 'sprite.json'));
+                        let info = $Frame.sl_fileRead($GlobalJS.toPath(spritePath + GameMakerGlobal.separator + 'sprite.json'));
                         if(info)
                             info = JSON.parse(info);
                         //else
                         //    return false;
 
                         let ts = null;
-                        if(FrameManager.sl_fileExists(spritePath + GameMakerGlobal.separator + 'sprite.js')) {
-                            //_private.jsEngine.clear();
-                            ts = _private.jsEngine.load(GlobalJS.toURL(spritePath + GameMakerGlobal.separator + 'sprite.js'));
+                        if($Frame.sl_fileExists(spritePath + GameMakerGlobal.separator + 'sprite.js')) {
+                            //_private.jsLoader.clear();
+                            ts = _private.jsLoader.load($GlobalJS.toURL(spritePath + GameMakerGlobal.separator + 'sprite.js'));
                         }
                         role.objActionsData[actionNames[tt].text.trim()] = {Info: info, Script: ts};
                     }
@@ -2844,7 +2844,7 @@ function $refresh(index, imageAnimate, path) {
             }
 
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator;
-            //if(FrameManager.sl_fileExists(path + 'role.js')) {
+            //if($Frame.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
             scriptEditor.init({
                 BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
@@ -2853,7 +2853,7 @@ function $refresh(index, imageAnimate, path) {
                 PathText: 0b0,
                 RunButton: 0b0,
             });
-            //scriptEditor.text = FrameManager.sl_fileRead(path + 'role.js') || '';
+            //scriptEditor.text = $Frame.sl_fileRead(path + 'role.js') || '';
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();
             //visualScriptEditor.loadData(path + 'role.vjs');
@@ -2868,7 +2868,7 @@ function $refresh(index, imageAnimate, path) {
                     scriptEditor.text = '';
 
                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
-                let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
             }
             else
                 return false;
@@ -2880,9 +2880,9 @@ function $refresh(index, imageAnimate, path) {
             //如果路径不为空，且是另存为，则赋值vjs文件
             if(_private.strRoleRID !== '' && textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) {
                 let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.vjs';
-                if(FrameManager.sl_fileExists(oldFilePath)) {
+                if($Frame.sl_fileExists(oldFilePath)) {
                     let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.vjs';
-                    let ret = FrameManager.sl_fileCopy(oldFilePath, newFilePath, true);
+                    let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -2893,8 +2893,8 @@ function $refresh(index, imageAnimate, path) {
             let roleName = textRoleName.text;
             let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.json';
 
-            /*//if(!FrameManager.sl_dirExists(path))
-                FrameManager.sl_dirCreate(path);
+            /*//if(!$Frame.sl_dirExists(path))
+                $Frame.sl_dirCreate(path);
             */
 
             let outputData = {};
@@ -2963,10 +2963,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 outputData.FrameIndex = {};
-                let actionNames = FrameManager.sl_findChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = FrameManager.sl_findChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = FrameManager.sl_findChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = FrameManager.sl_findChildren(layoutAction1, 'FrameInterval');
+                let actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
+                let frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                let frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
+                let frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -2986,8 +2986,8 @@ function $refresh(index, imageAnimate, path) {
             }
             else if(comboType.currentIndex === 2) {
                 outputData.FrameIndex = {};
-                let actionNames = FrameManager.sl_findChildren(layoutAction2, 'ActionName');
-                let SpriteNames = FrameManager.sl_findChildren(layoutAction2, 'SpriteName');
+                let actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
+                let SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim())
@@ -3005,7 +3005,7 @@ function $refresh(index, imageAnimate, path) {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(filepath, JSON.stringify(outputData));
-            let ret = FrameManager.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

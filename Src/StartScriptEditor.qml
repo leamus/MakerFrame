@@ -38,16 +38,17 @@ Item {
     function init() {
         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
-        if(FrameManager.sl_fileExists(path + 'main.js')) {
+        /*if($Frame.sl_fileExists(path + 'main.js')) {
             _private.strMainJSName = 'main.js';
         }
         //!!!兼容旧代码
-        //else if(FrameManager.sl_fileExists(path + 'start.js')) {
+        //else if($Frame.sl_fileExists(path + 'start.js')) {
         //    _private.strMainJSName = 'start.js';
         //}
         else {
             _private.strMainJSName = 'main.js';
         }
+        */
 
         console.debug('[StartScriptEditor]filePath:', path + _private.strMainJSName);
 
@@ -105,7 +106,7 @@ game.goon();
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
         visualScriptEditor.nLoadType: 1
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
@@ -130,7 +131,7 @@ game.goon();
 
 
         //js名
-        property string strMainJSName: 'main.js'
+        readonly property string strMainJSName: 'main.js'
 
         property string strTemplate: `
 //鹰：可以包含其他文件：
@@ -170,14 +171,14 @@ function* $start() {
                     case 0:
                     case 1:
                     case 2:
-                        //GlobalLibraryJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
+                        //$CommonLibJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
                         if(yield game.load('存档' + c))
                             break;
                         else
                             yield game.msg('读取失败');
                         continue;
                     case 3:
-                        //GlobalLibraryJS.runNextEventLoop(function() {yield game.load('autosave')},);
+                        //$CommonLibJS.runNextEventLoop(function() {yield game.load('autosave')},);
                         if(yield game.load('autosave'))
                             break;
                         else

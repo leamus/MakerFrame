@@ -44,7 +44,7 @@ let data = (function() {
             ],
         },
         '多行文本信息': {
-            command: ['显示多行文本信息', 'yield game.msg(GlobalLibraryJS.convertToHTML(%1, [" ", "\\n"]),%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
+            command: ['显示多行文本信息', 'yield game.msg($CommonLibJS.convertToHTML(%1, [" ", "\\n"]),%2,%3,%4,%5);', '', 0, true, 'red', 'white'],
             params: [
                 ['*@信息', 'text', true, 2, [['文字', '地图变量', '全局变量', '存档变量', '引擎变量', '普通变量'], ['', '${game.d["变量名1"]}', '${game.gf["变量名1"]}', '${game.gd["变量名1"]}', '${game.cd["变量名1"]}', '${变量名1}']], 'green'],
                 ['文字间隔', 'number', '60', 0, '60', 'blue'],
@@ -290,7 +290,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         },
 
         '挂载动画': {   //targets: %1; target: %1; 这种绑定，如果动画正在运行时 父组件被释放就会有警告，所以不用绑定；
-            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14; PropertyAnimation {property: "%2"; from: %3; to: %4; duration: %5; running: false; easing {type: %6; period: %7; amplitude: %8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); Component.onCompleted: {target = FrameManager.sl_objectParent(this); start();} %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
+            command: ['挂载动画', 'Qt.createQmlObject(\`import QtQuick 2.14; PropertyAnimation {property: "%2"; from: %3; to: %4; duration: %5; running: false; easing {type: %6; period: %7; amplitude: %8; overshoot: %9; bezierCurve: %10; } onStopped: this.destroy(); Component.onCompleted: {target = $Frame.sl_objectParent(this); start();} %11} \`, %1);', '挂载动画', 0, true, 'red', 'white'],
             params: [
                 ['*父组件', 'name', true, 0, '', 'green'],
                 ['*@动画属性', 'unformatted', true, 2, [['x', 'y', '宽', '高', '透明度', '缩放', '角度', '颜色',], ['x', 'y', 'width', 'height', 'opacity', 'scale', 'rotation', 'color',], ''], ''],

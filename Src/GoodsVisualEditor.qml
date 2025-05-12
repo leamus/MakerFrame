@@ -554,7 +554,7 @@ Item {
                             source: {
                                 if(textImage.text.length === 0)
                                     return '';
-                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textImage.text)))
+                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textImage.text)))
                                     return '';
                                 return GameMakerGlobal.imageResourceURL(textImage.text);
                             }
@@ -775,7 +775,7 @@ Item {
                             let c = comp.createObject(layoutEffectsLayout);
                             _private.arrCacheComponent.push(c);
 
-                            GlobalLibraryJS.setTimeout(function() {
+                            $CommonLibJS.setTimeout(function() {
                                 if(flickable.contentHeight > flickable.height)
                                     flickable.contentY = flickable.contentHeight - flickable.height;
                                 }, 1, root, '');
@@ -846,7 +846,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[GoodsVisualEditor]compile:', _private.filepath, jsScript);
@@ -917,8 +917,8 @@ Item {
         function saveData() {
             let properties = [];
 
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Property');
-            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Effect');
+            let propertyTextFields = $Frame.sl_findChildren(layoutEffectsLayout, 'Property');
+            let effectTextFields = $Frame.sl_findChildren(layoutEffectsLayout, 'Effect');
 
             for(let tt in propertyTextFields) {
                 properties.push([propertyTextFields[tt].text.trim(), effectTextFields[tt].text.trim()]);
@@ -944,7 +944,7 @@ Item {
 
             data.Properties = properties;
 
-            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
 
         }
 
@@ -953,7 +953,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
             console.debug('[GoodsVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -977,8 +977,8 @@ Item {
                 effectComp = comp.createObject(layoutEffectsLayout);
                 _private.arrCacheComponent.push(effectComp);
 
-                let propertyTextFields = FrameManager.sl_findChild(effectComp, 'Property');
-                let effectTextFields = FrameManager.sl_findChild(effectComp, 'Effect');
+                let propertyTextFields = $Frame.sl_findChild(effectComp, 'Property');
+                let effectTextFields = $Frame.sl_findChild(effectComp, 'Effect');
 
                 propertyTextFields.text = data.Properties[tt][0];
                 effectTextFields.text = data.Properties[tt][1];
@@ -1012,8 +1012,8 @@ Item {
             let bCheck = true;
             do {
                 for(let effectComp of _private.arrCacheComponent) {
-                    let propertyTextFields = FrameManager.sl_findChild(effectComp, 'Property');
-                    let effectTextFields = FrameManager.sl_findChild(effectComp, 'Effect');
+                    let propertyTextFields = $Frame.sl_findChild(effectComp, 'Property');
+                    let effectTextFields = $Frame.sl_findChild(effectComp, 'Effect');
                     if(!propertyTextFields.text.trim() || !effectTextFields.text.trim()) {
                         bCheck = false;
                         break;
@@ -1064,8 +1064,8 @@ Item {
 
             //道具效果
             let strEffects = '';
-            let propertyTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Property');
-            let effectTextFields = FrameManager.sl_findChildren(layoutEffectsLayout, 'Effect');
+            let propertyTextFields = $Frame.sl_findChildren(layoutEffectsLayout, 'Property');
+            let effectTextFields = $Frame.sl_findChildren(layoutEffectsLayout, 'Effect');
 
 
             //类型
@@ -1075,7 +1075,7 @@ Item {
                 type = 1;
 
                 position = textPosition.text.trim();
-                skills = GlobalLibraryJS.array2string(textSkills.text.trim().split(','));
+                skills = $CommonLibJS.array2string(textSkills.text.trim().split(','));
                 useScript = strTemplateUseScript2;
 
 
@@ -1157,7 +1157,7 @@ Item {
 
             let data = strTemplate.
                 replace(/\$\$name\$\$/g, textName.text).
-                replace(/\$\$description\$\$/g, GlobalLibraryJS.convertToHTML(textDescription.text)).
+                replace(/\$\$description\$\$/g, $CommonLibJS.convertToHTML(textDescription.text)).
                 replace(/\$\$price\$\$/g, price).
                 replace(/\$\$type\$\$/g, type).
                 replace(/\$\$color\$\$/g, textColor.text.trim()).
@@ -1167,7 +1167,7 @@ Item {
                 replace(/\$\$position\$\$/g, position).
                 replace(/\$\$skills\$\$/g, skills).
                 //replace(/\$\$stackable\$\$/g, textLuck.text.trim()).
-                replace(/\$\$fight\$\$/g, GlobalLibraryJS.array2string(fightskill.split(','))).
+                replace(/\$\$fight\$\$/g, $CommonLibJS.array2string(fightskill.split(','))).
                 replace(/\$\$useScript\$\$/g, useScript).
                 replace(/\$\$equipScript\$\$/g, equipScript).
                 replace(/\$\$fightScript\$\$/g, fightSkillScript)
@@ -1211,7 +1211,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();
@@ -1324,14 +1324,14 @@ $$equipEffectAlgorithm$$
     //装备脚本
     $$equipScript: function*(goods, combatant, params) {
         let r = game.$sys.resources.commonScripts.$equipScript(goods, combatant, params);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         return r;
     },
 
     /*/卸载装备脚本
     $unloadScript: function*(goods, combatant, params) {
         let r = game.$sys.resources.commonScripts.$unloadScript(goods, combatant, params);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         return r;
     },*/
 `
@@ -1350,7 +1350,7 @@ $$equipEffectAlgorithm$$
             $$useEffect$$
         }
         let r = game.$sys.resources.commonScripts.$useScript(goods, combatant, params);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         return r;
     },
 `

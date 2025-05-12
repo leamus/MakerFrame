@@ -227,14 +227,14 @@ Item {
         onWidthChanged: {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
-            //GlobalLibraryJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
-            //GlobalLibraryJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+            //$CommonLibJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
+            //$CommonLibJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
         }
         onHeightChanged: {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
-            //GlobalLibraryJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
-            //GlobalLibraryJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+            //$CommonLibJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
+            //$CommonLibJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
         }
 
         //anchors.horizontalCenter: parent.horizontalCenter

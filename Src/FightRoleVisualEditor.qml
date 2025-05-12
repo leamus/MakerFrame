@@ -36,7 +36,7 @@ Item {
         }
         _private.arrCacheComponent = [];
 
-        _private.jsEngine.clear();
+        _private.jsLoader.clear();
     }
 
     signal sg_compile(string code);
@@ -502,7 +502,7 @@ Item {
                             source: {
                                 if(textAvatar.text.length === 0)
                                     return '';
-                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
                                     return '';
                                 return GameMakerGlobal.imageResourceURL(textAvatar.text);
                             }
@@ -718,7 +718,7 @@ Item {
                                 let c = comp.createObject(layoutActionLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                GlobalLibraryJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout(function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
                                     }, 1, root, '');
@@ -871,7 +871,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[FightRoleVisualEditor]compile:', _private.filepath, jsScript);
@@ -984,9 +984,9 @@ Item {
             //console.debug('[FightScene]getSpriteEffect0');
 
             //读特效信息
-            let spriteDirPath = GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
+            let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
 
-            let spriteResourceInfo = FrameManager.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
+            let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
             if(spriteResourceInfo)
                 spriteResourceInfo = JSON.parse(spriteResourceInfo);
             else
@@ -994,9 +994,9 @@ Item {
 
             let script;
 
-            if(FrameManager.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
-                _private.jsEngine.clear();
-                script = _private.jsEngine.load(GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
+            if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
+                _private.jsLoader.clear();
+                script = _private.jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
             }
 
 
@@ -1043,25 +1043,25 @@ Item {
 
             //！！！兼容旧代码
             if(spriteEffectComp.nSpriteType === 1) {
-                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
+                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
                 0);
-                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
+                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
                 0);
 
                 //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
-                let t = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
+                let t = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
                 );
                 spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
 
-                t = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
+                t = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
                 );
                 spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
             }
@@ -1069,17 +1069,17 @@ Item {
                 let t = spriteResourceInfo.FrameData;
 
                 //！！！兼容旧代码
-                spriteEffectComp.nFrameCount = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
+                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
                 0);
-                spriteEffectComp.nInterval = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
+                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
                 0);
-                spriteEffectComp.sprite.nFrameStartIndex = GlobalLibraryJS.shortCircuit(0b1,
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
-                    GlobalLibraryJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
+                spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
+                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
                 0);
 
 
@@ -1095,8 +1095,8 @@ Item {
         function saveData() {
             let actions = [];
 
-            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
-            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
+            let actionTextFields = $Frame.sl_findChildren(layoutActionLayout, 'ActionName');
+            let spriteTextFields = $Frame.sl_findChildren(layoutActionLayout, 'SpriteName');
 
             for(let tt in actionTextFields) {
                 //console.debug(tt.text.trim());
@@ -1127,7 +1127,7 @@ Item {
             data.Actions = actions;
 
 
-            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1136,7 +1136,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
             console.debug('[FightRoleVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -1165,8 +1165,8 @@ Item {
                     actionComp = comp.createObject(layoutActionLayout);
                     _private.arrCacheComponent.push(actionComp);
                 }
-                let actionTextField = FrameManager.sl_findChild(actionComp, 'ActionName');
-                let spriteTextField = FrameManager.sl_findChild(actionComp, 'SpriteName');
+                let actionTextField = $Frame.sl_findChild(actionComp, 'ActionName');
+                let spriteTextField = $Frame.sl_findChild(actionComp, 'SpriteName');
 
                 actionTextField.text = data.Actions[tt][0];
                 spriteTextField.text = data.Actions[tt][1];
@@ -1196,8 +1196,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
-                let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
+                let actionTextFields = $Frame.sl_findChildren(layoutActionLayout, 'ActionName');
+                let spriteTextFields = $Frame.sl_findChildren(layoutActionLayout, 'SpriteName');
 
                 //console.debug(actionTextFields);
                 for(let tt in actionTextFields) {
@@ -1238,8 +1238,8 @@ Item {
 
 
             let strActions = '';
-            let actionTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'ActionName');
-            let spriteTextFields = FrameManager.sl_findChildren(layoutActionLayout, 'SpriteName');
+            let actionTextFields = $Frame.sl_findChildren(layoutActionLayout, 'ActionName');
+            let spriteTextFields = $Frame.sl_findChildren(layoutActionLayout, 'SpriteName');
 
             //console.debug(actionTextFields);
             for(let tt in actionTextFields) {
@@ -1260,9 +1260,9 @@ Item {
                 replace(/\$\$power\$\$/g, textPower.text.trim()).
                 replace(/\$\$luck\$\$/g, textLuck.text.trim()).
                 replace(/\$\$speed\$\$/g, textSpeed.text.trim()).
-                replace(/\$\$skills\$\$/g, GlobalLibraryJS.array2string(textSkills.text.trim().split(','))).
-                replace(/\$\$goods\$\$/g, GlobalLibraryJS.array2string(textGoods.text.trim().split(','))).
-                replace(/\$\$equipment\$\$/g, GlobalLibraryJS.array2string(textEquipment.text.trim().split(','))).
+                replace(/\$\$skills\$\$/g, $CommonLibJS.array2string(textSkills.text.trim().split(','))).
+                replace(/\$\$goods\$\$/g, $CommonLibJS.array2string(textGoods.text.trim().split(','))).
+                replace(/\$\$equipment\$\$/g, $CommonLibJS.array2string(textEquipment.text.trim().split(','))).
                 replace(/\$\$money\$\$/g, textMoney.text.trim() || '0').
                 replace(/\$\$EXP\$\$/g, textEXP.text.trim() || '0').
                 replace(/\$\$ExtraProperties\$\$/g, textExtraProperties.text.trim()/* || 'undefined'*/)
@@ -1306,7 +1306,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();
@@ -1328,7 +1328,7 @@ Item {
 
 
 
-        property var jsEngine: new GlobalJS.JSEngine(root)
+        property var jsLoader: new $GlobalJS.JSLoader(root)
 
 
         //创建的组件缓存

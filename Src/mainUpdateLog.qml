@@ -174,7 +174,7 @@ Item {
 **18、修改：将所有game.$sys.components中的组件对象移动在game.$sys.caches下，将所有fight.$sys.components中的组件对象移动在fight.$sys.caches下，game.$sys.components、fight.$sys.components只作为组件模板来创建组件对象，并改名所有的组件模板名称（去掉comp前缀并大写开头）；
 *19、修改：角色坐标的$x、$y含义改变为中心点放在这个坐标上（影响命令：createhero、hero、createrole、role）；
 *20、修改：角色的其他属性改变的是组件属性，而非data属性；
-*21、修改：将我自己给特定对象定义的一些便捷属性/方法的名字，前面改为 $$ 开头（比如$$type、$$json、$$then、$$catch等），防止和引擎中一些对象的属性冲突；
+*21、修改：将我自己给特定对象定义的一些便捷属性/方法的名字，前面改为 $$ 开头（比如$$type、$$json、$$keys、$$values、$$format、$$replaceAll、$$insert、$$parent、$$then、$$catch、$$toString、$$toJson等），防止和引擎中一些对象的属性冲突；
 **22、修改：将game.over改为game.restart（重启游戏），对应通用脚本需要改变，运行机制也有改变；
 23、修改：将几个异步命令（msg、talk等）返回的Promise，绑定了它自身的$resolve和$reject函数，用来外部控制其状态；
 24、新增：Pymo（AVG游戏引擎）工程兼容插件；
@@ -187,7 +187,11 @@ Item {
 31、修复：talk组件没有销毁的问题；
 32、修复：道具在战斗中$completeScript没有及时调用的Bug；
 33、修复：购买道具时道具没有放入背包的Bug；
-34、其他：优化调整很多代码和细节，修复一些Bugs；
+*34、修改：将原来全局的FrameManager、Platform、UserInfo、GameCore、global对象改名为$Frame、$Platform、$UserInfo、$GameCore、$global（原来的也保留，但推荐用新的）；
+35、修复：将 busyIndicator 放在 overlay 组件下，一定程度上保证了小概率误触导致焦点乱跑（比如 Menu 在点击隐藏动画时一瞬间还可以点击且焦点改变的BUG）；
+36、优化：将几个js作为对象挂在了全局下，可以避免每次导入时创建一次，也避免了一个 QML导入js文件有可能导致此js文件无法访问全局变量的坑；
+37、修改：JSEngine改名为JSLoader；
+38、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；
@@ -296,7 +300,7 @@ Item {
 5、修复：常年来的一个Bug，QML会释放CPP的QObject及子类对象的问题（Qt的坑）；
 6、修复：角色编辑器 中 p按钮播放错误的问题；
 7、修复：角色的动作使用特效（特效为序列图片文件时）的路径错误；
-**8、修改：JSEngine的load和unload函数，将参数文件名和文件路径合并为一个参数；
+**8、修改：JSLoader的load和unload函数，将参数文件名和文件路径合并为一个参数；
 9、修改：控制广告点击频率，增加广告调试参数；
 10、优化：角色的数据结构和一些实现；
 11、修复：如果退出错误时会导致后续工作没有进行（比如恢复旋转屏幕）；
@@ -373,7 +377,7 @@ Item {
 4、修改：将Async改名为AsyncScriptQueue；
 5、新增：重新设计了一套非常好用、类似await async语法和用法的机制，不用放在异步脚本队列里就直接可以运行的异步脚本（asyncScript）；
 6、修改：将 6+1个带yield的命令（msg、talk、menu、input、window、trade、wait）修改为兼容新增加的异步脚本机制，方法为：a、将这6+1个命令的最后一个参数callback设置为0即可；b、或者命令名+1（比如game.msg1），参数与原函数完全相同；
-7、新增：新异步脚本命令：game.async(生成器函数, tips, ...params)或GlobalLibraryJS.asyncScript(生成器函数, tips, ...params)，并增加对应可视化；
+7、新增：新异步脚本命令：game.async(生成器函数, tips, ...params)或$CommonLibJS.asyncScript(生成器函数, tips, ...params)，并增加对应可视化；
 8、修改：game.addtimer支持异步脚本（bGlobal参数改为flags，并兼容老工程）；
 9、修改：调整战斗结束后增加经验代码的顺序为返回地图后；
 10、修改：NPC速度为0，则不走动（以前至少走动1）；
@@ -853,7 +857,7 @@ Item {
 2、修复地图点击移动鬼畜问题；
 3、修复右键单击地图失去焦点问题；
 4、调整代码，将资源相对路径都改为绝对路径（Linux的GStreamer不支持相对路经），适配了openKylin系统（Linux的Debian分支 应该都可以）；
-5、修复部分bugs（包括：JSEngine的文件路径问题导致调试错误；战斗道具的使用等）；
+5、修复部分bugs（包括：JSLoader的文件路径问题导致调试错误；战斗道具的使用等）；
 6、调整战斗选择系统（Filter参数 更自由化） 和 道具可使用多个技能（选择系统为choiceScript或第一个道具的选择系统）；
 
 
@@ -1760,7 +1764,7 @@ Item {
 
 2022/3/23：发布0.2.0版本
 `;
-        msgBox.text = GlobalLibraryJS.convertToHTML(t);
+        msgBox.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainUpdateLog]Component.onCompleted');
     }

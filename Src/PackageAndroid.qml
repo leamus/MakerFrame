@@ -61,7 +61,7 @@ Item {
             Layout.fillWidth: true
 
             Label {
-                text: '*打包文件夹路径:'
+                text: '*打包文件夹路径：'
             }
 
             TextField {
@@ -126,7 +126,7 @@ Item {
             Layout.fillWidth: true
 
             Label {
-                text: '图标:'
+                text: '图标：'
             }
 
             TextField {
@@ -248,7 +248,7 @@ Item {
 
         title: '选择文件夹'
         //folder: shortcuts.home
-        folder: GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath)
+        folder: $GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath)
         //nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
 
         selectMultiple: false
@@ -267,9 +267,9 @@ Item {
             let fUrl;
             if(Qt.platform.os === 'android')
                 //注意：content://com.android.externalstorage.documents/tree转换真实路径时会报错：
-                fUrl = GlobalJS.toPath(Platform.sl_getRealPathFromURI(fileUrl.toString().replace('content://com.android.externalstorage.documents/tree', 'content://com.android.externalstorage.documents/document')));
+                fUrl = $GlobalJS.toPath($Platform.sl_getRealPathFromURI(fileUrl.toString().replace('content://com.android.externalstorage.documents/tree', 'content://com.android.externalstorage.documents/document')));
             else
-                fUrl = GlobalJS.toPath(FrameManager.sl_urlDecode(fileUrl.toString()));
+                fUrl = $GlobalJS.toPath($Frame.sl_urlDecode(fileUrl.toString()));
 
             textPackageDirPath.text = fUrl;
             _private.init();
@@ -322,12 +322,12 @@ Item {
 
             let path;
             if(Qt.platform.os === 'android')
-                path = Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                path = FrameManager.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl);
 
-            textIconPath.text = GlobalJS.toURL(path);
-            imageIcon.source = GlobalJS.toURL(path);
+            textIconPath.text = $GlobalJS.toURL(path);
+            imageIcon.source = $GlobalJS.toURL(path);
         }
 
         onRejected: {
@@ -358,7 +358,7 @@ Item {
             textResult.text = '';
 
 
-            if(!FrameManager.sl_fileExists(_private.strPackageDir + '/AndroidManifest.xml')) {
+            if(!$Frame.sl_fileExists(_private.strPackageDir + '/AndroidManifest.xml')) {
                 textResult.text = '没有找到打包文件夹，请配置后点击“生成”按钮';
                 return false;
             }
@@ -370,10 +370,10 @@ Item {
             let regExp;
             let res;
 
-            imageIcon.source = GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
+            imageIcon.source = $GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
             if(!content) {
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
                 ++error;
@@ -392,7 +392,7 @@ Item {
             textTapClientToken.text = res[1];
 
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content) {
                 textResult.text += '读取 AndroidManifest.xml 失败\r\n';
                 ++error;
@@ -416,7 +416,7 @@ Item {
             textResult.text = '';
 
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
             if(!content)
                 textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
             else {
@@ -430,7 +430,7 @@ Item {
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
                 if(res === 0) {
                     textResult.text += '写入 GameMakerGlobal.qml 成功\r\n';
                 }
@@ -439,7 +439,7 @@ Item {
                 //console.warn(content);
             }
 
-            content = FrameManager.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content)
                 textResult.text += '读取 AndroidManifest.xml 失败\r\n';
             else {
@@ -493,7 +493,7 @@ Item {
                 content = content.replace(regExp, textPackageName.text);
 
 
-                res = FrameManager.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
+                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
                 if(res === 0) {
                     textResult.text += '写入 AndroidManifest.xml 成功\r\n';
                 }
@@ -504,21 +504,21 @@ Item {
 
 
             //复制 icon
-            if(FrameManager.sl_fileExists(GlobalJS.toPath(textIconPath.text))) {
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xhdpi/icon.png', true);
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
-                FrameManager.sl_fileCopy(GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
+            if($Frame.sl_fileExists($GlobalJS.toPath(textIconPath.text))) {
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xhdpi/icon.png', true);
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
+                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
             }
         }
 
         //制作打包环境
         function makePackage() {
-            let path = Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games';
+            let path = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games';
 
-            let zipFiles = FrameManager.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            let zipFiles = $Frame.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
             zipFiles.sort();
             console.debug('[PackageAndroid]makePackage zip files:', zipFiles);
 
@@ -575,22 +575,22 @@ Item {
                 rootWindow.aliasGlobal.showBusyIndicator(true);
 
 
-                GlobalLibraryJS.setTimeout(function() {
+                $CommonLibJS.setTimeout(function() {
                     let ret;
 
                     try {
                         if(packageType === 1) {
-                            FrameManager.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
+                            $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
                         }
                         else if(packageType === 2) {
-                            FrameManager.sl_removeRecursively(strPackageDir);
-                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
-                            ret = FrameManager.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
+                            $Frame.sl_removeRecursively(strPackageDir);
+                            ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
+                            ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
                         }
 
-                        ret = FrameManager.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                        ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
                     } catch(e) {
-                        GlobalLibraryJS.printException(e);
+                        $CommonLibJS.printException(e);
                         return;
                     } finally {
                         rootWindow.aliasGlobal.showBusyIndicator(false);
@@ -617,7 +617,7 @@ Item {
                 //root.forceActiveFocus();
             }
 
-            if(FrameManager.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
+            if($Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
 
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '检测到有旧打包文件夹，Yes（是）：只更新工程；Discard（丢弃）：更新整个打包文件夹<br><font color="red">此操作会删除打包文件夹路径，请确保路径选择正确！</font>',
@@ -681,7 +681,7 @@ Item {
 
     Component.onCompleted: {
         //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-        textPackageDirPath.text = Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+        textPackageDirPath.text = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
         _private.init();
 
         console.debug('[PackageAndroid]Component.onCompleted');

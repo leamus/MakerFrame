@@ -187,7 +187,7 @@ Item {
     6.3、本协议适用中华人民共和国法律。
 
 `
-        msgBox.text = GlobalLibraryJS.convertToHTML(t);
+        msgBox.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainAgreement]Component.onCompleted');
     }

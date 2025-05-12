@@ -44,7 +44,7 @@ Item {
         //如果需要载入（这里其实可以废弃了）
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            tmapInfo = FrameManager.sl_fileRead(GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
+            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
             //console.debug("cfg", cfg, mapPath);
 
             if(!tmapInfo) {
@@ -149,12 +149,12 @@ Item {
 
         for(let tc in itemBackMapContainer.arrCanvas) {
             itemBackMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
-            GlobalLibraryJS.Utils.clearCanvas(itemBackMapContainer.arrCanvas[tc]);
+            $CommonLibJS.Utils.clearCanvas(itemBackMapContainer.arrCanvas[tc]);
             itemBackMapContainer.arrCanvas[tc].requestPaint();
         }
         for(let tc in itemFrontMapContainer.arrCanvas) {
             itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
-            GlobalLibraryJS.Utils.clearCanvas(itemFrontMapContainer.arrCanvas[tc]);
+            $CommonLibJS.Utils.clearCanvas(itemFrontMapContainer.arrCanvas[tc]);
             itemFrontMapContainer.arrCanvas[tc].requestPaint();
         }
 
@@ -319,7 +319,7 @@ Item {
     //最大地图像素数（超过则缩放）
     //32位安卓，70*70绘制一会就飘
     //64位安卓：200*200左右很卡（250*250闪退），100*100：明显卡
-    property int nMapMaxPixelCount: 60*60*32*32 //Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
+    property int nMapMaxPixelCount: 60*60*32*32 //$Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
 
     //地图大小（块）
     property size sizeMapSize
@@ -1001,7 +1001,7 @@ Item {
 
 
     Component.onCompleted: {
-        nMapMaxPixelCount = (Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
+        nMapMaxPixelCount = ($Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
 
         console.debug("[GameMapView]Component.onCompleted");
     }

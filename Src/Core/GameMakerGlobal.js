@@ -70,7 +70,7 @@ var $config = {
             $pressed: function*() {
                 this.scale = 0.9;
 
-                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
                     return null;
@@ -92,7 +92,7 @@ var $config = {
             $pressed: function*() {
                 this.scale = 0.9;
 
-                //if(!GlobalLibraryJS.objectIsEmpty(_private.config.objPauseNames))
+                //if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                 //    return;
                 if(game.pause(null))
                     return null;
@@ -287,13 +287,13 @@ function* $gameInit(newGame) {
     game.gf.$plugins = {};
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
-    if(FrameManager.sl_fileExists(GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'game.js'))) {
-        let gameJS = game.$sys.caches.jsEngine.load(GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'game.js'));
+    if($Frame.sl_fileExists($GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'game.js'))) {
+        let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'game.js'));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
             if(gameJS.$init) {
                 let r = gameJS.$init(newGame);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
                 //game.run(gameJS.$init(newGame) ?? null);
             }
         }
@@ -305,13 +305,13 @@ function* $gameInit(newGame) {
         for(let tp1 in plugins[tp0]) {
             game.gf.$plugins[tp0][tp1] = {};
             let gameJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
-            if(FrameManager.sl_fileExists(GlobalJS.toPath(gameJSPath + GameMakerGlobal.separator + 'game.js'))) {
-                let gameJS = game.$sys.caches.jsEngine.load(GlobalJS.toURL(gameJSPath + GameMakerGlobal.separator + 'game.js'));
+            if($Frame.sl_fileExists($GlobalJS.toPath(gameJSPath + GameMakerGlobal.separator + 'game.js'))) {
+                let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(gameJSPath + GameMakerGlobal.separator + 'game.js'));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
                     if(gameJS.$init) {
                         let r = gameJS.$init(newGame);
-                        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
                         //game.run(gameJS.$init(newGame) ?? null);
                     }
                 }
@@ -360,7 +360,7 @@ function* $gameRelease(gameExit) {
     //调用项目的 game.js 的 $release
     if(game.gf.$release) {
         let r = game.gf.$release(gameExit);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //game.run(game.gf.$release(gameExit) ?? null);
     }
 
@@ -370,7 +370,7 @@ function* $gameRelease(gameExit) {
         for(let tp1 in game.gf.$plugins[tp0]) {
             if(game.gf.$plugins[tp0][tp1].$release) {
                 let r = game.gf.$plugins[tp0][tp1].$release(gameExit);
-                if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+                if($CommonLibJS.isGenerator(r))r = yield* r;
                 //game.run(game.gf.$plugins[tp0][tp1].$release(gameExit) ?? null);
             }
         }
@@ -410,7 +410,7 @@ function* $afterLoad() {
 
 //打开地图前调用
 function* $beforeLoadmap(mapName, userData) {
-    /*if(GlobalLibraryJS.isArray(game.gd['$sys_before_loadmap'])) {
+    /*if($CommonLibJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
     }
@@ -422,7 +422,7 @@ function* $beforeLoadmap(mapName, userData) {
 
 //打开地图后调用
 function* $afterLoadmap(mapName, userData) {
-    /*if(GlobalLibraryJS.isArray(game.gd['$sys_after_loadmap'])) {
+    /*if($CommonLibJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
     }
@@ -437,7 +437,7 @@ function* $useScript(goods, combatant, params) {
     if(combatant === undefined || combatant === null)
         combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
 
-    if(GlobalLibraryJS.checkCallable(params)) {
+    if($CommonLibJS.checkCallable(params)) {
         //game.addprops(combatant, {HP: [10, 5]});
         //yield game.msg('...', 50);
         //console.debug(goods.$rid, combatant);
@@ -445,7 +445,7 @@ function* $useScript(goods, combatant, params) {
         //yield* eval(`(function*(){${params}})()`);
 
         let r = params.call(goods, goods, combatant, params);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
     }
 
     //如果道具在背包中
@@ -675,7 +675,7 @@ function $Combatant(fightRoleRID, showName) {
 
 
     //战斗属性+道具属性（动态计算），不会存档
-    this.$$propertiesWithExtra = GlobalLibraryJS.deepCopyObject(properties);
+    this.$$propertiesWithExtra = $CommonLibJS.deepCopyObject(properties);
 
 
     //战斗属性，不会保存
@@ -742,13 +742,13 @@ const mappingCombatantProperty = {
 
 function 属性(p, n=0) {
     let ret;
-    if(GlobalLibraryJS.isValidNumber(n, 0b1)) {
+    if($CommonLibJS.isValidNumber(n, 0b1)) {
         n = Number(n);
-        if(GlobalLibraryJS.isString(mappingCombatantProperty[p])) {
+        if($CommonLibJS.isString(mappingCombatantProperty[p])) {
             this.$properties[mappingCombatantProperty[p]] += n;
             ret = this.$properties[mappingCombatantProperty[p]];
         }
-        else if(GlobalLibraryJS.isArray(mappingCombatantProperty[p])) {
+        else if($CommonLibJS.isArray(mappingCombatantProperty[p])) {
             this.$properties[mappingCombatantProperty[p][0]][mappingCombatantProperty[p][1]] += n;
             ret = this.$properties[mappingCombatantProperty[p][0]][mappingCombatantProperty[p][1]];
         }
@@ -758,13 +758,13 @@ function 属性(p, n=0) {
 
 function 附加属性(p, n=0) {
     let ret;
-    if(GlobalLibraryJS.isValidNumber(n, 0b1)) {
+    if($CommonLibJS.isValidNumber(n, 0b1)) {
         n = Number(n);
-        if(GlobalLibraryJS.isString(mappingCombatantProperty[p])) {
+        if($CommonLibJS.isString(mappingCombatantProperty[p])) {
             this.$$propertiesWithExtra[mappingCombatantProperty[p]] += n;
             ret = this.$$propertiesWithExtra[mappingCombatantProperty[p]];
         }
-        else if(GlobalLibraryJS.isArray(mappingCombatantProperty[p])) {
+        else if($CommonLibJS.isArray(mappingCombatantProperty[p])) {
             this.$$propertiesWithExtra[mappingCombatantProperty[p][0]][mappingCombatantProperty[p][1]] += n;
             ret = this.$$propertiesWithExtra[mappingCombatantProperty[p][0]][mappingCombatantProperty[p][1]];
         }
@@ -782,7 +782,7 @@ function $combatantInfo(combatant) {
     let tinfo = '';
     for(let tp in mappingCombatantProperty) {
         //多段值
-        if(GlobalLibraryJS.isArray(mappingCombatantProperty[tp])) {
+        if($CommonLibJS.isArray(mappingCombatantProperty[tp])) {
             tinfo += (tp + ':' + combatant.$$propertiesWithExtra[mappingCombatantProperty[tp][0]][mappingCombatantProperty[tp][1]] + ' ');
         }
         //单值
@@ -806,9 +806,9 @@ function $showGoodsName(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
+        //let goodsPath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
 
-        //GlobalLibraryJS.showRichTextImage();
+        //$CommonLibJS.showRichTextImage();
         tstr = ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(goodsPath + goods.$rid + GameMakerGlobal.separator + goods.$image).
             arg(GameMakerGlobal.imageResourceURL(goods.$image)).
@@ -839,7 +839,7 @@ function $showGoodsName(goods, flags=null) {
     tstr = '';
 
     if(flags['Price'] !== undefined) {
-        if(GlobalLibraryJS.isArray(goods.$price))
+        if($CommonLibJS.isArray(goods.$price))
             tstr = ' ￥' + goods.$price[flags['Price']];
         else
             tstr = ' ￥?';
@@ -855,13 +855,13 @@ function $showGoodsName(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 function $showCombatantName(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+    //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
 
     if(flags['avatar'] && combatant.$avatar) {
-        //GlobalLibraryJS.showRichTextImage();
+        //$CommonLibJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
             //arg(fightRolePath + combatant.$rid + GameMakerGlobal.separator + combatant.$avatar).
             arg(GameMakerGlobal.imageResourceURL(combatant.$avatar)).
@@ -912,7 +912,7 @@ function levelUp(combatant, level=0, refresh=true) {
 
     if(!levelupscript) {
         try {
-            levelupscript = JSLevelChain.commonLevelUpScript;
+            levelupscript = LevelChainJS.commonLevelUpScript;
         }
         catch(e) {
             levelupscript = commonLevelUpScript;
@@ -921,7 +921,7 @@ function levelUp(combatant, level=0, refresh=true) {
 
     if(!levelalgorithm) {
         try {
-            levelalgorithm = JSLevelChain.commonLevelAlgorithm;
+            levelalgorithm = LevelChainJS.commonLevelAlgorithm;
         }
         catch(e) {
             levelalgorithm = commonLevelAlgorithm;
@@ -961,7 +961,7 @@ function levelUp(combatant, level=0, refresh=true) {
 //$equipEffectAlgorithm为某道具装备脚本
 function computeCombatantPropertiesWithExtra(combatant) {
     //累加装备、Buff后的属性
-    combatant.$$propertiesWithExtra = GlobalLibraryJS.deepCopyObject(combatant.$properties);
+    combatant.$$propertiesWithExtra = $CommonLibJS.deepCopyObject(combatant.$properties);
 
     //行走速度改变示例代码1/3
     let 行走速度 = 0;
@@ -1037,7 +1037,7 @@ function $combatantIsValid(combatant) {
 
 //通用逃跑算法（目前是整体逃跑，所以 index为 -1）
 function $commonRunAwayAlgorithm(team, index) {
-    return GlobalLibraryJS.randTarget(1,2);
+    return $CommonLibJS.randTarget(1,2);
 }
 
 
@@ -1046,7 +1046,7 @@ function $commonRunAwayAlgorithm(team, index) {
 //返回null表示战斗回合结束
 function* $fightRolesRound(round) {
     //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
-    //yield* GameMakerGlobalJS.fightRolesRound1(round, '$speed');
+    //yield* $GameMakerGlobalJS.fightRolesRound1(round, '$speed');
 
 
     //所有的战斗人物
@@ -1097,7 +1097,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //伤害
     let harm, t;
 
-    if(GlobalLibraryJS.randTarget(combatant2Props.luck / 5 + combatant2Props.speed / 5)) {  //miss各占%20
+    if($CommonLibJS.randTarget(combatant2Props.luck / 5 + combatant2Props.speed / 5)) {  //miss各占%20
         return [{'HP': [0, 0], Target: targetCombatant}];
     }
 
@@ -1106,21 +1106,21 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
 
 
     t = combatant1Props.attack;
-    t = t * GlobalLibraryJS.random(combatant1Props.power, combatant1Props.power*2) / 1000; //灵力1~2倍 //攻击+灵力效果
+    t = t * $CommonLibJS.random(combatant1Props.power, combatant1Props.power*2) / 1000; //灵力1~2倍 //攻击+灵力效果
     harm = harm + t;
     t = combatant1Props.attack;
-    t = t * GlobalLibraryJS.random(10, combatant1Props.luck/10+1) / 1000 ; //吉运效果 千分之一到十分之一
+    t = t * $CommonLibJS.random(10, combatant1Props.luck/10+1) / 1000 ; //吉运效果 千分之一到十分之一
     harm = harm + t;
     t = combatant2Props.defense;
-    t = t * GlobalLibraryJS.random(combatant2Props.power/2, combatant2Props.power) / 1000; //防御+灵力效果
+    t = t * $CommonLibJS.random(combatant2Props.power/2, combatant2Props.power) / 1000; //防御+灵力效果
     harm = harm - t;
     t = combatant2Props.defense;
-    t = t * GlobalLibraryJS.random(10, combatant2Props.luck/10+1) / 1000; //吉运效果
+    t = t * $CommonLibJS.random(10, combatant2Props.luck/10+1) / 1000; //吉运效果
     harm = harm - t;
 
 
     harm = Math.floor(harm);
-    if(harm <= 0)harm = GlobalLibraryJS.random(0, 10);
+    if(harm <= 0)harm = $CommonLibJS.random(0, 10);
 
     //targetCombatant.$properties.healthHP -= Math.floor(harm / 4);
     //targetCombatant.$properties.remainHP -= harm;
@@ -1225,11 +1225,11 @@ function $fightRoleChoiceSkillsOrGoodsAlgorithm(combatant) {
 
         //如果被封
         if(buffFlags & 0b0010)
-            return GlobalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0])[1]);
+            return $CommonLibJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0])[1]);
 
 
         //返回打乱后的所有技能
-        useSkillsOrGoods = GlobalLibraryJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0, 1])[1]);
+        useSkillsOrGoods = $CommonLibJS.disorderArray(fight.$sys.getCombatantSkills(combatant, [0, 1])[1]);
 
 
         //普通攻击或技能或道具（敌人被乱？？？）；鹰：感觉这句没用，像是如果选择了按上次的选择来
@@ -1264,7 +1264,7 @@ function getBuff(combatant, buffCode, params={}) {
     switch(buffCode) {
     //毒
     case 1:
-        if(!GlobalLibraryJS.isString(params.BuffName))
+        if(!$CommonLibJS.isString(params.BuffName))
             params.BuffName = '$$Poison';
         buffNameKey = params.BuffName;
         if(!override)
@@ -1302,7 +1302,7 @@ function getBuff(combatant, buffCode, params={}) {
 
     //乱
     case 2:
-        if(!GlobalLibraryJS.isString(params.BuffName))
+        if(!$CommonLibJS.isString(params.BuffName))
             params.BuffName = '$$Confusion';
         buffNameKey = params.BuffName;
         if(!override)
@@ -1332,7 +1332,7 @@ function getBuff(combatant, buffCode, params={}) {
 
     //封
     case 3:
-        if(!GlobalLibraryJS.isString(params.BuffName))
+        if(!$CommonLibJS.isString(params.BuffName))
             params.BuffName = '$$Sealing';
         buffNameKey = params.BuffName;
         if(!override)
@@ -1361,7 +1361,7 @@ function getBuff(combatant, buffCode, params={}) {
 
     //眠
     case 4:
-        if(!GlobalLibraryJS.isString(params.BuffName))
+        if(!$CommonLibJS.isString(params.BuffName))
             params.BuffName = '$$Sleep';
         buffNameKey = params.BuffName;
         if(!override)
@@ -1389,7 +1389,7 @@ function getBuff(combatant, buffCode, params={}) {
     //属性
     case 5:
     default:
-        if(!GlobalLibraryJS.isString(params.BuffName))
+        if(!$CommonLibJS.isString(params.BuffName))
             params.BuffName = '$$Properties';
         buffNameKey = params.BuffName;
         if(!override)
@@ -1647,16 +1647,16 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
     //如果选择的是道具
     if(choiceType === 2) {
         //如果都有定义
-        if(GlobalLibraryJS.isObject(goods.$fightScript) && goods.$fightScript.$check !== undefined) {
-            if(GlobalLibraryJS.isFunction(goods.$fightScript.$check)) {
+        if($CommonLibJS.isObject(goods.$fightScript) && goods.$fightScript.$check !== undefined) {
+            if($CommonLibJS.isFunction(goods.$fightScript.$check)) {
                 return goods.$fightScript.$check(goods, combatant, stage);
             }
             else
                 return goods.$fightScript.$check;
         }
         //!!兼容旧代码
-        else if(GlobalLibraryJS.isArray(goods.$fightScript) && goods.$fightScript[1] !== undefined) {
-            if(GlobalLibraryJS.isFunction(goods.$fightScript[1])) {
+        else if($CommonLibJS.isArray(goods.$fightScript) && goods.$fightScript[1] !== undefined) {
+            if($CommonLibJS.isFunction(goods.$fightScript[1])) {
                 return goods.$fightScript[1](goods, combatant, stage);
             }
             else
@@ -1671,7 +1671,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
     }
     //如果选择的是技能
     if(useSkillCheck || choiceType === 3) {
-        if(GlobalLibraryJS.isFunction(fightSkill.$check)) {
+        if($CommonLibJS.isFunction(fightSkill.$check)) {
             return fightSkill.$check(fightSkill, combatant, stage);
         }
         else
@@ -1723,14 +1723,14 @@ function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesCom
             if(enemies[ti].$goods) {
                 for(let goods of enemies[ti].$goods) {
                     /*let g;
-                    if(GlobalLibraryJS.isObject(teq)) { //如果直接是对象
+                    if($CommonLibJS.isObject(teq)) { //如果直接是对象
                         g = {$rid: teq.RID};
-                        GlobalLibraryJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq.RID).$properties);
-                        GlobalLibraryJS.copyPropertiesToObject(g, teq);
+                        $CommonLibJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq.RID).$properties);
+                        $CommonLibJS.copyPropertiesToObject(g, teq);
                     }
-                    else if(GlobalLibraryJS.isString(teq)) { //
+                    else if($CommonLibJS.isString(teq)) { //
                         g = {$rid: teq};
-                        GlobalLibraryJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq).$properties);
+                        $CommonLibJS.copyPropertiesToObject(g, game.$sys.getGoodsResource(teq).$properties);
                     }*/
                     totalGoods.push(goods);
                 }
@@ -1769,7 +1769,7 @@ function* $commonFightInitScript(teams, fightData) {
 
     if(fightData.$music === true) {
     }
-    else if(GlobalLibraryJS.isString(fightData.$music)) {
+    else if($CommonLibJS.isString(fightData.$music)) {
         game.pushmusic();
         game.playmusic(fightData.$music);
     }
@@ -1827,14 +1827,14 @@ function* $commonFightInitScript(teams, fightData) {
     let fightInitScript = fightData.$commons.$fightInitScript/* || fightData.$commons.FightInitScript*/;
     if(fightInitScript) {
         let r = fightInitScript.call(fightData, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightInitScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight init2'});
     }
 
     //if('FightInitScript' in fightData)
     if(Object.keys(fightData).indexOf('FightInitScript') >= 0) {
         let r = fightData.FightInitScript.call(fightData, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightData.FightInitScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight init3'});
     }
 
@@ -1855,7 +1855,7 @@ function* $commonFightStartScript(teams, fightData) {
     let fightStartScript = fightData.$commons.$fightStartScript/* || fightData.$commons.FightStartScript*/;
     if(fightStartScript) {
         let r = fightStartScript.call(fightData, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightStartScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight start2'});
     }
 
@@ -1863,7 +1863,7 @@ function* $commonFightStartScript(teams, fightData) {
     //if('FightStartScript' in fightData)
     if(Object.keys(fightData).indexOf('FightStartScript') >= 0) {
         let r = fightData.FightStartScript.call(fightData, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightData.FightStartScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight start3'});
     }
 
@@ -1883,7 +1883,7 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
     let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript* /;
     if(fightRoundScript) {
         let r = fightRoundScript.call(fightData, round, step, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round2:' + step});
     }
 
@@ -1891,7 +1891,7 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
     //if('FightRoundScript' in fightData)
     if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
         let r = fightData.FightRoundScript.call(fightData, round, step, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightData.FightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round3:' + step});
     }
     */
@@ -1906,7 +1906,7 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
         if(fight.$sys.autoAttack() === 1) {
             //自动重复上次类型，也可以根据需要改写
             fight.$sys.loadLast();
-            /*GlobalLibraryJS.runNextEventLoop(function() {
+            /*$CommonLibJS.runNextEventLoop(function() {
                     fight.$sys.continueFight();
                 },
             );*/
@@ -1926,7 +1926,7 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
     let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript*/;
     if(fightRoundScript) {
         let r = fightRoundScript.call(fightData, round, step, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round2:' + step});
     }
 
@@ -1934,7 +1934,7 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
     //if('FightRoundScript' in fightData)
     if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
         let r = fightData.FightRoundScript.call(fightData, round, step, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightData.FightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round3:' + step});
     }
 
@@ -1956,7 +1956,7 @@ function* $commonFightEndScript(res, teams, fightData) {
     let fightEndScript = fightData.$commons.$fightEndScript/* || fightData.$commons.FightEndScript*/;
     if(fightEndScript) {
         let r = fightEndScript.call(fightData, res, 0, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightEndScript.call(fightData, res, 0, teams, fightData) ?? null, {Priority: -2, Tips: 'fight end20'});
     }
 
@@ -1964,7 +1964,7 @@ function* $commonFightEndScript(res, teams, fightData) {
     //if('FightEndScript' in fightData)
     if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
         let r = fightData.FightEndScript.call(fightData, res, 0, teams, fightData);
-        if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+        if($CommonLibJS.isGenerator(r))r = yield* r;
         //yield fight.run(fightData.FightEndScript.call(fightData, res, 0, teams, fightData) ?? null, {Priority: -2, Tips: 'fight end30'});
     }
 
@@ -1984,10 +1984,10 @@ function* $commonFightEndScript(res, teams, fightData) {
 
 
     if(res.result === 1) {
-        yield fight.msg('战斗胜利<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
+        yield fight.msg('战斗胜利<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
     }
     else if(res.result === -1) {
-        yield fight.msg('战斗失败<BR>获得  %1经验，%2金钱'.arg(res.exp).arg(res.money));
+        yield fight.msg('战斗失败<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
     }
     if(bGetGoods)
         yield fight.msg(msgGoods);
@@ -1995,7 +1995,7 @@ function* $commonFightEndScript(res, teams, fightData) {
 
     if(fightData.$music === true) {
     }
-    else if(GlobalLibraryJS.isString(fightData.$music)) {
+    else if($CommonLibJS.isString(fightData.$music)) {
         game.popmusic();
     }
     else {
@@ -2012,7 +2012,7 @@ function* $commonFightEndScript(res, teams, fightData) {
         //战斗结束脚本2
         if(fightEndScript) {
             let r = fightEndScript.call(fightData, res, 1, teams, fightData);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             //game.run(fightEndScript.bind(fightData), {Tips: 'fight end21'}, res, 1, teams, fightData);
         }
 
@@ -2020,7 +2020,7 @@ function* $commonFightEndScript(res, teams, fightData) {
         //if('FightEndScript' in fightData)
         if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
             let r = fightData.FightEndScript.call(fightData, res, 1, teams, fightData);
-            if(GlobalLibraryJS.isGenerator(r))r = yield* r;
+            if($CommonLibJS.isGenerator(r))r = yield* r;
             //game.run(fightData.FightEndScript.bind(fightData), {Tips: 'fight end31'}, res, 1, teams, fightData);
         }
 
@@ -2299,11 +2299,11 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
             //如果有这个属性
             if(tKeys.indexOf(tp) >= 0) {
                 //如果 战斗人物属性 是数组值（多段类型：{HP: [。。。]}）
-                if(GlobalLibraryJS.isArray(props[tp])) {
+                if($CommonLibJS.isArray(props[tp])) {
                     //循环数组
                     for(let tti = props[tp].length; tti > 0; --tti) {
                         //如果增加的属性值是 数字，则每段都加（这个分支不会产生值越界）
-                        if(GlobalLibraryJS.isValidNumber(tincrementValue)) {
+                        if($CommonLibJS.isValidNumber(tincrementValue)) {
                             //根据type来赋值
                             if(type === 1)
                                 props[tp][tti - 1] = parseInt(props[tp][tti - 1] + tincrementValue);
@@ -2323,7 +2323,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                             }
                         }
                         //如果增加的属性值是 数组，且此下标值是数字（有可能产生值越界）
-                        else if(GlobalLibraryJS.isValidNumber(tincrementValue[tti - 1])) {
+                        else if($CommonLibJS.isValidNumber(tincrementValue[tti - 1])) {
                             //差值（这里保存差值是因为 下面会进行 越界调整使用，得调整propertiesWithExtra为正确值）
                             let dlta = propertiesWithExtra[tp][tti - 1] - props[tp][tti - 1];
 
@@ -2354,7 +2354,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 
                             //如果前面的大于后面的，则调整
                             if(tti < props[tp].length) {
-                            //if(GlobalLibraryJS.isValidNumber(props[tp][tti])) {
+                            //if($CommonLibJS.isValidNumber(props[tp][tti])) {
                                 if(propertiesWithExtra[tp][tti - 1] > propertiesWithExtra[tp][tti]) {
                                     let v1 = propertiesWithExtra[tp][tti] - dlta;
                                     if(v1 >= props[tp][tti]) {
@@ -2389,7 +2389,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                 }
                 //属性非多段
                 //如果属性是数字（{HP: 。。。}，且增加的属性也是数字
-                else if(GlobalLibraryJS.isValidNumber(tincrementValue)) {
+                else if($CommonLibJS.isValidNumber(tincrementValue)) {
 
                     //根据type来赋值
                     if(type === 1)
@@ -2434,7 +2434,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                 }
 
                 //形式2：value为数组，则 [值,属性,段]
-                else if(GlobalLibraryJS.isArray(tincrementValue)) {
+                else if($CommonLibJS.isArray(tincrementValue)) {
                     //直接乘
                     if(tincrementValue[0] !== undefined) {
                         tincrementValue[0] = tincrementValue[0].trim();
@@ -2457,7 +2457,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
                 }
 
                 //直接乘
-                else if(GlobalLibraryJS.isValidNumber(tincrementValue))
+                else if($CommonLibJS.isValidNumber(tincrementValue))
                     props[tp[0]][tp[1]] = parseInt(propertiesWithExtra[tp[0]][tp[1]] * tincrementValue);
 
                 propertiesWithExtra[tp[0]][tp[1]] = props[tp[0]][tp[1]] + dlta;
@@ -2473,7 +2473,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 
             //如果前面的大于后面的，则调整
             if(tp[1] < props[tp[0]].length - 1) {
-            //if(GlobalLibraryJS.isValidNumber(props[tp[0]][tp[1] + 1])) {
+            //if($CommonLibJS.isValidNumber(props[tp[0]][tp[1] + 1])) {
                 if(propertiesWithExtra[tp[0]][tp[1]] > propertiesWithExtra[tp[0]][tp[1] + 1]) {
                     let v1 = propertiesWithExtra[tp[0]][tp[1] + 1] - dlta;
                     if(v1 >= props[tp[0]][tp[1] + 1]) {
@@ -2509,7 +2509,7 @@ function addProps(props, incrementProps, type=1, propertiesWithExtra=undefined) 
 //计算行走路径
 function computePath(blockPos, targetBlockPos) {
 
-    const aPlus = GlobalLibraryJS.APlus.create({
+    const aPlus = $CommonLibJS.APlus.create({
         screenSize: [game.d['$sys_map'].$columns, game.d['$sys_map'].$rows],
         obstacles: game.d['$sys_map'].$obstacles,
         // true使用穷举法。默认为false贪心算法不一定是最优解。
@@ -2700,11 +2700,11 @@ function combatantChoiceSkillOrGoods(combatant) {
 
         //检测技能 或 道具是否可以使用（我方和敌方人物刚选择技能时判断）
         let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(choiceSkillOrGoods, combatant, 10);
-        if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
+        if($CommonLibJS.isString(checkSkill)) {   //如果不可用
             //fight.msg(checkSkill || '不能使用', 50);
             continue;
         }
-        else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
+        else if($CommonLibJS.isArray(checkSkill)) {   //如果不可用
             //fight.msg(...checkSkill);
             continue;
         }
@@ -2729,18 +2729,18 @@ function combatantChoiceSkillOrGoods(combatant) {
         //道具
         else if(combatant.$$fightData.$choice.$type === 2) {
             let goods = combatant.$$fightData.$choice.$attack;
-            if(GlobalLibraryJS.isArray(goods.$fight))
+            if($CommonLibJS.isArray(goods.$fight))
                 skill = goods.$fight[0];
             //有一种情况为空：道具没有对应技能（$fight[0]），只运行收尾代码（$fightScript[3]）；
             //if(!skill)
             //    skill = {$targetCount: 0, $targetFlag: 0};
 
             //如果有 $fightScript 和 $choiceScript
-            if(GlobalLibraryJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
+            if($CommonLibJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
                 genFightChoice = goods.$commons.$fightScript.$choiceScript.call(goods, goods, combatant);
             }
             //!!兼容旧代码
-            else if(GlobalLibraryJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
+            else if($CommonLibJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
                 genFightChoice = goods.$commons.$fightScript[0].call(goods, goods, combatant);
             }
             //使用技能的
@@ -2754,12 +2754,12 @@ function combatantChoiceSkillOrGoods(combatant) {
         //如果没有特定定义的 $choiceScript选择脚本，则使用系统的
         if(!genFightChoice) {
             //单人技能 且 目标敌方
-            if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
+            if((skill.$targetCount > 0 || $CommonLibJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b10)) {
                 genFightChoice = gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b10, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             }
 
             //目标己方
-            else if((skill.$targetCount > 0 || GlobalLibraryJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
+            else if((skill.$targetCount > 0 || $CommonLibJS.isArray(skill.$targetCount)) && (skill.$targetFlag & 0b1)) {
                 genFightChoice = gfChoiceSingleCombatantSkill(skill, combatant, {TeamFlags: 0b1, Filter: function(targetCombatant, combatant){if(targetCombatant.$$fightData.$info.$index >= 0 && targetCombatant.$$propertiesWithExtra.HP[0] > 0)return true;return false;}});
             }
 
@@ -2788,11 +2788,11 @@ function combatantChoiceSkillOrGoods(combatant) {
 
                 //检测技能 或 道具是否可以使用（我方和敌方人物选择技能的步骤完毕时判断）
                 let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(choiceSkillOrGoods, combatant, 11);
-                if(GlobalLibraryJS.isString(checkSkill)) {   //如果不可用
+                if($CommonLibJS.isString(checkSkill)) {   //如果不可用
                     //fight.msg(checkSkill || '不能使用', 50);
                     break;
                 }
-                else if(GlobalLibraryJS.isArray(checkSkill)) {   //如果不可用
+                else if($CommonLibJS.isArray(checkSkill)) {   //如果不可用
                     //fight.msg(...checkSkill);
                     break;
                 }
@@ -2850,10 +2850,10 @@ function combatantChoiceSkillOrGoods(combatant) {
 
 
     //单人，对方
-    if((choiceSkillOrGoods.$targetCount > 0 || GlobalLibraryJS.isArray(choiceSkillOrGoods.$targetCount)) && (choiceSkillOrGoods.$targetFlag & 0b10)) {
+    if((choiceSkillOrGoods.$targetCount > 0 || $CommonLibJS.isArray(choiceSkillOrGoods.$targetCount)) && (choiceSkillOrGoods.$targetFlag & 0b10)) {
 
         //如果角色选择了目标，且目标还活着（否则随机选）
-        if(GlobalLibraryJS.isArray(combatant.$$fightData.$choice.$targets)) {
+        if($CommonLibJS.isArray(combatant.$$fightData.$choice.$targets)) {
             if(combatant.$$fightData.$choice.$targets[0].$$propertiesWithExtra.HP[0] <= 0) {
                 combatant.$$fightData.$choice.$targets = undefined;
             }
@@ -2871,9 +2871,9 @@ function combatantChoiceSkillOrGoods(combatant) {
                     tarrAlive.push(tc);
             }
             //随机选择对方
-            //combatant.$$fightData.defenseProp = combatant.$$fightData.attackProp = GlobalLibraryJS.random(0, 5);
+            //combatant.$$fightData.defenseProp = combatant.$$fightData.attackProp = $CommonLibJS.random(0, 5);
 
-            combatant.$$fightData.$choice.$targets = [tarrAlive[GlobalLibraryJS.random(0, tarrAlive.length)]];
+            combatant.$$fightData.$choice.$targets = [tarrAlive[$CommonLibJS.random(0, tarrAlive.length)]];
             //console.debug('t1', t, JSON.stringify(team2));
 
             //roleSpriteEffect2 = repeaterSpriteEffect2.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
@@ -2883,10 +2883,10 @@ function combatantChoiceSkillOrGoods(combatant) {
     }
 
     //单人，己方
-    if((choiceSkillOrGoods.$targetCount > 0 || GlobalLibraryJS.isArray(choiceSkillOrGoods.$targetCount)) > 0 && (choiceSkillOrGoods.$targetFlag & 0b1)) {
+    if((choiceSkillOrGoods.$targetCount > 0 || $CommonLibJS.isArray(choiceSkillOrGoods.$targetCount)) > 0 && (choiceSkillOrGoods.$targetFlag & 0b1)) {
 
         //如果角色选择了目标（可以选择死亡角色）（否则随机选）
-        if(GlobalLibraryJS.isArray(combatant.$$fightData.$choice.$targets)) {
+        if($CommonLibJS.isArray(combatant.$$fightData.$choice.$targets)) {
             if(combatant.$$fightData.$choice.$targets[0].$$propertiesWithExtra.HP[0] <= 0) {
                 //combatant.$$fightData.$choice.$targets = undefined;
             }
@@ -2902,9 +2902,9 @@ function combatantChoiceSkillOrGoods(combatant) {
                     tarrAlive.push(tc);
             }
             //随机选择对方
-            //combatant.$$fightData.$info.defenseProp = combatant.$$fightData.$info.attackProp = GlobalLibraryJS.random(0, 5);
+            //combatant.$$fightData.$info.defenseProp = combatant.$$fightData.$info.attackProp = $CommonLibJS.random(0, 5);
 
-            combatant.$$fightData.$choice.$targets = [tarrAlive[GlobalLibraryJS.random(0, tarrAlive.length)]];
+            combatant.$$fightData.$choice.$targets = [tarrAlive[$CommonLibJS.random(0, tarrAlive.length)]];
             //console.debug('t1', t, JSON.stringify(team2));
 
             //roleSpriteEffect2 = repeaterSpriteEffect1.itemAt(combatant.$$fightData.$choice.$targets[0].$$fightData.$info.$index);
@@ -2954,12 +2954,12 @@ function skillStepCanSelecting(params, combatant) {
                 }
             }
 
-            selecting = GlobalLibraryJS.disorderArray(selecting);
+            selecting = $CommonLibJS.disorderArray(selecting);
 
             //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
             if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
-                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
-                GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets[params.Step])
+                $CommonLibJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
+                $CommonLibJS.isArray(combatant.$$fightData.$lastChoice.$targets[params.Step])
                 ) {
                 //selecting.push(...combatant.$$fightData.$lastChoice.$targets);
 
@@ -2988,8 +2988,8 @@ function skillStepCanSelecting(params, combatant) {
 
         //如果是我方且已经有目标，则压入备选（注意要使用$lastChoice,因为$choice会被 再次运行的技能步骤生成器 重新赋值）
         if(//combatant.$$fightData.$info.$teamsID[0] === 0 &&
-            GlobalLibraryJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
-            GlobalLibraryJS.isValidNumber(combatant.$$fightData.$lastChoice.$targets[params.Step])
+            $CommonLibJS.isArray(combatant.$$fightData.$lastChoice.$targets) &&
+            $CommonLibJS.isValidNumber(combatant.$$fightData.$lastChoice.$targets[params.Step])
             ) {
             selecting.push(combatant.$$fightData.$lastChoice.$targets[params.Step]);
         }
@@ -3030,14 +3030,14 @@ function getCombatantSkills(combatant, types=[0, 1], flags=0b11) {
             if(/*tWeapon && */tWeapon.$skills && tWeapon.$skills.length > 0)
                 for(let skill of tWeapon.$skills) {
                     /*let skill;
-                    if(GlobalLibraryJS.isString(tskill)) {
+                    if($CommonLibJS.isString(tskill)) {
                         skill = {$rid: tskill};
-                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill).$properties);
+                        $CommonLibJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill).$properties);
                     }
                     else {
                         skill = {$rid: tskill.RID};
-                        GlobalLibraryJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill.RID).$properties);
-                        GlobalLibraryJS.copyPropertiesToObject(skill, tskill);
+                        $CommonLibJS.copyPropertiesToObject(skill, game.$sys.getSkillResource(tskill.RID).$properties);
+                        $CommonLibJS.copyPropertiesToObject(skill, tskill);
                     }*/
 
                     if(types.indexOf(skill.$type) >= 0) {
@@ -3243,7 +3243,7 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     //伤害
     let harm, t;
 
-    if(GlobalLibraryJS.randTarget(role2.luck / 5 + role2.speed / 5)) //miss各占%20
+    if($CommonLibJS.randTarget(role2.luck / 5 + role2.speed / 5)) //miss各占%20
     {
         return [{property: 'remainHP', value: 0, target: team2[roleIndex2]}];
     }
@@ -3268,20 +3268,20 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     {
         if(role1.$$fightData.attackProp === 2)  //雷属性
         {
-            harm = t * GlobalLibraryJS.random(attackPropValue + 1,attackPropValue * 4 + 1) / 100 + t;  //max <5倍
+            harm = t * $CommonLibJS.random(attackPropValue + 1,attackPropValue * 4 + 1) / 100 + t;  //max <5倍
         }
         else   //其他属性
         {
-            harm = t * GlobalLibraryJS.random(attackPropValue + 1,attackPropValue * 2 + 1) / 100 + t;  //属性效果 <3倍
+            harm = t * $CommonLibJS.random(attackPropValue + 1,attackPropValue * 2 + 1) / 100 + t;  //属性效果 <3倍
         }
     }
     else if(PropFlag === -1) //失败
     {
-        harm = t - t * GlobalLibraryJS.random((100 - attackPropValue) * 2,(100 - attackPropValue) * 5) / 500;  //属性效果 减小
+        harm = t - t * $CommonLibJS.random((100 - attackPropValue) * 2,(100 - attackPropValue) * 5) / 500;  //属性效果 减小
     }
     else
         if(role1.$$fightData.attackProp === 2) //雷,且无作用
-            harm = t * GlobalLibraryJS.random(attackPropValue / 2,attackPropValue + 1) /100 + t;  //max <5倍
+            harm = t * $CommonLibJS.random(attackPropValue / 2,attackPropValue + 1) /100 + t;  //max <5倍
 
 
     //计算防御
@@ -3289,26 +3289,26 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     t = role2.defense;
     if(role2.$$fightData.bufferProps.defenceDown !== 0) //对方中火
     {
-        t = t * GlobalLibraryJS.random(2, 50) / 100;
+        t = t * $CommonLibJS.random(2, 50) / 100;
     }
 
     harm = harm - t;  //攻击-防御
     t = role1.attack;
-    t = t * GlobalLibraryJS.random(role1.power, role1.power*2) /10000; //灵力1~2倍 //攻击+灵力效果
+    t = t * $CommonLibJS.random(role1.power, role1.power*2) /10000; //灵力1~2倍 //攻击+灵力效果
     harm = harm + t;
     t = role1.attack;
-    t = t * GlobalLibraryJS.random(10,role1.luck / 10+1) /10000 ; //吉运效果 千分之一到十分之一
+    t = t * $CommonLibJS.random(10,role1.luck / 10+1) /10000 ; //吉运效果 千分之一到十分之一
     harm = harm + t;
     t = role2.defense;
-    t = t * GlobalLibraryJS.random(role2.power / 2,role2.power) /10000; //防御+灵力效果
+    t = t * $CommonLibJS.random(role2.power / 2,role2.power) /10000; //防御+灵力效果
     harm = harm - t;
     t = role2.defense;
-    t = t * GlobalLibraryJS.random(10,role2.luck / 10+1) /10000; //吉运效果
+    t = t * $CommonLibJS.random(10,role2.luck / 10+1) /10000; //吉运效果
     harm = harm - t;
 
 
     harm = Math.floor(harm)
-    if(harm <= 0)harm = GlobalLibraryJS.random(0, 10);
+    if(harm <= 0)harm = $CommonLibJS.random(0, 10);
 
     role2.remainHP -= harm;
 

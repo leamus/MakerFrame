@@ -178,7 +178,7 @@ Item {
             //循环每一行
             for(let j in cfg.MapData[k]) {
 
-                if(!GlobalLibraryJS.isArray(cfg.MapData[k][j]))
+                if(!$CommonLibJS.isArray(cfg.MapData[k][j]))
                     cfg.MapData[k][j] = [];
 
                 //实际宽
@@ -187,7 +187,7 @@ Item {
 
                 //循环每一列
                 for(let i in cfg.MapData[k][j]) {
-                    if(!GlobalLibraryJS.isArray(cfg.MapData[k][j][i])) {
+                    if(!$CommonLibJS.isArray(cfg.MapData[k][j][i])) {
                         cfg.MapData[k][j][i] = [-1, -1, -1];
                         continue;
                     }
@@ -552,7 +552,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                visible: Platform.compileType === 'debug'
+                visible: $Platform.compileType === 'debug'
 
                 font.pointSize: _config.nFontPointSize
                 text: '调试'
@@ -931,7 +931,7 @@ Item {
                                 break;
 
                             //检测arrMapData是否正常
-                            if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
+                            if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
                                 arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
 
                             for(let bx = 0; bx < _config.sizeMapSize.width; ++bx) {
@@ -940,7 +940,7 @@ Item {
                                     break;
 
                                 //检测arrMapData是否正常
-                                //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
+                                //if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
                                 //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
 
 
@@ -997,7 +997,7 @@ Item {
                             }
 
                             //检测arrMapData是否正常
-                            if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0]))
+                            if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0]))
                                 arrMapData[canvasMapContainer.nCurrentCanvasMap][by0] = [];
 
                             let bx = parseInt(rectPaste.x / _config.sizeMapBlockSize.width);
@@ -1010,7 +1010,7 @@ Item {
                                 }
 
                                 //检测arrMapData是否正常
-                                //if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
+                                //if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0]))
                                 //    arrMapData[canvasMapContainer.nCurrentCanvasMap][by0][bx0] = [-1,-1,-1];
 
 
@@ -1971,7 +1971,7 @@ Item {
                             rectPaste.visible = true;
                             textTips.refresh(bx, by);
 
-                            //Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
+                            //$Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
                             //console.debug(bx, by);
                         }
                         onPositionChanged: {
@@ -2142,9 +2142,9 @@ Item {
                     //绘制模式
                     else {
                         //检测arrMapData是否正常
-                        if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
+                        if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by]))
                             arrMapData[canvasMapContainer.nCurrentCanvasMap][by] = [];
-                        else if(!GlobalLibraryJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx]))
+                        else if(!$CommonLibJS.isArray(arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx]))
                             arrMapData[canvasMapContainer.nCurrentCanvasMap][by][bx] = [-1,-1,-1];
                         else {
                             //图块相同，则不绘
@@ -2446,7 +2446,7 @@ Item {
                     rectPaste.visible = true;
                     textTips.refresh(bx, by);
 
-                    //Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
+                    //$Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
                 }
 
                 onDoubleClicked: {
@@ -2584,7 +2584,7 @@ Item {
             textMapRID.text = textMapRID.text.trim();
             textMapName.text = textMapName.text.trim();
             if(textMapRID.text.length === 0 || textMapName.text.length === 0) {
-                //Platform.sl_showToast('名称不能为空');
+                //$Platform.sl_showToast('名称不能为空');
                 textDialogMsg.text = '资源ID和名称不能为空';
                 open();
                 return;
@@ -2611,7 +2611,7 @@ Item {
                 }
             }
 
-            if(textMapRID.text !== _private.strMapRID && FrameManager.sl_dirExists(path)) {
+            if(textMapRID.text !== _private.strMapRID && $Frame.sl_dirExists(path)) {
                 rootWindow.aliasGlobal.dialogCommon.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -2764,7 +2764,7 @@ Item {
             if(textEventName.text.length === 0) {
                 open();
                 //visible = true;
-                Platform.sl_showToast('事件名不能为空');
+                $Platform.sl_showToast('事件名不能为空');
                 return;
             }
 
@@ -2775,7 +2775,7 @@ Item {
                 if(listmodelEventsData.get(i)['EventName'] === textEventName.text) {
                     open();
                     //visible = true;
-                    Platform.sl_showToast('事件名不能重复');
+                    $Platform.sl_showToast('事件名不能重复');
                     return;
                 }
             }
@@ -2786,12 +2786,12 @@ Item {
                 _private.createEvent(textEventName.text);
                 //scriptEditor.text += '\r\n\r\nfunction* %1(){ //地图事件 \r\n}'.arg(textEventName.text);
                 scriptEditor.editor.append('\r\n\r\nfunction* $%1(){ //地图事件 \r\n}'.arg(textEventName.text));
-                //scriptEditor.editor.setPlainText(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction* $%1(){ //地图事件 \r\n}'.arg(textEventName.text));
+                //scriptEditor.editor.setPlainText($Frame.sl_toPlainText(scriptEditor.editor.textDocument) + '\r\n\r\nfunction* $%1(){ //地图事件 \r\n}'.arg(textEventName.text));
                 //scriptEditor.editor.toBegin();
             }
             //else if(nEventIndex === -2) {  //新建系统事件
                 //objSystemEventsData[textEventName.text] = scriptEditor.text;
-                //objSystemEventsData[textEventName.text] = FrameManager.sl_toPlainText(scriptEditor.textDocument);
+                //objSystemEventsData[textEventName.text] = $Frame.sl_toPlainText(scriptEditor.textDocument);
             //}
             else {  //修改
                 let oldEventName = listmodelEventsData.get(nEventIndex)['EventName'];
@@ -2801,7 +2801,7 @@ Item {
 
                 //delete objEventsData[oldEventName];
                 ////objEventsData[textEventName.text] = scriptEditor.text;
-                //objEventsData[textEventName.text] = FrameManager.sl_toPlainText(scriptEditor.editor.textDocument);
+                //objEventsData[textEventName.text] = $Frame.sl_toPlainText(scriptEditor.editor.textDocument);
 
                 if(oldEventName !== textEventName.text)
                     for(let i in objMapEventsData) {    //修改地图上的对应关系
@@ -2844,7 +2844,7 @@ Item {
 
         title: '保存文件'
         //folder: shortcuts.home
-        folder: GlobalJS._FixLocalPath_W('Map')
+        folder: $GlobalJS._FixLocalPath_W('Map')
 
         selectMultiple: false
         selectExisting: true
@@ -2938,11 +2938,11 @@ Item {
             //win下，Canvas.save 不支持 file: 开头的路径
             path = path.replace('file:/', '').replace('//', '');
 
-            //if(!FrameManager.sl_dirExists(path))
-                FrameManager.sl_dirCreate(path);
+            //if(!$Frame.sl_dirExists(path))
+                $Frame.sl_dirCreate(path);
 
             canvasExport.save(path + GameMakerGlobal.separator + textMapName.text.trim() + '.png');
-            //FrameManager.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
+            //$Frame.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
             bExport = false;
 
@@ -2964,7 +2964,7 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
         visualScriptEditor.nLoadType: 1
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
@@ -3218,7 +3218,7 @@ Item {
             }
 
             //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator;
-            //if(FrameManager.sl_fileExists(path + 'map.js')) {
+            //if($Frame.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
             scriptEditor.init({
                 BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
@@ -3227,7 +3227,7 @@ Item {
                 PathText: 0b0,
                 RunButton: 0b0,
             });
-            //scriptEditor.text = FrameManager.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
+            //scriptEditor.text = $Frame.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();
             //scriptEditor.visualScriptEditor.loadData(path + 'map.vjs');
@@ -3307,16 +3307,16 @@ Item {
             }*/
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
-            let ret = FrameManager.sl_fileWrite(FrameManager.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
+            let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
         }
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
             if(_private.strMapRID !== '' && textMapRID.text !== '' && _private.strMapRID !== textMapRID.text) {
                 let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapRID + GameMakerGlobal.separator + 'map.vjs';
-                if(FrameManager.sl_fileExists(oldFilePath)) {
+                if($Frame.sl_fileExists(oldFilePath)) {
                     let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text + GameMakerGlobal.separator + 'map.vjs';
-                    let ret = FrameManager.sl_fileCopy(oldFilePath, newFilePath, true);
+                    let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -3326,8 +3326,8 @@ Item {
 
             let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
 
-            //if(!FrameManager.sl_dirExists(newPath))
-                FrameManager.sl_dirCreate(newPath);
+            //if(!$Frame.sl_dirExists(newPath))
+                $Frame.sl_dirCreate(newPath);
 
 
             //绘制所有 0层及以上 canvas
@@ -3385,7 +3385,7 @@ Item {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-            let ret = FrameManager.sl_fileWrite(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 
@@ -3585,7 +3585,7 @@ Item {
         //最大地图像素数（超过则缩放）
         //32位安卓，70*70绘制一会就飘
         //64位安卓：200*200左右很卡（250*250闪退），100*100：明显卡
-        property int nMapMaxPixelCount: 60*60*32*32 //Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
+        property int nMapMaxPixelCount: 60*60*32*32 //$Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32
         //绘制地图时缩小倍数（防止太大出错）
         property int nMapDrawScale: 1
 
@@ -3633,7 +3633,7 @@ Item {
 
 
     Component.onCompleted: {
-        _config.nMapMaxPixelCount = (Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
+        _config.nMapMaxPixelCount = ($Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
 
         //console.debug(Qt.point(1,1) === Qt.point(1,1), Qt.point(0,1) === Qt.point(1,1));    //true false
 

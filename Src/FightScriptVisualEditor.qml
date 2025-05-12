@@ -238,7 +238,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'images.json';
                                 //let cfg = File.read(filePath);
-                                let cfg = FrameManager.sl_fileRead(filePath);
+                                let cfg = $Frame.sl_fileRead(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
@@ -270,7 +270,7 @@ Item {
                             source: {
                                 if(textBackground.text.length === 0)
                                     return '';
-                                if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
+                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
                                     return '';
                                 return GameMakerGlobal.imageResourceURL(textBackground.text);
                             }
@@ -301,7 +301,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'music.json';
                                 //let cfg = File.read(filePath);
-                                let cfg = FrameManager.sl_fileRead(filePath);
+                                let cfg = $Frame.sl_fileRead(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
@@ -459,7 +459,7 @@ Item {
                                 let c = comp.createObject(layoutEnemyLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                GlobalLibraryJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout(function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
                                     }, 1, root, '');
@@ -597,7 +597,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[FightScriptVisualEditor]compile:', _private.filepath, jsScript);
@@ -642,7 +642,7 @@ Item {
         source: {
             if(textMusic.text.length === 0)
                 return '';
-            if(!FrameManager.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
+            if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
                 return '';
             return GameMakerGlobal.musicResourceURL(textMusic.text)
         }
@@ -668,8 +668,8 @@ Item {
         function saveData() {
             let enemies = [];
 
-            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
-            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
+            let enemyTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'Enemy');
+            let enemyParamsTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
             for(let tt in enemyTextFields) {
                 //console.debug(tt.text);
@@ -686,7 +686,7 @@ Item {
             //data.EnemiesParams = enemiesParams;
 
 
-            let ret = FrameManager.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
 
         }
 
@@ -695,7 +695,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = FrameManager.sl_fileRead(filePath);
+            let data = $Frame.sl_fileRead(filePath);
             console.debug('[FightScriptVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -723,8 +723,8 @@ Item {
                     enemyComp = comp.createObject(layoutEnemyLayout);
                     _private.arrCacheComponent.push(enemyComp);
                 }
-                let enemyTextField = FrameManager.sl_findChild(enemyComp, 'Enemy');
-                let enemyParamsTextField = FrameManager.sl_findChild(enemyComp, 'EnemyParams');
+                let enemyTextField = $Frame.sl_findChild(enemyComp, 'Enemy');
+                let enemyParamsTextField = $Frame.sl_findChild(enemyComp, 'EnemyParams');
 
                 enemyTextField.text = data.Enemies[tt][0];
                 enemyParamsTextField.text = data.Enemies[tt][1];
@@ -743,8 +743,8 @@ Item {
         function compile() {
             let bCheck = true;
             do {
-                let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
-                let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
+                let enemyTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'Enemy');
+                let enemyParamsTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
                 //console.debug(actionTextFields);
                 for(let tt in enemyTextFields) {
@@ -785,8 +785,8 @@ Item {
 
 
             let strEnemies = '';
-            let enemyTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'Enemy');
-            let enemyParamsTextFields = FrameManager.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
+            let enemyTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'Enemy');
+            let enemyParamsTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'EnemyParams');
 
             //console.debug(enemyTextFields);
             for(let tt in enemyTextFields) {
@@ -810,7 +810,7 @@ Item {
             console.debug('data:', data);
             */
 
-            //let tpl = FrameManager.sl_fileRead(filePath);
+            //let tpl = $Frame.sl_fileRead(filePath);
             //console.debug('tpl:', tpl);
 
             let enemyCount = textEnemyCount.text.trim().split(',');
@@ -866,7 +866,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = FrameManager.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();

@@ -113,7 +113,7 @@ Item {
 
             let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
             //let cfg = File.read(filePath);
-            let cfg = FrameManager.sl_fileRead(filePath);
+            let cfg = $Frame.sl_fileRead(filePath);
             //console.debug('[mainMapEditor]filePath：', filePath);
 
             if(!cfg)
@@ -152,7 +152,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Yes | Dialog.Cancel,
                 OnAccepted: ()=>{
-                    console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), FrameManager.sl_dirExists(dirUrl), FrameManager.sl_removeRecursively(dirUrl));
+                    console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
                     l_listMaps.forceActiveFocus();
@@ -356,7 +356,7 @@ Item {
                 open();
                 //visible = true;
                 labelDialogTips.text = '路径不能为空';
-                Platform.sl_showToast('路径不能为空');
+                $Platform.sl_showToast('路径不能为空');
                 return;
             }
             */
@@ -364,25 +364,25 @@ Item {
                 open();
                 //visible = true;
                 labelDialogTips.text = '资源名不能为空';
-                Platform.sl_showToast('资源名不能为空');
+                $Platform.sl_showToast('资源名不能为空');
                 return;
             }
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
                 //filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapResourceDirName + GameMakerGlobal.separator + textMapBlockResourceName.text;
-                let ret = FrameManager.sl_fileCopy(GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
+                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝到资源目录失败';
-                    Platform.sl_showToast('拷贝到资源目录失败');
+                    $Platform.sl_showToast('拷贝到资源目录失败');
                     //console.debug('[mainMapEditor]Copy ERROR:', filepath);
 
                     //root.forceActiveFocus();
                     return;
                 }
 
-                //textMapBlockImageURL.text = GlobalJS.toURL(filepath);
+                //textMapBlockImageURL.text = $GlobalJS.toURL(filepath);
             }
             else {  //资源图库
                 //console.debug('ttt2:', filepath);
@@ -394,11 +394,11 @@ Item {
 
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
 
-            if(!FrameManager.sl_fileExists(GlobalJS.toPath(textMapBlockImageURL.text))) {
+            if(!$Frame.sl_fileExists($GlobalJS.toPath(textMapBlockImageURL.text))) {
                 open();
                 //visible = true;
-                labelDialogTips.text = '图块路径错误或文件不存在:' + GlobalJS.toPath(textMapBlockImageURL.text);
-                Platform.sl_showToast('图块路径错误或文件不存在');
+                labelDialogTips.text = '图块路径错误或文件不存在:' + $GlobalJS.toPath(textMapBlockImageURL.text);
+                $Platform.sl_showToast('图块路径错误或文件不存在');
                 return;
             }
 
@@ -469,9 +469,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textMapBlockImageURL.text = Platform.sl_getRealPathFromURI(fileUrl);
+                textMapBlockImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
             else
-                textMapBlockImageURL.text = FrameManager.sl_urlDecode(fileUrl);
+                textMapBlockImageURL.text = $Frame.sl_urlDecode(fileUrl);
 
             textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 
@@ -532,7 +532,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl);
-            //let cfg = FrameManager.sl_fileRead(fileUrl);
+            //let cfg = $Frame.sl_fileRead(fileUrl);
 
 
             visible = false;
@@ -559,7 +559,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[mainMapEditor]删除地图资源：' + path, Qt.resolvedUrl(path), FrameManager.sl_fileDelete(path));
+                    console.debug('[mainMapEditor]删除地图资源：' + path, Qt.resolvedUrl(path), $Frame.sl_fileDelete(path));
                     removeItem(index);
 
                     l_listMapBlockResource.forceActiveFocus();
@@ -601,7 +601,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl);
-            let cfg = FrameManager.sl_fileRead(fileUrl);
+            let cfg = $Frame.sl_fileRead(fileUrl);
             //console.debug('cfg', cfg);
 
             if(!cfg)
@@ -694,7 +694,7 @@ Item {
         title: '选择地图文件'
         selectMultiple: false
         //folder: shortcuts.home
-        folder: GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+        folder: $GlobalJS._FixLocalPath_W($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
         nameFilters: [ 'Json files (*.json *.map *.jsn)', 'All files (*)' ]
         selectExisting: true
         selectFolder: false
@@ -707,7 +707,7 @@ Item {
 
 
             let cfg = File.read(fileUrl);
-            //let cfg = FrameManager.sl_fileRead(fileUrl);
+            //let cfg = $Frame.sl_fileRead(fileUrl);
             console.debug('cfg', cfg, fileUrl);
 
             if(!cfg)
@@ -865,7 +865,7 @@ Item {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = GlobalJS._FixLocalPath_W(Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+            //filedialogOpenMap.folder = $GlobalJS._FixLocalPath_W($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
             //console.debug('filedialogOpenMap.folder:', filedialogOpenMap.folder)
@@ -875,16 +875,16 @@ Item {
             //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
 
             //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
-            let list = FrameManager.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00)
+            let list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00)
             list.unshift('【新建地图】');
             l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug('path:', GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
-            //console.debug('path:', Qt.resolvedUrl(Platform.externalDataPath));
-            //console.debug('path:', Qt.resolvedUrl(GlobalJS._FixLocalPath_W(Platform.externalDataPath)));
+            //console.debug('path:', $GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
+            //console.debug('path:', Qt.resolvedUrl($GlobalJS._FixLocalPath_W($Platform.externalDataPath)));
         }
     }
 

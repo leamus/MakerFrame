@@ -1,4 +1,5 @@
 module GameCore
+#module名字可以随意取（识别主要是含qmldir的文件夹名）
 
 
 
@@ -9,12 +10,12 @@ GameFightRoleInfoWindow 1.0 GameFightRoleInfoWindow.qml
 GameTradeWindow 1.0 GameTradeWindow.qml
 
 GameScene 1.0 GameScene.qml
-GameSceneJS 1.0 GameScene.js
+#GameSceneJS 1.0 GameScene.js
 FightScene 1.0 FightScene.qml
-FightSceneJS 1.0 FightScene.js
+#FightSceneJS 1.0 FightScene.js
 
 
-GameMakerGlobalJS 1.0 GameMakerGlobal.js
+#GameMakerGlobalJS 1.0 GameMakerGlobal.js
 
 
 
