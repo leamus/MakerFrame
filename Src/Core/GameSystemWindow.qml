@@ -53,7 +53,10 @@ Item {
         id: maskSystemMenu
 
         anchors.fill: parent
+        //opacity: 0
+        //color: Global.style.backgroundColor
         color: '#7FFFFFFF'
+        //radius: 9
 
         mouseArea.onPressed: {
             root.hide();
@@ -84,18 +87,11 @@ Item {
             case 0:
 
                 continueScript = function*() {
-                    let s = game.$sys.resources.commonScripts.$readSavesInfo();
-                    s.push('取消');
-                    let c = yield game.menu('选择存档', s);
-                    switch(c) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        yield game.save('存档' + c, game.d['$sys_map'].$name, -1);
+                    let s = game.$sys.resources.commonScripts.$readSavesInfo(3);
+                    let c = yield game.menu('选择存档', [...s, '取消']);
+                    if(c < s.length) {
+                        yield game.save('存档' + c, $CommonLibJS.getObjectValue(game.d['$sys_map'], '$name') ?? '', -1);
                         yield game.msg('存档成功');
-                        break;
-                    default:
-                        break;
                     }
                 }
                 game.run(continueScript() ?? null);
@@ -104,24 +100,16 @@ Item {
             case 1:
 
                 continueScript = function*() {
-                    let s = game.$sys.resources.commonScripts.$readSavesInfo();
-                    s.push('取消');
-                    let c = yield game.menu('选择存档', s);
-                    switch(c) {
-                    case 0:
-                    case 1:
-                    case 2:
+                    let s = game.$sys.resources.commonScripts.$readSavesInfo(3);
+                    let c = yield game.menu('选择存档', [...s, '取消']);
+                    if(c < s.length) {
                         ////$CommonLibJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
-                        let ret = yield game.load('存档' + c);
-                        if(ret) {
+                        if(yield game.load('存档' + c)) {
                             yield game.msg('读档成功');
                         }
                         else {
                             yield game.msg('读取失败');
                         }
-                        break;
-                    default:
-                        break;
                     }
                 }
                 game.run(continueScript() ?? null);

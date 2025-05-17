@@ -477,8 +477,10 @@ Item {
 
     Mask {
         anchors.fill: parent
+        //opacity: 0
+        //color: Global.style.backgroundColor
         color: '#00000000'
-        opacity: 0
+        //radius: 9
     }
 
 

@@ -52,8 +52,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -103,7 +104,7 @@ Item {
 
                     if(ret.length > 0) {
                         //GameMakerGlobal.config.strCurrentProjectName = $Frame.sl_completeBaseName(fUrl);
-                        //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl));
+                        //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()));
                     }
 
                     rootWindow.aliasGlobal.dialogCommon.show({
@@ -220,7 +221,7 @@ Item {
 
                                 let msg;
                                 if(ret.length > 0) {
-                                    //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl));
+                                    //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()));
                                     msg = '安装成功';
 
                                     if(jsPath && $Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {

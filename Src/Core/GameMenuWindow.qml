@@ -232,7 +232,10 @@ Item {
             id: maskMainMenu
 
             anchors.fill: parent
+            //opacity: 0
+            //color: Global.style.backgroundColor
             color: '#7FFFFFFF'
+            //radius: 9
 
             mouseArea.onPressed: {
                 closeWindow(0b1);
@@ -333,8 +336,10 @@ Item {
 
         Mask {
             anchors.fill: parent
-            color: 'lightgray'
             opacity: 0.6
+            //color: Global.style.backgroundColor
+            color: 'lightgray'
+            //radius: 9
 
             mouseArea.onPressed: {
                 itemUseOrEquip.visible = false;

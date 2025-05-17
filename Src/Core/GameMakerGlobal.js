@@ -14,7 +14,8 @@ var $config = {
         $walkAllDirections: true,   //主角可多方向行走（否则4方向）
         $changeMapStopAction: true,   //切换地图后停止主角动作
         $inactiveBackgroundMusic: false, //窗口非激活状态时是否继续背景音乐
-        $inactiveSoundEffect: false, //窗口非激活状态时是否继续背景音效
+        $inactiveSoundEffect: 0b01, //窗口非激活状态时是否继续背景音效（从右到左：播放/暂停、播放/静音）
+        $inactiveVideo: 1, //窗口非激活状态时是否继续视频（0：暂停；1：静音播放；2或其他值：正常播放）
         $soundEffectChannelCount: 6, //音效通道个数
     },
     //地图

@@ -59,8 +59,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -236,12 +237,14 @@ Item {
         id: maskImage
 
         visible: false
+        //opacity: 0
         //anchors.fill: parent
         width: parent.width
         height: parent.height
 
         //color: 'transparent'
         color: Global.style.backgroundColor
+        //radius: 9
 
 
 
@@ -337,17 +340,17 @@ Item {
                     textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
                 else
-                    textImageResourceName.text = fileUrl;
+                    textImageResourceName.text = fileUrl.toString();
             }
             else
-                textImageResourceName.text = fileUrl;
+                textImageResourceName.text = fileUrl.toString();
             */
 
             let path;
             if(Qt.platform.os === 'android')
-                path = $Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                path = $Frame.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl.toString());
 
             let tIndex = path.lastIndexOf('/');
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';

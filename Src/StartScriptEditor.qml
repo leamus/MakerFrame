@@ -153,39 +153,42 @@ function* $start() {
                 $$START_SCRIPT$$
 
                 break;
-            case 1:
-                /*let arrSave = [];
-                for(let i = 0; i < 3; ++i) {
-                    let ts = game.checksave('存档' + i);
-                    if(ts) {
-                        arrSave.push('存档%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
-                    }
-                    else
-                        arrSave.push('空');
-                }*/
+            case 1: {
+                    /*let arrSave = [];
+                    for(let i = 0; i < 3; ++i) {
+                        let ts = game.checksave('存档' + i);
+                        if(ts) {
+                            arrSave.push('存档%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
+                        }
+                        else
+                            arrSave.push('空');
+                    }*/
 
-                let arrSave = game.$sys.resources.commonScripts.$readSavesInfo();
-
-                c = yield game.menu('载入存档', [...arrSave,'自动存档','取消']);
-                switch(c) {
-                    case 0:
-                    case 1:
-                    case 2:
+                    let arrSave = game.$sys.resources.commonScripts.$readSavesInfo(3);
+                    c = yield game.menu("载入存档", [...arrSave, "自动存档", "取消"]);
+                    if(c < arrSave.length) {
                         //$CommonLibJS.runNextEventLoop(function() {yield game.load('存档' + c)},);
-                        if(yield game.load('存档' + c))
-                            break;
-                        else
+                        if(yield game.load('存档' + c)){
+                            yield game.msg('读档成功');
+                        }
+                        else {
                             yield game.msg('读取失败');
-                        continue;
-                    case 3:
+                            continue;
+                        }
+                    }
+                    else if(c === arrSave.length) {
                         //$CommonLibJS.runNextEventLoop(function() {yield game.load('autosave')},);
-                        if(yield game.load('autosave'))
-                            break;
-                        else
+                        if(yield game.load('autosave')) {
+                            yield game.msg('读档成功');
+                        }
+                        else {
                             yield game.msg('读取失败');
+                            continue;
+                        }
+                    }
+                    else {
                         continue;
-                    default:
-                        continue;
+                    }
                 }
                 break;
             case 2:

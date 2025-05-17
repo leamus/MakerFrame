@@ -86,8 +86,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -1236,7 +1237,7 @@ Item {
             else
                 fUrl = $Frame.sl_urlDecode(fileUrl.toString());
 
-            //console.error('!!!', fUrl, fileUrl, $Frame.sl_absolutePath(fileUrl))
+            //console.error('!!!', fUrl, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()))
 
             _private.unzipProjectPackage(fUrl);
         }
@@ -1386,7 +1387,10 @@ Item {
 
         Mask {
             anchors.fill: parent
+            //opacity: 0
+            //color: Global.style.backgroundColor
             color: '#90000000'
+            //radius: 9
 
             mouseArea.onPressed: {
                 parent.visible = false;

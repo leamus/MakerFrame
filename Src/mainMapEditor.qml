@@ -53,8 +53,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -469,9 +470,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textMapBlockImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
+                textMapBlockImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                textMapBlockImageURL.text = $Frame.sl_urlDecode(fileUrl);
+                textMapBlockImageURL.text = $Frame.sl_urlDecode(fileUrl.toString());
 
             textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 
@@ -485,7 +486,7 @@ Item {
 
 
             //鹰（Image的BUG）：3/3改这里
-            //canvasMapBlock.loadImage(fileUrl);
+            //canvasMapBlock.loadImage(fileUrl.toString());
             ////canvasMapBlock.requestPaint(); //重新绘图
 
 
@@ -531,8 +532,8 @@ Item {
             dialogMapData.visible = true;
 
 
-            //let cfg = File.read(fileUrl);
-            //let cfg = $Frame.sl_fileRead(fileUrl);
+            //let cfg = File.read(fileUrl.toString());
+            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             visible = false;
@@ -600,8 +601,8 @@ Item {
             loader.item.forceActiveFocus();
 
 
-            //let cfg = File.read(fileUrl);
-            let cfg = $Frame.sl_fileRead(fileUrl);
+            //let cfg = File.read(fileUrl.toString());
+            let cfg = $Frame.sl_fileRead(fileUrl.toString());
             //console.debug('cfg', cfg);
 
             if(!cfg)
@@ -706,8 +707,8 @@ Item {
             loader.item.forceActiveFocus();
 
 
-            let cfg = File.read(fileUrl);
-            //let cfg = $Frame.sl_fileRead(fileUrl);
+            let cfg = File.read(fileUrl.toString());
+            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
             console.debug('cfg', cfg, fileUrl);
 
             if(!cfg)

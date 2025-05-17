@@ -101,8 +101,8 @@ function* loadResources() {
         game.playsoundeffect(soundeffectSource, -1);
     }
     mainRole = compRole.createObject(itemViewPort.itemRoleContainer);
-    mainRole.sprite.sg_playEffect.connect(tf);
-    //mainRole.customSprite.sg_playEffect.connect(tf);
+    mainRole.sprite.sg_playSoundEffect.connect(tf);
+    //mainRole.customSprite.sg_playSoundEffect.connect(tf);
 
 
 
@@ -610,7 +610,10 @@ function* loadResources() {
     let soundEffectChannelCount = getCommonScriptResource('$config', '$game', '$soundEffectChannelCount');
     //创建音效通道
     for(let i = 0; i < soundEffectChannelCount; ++i)
-        rootSoundEffect.arrCacheSoundEffects[i] = compCacheAudio.createObject(rootGameScene, {});
+        rootSoundEffect.arrCacheSoundEffects[i] = compCacheAudio.createObject(rootGameScene, {
+            volume: Qt.binding(()=>rootSoundEffect.rVolume),
+            muted: Qt.binding(()=>rootSoundEffect.bMuted),
+        });
 
 
     loaderFightScene.load();
@@ -945,7 +948,11 @@ function getSpriteResource(item, forceLoad=false) {
             if(_private.objCacheSoundEffects[info.Sound])
                 cacheSoundEffect = _private.objCacheSoundEffects[info.Sound];
             else {
-                cacheSoundEffect = compCacheAudio.createObject(rootGameScene, {source: GameMakerGlobal.soundResourceURL(info.Sound)});
+                cacheSoundEffect = compCacheAudio.createObject(rootGameScene, {
+                    source: GameMakerGlobal.soundResourceURL(info.Sound),
+                    volume: Qt.binding(()=>rootSoundEffect.rVolume),
+                    muted: Qt.binding(()=>rootSoundEffect.bMuted),
+                });
                 _private.objCacheSoundEffects[info.Sound] = cacheSoundEffect;
             }
         }
@@ -1597,8 +1604,8 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
             const tf = function(soundeffectSource) {
                 game.playsoundeffect(soundeffectSource, -1);
             }
-            roleComp.sprite.sg_playEffect.connect(tf);
-            //roleComp.customSprite.sg_playEffect.connect(tf);
+            roleComp.sprite.sg_playSoundEffect.connect(tf);
+            //roleComp.customSprite.sg_playSoundEffect.connect(tf);
         }
 
 
@@ -1812,7 +1819,7 @@ function buttonAClicked() {
         usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     default:
-        return;
+        return -1;
     }
 
     //计算人物所占的地图块
@@ -1841,7 +1848,7 @@ function buttonAClicked() {
             if(bScriptQueueIsEmpty && !_private.scriptQueue.isEmpty())
                 game.run(true);
 
-            return; //!!只执行一次事件
+            return 1; //!!只执行一次事件
         }
         //console.debug('event:', event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
     }
@@ -1856,6 +1863,7 @@ function buttonAClicked() {
         )) {
             console.debug('[GameScene]触发NPC事件：', role.$data.$id);
 
+            let bReturn = false;
             //获得脚本（地图脚本优先级 > game.f定义的）
             let tScript;
             do {
@@ -1868,11 +1876,11 @@ function buttonAClicked() {
                 */
                 if(tScript = game.f['$' + role.$data.$id])
                     break;
-                if(tScript = game.f[role.$data.$id])    //!!!兼容旧的
+                if(tScript = game.f[role.$data.$id])    //!!!兼容旧代码
                     break;
                 if(tScript = game.gf['$' + role.$data.$id])
                     break;
-                if(tScript = game.gf[role.$data.$id])    //!!!兼容旧的
+                if(tScript = game.gf[role.$data.$id])    //!!!兼容旧代码
                     break;
                 if(role.$script && (tScript = role.$script['$interactive']))
                     break;
@@ -1882,10 +1890,22 @@ function buttonAClicked() {
                 game.run(tScript.call(role, role) ?? null, '$interactive:' + role.$data.$id);
                 //$GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(role.$data.$id));
 
-                return; //!!只执行一次事件
+                bReturn = true;
             }
+
+            if(tScript = game.gf['$interactive']) {  //$CommonLibJS.checkCallable(fn, 0b11)
+                game.run(tScript.call(role, role) ?? null, '$interactive');
+                //$GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(role.$data.$id));
+
+                bReturn = true;
+            }
+
+            if(bReturn) //!!只执行一次事件
+                return 2;
         }
     }
+
+    return 0;
 }
 
 
@@ -1924,10 +1944,12 @@ function mapEvent(eventName, role) {
 
 
     //调用总事件处理
-    tScript = game.gf['$' + eventName + '_map'];
-    if(tScript)  //$CommonLibJS.checkCallable(fn, 0b11)
+    if(tScript = game.gf['$' + eventName + '_map'])  //$CommonLibJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:map_' + eventName, );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
+    else if(tScript = game.gf['$map'])  //$CommonLibJS.checkCallable(fn, 0b11)
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图事件:map', );
+        //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map'}, );
 
 
 
@@ -1965,10 +1987,12 @@ function mapEventCanceled(eventName, role) {
 
 
     //调用总事件处理
-    tScript = game.gf['$' + eventName + '_map_leave'];
-    if(tScript)  //$CommonLibJS.checkCallable(fn, 0b11)
+    if(tScript = game.gf['$' + eventName + '_map_leave'])  //$CommonLibJS.checkCallable(fn, 0b11)
         /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:map_leave_' + eventName, );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
+    else if(tScript = game.gf['$map_leave'])  //$CommonLibJS.checkCallable(fn, 0b11)
+        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图离开事件:map_leave', );
+        //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave'}, );
 
 
 
@@ -2813,7 +2837,7 @@ function onTriggered() {
     //如果有跟随目标
     if(_private.sceneRole)
         //开始移动地图
-        setSceneToRole(_private.sceneRole);
+        setSceneToRole();
     //移动地图
     else {
         //下面是移动代码

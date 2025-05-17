@@ -180,7 +180,7 @@ Item {
             //game.hero(mainRole, th);
         }
         //开始移动地图
-        //setSceneToRole(_private.sceneRole);
+        //setSceneToRole();
 
 
         //计算新属性
@@ -313,7 +313,7 @@ Item {
         //进游戏时如果设置了屏幕旋转，则x、y坐标会互换导致出错，所以重新刷新一下屏幕；
         //!!!屏幕旋转会导致 itemContainer 的x、y坐标互换!!!???
         //$CommonLibJS.setTimeout(function() {
-        //        setSceneToRole(_private.sceneRole);
+        //        setSceneToRole();
         //    },10,rootGameScene
         //);
 
@@ -472,7 +472,7 @@ Item {
         _private.objGlobalTimers = {};
 
 
-        _private.sceneRole = mainRole;
+        _private.sceneRole = null; //mainRole;
         mainRole.$$collideRoles = {};
         mainRole.$$mapEventsTriggering = {};
 
@@ -531,7 +531,7 @@ Item {
             role.y = targetY - role.y1 - role.height1 / 2;
         //role.y = by * itemViewPort.sizeMapBlockScaledSize.height - role.y1;
 
-        if(role === _private.sceneRole)setSceneToRole(_private.sceneRole);
+        if(role === _private.sceneRole)setSceneToRole();
 
 
         return true;
@@ -545,8 +545,8 @@ Item {
             return false;
 
         setRolePos(bx, by, mainRole);
-        //setSceneToRole(_private.sceneRole);
-        if(mainRole === _private.sceneRole)setSceneToRole(_private.sceneRole);
+        //setSceneToRole();
+        if(mainRole === _private.sceneRole)setSceneToRole();
 
         game.gd['$sys_main_roles'][index].$x = mainRole.x + mainRole.x1 + parseInt(mainRole.width1 / 2);
         game.gd['$sys_main_roles'][index].$y = mainRole.y + mainRole.y1 + parseInt(mainRole.height1 / 2);
@@ -555,7 +555,7 @@ Item {
     //场景移动到某角色
     function setSceneToRole(role=_private.sceneRole) {
         if(!role)
-            return;
+            return false;
 
         //计算角色移动时，地图移动的 左上角和右下角 的坐标
 
@@ -572,8 +572,9 @@ Item {
         let roleCenterY = role.y + role.y1 + parseInt(role.height1 / 2);
 
         //开始移动地图
-
         itemViewPort.setScenePos(roleCenterX, roleCenterY);
+
+        return true;
     }
 
 
@@ -587,12 +588,12 @@ Item {
         //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
         //示例：yield game.loadmap('地图资源名')；
         function loadmap(mapRID, userData, forceRepaint=false) {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果使用生成器方式，则将 resolve 和 reject 删除即可，再用return返回数据；
             //！使用async是因为返回的是Promise（脚本队列必须等待Promise才能继续执行，如果用game.run则互相等造成死锁，下同）；
             const _loadmap = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -661,7 +662,7 @@ Item {
                     const mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
                     //itemViewPort.itemRoleContainer.visible = true;
 
-                    setSceneToRole(_private.sceneRole);
+                    setSceneToRole();
 
 
                     //载入地图会卡顿，重新开始计时会顺滑一点
@@ -703,8 +704,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'loadmap'});
             };
 
-            let ret = new Promise(_loadmap);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            const ret = $CommonLibJS.getPromise(_loadmap);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -759,35 +760,26 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemGameMsg;
 
-                itemGameMsg.show(msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
+                itemGameMsg.show(msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, _callback);
             }
-            //loaderGameMsg.item.fCallback = callback;
+            //loaderGameMsg.item.fCallback = _callback;
             //loaderGameMsg.item.show(msg.toString(), pretext.toString(), interval, keeptime, style);
 
 
@@ -830,33 +822,24 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemRoleMsg;
 
-                itemRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, callback);
+                itemRoleMsg.show(role, msg.toString(), interval, pretext.toString(), keeptime, style, pauseGame, _callback);
             }
 
 
@@ -958,33 +941,24 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemMenu;
 
-                itemMenu.show(title, items, style, pauseGame, callback);
+                itemMenu.show(title, items, style, pauseGame, _callback);
             }
 
 
@@ -1023,33 +997,24 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = itemGameInput;
 
-                itemGameInput.show(title, pretext, style, pauseGame, callback);
+                itemGameInput.show(title, pretext, style, pauseGame, _callback);
             }
 
 
@@ -1115,6 +1080,7 @@ Item {
             if(!roleComp) {
                 return false;
             }
+            _private.sceneRole = mainRole;
 
 
             //let role = compRole.createObject(itemViewPort.itemRoleContainer);
@@ -1361,7 +1327,7 @@ Item {
                 }
 
                 //if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
-                    if(heroComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
+                    if(heroComp === _private.sceneRole)setSceneToRole();
 
 
                 if(props.$start === true) {
@@ -1417,6 +1383,8 @@ Item {
                 mainRole.reset();
 
                 _private.stopMove(0);
+
+                _private.sceneRole = null;
             }
 
 
@@ -1615,7 +1583,8 @@ Item {
                 else {
                     //找出符合过滤条件的
                     let tret = [];
-                    for(let tr of _private.objRoles) {
+                    for(let ti in _private.objRoles) {
+                        const tr = _private.objRoles[ti]
                         if($CommonLibJS.filterObject(tr, role))
                             tret.push(tr);
                     }
@@ -1752,7 +1721,7 @@ Item {
                 }
 
                 //if(props.$x !== undefined || props.$y !== undefined || props.$bx !== undefined || props.$by !== undefined)
-                    if(roleComp === _private.sceneRole)setSceneToRole(_private.sceneRole);
+                    if(roleComp === _private.sceneRole)setSceneToRole();
 
 
                 if(props.$start === true) {
@@ -2583,11 +2552,11 @@ Item {
         //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
         //示例：yield usegoods();
         function usegoods(fighthero, goods, params) {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _usegoods = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -2712,8 +2681,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'usegoods'});
             };
 
-            let ret = new Promise(_usegoods);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            let ret = $CommonLibJS.getPromise(_usegoods);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -2724,11 +2693,11 @@ Item {
         //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
         //示例：yield equip();
         function equip(fighthero, goods, params) {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _equip = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -2845,8 +2814,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'equip'});
             };
 
-            let ret = new Promise(_equip);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            let ret = $CommonLibJS.getPromise(_equip);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -2857,11 +2826,11 @@ Item {
         //返回：脚本的返回值（默认为旧装备或undefined）；false表示错误；null表示脚本不存在；
         //示例：yield unload();
         function unload(fighthero, positionName, params) {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _unload = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -2925,8 +2894,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'unload'});
             };
 
-            let ret = new Promise(_unload);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            let ret = $CommonLibJS.getPromise(_unload);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -2985,33 +2954,24 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = dialogTrade;
 
-                dialogTrade.show(goods, mygoodsinclude, pauseGame, callback);
+                dialogTrade.show(goods, mygoodsinclude, pauseGame, _callback);
             }
 
             return ret;
@@ -3203,7 +3163,7 @@ Item {
         //参数：channel为通道（目前0~9，-1为随机挑选没有播放的通道，如果没有则返回；-2为随机挑选没有播放的通道，如果没有则随机强制选择一个）；
         function playsoundeffect(soundeffectName, channel=-1, loops=1, forcePlay=false) {
             if(!forcePlay && game.soundeffectpausing())
-                return;
+                return -10;
 
             return rootSoundEffect.play(GameMakerGlobal.soundResourceURL(soundeffectName), channel, loops);
         }
@@ -3279,9 +3239,9 @@ Item {
             //if(_private.objVideos[videoRID] === undefined)
             //    return false;
 
-            if(videoParams.$videoOutput === undefined)
+            if(!videoParams.$videoOutput)
                 videoParams.$videoOutput = {};
-            if(videoParams.$mediaPlayer === undefined)
+            if(!videoParams.$mediaPlayer)
                 videoParams.$mediaPlayer = {};
 
 
@@ -3318,31 +3278,26 @@ Item {
 
 
 
-            let _resolve, _reject;
-            //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-            if($CommonLibJS.isFunction(itemVideo.fCallback)) {
-                ret = new Promise(function(resolve, reject) {
-                    _resolve = resolve; _reject = reject;
-                    const fcallback = itemVideo.fCallback;
-                    itemVideo.fCallback = (cb, ...params)=>{
-                        fcallback(cb, ...params);
-                        resolve(params[0]);
-                        //reject(params[0]);
-                    }
-                });
-            }
-            else {// if(videoParams.$callback === true || videoParams.$callback === undefined) {
-                ret = new Promise(function(resolve, reject) {
-                    _resolve = resolve; _reject = reject;
-                    itemVideo.fCallback = (cb, ...params)=>{
+            const callback = itemVideo.fCallback;
+
+            //let _resolve, _reject;
+            let _callback;
+            //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+            ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                //_resolve = resolve; _reject = reject;
+                _callback = (cb, ...params)=>{
+                    if($CommonLibJS.isFunction(callback))
+                        callback(cb, ...params);
+                    else
                         cb(...params);
-                        resolve(params[0]);
-                        //reject(params[0]);
-                    }
-                });
-            }
-            ret.$resolve = _resolve; ret.$reject = _reject;
+                    resolve(params[0]);
+                    //reject(params[0]);
+                };
+            });
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             ret.$params = itemVideo;
+
+            itemVideo.fCallback = _callback;
 
 
             return ret;
@@ -3416,8 +3371,14 @@ Item {
             let parentComp;
             //暂存位置
             let objTmpComponents;
+            //屏幕上
+            if(imageParams.$parent === 0) {
+                parentComp = rootGameScene;
+
+                objTmpComponents = _private.objTmpComponents;
+            }
             //游戏视窗
-            if(imageParams.$parent === 1) {
+            else if(imageParams.$parent === 1) {
                 parentComp = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -3462,8 +3423,11 @@ Item {
                 //不一定存在
                 objTmpComponents = parentComp.$tmpComponents;
             }
-            //固定屏幕上
+            //屏幕上
             else {
+                console.info('[GameScene]showimage:$parent参数不符，默认挂载在gameScene上');
+                //imageParams.$parent = 0;
+
                 parentComp = rootGameScene;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -3763,8 +3727,15 @@ Item {
                 return false;
 
 
+            //屏幕上
+            if(idParams.$parent === 0) {
+                //idParams.$parent = rootGameScene;
+
+                objTmpComponents = _private.objTmpComponents;
+                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+            }
             //游戏视窗
-            if(idParams.$parent === 1) {
+            else if(idParams.$parent === 1) {
                 //idParams.$parent = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -3811,7 +3782,7 @@ Item {
 
                 tmpImage = idParams;
             }
-            //固定屏幕上
+            //屏幕上
             else {
                 //idParams.$parent = rootGameScene;
 
@@ -3900,14 +3871,20 @@ Item {
             let parentComp;
             //暂存位置
             let objTmpComponents;
+            //屏幕上
+            if(spriteParams.$parent === 0) {
+                parentComp = rootGameScene;
+
+                objTmpComponents = _private.objTmpComponents;
+            }
             //游戏视窗
-            if(spriteParams.$parent === 1) {
+            else if(spriteParams.$parent === 1) {
                 parentComp = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
             }
             //会改变大小
-            if(spriteParams.$parent === 2) {
+            else if(spriteParams.$parent === 2) {
                 parentComp = itemViewPort.gameScene;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -3946,8 +3923,11 @@ Item {
                 //不一定存在
                 objTmpComponents = parentComp.$tmpComponents;
             }
-            //固定屏幕上
+            //屏幕上
             else {
+                console.info('[GameScene]showsprite:$parent参数不符，默认挂载在gameScene上');
+                //spriteParams.$parent = 0;
+
                 parentComp = rootGameScene;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -4260,8 +4240,15 @@ Item {
                 return false;
 
 
+            //屏幕上
+            if(idParams.$parent === 0) {
+                //idParams.$parent = rootGameScene;
+
+                objTmpComponents = _private.objTmpComponents;
+                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+            }
             //游戏视窗
-            if(idParams.$parent === 1) {
+            else if(idParams.$parent === 1) {
                 //idParams.$parent = itemViewPort;
 
                 objTmpComponents = _private.objTmpComponents;
@@ -4309,7 +4296,7 @@ Item {
 
                 tmpSprites = idParams;
             }
-            //固定屏幕上
+            //屏幕上
             else {
                 //idParams.$parent = rootGameScene;
 
@@ -4377,7 +4364,7 @@ Item {
         //将场景缩放n倍；可以是小数。
         readonly property var scale: function(n) {
             itemViewPort.gameScene.scale = parseFloat(n);
-            setSceneToRole(_private.sceneRole);
+            setSceneToRole();
 
             game.gd['$sys_scale'] = parseFloat(n);
         }
@@ -4395,14 +4382,15 @@ Item {
                     return false;
 
                 _private.sceneRole = role;
-                setSceneToRole(_private.sceneRole);
+                setSceneToRole();
+            }
+            else if($CommonLibJS.isObject(r)) {
+                _private.sceneRole = r;
+                setSceneToRole();
             }
             else if($CommonLibJS.isNumber(r)) {
                 _private.sceneRole = null;
                 _private.config.rSceneMoveSpeed = r;
-            }
-            else if($CommonLibJS.isObject(r)) {
-                _private.sceneRole = r;
             }
             else
                 _private.sceneRole = null;
@@ -4421,6 +4409,18 @@ Item {
 
             timer.stop();
             _private.stopMove(0);
+
+            //暂停所有人物动作
+            for(let tr in _private.arrMainRoles) {
+                let role = _private.arrMainRoles[tr];
+                role.$props.$$running_backup = role.sprite.sprite.bRunning;
+                role.sprite.sprite.bRunning = false;
+            }
+            for(let tr in _private.objRoles) {
+                let role = _private.objRoles[tr];
+                role.$props.$$running_backup = role.sprite.sprite.bRunning;
+                role.sprite.sprite.bRunning = false;
+            }
 
             if(_private.config.objPauseNames[name] > 0) {
                 _private.config.objPauseNames[name] += times;
@@ -4462,6 +4462,18 @@ Item {
             if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 timer.start();
                 //_private.config.bPauseGame = false;
+            }
+
+            //恢复所有人物动作
+            for(let tr in _private.arrMainRoles) {
+                let role = _private.arrMainRoles[tr];
+                if(role.$props.$$running_backup)
+                    role.sprite.sprite.bRunning = role.$props.$$running_backup;
+            }
+            for(let tr in _private.objRoles) {
+                let role = _private.objRoles[tr];
+                if(role.$props.$$running_backup)
+                    role.sprite.sprite.bRunning = role.$props.$$running_backup;
             }
 
             //joystick.enabled = true;
@@ -4532,33 +4544,24 @@ Item {
                     }
                 */
 
-                let _resolve, _reject;
-                //如果callback是自定义函数，则调用自定义函数（fcallback），否则调用默认函数（cb）
-                if($CommonLibJS.isFunction(callback)) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        const fcallback = callback;
-                        callback = (cb, ...params)=>{
-                            fcallback(cb, ...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                else {// if(callback === true) {
-                    ret = new Promise(function(resolve, reject) {
-                        _resolve = resolve; _reject = reject;
-                        callback = (cb, ...params)=>{
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
                             cb(...params);
-                            resolve(params[0]);
-                            //reject(params[0]);
-                        }
-                    });
-                }
-                ret.$resolve = _resolve; ret.$reject = _reject;
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
                 ret.$params = gameMenuWindow;
 
-                gameMenuWindow.show(params.$id, params.$value, style, pauseGame, callback);
+                gameMenuWindow.show(params.$id, params.$value, style, pauseGame, _callback);
             }
             else
                 gameMenuWindow.closeWindow(params.$id);
@@ -4647,14 +4650,15 @@ Item {
         //showName为显示名；
         //compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
         //成功返回 存档序列化字符串，失败返回false；
+        //game.async(function*(){game.save('存档3')})
         readonly property var save: function(fileName='autosave', showName='', compressionLevel=-1) {
             //scriptQueue.runNextEventLoop('save');
 
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _save = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -4754,8 +4758,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'save'});
             };
 
-            let ret = new Promise(_save);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            const ret = $CommonLibJS.getPromise(_save);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -4763,12 +4767,12 @@ Item {
         //data为字符串（本地存档文件路径）或对象；
         //成功返回true（生成器返回true），失败返回false。
         readonly property var load: function(data='autosave') {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->$CommonLibJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _load = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //这里用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 $CommonLibJS.asyncScript(function*() {
@@ -4845,8 +4849,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'load'});
             };
 
-            let ret = new Promise(_load);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            const ret = $CommonLibJS.getPromise(_load);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -4880,11 +4884,11 @@ Item {
         //返回插件
         //参数0是组织/开发者名，参数1是插件名
         readonly property var plugin: function(...params) {
-            let _resolve, _reject;
+            //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
             const _plugin = function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+                //_resolve = resolve; _reject = reject;
 
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -4932,8 +4936,8 @@ Item {
                 //}(), {Priority: -2, Type: 0, Running: 0, Tips: 'plugin'});
             };
 
-            let ret = new Promise(_plugin);
-            ret.$resolve = _resolve; ret.$reject = _reject;
+            const ret = $CommonLibJS.getPromise(_plugin);
+            //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
 
@@ -5457,6 +5461,9 @@ Item {
             //readonly property alias objVideos: _private.objVideos
         }
 
+        //用户数据（可以保存与运行工程生命周期一致的数据）
+        property var $data: ({})
+
 
         //上次帧间隔时长
         property int $frameDuration: 0
@@ -5536,8 +5543,10 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: 'black'
         //opacity: 0
+        //color: Global.style.backgroundColor
+        color: 'black'
+        //radius: 9
     }
 
 
@@ -6189,12 +6198,14 @@ Item {
 
 
         visible: false
+        //opacity: 0
         //anchors.fill: parent
         width: parent.width
         height: parent.height
         z: 9
 
         color: Global.style.backgroundColor
+        //radius: 9
 
 
 
@@ -6337,6 +6348,8 @@ Item {
                 if(!game.musicpausing())
                     //if(audioBackgroundMusic.playbackState !== Audio.StoppedState)
                     audioBackgroundMusic.play();
+                else
+                    audioBackgroundMusic.pause();
                 //nPauseTimes = 0;
             }
 
@@ -6511,17 +6524,17 @@ Item {
                 se.play();
             }
 
-            let _resolve, _reject;
-            const res = new Promise(function(resolve, reject) {
-                _resolve = resolve; _reject = reject;
+            //let _resolve, _reject;
+            const ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                //_resolve = resolve; _reject = reject;
                 se.fnStoppedCallback = function() {
                     resolve(se.source);
                     se.source = '';
                 }
             });
-            res.$resolve = _resolve; res.$reject = _reject;
-            res.$params = se;
-            return res;
+            //ret.$resolve = _resolve; ret.$reject = _reject;
+            ret.$params = se;
+            return ret;
         }
 
         function stop(index=-1) {
@@ -6556,19 +6569,31 @@ Item {
             else if(name === false) { //存档
                 game.gd['$sys_sound'] &= ~0b10;
             }
-            else if($CommonLibJS.isNumber(name) && name >= 0 && name < arrCacheSoundEffects.length) {
-                const se = arrCacheSoundEffects[name];
-                if(!se)
-                    return false;
-                if(se.isPlaying())
-                    se.pause();
-                return true;
-            }
             else if(name && $CommonLibJS.isString(name)) {
                 //if(objSoundEffectPause[name] === 1)
                 //    console.warn('游戏被多次暂停，请检查是否有暂停游戏的指令（比如msg、menu等）没有使用yield？');
                 objSoundEffectPause[name] = (objSoundEffectPause[name] ? objSoundEffectPause[name] + 1 : 1);
                 //objSoundEffectPause[name] = 1;
+            }
+            else if($CommonLibJS.isNumber(name)) { //某个通道（-1为全部）
+                if(name >= 0 && name < arrCacheSoundEffects.length) {
+                    const se = arrCacheSoundEffects[name];
+                    if(!se)
+                        return false;
+                    if(se.isPlaying())
+                        se.pause();
+                    return true;
+                }
+                else if(name < 0) {
+                    for(let se of arrCacheSoundEffects.length) {
+                        if(!se)
+                            continue;
+                        if(se.isPlaying())
+                            se.pause();
+                    }
+                    return true;
+                }
+                return false;
             }
             else
                 return false;
@@ -6653,6 +6678,7 @@ Item {
 
 
         property real rVolume: 1.0
+        property bool bMuted: false
 
         property var arrCacheSoundEffects: ([]) //音效组件
 
@@ -6760,15 +6786,15 @@ Item {
         }
 
         onAccepted: {
-            //gameMap.focus = true;
-            rootGameScene.forceActiveFocus();
             console.debug(eval(textScript.text));
             //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
+
+            rootGameScene.forceActiveFocus();
         }
         onRejected: {
-            //gameMap.focus = true;
-            rootGameScene.forceActiveFocus();
             //console.log('Cancel clicked');
+
+            rootGameScene.forceActiveFocus();
         }
     }
 
@@ -6847,7 +6873,7 @@ Item {
         }
 
         //场景跟踪角色
-        property var sceneRole: mainRole
+        property var sceneRole: null //mainRole
 
         //游戏目前阶段（0：正常；1：战斗）
         property int nStage: 0
@@ -6913,7 +6939,7 @@ Item {
             //创建时回调
             $create: function(p) {
                 let o = compCacheSpriteEffect.createObject(p);
-                /*o.sg_playEffect.connect(function(soundeffectSource) {
+                /*o.sg_playSoundEffect.connect(function(soundeffectSource) {
                     game.playsoundeffect(soundeffectSource, -1);
                 });
                 */
@@ -7201,8 +7227,9 @@ Item {
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if(rootGameScene)rootGameScene.forceActiveFocus();
                     exitGame(false);
+
+                    if(rootGameScene)rootGameScene.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     if(rootGameScene)rootGameScene.forceActiveFocus();
@@ -7492,8 +7519,11 @@ Item {
                 anchors.fill: parent
 
                 visible: color.a !== 0
+                //opacity: 0
 
+                //color: Global.style.backgroundColor
                 color: 'transparent'
+                //radius: 9
 
                 mouseArea.onPressed: {
                     rootRoleMsg.clicked();
@@ -7767,8 +7797,11 @@ Item {
                 anchors.fill: parent
 
                 visible: color.a !== 0
+                //opacity: 0
 
+                //color: Global.style.backgroundColor
                 color: '#7FFFFFFF'
+                //radius: 9
 
                 mouseArea.onPressed: {
                     rootGameMsgDialog.clicked();
@@ -7983,8 +8016,11 @@ Item {
                 anchors.fill: parent
 
                 visible: color.a !== 0
+                //opacity: 0
 
+                //color: Global.style.backgroundColor
                 color: '#60000000'
+                //radius: 9
             }
 
             Rectangle {
@@ -8180,8 +8216,11 @@ Item {
                 anchors.fill: parent
 
                 visible: color.a !== 0
+                //opacity: 0
 
+                //color: Global.style.backgroundColor
                 color: '#7FFFFFFF'
+                //radius: 9
 
                 mouseArea.onPressed: {
                     //rootGameInput.visible = false;
@@ -8504,14 +8543,14 @@ Item {
 
 
             //自定义属性（也包含系统一些常用属性，比如$id、$index、$name、$showName、$avatar、$avatarSize等）
-            //主角的会被保存，NPC不会
+            //主角的会被保存到存档，NPC不会
             property var $data: null
             //其他属性（用户自定义）
-            //目前没用到
+            //目前只用到 $$running_backup
             property var $props: ({})
 
-            property var $info: null
-            property var $script: null
+            property var $info: null //json文件
+            property var $script: null //js脚本
             //property string $name: ''
             //property string $avatar: ''
             //property size $avatarSize: Qt.size(0, 0)
@@ -8745,7 +8784,7 @@ Item {
     }
 
 
-    //音效
+    //音效（目前引擎没用到）
     Component {
         id: compCacheSoundEffect
 
@@ -8755,7 +8794,7 @@ Item {
             }
 
 
-            volume: rootSoundEffect.rVolume
+            //volume: rootSoundEffect.rVolume
 
             property var fnPlayingCallback: null
             property var fnStatusChangedCallback: null
@@ -8787,7 +8826,7 @@ Item {
             }
 
 
-            volume: rootSoundEffect.rVolume
+            //volume: rootSoundEffect.rVolume
 
             property var fnPlayingCallback: null
             property var fnStoppedCallback: null
@@ -8891,8 +8930,8 @@ Item {
             //组件类型（用来识别）
             readonly property int $componentType: 2
 
-            property var $info: null
-            property var $script: null
+            property var $info: null //json文件
+            property var $script: null //js脚本
             //property bool bUsing: false
 
             //回调函数
@@ -8956,7 +8995,7 @@ Item {
             }
 
 
-            onSg_playEffect: {
+            onSg_playSoundEffect: {
                 game.playsoundeffect(soundeffectSource, -1);
             }
 
@@ -8986,26 +9025,50 @@ Item {
 
         function onStateChanged() {
             switch(Qt.application.state) {
-            case Qt.ApplicationActive:   //每次窗口激活时触发
-                _private.arrPressedKeys = [];
-                //mainRole.$$nMoveDirectionFlag = 0;
+            case Qt.ApplicationActive: { //每次窗口激活时触发
+                    _private.arrPressedKeys = [];
+                    //mainRole.$$nMoveDirectionFlag = 0;
 
-                if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveBackgroundMusic') ?? false))
-                    itemBackgroundMusic.resume('$sys_inactive');
-                if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? false))
-                    rootSoundEffect.resume('$sys_inactive');
-                mediaPlayer.muted = false;
+
+                    let value;
+                    if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveBackgroundMusic') ?? false))
+                        itemBackgroundMusic.resume('$sys_inactive');
+
+                    value = GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? 0b10;
+                    if((value & 0b1) === 0)
+                        rootSoundEffect.resume('$sys_inactive');
+                    if((value & 0b10) === 0)
+                        rootSoundEffect.bMuted = false;
+
+                    value = GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveVideo') ?? 1;
+                    if(value === 0)
+                        mediaPlayer.play(); //!这里应该改为和 music 和 soundeffect 一样的暂停，但无所谓了
+                    else if(value === 1)
+                        mediaPlayer.muted = false;
+                }
 
                 break;
-            case Qt.ApplicationInactive:    //每次窗口非激活时触发
-                _private.arrPressedKeys = [];
-                //mainRole.$$nMoveDirectionFlag = 0;
+            case Qt.ApplicationInactive: { //每次窗口非激活时触发
+                    _private.arrPressedKeys = [];
+                    //mainRole.$$nMoveDirectionFlag = 0;
 
-                if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveBackgroundMusic') ?? false))
-                    itemBackgroundMusic.pause('$sys_inactive');
-                if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? false))
-                    rootSoundEffect.pause('$sys_inactive');
-                mediaPlayer.muted = true;
+
+                    let value;
+                    if(!(GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveBackgroundMusic') ?? false))
+                        itemBackgroundMusic.pause('$sys_inactive');
+
+                    value = GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveSoundEffect') ?? 0b10;
+                    if((value & 0b1) === 0)
+                        rootSoundEffect.pause('$sys_inactive');
+                    if((value & 0b10) === 0)
+                        rootSoundEffect.bMuted = true;
+
+                    value = GameSceneJS.getCommonScriptResource('$config', '$game', '$inactiveVideo') ?? 1;
+                    if(value === 0)
+                        mediaPlayer.pause(); //!这里应该改为和 music 和 soundeffect 一样的暂停，但无所谓了
+                    else if(value === 1)
+                        mediaPlayer.muted = true;
+                }
 
                 break;
             case Qt.ApplicationSuspended:   //程序挂起（比如安卓的后台运行、息屏）
@@ -9034,9 +9097,7 @@ Item {
         function onSg_messageHandler(msgType, msg) {
         }
         function onRAspectRatioChanged() {
-            if(_private.sceneRole)
-                //开始移动地图
-                setSceneToRole(_private.sceneRole);
+            setSceneToRole();
         }
     }
 

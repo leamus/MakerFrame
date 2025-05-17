@@ -988,7 +988,7 @@ Item {
                 $GameMakerGlobalJS.$config.$spriteEffect.$smooth,
                 true)
 
-            onSg_playEffect: {
+            onSg_playSoundEffect: {
                 game.playsoundeffect(soundeffectSource, -1);
             }
         }
@@ -998,8 +998,10 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: 'black'
         //opacity: 0
+        //color: Global.style.backgroundColor
+        color: 'black'
+        //radius: 9
     }
 
 
@@ -1249,7 +1251,7 @@ Item {
                             }
                         }
 
-                        onSg_playEffect: {
+                        onSg_playSoundEffect: {
                             game.playsoundeffect(soundeffectSource, -1);
                         }
                     }
@@ -1459,7 +1461,7 @@ Item {
                             }
                         }
 
-                        onSg_playEffect: {
+                        onSg_playSoundEffect: {
                             game.playsoundeffect(soundeffectSource, -1);
                         }
                     }
@@ -1902,7 +1904,10 @@ Item {
 
         Mask {
             anchors.fill: parent
+            //opacity: 0
+            //color: Global.style.backgroundColor
             color: '#10000000'
+            //radius: 9
 
             mouseArea.onPressed: {
                 parent.visible = false;

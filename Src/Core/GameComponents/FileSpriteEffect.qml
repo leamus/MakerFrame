@@ -48,7 +48,7 @@ Item {
     signal sg_stoped();
 
     //播放音效
-    signal sg_playEffect(string soundeffectSource)
+    signal sg_playSoundEffect(string soundeffectSource)
 
 
 
@@ -446,7 +446,7 @@ Item {
                 soundeffect.play();
             }
             else
-                sg_playEffect(root.strSoundeffectName);
+                sg_playSoundEffect(root.strSoundeffectName);
         }
     }
 

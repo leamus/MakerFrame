@@ -47,8 +47,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -72,6 +73,10 @@ Item {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextField.Wrap
+
+                onTextChanged: {
+                    _private.refresh();
+                }
             }
 
             Button {
@@ -137,6 +142,10 @@ Item {
                 //selectByKeyboard: true
                 selectByMouse: true
                 //wrapMode: TextField.Wrap
+
+                onTextChanged: {
+                    imageIcon.source = textIconPath.text;
+                }
             }
 
             Image {
@@ -146,6 +155,8 @@ Item {
                 Layout.preferredHeight: 50
                 //width: 50
                 //height: 50
+
+                //source: textIconPath.text
             }
 
             Button {
@@ -196,6 +207,43 @@ Item {
             }
         }
 
+        ComboBox {
+            id: comboType
+
+            Layout.fillWidth: true
+
+
+            model: ['重新生成全部文件', '只重新复制工程', '只修改配置']
+
+            background: Rectangle {
+                //implicitWidth: comboBoxComponentItem.comboBoxWidth
+                implicitHeight: 35
+                //border.color: control.pressed ? '#6495ED' : '#696969'
+                //border.width: control.visualFocus ? 2 : 1
+                color: 'transparent'
+                //border.color: comboBoxComponentItem.color
+                border.width: 2
+                radius: 6
+            }
+
+            onActivated: {
+                console.debug('[PackageAndroid]ComboBox:', comboType.currentIndex,
+                              comboType.currentText,
+                              comboType.currentValue);
+            }
+            /*onHighlighted: {
+                console.debug('onHighlighted:', comboType.currentIndex,
+                              comboType.currentText,
+                              comboType.currentValue);
+            }
+            onAccepted: {
+                console.debug(comboType.currentIndex,
+                              comboType.currentText,
+                              comboType.currentValue);
+            }*/
+
+        }
+
         Label {
             Layout.fillWidth: true
 
@@ -233,7 +281,7 @@ Item {
 
             text: '生　成'
             onClicked: {
-                _private.makePackage();
+                _private.make();
             }
         }
     }
@@ -261,7 +309,7 @@ Item {
             //rootGameMaker.focus = true;
             //rootGameMaker.forceActiveFocus();
 
-            console.debug('[AndroidConfigure]You chose:', fileUrl, fileUrls);
+            console.debug('[PackageAndroid]You chose:', fileUrl, fileUrls);
 
 
             let fUrl;
@@ -272,12 +320,11 @@ Item {
                 fUrl = $GlobalJS.toPath($Frame.sl_urlDecode(fileUrl.toString()));
 
             textPackageDirPath.text = fUrl;
-            _private.init();
 
             root.forceActiveFocus();
         }
         onRejected: {
-            console.debug('[AndroidConfigure]onRejected');
+            console.debug('[PackageAndroid]onRejected');
             //rootGameMaker.forceActiveFocus();
 
 
@@ -302,7 +349,7 @@ Item {
         selectFolder: false
 
         onAccepted: {
-            console.debug('[AndroidConfigure]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
+            console.debug('[PackageAndroid]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {
@@ -314,24 +361,23 @@ Item {
                     textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
                 else
-                    textImageResourceName.text = fileUrl;
+                    textImageResourceName.text = fileUrl.toString();
             }
             else
-                textImageResourceName.text = fileUrl;
+                textImageResourceName.text = fileUrl.toString();
             */
 
             let path;
             if(Qt.platform.os === 'android')
-                path = $Platform.sl_getRealPathFromURI(fileUrl);
+                path = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                path = $Frame.sl_urlDecode(fileUrl);
+                path = $Frame.sl_urlDecode(fileUrl.toString());
 
             textIconPath.text = $GlobalJS.toURL(path);
-            imageIcon.source = $GlobalJS.toURL(path);
         }
 
         onRejected: {
-            console.debug('[AndroidConfigure]onRejected');
+            console.debug('[PackageAndroid]onRejected');
 
             //gameMap.forceActiveFocus();
         }
@@ -348,8 +394,8 @@ Item {
         //property string strPackageDir: 'D:/Documents/Desktop/QtEnv/_MakerFrame/Packages/Android/MakerFrame_鹰歌软件框架游戏引擎_ALL_Qt5.15.2'
         property alias strPackageDir: textPackageDirPath.text
 
-        //初始化，读取配置
-        function init() {
+        //初始化，刷新配置
+        function refresh() {
             textGameName.text = '';
             textPackageName.text = '';
             textIconPath.text = '';
@@ -504,7 +550,7 @@ Item {
 
 
             //复制 icon
-            if($Frame.sl_fileExists($GlobalJS.toPath(textIconPath.text))) {
+            if(textIconPath.text.trim() && $Frame.sl_fileExists($GlobalJS.toPath(textIconPath.text))) {
                 $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
                 $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
                 $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
@@ -514,13 +560,13 @@ Item {
             }
         }
 
-        //制作打包环境
-        function makePackage() {
+        //生成
+        function make() {
             let path = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games';
 
             let zipFiles = $Frame.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
             zipFiles.sort();
-            console.debug('[PackageAndroid]makePackage zip files:', zipFiles);
+            console.debug('[PackageAndroid]make zip files:', zipFiles);
 
             /*let needFilesName = ['Android_Package_', 'Android_MakerFrame_GameRuntime_'];
             let needFilesIndex = [];
@@ -539,20 +585,6 @@ Item {
                 missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
             if(!zipFiles[1] || zipFiles[1].indexOf('MakerFrame_Package_Android_') < 0)
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
-
-            if(missingFiles !== '') {
-                rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '请将 <font color="red">%1</font> 文件下载并放入 <font color="red">%2</font> 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
-                    Buttons: Dialog.Yes,
-                    OnAccepted: function() {
-                        root.forceActiveFocus();
-                    },
-                    OnRejected: ()=>{
-                        root.forceActiveFocus();
-                    },
-                });
-                return false;
-            }
 
 
             //let strPackageDir = path + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
@@ -579,16 +611,18 @@ Item {
                     let ret;
 
                     try {
-                        if(packageType === 1) {
+                        if(packageType === 1) { //只是工程
                             $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
+
+                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
                         }
-                        else if(packageType === 2) {
+                        else if(packageType === 0) { //全部
                             $Frame.sl_removeRecursively(strPackageDir);
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
-                        }
 
-                        ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                        }
                     } catch(e) {
                         $CommonLibJS.printException(e);
                         return;
@@ -612,43 +646,64 @@ Item {
                             root.forceActiveFocus();
                         },
                     });
-                },200,root);
+                }, 200, root);
 
                 //root.forceActiveFocus();
             }
 
-            if($Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
+            let msg;
+            if(comboType.currentIndex === 0) { //需要两个压缩文件
+                if(missingFiles !== '') {
+                    rootWindow.aliasGlobal.dialogCommon.show({
+                        Msg: '请将 <font color="red">%1</font> 文件下载并放入 <font color="red">%2</font> 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
+                        Buttons: Dialog.Yes,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+                    return false;
+                }
+                msg = '找到：<font color="red">' + zipFiles.join(',') + '</font><br><font color="red">注意：此操作会删除 打包文件夹的所有文件，请确保路径选择正确！</font><br>确定？';
+            }
+            else { //需要 AndroidManifest.xml 和其他配置文件
+                if(!$Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
+                    rootWindow.aliasGlobal.dialogCommon.show({
+                        Msg: '没有找到配置文件，请先选择“重新生成全部文件”',
+                        Buttons: Dialog.Yes | Dialog.No,
+                        OnAccepted: function() {
+                            root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            root.forceActiveFocus();
+                        },
+                        OnDiscarded: ()=>{
+                            root.forceActiveFocus();
+                        },
+                    });
+                    return false;
+                }
+                if(comboType.currentIndex === 1)
+                    msg = '<font color="red">此操作会删除 打包文件夹的项目的所有文件，请确保路径选择正确！</font><br>确定？';
+                else if(comboType.currentIndex === 2)
+                    msg = '确定？';
+            }
 
-                rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '检测到有旧打包文件夹，Yes（是）：只更新工程；Discard（丢弃）：更新整个打包文件夹<br><font color="red">此操作会删除打包文件夹路径，请确保路径选择正确！</font>',
-                    Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
-                    OnAccepted: function() {
-                        continueScript(1);
-                    },
-                    OnRejected: ()=>{
-                        root.forceActiveFocus();
-                    },
-                    OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
-                        continueScript(2);
-                    },
-                });
-            }
-            else {
-                rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '找到：<font color="red">' + zipFiles.join(',') + '</font>，是否继续？',
-                    Buttons: Dialog.Yes | Dialog.No,
-                    OnAccepted: function() {
-                        continueScript(2);
-                    },
-                    OnRejected: ()=>{
-                        root.forceActiveFocus();
-                    },
-                    OnDiscarded: ()=>{
-                        root.forceActiveFocus();
-                    },
-                });
-            }
+            rootWindow.aliasGlobal.dialogCommon.show({
+                Msg: msg,
+                Buttons: Dialog.Yes | Dialog.No,
+                OnAccepted: function() {
+                    continueScript(comboType.currentIndex);
+                },
+                OnRejected: ()=>{
+                    root.forceActiveFocus();
+                },
+                OnDiscarded: ()=>{
+                    root.forceActiveFocus();
+                },
+            });
 
             return true;
         }
@@ -682,7 +737,7 @@ Item {
     Component.onCompleted: {
         //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
         textPackageDirPath.text = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-        _private.init();
+        _private.refresh();
 
         console.debug('[PackageAndroid]Component.onCompleted');
     }

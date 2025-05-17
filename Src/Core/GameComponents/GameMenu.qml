@@ -180,6 +180,7 @@ Rectangle {
     property int nChoiceListIndex: -1
 
     property string strTitle: ''
+    property int nWrapMode: TextEdit.WordWrap
 
 
     property alias rectMenuTitle: rectMenuTitle
@@ -219,6 +220,7 @@ Rectangle {
                 color: colorItemFontColor
 
                 textFormat: TextEdit.RichText
+                wrapMode: root.nWrapMode
 
                 horizontalAlignment: root.itemAlignment
                 verticalAlignment: Text.AlignVCenter

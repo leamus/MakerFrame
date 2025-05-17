@@ -47,8 +47,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -499,7 +500,7 @@ Item {
         //创建时回调
         $create: function(p) {
             let o = compCacheSpriteEffect.createObject(p);
-            /*o.sg_playEffect.connect(function(soundeffectSource) {
+            /*o.sg_playSoundEffect.connect(function(soundeffectSource) {
                 。。。
             });
             */

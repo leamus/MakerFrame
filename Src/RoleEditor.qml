@@ -530,8 +530,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -2093,9 +2094,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textRoleImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
+                textRoleImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                textRoleImageURL.text = $Frame.sl_urlDecode(fileUrl);
+                textRoleImageURL.text = $Frame.sl_urlDecode(fileUrl.toString());
 
             textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
 
@@ -2397,15 +2398,15 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl);
-            //let cfg = $Frame.sl_fileRead(fileUrl);
+            //let cfg = File.read(fileUrl.toString());
+            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             visible = false;
             //root.focus = true;
             root.forceActiveFocus();
 
-            console.debug('[RoleEditor]fileURL', textRoleImageURL.text);
+            console.debug('[RoleEditor]Role image file URL:', textRoleImageURL.text);
         }
 
         onSg_canceled: {
@@ -2609,11 +2610,12 @@ Item {
         id: rectImage
 
         visible: false
+        //opacity: 0
 
         anchors.fill: parent
 
         color: Global.style.backgroundColor
-        //opacity: 0
+        //radius: 9
 
         Image {
             id: image

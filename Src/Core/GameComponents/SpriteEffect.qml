@@ -87,7 +87,7 @@ Loader {
             onSg_paused: root.sg_paused()
             onSg_stoped: root.sg_stoped()
 
-            onSg_playEffect: root.sg_playEffect(soundeffectSource)
+            onSg_playSoundEffect: root.sg_playSoundEffect(soundeffectSource)
 
 
             Component.onCompleted: {
@@ -154,7 +154,7 @@ Loader {
             onSg_paused: root.sg_paused()
             onSg_stoped: root.sg_stoped()
 
-            onSg_playEffect: root.sg_playEffect(soundeffectSource)
+            onSg_playSoundEffect: root.sg_playSoundEffect(soundeffectSource)
 
 
             Component.onCompleted: {
@@ -214,7 +214,7 @@ Loader {
     signal sg_stoped();
 
     //播放音效
-    signal sg_playEffect(string soundeffectSource)
+    signal sg_playSoundEffect(string soundeffectSource)
 
 
 

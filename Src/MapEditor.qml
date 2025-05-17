@@ -287,8 +287,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -2856,7 +2857,7 @@ Item {
 
 
             //console.debug('You chose:', fileUrl, fileUrls);
-            _private.exportMap(fileUrl);
+            _private.exportMap(fileUrl.toString());
         }
         onRejected: {
             //console.log('Canceled');

@@ -161,8 +161,9 @@ Item {
 
     Mask {
         anchors.fill: parent
-        color: Global.style.backgroundColor
         //opacity: 0
+        color: Global.style.backgroundColor
+        //radius: 9
     }
 
 
@@ -1069,9 +1070,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textSpriteImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
+                textSpriteImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                textSpriteImageURL.text = $Frame.sl_urlDecode(fileUrl);
+                textSpriteImageURL.text = $Frame.sl_urlDecode(fileUrl.toString());
 
             textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf('/') + 1);
 
@@ -1370,15 +1371,15 @@ Item {
             checkboxSaveSpriteImageResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl);
-            //let cfg = $Frame.sl_fileRead(fileUrl);
+            //let cfg = File.read(fileUrl.toString());
+            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             visible = false;
             //root.focus = true;
             root.forceActiveFocus();
 
-            console.debug('[SpriteEditor]fileURL', textSpriteImageURL.text);
+            console.debug('[SpriteEditor]Sprite Image file URL:', textSpriteImageURL.text);
         }
 
         onSg_canceled: {
@@ -1440,9 +1441,9 @@ Item {
 
 
             if(Qt.platform.os === 'android')
-                textSpriteSoundURL.text = $Platform.sl_getRealPathFromURI(fileUrl);
+                textSpriteSoundURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                textSpriteSoundURL.text = $Frame.sl_urlDecode(fileUrl);
+                textSpriteSoundURL.text = $Frame.sl_urlDecode(fileUrl.toString());
 
             textSpriteSoundResourceName.text = textSpriteSoundURL.text.slice(textSpriteSoundURL.text.lastIndexOf('/') + 1);
 
@@ -1745,15 +1746,15 @@ Item {
             checkboxSaveSpriteSoundResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl);
-            //let cfg = $Frame.sl_fileRead(fileUrl);
+            //let cfg = File.read(fileUrl.toString());
+            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             //root.focus = true;
             root.forceActiveFocus();
             visible = false;
 
-            console.debug('[SpriteEditor]fileURL', textSpriteSoundURL.text);
+            console.debug('[SpriteEditor]Sprite sound file URL:', textSpriteSoundURL.text);
         }
 
         onSg_canceled: {
@@ -1954,11 +1955,12 @@ Item {
         id: rectImage
 
         visible: false
+        //opacity: 0
 
         anchors.fill: parent
 
         color: Global.style.backgroundColor
-        //opacity: 0
+        //radius: 9
 
         Image {
             id: image
