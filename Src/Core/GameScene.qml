@@ -5238,6 +5238,9 @@ Item {
         //在f和gf中定义某些特定功能的函数，系统会自动触发（优先级：地图脚本高于f高于gf）
         //  比如地图事件、地图离开事件、NPC交互事件、地图点击事件、NPC点击事件、定时器事件、NPC抵达事件、NPC触碰事件
 
+        //用户数据（可以保存与运行工程生命周期一致的数据）
+        property var g: ({})
+
 
 
         //项目根目录
@@ -5460,9 +5463,6 @@ Item {
             //readonly property alias objMusic: _private.objMusic
             //readonly property alias objVideos: _private.objVideos
         }
-
-        //用户数据（可以保存与运行工程生命周期一致的数据）
-        property var $data: ({})
 
 
         //上次帧间隔时长
@@ -6317,7 +6317,7 @@ Item {
 
         }
         Component.onDestruction: {
-            game.stopvideo(-1);
+            //game.stopvideo(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
         }
     }
 
@@ -7267,7 +7267,10 @@ Item {
                     //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
 
 
-                    sg_close();
+                    //等待组件都释放完毕，再关闭（Loader释放时会直接析构rootGameScene和所有组件）；
+                    $CommonLibJS.runNextEventLoop(function(...params) {
+                        sg_close();
+                    }, 'sg_close');
 
 
                 }(), 'exitGame');
@@ -7591,7 +7594,7 @@ Item {
             Component.onCompleted: {
             }
             Component.onDestruction: {
-                over(-1);
+                //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
             }
         }
     }
@@ -7874,10 +7877,9 @@ Item {
             Component.onCompleted: {
             }
             Component.onDestruction: {
-                over(-1);
+                //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
             }
         }
-
     }
 
     //游戏选择菜单
@@ -8060,7 +8062,7 @@ Item {
             Component.onCompleted: {
             }
             Component.onDestruction: {
-                over(-1);
+                //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
             }
         }
     }
@@ -8346,7 +8348,7 @@ Item {
             Component.onCompleted: {
             }
             Component.onDestruction: {
-                over('');
+                //over(''); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
             }
         }
     }
