@@ -142,9 +142,6 @@ Notepad {
     radius: height / 20
 
 
-    //font.pointSize: 16
-
-
     //textArea.enabled: false
     textArea.readOnly: true
     textArea.color: 'white'
@@ -152,6 +149,9 @@ Notepad {
     textArea.selectByKeyboard: false
     textArea.selectByMouse: false
     textArea.wrapMode: TextArea.WrapAnywhere
+
+    //textArea.horizontalAlignment: TextArea.AlignLeft //TextArea.AlignHCenter //TextArea.AlignJustify
+    //textArea.verticalAlignment: TextArea.AlignTop //TextArea.AlignVCenter
 
 
     /*
@@ -173,6 +173,9 @@ Notepad {
     /*textArea.onReleased: {
         root.sg_mouseReleased();
     }*/
+
+
+    //textArea.font.pointSize: 16
 
 
 

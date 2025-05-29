@@ -2272,6 +2272,51 @@ function $readSavesInfo(count=3) {
 
 
 
+//type：true表示保持宽高缩放到适合窗口；false：拉伸到满窗口；数字：缩放倍数；数组：x、y方向缩放倍数；且默认居中窗口；
+function setSceneSize(width, height, type=true) {
+    const xScale = game.$sys.screen.width / width;
+    const yScale = game.$sys.screen.height / height;
+
+    game.$sys.scene.width = width >= 0 ? width : game.$sys.scene.parent.width;
+    game.$sys.scene.height = height >= 0 ? height : game.$sys.scene.parent.height;
+
+    //将作用点移动到中间，game.$sys.scene.anchors.centerIn 才可以居中（说明anchors计算时没有考虑到缩放因素，只是简单的按width和height来计算x、y）；
+    //game.$sys.scene.transform = Qt.createQmlObject(`import QtQuick 2.14; Scale { xScale: ${game.$sys.screen.width / Config.sceneWidth}; yScale: ${game.$sys.screen.height / Config.sceneHeight}}`, game.$sys.scene);
+    game.$sys.scene.transform[0].origin.x = game.$sys.scene.width / 2;
+    game.$sys.scene.transform[0].origin.y = game.$sys.scene.height / 2;
+
+    if(type === true)
+        game.$sys.scene.transform[0].xScale = game.$sys.scene.transform[0].yScale = Math.min(xScale, yScale);
+    else if(type === false) {
+        game.$sys.scene.transform[0].xScale = xScale;
+        game.$sys.scene.transform[0].yScale = yScale;
+    }
+    else if($CommonLibJS.isValidNumber(type, 0b1))
+        game.$sys.scene.transform[0].xScale = game.$sys.scene.transform[0].yScale = parseFloat(type);
+    else if($CommonLibJS.isArray(type)) {
+        if($CommonLibJS.isValidNumber(type[0], 0b1))
+            game.$sys.scene.transform[0].xScale = parseFloat(type[0]);
+        if($CommonLibJS.isValidNumber(type[1], 0b1))
+            game.$sys.scene.transform[0].yScale = parseFloat(type[1]);
+    }
+    else if(type === null) {
+        //game.$sys.scene.transform[0].xScale = 1;
+        //game.$sys.scene.transform[0].yScale = 1;
+    }
+    else {
+        console.warn('[!GameMakerGlobalJS]参数错误');
+        return false;
+    }
+
+    //只居中，不绑定
+    game.$sys.scene.anchors.centerIn = game.$sys.scene.parent;
+    game.$sys.scene.anchors.centerIn = null;
+
+    return true;
+}
+
+
+
 //增加属性（支持多段属性增加）；
 //props是战斗人物的$properties；如果props的某个属性是单段（字符串），则直接增加；如果是多段（数组），如果incrementProps对应属性是单值，则都增加，如果是数组，则对应增加；
 //  incrementProps：对象，支持格式：
