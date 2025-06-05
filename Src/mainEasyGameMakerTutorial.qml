@@ -418,7 +418,7 @@ Item {
 //flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列里运行（否则在game.async）；
 //params为自定义参数（回调时传入）；
 //成功返回true；如果已经有定时器则返回false；
-<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, params=null);</font>
+<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, ...params);</font>
 //删除定时器；
 //flags：从右到左，是否是全局定时器（否则地图定时器）；
 //成功返回true；如果没有则返回false；

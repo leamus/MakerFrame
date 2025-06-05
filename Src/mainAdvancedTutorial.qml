@@ -182,6 +182,7 @@ Item {
         });
   b、使用封装的异步/协程方案：
     示例：
+      使用回调函数：
         $CommonLibJS.request({
             Url: url,
             Method: 'GET',
@@ -191,11 +192,11 @@ Item {
             //FilePath: path,
             //Params: ,
         }, 2).$$then((xhr)=>{
-            console.info(xhr.$$toString());
+            console.info(xhr.responseText, xhr.$$json));
         }).$$catch((e)=>{
-            console.info(e.$params.$$toString());
+            console.info(e, e.$params.$$json);
         });
-      或：
+      或 使用异步：
         $CommonLibJS.asyncScript(function*() {
             try {
                 let res = yield $CommonLibJS.request({
@@ -206,10 +207,11 @@ Item {
                     //Headers: {},
                     //FilePath: path,
                     //Params: ,
+                    //CustomData: customData,
                 }, 2);
-                console.info(res.response);
+                console.info(res.responseText, res.$$json);
             } catch(e) {
-                console.info(e.$params.$$toString());
+                console.info(e, e.$params.$$json);
             }
         });
 4、HTTPServer(Libhv)    //~~~~~~

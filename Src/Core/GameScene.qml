@@ -58,11 +58,6 @@ import 'GameScene.js' as GameSceneJS
       所以这些命令用yield都有暂停效果，loadmap、usegoods等这些命令要立即运行代码并完成才能激活Promise对象，而msg、talk等这些是通过交互后调用回调函数来激活Promise对象）；
 
   说明：占用的全局属性、事件和定时器：
-    game.addtimer('$sys_random_fight_timer', 1000, -1, 0b11)：战斗定时
-    game.gf['$sys_random_fight_timer']：战斗事件
-    //game.addtimer('resume_event', 1000, -1, 0b11)：恢复定时
-    //game.gf['resume_timer']：恢复事件
-
     game.gd['$sys_fight_heros']：我方所有战斗人员列表
     //game.gd['$sys_hidden_fight_heros']：我方所有隐藏了的战斗人员列表
     game.gd['$sys_money']: 金钱
@@ -76,6 +71,22 @@ import 'GameScene.js' as GameSceneJS
     game.gd['$sys_scale']: 当前缩放大小
     game.gd['$sys_random_fight']：随机战斗
 
+
+    game.f：地图函数，地图定时器、地图事件、人物事件会搜索调用；
+    game.gf：全局函数，全局定时器、地图事件、人物事件会搜索调用；
+      例子：
+        game.addtimer('$sys_random_fight_timer', 1000, -1, 0b11)：战斗定时
+        game.gf['$sys_random_fight_timer']：战斗事件
+        //game.addtimer('resume_event', 1000, -1, 0b11)：恢复定时
+        //game.gf['resume_timer']：恢复事件
+      .$map：全局地图事件
+      .$map_leave：全局地图离开事件
+      .$collide：全局碰撞事件
+      .$collide_obstacle：全局碰撞障碍事件
+
+
+
+    game.$sys.resources.commonScripts.：通用脚本
       .$gameStart = *$start;
       .$gameInit;
       .$gameRelease;
@@ -108,8 +119,8 @@ import 'GameScene.js' as GameSceneJS
       .$checkAllCombatants;
       .$commonCheckSkill
 
-    //_private.objCommonScripts.$commonLevelUpScript：升级脚本（经验等条件达到后升级和结果）
-    //_private.objCommonScripts.$commonLevelAlgorithm：升级算法（直接升级对经验等条件的影响）
+      //.$commonLevelUpScript：升级脚本（经验等条件达到后升级和结果）
+      //.$commonLevelAlgorithm：升级算法（直接升级对经验等条件的影响）
 
 */
 
@@ -2997,7 +3008,7 @@ Item {
         //flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列里运行（否则在game.async）；
         //params：为自定义参数（回调时传入）；
         //成功返回true；如果已经有定时器则返回false；
-        readonly property var addtimer: function(timerName, interval, times=1, flags=0b10, params=null) {
+        readonly property var addtimer: function(timerName, interval, times=1, flags=0b10, ...params) {
             //！！兼容旧代码
             if(flags === true)
                 flags = 0b11;

@@ -614,7 +614,7 @@ Item {
 
             game.deltimer('$sys_random_fight_timer', true);
             game.addtimer('$sys_random_fight_timer', interval, -1, 0b11);
-            game.gf['$sys_random_fight_timer'] = function() {
+            game.gf['$sys_random_fight_timer'] = function(realinterval, ) {
 
                 //判断行动或静止状态
 

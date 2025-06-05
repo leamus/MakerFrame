@@ -1944,12 +1944,14 @@ function mapEvent(eventName, role) {
 
 
     //调用总事件处理
-    if(tScript = game.gf['$' + eventName + '_map'])  //$CommonLibJS.checkCallable(fn, 0b11)
-        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:map_' + eventName, );
+    if(tScript = game.gf['$' + eventName + '_map']) { //$CommonLibJS.checkCallable(fn, 0b11)
+        const ret1 = _private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图事件:map_' + eventName, );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map_' + eventName}, );
-    else if(tScript = game.gf['$map'])  //$CommonLibJS.checkCallable(fn, 0b11)
-        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图事件:map', );
+    }
+    else if(tScript = game.gf['$map']) { //$CommonLibJS.checkCallable(fn, 0b11)
+        const ret1 = _private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图事件:map', );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图事件:map'}, );
+    }
 
 
 
@@ -1957,7 +1959,7 @@ function mapEvent(eventName, role) {
 }
 
 //离开事件触发
-function mapEventCanceled(eventName, role) {
+function mapLeaveEvent(eventName, role) {
     let tScript;
 
 
@@ -1987,16 +1989,18 @@ function mapEventCanceled(eventName, role) {
 
 
     //调用总事件处理
-    if(tScript = game.gf['$' + eventName + '_map_leave'])  //$CommonLibJS.checkCallable(fn, 0b11)
-        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:map_leave_' + eventName, );
+    if(tScript = game.gf['$' + eventName + '_map_leave']) { //$CommonLibJS.checkCallable(fn, 0b11)
+        const ret1 = _private.scriptQueue.create(tScript.call(role, role) ?? null, -1, true, '地图离开事件:map_leave_' + eventName, );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave_' + eventName}, );
-    else if(tScript = game.gf['$map_leave'])  //$CommonLibJS.checkCallable(fn, 0b11)
-        /*const ret1 = */_private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图离开事件:map_leave', );
+    }
+    else if(tScript = game.gf['$map_leave']) { //$CommonLibJS.checkCallable(fn, 0b11)
+        const ret1 = _private.scriptQueue.create(tScript.call(role, eventName, role) ?? null, -1, true, '地图离开事件:map_leave', );
         //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role) ?? null, Tips: '地图离开事件:map_leave'}, );
+    }
 
 
 
-    console.debug('[GameScene]mapEventCanceled:', role.$data.$id + '_' + eventName + '_map_leave');    //触发
+    console.debug('[GameScene]mapLeaveEvent:', role.$data.$id + '_' + eventName + '_map_leave');    //触发
 }
 
 
@@ -2104,6 +2108,7 @@ function onTriggered() {
 
 
             let tScript;
+            let processed = false;
             do {
                 /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
                     break;
@@ -2116,17 +2121,32 @@ function onTriggered() {
 
             if(tScript) { //$CommonLibJS.checkCallable(fn, 0b11)
                 if(objTimer[2] & 0b10) {
-                    const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '全局定时器事件1:' + tt, );
-                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '全局定时器事件1:' + tt});
+                    const ret1 = _private.scriptQueue.create(tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, -1, true, '全局定时器事件1:' + tt, );
+                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, Tips: '全局定时器事件1:' + tt});
                     //game.run(tScript() ?? null, tt);
                     //$GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
                 }
                 else
                     //也可以用game.run
-                    game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '全局定时器事件:' + tt, );
+                    game.async(tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, '全局定时器事件1:' + tt, );
+                processed = true;
             }
             else
                 console.warn('[!GameScene]未定义定时器函数：', tt);
+
+
+            //调用总事件处理
+            if(tScript = game.gf['$timer']) { //$CommonLibJS.checkCallable(fn, 0b11)
+                if(objTimer[2] & 0b10) {
+                    const ret1 = _private.scriptQueue.create(tScript.call(objTimer, tt, processed, realinterval, ...objTimer[4]) ?? null, -1, true, '全局定时器事件2:' + tt, );
+                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(objTimer, tt, realinterval, ...objTimer[4]) ?? null, Tips: '全局定时器事件2:' + tt});
+                    //game.run(tScript() ?? null, tt);
+                    //$GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
+                }
+                else
+                    //也可以用game.run
+                    game.async(tScript.call(objTimer, tt, processed, realinterval, ...objTimer[4]) ?? null, '全局定时器事件2:' + tt, );
+            }
 
 
             //如果次数完毕
@@ -2134,7 +2154,7 @@ function onTriggered() {
                 delete _private.objGlobalTimers[tt];
         }
     }
-    //遍历定时器
+    //遍历地图定时器
     for(let tt in _private.objTimers) {
         const objTimer = _private.objTimers[tt];
         objTimer[0] -= realinterval;
@@ -2153,6 +2173,7 @@ function onTriggered() {
 
 
             let tScript;
+            let processed = false;
             do {
                 /*if(itemViewPort.mapScript && (tScript = itemViewPort.mapScript[tt]))
                     break;
@@ -2165,16 +2186,32 @@ function onTriggered() {
 
             if(tScript) { //$CommonLibJS.checkCallable(fn, 0b11)
                 if(objTimer[2] & 0b10) {
-                    const ret1 = _private.scriptQueue.create(tScript(objTimer[4], objTimer[1], realinterval) ?? null, -1, true, '定时器事件1:' + tt, );
-                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript(objTimer[4], objTimer[1], realinterval) ?? null, Tips: '定时器事件1:' + tt}, );
+                    const ret1 = _private.scriptQueue.create(tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, -1, true, '定时器事件1:' + tt, );
+                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, Tips: '定时器事件1:' + tt}, );
                     //game.run(tScript() ?? null, tt);
                     //$GlobalJS.runScript(_private.scriptQueue, 0, "game.f['%1']()".arg(tt));
                 }
                 else
                     //也可以用game.run
-                    game.async(tScript.call(objTimer, objTimer[4], objTimer[1], realinterval) ?? null, '定时器事件:' + tt, );}
+                    game.async(tScript.call(objTimer, realinterval, ...objTimer[4]) ?? null, '定时器事件1:' + tt, );
+                processed = true;
+            }
             else
                 console.warn('[!GameScene]未定义定时器函数：', tt);
+
+
+            //调用总事件处理
+            if(tScript = game.gf['$timer']) { //$CommonLibJS.checkCallable(fn, 0b11)
+                if(objTimer[2] & 0b10) {
+                    const ret1 = _private.scriptQueue.create(tScript.call(objTimer, tt, processed, realinterval, ...objTimer[4]) ?? null, -1, true, '定时器事件2:' + tt, );
+                    //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(objTimer, tt, realinterval, ...objTimer[4]) ?? null, Tips: '定时器事件2:' + tt});
+                    //game.run(tScript() ?? null, tt);
+                    //$GlobalJS.runScript(_private.scriptQueue, 0, "game.gf['%1']()".arg(tt));
+                }
+                else
+                    //也可以用game.run
+                    game.async(tScript.call(objTimer, tt, processed, realinterval, ...objTimer[4]) ?? null, '定时器事件2:' + tt, );
+            }
 
 
             //如果次数完毕
@@ -2471,9 +2508,9 @@ function onTriggered() {
                     //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
+
                 //调用总事件处理
-                tScript = game.gf['$collide'];
-                if(tScript) {  //$CommonLibJS.checkCallable(fn, 0b11)
+                if(tScript = game.gf['$collide']) { //$CommonLibJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, -1, true, eventName, );
                     //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], keep, collideRoles[key]) ?? null, Tips: eventName}, );
                 }
@@ -2492,9 +2529,9 @@ function onTriggered() {
                     //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
 
+
                 //调用总事件处理
-                tScript = game.gf['$collide'];
-                if(tScript) {  //$CommonLibJS.checkCallable(fn, 0b11)
+                if(tScript = game.gf['$collide']) { //$CommonLibJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, -1, true, eventName, );
                     //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(_private.arrMainRoles[r], role, _private.arrMainRoles[r], -1, role.$$collideRoles[key]) ?? null, Tips: eventName}, );
                 }
@@ -2547,8 +2584,8 @@ function onTriggered() {
 
         //检测离开事件区域
         for(let event in role.$$mapEventsTriggering) {
-            //console.debug('[GameScene]mapEventCanceled触发:', event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
+            //console.debug('[GameScene]mapLeaveEvent触发:', event, roleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapLeaveEvent(itemViewPort.mapEventBlocks[role.$$mapEventsTriggering[event]], role);   //触发事件
             //console.debug('event:', event, roleUseBlocks, roleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(roleUseBlocks[0]))
         }
 
@@ -2807,8 +2844,8 @@ function onTriggered() {
 
         //检测离开事件区域
         for(let event in mainRole.$$mapEventsTriggering) {
-            //console.debug('[GameScene]mapEventCanceled触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
-            GameSceneJS.mapEventCanceled(itemViewPort.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
+            //console.debug('[GameScene]mapLeaveEvent触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
+            GameSceneJS.mapLeaveEvent(itemViewPort.mapEventBlocks[mainRole.$$mapEventsTriggering[event]], mainRole);   //触发事件
             //console.debug('event:', event, mainRoleUseBlocks, mainRoleUseBlocks.indexOf(event), typeof(event), typeof(itemViewPort.mapInfo.events[0]), typeof(mainRoleUseBlocks[0]))
         }
 
@@ -2965,8 +3002,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
 
             //调用总事件处理
             if(role.$$type === 1) {
-                tScript = game.gf['$collide_obstacle'];
-                if(tScript) {  //$CommonLibJS.checkCallable(fn, 0b11)
+                if(tScript = game.gf['$collide_obstacle']) { //$CommonLibJS.checkCallable(fn, 0b11)
                     const ret1 = _private.scriptQueue.create(tScript.call(role, role, collideObstacle, 0) ?? null, -1, true, eventName, );
                     //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: tScript.call(role, role, collideObstacle, 0) ?? null, Tips: eventName}, );
                 }

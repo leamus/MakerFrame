@@ -371,11 +371,11 @@ function* $gameInit(newGame) {
 
 
     //每秒恢复事件
-    game.addtimer('resume_event', 1000, -1, 0b11);
-    game.gf['resume_event'] = function() {
+    game.addtimer('resume_event', 1000, -1, 0b11, {'HP': [2], 'MP': [2]});
+    game.gf['resume_event'] = function(realinterval, props) {
         for(let combatant of game.gd['$sys_fight_heros']) {
             if(combatant.$$propertiesWithExtra.HP[0] > 0)
-                game.addprops(combatant, {'HP': [2], 'MP': [2]});
+                game.addprops(combatant, props);
         }
     }
 
