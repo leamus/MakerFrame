@@ -180,7 +180,7 @@ Rectangle {
     property int nChoiceListIndex: -1
 
     property string strTitle: ''
-    property int nWrapMode: TextEdit.WordWrap
+    property int nWrapMode: TextEdit.NoWrap //TextEdit.WordWrap
 
 
     property alias rectMenuTitle: rectMenuTitle
@@ -205,6 +205,22 @@ Rectangle {
 
     Component {
         id: compItem
+
+        /*/ScrollView {
+        Flickable {
+            id: tFlickable
+
+            //width: parent.width
+            Layout.fillWidth: true
+            height: parent.height
+
+            clip: true
+
+            boundsBehavior: Flickable.StopAtBounds
+            flickableDirection: Flickable.HorizontalFlick
+            contentWidth: tRoot.implicitWidth
+            contentHeight: parent.height
+        */
 
         Rectangle {
             id: tRoot
@@ -254,7 +270,7 @@ Rectangle {
                     if(rItemFontSize < 0)
                         font.pixelSize = Qt.binding(function(){return -rItemFontSize;});
                     else
-                        font.pixelSize = Qt.binding(function(){return rItemFontSize * Global.rFontPointRatio;});
+                        font.pixelSize = Qt.binding(function(){return rItemFontSize * $fontPointRatio;});
                         //font.pointSize = Qt.binding(function(){return rItemFontSize;});
                 }
             }
@@ -339,7 +355,7 @@ Rectangle {
                     if(rTitleFontSize < 0)
                         font.pixelSize = Qt.binding(function(){return -rTitleFontSize;});
                     else
-                        font.pixelSize = Qt.binding(function(){return rTitleFontSize * Global.rFontPointRatio;});
+                        font.pixelSize = Qt.binding(function(){return rTitleFontSize * $fontPointRatio;});
                         //font.pointSize = Qt.binding(function(){return rTitleFontSize;});
                 }
             }

@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -99,16 +98,16 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: path,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -248,16 +247,16 @@ Item {
                                 console.debug('!!!', JSON.stringify(JSON.parse(cfg)['List']))
                                 */
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: GameMakerGlobal.imageResourcePath(),
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -309,16 +308,16 @@ Item {
                                     return false;
                                 */
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: GameMakerGlobal.musicResourcePath(),
                                     OnClicked: (index, item)=>{
                                         textMusic.text = item;
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -361,16 +360,16 @@ Item {
                                 let data = [['百分比，比如0.1', '调用系统算法'],
                                             ['0.1', 'true']];
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -403,16 +402,16 @@ Item {
                                 let data = [['随机1-3个', '顺序2个', '全部顺序出现'],
                                             ['1, 3', '2', 'true']];
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -529,16 +528,16 @@ Item {
                                         onPressAndHold: {
                                             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
-                                            rootWindow.aliasGlobal.list.open({
+                                            $list.open({
                                                 Data: path,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    rootWindow.aliasGlobal.list.visible = false;
+                                                    $list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    rootWindow.aliasGlobal.list.visible = false;
+                                                    $list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                             });
@@ -766,7 +765,7 @@ Item {
                 }
             } while(0);
             if(!bCheck) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -776,7 +775,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -838,7 +837,7 @@ Item {
                 eval(data);
             }
             catch(e) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -848,7 +847,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -859,7 +858,7 @@ Item {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -881,7 +880,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

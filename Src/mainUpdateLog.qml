@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -201,7 +200,19 @@ Item {
 44、修复：子窗口内容有可能不会铺满窗口的Bug；
 *45、修改：game.addtimer的最后一个参数，回调函数的参数同时也修改；
 46、新增：定时器全局处理函数（game.gf['timer']）；
-47、其他：优化调整很多代码和细节，修复一些Bugs；
+47、新增：game.time属性，返回当前时间戳；
+*48、修改：game.http为函数，返回XMLHttpRequest对象；game.date为$CommonLibJS.formatDate函数；
+*49、修改：levelAlgorithm 和 commonLevelAlgorithm 函数返回的数据（为一个对象，包括Conditions、Properties和Skills）；
+50、修改：升级链为3种方式：（1）fight_role.js中定义两个函数或一个升级链数据；（2）通用升级链脚本；（3）都无时使用系统自带的；
+51、修复：游戏init时，第一次不会载入战斗人物自身的升级链问题；
+52、新增：两个系统函数：Array的$$value函数 和 $CommonLibJS.setObjectValue；
+53、修复：将convertToHTML的一个问题修复，并增强和优化；
+54、修复：将Message组件显示HTML代码时多出一个interval的问题修复，并加入 '<>' 为等待一个interval的功能；
+55、优化：将 调试 在桌面端改为多窗口（可以调试多个qml文件）；
+*56、修改：虚拟坐标相关函数（优化多窗口下支持）；
+*57、修改：很多系统提供的对象和函数的名字；
+*58、修复：调整目录结构（GameMakerGlobal.qml），修复 Cyclic dependency detected between 警告；
+59、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

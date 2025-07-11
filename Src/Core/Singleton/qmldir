@@ -1,0 +1,21 @@
+module Singleton_GameMakerGlobal
+#module名字可以随意取（纯QML组件的识别方式是 含qmldir的文件夹名）
+
+
+#鹰：将 singleton 和普通组件独立开写，是因为写在一块且网络访问时，会有循环警告（Cyclic dependency detected between "http://。。GameMakerGlobal.qml" and "http://。。GameTradeWindow.qml"），本地载入没有警告；
+#  这貌似是因为：
+#    QML 引擎的远程加载机制：
+#      当 QML 文件从远程服务器加载时，引擎会预解析所有关联组件（包括 qmldir 定义的模块）
+#      本地加载时引擎使用延迟加载策略，但远程加载为减少网络请求会尝试提前加载所有可能依赖
+#    单例组件的特殊处理：
+#      单例被标记为 "立即初始化" 组件
+#      远程加载时，引擎会同时初始化 qmldir 中的所有组件，造成逻辑上的循环依赖
+#    网络加载的验证过程：
+#      远程加载时引擎会严格验证组件依赖图
+#      即使没有实际代码依赖，qmldir 定义的同一模块内的单例和其他组件会被视为相互关联
+
+
+#GameMakerGlobalJS 1.0 GameMakerGlobal.js
+
+
+singleton GameMakerGlobal 1.0 GameMakerGlobal.qml

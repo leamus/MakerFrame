@@ -184,10 +184,10 @@ function* loadResources() {
     const joystickDefaultConfig = $GameMakerGlobalJS.$config.$joystick;
     const joystickConfig = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$joystick'), joystickDefaultConfig);
 
-    joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * rootWindow.aliasGlobal.Screen.pixelDensity;
-    joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * rootWindow.aliasGlobal.Screen.pixelDensity;
-    joystick.anchors.leftMargin = (joystickConfig.$left ?? joystickDefaultConfig.$left) * rootWindow.aliasGlobal.Screen.pixelDensity;
-    joystick.anchors.bottomMargin = (joystickConfig.$bottom ?? joystickDefaultConfig.$bottom) * rootWindow.aliasGlobal.Screen.pixelDensity;
+    joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * $aliasGlobal.Screen.pixelDensity;
+    joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * $aliasGlobal.Screen.pixelDensity;
+    joystick.anchors.leftMargin = (joystickConfig.$left ?? joystickDefaultConfig.$left) * $aliasGlobal.Screen.pixelDensity;
+    joystick.anchors.bottomMargin = (joystickConfig.$bottom ?? joystickDefaultConfig.$bottom) * $aliasGlobal.Screen.pixelDensity;
     joystick.opacity = (joystickConfig.$opacity ?? joystickDefaultConfig.$opacity);
     joystick.rJoystickMinimumProportion = (joystickConfig.$joystickMinimumProportion ?? joystickDefaultConfig.$joystickMinimumProportion);
     joystick.imageHandle.source = (joystickConfig.$image ?? joystickDefaultConfig.$image);
@@ -254,16 +254,16 @@ function* loadResources() {
         for(let tb = 0; tb < buttonsConfig.length; ++tb) {
             const tConfig = buttonsConfig[tb];
             const button = compButtons.createObject(itemButtons);
-            button.width = tConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
-            button.height = tConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
+            button.width = tConfig.$size * $aliasGlobal.Screen.pixelDensity;
+            button.height = tConfig.$size * $aliasGlobal.Screen.pixelDensity;
             if(tConfig.$color !== undefined)
                 button.color = tConfig.$color;
             if(tConfig.$opacity !== undefined)
                 button.opacity = tConfig.$opacity;
             if(tConfig.$image)
                 button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
-            button.anchors.rightMargin = tConfig.$right * rootWindow.aliasGlobal.Screen.pixelDensity;
-            button.anchors.bottomMargin = tConfig.$bottom * rootWindow.aliasGlobal.Screen.pixelDensity;
+            button.anchors.rightMargin = tConfig.$right * $aliasGlobal.Screen.pixelDensity;
+            button.anchors.bottomMargin = tConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
 
             if(tConfig.$pressed)  //$CommonLibJS.checkCallable(fn, 0b11)
                 button.sg_pressed.connect(function() {
@@ -281,24 +281,24 @@ function* loadResources() {
 
     } while(0);
 
-    /*buttonA.width = buttonAConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
-    buttonA.height = buttonAConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
+    /*buttonA.width = buttonAConfig.$size * $aliasGlobal.Screen.pixelDensity;
+    buttonA.height = buttonAConfig.$size * $aliasGlobal.Screen.pixelDensity;
     buttonA.color = buttonAConfig.$color;
     buttonA.opacity = buttonAConfig.$opacity;
     if(buttonAConfig.$image)
         buttonA.image.source = GameMakerGlobal.imageResourceURL(buttonAConfig.$image);
-    buttonA.anchors.rightMargin = buttonAConfig.$right * rootWindow.aliasGlobal.Screen.pixelDensity;
-    buttonA.anchors.bottomMargin = buttonAConfig.$bottom * rootWindow.aliasGlobal.Screen.pixelDensity;
+    buttonA.anchors.rightMargin = buttonAConfig.$right * $aliasGlobal.Screen.pixelDensity;
+    buttonA.anchors.bottomMargin = buttonAConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
     buttonA.buttonClicked = buttonAConfig.$clicked;
 
-    buttonMenu.width = buttonMenuConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
-    buttonMenu.height = buttonMenuConfig.$size * rootWindow.aliasGlobal.Screen.pixelDensity;
+    buttonMenu.width = buttonMenuConfig.$size * $aliasGlobal.Screen.pixelDensity;
+    buttonMenu.height = buttonMenuConfig.$size * $aliasGlobal.Screen.pixelDensity;
     buttonMenu.color = buttonMenuConfig.$color;
     buttonMenu.opacity = buttonMenuConfig.$opacity;
     if(buttonMenuConfig.$image)
         buttonMenu.image.source = GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image);
-    buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * rootWindow.aliasGlobal.Screen.pixelDensity;
-    buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * rootWindow.aliasGlobal.Screen.pixelDensity;
+    buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * $aliasGlobal.Screen.pixelDensity;
+    buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
     buttonMenu.buttonClicked = buttonMenuConfig.$clicked;
     */
 

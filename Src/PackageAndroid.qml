@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -591,20 +590,20 @@ Item {
 
             //1：只更新工程；2：全部更新；
             function continueScript(packageType) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '请等待...',
                     Buttons: Dialog.NoButton,
                     OnAccepted: function() {
-                        rootWindow.aliasGlobal.dialogCommon.open();
-                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                        $dialog.open();
+                        $dialog.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.open();
-                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                        $dialog.open();
+                        $dialog.forceActiveFocus();
                     },
                 });
 
-                rootWindow.aliasGlobal.showBusyIndicator(true);
+                $showBusyIndicator(true);
 
 
                 $CommonLibJS.setTimeout(function() {
@@ -627,16 +626,16 @@ Item {
                         $CommonLibJS.printException(e);
                         return;
                     } finally {
-                        rootWindow.aliasGlobal.showBusyIndicator(false);
+                        $showBusyIndicator(false);
 
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                     }
 
 
                     modifyConfig();
 
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '生成打包文件夹成功，请用三方软件来打包并签名APK（<font color="red">%1</font>）'.arg(strPackageDir),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -654,8 +653,8 @@ Item {
             let msg;
             if(comboType.currentIndex === 0) { //需要两个压缩文件
                 if(missingFiles !== '') {
-                    rootWindow.aliasGlobal.dialogCommon.show({
-                        Msg: '请将 <font color="red">%1</font> 文件下载并放入 <font color="red">%2</font> 文件夹下（文件可以在Q群或gitee里下载）'.arg(missingFiles).arg(path),
+                    $dialog.show({
+                        Msg: '请将 <font color="red">%1</font> 环境文件下载并放入 <font color="red">%2</font> 文件夹下（可以在gitee、github或Q群里下载）'.arg(missingFiles).arg(path),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
                             root.forceActiveFocus();
@@ -670,7 +669,7 @@ Item {
             }
             else { //需要 AndroidManifest.xml 和其他配置文件
                 if(!$Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '没有找到配置文件，请先选择“重新生成全部文件”',
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
@@ -691,7 +690,7 @@ Item {
                     msg = '确定？';
             }
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: msg,
                 Buttons: Dialog.Yes | Dialog.No,
                 OnAccepted: function() {

@@ -15,14 +15,14 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
+import 'Core/Singleton'
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import '../../_Global/CommonLib.js' as CommonLibJS
@@ -112,7 +112,7 @@ Item {
 
             font.pointSize: 22
             font.bold: true
-            text: qsTr('鹰歌游戏引擎')
+            text: qsTr('鹰歌游戏引擎 GameMaker')
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -1186,7 +1186,7 @@ Item {
         onSg_removeClicked: {
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + item;
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ?',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1259,7 +1259,7 @@ Item {
     Loader {
         id: loader
 
-        property var vParams: undefined
+        property var vInitParams: [] //调用init时给的参数
 
         visible: false
         focus: true
@@ -1292,7 +1292,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -1301,16 +1301,16 @@ Item {
                 rootGameMaker.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                rootWindow.aliasGlobal.showBusyIndicator(true);
+                $showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                rootWindow.clearComponentCache();
-                rootWindow.trimComponentCache();
+                $clearComponentCache();
+                $trimComponentCache();
             }
         }
 
         onLoaded: {
-            console.debug('[mainGameMaker]loader onLoaded:', vParams);
+            console.debug('[mainGameMaker]loader onLoaded:', vInitParams);
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
@@ -1322,7 +1322,7 @@ Item {
                     item.forceActiveFocus();
 
                 if(item.init)
-                    item.init(vParams);
+                    item.init(...vInitParams);
 
                 visible = true;
             }
@@ -1330,7 +1330,7 @@ Item {
                 throw e;
             }
             finally {
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
         }
     }
@@ -1483,7 +1483,7 @@ Item {
 
         function checkCurrentProjectName() {
             if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '请先新建或选择一个工程',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1500,8 +1500,8 @@ Item {
         }
 
         //载入模块
-        function loadModule(module, params) {
-            //console.debug('~~~loadModule:', module);
+        function loadModule(module, ...params) {
+            //console.debug('~~~loadModule:', module, params);
 
 
             //if(module.length !== 0 && !checkCurrentProjectName())
@@ -1517,7 +1517,7 @@ Item {
             //loader.focus = true;
             //loader.forceActiveFocus();
 
-            loader.vParams = params;
+            loader.vInitParams = params;
             if($CommonLibJS.isObject(module)) {
                 loader.sourceComponent = module;
             }
@@ -1556,13 +1556,13 @@ Item {
 
         //打开工程
         function newProject() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '输入工程名',
                 Input: '新建工程',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input)) {
+                        $dialog.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -1575,17 +1575,17 @@ Item {
                         return;
                     }
 
-                    _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input);
+                    _private.changeProject($dialog.input);
 
                     let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
                     $Frame.sl_dirCreate(projectPath);
 
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '是否复制素材资源？\r\n（注意：素材资源均来自互联网，仅供测试使用，侵删）',
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
-                            /*rootWindow.aliasGlobal.dialogCommon.show({
+                            /*$dialog.show({
                                 Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
                                 Buttons: Dialog.Yes | Dialog.No,
                                 OnAccepted: function() {
@@ -1595,16 +1595,16 @@ Item {
                             let resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + '$资源模板.zip';
 
                             function _continue() {
-                                rootWindow.aliasGlobal.dialogCommon.show({
+                                $dialog.show({
                                     Msg: '正在解压，请等待',
                                     Buttons: Dialog.NoButton,
                                     OnAccepted: function() {
-                                        rootWindow.aliasGlobal.dialogCommon.open();
-                                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                        $dialog.open();
+                                        $dialog.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
-                                        rootWindow.aliasGlobal.dialogCommon.open();
-                                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                        $dialog.open();
+                                        $dialog.forceActiveFocus();
                                     },
                                 });
 
@@ -1617,7 +1617,7 @@ Item {
                                     //console.debug(ret, projectPath);
                                 }
 
-                                rootWindow.aliasGlobal.dialogCommon.show({
+                                $dialog.show({
                                     Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
                                     Buttons: Dialog.Ok,
                                     OnAccepted: function() {
@@ -1671,13 +1671,13 @@ Item {
         }
 
         function renameProject() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '输入工程名',
                 Input: GameMakerGlobal.config.strCurrentProjectName,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input)) {
+                        $dialog.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -1690,12 +1690,12 @@ Item {
                         return;
                     }
 
-                    if($Frame.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input) > 0) {
-                        _private.changeProject(rootWindow.aliasGlobal.dialogCommon.input, GameMakerGlobal.config.strCurrentProjectName);
+                    if($Frame.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input) > 0) {
+                        _private.changeProject($dialog.input, GameMakerGlobal.config.strCurrentProjectName);
                     }
                     else {
-                        if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input)) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
+                        if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input)) {
+                            $dialog.show({
                                 Msg: '重命名失败，请检查名称',
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
@@ -1707,7 +1707,7 @@ Item {
                             });
                             return;
                         }
-                        console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + rootWindow.aliasGlobal.dialogCommon.input);
+                        console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input);
                     }
 
                     rootGameMaker.forceActiveFocus();
@@ -1930,7 +1930,7 @@ Item {
             }
         }
         function future() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '敬请期待~',
                 Buttons: Dialog.Ok,
                 OnAccepted: function() {
@@ -1948,16 +1948,16 @@ Item {
             }
 
 
-            dialogCommon.show({
+            dialog.show({
                 Msg: '正在压缩，请等待',
                 Buttons: Dialog.NoButton,
                 OnAccepted: function() {
-                    rootWindow.aliasGlobal.dialogCommon.open();
-                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                    $dialog.open();
+                    $dialog.forceActiveFocus();
                 },
                 OnRejected: function() {
-                    rootWindow.aliasGlobal.dialogCommon.open();
-                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                    $dialog.open();
+                    $dialog.forceActiveFocus();
                 },
             });
 
@@ -1967,7 +1967,7 @@ Item {
                 destPath
             );
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: ret ? ('成功:' + destPath + '.zip') : '失败',
                 Buttons: Dialog.Ok,
                 OnAccepted: function() {
@@ -1984,20 +1984,20 @@ Item {
         }
 
         function unzipProjectPackage(fUrl) {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认解包吗？这会替换目标项目中的同名文件！',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '正在解压，请等待',
                         Buttons: Dialog.NoButton,
                         OnAccepted: function() {
-                            rootWindow.aliasGlobal.dialogCommon.open();
-                            rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                            $dialog.open();
+                            $dialog.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            rootWindow.aliasGlobal.dialogCommon.open();
-                            rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                            $dialog.open();
+                            $dialog.forceActiveFocus();
                         },
                     });
 
@@ -2015,7 +2015,7 @@ Item {
                         //console.debug('[mainGameMaker]', ret, projectPath);
                     }
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
                         Buttons: Dialog.Ok,
                         OnAccepted: function() {
@@ -2033,7 +2033,7 @@ Item {
         }
 
         function downloadDemoProject() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
                 Buttons: Dialog.Yes | Dialog.No,
                 OnAccepted: function() {
@@ -2046,16 +2046,16 @@ Item {
                     //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
 
                     function _continue() {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: '正在解压，请等待',
                             Buttons: Dialog.NoButton,
                             OnAccepted: function() {
-                                rootWindow.aliasGlobal.dialogCommon.open();
-                                rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                $dialog.open();
+                                $dialog.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                rootWindow.aliasGlobal.dialogCommon.open();
-                                rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                $dialog.open();
+                                $dialog.forceActiveFocus();
                             },
                         });
 
@@ -2068,7 +2068,7 @@ Item {
                             //console.debug(ret, projectPath);
                         }
 
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
                             Buttons: Dialog.Ok,
                             OnAccepted: function() {
@@ -2103,15 +2103,15 @@ Item {
                 FilePath: filePath,
                 //Params: ,
             }, 2).$$then(function(xhr) {
-                rootWindow.aliasGlobal.dialogCommon.close();
+                $dialog.close();
 
                 if(successCallback)
                     successCallback();
             }).$$catch(function(e) {
-                //rootWindow.aliasGlobal.dialogCommon.close();
+                //$dialog.close();
 
-                rootWindow.aliasGlobal.dialogCommon.show({
-                    Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                $dialog.show({
+                    Msg: '下载失败(%1,%2)'.arg(e.$params.code).arg(e.$params.error),
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         rootGameMaker.forceActiveFocus();
@@ -2135,10 +2135,10 @@ Item {
                 $Frame.sl_deleteLater(httpReply);
 
 
-                rootWindow.aliasGlobal.dialogCommon.close();
+                $dialog.close();
 
                 if(code !== 0) {
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '下载失败：%1'.arg(code),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -2156,16 +2156,16 @@ Item {
             */
 
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '正在下载，请等待（请勿进行其他操作）',
                 Buttons: Dialog.NoButton,
                 OnAccepted: function() {
-                    rootWindow.aliasGlobal.dialogCommon.open();
-                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                    $dialog.open();
+                    $dialog.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.open();
-                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                    $dialog.open();
+                    $dialog.forceActiveFocus();
                 },
             });
         }
@@ -2262,8 +2262,8 @@ Item {
 
 
 
-        _private.fnBackupOpenFile = rootWindow.fnOpenFile;
-        rootWindow.fnOpenFile = (url, type)=>{
+        _private.fnBackupOpenFile = $globalData.$openFile;
+        $globalData.$openFile = (url, type)=>{
             //如果是文件夹
             if($Frame.sl_isDir($GlobalJS.toPath(url))) {
                 return false;
@@ -2289,7 +2289,7 @@ Item {
         console.debug('[mainGameMaker]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
-        rootWindow.fnOpenFile = _private.fnBackupOpenFile;
+        $globalData.$openFile = _private.fnBackupOpenFile;
 
 
         //delete $Frame.sl_globalObject().$GameMakerGlobal;

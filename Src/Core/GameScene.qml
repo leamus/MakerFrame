@@ -178,9 +178,27 @@ Item {
 
 
         //恢复游戏数据
-        if(gameData)
-            $CommonLibJS.copyPropertiesToObject(game.gd, gameData);
-        //game.gd = ret['Data'];
+        if(gameData) //！！！注意测试有没有问题（250623）
+            //$CommonLibJS.copyPropertiesToObject(game.gd, gameData);
+            game.gd = gameData;
+
+
+        game.$sys.reloadFightRoles();
+
+        game.$sys.reloadGoods();
+
+        //其他
+        game.interval(game.gd['$sys_fps']);
+        game.scale(game.gd['$sys_scale']);
+
+        if(game.gd['$sys_music'])
+            game.playmusic(game.gd['$sys_music']);
+
+        /*if(game.gd['$sys_sound'] & 0b10)
+            _private.config.nSoundConfig = 0;
+        else
+            _private.config.nSoundConfig = 1;
+        */
 
 
         //读取主角
@@ -199,23 +217,6 @@ Item {
             _private.objCommonScripts.$refreshCombatant(tfh);
         //刷新战斗时人物数据
         //fight.$sys.refreshCombatant(-1);
-
-        game.$sys.reloadFightRoles();
-
-        game.$sys.reloadGoods();
-
-        //其他
-        game.interval(game.gd['$sys_fps']);
-        game.scale(game.gd['$sys_scale']);
-
-        if(game.gd['$sys_music'])
-            game.playmusic(game.gd['$sys_music']);
-
-        /*if(game.gd['$sys_sound'] & 0b10)
-            _private.config.nSoundConfig = 0;
-        else
-            _private.config.nSoundConfig = 1;
-        */
 
 
 
@@ -906,7 +907,7 @@ Item {
             if(tn < 0)
                 role.message.textArea.font.pixelSize = -tn;
             else
-                role.message.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                role.message.textArea.font.pixelSize = tn * $fontPointRatio;
                 //role.message.textArea.font.pointSize = tn;
             role.message.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
@@ -3526,7 +3527,7 @@ Item {
                     break;
                 //跨平台宽度
                 case 9:
-                    tmp.width = Qt.binding(function(){return Global.vx(imageParams.$width[0])});
+                    tmp.width = Qt.binding(function(){return $vx(imageParams.$width[0])});
                     break;
                 //按像素
                 default:
@@ -3563,7 +3564,7 @@ Item {
                     break;
                 //跨平台高度
                 case 9:
-                    tmp.height = Qt.binding(function(){return Global.vy(imageParams.$height[0])});
+                    tmp.height = Qt.binding(function(){return $vy(imageParams.$height[0])});
                     break;
                 //按像素
                 default:
@@ -3624,7 +3625,7 @@ Item {
                     break;
                 //跨平台x
                 case 9:
-                    tmp.x = Qt.binding(function(){return Global.vx(imageParams.$x[0])});
+                    tmp.x = Qt.binding(function(){return $vx(imageParams.$x[0])});
                     break;
                 //按像素
                 default:
@@ -3678,7 +3679,7 @@ Item {
                     break;
                 //跨平台y
                 case 9:
-                    tmp.y = Qt.binding(function(){return Global.vy(imageParams.$y[0])});
+                    tmp.y = Qt.binding(function(){return $vy(imageParams.$y[0])});
                     break;
                 //按像素
                 default:
@@ -4004,7 +4005,7 @@ Item {
                     break;
                 //跨平台宽度
                 case 9:
-                    sprite.width = Qt.binding(function(){return Global.vx(spriteParams.$width[0])});
+                    sprite.width = Qt.binding(function(){return $vx(spriteParams.$width[0])});
                     break;
                 //按像素
                 default:
@@ -4042,7 +4043,7 @@ Item {
                     break;
                 //跨平台高度
                 case 9:
-                    sprite.height = Qt.binding(function(){return Global.vy(spriteParams.$height[0])});
+                    sprite.height = Qt.binding(function(){return $vy(spriteParams.$height[0])});
                     break;
                 //按像素
                 default:
@@ -4103,7 +4104,7 @@ Item {
                     break;
                 //跨平台x
                 case 9:
-                    sprite.x = Qt.binding(function(){return Global.vx(spriteParams.$x[0])});
+                    sprite.x = Qt.binding(function(){return $vx(spriteParams.$x[0])});
                     break;
                 //按像素
                 default:
@@ -4157,7 +4158,7 @@ Item {
                     break;
                 //跨平台y
                 case 9:
-                    sprite.y = Qt.binding(function(){return Global.vy(spriteParams.$y[0])});
+                    sprite.y = Qt.binding(function(){return $vy(spriteParams.$y[0])});
                     break;
                 //按像素
                 default:
@@ -4710,7 +4711,7 @@ Item {
                     outputData.Version = '0.6';
                     outputData.Name = showName;
                     outputData.Type = compressionLevel === 0 ? 0 : 1;
-                    outputData.Time = $CommonLibJS.formatDate();
+                    outputData.Time = $CommonLibJS.formatDate('YYYY-mm-dd HH:MM:SS'); //'YYYY-mm-dd HH:MM:SS sss'
                     if(compressionLevel !== 0) {    //压缩
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
                         outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 1).toString();
@@ -5491,8 +5492,6 @@ Item {
 
 
 
-        readonly property var date: ()=>{return new Date();}
-        readonly property var math: Math
         function request(params={}, verifyType=0, type=1) {
             return $CommonLibJS.requestEx(params, verifyType, type).catch((e)=>{
                 //throw e;
@@ -5500,7 +5499,9 @@ Item {
                 return e.$params;
             });
         }
-        readonly property var http: XMLHttpRequest
+        readonly property var http: ()=>new XMLHttpRequest;
+        readonly property var date: (...args)=>$CommonLibJS.formatDate(...args);
+        //readonly property var math: Math
 
     }
 
@@ -7004,7 +7005,7 @@ Item {
 
                 //四向
                 if(!_private.config.bWalkAllDirections) {
-                    switch(_private.arrPressedKeys.slice(-1)[0]) {
+                    switch(_private.arrPressedKeys.$$value(-1)) {
                     case Qt.Key_Down:
                         mainRole.$$arrMoveDirection[1] = 1;
                         break;
@@ -7234,7 +7235,7 @@ Item {
         //退出游戏
         function showExitDialog() {
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认退出游戏？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -7441,7 +7442,7 @@ Item {
                 if(tn < 0)
                     messageRole.textArea.font.pixelSize = -tn;
                 else
-                    messageRole.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                    messageRole.textArea.font.pixelSize = tn * $fontPointRatio;
                     //messageRole.textArea.font.pointSize = tn;
                 messageRole.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -7717,7 +7718,7 @@ Item {
                 if(tn < 0)
                     messageGame.textArea.font.pixelSize = -tn;
                 else
-                    messageGame.textArea.font.pixelSize = tn * Global.rFontPointRatio;
+                    messageGame.textArea.font.pixelSize = tn * $fontPointRatio;
                     //messageGame.textArea.font.pointSize = tn;
                 messageGame.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
                 maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -8061,6 +8062,7 @@ Item {
                     nTitleHeight: textMenuTitle.implicitHeight
                     colorTitleColor: '#EE00CC99'
                     strTitle: ''
+                    nWrapMode: TextEdit.WordWrap
 
                     //height: parent.height / 2
                     //anchors.centerIn: parent
@@ -8168,7 +8170,7 @@ Item {
                 if(tn < 0)
                     textGameInput.font.pixelSize = -tn;
                 else
-                    textGameInput.font.pixelSize = tn * Global.rFontPointRatio;
+                    textGameInput.font.pixelSize = tn * $fontPointRatio;
                     //textGameInput.font.pointSize = tn;
                 textGameInput.textArea.color = style.FontColor || styleUser.$fontColor || styleSystem.$fontColor;
 
@@ -8185,7 +8187,7 @@ Item {
                 if(tn < 0)
                     textGameInputTitle.font.pixelSize = -tn;
                 else
-                    textGameInputTitle.font.pixelSize = tn * Global.rFontPointRatio;
+                    textGameInputTitle.font.pixelSize = tn * $fontPointRatio;
                     //textGameInputTitle.font.pointSize = tn;
                 textGameInputTitle.color = style.TitleFontColor || styleUser.$titleFontColor || styleSystem.$titleFontColor;
 
@@ -8290,11 +8292,9 @@ Item {
                             textFormat: TextArea.RichText
                             wrapMode: Text.Wrap
 
-                            font.pointSize: 16
+                            //font.pointSize: 16
                             font.bold: true
-
                         }
-
                     }
 
 
@@ -8330,7 +8330,7 @@ Item {
                             textArea.selectByMouse: true
 
 
-                            textArea.font.pointSize: 16
+                            //textArea.font.pointSize: 16
                             textArea.font.bold: true
 
 
@@ -8787,7 +8787,7 @@ Item {
                 if(tn < 0)
                     textName.font.pixelSize = -tn;
                 else
-                    textName.font.pixelSize = tn * Global.rFontPointRatio;
+                    textName.font.pixelSize = tn * $fontPointRatio;
                     //textName.font.pointSize = tn;
 
                 rectName.color = $CommonLibJS.getObjectValue(styleUser, '$name', '$backgroundColor') ?? styleSystem.$name.$backgroundColor;
@@ -9273,6 +9273,23 @@ Item {
     Component.onCompleted: {
         $Frame.sl_globalObject().game = game;
         $Frame.sl_globalObject().g = game;
+
+        Object.defineProperty(game, 'time', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                //return Number(new Date());
+                return new Date().getTime();
+            },
+        });
+        /*Object.defineProperty(game, 'http', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return new XMLHttpRequest;
+            },
+        });
+        */
 
         //console.debug('[GameScene]sl_globalObject：', $Frame.sl_globalObject());
 

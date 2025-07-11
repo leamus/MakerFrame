@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -82,7 +81,7 @@ Item {
                 return false;
 
             //if(item === '..') {
-            //    rootWindow.aliasGlobal.list.visible = false;
+            //    $list.visible = false;
             //    return;
             //}
 
@@ -124,7 +123,7 @@ Item {
         onSg_removeClicked: {
             let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + item;
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -179,7 +178,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -188,11 +187,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                rootWindow.aliasGlobal.showBusyIndicator(true);
+                $showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                rootWindow.clearComponentCache();
-                rootWindow.trimComponentCache();
+                $clearComponentCache();
+                $trimComponentCache();
             }
         }
 
@@ -218,7 +217,7 @@ Item {
                 throw e;
             }
             finally {
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
         }
     }

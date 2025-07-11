@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -371,7 +370,7 @@ function* $gameInit(newGame) {
 
 
     //每秒恢复事件
-    game.addtimer('resume_event', 1000, -1, 0b11, {'HP': [2], 'MP': [2]});
+    game.addtimer('resume_event', 1000, -1, 0b11, {HP: [2], MP: [2]});
     game.gf['resume_event'] = function(realinterval, props) {
         for(let combatant of game.gd['$sys_fight_heros']) {
             if(combatant.$$propertiesWithExtra.HP[0] > 0)
@@ -688,21 +687,21 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 //系统显示 和 真实属性 对应
 //中文属性索引
 const mappingCombatantProperty = {
-    '血量': ['HP', 0],
-    '血量1': ['HP', 1],
-    '血量2': ['HP', 2],
+    血量: ['HP', 0],
+    血量1: ['HP', 1],
+    血量2: ['HP', 2],
 
-    '魔法': ['MP', 0],
-    '魔法1': ['MP', 1],
+    魔法: ['MP', 0],
+    魔法1: ['MP', 1],
 
-    '攻击': 'attack',
-    '防御': 'defense',
-    '灵力': 'power',
-    '幸运': 'luck',
-    '速度': 'speed',
+    攻击: 'attack',
+    防御: 'defense',
+    灵力: 'power',
+    幸运: 'luck',
+    速度: 'speed',
 
-    '经验': 'EXP',
-    '级别': 'level',
+    经验: 'EXP',
+    级别: 'level',
 };
 
 
@@ -849,7 +848,6 @@ function $showCombatantName(combatant, flags=null) {
 
 //刷新战斗人物
 function $refreshCombatant(combatant, checkLevel=true) {
-
     //只有我方战斗人物才可以升级
     if(checkLevel && combatant.$index >= 0)
         levelUp(combatant, 0, false);
@@ -867,15 +865,9 @@ function $refreshCombatant(combatant, checkLevel=true) {
 //直接升level级；为0表示检测是否需要升级；
 //  combatant是战斗角色对象；
 function levelUp(combatant, level=0, refresh=true) {
-
     //优先载入战斗角色自己的升级链，如果没有则载入系统的
-    let levelupscript;
-    let levelalgorithm;
-    if(combatant.$commons) {
-        levelupscript = combatant.levelUpScript;
-        levelalgorithm = combatant.levelAlgorithm;
-    }
-
+    let levelupscript = combatant.levelUpScript;
+    //let levelalgorithm = combatant.levelAlgorithm;
     if(!levelupscript) {
         try {
             levelupscript = LevelChainJS.commonLevelUpScript;
@@ -884,8 +876,7 @@ function levelUp(combatant, level=0, refresh=true) {
             levelupscript = $GameMakerGlobalJS.commonLevelUpScript;
         }
     }
-
-    if(!levelalgorithm) {
+    /*if(!levelalgorithm) {
         try {
             levelalgorithm = LevelChainJS.commonLevelAlgorithm;
         }
@@ -893,23 +884,12 @@ function levelUp(combatant, level=0, refresh=true) {
             levelalgorithm = $GameMakerGlobalJS.commonLevelAlgorithm;
         }
     }
+    */
 
-
-
-    //如果需要升级，则计算升级所需要的条件，然后直接达到即可（只增不减）；
-    if(level > 0) {
-        //game.run(function() {
-            let result = levelalgorithm(combatant, combatant.$properties.level + level);
-            for(let r in result) {  //提取所有条件并设置为满足
-                //只增不减
-                if(combatant.$properties[r] < result[r])
-                    combatant.$properties[r] = result[r];
-            }
-        //});
-    }
 
     //检测升级
-    game.run(levelupscript(combatant), 'levelupscript');
+    game.run(levelupscript(combatant, level), 'levelupscript');
+
 
     //强制刷新
     if(refresh)
@@ -1064,7 +1044,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     let harm, t;
 
     if($CommonLibJS.randTarget(combatant2Props.luck / 5 + combatant2Props.speed / 5)) {  //miss各占%20
-        return [{'HP': [0, 0], Target: targetCombatant}];
+        return [{HP: [0, 0], Target: targetCombatant}];
     }
 
     //计算攻击：攻击-防御
@@ -1092,7 +1072,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //targetCombatant.$properties.remainHP -= harm;
 
     //console.debug('damage1');
-    return [{'HP': [harm, Math.floor(harm / 4)], Target: targetCombatant}];
+    return [{HP: [harm, Math.floor(harm / 4)], Target: targetCombatant}];
 }
 
 
@@ -1253,7 +1233,7 @@ function getBuff(combatant, buffCode, params={}) {
                 }
                 harm = Math.round(harm);
 
-                game.addprops(combatant, {'HP': [-harm, -Math.floor(harm / 4)]});
+                game.addprops(combatant, {HP: [-harm, -Math.floor(harm / 4)]});
                 //刷新人物信息
                 yield ({Type: 1});
                 //显示伤害血量
@@ -1994,7 +1974,7 @@ function* $commonFightEndScript(res, teams, fightData) {
         //增加经验
         for(let tc of fight.myCombatants) {
             //fight.myCombatants[t].$properties.EXP += res.exp;
-            game.addprops(tc, {'EXP': res.exp});
+            game.addprops(tc, {EXP: res.exp});
 
             /*/将血量设置为1
             if(tc.$properties.HP[1] <= 0)

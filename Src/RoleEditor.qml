@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import GameComponents 1.0
-import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -313,17 +312,17 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: path,
                             CustomData: this,
                             OnClicked: (index, item, customData)=>{
                                 text = item;
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 customData.forceActiveFocus();
                             },
                             OnCanceled: (customData)=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 customData.forceActiveFocus();
                             },
                         });
@@ -788,16 +787,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.imageResourcePath();
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -1610,7 +1609,7 @@ Item {
                         onClicked: {
 
                             if(!_private.strRoleRID) {
-                                rootWindow.aliasGlobal.dialogCommon.show({
+                                $dialog.show({
                                       Msg: '请先保存角色',
                                       Buttons: Dialog.Yes,
                                       OnAccepted: function() {
@@ -2422,7 +2421,7 @@ Item {
         onSg_removeClicked: {
             let filepath = GameMakerGlobal.spriteResourcePath(item);
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -2486,7 +2485,7 @@ Item {
             }
 
             if(textRoleRID.text !== _private.strRoleRID && $Frame.sl_dirExists(path)) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -2500,7 +2499,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -3125,7 +3124,7 @@ function $refresh(index, imageAnimate, path) {
 
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -3140,7 +3139,7 @@ function $refresh(index, imageAnimate, path) {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

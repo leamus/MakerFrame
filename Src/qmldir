@@ -1,5 +1,5 @@
 module GameMaker
-#module名字可以随意取（识别主要是含qmldir的文件夹名）
+#module名字可以随意取（纯QML组件的识别方式是 含qmldir的文件夹名）
 
 
 

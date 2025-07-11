@@ -237,7 +237,7 @@ Item {
                             Layout.fillWidth: true
 
 
-                            model: ['装备', '使用', /*'战斗食用', '投掷',*/]
+                            model: 90
 
                             background: Rectangle {
                                 //implicitWidth: comboBoxComponentItem.comboBoxWidth

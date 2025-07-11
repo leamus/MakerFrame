@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS

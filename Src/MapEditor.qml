@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -433,7 +432,7 @@ Item {
                     //scriptEditor.editor.setPlainText(objSystemEventsData['$1'] || '');
 
                     if(!_private.strMapRID) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                               Msg: '请先保存地图',
                               Buttons: Dialog.Yes,
                               OnAccepted: function() {
@@ -2269,7 +2268,7 @@ Item {
                         }
                         //如果值无效
                         catch(e) {
-                            rootWindow.aliasGlobal.dialogCommon.show({
+                            $dialog.show({
                                 Msg: '特殊图块值无效，请输入一个数字（支持二进制、八进制和十六进制）',
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
@@ -2613,7 +2612,7 @@ Item {
             }
 
             if(textMapRID.text !== _private.strMapRID && $Frame.sl_dirExists(path)) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -2628,7 +2627,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -3078,7 +3077,7 @@ Item {
         onSg_close: function() {
             hotLoader.visible = false;
 
-            Global.referenceComponent = null;
+            referenceComponent = null;
 
             root.forceActiveFocus();
         }
@@ -3088,12 +3087,12 @@ Item {
             hotLoader.strRoleName = qmlObject.textRoleName;
             arrPosition = [qmlObject.textMapBlockX, qmlObject.textMapBlockY];
 
-            root.forceActiveFocus();
+            ///root.forceActiveFocus();
         }
 
         onSg_reloaded: function(code, data) {
             if(code === 1) {
-                Global.referenceComponent = rootTest;
+                referenceComponent = rootTest;
 
                 qmlObject.init({Map: _private.strMapRID, Role: strRoleName, Position: arrPosition});
             }
@@ -3537,7 +3536,7 @@ Item {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -3553,7 +3552,7 @@ Item {
                     //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

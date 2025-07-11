@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -239,7 +238,7 @@ let data = (function() {
                     let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadFightSkillScript.textDocument));
 
                     if(e) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -253,7 +252,7 @@ let data = (function() {
                         return;
                     }
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -288,7 +287,7 @@ let data = (function() {
                 text: 'V'
                 onClicked: {
                     if(!_private.strSavedName) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -432,7 +431,7 @@ let data = (function() {
             textFightSkillName.text = textFightSkillName.text.trim();
 
             if(textFightSkillName.text.length === 0) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '名称不能为空',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -446,7 +445,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -475,7 +474,7 @@ let data = (function() {
             }
 
             if(textFightSkillName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textFightSkillName.text)) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -487,7 +486,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -503,7 +502,7 @@ let data = (function() {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -515,7 +514,7 @@ let data = (function() {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -59,7 +58,7 @@ let data = (function() {
     //params：使用对象{RID:xxx, Params: 。。。}创建时的对象参数。
     let $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
         return {
-            $name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
+            $name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: 'avatar.png', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
         };
     };
 
@@ -67,7 +66,7 @@ let data = (function() {
     //公用属性，用 combatant.$commons 或 combatant 来引用；
     let $commons = {
 
-        //$name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: '', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
+        //$name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: 'avatar.png', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
 
 
         //动作包含的 精灵名
@@ -76,18 +75,20 @@ let data = (function() {
                 'Normal': 'killer_normal',
                 'Kill': 'killer_kill',
             };
-        }
+        },
 
 
-        //角色单独的升级链脚本和升级算法，可忽略（会自动使用通用的升级链和算法）
 
-        /*
-        //角色单独的升级链脚本
-        function* levelUpScript(combatant) {
-        }
+        //角色单独的升级链脚本和升级算法（方法1：这里定义 levelUpScript、levelAlgorithm 或 levelInfos；方法2：载入level_chain.js的）；
 
-        //targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）
-        function levelAlgorithm(combatant, targetLevel) {
+        /*/方法1（优先）：
+        //角色单独的升级链脚本；
+        //  level为0表示检测升级，否则表示直接升级level级；
+        levelUpScript: function*(combatant, level=0) {
+        },
+
+        //targetLevel级别对应需要达到的 各项属性 的算法
+        levelAlgorithm: function(combatant, targetLevel) {
             if(targetLevel <= 0)
                 return 0;
 
@@ -98,11 +99,45 @@ let data = (function() {
                 exp = exp * 2;
                 ++level;
             }
-            return {EXP: exp};
-        }
+
+            return {Conditions: {EXP: exp}, //支持'HP,2': xxx，不能有空格
+                Properties: {
+                    HP: {Type: 1, Value: combatant.$properties.HP[2] * 0.1},
+                    MP: {Type: 2, Value: 1.1},
+                    attack: {Type: 1, Value: combatant.$properties.attack * 0.1},
+                    defense: {Type: 2, Value: 1.1},
+                    power: {Type: 3, Value: combatant.$properties.power * 1.1},
+                    luck: {Type: 3, Value: combatant.$properties.luck * 1.1},
+                    speed: {Type: 3, Value: combatant.$properties.speed * 1.1},
+                },
+                Skills: [],
+            };
+        },
         */
+
+
+        //方法2：
+        //levelInfos: [],
     };
 
+
+    /*/方法1：
+    if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
+        let levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
+        if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
+    }
+    */
+    //方法2：
+    if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
+        let levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        try {
+            $commons.levelInfos = JSON.parse(levelInfos);
+        }
+        catch(e) {
+            console.warn('[!fight_role]level_chain.json文件不合法：', Qt.resolvedUrl('.'));
+        }
+    }
 
 
     return {$createData, $commons};
@@ -155,7 +190,7 @@ let data = (function() {
                     let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument));
 
                     if(e) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -169,7 +204,7 @@ let data = (function() {
                         return;
                     }
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
@@ -203,7 +238,7 @@ let data = (function() {
                 text: 'V'
                 onClicked: {
                     if(!_private.strSavedName) {
-                        rootWindow.aliasGlobal.dialogCommon.show({
+                        $dialog.show({
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
@@ -336,7 +371,7 @@ let data = (function() {
             textFightRoleName.text = textFightRoleName.text.trim();
 
             if(textFightRoleName.text.length === 0) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '名称不能为空',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -350,7 +385,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -379,7 +414,7 @@ let data = (function() {
             }
 
             if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textFightRoleName.text)) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -391,7 +426,7 @@ let data = (function() {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -407,7 +442,7 @@ let data = (function() {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -419,7 +454,7 @@ let data = (function() {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

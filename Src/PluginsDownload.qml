@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -81,7 +80,7 @@ Item {
             console.debug('[PluginsDownload]You chose:', fileUrl, fileUrls);
 
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认安装吗？这可能会替换同名插件！',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -107,7 +106,7 @@ Item {
                         //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()));
                     }
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: ret.length > 0 ? '成功' : '失败',
                         Buttons: Dialog.Ok,
                         OnAccepted: function() {
@@ -155,7 +154,7 @@ Item {
                 return false;
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            rootWindow.aliasGlobal.list.open({
+            $list.open({
                 RemoveButtonVisible: false,
                 Data: Object.keys(menuJS.plugins),
                 OnClicked: (index, item)=>{
@@ -164,7 +163,7 @@ Item {
                         return;
                     }
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         TextFormat: Label.PlainText,
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
                             .arg(menuJS.plugins[item]['Name'])
@@ -204,7 +203,7 @@ Item {
                                             return;
 
                                         //itemExtendsRoot.forceActiveFocus();
-                                        //rootWindow.aliasGlobal.list.visible = false;
+                                        //$list.visible = false;
 
                                     }
                                     catch(e) {
@@ -244,7 +243,7 @@ Item {
                                             }
 
                                             //itemExtendsRoot.forceActiveFocus();
-                                            //rootWindow.aliasGlobal.list.visible = false;
+                                            //$list.visible = false;
 
                                         }
                                         catch(e) {
@@ -256,7 +255,7 @@ Item {
                                 else
                                     msg = '安装失败';
 
-                                rootWindow.aliasGlobal.dialogCommon.show({
+                                $dialog.show({
                                     Msg: msg,
                                     Buttons: Dialog.Yes,
                                     OnAccepted: function() {
@@ -279,14 +278,14 @@ Item {
                                 FilePath: zipPath,
                                 //Params: ,
                             }, 2).$$then(function(xhr) {
-                                rootWindow.aliasGlobal.dialogCommon.close();
+                                $dialog.close();
 
                                 $CommonLibJS.asyncScript(setup(), 'setup');
                             }).$$catch(function(e) {
-                                //rootWindow.aliasGlobal.dialogCommon.close();
+                                //$dialog.close();
 
-                                rootWindow.aliasGlobal.dialogCommon.show({
-                                    Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                                $dialog.show({
+                                    Msg: '下载失败(%1,%2)'.arg(e.$params.code).arg(e.$params.error),
                                     Buttons: Dialog.Yes,
                                     OnAccepted: function() {
                                         root.forceActiveFocus();
@@ -307,10 +306,10 @@ Item {
                                 $Frame.sl_deleteLater(httpReply);
 
 
-                                rootWindow.aliasGlobal.dialogCommon.close();
+                                $dialog.close();
 
                                 if(code !== 0) {
-                                    rootWindow.aliasGlobal.dialogCommon.show({
+                                    $dialog.show({
                                         Msg: '下载失败(%1)'.arg(code),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
@@ -328,16 +327,16 @@ Item {
                             */
 
 
-                            rootWindow.aliasGlobal.dialogCommon.show({
+                            $dialog.show({
                                 Msg: '正在下载，请等待（请勿进行其他操作）',
                                 Buttons: Dialog.NoButton,
                                 OnAccepted: function() {
-                                    rootWindow.aliasGlobal.dialogCommon.open();
-                                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                    $dialog.open();
+                                    $dialog.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
-                                    rootWindow.aliasGlobal.dialogCommon.open();
-                                    rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                    $dialog.open();
+                                    $dialog.forceActiveFocus();
                                 },
                             });
 
@@ -350,11 +349,11 @@ Item {
                         },
                     });
 
-                    //rootWindow.aliasGlobal.list.visible = false;
+                    //$list.visible = false;
                     //root.forceActiveFocus();
                 },
                 OnCanceled: ()=>{
-                    rootWindow.aliasGlobal.list.visible = false;
+                    $list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -369,14 +368,14 @@ Item {
         console.debug('[PluginsDownload]Keys.onEscapePressed');
         event.accepted = true;
 
-        rootWindow.aliasGlobal.list.visible = false;
+        $list.visible = false;
         sg_close();
     }
     Keys.onBackPressed: function(event) {
         console.debug('[PluginsDownload]Keys.onBackPressed');
         event.accepted = true;
 
-        rootWindow.aliasGlobal.list.visible = false;
+        $list.visible = false;
         sg_close();
     }
     Keys.onPressed: function(event) {

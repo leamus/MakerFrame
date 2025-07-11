@@ -11,14 +11,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import GameComponents 1.0
-import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -139,7 +138,7 @@ Item {
                         let data = [['[选择Buff类型]', '毒','乱','封','眠','攻','防','速','灵','幸'],
                                     ['', 0,1,2,3,4,5,6,7,8]];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
@@ -155,11 +154,11 @@ Item {
                                     ttextEffect.visible = true;
                                 }
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -185,16 +184,16 @@ Item {
                         let data = [['[Buff效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                     ['', '20','2.0']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -220,16 +219,16 @@ Item {
                         let data = [['[持续回合数]', '2回合','5回合'],
                                     ['', '2','5']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -255,16 +254,16 @@ Item {
                         let data = [['[获得Buff概率]', '50%','100%'],
                                     ['', '0.5','1']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -338,16 +337,16 @@ Item {
                         let data = [['[影响属性]', '一段HP','二段HP','一段MP'],
                                     ['', 'HP, 0','HP, 1','MP, 0']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -373,16 +372,16 @@ Item {
                         let data = [['[效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                     ['', '20','2.0']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -408,16 +407,16 @@ Item {
                         let data = [['[倍率参考对象]', '本人','对方'],
                                     ['', '0','1']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -443,16 +442,16 @@ Item {
                         let data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（装备后）','二段血（装备后）','三段血（装备后）','一段MP（装备后）','二段MP（装备后）','攻击（装备后）','防御（装备后）','速度（装备后）','幸运（装备后）','灵力（装备后）'],
                                     ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: data[0],
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -660,16 +659,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -711,16 +710,16 @@ Item {
                                 let data = [['己方', '对方'],
                                             ['1', '2']];
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -753,16 +752,16 @@ Item {
                                 let data = [['单体', '全体'],
                                             ['1', '-1']];
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -1135,16 +1134,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -1176,16 +1175,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -1688,7 +1687,7 @@ Item {
                 }
             } while(0);
             if(!bCheck) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1698,7 +1697,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1953,7 +1952,7 @@ Item {
                 eval(data);
             }
             catch(e) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1963,7 +1962,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1974,7 +1973,7 @@ Item {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -1996,7 +1995,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

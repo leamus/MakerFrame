@@ -94,7 +94,7 @@ QtObject {
             }
         }
 
-        property url urlGameMakerCorePath: Qt.resolvedUrl('.')
+        property url urlGameMakerCorePath: Qt.resolvedUrl('..')
 
 
         //数据文件存储 目录名
@@ -251,7 +251,7 @@ QtObject {
         if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
             console.warn('[!GameMakerGlobal]已经存在单例类，请重启框架或返回原引擎');
 
-            Global.window.aliasGlobal.dialogCommon.show({
+            Global.aliasGlobal.dialog.show({
                 Msg: '已经存在单例类，请重启框架或返回原引擎，否则数据出错',
                 //Buttons: 0,
                 OnAccepted: function() {

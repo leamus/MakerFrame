@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -274,7 +273,7 @@ Item {
             else if(status === Loader.Error) {
                 _private.gameSceneClose();
 
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -283,11 +282,11 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                rootWindow.aliasGlobal.showBusyIndicator(true);
+                $showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                rootWindow.clearComponentCache();
-                rootWindow.trimComponentCache();
+                $clearComponentCache();
+                $trimComponentCache();
             }
         }
 
@@ -344,7 +343,7 @@ Item {
                 throw e;
             }
             finally {
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
         }
     }

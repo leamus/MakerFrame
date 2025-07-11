@@ -29,7 +29,7 @@ Notepad {
 
             timer.stop();
             timer.nStatus = -1;
-            _private.textIndex = 0;
+            _private.nTextIndex = 0;
         }
 
 
@@ -106,7 +106,7 @@ Notepad {
 
         timer.stop();
         timer.nStatus = -1;
-        _private.textIndex = 0;
+        _private.nTextIndex = 0;
 
         sg_over();
     }
@@ -237,32 +237,43 @@ Notepad {
         repeat: true
 
         onTriggered: {
-            //console.debug(_private.textVar.substr(0, _private.textIndex), textArea.width, _private.textVar[_private.textIndex])
+            //console.debug(_private.textVar.substr(0, _private.nTextIndex), textArea.width, _private.textVar[_private.nTextIndex])
 
             if(nStatus === 1) {
 
-                //如果有标签 <。。。>
-                if(_private.textVar[_private.textIndex] === '<') {
-                    _private.textIndex = _private.textVar.indexOf('>', _private.textIndex);
-                    if(_private.textIndex === -1)   //如果没有搜到,则直接到最后
-                        _private.textIndex = _private.textVar.length - 1;
+                if(textArea.textFormat === TextArea.RichText) {
+                    //如果有标签 <。。。>，则一次性跳过这些标签到下一个输出字符
+                    while(_private.textVar[_private.nTextIndex] === '<') {
+                        const tIndex = _private.nTextIndex;
+                        _private.nTextIndex = _private.textVar.indexOf('>', _private.nTextIndex);
+                        if(_private.nTextIndex === -1) { //如果没有搜到,则直接到最后
+                            _private.nTextIndex = _private.textVar.length - 1;
+                            break;
+                        }
+                        else {
+                            if(tIndex + 1 === _private.nTextIndex) //如果是 <>，则暂停一个interval
+                                break;
+                            ++_private.nTextIndex; //跳到标签的下一个字符
+                        }
+                    }
+                    //如果有转义字符
+                    if(_private.textVar[_private.nTextIndex] === '&') {
+                        const tIndex = _private.textVar.indexOf(';', _private.nTextIndex);
+                        if(tIndex !== -1) //如果搜到
+                            _private.nTextIndex = tIndex;
+                    }
                 }
-                //如果有转义字符
-                else if(_private.textVar[_private.textIndex] === '&') {
-                    let tIndex = _private.textVar.indexOf(';', _private.textIndex);
-                    if(tIndex !== -1)   //如果搜到
-                        _private.textIndex = tIndex;
-                }
-                ++_private.textIndex;
+
+                ++_private.nTextIndex;
 
 
-                textArea.text = _private.pretext + _private.textVar.substr(0, _private.textIndex);
+                textArea.text = _private.pretext + _private.textVar.substr(0, _private.nTextIndex);
                 toEnd();
-                //textArea.insert(textArea.length, _private.textVar[_private.textIndex]);
+                //textArea.insert(textArea.length, _private.textVar[_private.nTextIndex]);
 
 
                 //判断是否结束
-                if(_private.textIndex >= _private.textVar.length) {
+                if(_private.nTextIndex >= _private.textVar.length) {
                     //textArea.text = ''
 
                     timer.nStatus = 2;
@@ -292,7 +303,7 @@ Notepad {
 
         property string textVar: ''
         property string pretext: ''
-        property var textIndex: 0
+        property int nTextIndex: 0
 
         property int nKeepTime: -1
     }

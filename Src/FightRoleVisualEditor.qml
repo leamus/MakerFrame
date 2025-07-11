@@ -11,14 +11,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import GameComponents 1.0
-import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -120,16 +119,16 @@ Item {
                     onPressAndHold: {
                         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                        rootWindow.aliasGlobal.list.open({
+                        $list.open({
                             Data: path,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                rootWindow.aliasGlobal.list.visible = false;
+                                $list.visible = false;
                                 root.forceActiveFocus();
                             },
                         });
@@ -438,16 +437,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.imageResourcePath();
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -534,16 +533,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -575,16 +574,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -616,16 +615,16 @@ Item {
                             onPressAndHold: {
                                 let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
-                                rootWindow.aliasGlobal.list.open({
+                                $list.open({
                                     Data: path,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        rootWindow.aliasGlobal.list.visible = false;
+                                        $list.visible = false;
                                         root.forceActiveFocus();
                                     },
                                 });
@@ -812,16 +811,16 @@ Item {
                                         onPressAndHold: {
                                             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                                            rootWindow.aliasGlobal.list.open({
+                                            $list.open({
                                                 Data: path,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    rootWindow.aliasGlobal.list.visible = false;
+                                                    $list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    rootWindow.aliasGlobal.list.visible = false;
+                                                    $list.visible = false;
                                                     root.forceActiveFocus();
                                                 },
                                             });
@@ -1219,7 +1218,7 @@ Item {
                 }
             } while(0);
             if(!bCheck) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1229,7 +1228,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1278,7 +1277,7 @@ Item {
                 eval(data);
             }
             catch(e) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
@@ -1288,7 +1287,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
                         root.forceActiveFocus();
                     },*/
                 });
@@ -1299,7 +1298,7 @@ Item {
         }
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -1321,7 +1320,7 @@ Item {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });
@@ -1363,18 +1362,20 @@ let data = (function() {
         //动作包含的 精灵名
         $actions: function(combatant) {
             return {$$actions$$};
-        }
+        },
 
 
-        //角色单独的升级链脚本和升级算法，可忽略（会自动使用通用的升级链和算法）
 
-        /*
-        //角色单独的升级链脚本
-        function* levelUpScript(combatant) {
-        }
+        //角色单独的升级链脚本和升级算法（方法1：这里定义 levelUpScript、levelAlgorithm 或 levelInfos；方法2：载入level_chain.js的）；
 
-        //targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）
-        function levelAlgorithm(combatant, targetLevel) {
+        /*/方法1（优先）：
+        //角色单独的升级链脚本；
+        //  level为0表示检测升级，否则表示直接升级level级；
+        levelUpScript: function*(combatant, level=0) {
+        },
+
+        //targetLevel级别对应需要达到的 各项属性 的算法
+        levelAlgorithm: function(combatant, targetLevel) {
             if(targetLevel <= 0)
                 return 0;
 
@@ -1385,11 +1386,45 @@ let data = (function() {
                 exp = exp * 2;
                 ++level;
             }
-            return {EXP: exp};
-        }
+
+            return {Conditions: {EXP: exp}, //支持'HP,2': xxx，不能有空格
+                Properties: {
+                    HP: {Type: 1, Value: combatant.$properties.HP[2] * 0.1},
+                    MP: {Type: 2, Value: 1.1},
+                    attack: {Type: 1, Value: combatant.$properties.attack * 0.1},
+                    defense: {Type: 2, Value: 1.1},
+                    power: {Type: 3, Value: combatant.$properties.power * 1.1},
+                    luck: {Type: 3, Value: combatant.$properties.luck * 1.1},
+                    speed: {Type: 3, Value: combatant.$properties.speed * 1.1},
+                },
+                Skills: [],
+            };
+        },
         */
+
+
+        //方法2：
+        //levelInfos: [],
     };
 
+
+    /*/方法1：
+    if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
+        let levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
+        if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
+    }
+    */
+    //方法2：
+    if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
+        let levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        try {
+            $commons.levelInfos = JSON.parse(levelInfos);
+        }
+        catch(e) {
+            console.warn('[!fight_role]level_chain.json文件不合法：', Qt.resolvedUrl('.'));
+        }
+    }
 
 
     return {$createData, $commons};

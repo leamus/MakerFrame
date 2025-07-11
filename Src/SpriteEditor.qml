@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-//import GameComponents 1.0
-import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 import './Core'
+
+//import GameComponents 1.0
+import 'Core/GameComponents'
 
 
 import 'GameVisualScript.js' as GameVisualScriptJS
@@ -779,7 +778,7 @@ Item {
                             onClicked: {
 
                                 if(!_private.strSpriteName) {
-                                    rootWindow.aliasGlobal.dialogCommon.show({
+                                    $dialog.show({
                                           Msg: '请先保存特效',
                                           Buttons: Dialog.Yes,
                                           OnAccepted: function() {
@@ -1395,7 +1394,7 @@ Item {
         onSg_removeClicked: {
             let filepath = GameMakerGlobal.spriteResourcePath(item);
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1770,7 +1769,7 @@ Item {
         onSg_removeClicked: {
             let filepath = GameMakerGlobal.soundResourcePath(item);
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
@@ -1831,7 +1830,7 @@ Item {
             }
 
             if(textSpriteName.text !== _private.strSpriteName && $Frame.sl_dirExists(path)) {
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
                     OnAccepted: function() {
@@ -1845,7 +1844,7 @@ Item {
                         root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
-                        rootWindow.aliasGlobal.dialogCommon.close();
+                        $dialog.close();
 
                         root.forceActiveFocus();
                     },*/
@@ -2246,7 +2245,7 @@ function $refresh(index, imageAnimate, path) {
 
 
         function close() {
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
@@ -2261,7 +2260,7 @@ function $refresh(index, imageAnimate, path) {
                     sg_close();
                 },
                 OnDiscarded: ()=>{
-                    rootWindow.aliasGlobal.dialogCommon.close();
+                    $dialog.close();
                     root.forceActiveFocus();
                 },
             });

@@ -12,14 +12,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -81,8 +80,8 @@ Item {
             }
 
 
-            //rootWindow.aliasGlobal.list.visible = true;
-            //rootWindow.aliasGlobal.list.forceActiveFocus();
+            //$list.visible = true;
+            //$list.forceActiveFocus();
             _private.refresh();
         }
 
@@ -153,7 +152,7 @@ Item {
             else if(status === Loader.Error) {
                 setSource('');
 
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -162,16 +161,16 @@ Item {
                 root.forceActiveFocus();
 
 
-                //rootWindow.aliasGlobal.list.visible = true;
-                //rootWindow.aliasGlobal.list.forceActiveFocus();
+                //$list.visible = true;
+                //$list.forceActiveFocus();
                 _private.refresh();
             }
             else if(status === Loader.Loading) {
-                rootWindow.aliasGlobal.showBusyIndicator(true);
+                $showBusyIndicator(true);
             }
             if(status !== Loader.Loading) {
-                rootWindow.clearComponentCache();
-                rootWindow.trimComponentCache();
+                $clearComponentCache();
+                $trimComponentCache();
             }
         }
 
@@ -193,13 +192,13 @@ Item {
                 visible = true;
 
 
-                rootWindow.aliasGlobal.list.visible = false;
+                $list.visible = false;
             }
             catch(e) {
                 throw e;
             }
             finally {
-                rootWindow.aliasGlobal.showBusyIndicator(false);
+                $showBusyIndicator(false);
             }
         }
 
@@ -247,8 +246,8 @@ Item {
         function refresh() {
             jsLoader.clear();
 
-            rootWindow.clearComponentCache();
-            rootWindow.trimComponentCache();
+            $clearComponentCache();
+            $trimComponentCache();
 
 
             arrPluginsShowName = [];
@@ -306,7 +305,7 @@ Item {
 
             //console.debug(menuJS.plugins, Object.keys(menuJS.plugins), JSON.stringify(menuJS.plugins));
 
-            rootWindow.aliasGlobal.list.open({
+            $list.open({
                 RemoveButtonVisible: true,
                 Data: arrPluginsShowName,
                 OnClicked: (index, item)=>{
@@ -323,7 +322,7 @@ Item {
                             }
 
                             itemExtendsRoot.forceActiveFocus();
-                            rootWindow.aliasGlobal.list.visible = false;
+                            $list.visible = false;
 
                             return 1;
                         }
@@ -341,23 +340,23 @@ Item {
                     }
 
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '扩展不能运行',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            rootWindow.aliasGlobal.list.forceActiveFocus();
+                            $list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            rootWindow.aliasGlobal.list.forceActiveFocus();
+                            $list.forceActiveFocus();
                         },
                     });
 
-                    //rootWindow.aliasGlobal.list.visible = false;
+                    //$list.visible = false;
                     //root.forceActiveFocus();
                     return 0;
                 },
                 OnCanceled: ()=>{
-                    rootWindow.aliasGlobal.list.visible = false;
+                    $list.visible = false;
                     //root.forceActiveFocus();
                     sg_close();
                 },
@@ -379,7 +378,7 @@ Item {
                             console.error('[!PluginsManager]', e);
                         }
                     }
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         TextFormat: Label.RichText,
                         //TextFormat: Label.PlainText,
                         Msg: '确认删除 <font color="red">' + item + '</font> ？<br>' + description,
@@ -409,7 +408,7 @@ Item {
                                             return;
 
                                         //itemExtendsRoot.forceActiveFocus();
-                                        //rootWindow.aliasGlobal.list.visible = false;
+                                        //$list.visible = false;
 
                                         console.debug('[PluginsManager]ret:', ret);
                                     }
@@ -423,15 +422,15 @@ Item {
 
                                 if(removeFlag) {
                                     $Frame.sl_removeRecursively(pluginDirPath);
-                                    rootWindow.aliasGlobal.list.removeItem(index);
+                                    $list.removeItem(index);
                                     _private.refresh();
                                 }
 
-                                //rootWindow.aliasGlobal.list.forceActiveFocus();
+                                //$list.forceActiveFocus();
                             }, 'remove plugin');
                         },
                         OnRejected: ()=>{
-                            rootWindow.aliasGlobal.list.forceActiveFocus();
+                            $list.forceActiveFocus();
                         },
                     });
 
@@ -447,14 +446,14 @@ Item {
         console.debug('[PluginsManager]Keys.onEscapePressed');
         event.accepted = true;
 
-        rootWindow.aliasGlobal.list.visible = false;
+        $list.visible = false;
         sg_close();
     }
     Keys.onBackPressed: function(event) {
         console.debug('[PluginsManager]Keys.onBackPressed');
         event.accepted = true;
 
-        rootWindow.aliasGlobal.list.visible = false;
+        $list.visible = false;
         sg_close();
     }
     Keys.onPressed: function(event) {

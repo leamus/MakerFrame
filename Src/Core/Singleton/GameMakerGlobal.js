@@ -323,7 +323,7 @@ function* $gameInit(newGame) {
 
 
     //每秒恢复事件
-    game.addtimer('resume_event', 1000, -1, 0b11, {'HP': [2], 'MP': [2]});
+    game.addtimer('resume_event', 1000, -1, 0b11, {HP: [2], MP: [2]});
     game.gf['resume_event'] = function(realinterval, props) {
         for(let combatant of game.gd['$sys_fight_heros']) {
             if(combatant.$$propertiesWithExtra.HP[0] > 0)
@@ -723,21 +723,21 @@ $Combatant.prototype = $config.$protoObjects.$fightRole;
 //系统显示 和 真实属性 对应
 //中文属性索引
 const mappingCombatantProperty = {
-    '血量': ['HP', 0],
-    '血量1': ['HP', 1],
-    '血量2': ['HP', 2],
+    血量: ['HP', 0],
+    血量1: ['HP', 1],
+    血量2: ['HP', 2],
 
-    '魔法': ['MP', 0],
-    '魔法1': ['MP', 1],
+    魔法: ['MP', 0],
+    魔法1: ['MP', 1],
 
-    '攻击': 'attack',
-    '防御': 'defense',
-    '灵力': 'power',
-    '幸运': 'luck',
-    '速度': 'speed',
+    攻击: 'attack',
+    防御: 'defense',
+    灵力: 'power',
+    幸运: 'luck',
+    速度: 'speed',
 
-    '经验': 'EXP',
-    '级别': 'level',
+    经验: 'EXP',
+    级别: 'level',
 };
 
 
@@ -884,7 +884,6 @@ function $showCombatantName(combatant, flags=null) {
 
 //刷新战斗人物
 function $refreshCombatant(combatant, checkLevel=true) {
-
     //只有我方战斗人物才可以升级
     if(checkLevel && combatant.$index >= 0)
         levelUp(combatant, 0, false);
@@ -902,15 +901,9 @@ function $refreshCombatant(combatant, checkLevel=true) {
 //直接升level级；为0表示检测是否需要升级；
 //  combatant是战斗角色对象；
 function levelUp(combatant, level=0, refresh=true) {
-
     //优先载入战斗角色自己的升级链，如果没有则载入系统的
-    let levelupscript;
-    let levelalgorithm;
-    if(combatant.$commons) {
-        levelupscript = combatant.levelUpScript;
-        levelalgorithm = combatant.levelAlgorithm;
-    }
-
+    let levelupscript = combatant.levelUpScript;
+    //let levelalgorithm = combatant.levelAlgorithm;
     if(!levelupscript) {
         try {
             levelupscript = LevelChainJS.commonLevelUpScript;
@@ -919,8 +912,7 @@ function levelUp(combatant, level=0, refresh=true) {
             levelupscript = commonLevelUpScript;
         }
     }
-
-    if(!levelalgorithm) {
+    /*if(!levelalgorithm) {
         try {
             levelalgorithm = LevelChainJS.commonLevelAlgorithm;
         }
@@ -928,23 +920,12 @@ function levelUp(combatant, level=0, refresh=true) {
             levelalgorithm = commonLevelAlgorithm;
         }
     }
+    */
 
-
-
-    //如果需要升级，则计算升级所需要的条件，然后直接达到即可（只增不减）；
-    if(level > 0) {
-        //game.run(function() {
-            let result = levelalgorithm(combatant, combatant.$properties.level + level);
-            for(let r in result) {  //提取所有条件并设置为满足
-                //只增不减
-                if(combatant.$properties[r] < result[r])
-                    combatant.$properties[r] = result[r];
-            }
-        //});
-    }
 
     //检测升级
-    game.run(levelupscript(combatant), 'levelupscript');
+    game.run(levelupscript(combatant, level), 'levelupscript');
+
 
     //强制刷新
     if(refresh)
@@ -1099,7 +1080,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     let harm, t;
 
     if($CommonLibJS.randTarget(combatant2Props.luck / 5 + combatant2Props.speed / 5)) {  //miss各占%20
-        return [{'HP': [0, 0], Target: targetCombatant}];
+        return [{HP: [0, 0], Target: targetCombatant}];
     }
 
     //计算攻击：攻击-防御
@@ -1127,7 +1108,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     //targetCombatant.$properties.remainHP -= harm;
 
     //console.debug('damage1');
-    return [{'HP': [harm, Math.floor(harm / 4)], Target: targetCombatant}];
+    return [{HP: [harm, Math.floor(harm / 4)], Target: targetCombatant}];
 }
 
 
@@ -1288,7 +1269,7 @@ function getBuff(combatant, buffCode, params={}) {
                 }
                 harm = Math.round(harm);
 
-                game.addprops(combatant, {'HP': [-harm, -Math.floor(harm / 4)]});
+                game.addprops(combatant, {HP: [-harm, -Math.floor(harm / 4)]});
                 //刷新人物信息
                 yield ({Type: 1});
                 //显示伤害血量
@@ -2029,7 +2010,7 @@ function* $commonFightEndScript(res, teams, fightData) {
         //增加经验
         for(let tc of fight.myCombatants) {
             //fight.myCombatants[t].$properties.EXP += res.exp;
-            game.addprops(tc, {'EXP': res.exp});
+            game.addprops(tc, {EXP: res.exp});
 
             /*/将血量设置为1
             if(tc.$properties.HP[1] <= 0)
@@ -3163,39 +3144,127 @@ function* fightRolesRound1(round, speedProp='$speed') {
 
 
 //升级脚本（示例）
-function* commonLevelUpScript(combatant) {
+//  level为0表示检测升级，否则表示直接升级level级；
+function* commonLevelUpScript(combatant, level=0) {
+    //优先载入战斗角色自己的升级链，如果没有则载入系统的
+    //let levelupscript = combatant.levelUpScript;
+    let levelalgorithm = combatant.levelAlgorithm;
+    let levelInfos = combatant.levelInfos;
+    /*if(!levelupscript) {
+        try {
+            levelupscript = LevelChainJS.commonLevelUpScript;
+        }
+        catch(e) {
+            levelupscript = commonLevelUpScript;
+        }
+    }
+    */
+    if(!levelalgorithm) {
+        try {
+            levelalgorithm = LevelChainJS.commonLevelAlgorithm;
+        }
+        catch(e) {
+            levelalgorithm = commonLevelAlgorithm;
+        }
+    }
+
+
+    //直接升级，则获取升级所需要的条件，然后直接达到即可（只增不减）；
+    if(level > 0) {
+        //game.run(function() {
+        let levelInfo;
+        if(levelInfos)
+            levelInfo = levelInfos[combatant.$properties.level + level];
+        if(!levelInfo)
+            levelInfo = levelalgorithm(combatant, combatant.$properties.level + level);
+
+        const levelInfoConditions = levelInfo.Conditions;
+        for(let tp in levelInfoConditions) { //提取所有条件并设置为满足
+            const tmpProps = tp.split(','); //注意：这里没有用trim
+            const propName = tmpProps.shift();
+
+            //只增不减
+            if($CommonLibJS.isArray(combatant.$properties[propName])) {
+                if($CommonLibJS.getObjectValue(combatant.$properties[propName], ...tmpProps) < levelInfoConditions[tp])
+                    $CommonLibJS.setObjectValue(levelInfoConditions[tp], combatant.$properties[propName], ...tmpProps);
+            }
+            else {
+                if(combatant.$properties[tp] < levelInfoConditions[tp])
+                    combatant.$properties[tp] = levelInfoConditions[tp];
+            }
+        }
+        //});
+    }
+
 
     //升级
+    LevelUpLoop:
     while(1) {
 
-        //升级条件是否通过
-        let bConditions = true;
-        //下一级所需条件
-        let nextLevelConditions = commonLevelAlgorithm(combatant, combatant.$properties.level + 1);
+        //下一等级
+        let nextLevelInfo;
+        if(levelInfos)
+            nextLevelInfo = levelInfos[combatant.$properties.level + 1];
+        if(!nextLevelInfo)
+            nextLevelInfo = commonLevelAlgorithm(combatant, combatant.$properties.level + 1);
+
+        //所需条件
+        const nextLevelConditions = nextLevelInfo.Conditions;
         //循环所有条件
         for(let tc in nextLevelConditions) {
+            const tmpProps = tc.split(','); //注意：这里没有用trim
+            const propName = tmpProps.shift();
+
             //如果有一条不符合
-            if(combatant.$properties[tc] < nextLevelConditions[tc]) {
-                bConditions = false;
-                break;
+            if($CommonLibJS.isArray(combatant.$properties[propName])) {
+                if($CommonLibJS.getObjectValue(combatant.$properties[propName], ...tmpProps) < nextLevelConditions[propName]) {
+                    break LevelUpLoop;
+                }
+            }
+            else {
+                if(combatant.$properties[propName] < nextLevelConditions[propName]) {
+                    break LevelUpLoop;
+                }
             }
         }
 
-        //不符合，则退出
-        if(!bConditions)
-            break;
+        //处理所有属性
+        const nextLevelProperties = nextLevelInfo.Properties;
+        for(let tp in nextLevelProperties) {
+            let value;
+            switch(nextLevelProperties[tp].Type) {
+            case 1: //加减
+                if($CommonLibJS.isArray(combatant.$properties[tp]))
+                    value = parseInt(combatant.$properties[tp].$$value(-1) + nextLevelProperties[tp].Value);
+                else
+                    value = parseInt(combatant.$properties[tp] + nextLevelProperties[tp].Value);
+                break;
+            case 2: //倍率
+                if($CommonLibJS.isArray(combatant.$properties[tp]))
+                    value = parseInt(combatant.$properties[tp].$$value(-1) * nextLevelProperties[tp].Value);
+                else
+                    value = parseInt(combatant.$properties[tp] * nextLevelProperties[tp].Value);
+                break;
+            case 3: //直接设置
+                value = parseInt(nextLevelProperties[tp].Value);
+                break;
+            }
 
+            if($CommonLibJS.isArray(combatant.$properties[tp]))
+                combatant.$properties[tp].forEach(function(v, n, arr){arr[n] = value;});
+            else
+                combatant.$properties[tp] = value;
+        }
+
+        if(nextLevelInfo.Skills)
+            for(let tskill of nextLevelInfo.Skills) {
+                const skill = game.$sys.getSkillObject(tskill);
+                game.getskill(combatant, skill);
+                yield game.msg('%1 获得技能 %2'.arg(combatant.$name).arg(skill.$rid), 20, '', 0, 0b11);
+            }
 
 
         ++combatant.$properties.level;
-
-        combatant.$properties.HP[0] = combatant.$properties.HP[1] = combatant.$properties.HP[2] = parseInt(combatant.$properties.HP[2] * 1.1);
-        combatant.$properties.MP[0] = combatant.$properties.MP[1] = parseInt(combatant.$properties.MP[1] * 1.1);
-        combatant.$properties.attack = parseInt(combatant.$properties.attack * 1.1);
-        combatant.$properties.defense = parseInt(combatant.$properties.defense * 1.1);
-        combatant.$properties.power = parseInt(combatant.$properties.power * 1.1);
-        combatant.$properties.luck = parseInt(combatant.$properties.luck * 1.1);
-        combatant.$properties.speed = parseInt(combatant.$properties.speed * 1.1);
 
 
         /*game.run(
@@ -3218,7 +3287,7 @@ function* commonLevelUpScript(combatant) {
     return combatant.$properties.level;
 }
 
-//targetLeve级别对应需要达到的 各项属性 的算法（升级时会设置，可选；注意：只增不减）（示例）
+//targetLevel级别对应需要达到的 各项属性 的算法（示例）
 function commonLevelAlgorithm(combatant, targetLevel) {
     if(targetLevel <= 0)
         return null;
@@ -3231,7 +3300,22 @@ function commonLevelAlgorithm(combatant, targetLevel) {
         ++level;
     }
 
-    return {EXP: exp};
+    const skills = [];
+    //if(combatant.$name === 'killer' && targetLevel === 1)
+    //    skills.push('恢复血量');
+
+    return {Conditions: {EXP: exp}, //支持'HP,2': xxx，不能有空格
+        Properties: {
+            HP: {Type: 1, Value: combatant.$properties.HP[2] * 0.1},
+            MP: {Type: 2, Value: 1.1},
+            attack: {Type: 1, Value: combatant.$properties.attack * 0.1},
+            defense: {Type: 2, Value: 1.1},
+            power: {Type: 3, Value: combatant.$properties.power * 1.1},
+            luck: {Type: 3, Value: combatant.$properties.luck * 1.1},
+            speed: {Type: 3, Value: combatant.$properties.speed * 1.1},
+        },
+        Skills: skills,
+    };
 }
 
 

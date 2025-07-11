@@ -13,14 +13,13 @@ import _Global 1.0
 import _Global.Button 1.0
 
 
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
 import 'qrc:/QML'
 
 
 //import './Core'
+
+////import GameComponents 1.0
+//import 'Core/GameComponents'
 
 
 //import 'File.js' as File
@@ -102,7 +101,7 @@ Item {
                 //_private.arrVideos.splice(index, 1);
                 //_private.arrVideos = _private.arrVideos;
 
-                rootWindow.aliasGlobal.dialogCommon.show({
+                $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
                     Buttons: Dialog.Ok | Dialog.Cancel,
                     OnAccepted: function() {
@@ -173,23 +172,23 @@ Item {
                     let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
                     //let oldFileName = _private.arrVideos[listview.listview.currentIndex];
 
-                    rootWindow.aliasGlobal.dialogCommon.show({
+                    $dialog.show({
                         Msg: '请输入新文件名',
                         Input: oldFileName,
                         Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
                             root.forceActiveFocus();
 
-                            let newFileName = rootWindow.aliasGlobal.dialogCommon.input.trim();
+                            let newFileName = $dialog.input.trim();
                             //if(_private.arrVideos.indexOf(newFileName) >= 0) {
                             if(listview.listData.indexOf(newFileName) >= 0) {
                                 if(newFileName === oldFileName)
                                     return;
 
-                                rootWindow.aliasGlobal.dialogCommon.msg = '文件名重复，请重新输入';
-                                //rootWindow.aliasGlobal.dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
-                                rootWindow.aliasGlobal.dialogCommon.open();
-                                rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                                $dialog.msg = '文件名重复，请重新输入';
+                                //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
+                                $dialog.open();
+                                $dialog.forceActiveFocus();
                             }
                             else {
                                 let ret = $Frame.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
@@ -383,20 +382,20 @@ Item {
             let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
 
 
-            rootWindow.aliasGlobal.dialogCommon.show({
+            $dialog.show({
                 Msg: '请输入新文件名',
                 Input: filename,
                 Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
                     root.forceActiveFocus();
 
-                    let newFileName = rootWindow.aliasGlobal.dialogCommon.input.trim();
+                    let newFileName = $dialog.input.trim();
                     //if(_private.arrVideos.indexOf(newFileName) >= 0) {
                     if(listview.listData.indexOf(newFileName) >= 0) {
-                        rootWindow.aliasGlobal.dialogCommon.msg = '文件名重复，请重新输入';
-                        //rootWindow.aliasGlobal.dialogCommon.standardButtons = Dialog.Yes | Dialog.Cancel;
-                        rootWindow.aliasGlobal.dialogCommon.open();
-                        rootWindow.aliasGlobal.dialogCommon.forceActiveFocus();
+                        $dialog.msg = '文件名重复，请重新输入';
+                        //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
+                        $dialog.open();
+                        $dialog.forceActiveFocus();
                     }
                     else {
                         let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
