@@ -172,12 +172,12 @@ Item {
 目前支持（已封装）的脚本命令（中括号[]为可选参数）：
 
 
-功能：载入地图资源名为mapRID的地图并执行地图载入事件$start。
-参数：userData是用户传入数据，后期调用的钩子函数会传入；
-  forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
+功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
+参数：forceRepaint表示是否强制重绘（为false时表示如果map与已载入的相同，则不重绘）；
+  userData是用户传入数据，后期调用的钩子函数会传入；
 返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），携带值为地图信息；
 示例：yield game.loadmap('地图资源名');
-<font color='yellow'>yield game.loadmap(mapRID, userData, forceRepait=false)</font>
+<font color='yellow'>yield game.loadmap(map, forceRepait=false, ...userData)</font>
 
 功能：在屏幕中间显示提示信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：msg为提示文字，支持HTML标签；
@@ -391,7 +391,7 @@ Item {
 //注意：会将目标装备移除，需要保存则先unload到getgoods。
 <font color='yellow'>yield game.equip(fighthero, goods, newPosition=undefined, copyedNewProps={$count: 1});</font>
 
-<font color='yellow'>game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
+<font color='yellow'>yield game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
 <font color='yellow'>game.equipment(fighthero, positionName=null)</font>：返回某 fighthero 的装备；如果positionName为null，则返回所有装备；fighthero为下标，或战斗角色的name，或战斗角色对象；返回格式：单个：装备对象，多个：单个的数组；错误返回null。
 
 <font color='yellow'>[yield] game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品RID列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
@@ -505,7 +505,7 @@ Item {
 <font color='yellow'>game.checksave(文件名)</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
 <font color='yellow'>yield game.save(文件名, showName="", compressionLevel=-1)</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
 <font color='yellow'>yield game.load(文件名)</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
-<font color='yellow'>yield game.gameover(params)</font>：游戏结束（调用游戏结束脚本）；
+<font color='yellow'>game.restart(params)</font>：游戏重新开始；
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
 

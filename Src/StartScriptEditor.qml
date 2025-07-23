@@ -96,8 +96,9 @@ game.goon();
 
         strTitle: '游戏开始脚本'
         fnAfterCompile: function(code) {
-            //console.debug(code);
-            if(code.indexOf('function* $start() {') < 0 && code.indexOf('function* start() {') < 0) {
+            console.debug('[StartScriptEditor]code:', code);
+            //if(code.indexOf('function* $start() {') < 0 && code.indexOf('function* start() {') < 0) {
+            if(!/function\s*\*{0,1}\s*\${0,1}start\s*\(/.test(code)) {
                 code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
             }
             return code;

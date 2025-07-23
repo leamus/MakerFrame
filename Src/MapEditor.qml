@@ -577,7 +577,7 @@ Item {
                     //for(let j in cfg.MapData[k]) {
                     //arrMapData[k] = cfg.MapData[k];
                     */
-                    console.debug('[MapEditor]focus:', root.focus, root.focus, loaderUserMainProject.focus, itemRootScaled.focus, rootWindow.focus);
+                    console.debug('[MapEditor]focus:', root.focus, rootFocusScopeScaled.focus, loaderUserMainProject.focus, rootWindow.focus);
                     console.debug('[MapEditor]', filedialogOpenMapBlock.folder);
 
                     console.debug('[MapEditor]imageMapBlock:', itemMapBlockContainer.currentMapBlock.imageMapBlock.source);
@@ -1463,9 +1463,9 @@ Item {
                                 //y: canvasMapContainer.pointScaleCenterPos.y
                             }
                             /*xScale:
-                                rootWindow.width / Global.frameConfig.$sys.sizeWindowVirtualSize.width
+                                rootWindow.width / Global.frameConfig.$sys.windowVirtualSize.width
                             yScale:
-                                rootWindow.height / Global.frameConfig.$sys.sizeWindowVirtualSize.height
+                                rootWindow.height / Global.frameConfig.$sys.windowVirtualSize.height
                             */
                         }
 
@@ -2593,7 +2593,7 @@ Item {
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
 
             function fnSave() {
-                if(_private.exportMap()) {
+                if(_private.exportMap(null)) {
                     //第一次保存，重新刷新
                     if(_private.strMapRID === '')
                         _private.loadScript(textMapRID.text);
@@ -2889,7 +2889,7 @@ Item {
     Canvas {
         id: canvasExport
 
-        property bool bExport: false
+        property var fnExported: null //输出成功后回调（因为直接退出编辑器后无法输出地图，所以必须在回调函数中退出）
 
         visible: false
         width: canvasMapContainer.width / Screen.devicePixelRatio
@@ -2904,7 +2904,7 @@ Item {
 
 
         onPaint: {
-            if(bExport) {
+            if(fnExported) {
 
                 let ctx = getContext('2d');
 
@@ -2933,7 +2933,7 @@ Item {
             let path = GameMakerGlobal.config.strProjectRootPath +
                 GameMakerGlobal.separator +
                 GameMakerGlobal.config.strCurrentProjectName +
-                GameMakerGlobal.separator + 'Outputs' +
+                GameMakerGlobal.separator + '~Cache' +
                 GameMakerGlobal.separator + 'Maps';
             //win下，Canvas.save 不支持 file: 开头的路径
             path = path.replace('file:/', '').replace('//', '');
@@ -2944,7 +2944,11 @@ Item {
             canvasExport.save(path + GameMakerGlobal.separator + textMapName.text.trim() + '.png');
             //$Frame.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
-            bExport = false;
+
+            if($CommonLibJS.isFunction(fnExported)) {
+                fnExported();
+                fnExported = null;
+            }
 
             console.debug('[MapEditor]canvasExport onPainted:', canvasExport.width, canvasExport.height);
         }
@@ -3058,7 +3062,7 @@ Item {
 
 
         property string strMapRID
-        property string strRoleName
+        property string strRoleRID
         property var arrPosition
 
         visible: false
@@ -3084,7 +3088,7 @@ Item {
 
         onSg_release: function(qmlObject) {
             hotLoader.strMapRID = qmlObject.textMapRID;
-            hotLoader.strRoleName = qmlObject.textRoleName;
+            hotLoader.strRoleRID = qmlObject.textRoleRID;
             arrPosition = [qmlObject.textMapBlockX, qmlObject.textMapBlockY];
 
             ///root.forceActiveFocus();
@@ -3094,10 +3098,10 @@ Item {
             if(code === 1) {
                 referenceComponent = rootTest;
 
-                qmlObject.init({Map: _private.strMapRID, Role: strRoleName, Position: arrPosition});
+                qmlObject.init({Map: _private.strMapRID, Role: strRoleRID, Position: arrPosition});
             }
             else if(code === 2) {
-                qmlObject.init({Map: strMapRID, Role: strRoleName, Position: arrPosition});
+                qmlObject.init({Map: strMapRID, Role: strRoleRID, Position: arrPosition});
                 qmlObject.start();
             }
             else {
@@ -3303,7 +3307,7 @@ Item {
         //保存js文件
         function saveJS() {
             /*/第一次保存，重新刷新
-            if(_private.strRoleName === '') {
+            if(_private.strRoleRID === '') {
             }*/
 
             let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
@@ -3322,7 +3326,9 @@ Item {
         }
 
         //导出地图
-        function exportMap() {
+        function exportMap(exportedFunction) {
+            if(textMapRID.text.length === 0 || textMapName.text.length === 0)
+                return false;
 
             let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
 
@@ -3331,7 +3337,7 @@ Item {
 
 
             //绘制所有 0层及以上 canvas
-            canvasExport.bExport = true;
+            canvasExport.fnExported = exportedFunction;
             canvasExport.requestPaint();
 
             //canvasMapContainer.arrCanvasMap[0].save(newPath + '/output_0.png');
@@ -3340,12 +3346,12 @@ Item {
 
             let i = 0;
 
-            let tmpEventList = []; //保存所有事件名 对应的 显示关键字
+            const tmpEventList = []; //保存所有事件名 对应的 显示关键字
             for(i = 0; i < listmodelEventsData.count; ++i) {
                 tmpEventList.push(listmodelEventsData.get(i)['EventName']);
             }
 
-            let outputData = {};
+            const outputData = {};
             outputData.Version = '0.6';
             outputData.MapName = textMapName.text;
             outputData.MapType = 1; //地图类型
@@ -3540,8 +3546,8 @@ Item {
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    if(exportMap())
-                        sg_close();
+                    if(exportMap(()=>sg_close())) {
+                    }
                     else {
                         dialogSave.open();
                     }

@@ -457,7 +457,7 @@ function* $afterLoad() {
 
 
 //打开地图前调用
-function* $beforeLoadmap(mapName, userData) {
+function* $beforeLoadmap(map, ...userData) {
     /*if($CommonLibJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
@@ -469,7 +469,7 @@ function* $beforeLoadmap(mapName, userData) {
 }
 
 //打开地图后调用
-function* $afterLoadmap(mapName, userData) {
+function* $afterLoadmap(map, ...userData) {
     /*if($CommonLibJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
             game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});

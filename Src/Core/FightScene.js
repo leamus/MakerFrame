@@ -765,7 +765,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
             //保存到列表中，退出时会删除所有，防止删除错误
             _private.mapSpriteEffectsTemp[combatantActionSpriteData.ID] = spriteEffect;
             let _finished = function() {
-                if($CommonLibJS.isComponent(spriteEffect)) {
+                if($CommonLibJS.isQtObject(spriteEffect)) {
                     game.$sys.putSpriteEffect(spriteEffect);
                     //spriteEffect.destroy();
                 }
@@ -906,7 +906,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
         let wordmove = compCacheWordMove.createObject(fightScene);
         wordmove.parallelAnimation.finished.connect(function() {
-            if($CommonLibJS.isComponent(wordmove)) {
+            if($CommonLibJS.isQtObject(wordmove)) {
                 wordmove.destroy();
             }
         });

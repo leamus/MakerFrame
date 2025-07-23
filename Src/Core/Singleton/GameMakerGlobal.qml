@@ -49,7 +49,7 @@ QtObject {
     //配置
     property QtObject config: QtObject {
         //调试（显示一些调试功能）
-        //property bool bDebug: Global.frameConfig.$sys.nDebug === 0 ? false : true
+        //property bool bDebug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool bDebug: parseInt($Frame.config.Debug) === 0 ? false : true
         //property bool bDebug: parseInt($Frame.sl_configValue('Debug', 0)) === 0 ? false : true
         property bool bDebug: true

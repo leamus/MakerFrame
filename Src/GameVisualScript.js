@@ -25,9 +25,12 @@ let data = (function() {
     //  [命令Key名, 额外设置（enabled为是否注释）, 参数值1, ...]
     let commandsInfo = ({
         '载入地图': {
-            command: ['载入地图', 'yield game.loadmap(%1);', '载入一张地图', 0, true, 'red', 'white'],
+            command: ['载入地图', 'yield game.loadmap({RID: %1, $name: %2, $scale: %3}, %4);', '载入一张地图', 0, true, 'red', 'white'],
             params: [
                 ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
+                ['地图名', 'string', undefined, 0, '', 'darkgreen'],
+                ['缩放倍数', 'number', undefined, 0, '', 'blue'],
+                ['是否重绘', 'bool', 'false', 0, '', 'blue'],
                 ['载入一张地图（长按编辑框可选择）。', 'label'],
             ],
         },
@@ -353,7 +356,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '游戏结束': {
-            command: ['游戏结束', 'yield game.gameover(%1);', '', 0, true, 'red', 'white'],
+            command: ['游戏结束', 'game.restart(%1);', '', 0, true, 'red', 'white'],
             params: [
                 ['参数', 'json', '{}', 0, '', 'green'],
             ],
@@ -481,7 +484,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '卸下装备': {
-            command: ['卸下装备', 'game.unload(%1,%2);', '卸下装备', 0, true, 'red', 'white'],
+            command: ['卸下装备', 'yield game.unload(%1,%2);', '卸下装备', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
                 ['*@部位', 'string', true, 2, [['武器', '头戴', '身穿', '鞋子'], ['武器', '头戴', '身穿', '鞋子']], 'darkgreen'],

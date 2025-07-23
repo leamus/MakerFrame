@@ -218,8 +218,8 @@ Item {
 
                                 $dialog.msg = '文件名重复，请重新输入';
                                 //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
-                                $dialog.open();
-                                $dialog.forceActiveFocus();
+                                $dialog.show();
+                                //$dialog.forceActiveFocus();
                             }
                             else {
                                 let ret = $Frame.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
@@ -330,8 +330,8 @@ Item {
                     if(listview.listData.indexOf(newFileName) >= 0) {
                         $dialog.msg = '文件名重复，请重新输入';
                         //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
-                        $dialog.open();
-                        $dialog.forceActiveFocus();
+                        $dialog.show();
+                        //$dialog.forceActiveFocus();
                     }
                     else {
                         let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);

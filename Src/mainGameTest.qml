@@ -35,9 +35,9 @@ Item {
 
     function init(cfg) {
         if(cfg && cfg.Map)
-            textMapName.text = cfg.Map;
+            textMapRID.text = cfg.Map;
         if(cfg && cfg.Role)
-            textRoleName.text = cfg.Role;
+            textRoleRID.text = cfg.Role;
         if(cfg && cfg.Position) {
             textMapBlockX.text = cfg.Position[0];
             textMapBlockY.text = cfg.Position[1];
@@ -49,8 +49,8 @@ Item {
 
 
 
-    property alias textMapName: textMapName.text
-    property alias textRoleName: textRoleName.text
+    property alias textMapRID: textMapRID.text
+    property alias textRoleRID: textRoleRID.text
     property alias textMapBlockX: textMapBlockX.text
     property alias textMapBlockY: textMapBlockY.text
 
@@ -80,7 +80,7 @@ Item {
         anchors.centerIn: parent
 
         TextField {
-            id: textMapName
+            id: textMapRID
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -106,12 +106,12 @@ Item {
                 //l_listChoice.forceActiveFocus();
                 l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
 
-                l_listChoice.choicedComponent = textMapName;
+                l_listChoice.choicedComponent = textMapRID;
             }
         }
 
         TextField {
-            id: textRoleName
+            id: textRoleRID
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -137,7 +137,7 @@ Item {
                 //l_listChoice.forceActiveFocus();
                 l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
 
-                l_listChoice.choicedComponent = textRoleName;
+                l_listChoice.choicedComponent = textRoleRID;
             }
         }
 
@@ -323,9 +323,9 @@ Item {
                 //item.openMap(item);
                 const tScript = function*() {
                     yield game.msg('欢迎来到鹰歌Maker世界！');
-                    yield game.loadmap(textMapName.text);
-                    if(textRoleName.text.trim()) {
-                        game.createhero(textRoleName.text);
+                    yield game.loadmap(textMapRID.text);
+                    if(textRoleRID.text.trim()) {
+                        game.createhero(textRoleRID.text);
                         game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
                     }
                     game.interval(16);
@@ -399,7 +399,7 @@ Item {
         id: _private
 
         function start() {
-            if(textMapName.text === ''/* || textRoleName.text === ''*/)
+            if(textMapRID.text === ''/* || textRoleRID.text === ''*/)
                 return;
 
 

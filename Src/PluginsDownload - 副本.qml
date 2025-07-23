@@ -152,7 +152,7 @@ Item {
 
             if(!menuJS)
                 return false;
-            //console.debug('[PluginsDownload]menuJS:', menuJS, menuJS.infos, Object.keys(menuJS.infos), JSON.stringify(menuJS.infos));
+            //console.debug(menuJS.infos, Object.keys(menuJS.infos), JSON.stringify(menuJS.infos));
 
             const menuNames = Object.keys(menuJS.infos);
             menuNames.unshift('【本地载入】');
@@ -167,43 +167,28 @@ Item {
                         return;
                     }
 
-                    const pluginJS = jsLoader.load(menuJS.infos[item]['Path']);
-                    if(!pluginJS) {
-                        $dialog.show({
-                            TextFormat: Label.PlainText,
-                            Msg: '错误',
-                            Buttons: Dialog.Yes,
-                            OnAccepted: function() {
-                                root.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                root.forceActiveFocus();
-                            },
-                        });
-                        return;
-                    }
-
-                    //console.debug('[PluginsDownload]pluginJS:', pluginJS, pluginJS.$$type, pluginJS.$$keys);
-
                     $dialog.show({
                         TextFormat: Label.PlainText,
                         Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
-                            .arg(pluginJS.$name)
-                            .arg(pluginJS.$version)
-                            .arg(pluginJS.$update)
-                            .arg(pluginJS.$author)
-                            .arg(pluginJS.$size)
-                            .arg(pluginJS.$description)
+                            .arg(menuJS.infos[item]['Name'])
+                            .arg(menuJS.infos[item]['Version'])
+                            .arg(menuJS.infos[item]['Update'])
+                            .arg(menuJS.infos[item]['Author'])
+                            .arg(menuJS.infos[item]['Size'])
+                            .arg(menuJS.infos[item]['Description'])
                         ,
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
                             const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
-                            const zipPath = projectPath + '~Cache' + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + pluginJS.$path[0] + GameMakerGlobal.separator + pluginJS.$file;
-                            const pluginPath = pluginJS.$path.join(GameMakerGlobal.separator).trim();
-                            const jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath + GameMakerGlobal.separator + 'main.js';
+                            const zipPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['File'];
+                            let jsPath;
+                            if(menuJS.infos[item]['Path'])
+                                jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['Path'].trim() + GameMakerGlobal.separator + 'main.js';
+                            else
+                                jsPath = false;
 
                             function* remove() {
-                                if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
+                                if(jsPath && $Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                     try {
                                         const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                         let ret;
@@ -215,8 +200,8 @@ Item {
                                             ret = yield* ts.$uninstall();
 
                                         if(ret === undefined || ret === null) {
-                                            //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
-                                            $Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
+                                            //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['Path'].trim());
+                                            $Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['Path'].trim());
                                         }
                                         else if(ret === false)
                                             return;
@@ -242,7 +227,7 @@ Item {
                                     //console.debug(ret, projectPath, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()));
                                     msg = '安装成功';
 
-                                    if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
+                                    if(jsPath && $Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                         try {
                                             const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                             let ret;
@@ -254,8 +239,8 @@ Item {
                                                 ret = yield* ts.$install();
 
                                             if(ret === false) {
-                                                //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
-                                                //$Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
+                                                //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['Path'].trim());
+                                                //$Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + menuJS.infos[item]['Path'].trim());
                                                 yield* remove();
 
                                                 return;
@@ -289,7 +274,7 @@ Item {
 
                             //方法一：
                             /*const httpReply = */$CommonLibJS.request({
-                                Url: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1/%2'.arg(pluginPath).arg(pluginJS.$file),
+                                Url: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.infos[item]['File']),
                                 Method: 'GET',
                                 //Data: {},
                                 //Gzip: [1, 1024],
@@ -316,7 +301,7 @@ Item {
                             });
 
                             /*/方法二：
-                            const httpReply = $Frame.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(pluginJS.$file), zipPath);
+                            const httpReply = $Frame.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(menuJS.infos[item]['File']), zipPath);
                             httpReply.sg_finished.connect(function(httpReply) {
                                 const networkReply = httpReply.networkReply;
                                 const code = $Frame.sl_objectProperty('Code', networkReply);
@@ -351,11 +336,11 @@ Item {
                                 Buttons: Dialog.NoButton,
                                 OnAccepted: function() {
                                     $dialog.show();
-                                    //$dialog.forceActiveFocus();
+                                    $dialog.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
                                     $dialog.show();
-                                    //$dialog.forceActiveFocus();
+                                    $dialog.forceActiveFocus();
                                 },
                             });
 

@@ -182,15 +182,15 @@ Item {
                     Action {
                         text: 'Action'
                         onTriggered: {
-                            console.warn(999)
+                            console.info(999)
                         }
                     }
 
                     onAboutToHide: {
-                        console.warn(6)
+                        console.info(6)
                     }
                     onClosed: {
-                        console.warn(66)
+                        console.info(66)
                     }
                 }
             }
@@ -207,11 +207,16 @@ Item {
                 Layout.fillHeight: true
 
                 text: '工程管理'
-                onClicked: menuProjectManage.open();
+                onClicked: {
+                    menuProjectManager.open();
+                    menuProjectManager.enabled = true;
+                }
 
                 Menu {
-                    id: menuProjectManage
+                    id: menuProjectManager
 
+                    //鹰：控制enable，是因为Menu关闭的瞬间，鼠标和触屏仍然可以点到MenuItem会让focus会转移到它身上，enabled设置为false可避免；
+                    enabled: false
                     //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
@@ -257,13 +262,14 @@ Item {
                             _private.importProject();
                         }
                     }
-                    MenuItem {
+                    /*MenuItem {
                         text: '下载示例工程'
                         height: _config.nMenuItemHeight
                         onClicked: {
                             _private.downloadDemoProject();
                         }
                     }
+                    */
                     MenuSeparator { }
                     MenuItem {
                         text: '打包项目'
@@ -287,6 +293,13 @@ Item {
                     Action { text: "Copy" }
                     Action { text: "Paste" }
                     */
+
+
+                    onAboutToHide: {
+                        enabled = false;
+                    }
+                    //onClosed: {
+                    //}
                 }
             }
 
@@ -305,11 +318,14 @@ Item {
                         return;
                     }
                     menuGameEditor.open();
+                    menuGameEditor.enabled = true;
                 }
 
                 Menu {
                     id: menuGameEditor
 
+                    //鹰：控制enable，是因为Menu关闭的瞬间，鼠标和触屏仍然可以点到MenuItem会让focus会转移到它身上，enabled设置为false可避免；
+                    enabled: false
                     //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
@@ -395,6 +411,13 @@ Item {
                             _private.gameTest();
                         }
                     }
+
+
+                    onAboutToHide: {
+                        enabled = false;
+                    }
+                    //onClosed: {
+                    //}
                 }
             }
 
@@ -413,11 +436,14 @@ Item {
                         return;
                     }
                     menuResourceManager.open();
+                    menuResourceManager.enabled = true;
                 }
 
                 Menu {
                     id: menuResourceManager
 
+                    //鹰：控制enable，是因为Menu关闭的瞬间，鼠标和触屏仍然可以点到MenuItem会让focus会转移到它身上，enabled设置为false可避免；
+                    enabled: false
                     //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
@@ -458,6 +484,13 @@ Item {
                         }
                     }
                     */
+
+
+                    onAboutToHide: {
+                        enabled = false;
+                    }
+                    //onClosed: {
+                    //}
                 }
             }
 
@@ -476,11 +509,14 @@ Item {
                         return;
                     }
                     menuPluginsManager.open();
+                    menuPluginsManager.enabled = true;
                 }
 
                 Menu {
                     id: menuPluginsManager
 
+                    //鹰：控制enable，是因为Menu关闭的瞬间，鼠标和触屏仍然可以点到MenuItem会让focus会转移到它身上，enabled设置为false可避免；
+                    enabled: false
                     //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
@@ -499,6 +535,13 @@ Item {
                             _private.pluginsDownload();
                         }
                     }
+
+
+                    onAboutToHide: {
+                        enabled = false;
+                    }
+                    //onClosed: {
+                    //}
                 }
             }
 
@@ -529,11 +572,16 @@ Item {
                 Layout.fillHeight: true
 
                 text: '文　档'
-                onClicked: menuDocuments.open();
+                onClicked: {
+                    menuDocuments.open();
+                    menuDocuments.enabled = true;
+                }
 
                 Menu {
                     id: menuDocuments
 
+                    //鹰：控制enable，是因为Menu关闭的瞬间，鼠标和触屏仍然可以点到MenuItem会让focus会转移到它身上，enabled设置为false可避免；
+                    enabled: false
                     //鹰（BUG）：注意：不知为何，加上这个，安卓手机上菜单就不会偏移了！！！
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
@@ -559,6 +607,13 @@ Item {
                             _private.updateLog();
                         }
                     }
+
+
+                    onAboutToHide: {
+                        enabled = false;
+                    }
+                    //onClosed: {
+                    //}
                 }
             }
 
@@ -1599,12 +1654,12 @@ Item {
                                     Msg: '正在解压，请等待',
                                     Buttons: Dialog.NoButton,
                                     OnAccepted: function() {
-                                        $dialog.open();
-                                        $dialog.forceActiveFocus();
+                                        $dialog.show();
+                                        //$dialog.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
-                                        $dialog.open();
-                                        $dialog.forceActiveFocus();
+                                        $dialog.show();
+                                        //$dialog.forceActiveFocus();
                                     },
                                 });
 
@@ -1948,16 +2003,16 @@ Item {
             }
 
 
-            dialog.show({
+            $dialog.show({
                 Msg: '正在压缩，请等待',
                 Buttons: Dialog.NoButton,
                 OnAccepted: function() {
-                    $dialog.open();
-                    $dialog.forceActiveFocus();
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
                 },
                 OnRejected: function() {
-                    $dialog.open();
-                    $dialog.forceActiveFocus();
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
                 },
             });
 
@@ -1978,119 +2033,152 @@ Item {
                 },
             });
         }
-        function importProject() {
+        /*function importProject() {
             filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
             filedialogOpenProject.open();
         }
+        */
 
-        function unzipProjectPackage(fUrl) {
-            $dialog.show({
-                Msg: '确认解包吗？这会替换目标项目中的同名文件！',
-                Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function() {
-                    $dialog.show({
-                        Msg: '正在解压，请等待',
-                        Buttons: Dialog.NoButton,
-                        OnAccepted: function() {
-                            $dialog.open();
-                            $dialog.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            $dialog.open();
-                            $dialog.forceActiveFocus();
-                        },
-                    });
+        //function downloadDemoProject() {
+        function importProject() {
+            const jsLoader = new $GlobalJS.JSLoader(rootGameMaker);
+            let menuList;
+            const menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Projects/menu.js');
+            if(!menuJS) {
+                menuList = [];
+                //return false;
+            }
+            else
+                menuList = Object.keys(menuJS.infos);
+            menuList.unshift('【本地导入】');
 
-                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+            //console.debug(menuJS.infos, Object.keys(menuJS.infos), JSON.stringify(menuJS.infos));
 
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
-                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, $Frame.sl_completeBaseName(fUrl))
-
-                    $Frame.sl_dirCreate(projectPath);
-                    let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
-
-                    if(ret.length > 0) {
-                        _private.changeProject($Frame.sl_completeBaseName(fUrl));
-
-                        //console.debug('[mainGameMaker]', ret, projectPath);
-                    }
-
-                    $dialog.show({
-                        Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
-                        },
-                    });
-                },
-                OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
-                },
-            });
-        }
-
-        function downloadDemoProject() {
-            $dialog.show({
-                Msg: '由于服务器带宽低，下载人数多时会导致很慢，建议加群后可以下载更多的示例工程，确定下载吗？',
-                Buttons: Dialog.Yes | Dialog.No,
-                OnAccepted: function() {
-
-                    enabled = false;
-
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + '$Leamus';
-
-                    //https://qiniu.leamus.cn/$Leamus.zip
-                    //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
-
-                    function _continue() {
-                        $dialog.show({
-                            Msg: '正在解压，请等待',
-                            Buttons: Dialog.NoButton,
-                            OnAccepted: function() {
-                                $dialog.open();
-                                $dialog.forceActiveFocus();
-                            },
-                            OnRejected: ()=>{
-                                $dialog.open();
-                                $dialog.forceActiveFocus();
-                            },
-                        });
-
-                        $Frame.sl_dirCreate(projectPath);
-                        let ret = $Frame.sl_extractDir(projectPath + '.zip', projectPath);
-
-                        if(ret.length > 0) {
-                            _private.changeProject('$Leamus');
-
-                            //console.debug(ret, projectPath);
+            //$showBusyIndicator(true, function() {
+                $list.open({
+                    RemoveButtonVisible: false,
+                    Data: menuList,
+                    OnClicked: (index, item)=>{
+                        if(index === 0) {
+                            filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
+                            filedialogOpenProject.open();
+                            return;
                         }
 
                         $dialog.show({
-                            Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
-                            Buttons: Dialog.Ok,
+                            TextFormat: Label.PlainText,
+                            Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载（由于服务器带宽低，下载人数多时会慢一些）？'
+                                .arg(menuJS.infos[item]['Name'])
+                                .arg(menuJS.infos[item]['Version'])
+                                .arg(menuJS.infos[item]['Update'])
+                                .arg(menuJS.infos[item]['Author'])
+                                .arg(menuJS.infos[item]['Size'])
+                                .arg(menuJS.infos[item]['Description'])
+                            ,
+                            Buttons: Dialog.Yes | Dialog.No,
+                            FocusItem: $list,
                             OnAccepted: function() {
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.enabled = false;
+
+                                const projectName = $Frame.sl_completeBaseName(menuJS.infos[item]['Path']);
+                                const fileName = $Frame.sl_fileName(menuJS.infos[item]['Path']);
+                                const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + projectName;
+                                //https://qiniu.leamus.cn/$Leamus.zip
+                                //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
+
+
+                                function _continue() {
+                                    $dialog.show({
+                                        Msg: '正在解压，请等待',
+                                        Buttons: Dialog.NoButton,
+                                        OnAccepted: function() {
+                                            $dialog.show();
+                                            //$dialog.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            $dialog.show();
+                                            //$dialog.forceActiveFocus();
+                                        },
+                                    });
+
+                                    $Frame.sl_dirCreate(projectPath);
+                                    let ret = $Frame.sl_extractDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + fileName, projectPath);
+
+                                    if(ret.length > 0) {
+                                        _private.changeProject(projectName);
+
+                                        //console.debug(ret, projectPath);
+                                    }
+
+                                    $dialog.show({
+                                        Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
+                                        Buttons: Dialog.Ok,
+                                        FocusItem: $list,
+                                        OnAccepted: function() {
+                                            $list.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            $list.forceActiveFocus();
+                                        },
+                                    });
+                                }
+
+                                downloadFile(menuJS.infos[item]['Path'], GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + fileName,
+                                    function() {/*rootGameMaker.enabled = true;*/ _continue();}, function() {/*rootGameMaker.enabled = true;*/});
+
+
+                                $list.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                rootGameMaker.forceActiveFocus();
+                                $list.forceActiveFocus();
                             },
                         });
-                    }
 
-                    downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Projects/$Leamus.zip', projectPath + '.zip',
-                        function() {enabled = true; _continue();}, function() {enabled = true;});
+                        //$list.visible = false;
+                        //rootGameMaker.forceActiveFocus();
+                    },
+                    OnCanceled: ()=>{
+                        jsLoader.clear();
 
-
-                    rootGameMaker.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
-                },
-            });
+                        $list.visible = false;
+                        rootGameMaker.forceActiveFocus();
+                    },
+                });
+                //$showBusyIndicator(false);
+            //});
         }
+
+        function tutorial() {
+            if($Platform.compileType === 'debug') {
+                _private.loadModule('mainTutorial.qml');
+                //userMainProject.source = 'mainTutorial.qml';
+            }
+            else {
+                _private.loadModule('mainTutorial.qml');
+                //userMainProject.source = 'mainTutorial.qml';
+            }
+        }
+        function agreement() {
+            if($Platform.compileType === 'debug') {
+                _private.loadModule('mainAgreement.qml');
+                //userMainProject.source = 'mainAgreement.qml';
+            }
+            else {
+                _private.loadModule('mainAgreement.qml');
+                //userMainProject.source = 'mainAgreement.qml';
+            }
+        }
+        function updateLog() {
+            if($Platform.compileType === 'debug') {
+                _private.loadModule('mainUpdateLog.qml');
+                //userMainProject.source = 'mainUpdateLog.qml';
+            }
+            else {
+                _private.loadModule('mainUpdateLog.qml');
+                //userMainProject.source = 'mainUpdateLog.qml';
+            }
+        }
+
 
         function downloadFile(url, filePath, successCallback, failCallback) {
             //方法一：
@@ -2160,45 +2248,63 @@ Item {
                 Msg: '正在下载，请等待（请勿进行其他操作）',
                 Buttons: Dialog.NoButton,
                 OnAccepted: function() {
-                    $dialog.open();
-                    $dialog.forceActiveFocus();
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    $dialog.open();
-                    $dialog.forceActiveFocus();
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
                 },
             });
         }
 
-        function tutorial() {
-            if($Platform.compileType === 'debug') {
-                _private.loadModule('mainTutorial.qml');
-                //userMainProject.source = 'mainTutorial.qml';
-            }
-            else {
-                _private.loadModule('mainTutorial.qml');
-                //userMainProject.source = 'mainTutorial.qml';
-            }
-        }
-        function agreement() {
-            if($Platform.compileType === 'debug') {
-                _private.loadModule('mainAgreement.qml');
-                //userMainProject.source = 'mainAgreement.qml';
-            }
-            else {
-                _private.loadModule('mainAgreement.qml');
-                //userMainProject.source = 'mainAgreement.qml';
-            }
-        }
-        function updateLog() {
-            if($Platform.compileType === 'debug') {
-                _private.loadModule('mainUpdateLog.qml');
-                //userMainProject.source = 'mainUpdateLog.qml';
-            }
-            else {
-                _private.loadModule('mainUpdateLog.qml');
-                //userMainProject.source = 'mainUpdateLog.qml';
-            }
+        function unzipProjectPackage(fUrl) {
+            $dialog.show({
+                Msg: '确认解包吗？这会替换目标项目中的同名文件！',
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    $dialog.show({
+                        Msg: '正在解压，请等待',
+                        Buttons: Dialog.NoButton,
+                        OnAccepted: function() {
+                            $dialog.show();
+                            //$dialog.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            $dialog.show();
+                            //$dialog.forceActiveFocus();
+                        },
+                    });
+
+                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+
+                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
+                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, $Frame.sl_completeBaseName(fUrl))
+
+                    $Frame.sl_dirCreate(projectPath);
+                    let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
+
+                    if(ret.length > 0) {
+                        _private.changeProject($Frame.sl_completeBaseName(fUrl));
+
+                        //console.debug('[mainGameMaker]', ret, projectPath);
+                    }
+
+                    $dialog.show({
+                        Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
+                        Buttons: Dialog.Ok,
+                        OnAccepted: function() {
+                            //rootGameMaker.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            //rootGameMaker.forceActiveFocus();
+                        },
+                    });
+                },
+                OnRejected: ()=>{
+                    //rootGameMaker.forceActiveFocus();
+                },
+            });
         }
 
 

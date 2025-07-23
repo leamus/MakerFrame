@@ -305,8 +305,8 @@ Item {
         onAccepted: {
             //loader.focus = true;
             //loader.forceActiveFocus();
-            //rootGameMaker.focus = true;
-            //rootGameMaker.forceActiveFocus();
+            //root.focus = true;
+            //root.forceActiveFocus();
 
             console.debug('[PackageAndroid]You chose:', fileUrl, fileUrls);
 
@@ -324,7 +324,7 @@ Item {
         }
         onRejected: {
             console.debug('[PackageAndroid]onRejected');
-            //rootGameMaker.forceActiveFocus();
+            //root.forceActiveFocus();
 
 
             //sg_close();
@@ -594,12 +594,12 @@ Item {
                     Msg: '请等待...',
                     Buttons: Dialog.NoButton,
                     OnAccepted: function() {
-                        $dialog.open();
-                        $dialog.forceActiveFocus();
+                        $dialog.show();
+                        //$dialog.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        $dialog.open();
-                        $dialog.forceActiveFocus();
+                        $dialog.show();
+                        //$dialog.forceActiveFocus();
                     },
                 });
 

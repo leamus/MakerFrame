@@ -36,7 +36,7 @@ Item {
 
     //打开地图；tmapInfo如果为空，则从map.json载入，否则是已经载入过的json对象；
     //  尽量用GameSceneJS.getMapResource给tmapInfo，因为还会载入js文件，而这里不会；
-    function openMap(mapPath, tmapInfo=null) {
+    function openMap(mapPath, tmapInfo=null, newMapProp={}) {
 
         itemBackMapContainer.visible = false;
         itemFrontMapContainer.visible = false;
@@ -73,7 +73,7 @@ Item {
         //_private.nMapDrawScale = 2;
         _private.sizeCanvas = Qt.size(sizeMapSize.width * sizeMapBlockSize.width / _private.nMapDrawScale, sizeMapSize.height * sizeMapBlockSize.height / _private.nMapDrawScale)
 
-        _private.rMapScale = parseFloat(mapInfo.MapScale) || 1;
+        _private.rMapScale = parseFloat(newMapProp.MapScale) || parseFloat(mapInfo.MapScale) || 1;
         sizeMapBlockScaledSize.width = Math.round(sizeMapBlockSize.width * _private.rMapScale);
         sizeMapBlockScaledSize.height = Math.round(sizeMapBlockSize.height * _private.rMapScale);
 
@@ -349,6 +349,7 @@ Item {
     property alias canvasBackMap: canvasBackMap
     property alias canvasFrontMap: canvasFrontMap
 
+    property alias mapScale: _private.rMapScale
     property var mapInfo: null          //地图数据（map.json）
     property var mapEventBlocks: ({})   //有事件的地图块ID（从左到右从上到下从0开始的ID）
     property var mapSpecialBlocks: ({})   //有特殊标记的地图块ID（从左到右从上到下从0开始的ID）

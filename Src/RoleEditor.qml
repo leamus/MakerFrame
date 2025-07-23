@@ -2891,14 +2891,14 @@ function $refresh(index, imageAnimate, path) {
         //导出角色
         function exportRole() {
 
-            let roleName = textRoleName.text;
-            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.json';
+            const roleName = textRoleName.text;
+            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
             */
 
-            let outputData = {};
+            const outputData = {};
             /*outputData.Version = '0.6';
             //outputData.RoleName = roleName;
             outputData.RoleType = 1; //角色类型

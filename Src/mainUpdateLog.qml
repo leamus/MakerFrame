@@ -163,7 +163,7 @@ Item {
 7、增加：应用程序的一些相关函数；
 8、增加：关闭音效game.stopsoundeffect函数；
 9、增加：game.showimage和game.showsprite的坐标功能；
-10、修改：增强sl_fileRead和sl_fileWrite二进制读写功能；
+10、增强：sl_fileRead和sl_fileWrite二进制读写功能；
 11、增强：game.usegoods功能；
 **12、修改：game.usegoods、game.equip、game.unload的实现流程和方式（所有道具脚本的$equipScript需要修改）；
 **13、修改：game.equip和game.unload为异步，调用时加yield，且道具脚本中新增和修改了相关函数；
@@ -207,12 +207,26 @@ Item {
 51、修复：游戏init时，第一次不会载入战斗人物自身的升级链问题；
 52、新增：两个系统函数：Array的$$value函数 和 $CommonLibJS.setObjectValue；
 53、修复：将convertToHTML的一个问题修复，并增强和优化；
-54、修复：将Message组件显示HTML代码时多出一个interval的问题修复，并加入 '<>' 为等待一个interval的功能；
+54、修复：将Message组件显示HTML代码时多出一个interval的问题修复，并加入 '&lt;&gt;' 为等待一个interval的功能；
 55、优化：将 调试 在桌面端改为多窗口（可以调试多个qml文件）；
 *56、修改：虚拟坐标相关函数（优化多窗口下支持）；
 *57、修改：很多系统提供的对象和函数的名字；
-*58、修复：调整目录结构（GameMakerGlobal.qml），修复 Cyclic dependency detected between 警告；
-59、其他：优化调整很多代码和细节，修复一些Bugs；
+*58、修复：调整目录结构（GameMakerGlobal.qml），修复使用在线GameMaker时报 Cyclic dependency detected between 的警告；
+59、增强：game.loadmap支持对象载入（加入$name和$scale分别为地图名和缩放大小，注意缩放大小只能在调用loadmap时指定，且重复载入本地图并缩放时必须设置重绘为true）；
+**60、修改：game.loadmap参数修改（2、3参数互换位置，且userData改为...参数），对应的回调函数 $beforeLoadmap 和 $afterLoadmap 改为 map（对象）和 ...userData；
+61、修复：起始脚本可视化编辑start函数并编译后重复套start的Bug；
+*62、修改：$Global.$sys的属性名；
+63、增加：示例下载列表和多个示例工程；
+64、修改：在线插件文件组织方式；
+65、修复：彻底修复Menu和Dialog的坑导致的focus不对的问题（各种绕过。。。）；
+66、修复：$CommonLibJS.isQtObjectDestroyed函数返回值相反的Bug；
+67、修复：游戏测试的一些Bugs；
+68、修复：game.delsprite和game.delimage直接给组件时不会删除的Bug；
+69、修复：地图编辑器的2个Bugs（1是无法在退出对话框时输出png；2是新建地图在退出对话框中会保存错误）；
+70、增加：项目根目录增加 ~Cache 文件夹，用来临时保存地图输出和插件下载；
+71、修复：修复和增强game.showimage、game.delimage、game.showsprite、game.delsprite的一些问题和功能；
+72、修改：把itemRootScaled修改为FocusScope类型，并将$list组件放入它的焦点作用域，防止使用rootWindow下的组件时焦点混乱；
+73、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；
@@ -229,14 +243,14 @@ Item {
 6、新增：sl_compressFileEx、sl_compressFilesEx、sl_extractDirEx加密zip操作函数；
 7、修复：game.playvideo播放时报错、结束时无法退出的问题；
 8、新增：异步脚本AsyncScript新增terminateAll函数；
-9、修改：增强了AsyncScript的功能；
+9、增强：AsyncScript的功能；
 10、修改：重构了ScriptQueue，解决了递归问题，简化了代码，增强了功能，合并了GlobalJS.createScript函数；
 11、修复：退出游戏时会强制停止并清空所有异步脚本，修复了退出时报的一些找不到游戏变量的Bug；
 12、修复：打包安卓时有些字段没有被替换的问题；
 13、修改：将ScriptEditor抽出为系统组件；
 14、修改：修改了地图编辑器、角色编辑器、特效编辑器等的代码编辑器；
 15、修改：修改了很多组件的名字；
-16、修改：增强（并兼容）通用文件中 各种fontSize 和 $minWidth、$maxWidth 的功能；
+16、增强：增强（并兼容）通用文件中 各种fontSize 和 $minWidth、$maxWidth 的功能；
 17、增强：优化网络插件、加解密插件，增强插件下载和管理；
 18、修改：将2个战斗脚本队列合并为1个；
 19、发布：linux的deb新版包；

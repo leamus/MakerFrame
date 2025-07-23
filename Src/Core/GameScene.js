@@ -1706,37 +1706,38 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
 
 
 //打开地图
-function openMap(mapRID, forceRepaint=false) {
+function openMap(map, forceRepaint=false) {
     game.d['$sys_map'] = {};
 
-    let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID;
+    let mapPath = game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + map.$rid;
 
     //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
-    if(forceRepaint || game.gd['$sys_map'].$rid !== mapRID || !itemViewPort.mapInfo) {
+    if(forceRepaint || game.gd['$sys_map'].$rid !== map.$rid || !itemViewPort.mapInfo) {
 
-        if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(mapRID))) {
+        if(!itemViewPort.openMap(mapPath, GameSceneJS.getMapResource(map.$rid), {MapScale: map.$scale})) {
             game.gd['$sys_map'].$rid = null;
 
             game.d['$sys_map'].$info = {};
             game.d['$sys_map'].$rid = null;
             game.d['$sys_map'].$name = null;
+            game.d['$sys_map'].$scale = 0;
             game.d['$sys_map'].$columns = 0;
             game.d['$sys_map'].$rows = 0;
             game.d['$sys_map'].$specials = {};
             game.d['$sys_map'].$obstacles = [];
 
 
-            //console.warn('[!GameScene]Map load ERROR:', mapRID, mapPath);
+            //console.warn('[!GameScene]Map load ERROR:', map.$rid, mapPath);
             return false;
         }
     }
 
-    //game.$sys_map.$name = itemViewPort.mapInfo.MapName;
-    game.gd['$sys_map'].$rid = mapRID;
+    game.gd['$sys_map'].$rid = map.$rid;
 
     game.d['$sys_map'].$info = itemViewPort.mapInfo;
-    game.d['$sys_map'].$rid = mapRID;
-    game.d['$sys_map'].$name = itemViewPort.mapInfo.MapName;
+    game.d['$sys_map'].$rid = map.$rid;
+    game.d['$sys_map'].$name = map.$name ?? itemViewPort.mapInfo.MapName;
+    game.d['$sys_map'].$scale = itemViewPort.mapScale;
     game.d['$sys_map'].$columns = itemViewPort.mapInfo.MapSize[0];
     game.d['$sys_map'].$rows = itemViewPort.mapInfo.MapSize[1];
 
@@ -1769,7 +1770,7 @@ function openMap(mapRID, forceRepaint=false) {
 
     //let ts = _private.jsLoader.load($GlobalJS.toURL(mapPath + GameMakerGlobal.separator + 'map.js'));
     //itemViewPort.mapScript = ts;
-    itemViewPort.mapScript = _private.mapsResource[mapRID].$script;
+    itemViewPort.mapScript = _private.mapsResource[map.$rid].$script;
 
     //$CommonLibJS.copyPropertiesToObject(game.f, itemViewPort.mapScript/*, true*/);
     Object.assign(game.f, itemViewPort.mapScript);
@@ -3012,7 +3013,7 @@ function fComputeRoleMultiMoveOffset(role, directionX, directionY, offsetMoveX, 
 
         //放在这里是因为，上面的脚本使用时可以访问到原来的 role.$$collideRoles，来确定是否第一次碰撞；
         /*let continueScript = function() {
-            if($CommonLibJS.isComponent(role))
+            if($CommonLibJS.isQtObject(role))
                 role.$$collideRoles['$obstacle'] = collideObstacle;
             return null;
         }

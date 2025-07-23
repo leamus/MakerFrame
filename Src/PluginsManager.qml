@@ -79,7 +79,6 @@ Item {
                 itemExtendsRoot.children[tc].destroy();
             }
 
-
             //$list.visible = true;
             //$list.forceActiveFocus();
             _private.refresh();

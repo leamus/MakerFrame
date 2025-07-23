@@ -53,7 +53,7 @@ import 'GameScene.js' as GameSceneJS
       game.async：异步脚本对象，可以运行生成器，无顺序限制，可以控制所有的生成器（waitAll和terminateAll）；
       $CommonLibJS.asyncScript：异步脚本函数，类似game.async，但不能控制所有生成器；
       上面3个可以任意组合使用，但：游戏事件尽量放在game.run里运行；$CommonLibJS.asyncScript必须运行带有release的生成器（因为里面有清空 系统脚本队列 和 异步脚本对象 的代码）；
-    2、loadmap、usegoods、save、load、gameover、plugin 这些命令有脚本的，必须要立即运行，所以可以用 game.run 的 -2，也可以使用 game.async，但最好不要用 异步脚本函数（因为release不能清空它）；
+    2、loadmap、usegoods、equip、unload、save、load、plugin 这些命令有脚本的，必须要立即运行，所以可以用 game.run 的 -2，也可以使用 game.async，但最好不要用 异步脚本函数（因为release不能清空它）；
     3、很多命令返回Promise对象，除了上述还有6+1个（msg、talk、menu、input、window、trade、wait）：
       所以这些命令用yield都有暂停效果，loadmap、usegoods等这些命令要立即运行代码并完成才能激活Promise对象，而msg、talk等这些是通过交互后调用回调函数来激活Promise对象）；
 
@@ -471,7 +471,7 @@ Item {
 
             for(let tc in _private.objTmpComponents) {
                 const c = _private.objTmpComponents[tc];
-                if($CommonLibJS.isComponent(c)) {
+                if($CommonLibJS.isQtObject(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -594,12 +594,12 @@ Item {
     //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
-        //功能：载入地图资源名为mapRID的地图并执行地图载入事件$start。
-        //参数：userData是用户传入数据，后期调用的钩子函数会传入；
-        //  forceRepaint表示是否强制重绘（为false时表示如果mapRID与现在的相同，则不重绘）；
+        //功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
+        //参数：forceRepaint表示是否强制重绘（为false时表示如果map与已载入的相同，则不重绘）；
+        //  userData是用户传入数据，后期调用的钩子函数会传入；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
         //示例：yield game.loadmap('地图资源名')；
-        function loadmap(mapRID, userData, forceRepaint=false) {
+        function loadmap(map, forceRepaint=false, ...userData) {
             //let _resolve, _reject;
 
             //！如果使用生成器方式，则将 resolve 和 reject 删除即可，再用return返回数据；
@@ -610,9 +610,13 @@ Item {
                 //game.run(function*() {
                 game.async(function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
-                    if(!mapRID) {
+                    if($CommonLibJS.isString(map)) {
+                        map = {RID: map};
+                    }
+                    map.$rid = map.RID ?? map.RId;
+                    if(!map || !map.$rid) {
                         //scriptQueue.runNextEventLoop('loadmap');
-                        console.exception('[!GameScene]loadmap FAIL:', mapRID);
+                        console.exception('[!GameScene]loadmap FAIL:', map.$rid);
                         return reject('loadmap FAIL');
                     }
 
@@ -628,10 +632,19 @@ Item {
                         //const ts = _private.jsLoader.load($GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + game.d['$sys_map'].$rid + GameMakerGlobal.separator + 'map.js'));
                         //if(ts.$end) { //$CommonLibJS.checkCallable
                         if(itemViewPort.mapScript && itemViewPort.mapScript.$end) {
-                            let r = itemViewPort.mapScript.$end(userData);
+                            let r = itemViewPort.mapScript.$end(...userData);
                             if($CommonLibJS.isGenerator(r))r = yield* r;
-                            //game.run(itemViewPort.mapScript.$end(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
+                            //game.run(itemViewPort.mapScript.$end(...userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $end'});
                         }
+                    }
+
+
+                    //载入beforeLoadmap脚本
+                    const beforeLoadmap = _private.objCommonScripts.$beforeLoadmap;
+                    if(beforeLoadmap) { //$CommonLibJS.checkCallable
+                        let r = beforeLoadmap(map, ...userData);
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
+                        //game.run(beforeLoadmap(map, ...userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
                     }
 
 
@@ -642,7 +655,7 @@ Item {
 
                     for(let tc in _private.objTmpMapComponents) {
                         const c = _private.objTmpMapComponents[tc];
-                        if($CommonLibJS.isComponent(c)) {
+                        if($CommonLibJS.isQtObject(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -661,17 +674,8 @@ Item {
                     game.f = {};
 
 
-                    //载入beforeLoadmap脚本
-                    const beforeLoadmap = _private.objCommonScripts.$beforeLoadmap;
-                    if(beforeLoadmap) { //$CommonLibJS.checkCallable
-                        let r = beforeLoadmap(mapRID, userData);
-                        if($CommonLibJS.isGenerator(r))r = yield* r;
-                        //game.run(beforeLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'beforeLoadmap'});
-                    }
-
-
                     //itemViewPort.itemRoleContainer.visible = false;
-                    const mapInfo = GameSceneJS.openMap(mapRID, forceRepaint);
+                    const mapInfo = GameSceneJS.openMap(map, forceRepaint);
                     //itemViewPort.itemRoleContainer.visible = true;
 
                     setSceneToRole();
@@ -687,23 +691,23 @@ Item {
 
                     if(itemViewPort.mapScript)
                         if(itemViewPort.mapScript.$start) { //$CommonLibJS.checkCallable
-                            let r = itemViewPort.mapScript.$start(userData);
+                            let r = itemViewPort.mapScript.$start(...userData);
                             if($CommonLibJS.isGenerator(r))r = yield* r;
-                            //game.run(itemViewPort.mapScript.$start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
+                            //game.run(itemViewPort.mapScript.$start(...userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map $start'});
                         }
                         else if(itemViewPort.mapScript.start) { //$CommonLibJS.checkCallable
-                            let r = itemViewPort.mapScript.start(userData);
+                            let r = itemViewPort.mapScript.start(...userData);
                             if($CommonLibJS.isGenerator(r))r = yield* r;
-                            //game.run(itemViewPort.mapScript.start(userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
+                            //game.run(itemViewPort.mapScript.start(...userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'map start'});
                         }
 
 
                     //载入after_loadmap脚本
                     const afterLoadmap = _private.objCommonScripts.$afterLoadmap;
                     if(afterLoadmap) { //$CommonLibJS.checkCallable
-                        let r = afterLoadmap(mapRID, userData);
+                        let r = afterLoadmap(map, ...userData);
                         if($CommonLibJS.isGenerator(r))r = yield* r;
-                        //game.run(afterLoadmap(mapRID, userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'afterLoadmap'});
+                        //game.run(afterLoadmap(map, ...userData) ?? null, {Priority: priority++, Type: 0, Running: 1, Tips: 'afterLoadmap'});
                     }
 
 
@@ -890,7 +894,7 @@ Item {
                 } while(0);
 
             }
-            else if(!$CommonLibJS.isComponent(role))
+            else if(!$CommonLibJS.isQtObject(role))
                 return false;
 
             //样式
@@ -1188,7 +1192,7 @@ Item {
             }
             else if($CommonLibJS.isObject(hero)) {
                 //如果是组件直接用
-                if($CommonLibJS.isComponent(hero))
+                if($CommonLibJS.isQtObject(hero))
                     index = hero.$data.$index;
                 else {
                     //找出符合过滤条件的
@@ -1408,7 +1412,7 @@ Item {
 
                     for(let tc in tr.$tmpComponents) {
                         let c = tr.$tmpComponents[tc];
-                        if($CommonLibJS.isComponent(c)) {
+                        if($CommonLibJS.isQtObject(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -1450,7 +1454,7 @@ Item {
             _private.arrMainRoles[index].visible = false;
             for(let tc in _private.arrMainRoles[index].$tmpComponents) {
                 const c = _private.arrMainRoles[index].$tmpComponents[tc];
-                if($CommonLibJS.isComponent(c)) {
+                if($CommonLibJS.isQtObject(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -1590,7 +1594,7 @@ Item {
                 return false;
             else if($CommonLibJS.isObject(role)) {
                 //如果是组件直接用
-                if($CommonLibJS.isComponent(role))
+                if($CommonLibJS.isQtObject(role))
                     roleComp = role;
                 else {
                     //找出符合过滤条件的
@@ -1766,7 +1770,7 @@ Item {
                 for(let r in _private.objRoles) {
                     for(let tc in _private.objRoles[r].$tmpComponents) {
                         let c = _private.objRoles[r].$tmpComponents[tc];
-                        if($CommonLibJS.isComponent(c)) {
+                        if($CommonLibJS.isQtObject(c)) {
                             (c.$destroy ?? c.Destroy ?? c.destroy)();
                         }
                     }
@@ -1787,7 +1791,7 @@ Item {
                 if(role === undefined)
                     return false;
             }
-            else if(!$CommonLibJS.isComponent(role))
+            else if(!$CommonLibJS.isQtObject(role))
                 return false;
 
 
@@ -1795,7 +1799,7 @@ Item {
 
             for(let tc in role.$tmpComponents) {
                 let c = role.$tmpComponents[tc];
-                if($CommonLibJS.isComponent(c)) {
+                if($CommonLibJS.isQtObject(c)) {
                     (c.$destroy ?? c.Destroy ?? c.destroy)();
                 }
             }
@@ -1818,7 +1822,7 @@ Item {
                 if(role === undefined)
                     return false;
             }
-            else if(!$CommonLibJS.isComponent(role))
+            else if(!$CommonLibJS.isQtObject(role))
                 return false;
 
 
@@ -3330,7 +3334,7 @@ Item {
 
         //显示图片；
         //imageParams为图片名或对象（包含RID）；
-        //imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold 事件的回调函数；
+        //imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold 事件的回调函数；
         //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
@@ -3382,36 +3386,31 @@ Item {
             //父组件
             let parentComp;
             //暂存位置
-            let objTmpComponents;
+            let collection;
             //屏幕上
-            if(imageParams.$parent === 0) {
+            if(imageParams.$parent === 0 || imageParams.$parent === undefined) {
                 parentComp = rootGameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //游戏视窗
             else if(imageParams.$parent === 1) {
                 parentComp = itemViewPort;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //会改变大小
             else if(imageParams.$parent === 2) {
                 parentComp = itemViewPort.gameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //会改变大小和随地图移动
             else if(imageParams.$parent === 3) {
                 parentComp = itemViewPort.itemContainer;
-
-                objTmpComponents = _private.objTmpMapComponents;
+                collection = _private.objTmpMapComponents;
             }
             //会改变大小和随地图移动
             else if(imageParams.$parent === 4) {
                 parentComp = itemViewPort.itemRoleContainer;
-
-                objTmpComponents = _private.objTmpMapComponents;
+                collection = _private.objTmpMapComponents;
             }
             //某角色上
             else if($CommonLibJS.isString(imageParams.$parent)) {
@@ -3420,8 +3419,7 @@ Item {
                     role = game.role(imageParams.$parent);
                 if(role) {
                     parentComp = role;
-
-                    objTmpComponents = role.$tmpComponents;
+                    collection = role.$tmpComponents;
                 }
                 else {
                     console.warn('[!GameScene]showimage:找不到parent:', imageParams.$parent);
@@ -3431,26 +3429,25 @@ Item {
             }
             else if($CommonLibJS.isObject(imageParams.$parent)) {
                 parentComp = imageParams.$parent;
-
-                //不一定存在
-                objTmpComponents = parentComp.$tmpComponents;
+                collection = parentComp.$tmpComponents; //不一定存在
             }
             //屏幕上
             else {
-                console.info('[GameScene]showimage:$parent参数不符，默认挂载在gameScene上');
+                parentComp = rootGameScene;
+                collection = _private.objTmpComponents;
+
                 //imageParams.$parent = 0;
 
-                parentComp = rootGameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                console.info('[GameScene]showimage:$parent参数不符，默认挂载在gameScene上');
             }
+            collection = imageParams.$collection ?? collection;
 
 
             //if(id === undefined || id === null)
             id = id ?? imageParams.$id ?? imageParams.$rid;
 
 
-            let tmp = imageParams.$component || $CommonLibJS.getObjectValue(objTmpComponents, 'id') || compCacheImage.createObject(null);
+            let tmp = imageParams.$component || $CommonLibJS.getObjectValue(collection, 'id') || compCacheImage.createObject(null);
             if(tmp && tmp.$componentType !== 1) {
                 console.exception('[!GameScene]组件类型错误：', tmp, tmp.$componentType);
                 return false;
@@ -3467,9 +3464,10 @@ Item {
                 //随地图移动
                 //tmp = compCacheImage.createObject(itemViewPort.itemContainer, {source: fileURL});
 
-                if(objTmpComponents)
-                    objTmpComponents[id] = tmp;
+                if(collection)
+                    collection[id] = tmp;
                 tmp.$id = id;
+                tmp.$collection = collection;
                 //tmp.anchors.centerIn = rootGameScene;
             //}
 
@@ -3722,8 +3720,8 @@ Item {
         //删除图片；
         //idParams：-1：屏幕上的全部图片组件（包含图片和特效等）；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id（-1表示全部图片组件）和$parent属性（同showimage）；
         readonly property var delimage: function(idParams=-1) {
-            //暂存位置
-            let objTmpComponents;
+            let parent;
+            let collection;
             let tmpImage;
 
             if($CommonLibJS.isNumber(idParams)) {
@@ -3733,82 +3731,82 @@ Item {
                 idParams = {$id: idParams};
             }
             else if($CommonLibJS.isObject(idParams)) {
-                tmpImage = idParams;
+                if($CommonLibJS.isQtObject(idParams)) {
+                    tmpImage = idParams;
+                    parent = null;
+                }
+                else
+                    parent = idParams.$parent;
             }
             else
                 return false;
 
 
             //屏幕上
-            if(idParams.$parent === 0) {
-                //idParams.$parent = rootGameScene;
+            if(parent === 0 || parent === undefined) {
+                //parent = rootGameScene;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //游戏视窗
-            else if(idParams.$parent === 1) {
-                //idParams.$parent = itemViewPort;
+            else if(parent === 1) {
+                //parent = itemViewPort;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //会改变大小
-            else if(idParams.$parent === 2) {
-                //idParams.$parent = itemViewPort.gameScene;
+            else if(parent === 2) {
+                //parent = itemViewPort.gameScene;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //会改变大小和随地图移动
-            else if(idParams.$parent === 3) {
-                //idParams.$parent = itemViewPort.itemContainer;
+            else if(parent === 3) {
+                //parent = itemViewPort.itemContainer;
 
-                objTmpComponents = _private.objTmpMapComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpMapComponents;
             }
             //会改变大小和随地图移动
-            else if(idParams.$parent === 4) {
-                //idParams.$parent = itemViewPort.itemRoleContainer;
+            else if(parent === 4) {
+                //parent = itemViewPort.itemRoleContainer;
 
-                objTmpComponents = _private.objTmpMapComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpMapComponents;
             }
             //某角色上
-            else if($CommonLibJS.isString(idParams.$parent)) {
-                let role = game.hero(idParams.$parent);
+            else if($CommonLibJS.isString(parent)) {
+                let role = game.hero(parent);
                 if(!role)
-                    role = game.role(idParams.$parent);
+                    role = game.role(parent);
                 if(role) {
-                    //idParams.$parent = role;
+                    //parent = role;
 
-                    objTmpComponents = role.$tmpComponents;
-                    tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                    collection = role.$tmpComponents;
                 }
                 else
                     return false;
             }
-            else if($CommonLibJS.isObject(idParams.$parent)) {
-                //不一定存在
-                objTmpComponents = idParams.$parent.$tmpComponents;
-
-                tmpImage = idParams;
+            else if($CommonLibJS.isObject(parent)) {
+                collection = parent.$tmpComponents; //不一定存在
             }
-            //屏幕上
+            else if(parent === null)
+                ;
             else {
-                //idParams.$parent = rootGameScene;
+                collection = _private.objTmpComponents;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpImage = tmpImage ?? objTmpComponents[idParams.$id];
+                console.info('[!GameScene]delimage:$parent参数不符');
             }
+            collection = idParams.$collection ?? collection;
+            tmpImage = tmpImage ?? collection[idParams.$id];
 
+            //console.debug('[GameScene]测试:', tmpImage, idParams.$id, collection, idParams.$collection);
 
-            if(idParams.$id === -1 && objTmpComponents) {
-                for(let ti in objTmpComponents) {
-                    if(objTmpComponents[ti].$componentType === 1) {
+            //删除所有
+            if(idParams.$id === -1 && collection) {
+                for(let ti in collection) {
+                    if(collection[ti].$componentType === 1) {
                         //自定义 释放函数
-                        (objTmpComponents[ti].$destroy ?? objTmpComponents[ti].Destroy ?? objTmpComponents[ti].destroy)();
-                        delete objTmpComponents[ti];
+                        (collection[ti].$destroy ?? collection[ti].Destroy ?? collection[ti].destroy)();
+                        delete collection[ti];
                     }
                 }
 
@@ -3819,17 +3817,25 @@ Item {
             if(tmpImage && tmpImage.$componentType === 1) {
                 (tmpImage.$destroy ?? tmpImage.Destroy ?? tmpImage.destroy)();
 
-                if(objTmpComponents && idParams.$id !== undefined && idParams.$id !== null)
-                    delete objTmpComponents[idParams.$id];
+                if(collection)
+                    if(idParams.$id !== undefined && idParams.$id !== null && collection[idParams.$id]) {
+                        delete collection[idParams.$id];
+                        //console.debug('[GameScene]delimage:成功:', idParams.$id);
+                    }
+                    else
+                        console.warn('[!GameScene]delimage:父组件中找不到:', idParams.$id, collection, idParams, idParams.$collection);
 
                 return true;
             }
-            return null;
+            else
+                console.warn('[!GameScene]delimage:找不到:', idParams.$id);
+
+            return false;
         }
 
         //显示特效；
         //spriteParams为特效名或对象（包含RID）；
-        //spriteParams为对象：包含 SpriteEffect组件 的所有属性、$x、$y、$width、$height、$parent、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold、$looped、$finished 事件的回调函数；
+        //spriteParams为对象：包含 SpriteEffect组件 的所有属性、$x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold、$looped、$finished 事件的回调函数；
         //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
         //    不带$表示按像素；
         //    带$的属性有以下几种格式：
@@ -3882,36 +3888,31 @@ Item {
             //父组件
             let parentComp;
             //暂存位置
-            let objTmpComponents;
+            let collection;
             //屏幕上
-            if(spriteParams.$parent === 0) {
+            if(spriteParams.$parent === 0 || spriteParams.$parent === undefined) {
                 parentComp = rootGameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //游戏视窗
             else if(spriteParams.$parent === 1) {
                 parentComp = itemViewPort;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //会改变大小
             else if(spriteParams.$parent === 2) {
                 parentComp = itemViewPort.gameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                collection = _private.objTmpComponents;
             }
             //会改变大小和随地图移动
             else if(spriteParams.$parent === 3) {
                 parentComp = itemViewPort.itemContainer;
-
-                objTmpComponents = _private.objTmpMapComponents;
+                collection = _private.objTmpMapComponents;
             }
             //会改变大小和随地图移动
             else if(spriteParams.$parent === 4) {
                 parentComp = itemViewPort.itemRoleContainer;
-
-                objTmpComponents = _private.objTmpMapComponents;
+                collection = _private.objTmpMapComponents;
             }
             //某角色上
             else if($CommonLibJS.isString(spriteParams.$parent)) {
@@ -3920,8 +3921,7 @@ Item {
                     role = game.role(spriteParams.$parent);
                 if(role) {
                     parentComp = role;
-
-                    objTmpComponents = role.$tmpComponents;
+                    collection = role.$tmpComponents;
                 }
                 else {
                     console.warn('[!GameScene]showsprite:找不到parent:', spriteParams.$parent);
@@ -3931,19 +3931,18 @@ Item {
             }
             else if($CommonLibJS.isObject(spriteParams.$parent)) {
                 parentComp = spriteParams.$parent;
-
-                //不一定存在
-                objTmpComponents = parentComp.$tmpComponents;
+                collection = parentComp.$tmpComponents; //不一定存在
             }
             //屏幕上
             else {
-                console.info('[GameScene]showsprite:$parent参数不符，默认挂载在gameScene上');
+                parentComp = rootGameScene;
+                collection = _private.objTmpComponents;
+
                 //spriteParams.$parent = 0;
 
-                parentComp = rootGameScene;
-
-                objTmpComponents = _private.objTmpComponents;
+                console.info('[GameScene]showsprite:$parent参数不符，默认挂载在gameScene上');
             }
+            collection = spriteParams.$collection ?? collection;
 
 
             //if(id === undefined || id === null)
@@ -3951,7 +3950,7 @@ Item {
 
 
             let spriteInfo = GameSceneJS.getSpriteResource(spriteParams.$rid);
-            let sprite = spriteParams.$component || $CommonLibJS.getObjectValue(objTmpComponents, 'id') || compCacheSpriteEffect.createObject(null);
+            let sprite = spriteParams.$component || $CommonLibJS.getObjectValue(collection, 'id') || compCacheSpriteEffect.createObject(null);
             if(sprite && sprite.$componentType !== 2) {
                 console.exception('[!GameScene]组件类型错误：', sprite.$componentType);
                 return false;
@@ -3962,9 +3961,10 @@ Item {
                 return false;
 
             sprite.visible = false;
-            if(objTmpComponents)
-                objTmpComponents[id] = sprite;
+            if(collection)
+                collection[id] = sprite;
             sprite.$id = id;
+            sprite.$collection = collection;
 
 
             sprite.parent = parentComp;
@@ -4235,8 +4235,8 @@ Item {
         //删除特效；
         //idParams：-1：屏幕上的全部特效组件（包含图片和特效等）；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id（-1表示全部特效组件）和$parent属性（同showsprite）；
         readonly property var delsprite: function(idParams=-1) {
-            //暂存位置
-            let objTmpComponents;
+            let parent;
+            let collection;
             let tmpSprites;
 
             if($CommonLibJS.isNumber(idParams)) {
@@ -4246,83 +4246,82 @@ Item {
                 idParams = {$id: idParams};
             }
             else if($CommonLibJS.isObject(idParams)) {
-                tmpSprites = idParams;
+                if($CommonLibJS.isQtObject(idParams)) {
+                    tmpSprites = idParams;
+                    parent = null;
+                }
+                else
+                    parent = idParams.$parent;
             }
             else
                 return false;
 
 
             //屏幕上
-            if(idParams.$parent === 0) {
-                //idParams.$parent = rootGameScene;
+            if(parent === 0 || parent === undefined) {
+                //parent = rootGameScene;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //游戏视窗
-            else if(idParams.$parent === 1) {
-                //idParams.$parent = itemViewPort;
+            else if(parent === 1) {
+                //parent = itemViewPort;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //会改变大小
-            else if(idParams.$parent === 2) {
-                //idParams.$parent = itemViewPort.gameScene;
+            else if(parent === 2) {
+                //parent = itemViewPort.gameScene;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpComponents;
             }
             //会改变大小和随地图移动
-            else if(idParams.$parent === 3) {
-                //idParams.$parent = itemViewPort.itemContainer;
+            else if(parent === 3) {
+                //parent = itemViewPort.itemContainer;
 
-                objTmpComponents = _private.objTmpMapComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpMapComponents;
             }
             //会改变大小和随地图移动
-            else if(idParams.$parent === 4) {
-                //idParams.$parent = itemViewPort.itemContainer;
+            else if(parent === 4) {
+                //parent = itemViewPort.itemContainer;
 
-                objTmpComponents = _private.objTmpMapComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                collection = _private.objTmpMapComponents;
             }
             //某角色上
-            else if($CommonLibJS.isString(idParams.$parent)) {
-                let role = game.hero(idParams.$parent);
+            else if($CommonLibJS.isString(parent)) {
+                let role = game.hero(parent);
                 if(!role)
-                    role = game.role(idParams.$parent);
+                    role = game.role(parent);
                 if(role) {
-                    //idParams.$parent = role;
+                    //parent = role;
 
-                    objTmpComponents = role.$tmpComponents;
-                    tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                    collection = role.$tmpComponents;
                 }
                 else
                     return false;
-
             }
-            else if($CommonLibJS.isObject(idParams.$parent)) {
-                //不一定存在
-                objTmpComponents = idParams.$parent.$tmpComponents;
-
-                tmpSprites = idParams;
+            else if($CommonLibJS.isObject(parent)) {
+                collection = parent.$tmpComponents; //不一定存在
             }
-            //屏幕上
+            else if(parent === null)
+                ;
             else {
-                //idParams.$parent = rootGameScene;
+                collection = _private.objTmpComponents;
 
-                objTmpComponents = _private.objTmpComponents;
-                tmpSprites = tmpSprites ?? objTmpComponents[idParams.$id];
+                console.info('[!GameScene]delsprite:$parent参数不符');
             }
+            collection = idParams.$collection ?? collection;
+            tmpSprites = tmpSprites ?? collection[idParams.$id];
 
+            //console.debug('[GameScene]测试:', tmpSprites, idParams.$id, collection, idParams.$collection);
 
-            if(idParams.$id === -1 && objTmpComponents) {
-                for(let ti in objTmpComponents) {
-                    if(objTmpComponents[ti].$componentType === 2) {
+            //删除所有
+            if(idParams.$id === -1 && collection) {
+                for(let ti in collection) {
+                    if(collection[ti].$componentType === 2) {
                         //自定义 释放函数
-                        (objTmpComponents[ti].$destroy ?? objTmpComponents[ti].Destroy ?? objTmpComponents[ti].destroy)();
-                        delete objTmpComponents[ti];
+                        (collection[ti].$destroy ?? collection[ti].Destroy ?? collection[ti].destroy)();
+                        delete collection[ti];
                     }
                 }
 
@@ -4334,13 +4333,20 @@ Item {
                 (tmpSprites.$destroy ?? tmpSprites.Destroy ?? tmpSprites.destroy)();
 
                 //_private.cacheSprites.put(tmpSprites);
-                if(objTmpComponents && idParams.$id !== undefined && idParams.$id !== null)
-                    delete objTmpComponents[idParams.$id];
+                if(collection)
+                    if(idParams.$id !== undefined && idParams.$id !== null && collection[idParams.$id]) {
+                        delete collection[idParams.$id];
+                        //console.debug('[GameScene]delsprite:成功:', idParams.$id);
+                    }
+                    else
+                        console.warn('[!GameScene]delsprite:父组件中找不到:', idParams.$id, collection, idParams, idParams.$collection);
 
                 return true;
             }
+            else
+                console.warn('[!GameScene]delsprite:找不到:', idParams.$id);
 
-            return null;
+            return false;
         }
 
 
@@ -5250,7 +5256,7 @@ Item {
         //在f和gf中定义某些特定功能的函数，系统会自动触发（优先级：地图脚本高于f高于gf）
         //  比如地图事件、地图离开事件、NPC交互事件、地图点击事件、NPC点击事件、定时器事件、NPC抵达事件、NPC触碰事件
 
-        //用户数据（可以保存与运行工程生命周期一致的数据）
+        //用户游戏数据（可以保存与运行工程生命周期一致的数据）
         property var g: ({})
 
 
@@ -7372,7 +7378,7 @@ Item {
                 let name = '', avatar = '', avatarSize = null;
                 if(role && $CommonLibJS.isString(role)) {
                     do {
-                        let roleName = role;
+                        const roleName = role;
                         role = game.hero(roleName);
                         if(role !== null) {
                             name = role.$data.$name;
@@ -8874,9 +8880,9 @@ Item {
 
         //Image {
         AnimatedImage {
-            //id号 和 父组件代号
-            property var $id
-            property var $parent
+            property var $id //一个collection内唯一标识
+            //property var $parent //父组件（可以是数字、字符串代号 或 组件）
+            property var $collection //哪个集合内
             //组件类型（用来识别）
             readonly property int $componentType: 1
 
@@ -8929,6 +8935,9 @@ Item {
             Component.onCompleted: {
                 smooth = GameSceneJS.getCommonScriptResource('$config', '$image', '$smooth') ?? true;
             }
+            Component.onDestruction: {
+                //console.debug('[GameScene]Component.onDestruction:CacheImage', $id, $collection);
+            }
         }
     }
 
@@ -8937,9 +8946,9 @@ Item {
         id: compCacheSpriteEffect
 
         SpriteEffect {
-            //id号 和 父组件代号
-            property var $id
-            property var $parent
+            property var $id //一个collection内唯一标识
+            //property var $parent //父组件（可以是数字、字符串代号 或 组件）
+            property var $collection //哪个集合内
             //组件类型（用来识别）
             readonly property int $componentType: 2
 
@@ -9014,6 +9023,9 @@ Item {
 
             Component.onCompleted: {
                 smooth = GameSceneJS.getCommonScriptResource('$config', '$spriteEffect', '$smooth') ?? true;
+            }
+            Component.onDestruction: {
+                //console.debug('[GameScene]Component.onDestruction:CacheSpriteEffect', $id, $collection);
             }
         }
     }
