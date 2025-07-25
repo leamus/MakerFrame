@@ -130,10 +130,10 @@ Item {
                     console.debug('[mainFightScriptEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
-                    l_listFightScript.forceActiveFocus();
+                    //l_listFightScript.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listFightScript.forceActiveFocus();
+                    //l_listFightScript.forceActiveFocus();
                 },
             });
         }

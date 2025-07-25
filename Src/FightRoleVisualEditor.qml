@@ -1222,14 +1222,14 @@ Item {
                     Msg: '有必填项没有完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
                 return false;
@@ -1281,14 +1281,14 @@ Item {
                     Msg: '错误：' + e.toString() + '<BR>请检查各参数',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
                 return [false, data];
@@ -1314,14 +1314,14 @@ Item {
                     if(jsScript[0])
                         sg_close();
 
-                    //root.forceActiveFocus();
+                    ///root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
                 },
                 OnDiscarded: ()=>{
                     $dialog.close();
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }

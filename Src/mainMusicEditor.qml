@@ -105,13 +105,13 @@ Item {
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
                     Buttons: Dialog.Ok | Dialog.Cancel,
                     OnAccepted: function() {
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
 
                         $Frame.sl_fileDelete(GameMakerGlobal.musicResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                 });
             }
@@ -208,7 +208,7 @@ Item {
                         Input: oldFileName,
                         Buttons: Dialog.Save | Dialog.Cancel,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
 
                             let newFileName = $dialog.input.trim();
                             //if(_private.arrMusic.indexOf(newFileName) >= 0) {
@@ -232,7 +232,7 @@ Item {
                             }
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -323,7 +323,7 @@ Item {
                 Input: filename,
                 Buttons: Dialog.Save | Dialog.Cancel,
                 OnAccepted: function() {
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
 
                     let newFileName = $dialog.input.trim();
                     //if(_private.arrMusic.indexOf(newFileName) >= 0) {
@@ -344,7 +344,7 @@ Item {
                     }
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }

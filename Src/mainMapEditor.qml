@@ -155,10 +155,10 @@ Item {
                     console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
-                    l_listMaps.forceActiveFocus();
+                    //l_listMaps.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listMaps.forceActiveFocus();
+                    //l_listMaps.forceActiveFocus();
                 },
             });
         }
@@ -562,10 +562,10 @@ Item {
                     console.debug('[mainMapEditor]删除地图资源：' + path, Qt.resolvedUrl(path), $Frame.sl_fileDelete(path));
                     removeItem(index);
 
-                    l_listMapBlockResource.forceActiveFocus();
+                    //l_listMapBlockResource.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listMapBlockResource.forceActiveFocus();
+                    //l_listMapBlockResource.forceActiveFocus();
                 },
             });
         }

@@ -110,15 +110,15 @@ Item {
                         Msg: ret.length > 0 ? '成功' : '失败',
                         Buttons: Dialog.Ok,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }
@@ -174,10 +174,10 @@ Item {
                             Msg: '错误',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                         });
                         return;
@@ -278,10 +278,10 @@ Item {
                                     Msg: msg,
                                     Buttons: Dialog.Yes,
                                     OnAccepted: function() {
-                                        root.forceActiveFocus();
+                                        //root.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
-                                        root.forceActiveFocus();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -307,10 +307,10 @@ Item {
                                     Msg: '下载失败(%1,%2)'.arg(e.$params.code).arg(e.$params.error),
                                     Buttons: Dialog.Yes,
                                     OnAccepted: function() {
-                                        root.forceActiveFocus();
+                                        //root.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
-                                        root.forceActiveFocus();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             });
@@ -332,10 +332,10 @@ Item {
                                         Msg: '下载失败(%1)'.arg(code),
                                         Buttons: Dialog.Yes,
                                         OnAccepted: function() {
-                                            root.forceActiveFocus();
+                                            //root.forceActiveFocus();
                                         },
                                         OnRejected: ()=>{
-                                            root.forceActiveFocus();
+                                            //root.forceActiveFocus();
                                         },
                                     });
                                     return;
@@ -361,10 +361,10 @@ Item {
 
 
 
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
 

@@ -1252,10 +1252,10 @@ Item {
                     GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
                     _private.changeProject('');
 
-                    l_listProjects.forceActiveFocus();
+                    //l_listProjects.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listProjects.forceActiveFocus();
+                    //l_listProjects.forceActiveFocus();
                 },
             });
         }
@@ -1542,10 +1542,10 @@ Item {
                     Msg: '请先新建或选择一个工程',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
-                        rootGameMaker.forceActiveFocus();
+                        //rootGameMaker.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        rootGameMaker.forceActiveFocus();
+                        //rootGameMaker.forceActiveFocus();
                     },
                 });
                 return false;
@@ -1621,10 +1621,10 @@ Item {
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.forceActiveFocus();
                             },
                         });
                         return;
@@ -1676,10 +1676,10 @@ Item {
                                     Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
                                     Buttons: Dialog.Ok,
                                     OnAccepted: function() {
-                                        rootGameMaker.forceActiveFocus();
+                                        //rootGameMaker.forceActiveFocus();
                                     },
                                     OnRejected: ()=>{
-                                        rootGameMaker.forceActiveFocus();
+                                        //rootGameMaker.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1703,17 +1703,17 @@ Item {
                             });
                             */
 
-                            rootGameMaker.forceActiveFocus();
+                            //rootGameMaker.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
+                            //rootGameMaker.forceActiveFocus();
                         },
                     });
 
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
             });
         }
@@ -1736,10 +1736,10 @@ Item {
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                rootGameMaker.forceActiveFocus();
+                                //rootGameMaker.forceActiveFocus();
                             },
                         });
                         return;
@@ -1754,10 +1754,10 @@ Item {
                                 Msg: '重命名失败，请检查名称',
                                 Buttons: Dialog.Yes,
                                 OnAccepted: function() {
-                                    rootGameMaker.forceActiveFocus();
+                                    //rootGameMaker.forceActiveFocus();
                                 },
                                 OnRejected: ()=>{
-                                    rootGameMaker.forceActiveFocus();
+                                    //rootGameMaker.forceActiveFocus();
                                 },
                             });
                             return;
@@ -1765,10 +1765,10 @@ Item {
                         console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $dialog.input);
                     }
 
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
+                    ///rootGameMaker.forceActiveFocus();
                 },
             });
         }
@@ -1989,10 +1989,10 @@ Item {
                 Msg: '敬请期待~',
                 Buttons: Dialog.Ok,
                 OnAccepted: function() {
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
             });
         }
@@ -2026,10 +2026,10 @@ Item {
                 Msg: ret ? ('成功:' + destPath + '.zip') : '失败',
                 Buttons: Dialog.Ok,
                 OnAccepted: function() {
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    rootGameMaker.forceActiveFocus();
+                    //rootGameMaker.forceActiveFocus();
                 },
             });
         }
@@ -2115,10 +2115,10 @@ Item {
                                         Buttons: Dialog.Ok,
                                         FocusItem: $list,
                                         OnAccepted: function() {
-                                            $list.forceActiveFocus();
+                                            //$list.forceActiveFocus();
                                         },
                                         OnRejected: ()=>{
-                                            $list.forceActiveFocus();
+                                            //$list.forceActiveFocus();
                                         },
                                     });
                                 }
@@ -2127,10 +2127,10 @@ Item {
                                     function() {/*rootGameMaker.enabled = true;*/ _continue();}, function() {/*rootGameMaker.enabled = true;*/});
 
 
-                                $list.forceActiveFocus();
+                                //$list.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                $list.forceActiveFocus();
+                                //$list.forceActiveFocus();
                             },
                         });
 
@@ -2202,10 +2202,10 @@ Item {
                     Msg: '下载失败(%1,%2)'.arg(e.$params.code).arg(e.$params.error),
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
-                        rootGameMaker.forceActiveFocus();
+                        //rootGameMaker.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        rootGameMaker.forceActiveFocus();
+                        //rootGameMaker.forceActiveFocus();
                     },
                 });
 
@@ -2230,10 +2230,10 @@ Item {
                         Msg: '下载失败：%1'.arg(code),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            rootGameMaker.forceActiveFocus();
+                            //rootGameMaker.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            rootGameMaker.forceActiveFocus();
+                            //rootGameMaker.forceActiveFocus();
                         },
                     });
                     return;

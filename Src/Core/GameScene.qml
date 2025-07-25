@@ -7247,10 +7247,10 @@ Item {
                 OnAccepted: function() {
                     exitGame(false);
 
-                    if(rootGameScene)rootGameScene.forceActiveFocus();
+                    //if(rootGameScene)rootGameScene.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    if(rootGameScene)rootGameScene.forceActiveFocus();
+                    //if(rootGameScene)rootGameScene.forceActiveFocus();
                 },
             });
         }

@@ -128,10 +128,10 @@ Item {
                     console.debug('[mainSpriteEditor]删除:' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
-                    l_listSprite.forceActiveFocus();
+                    //l_listSprite.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listSprite.forceActiveFocus();
+                    //l_listSprite.forceActiveFocus();
                 },
             });
         }

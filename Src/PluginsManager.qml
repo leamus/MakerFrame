@@ -343,10 +343,10 @@ Item {
                         Msg: '扩展不能运行',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            $list.forceActiveFocus();
+                            //$list.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            $list.forceActiveFocus();
+                            //$list.forceActiveFocus();
                         },
                     });
 
@@ -425,11 +425,11 @@ Item {
                                     _private.refresh();
                                 }
 
-                                //$list.forceActiveFocus();
+                                ///$list.forceActiveFocus();
                             }, 'remove plugin');
                         },
                         OnRejected: ()=>{
-                            $list.forceActiveFocus();
+                            //$list.forceActiveFocus();
                         },
                     });
 

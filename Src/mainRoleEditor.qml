@@ -128,10 +128,10 @@ Item {
                     console.debug('[mainRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
-                    l_listRole.forceActiveFocus();
+                    //l_listRole.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listRole.forceActiveFocus();
+                    //l_listRole.forceActiveFocus();
                 },
             });
         }

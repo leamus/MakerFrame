@@ -130,10 +130,10 @@ Item {
                     console.debug('[mainGoodsEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
                     removeItem(index);
 
-                    l_listGoods.forceActiveFocus();
+                    //l_listGoods.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listGoods.forceActiveFocus();
+                    //l_listGoods.forceActiveFocus();
                 },
             });
         }

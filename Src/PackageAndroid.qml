@@ -639,10 +639,10 @@ Item {
                         Msg: '生成打包文件夹成功，请用三方软件来打包并签名APK（<font color="red">%1</font>）'.arg(strPackageDir),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
                 }, 200, root);
@@ -657,10 +657,10 @@ Item {
                         Msg: '请将 <font color="red">%1</font> 环境文件下载并放入 <font color="red">%2</font> 文件夹下（可以在gitee、github或Q群里下载）'.arg(missingFiles).arg(path),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
                     return false;
@@ -673,13 +673,13 @@ Item {
                         Msg: '没有找到配置文件，请先选择“重新生成全部文件”',
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnDiscarded: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
                     return false;
@@ -697,10 +697,10 @@ Item {
                     continueScript(comboType.currentIndex);
                 },
                 OnRejected: ()=>{
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
 

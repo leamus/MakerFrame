@@ -90,10 +90,10 @@ Item {
                     Msg: '有需要时再做~',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                 });
 

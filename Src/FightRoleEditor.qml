@@ -194,10 +194,10 @@ let data = (function() {
                             Msg: e,
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                         });
 
@@ -208,10 +208,10 @@ let data = (function() {
                         Msg: '恭喜，没有语法错误',
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                         OnRejected: ()=>{
-                            root.forceActiveFocus();
+                            //root.forceActiveFocus();
                         },
                     });
 
@@ -242,10 +242,10 @@ let data = (function() {
                             Msg: '请先保存',
                             Buttons: Dialog.Yes,
                             OnAccepted: function() {
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                             OnRejected: ()=>{
-                                root.forceActiveFocus();
+                                //root.forceActiveFocus();
                             },
                         });
                         return;
@@ -377,17 +377,16 @@ let data = (function() {
                     OnAccepted: function() {
                         textFightRoleName.text = _private.strSavedName;
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     OnRejected: ()=>{
                         textFightRoleName.text = _private.strSavedName;
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
 
@@ -410,7 +409,7 @@ let data = (function() {
                 _private.strSavedName = textFightRoleName.text;
 
                 //root.focus = true;
-                root.forceActiveFocus();
+                //root.forceActiveFocus();
             }
 
             if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textFightRoleName.text)) {
@@ -423,12 +422,11 @@ let data = (function() {
                     OnRejected: ()=>{
                         textFightRoleName.text = _private.strSavedName;
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
 
@@ -448,14 +446,15 @@ let data = (function() {
                 OnAccepted: function() {
                     if(save())
                         sg_close();
-                    //root.forceActiveFocus();
+
+                    ///root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
                 },
                 OnDiscarded: ()=>{
                     $dialog.close();
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }

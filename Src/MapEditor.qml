@@ -433,15 +433,15 @@ Item {
 
                     if(!_private.strMapRID) {
                         $dialog.show({
-                              Msg: '请先保存地图',
-                              Buttons: Dialog.Yes,
-                              OnAccepted: function() {
-                                  root.forceActiveFocus();
-                              },
-                              OnRejected: ()=>{
-                                  root.forceActiveFocus();
-                              },
-                          });
+                                Msg: '请先保存地图',
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    //root.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    //root.forceActiveFocus();
+                                },
+                            });
 
                         return;
                     }
@@ -2604,7 +2604,7 @@ Item {
                     textDialogMsg.text = '';
 
                     //root.focus = true;
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 }
                 else {
                     open();
@@ -2624,11 +2624,10 @@ Item {
                         textDialogMsg.text = '';
 
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-
                         root.forceActiveFocus();
                     },*/
                 });
@@ -3095,12 +3094,12 @@ Item {
         }
 
         onSg_reloaded: function(code, data) {
-            if(code === 1) {
+            if(code === 0) {
                 referenceComponent = rootTest;
 
                 qmlObject.init({Map: _private.strMapRID, Role: strRoleRID, Position: arrPosition});
             }
-            else if(code === 2) {
+            else if(code > 0) {
                 qmlObject.init({Map: strMapRID, Role: strRoleRID, Position: arrPosition});
                 qmlObject.start();
             }
@@ -3551,15 +3550,17 @@ Item {
                     else {
                         dialogSave.open();
                     }
+
                     //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
+
                     //root.forceActiveFocus();
                 },
                 OnDiscarded: ()=>{
                     $dialog.close();
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }

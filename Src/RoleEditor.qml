@@ -1610,15 +1610,15 @@ Item {
 
                             if(!_private.strRoleRID) {
                                 $dialog.show({
-                                      Msg: '请先保存角色',
-                                      Buttons: Dialog.Yes,
-                                      OnAccepted: function() {
-                                          root.forceActiveFocus();
-                                      },
-                                      OnRejected: ()=>{
-                                          root.forceActiveFocus();
-                                      },
-                                  });
+                                        Msg: '请先保存角色',
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            //root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            //root.forceActiveFocus();
+                                        },
+                                    });
 
                                 return;
                             }
@@ -2428,10 +2428,10 @@ Item {
                     console.debug('[RoleEditor]删除:' + filepath, Qt.resolvedUrl(filepath), $Frame.sl_fileExists(filepath), $Frame.sl_fileDelete(filepath));
                     removeItem(index);
 
-                    l_listRoleResource.forceActiveFocus();
+                    //l_listRoleResource.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listRoleResource.forceActiveFocus();
+                    //l_listRoleResource.forceActiveFocus();
                 },
             });
         }
@@ -2496,12 +2496,11 @@ Item {
 
                         textDialogMsg.text = '';
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
             }
@@ -3133,14 +3132,15 @@ function $refresh(index, imageAnimate, path) {
                     else {
                         dialogSaveRole.open();
                     }
-                    //root.forceActiveFocus();
+
+                    ///root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
                 },
                 OnDiscarded: ()=>{
                     $dialog.close();
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }

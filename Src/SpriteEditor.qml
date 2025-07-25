@@ -779,15 +779,15 @@ Item {
 
                                 if(!_private.strSpriteName) {
                                     $dialog.show({
-                                          Msg: '请先保存特效',
-                                          Buttons: Dialog.Yes,
-                                          OnAccepted: function() {
-                                              root.forceActiveFocus();
-                                          },
-                                          OnRejected: ()=>{
-                                              root.forceActiveFocus();
-                                          },
-                                      });
+                                            Msg: '请先保存特效',
+                                            Buttons: Dialog.Yes,
+                                            OnAccepted: function() {
+                                                //root.forceActiveFocus();
+                                            },
+                                            OnRejected: ()=>{
+                                                //root.forceActiveFocus();
+                                            },
+                                        });
 
                                     return;
                                 }
@@ -1401,10 +1401,10 @@ Item {
                     console.debug('[SpriteEditor]删除:' + filepath, Qt.resolvedUrl(filepath), $Frame.sl_fileExists(filepath), $Frame.sl_fileDelete(filepath));
                     removeItem(index);
 
-                    l_listSpriteImageResource.forceActiveFocus();
+                    //l_listSpriteImageResource.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listSpriteImageResource.forceActiveFocus();
+                    //l_listSpriteImageResource.forceActiveFocus();
                 },
             });
         }
@@ -1776,10 +1776,10 @@ Item {
                     console.debug('[SpriteEditor]删除:' + filepath, Qt.resolvedUrl(filepath), $Frame.sl_fileExists(filepath), $Frame.sl_fileDelete(filepath));
                     removeItem(index);
 
-                    l_listSpriteSoundResource.forceActiveFocus();
+                    //l_listSpriteSoundResource.forceActiveFocus();
                 },
                 OnRejected: ()=>{
-                    l_listSpriteSoundResource.forceActiveFocus();
+                    //l_listSpriteSoundResource.forceActiveFocus();
                 },
             });
         }
@@ -1841,12 +1841,11 @@ Item {
 
                         textDialogMsg.text = '';
 
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },
                     /*OnDiscarded: ()=>{
                         $dialog.close();
-
-                        root.forceActiveFocus();
+                        //root.forceActiveFocus();
                     },*/
                 });
             }
@@ -2254,14 +2253,15 @@ function $refresh(index, imageAnimate, path) {
                     else {
                         dialogSaveSprite.open();
                     }
-                    //root.forceActiveFocus();
+
+                    ///root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
                 },
                 OnDiscarded: ()=>{
                     $dialog.close();
-                    root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
             });
         }
