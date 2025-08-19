@@ -184,7 +184,6 @@ Item {
 
         anchors.centerIn: parent
         width: parent.width * 0.96
-        //height: parent.height * 0.9
         height: parent.height * 0.96
 
         //spacing: 16
@@ -224,7 +223,8 @@ Item {
                 ColumnLayout {
                     id: layout
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: parent.width
 
                     spacing: 16
 
@@ -701,11 +701,12 @@ Item {
                         }
                     }
 
+
                     ColumnLayout {
-                        //id: layoutActionLayout
+                        //id: layoutActionGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
                         //spacing: 16
 
@@ -751,7 +752,7 @@ Item {
                             id: layoutActionLayout
 
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            //Layout.fillHeight: true
 
                             spacing: 16
 

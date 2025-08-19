@@ -1663,7 +1663,7 @@ Item {
 
                         //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
-                            _private.clearCanvas(canvasBlockSpecial);
+                            $CommonLibJS.Utils.clearCanvas(canvasBlockSpecial);
 
                             //地图上绘制 特殊图块
                             let ctx = getContext('2d');
@@ -1712,7 +1712,7 @@ Item {
 
                         //重新将 objMapBlockSpecialData 绘制
                         function rePaint() {
-                            _private.clearCanvas(canvasEvent);
+                            $CommonLibJS.Utils.clearCanvas(canvasEvent);
 
                             //地图上绘制 事件
 
@@ -3269,9 +3269,9 @@ Item {
 
             canvasMapBlock1.unloadImage(imageMapBlock1.source);
 
-            _private.clearCanvas(canvasMapBlock1);
-            _private.clearCanvas(canvasEvent);
-            _private.clearCanvas(canvasBlockSpecial);
+            $CommonLibJS.Utils.clearCanvas(canvasMapBlock1);
+            $CommonLibJS.Utils.clearCanvas(canvasEvent);
+            $CommonLibJS.Utils.clearCanvas(canvasBlockSpecial);
             canvasMapBlock1.requestPaint();
             canvasEvent.requestPaint();
             canvasBlockSpecial.requestPaint();
@@ -3407,12 +3407,6 @@ Item {
             return true;
         }
 
-
-        //清空canvas
-        function clearCanvas(canvas) {
-            let ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
 
         //初始化一层地图的数据
         //使用initData进行填充（只填充undefined的元素）

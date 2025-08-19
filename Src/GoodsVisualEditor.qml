@@ -218,9 +218,10 @@ Item {
                 ColumnLayout {
                     id: layout
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: parent.width
 
-                    //spacing: 16
+                    spacing: 16
 
 
                     RowLayout {
@@ -766,52 +767,62 @@ Item {
                     }
 
 
-                    Button {
-                        Layout.fillWidth: true
-
-                        text: '增加效果'
-
-                        onClicked: {
-                            let c = comp.createObject(layoutEffectsLayout);
-                            _private.arrCacheComponent.push(c);
-
-                            $CommonLibJS.setTimeout(function() {
-                                if(flickable.contentHeight > flickable.height)
-                                    flickable.contentY = flickable.contentHeight - flickable.height;
-                                }, 1, root, '');
-
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-
-                        Label {
-                            Layout.preferredWidth: 1
-                            Layout.fillWidth: true
-
-                            text: '*@属性'
-                            font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Orange)
-                        }
-                        Label {
-                            Layout.preferredWidth: 1
-                            Layout.fillWidth: true
-
-                            text: '*@效果值'
-                            font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Orange)
-                        }
-                    }
-
                     ColumnLayout {
-                        id: layoutEffectsLayout
+                        id: layoutEffectGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
+
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '增加效果'
+
+                            onClicked: {
+                                let c = comp.createObject(layoutEffectsLayout);
+                                _private.arrCacheComponent.push(c);
+
+                                $CommonLibJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@属性'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@效果值'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: layoutEffectsLayout
+
+                            Layout.fillWidth: true
+                            //Layout.fillHeight: true
+
+                            spacing: 16
+
+                        }
                     }
                 }
             }

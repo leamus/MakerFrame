@@ -209,7 +209,8 @@ Item {
                 ColumnLayout {
                     id: layout
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: parent.width
 
                     spacing: 16
 
@@ -443,10 +444,10 @@ Item {
                     }
 
                     ColumnLayout {
-                        //id: layoutEnemyLayout
+                        //id: layoutEnemyGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
                         //spacing: 16
 
@@ -492,7 +493,7 @@ Item {
                             id: layoutEnemyLayout
 
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            //Layout.fillHeight: true
 
                             spacing: 16
 

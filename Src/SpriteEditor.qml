@@ -39,7 +39,7 @@ Item {
         spriteEffect.nSpriteType = 0;
 
 
-        _private.strSpriteName = '';
+        _private.strSpriteRID = '';
         _private.strTextBackupSpriteImageURL = '';
         _private.strTextBackupSpriteImageResourceName = '';
         _private.strTextBackupSpriteSoundURL = '';
@@ -54,7 +54,7 @@ Item {
     function newSprite() {
         comboType.currentIndex = 0;
 
-        textSpriteName.text = '';
+        textSpriteRID.text = '';
 
         textSpriteImageURL.text = '';
         textSpriteImageResourceName.text = '';
@@ -85,12 +85,12 @@ Item {
         _private.loadScript();
     }
 
-    function openSprite(cfg) {
+    function openSprite(cfg, spriteRID) {
 
         console.debug('[SpriteEditor]openSprite:', JSON.stringify(cfg));
 
         //cfg.Version;
-        _private.strSpriteName = textSpriteName.text = cfg.SpriteName.trim();
+        _private.strSpriteRID = textSpriteRID.text = spriteRID;
 
         //textSpriteImageURL.text = cfg.Image;
         //textSpriteImageResourceName.text = textSpriteImageURL.text.slice(textSpriteImageURL.text.lastIndexOf('/') + 1);
@@ -139,7 +139,7 @@ Item {
         _private.refreshSprite();
 
 
-        _private.loadScript(textSpriteName.text);
+        _private.loadScript(textSpriteRID.text);
     }
 
 
@@ -777,25 +777,25 @@ Item {
 
                             onClicked: {
 
-                                if(!_private.strSpriteName) {
+                                if(!_private.strSpriteRID) {
                                     $dialog.show({
-                                            Msg: '请先保存特效',
-                                            Buttons: Dialog.Yes,
-                                            OnAccepted: function() {
-                                                //root.forceActiveFocus();
-                                            },
-                                            OnRejected: ()=>{
-                                                //root.forceActiveFocus();
-                                            },
-                                        });
+                                        Msg: '请先保存特效',
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            //root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            //root.forceActiveFocus();
+                                        },
+                                    });
 
                                     return;
                                 }
 
 
-                                //_private.loadScript(textSpriteName.text);
+                                //_private.loadScript(textSpriteRID.text);
                                 if(!scriptEditor.text &&
-                                        !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteName + GameMakerGlobal.separator + 'sprite.js')) {
+                                        !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js')) {
                                     if(comboType.currentIndex === 1)
                                         scriptEditor.text = _private.strTemplateCode0;
                                     else
@@ -934,7 +934,7 @@ Item {
                 font.pointSize: _config.nButtonFontSize
 
                 onClicked: {
-                    //_private.strSpriteName = textSpriteName.text;
+                    //_private.strSpriteRID = textSpriteRID.text;
 
                     dialogSaveSprite.open();
                 }
@@ -1015,7 +1015,7 @@ Item {
         anchors.fill: parent
 
 
-        strTitle: `${_private.strSpriteName}(特效脚本)`
+        strTitle: `${_private.strSpriteRID}(特效脚本)`
         /*fnAfterCompile: function(code) {return code;}*/
 
         visualScriptEditor.strTitle: strTitle
@@ -1182,7 +1182,7 @@ Item {
                     onClicked: {
                         //dialogSpriteImageData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.spriteResourcePath();
+                        const path = GameMakerGlobal.spriteResourcePath();
 
                         if(comboType.currentIndex === 0)
                             l_listSpriteImageResource.show(path, [], 0x002, 0x00);
@@ -1234,7 +1234,7 @@ Item {
             //系统图片
             //if(dialogSpriteImageData.nChoiceType === 1) {
             if(checkboxSaveSpriteImageResource.checked) {
-                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textSpriteImageURL.text), GameMakerGlobal.spriteResourcePath(textSpriteImageResourceName.text), false);
+                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textSpriteImageURL.text), GameMakerGlobal.spriteResourcePath(textSpriteImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteImageDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
@@ -1370,8 +1370,8 @@ Item {
             checkboxSaveSpriteImageResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl.toString());
-            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //const cfg = File.read(fileUrl.toString());
+            //const cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             visible = false;
@@ -1392,7 +1392,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            let filepath = GameMakerGlobal.spriteResourcePath(item);
+            const filepath = GameMakerGlobal.spriteResourcePath(item);
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -1550,7 +1550,7 @@ Item {
                     onClicked: {
                         //dialogSpriteSoundDataData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.soundResourcePath();
+                        const path = GameMakerGlobal.soundResourcePath();
 
                         l_listSpriteSoundResource.show(path, [], 0x002, 0x00);
                         l_listSpriteSoundResource.visible = true;
@@ -1617,7 +1617,7 @@ Item {
             //音效
             //if(dialogSpriteSoundData.nChoiceType === 1) {
             if(checkboxSaveSpriteSoundResource.checked) {
-                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textSpriteSoundURL.text), GameMakerGlobal.soundResourcePath(textSpriteSoundResourceName.text), false);
+                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textSpriteSoundURL.text), GameMakerGlobal.soundResourcePath(textSpriteSoundResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteSoundDialogTips.text = '拷贝到资源目录失败';
@@ -1745,8 +1745,8 @@ Item {
             checkboxSaveSpriteSoundResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl.toString());
-            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //const cfg = File.read(fileUrl.toString());
+            //const cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             //root.focus = true;
@@ -1767,7 +1767,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            let filepath = GameMakerGlobal.soundResourcePath(item);
+            const filepath = GameMakerGlobal.soundResourcePath(item);
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -1799,25 +1799,25 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
-            textSpriteName.text = textSpriteName.text.trim();
-            if(textSpriteName.text.length === 0) {
+            textSpriteRID.text = textSpriteRID.text.trim();
+            if(textSpriteRID.text.length === 0) {
                 //$Platform.sl_showToast('名称不能为空');
                 textDialogMsg.text = '名称不能为空';
                 open();
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
 
             function fnSave() {
                 if(_private.exportSprite()) {
                     //第一次保存，重新刷新
-                    if(_private.strSpriteName === '') {
-                        _private.loadScript(textSpriteName.text);
+                    if(_private.strSpriteRID === '') {
+                        _private.loadScript(textSpriteRID.text);
                         _private.refreshSprite();
                     }
 
-                    _private.strSpriteName = textSpriteName.text;
+                    _private.strSpriteRID = textSpriteRID.text;
 
                     textDialogMsg.text = '';
 
@@ -1829,7 +1829,7 @@ Item {
                 }
             }
 
-            if(textSpriteName.text !== _private.strSpriteName && $Frame.sl_dirExists(path)) {
+            if(textSpriteRID.text !== _private.strSpriteRID && $Frame.sl_dirExists(path)) {
                 $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,
@@ -1837,7 +1837,7 @@ Item {
                         fnSave();
                     },
                     OnRejected: ()=>{
-                        textSpriteName.text = _private.strSpriteName;
+                        textSpriteRID.text = _private.strSpriteRID;
 
                         textDialogMsg.text = '';
 
@@ -1851,10 +1851,9 @@ Item {
             }
             else
                 fnSave();
-
         }
         onRejected: {
-            textSpriteName.text = _private.strSpriteName;
+            textSpriteRID.text = _private.strSpriteRID;
 
             textDialogMsg.text = '';
 
@@ -1872,10 +1871,10 @@ Item {
             RowLayout {
                 //width: parent.width
                 Label {
-                    text: qsTr('特效名:')
+                    text: qsTr('特效资源名:')
                 }
                 TextField {
-                    id: textSpriteName
+                    id: textSpriteRID
 
                     Layout.fillWidth: true
                     placeholderText: '深林孤鹰'
@@ -1978,6 +1977,14 @@ Item {
             rectImage.visible = false;
             root.forceActiveFocus();
         }
+        Keys.onEscapePressed: function(event) {
+            rectImage.visible = false;
+            root.forceActiveFocus();
+        }
+        Keys.onBackPressed: function(event) {
+            rectImage.visible = false;
+            root.forceActiveFocus();
+        }
     }
 
 
@@ -1986,7 +1993,7 @@ Item {
         id: _private
 
 
-        property string strSpriteName: ''
+        property string strSpriteRID: ''
         property string strTextBackupSpriteImageURL
         property string strTextBackupSpriteImageResourceName
         property string strTextBackupSpriteSoundURL
@@ -2093,10 +2100,10 @@ function $refresh(index, imageAnimate, path) {
                 spriteEffect.height = parseInt(textSpriteHeight.text);
 
 
-                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text + GameMakerGlobal.separator + 'sprite.js';
+                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
                 if($Frame.sl_fileExists(jsPath)) {
                     _private.jsLoader.clear();
-                    let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                    const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                     spriteEffect.sprite.fnRefresh = ts.$refresh;
                 }
 
@@ -2126,20 +2133,20 @@ function $refresh(index, imageAnimate, path) {
         }
 
 
-        function loadScript(spriteName) {
-            if(!spriteName) {
+        function loadScript(spriteRID) {
+            if(!spriteRID) {
                 //scriptEditor.text = _private.strTemplateCode0;
                 scriptEditor.text = '';
                 scriptEditor.visualScriptEditor.loadData(null);
                 return;
             }
 
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator;
+            //const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator;
             //if($Frame.sl_fileExists(path + 'sprite.js')) {
             //File.read(path + 'sprite.js');
             scriptEditor.init({
                 BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
-                RelativePath: GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.js',
+                RelativePath: GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator + 'sprite.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
                 RunButton: 0b0,
@@ -2152,14 +2159,21 @@ function $refresh(index, imageAnimate, path) {
 
         function createJS() {
             //第一次保存js文件
-            if(_private.strSpriteName === '') {
+            if(_private.strSpriteRID === '') {
                 if(comboType.currentIndex === 1)    //序列图片文件
                     scriptEditor.text = _private.strTemplateCode0;
                 else
                     scriptEditor.text = '';
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text;
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'sprite.js', 0);
+                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
+                const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'sprite.js', 0);
+            }
+            else if(textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) { //另存为
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js';
+                if($Frame.sl_fileExists(oldFilePath)) {
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
+                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                }
             }
             else
                 return false;
@@ -2168,12 +2182,12 @@ function $refresh(index, imageAnimate, path) {
         }
         //复制可视化
         function copyVJS() {
-            //如果路径不为空，且是另存为，则赋值vjs文件
-            if(_private.strSpriteName !== '' && textSpriteName.text !== '' && _private.strSpriteName !== textSpriteName.text) {
-                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteName + GameMakerGlobal.separator + 'sprite.vjs';
+            //如果路径不为空，且是另存为，则复制vjs文件
+            if(_private.strSpriteRID !== '' && textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) {
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteName.text + GameMakerGlobal.separator + 'sprite.vjs';
-                    let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.vjs';
+                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -2181,17 +2195,17 @@ function $refresh(index, imageAnimate, path) {
         //导出特效
         function exportSprite() {
 
-            let spriteName = textSpriteName.text;
-            let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName + GameMakerGlobal.separator + 'sprite.json';
+            const spriteRID = textSpriteRID.text;
+            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator + 'sprite.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
             */
 
-            let outputData = {};
+            const outputData = {};
 
             outputData.Version = '0.9';
-            outputData.SpriteName = spriteName;
+            outputData.SpriteName = spriteRID;
             outputData.SpriteType = comboType.currentIndex + 1; //特效类型
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
             outputData.SpriteSize = [parseInt(textSpriteWidth.text), parseInt(textSpriteHeight.text)];
@@ -2225,8 +2239,8 @@ function $refresh(index, imageAnimate, path) {
 
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
-            //let ret = File.write(filepath, JSON.stringify(outputData));
-            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
+            //const ret = File.write(filepath, JSON.stringify(outputData));
+            const ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

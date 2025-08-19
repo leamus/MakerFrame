@@ -310,7 +310,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
                         $list.open({
                             Data: path,
@@ -785,7 +785,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.imageResourcePath();
+                                const path = GameMakerGlobal.imageResourcePath();
 
                                 $list.open({
                                     Data: path,
@@ -1556,7 +1556,7 @@ Item {
                             text: '增加动作'
 
                             onClicked: {
-                                let c = compActions2.createObject(layoutAction2);
+                                const c = compActions2.createObject(layoutAction2);
                                 layoutAction2.arrCacheComponent.push(c);
 
                                 $CommonLibJS.setTimeout(function() {
@@ -1668,7 +1668,7 @@ Item {
                                 text: '增加动作'
 
                                 onClicked: {
-                                    let c = compActions1.createObject(layoutAction1);
+                                    const c = compActions1.createObject(layoutAction1);
                                     layoutAction1.arrCacheComponent.push(c);
 
                                     $CommonLibJS.setTimeout(function() {
@@ -2206,7 +2206,7 @@ Item {
                     onClicked: {
                         //dialogRoleData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.spriteResourcePath();
+                        const path = GameMakerGlobal.spriteResourcePath();
 
                         if(comboType.currentIndex === 0)
                             l_listRoleResource.show(path, [], 0x002, 0x00);
@@ -2257,7 +2257,7 @@ Item {
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
+                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
@@ -2397,8 +2397,8 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            //let cfg = File.read(fileUrl.toString());
-            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //const cfg = File.read(fileUrl.toString());
+            //const cfg = $Frame.sl_fileRead(fileUrl.toString());
 
 
             visible = false;
@@ -2419,7 +2419,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            let filepath = GameMakerGlobal.spriteResourcePath(item);
+            const filepath = GameMakerGlobal.spriteResourcePath(item);
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -2462,7 +2462,7 @@ Item {
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
 
             function fnSave() {
                 if(_private.exportRole()) {
@@ -2506,7 +2506,6 @@ Item {
             }
             else
                 fnSave();
-
         }
         onRejected: {
             textRoleRID.text = _private.strRoleRID;
@@ -2633,6 +2632,14 @@ Item {
             rectImage.visible = false;
             root.forceActiveFocus();
         }
+        Keys.onEscapePressed: function(event) {
+            rectImage.visible = false;
+            root.forceActiveFocus();
+        }
+        Keys.onBackPressed: function(event) {
+            rectImage.visible = false;
+            root.forceActiveFocus();
+        }
     }
 
 
@@ -2746,10 +2753,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 role.objActionsData = {};
-                let actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
+                const actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
+                const frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                const frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
+                const frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -2765,7 +2772,7 @@ function $refresh(index, imageAnimate, path) {
                 const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
                 if($Frame.sl_fileExists(jsPath)) {
                     _private.jsLoader.clear();
-                    let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                    const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                     role.sprite.sprite.fnRefresh = ts.$refresh;
                 }
             }
@@ -2774,8 +2781,8 @@ function $refresh(index, imageAnimate, path) {
                 //role.implicitHeight = parseInt(textRoleHeight.text);
 
                 role.objActionsData = {};
-                let actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
-                let SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
+                const actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
+                const SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
@@ -2783,7 +2790,7 @@ function $refresh(index, imageAnimate, path) {
                         //    SpriteNames[tt].text.trim()
                         //];
 
-                        let spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
+                        const spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
                         let info = $Frame.sl_fileRead($GlobalJS.toPath(spritePath + GameMakerGlobal.separator + 'sprite.json'));
                         if(info)
                             info = JSON.parse(info);
@@ -2843,7 +2850,7 @@ function $refresh(index, imageAnimate, path) {
                 return;
             }
 
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator;
+            //const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator;
             //if($Frame.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
             scriptEditor.init({
@@ -2867,8 +2874,15 @@ function $refresh(index, imageAnimate, path) {
                 else
                     scriptEditor.text = '';
 
-                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
+                const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+            }
+            else if(textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) { //另存为
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js';
+                if($Frame.sl_fileExists(oldFilePath)) {
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
+                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                }
             }
             else
                 return false;
@@ -2877,12 +2891,12 @@ function $refresh(index, imageAnimate, path) {
         }
         //复制可视化
         function copyVJS() {
-            //如果路径不为空，且是另存为，则赋值vjs文件
+            //如果路径不为空，且是另存为，则复制vjs文件
             if(_private.strRoleRID !== '' && textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) {
-                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.vjs';
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.vjs';
-                    let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.vjs';
+                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -2890,8 +2904,9 @@ function $refresh(index, imageAnimate, path) {
         //导出角色
         function exportRole() {
 
-            const roleName = textRoleName.text;
-            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.json';
+            const roleRID = textRoleRID.text;
+            const roleName = textRoleName.text || roleRID;
+            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator + 'role.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
@@ -2963,10 +2978,10 @@ function $refresh(index, imageAnimate, path) {
 
 
                 outputData.FrameIndex = {};
-                let actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
-                let frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
-                let frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
-                let frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
+                const actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
+                const frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
+                const frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
+                const frameIntervals = $Frame.sl_findChildren(layoutAction1, 'FrameInterval');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
@@ -2986,8 +3001,8 @@ function $refresh(index, imageAnimate, path) {
             }
             else if(comboType.currentIndex === 2) {
                 outputData.FrameIndex = {};
-                let actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
-                let SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
+                const actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
+                const SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim())
@@ -3004,8 +3019,8 @@ function $refresh(index, imageAnimate, path) {
 
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
-            //let ret = File.write(filepath, JSON.stringify(outputData));
-            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
+            //const ret = File.write(filepath, JSON.stringify(outputData));
+            const ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 
@@ -3088,7 +3103,7 @@ function $refresh(index, imageAnimate, path) {
                     delete keys[action]; //从键盘保存中删除
 
                     //获取下一个已经按下的键
-                    let l = Object.keys(keys);
+                    const l = Object.keys(keys);
                     //console.debug(l);
                     //keys.pop();
                     if(l.length === 0) {    //如果没有键被按下

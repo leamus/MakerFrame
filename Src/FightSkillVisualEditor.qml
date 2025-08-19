@@ -537,7 +537,8 @@ Item {
                 ColumnLayout {
                     id: layout
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: parent.width
 
                     spacing: 16
 
@@ -821,10 +822,10 @@ Item {
                     }
 
                     ColumnLayout {
-                        //id: layoutBuff
+                        //id: layoutBuffGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
                         //spacing: 16
 
@@ -888,7 +889,7 @@ Item {
                             id: layoutBuff
 
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            //Layout.fillHeight: true
 
                             spacing: 16
                         }
@@ -896,10 +897,10 @@ Item {
 
 
                     ColumnLayout {
-                        id: layoutEffectRoot
+                        id: layoutEffectGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
                         //spacing: 16
 
@@ -963,7 +964,7 @@ Item {
                             id: layoutEffect
 
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            //Layout.fillHeight: true
 
                             spacing: 16
                         }
@@ -1495,12 +1496,12 @@ Item {
             switch(comboType.currentIndex) {
             //普通技能
             case 0:
-                layoutEffectRoot.visible = false;
+                layoutEffectGroup.visible = false;
                 layoutRequiredMP.visible = false;
                 break;
             //技能
             case 1:
-                layoutEffectRoot.visible = true;
+                layoutEffectGroup.visible = true;
                 layoutRequiredMP.visible = true;
                 break;
             }

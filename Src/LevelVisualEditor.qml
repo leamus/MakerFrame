@@ -55,7 +55,154 @@ Item {
 
 
     Component {
-        id: comp
+        id: compEffect
+
+        Item {
+            id: tRoot
+
+            //property alias label: tlable.text
+
+
+            //anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.preferredHeight: 30
+
+            RowLayout {
+                anchors.fill: parent
+
+                TextField {
+                    id: ttextproperty
+
+                    objectName: 'Property'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    text: ''
+                    placeholderText: '*@属性'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onPressAndHold: {
+                        let data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
+                                    ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
+
+                        $list.open({
+                            Data: data[0],
+                            OnClicked: (index, item)=>{
+                                text = data[1][index];
+
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                            OnCanceled: ()=>{
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                        });
+                    }
+                }
+
+                TextField {
+                    id: ttextType
+
+                    objectName: 'Type'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    text: ''
+                    placeholderText: '*@类型'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onPressAndHold: {
+                        let data = [['加减：1','倍率：2','设置：3'],
+                                    ['1','2','3']];
+
+                        $list.open({
+                            Data: data[0],
+                            OnClicked: (index, item)=>{
+                                text = data[1][index];
+
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                            OnCanceled: ()=>{
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                        });
+                    }
+                }
+
+                TextField {
+                    id: ttextEffect
+
+                    objectName: 'Effect'
+
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                    text: ''
+                    placeholderText: '*值'
+
+                    //selectByKeyboard: true
+                    selectByMouse: true
+                    //wrapMode: TextEdit.Wrap
+
+                    onPressAndHold: {
+                        /*let data = [['固定值（整数）：20','倍率（小数）：2.0'],
+                                    ['20','2.0']];
+
+                        $list.open({
+                            Data: data[0],
+                            OnClicked: (index, item)=>{
+                                text = data[1][index];
+
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                            OnCanceled: ()=>{
+                                $list.visible = false;
+                                root.forceActiveFocus();
+                            },
+                        });
+                        */
+                    }
+                }
+
+                Button {
+                    id: tbutton
+
+                    implicitWidth: 30
+
+                    text: 'X'
+
+                    onClicked: {
+                        for(let tc in _private.arrCacheComponent) {
+                            if(_private.arrCacheComponent[tc] === tRoot) {
+                                _private.arrCacheComponent.splice(tc, 1);
+                                break;
+                            }
+
+                        }
+                        tRoot.destroy();
+
+                        root.forceActiveFocus();
+                    }
+                }
+            }
+
+        }
+    }
+
+    Component {
+        id: compCondition
 
         Item {
             id: tRoot
@@ -114,14 +261,14 @@ Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                     text: ''
-                    placeholderText: '*@效果值'
+                    placeholderText: '*值'
 
                     //selectByKeyboard: true
                     selectByMouse: true
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['固定值（整数）：20','倍率（小数）：2.0'],
+                        /*let data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
                         $list.open({
@@ -137,6 +284,7 @@ Item {
                                 root.forceActiveFocus();
                             },
                         });
+                        */
                     }
                 }
 
@@ -218,9 +366,10 @@ Item {
                 ColumnLayout {
                     id: layout
 
-                    anchors.fill: parent
+                    //anchors.fill: parent
+                    width: parent.width
 
-                    //spacing: 16
+                    spacing: 16
 
 
                     RowLayout {
@@ -228,10 +377,10 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '类型:'
+                            text: '级别（当前/最大）:'
                         }
 
-                        ComboBox {
+                        /*ComboBox {
                             id: comboType
 
                             Layout.fillWidth: true
@@ -266,310 +415,175 @@ Item {
                                 console.debug(comboType.currentIndex,
                                               comboType.currentText,
                                               comboType.currentValue);
-                            }*/
+                            }* /
 
-                        }
-                    }
+                        }*/
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '名字:'
-                        }
-
-                        TextField {
-                            id: textName
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '名字'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '描述:'
-                        }
-
-                        TextArea {
-                            id: textDescription
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '描述'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '价格:'
+                        Button {
+                            Layout.preferredWidth: 30
+                            text: '<'
+                            onClicked: {
+                                --textLevel.text;
+                            }
                         }
 
                         TextField {
-                            id: textPrice
+                            id: textLevel
 
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
+                            horizontalAlignment: Label.AlignHCenter
                             text: '0'
-                            placeholderText: '价格'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-
-                    /*
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '类型:'
-                        }
-
-                        TextField {
-                            id: textType
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: '4'
-                            placeholderText: '类型'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-                    */
-
-                    /*RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@是否可叠加'
-                        }
-
-                        TextField {
-                            id: textStackable
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: 'true'
-                            placeholderText: '@是否可叠加'
-                            readOnly: true
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-                    */
-
-                    /*RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@战斗使用/投掷技能:'
-                        }
-
-                        TextField {
-                            id: textFight
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '@战斗使用/投掷技能'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
-
-                                $list.open({
-                                    Data: path,
-                                    OnClicked: (index, item)=>{
-                                        text = item;
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
+                            placeholderText: '级别'
+                            /*validator: RegExpValidator {
+                                regExp: /^[0-9]{2,6}$/
                             }
-                        }
-                    }*/
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@文字颜色:'
-                        }
-
-                        TextField {
-                            id: textColor
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: 'white'
-                            placeholderText: '@文字颜色'
-                            color: text
+                            */
+                            validator: IntValidator {bottom: 0; /*top: 999999;*/}
 
                             //selectByKeyboard: true
                             selectByMouse: true
                             //wrapMode: TextEdit.Wrap
 
-                            onPressAndHold: {
-                                let data = [['白', '红', '绿', '蓝', '黑', '灰', '黄'], ['white', 'red', 'green', 'blue', 'black', 'gray', 'yellow']]
-                                $list.open({
-                                    Data: data[0],
-                                    OnClicked: (index, item)=>{
-                                        text = data[1][index];
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@图像:'
-                        }
-
-                        TextField {
-                            id: textImage
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '@图像'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onPressAndHold: {
-                                $list.open({
-                                    Data: GameMakerGlobal.imageResourcePath(),
-                                    OnClicked: (index, item)=>{
-                                        text = item;
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
+                            onTextChanged: {
+                                let n = parseInt(text);
+                                if(isNaN(n) || n < 0)
+                                    n = 0;
+                                if(n > parseInt(textMaxLevel.text))
+                                    n = parseInt(textMaxLevel.text);
+                                text = n.toString();
                             }
                         }
 
-                        TextField {
-                            id: textImageWidth
-
-                            //Layout.fillWidth: true
+                        Button {
                             Layout.preferredWidth: 30
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: '50'
-                            placeholderText: '宽'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
+                            text: '>'
+                            onClicked: {
+                                ++textLevel.text;
+                            }
                         }
+
                         Label {
-                            //Layout.preferredWidth: 80
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            Layout.preferredWidth: 10
-
-                            text: '*'
-                            //font.pointSize: _config.nLabelFontSize
+                            text: '/'
                         }
-                        TextField {
-                            id: textImageHeight
 
-                            //Layout.fillWidth: true
-                            Layout.preferredWidth: 30
+                        TextField {
+                            id: textMaxLevel
+
+                            Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            text: '50'
-                            placeholderText: '高'
+                            horizontalAlignment: Label.AlignHCenter
+                            text: '99'
+                            placeholderText: '满级'
+                            /*validator: RegExpValidator {
+                                regExp: /^[0-9]{2,6}$/
+                            }
+                            */
+                            validator: IntValidator {bottom: 1; /*top: 999999;*/}
 
                             //selectByKeyboard: true
                             selectByMouse: true
                             //wrapMode: TextEdit.Wrap
-                        }
 
-                        Image {
-                            visible: source.length !== 0
-                            Layout.preferredWidth: 36
-                            Layout.preferredHeight: 36
-                            source: {
-                                if(textImage.text.length === 0)
-                                    return '';
-                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textImage.text)))
-                                    return '';
-                                return GameMakerGlobal.imageResourceURL(textImage.text);
+                            onTextChanged: {
+                                let n = parseInt(text);
+                                if(isNaN(n) || n < 1)
+                                    n = 1;
+                                text = n.toString();
                             }
                         }
                     }
 
-                    /*RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
+                    Label {
+                        Layout.preferredHeight: 10
+                        //Layout.fillWidth: true
+                        text: '<font color="red"><b>注意:0级可以作为每个级别的初始模板</b></font>'
+                        horizontalAlignment: Label.AlignHCenter
+                    }
 
-                        Label {
-                            text: '图像大小:'
+
+                    Item {
+                        Layout.preferredHeight: 1
+                    }
+
+                    Label {
+                        Layout.preferredHeight: 10
+                        Layout.fillWidth: true
+                        text: '<b>升级条件：</b>'
+                        horizontalAlignment: Label.AlignHCenter
+                    }
+
+                    ColumnLayout {
+                        //id: layoutEffectGroup
+
+                        Layout.fillWidth: true
+                        //Layout.fillHeight: true
+
+                        //spacing: 16
+
+
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '增加条件'
+
+                            onClicked: {
+                                let c = compCondition.createObject(layoutConditionLayout);
+                                _private.arrCacheComponent.push(c);
+
+                                $CommonLibJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@属性'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*值'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: layoutConditionLayout
+
+                            Layout.fillWidth: true
+                            //Layout.fillHeight: true
+
+                            spacing: 16
+
                         }
                     }
-                    */
+
+
+                    Item {
+                        Layout.preferredHeight: 1
+                    }
+
+                    Label {
+                        Layout.preferredHeight: 10
+                        Layout.fillWidth: true
+                        text: '<b>升级效果：</b>'
+                        horizontalAlignment: Label.AlignHCenter
+                    }
 
                     RowLayout {
                         id: layoutFightSkill
@@ -578,7 +592,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '@战斗技能:'
+                            text: '@习得技能:'
                         }
 
                         TextField {
@@ -588,134 +602,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: ''
-                            placeholderText: '@战斗技能'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
-
-                                $list.open({
-                                    Data: path,
-                                    OnClicked: (index, item)=>{
-                                        text = item;
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        id: layoutUseScript
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@使用函数:'
-                        }
-
-                        TextField {
-                            id: textUseScript
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '@使用函数'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onPressAndHold: {
-                                let data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gf[""]']];
-                                $list.open({
-                                    Data: data[0],
-                                    OnClicked: (index, item)=>{
-                                        text = data[1][index];
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        id: layoutPosition
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '*@装备位置:'
-                        }
-
-                        TextField {
-                            id: textPosition
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '*@装备位置'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onPressAndHold: {
-                                let data = ['头戴', '身穿', '武器', '鞋子'];
-                                $list.open({
-                                    Data: data,
-                                    OnClicked: (index, item)=>{
-                                        text = data[index];
-
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                    OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
-                                    },
-                                });
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        id: layoutSkills
-
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '@附加技能:'
-                        }
-
-                        TextField {
-                            id: textSkills
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '@附加技能'
+                            placeholderText: '@选择技能'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -741,77 +628,70 @@ Item {
                         }
                     }
 
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-
-                        Label {
-                            text: '额外属性:'
-                        }
-
-                        TextField {
-                            id: textExtraProperties
-
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                            text: ''
-                            placeholderText: '额外属性'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-                        }
-                    }
-
-
-                    Button {
-                        Layout.fillWidth: true
-
-                        text: '增加效果'
-
-                        onClicked: {
-                            let c = comp.createObject(layoutEffectsLayout);
-                            _private.arrCacheComponent.push(c);
-
-                            $CommonLibJS.setTimeout(function() {
-                                if(flickable.contentHeight > flickable.height)
-                                    flickable.contentY = flickable.contentHeight - flickable.height;
-                                }, 1, root, '');
-
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-
-                        Label {
-                            Layout.preferredWidth: 1
-                            Layout.fillWidth: true
-
-                            text: '*@属性'
-                            font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Orange)
-                        }
-                        Label {
-                            Layout.preferredWidth: 1
-                            Layout.fillWidth: true
-
-                            text: '*@效果值'
-                            font.pointSize: _config.nLabelFontSize
-                            color: Global.style.color(Global.style.Orange)
-                        }
-                    }
-
                     ColumnLayout {
-                        id: layoutEffectsLayout
+                        //id: layoutEffectGroup
 
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        //Layout.fillHeight: true
 
-                        spacing: 16
+                        //spacing: 16
 
+
+                        Button {
+                            Layout.fillWidth: true
+
+                            text: '增加效果'
+
+                            onClicked: {
+                                let c = compEffect.createObject(layoutEffectsLayout);
+                                _private.arrCacheComponent.push(c);
+
+                                $CommonLibJS.setTimeout(function() {
+                                    if(flickable.contentHeight > flickable.height)
+                                        flickable.contentY = flickable.contentHeight - flickable.height;
+                                    }, 1, root, '');
+
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@属性'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*@类型'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                            Label {
+                                Layout.preferredWidth: 1
+                                Layout.fillWidth: true
+
+                                text: '*值'
+                                font.pointSize: _config.nLabelFontSize
+                                color: Global.style.color(Global.style.Orange)
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: layoutEffectsLayout
+
+                            Layout.fillWidth: true
+                            //Layout.fillHeight: true
+
+                            spacing: 16
+
+                        }
                     }
                 }
             }
@@ -974,7 +854,7 @@ Item {
 
             for(let tt in data.Properties) {
                 let effectComp;
-                effectComp = comp.createObject(layoutEffectsLayout);
+                effectComp = compEffect.createObject(layoutEffectsLayout);
                 _private.arrCacheComponent.push(effectComp);
 
                 let propertyTextFields = $Frame.sl_findChild(effectComp, 'Property');

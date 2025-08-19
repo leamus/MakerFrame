@@ -115,7 +115,7 @@ Item {
             //console.debug('cfg', cfg);
             //loader.setSource('./MapEditor_1.qml', {});
 
-            loader.item.openSprite(cfg);
+            loader.item.openSprite(cfg, item);
         }
 
         onSg_removeClicked: {

@@ -72,7 +72,7 @@ Item {
             textArea.color: 'white'
             //textArea.color: Global.style.foreground
             //textArea.enabled: false
-            //textArea.readOnly: true
+            textArea.readOnly: true
 
             //textArea.selectByMouse: false
 

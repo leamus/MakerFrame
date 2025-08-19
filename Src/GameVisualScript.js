@@ -5,7 +5,7 @@
 console.debug('[GameVisualScriptJS]Loading');
 
 
-let data = (function() {
+const data = (function() {
 
     //命令格式加入 type和param（比如可以选择路径、可以选择一些参数）
     //数据格式加入 enable 和 yield
@@ -23,7 +23,7 @@ let data = (function() {
     //              输入类型：为0表示只给默认值（输入参数为默认值）；为1表示选择某目录下的文件夹，输入参数为目录路径；为2表示选择预选选项（输入参数为[[选项], [对应值], 默认值]）；为9表示固定值；
     //数据格式：
     //  [命令Key名, 额外设置（enabled为是否注释）, 参数值1, ...]
-    let commandsInfo = ({
+    const commandsInfo = ({
         '载入地图': {
             command: ['载入地图', 'yield game.loadmap({RID: %1, $name: %2, $scale: %3}, %4);', '载入一张地图', 0, true, 'red', 'white'],
             params: [
@@ -790,7 +790,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         },
     })
 
-    let groupsInfo = [
+    const groupsInfo = [
         ['游戏命令', 'white', ['载入地图', '场景缩放', '暂停游戏', '继续游戏', '延时', '游戏刷新率', '存档', '读档', '游戏结束']],
         ['交互', '#FF7DF3AA', ['信息', '多行文本信息', '菜单', '输入文本', '对话', '说话', ]],
         ['地图角色', 'yellowgreen', ['创建主角', '移动主角', '主角对象', '修改主角', '删除主角', '创建NPC', '移动NPC', 'NPC对象', '修改NPC', '删除NPC', ]],

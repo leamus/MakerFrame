@@ -1715,12 +1715,10 @@ function* $commonFightInitScript(teams, fightData) {
 
     if(fightData.$music === true) {
     }
-    else if($CommonLibJS.isString(fightData.$music)) {
-        game.pushmusic();
-        game.playmusic(fightData.$music);
-    }
     else {
         game.pushmusic();
+        if($CommonLibJS.isString(fightData.$music) && fightData.$music.trim().length > 0)
+            game.playmusic(fightData.$music);
     }
 
 
@@ -1940,9 +1938,6 @@ function* $commonFightEndScript(res, teams, fightData) {
 
 
     if(fightData.$music === true) {
-    }
-    else if($CommonLibJS.isString(fightData.$music)) {
-        game.popmusic();
     }
     else {
         game.popmusic();
