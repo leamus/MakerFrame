@@ -269,6 +269,7 @@ Item {
             console.debug('[mainGameTest]loaderGameScene:', source, status);
 
             if(status === Loader.Ready) {
+                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
                 _private.gameSceneClose();

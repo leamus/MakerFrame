@@ -173,11 +173,13 @@ Item {
 
 
 功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
-参数：forceRepaint表示是否强制重绘（为false时表示如果map与已载入的相同，则不重绘）；
+参数：
+  map：地图资源名，或对象（属性有RID、$name、$scale）；
+  flags：从右到左：是否强制重绘（如果map与已载入的相同，则不重绘）；是否清空所有npc；
   userData是用户传入数据，后期调用的钩子函数会传入；
 返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），携带值为地图信息；
 示例：yield game.loadmap('地图资源名');
-<font color='yellow'>yield game.loadmap(map, forceRepait=false, ...userData)</font>
+<font color='yellow'>yield game.loadmap(map, flags=0b10, ...userData)</font>
 
 功能：在屏幕中间显示提示信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：msg为提示文字，支持HTML标签；

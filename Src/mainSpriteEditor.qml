@@ -172,6 +172,7 @@ Item {
             console.debug('[mainSpriteEditor]loader:', source, status);
 
             if(status === Loader.Ready) {
+                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
                 setSource('');

@@ -2071,7 +2071,8 @@ function $fightCombatantMeleePositionAlgorithm(combatant, targetCombatant) {
 
     //x偏移（targetCombatant的左或右边）
     let tx = combatantComp.x < targetCombatantComp.x ? -combatantComp.width : combatantComp.width;
-    let position = combatantComp.mapFromItem(targetCombatantComp, tx, 0);
+    let ty = 0; //combatantComp.y < targetCombatantComp.y ? -combatantComp.height : combatantComp.height;
+    let position = combatantComp.mapFromItem(targetCombatantComp, tx, ty);
 
     return Qt.point(position.x + combatantComp.x, position.y + combatantComp.y);
 }

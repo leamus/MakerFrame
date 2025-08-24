@@ -54,44 +54,56 @@ Item {
 
     //开始播放动画
     function start() {
-        //console.debug('start:', animatedsprite.running, strSource)
+        //console.debug('start:', animatedsprite.running, strSource);
 
         if(_private.nState === 1)
         //if(animatedsprite.running)
             return;
 
+        if(nInterval <= 0) {
+            //animatedsprite.stop();
+            //timerInterval.stop();
+            return;
+        }
 
-        if(nType === 1 && soundeffect.playbackState === Audio.PausedState)
-            soundeffect.play();
 
         animatedsprite.start();
-
-        //if(strSoundeffectName)
-        //    timerSound.start();
-
         if(animatedsprite.frameCount === 1) {
             timerInterval.interval = nInterval;
             timerInterval.start();
         }
+
+        if(nType === 1 && soundeffect.playbackState === Audio.PausedState)
+            soundeffect.play();
+        //if(strSoundeffectName)
+        //    timerSound.start();
+
 
         _private.nState = 1;
     }
 
     //重新开始播放动画
     function restart() {
-        //console.debug('restart:', animatedsprite.running, strSource)
+        //console.debug('restart:', animatedsprite.running, strSource);
+
+        if(nInterval <= 0) {
+            animatedsprite.stop();
+            timerInterval.stop();
+            return;
+        }
+
+
         animatedsprite.restart();
-
-        if(nType === 1)
-            soundeffect.stop();
-
-        if(strSoundeffectName)
-            timerSound.restart();
-
         if(animatedsprite.frameCount === 1) {
             timerInterval.interval = nInterval;
             timerInterval.restart();
         }
+
+        if(nType === 1)
+            soundeffect.stop();
+        if(strSoundeffectName)
+            timerSound.restart();
+
 
         _private.nState = 1;
     }
@@ -409,6 +421,7 @@ Item {
     }
 
 
+    //如果帧数为1，则用这个timer来控制和发送信号
     Timer {
         id: timerInterval
 

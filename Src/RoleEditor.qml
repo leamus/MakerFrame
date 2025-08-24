@@ -2454,10 +2454,10 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
-            textRoleRID.text = textRoleRID.text.trim();
-            if(textRoleRID.text.length === 0) {
+            const ret = _private.checkExport();
+            if(ret !== true) {
                 //$Platform.sl_showToast('资源名不能为空');
-                textDialogMsg.text = '资源名不能为空';
+                textDialogMsg.text = ret;
                 open();
                 return;
             }
@@ -2901,6 +2901,13 @@ function $refresh(index, imageAnimate, path) {
             }
         }
 
+        function checkExport() {
+            textRoleRID.text = textRoleRID.text.trim();
+            if(textRoleRID.text.length === 0) {
+                return '资源名不能为空';
+            }
+            return true;
+        }
         //导出角色
         function exportRole() {
 
@@ -3142,6 +3149,14 @@ function $refresh(index, imageAnimate, path) {
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
+                    const ret = _private.checkExport();
+                    if(ret !== true) {
+                        //$Platform.sl_showToast('资源名不能为空');
+                        textDialogMsg.text = ret;
+                        dialogSaveRole.open();
+                        return;
+                    }
+
                     if(exportRole())
                         sg_close();
                     else {

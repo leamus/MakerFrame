@@ -51,32 +51,45 @@ Item {
 
     //开始播放动画
     function start() {
-        //console.debug('start:', animatedsprite.running, strSource)
+        //console.debug('start:', animatedsprite.running, strSource);
 
         if(_private.nState === 1)
         //if(timerInterval.running)
             return;
 
+        if(timerInterval.interval <= 0) {
+            //timerInterval.stop();
+            return;
+        }
 
-        if(nType === 1 && soundeffect.playbackState === Audio.PausedState)
-            soundeffect.play();
 
         if(_private.nState === 0)
             _private.init();
         timerInterval.start();
+
+        if(nType === 1 && soundeffect.playbackState === Audio.PausedState)
+            soundeffect.play();
+
 
         _private.nState = 1;
     }
 
     //重新开始播放动画
     function restart() {
-        //console.debug('restart:', animatedsprite.running, strSource)
+        //console.debug('restart:', animatedsprite.running, strSource);
+
+        if(timerInterval.interval <= 0) {
+            timerInterval.stop();
+            return;
+        }
+
 
         _private.init();
         timerInterval.restart();
 
         if(nType === 1)
             soundeffect.stop();
+
 
         _private.nState = 1;
     }

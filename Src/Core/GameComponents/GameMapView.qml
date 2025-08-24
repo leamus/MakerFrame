@@ -231,7 +231,7 @@ Item {
         }
         //如果地图小于等于场景，则将地图居中
         else {
-            itemContainer.x = parseInt((width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
+            itemContainer.x = parseInt((gameScene.width - itemContainer.width * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.x = 0;
         }
@@ -254,7 +254,7 @@ Item {
         }
         //如果地图小于等于场景，则将地图居中
         else {
-            itemContainer.y = parseInt((height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
+            itemContainer.y = parseInt((gameScene.height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
             //itemContainer.y = 0;
         }

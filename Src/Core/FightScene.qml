@@ -647,7 +647,12 @@ Item {
         }
 
 
-        //result：为undefined 发送 sg_fightOver 信号（调用release，比如关闭战斗画面等）；为true或对象则强制结束战斗；为null只是判断战斗是否结束；为其他值（0平1胜-1败-2逃跑）执行事件（事件中调用结束信号）；
+        //参数result：
+        //  为 undefined 发送 sg_fightOver 信号（调用release，比如关闭战斗画面等）；
+        //  为 true 或对象则强制结束战斗；
+        //  为 null 只是判断战斗是否结束（返回判断结果）；
+        //  为 其他值（0平1胜-1败-2逃跑） 结束战斗并执行事件（事件中调用结束信号）；
+        //  为 对象 则是 用户自定义的战斗结果（包括 exp、goods、money、result 属性）；
         //流程：手动或自动 游戏结束，调用依次FightSceneJS.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
         readonly property var over: function(result) {
             if(result === undefined) {
@@ -662,13 +667,12 @@ Item {
                 let fightResult = game.$sys.resources.commonScripts.$checkAllCombatants(fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
                 if(result !== null) {
                     fightResult.result = result;
-                    FightSceneJS.fightOver(fightResult);
+                    FightSceneJS.fightOver(fightResult, true);
                     return;
                 }
                 else
                     return fightResult;
             }
-
         }
 
 

@@ -1799,10 +1799,10 @@ Item {
         anchors.centerIn: parent
 
         onAccepted: {
-            textSpriteRID.text = textSpriteRID.text.trim();
-            if(textSpriteRID.text.length === 0) {
-                //$Platform.sl_showToast('名称不能为空');
-                textDialogMsg.text = '名称不能为空';
+            const ret = _private.checkExport();
+            if(ret !== true) {
+                //$Platform.sl_showToast('资源名不能为空');
+                textDialogMsg.text = ret;
                 open();
                 return;
             }
@@ -2192,6 +2192,13 @@ function $refresh(index, imageAnimate, path) {
             }
         }
 
+        function checkExport() {
+            textSpriteRID.text = textSpriteRID.text.trim();
+            if(textSpriteRID.text.length === 0) {
+                return '名称不能为空';
+            }
+            return true;
+        }
         //导出特效
         function exportSprite() {
 
@@ -2262,6 +2269,14 @@ function $refresh(index, imageAnimate, path) {
                 Msg: '退出前需要保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
+                    const ret = _private.checkExport();
+                    if(ret !== true) {
+                        //$Platform.sl_showToast('资源名不能为空');
+                        textDialogMsg.text = ret;
+                        dialogSaveSprite.open();
+                        return;
+                    }
+
                     if(exportSprite())
                         sg_close();
                     else {

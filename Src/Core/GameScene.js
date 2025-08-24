@@ -784,10 +784,8 @@ function getGoodsResource(item, forceLoad=false) {
     let path = $GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'goods.js');
 
     let ts = _private.jsLoader.load(path);
-    let info = ts.data;
-
     //写入
-    if(info) {
+    if(ts && ts.data) {
         _private.goodsResource[item] = ts.data;
         _private.goodsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.goods;
@@ -799,7 +797,7 @@ function getGoodsResource(item, forceLoad=false) {
             _private.goodsResource[item].__proto__ = _proto_;
 
         console.debug('[GameScene]getGoodsResource:', item);
-        return info;
+        return ts.data;
     }
 
     console.warn('[!GameScene]getGoodsResource ERROR:', item);
@@ -820,10 +818,8 @@ function getSkillResource(item, forceLoad=false) {
     let path = $GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_skill.js');
 
     let ts = _private.jsLoader.load(path);
-    let info = ts.data;
-
     //写入
-    if(info) {
+    if(ts && ts.data) {
         _private.skillsResource[item] = ts.data;
         _private.skillsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.skill;
@@ -835,7 +831,7 @@ function getSkillResource(item, forceLoad=false) {
             _private.skillsResource[item].__proto__ = _proto_;
 
         console.debug('[GameScene]getSkillResource:', item);
-        return info;
+        return ts.data;
     }
 
     console.warn('[!GameScene]getSkillResource ERROR:', item);
@@ -856,10 +852,8 @@ function getFightScriptResource(item, forceLoad=false) {
     let path = $GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_script.js');
 
     let ts = _private.jsLoader.load(path);
-    let info = ts.data;
-
     //写入
-    if(info) {
+    if(ts && ts.data) {
         _private.fightScriptsResource[item] = ts.data;
         _private.fightScriptsResource[item].$rid = item;
         let _proto_ = game.$sys.protoObjects.fightScript;
@@ -871,7 +865,7 @@ function getFightScriptResource(item, forceLoad=false) {
             _private.fightScriptsResource[item].__proto__ = _proto_;
 
         console.debug('[GameScene]getFightScriptResource:', item);
-        return info;
+        return ts.data;
     }
 
     console.warn('[!GameScene]getFightScriptResource ERROR:', item);
@@ -892,10 +886,8 @@ function getFightRoleResource(item, forceLoad=false) {
     let path = $GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_role.js');
 
     let ts = _private.jsLoader.load(path);
-    let info = ts.data;
-
     //写入
-    if(info) {
+    if(ts && ts.data) {
         //_private.fightRolesResource[item].$createData = ts.$createData;
         //_private.fightRolesResource[item].$commons = ts.$commons;
 
@@ -911,7 +903,7 @@ function getFightRoleResource(item, forceLoad=false) {
         }
 
         console.debug('[GameScene]getFightRoleResource:', item);
-        return info;
+        return ts.data;
     }
 
     console.warn('[!GameScene]getFightRoleResource ERROR:', item);
@@ -936,7 +928,6 @@ function getSpriteResource(item, forceLoad=false) {
     let info = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
     if(info)
         info = JSON.parse(info);
-
     //写入
     if(info) {
         _private.spritesResource[item] = info;
@@ -999,7 +990,6 @@ function getRoleResource(item, forceLoad=false) {
     let info = $Frame.sl_fileRead(roleDirPath + GameMakerGlobal.separator + 'role.json');
     if(info)
         info = JSON.parse(info);
-
     if(info) {
         _private.rolesResource[item] = info;
         _private.rolesResource[item].$rid = item;
@@ -1035,7 +1025,6 @@ function getMapResource(item, forceLoad=false) {
     let info = $Frame.sl_fileRead(mapDirPath + GameMakerGlobal.separator + 'map.json');
     if(info)
         info = JSON.parse(info);
-
     if(info) {
         _private.mapsResource[item] = info;
         _private.mapsResource[item].$rid = item;
@@ -1805,19 +1794,19 @@ function buttonAClicked() {
     switch(mainRole.direction()) {
     case 0:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.height / 3);
-        usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance, mainRole.width1, maxDistance);
+        usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y1 - maxDistance - 1, mainRole.width1, maxDistance);
         break;
     case 1:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.width / 3);
-        usePos = Qt.rect(mainRole.x + mainRole.x2, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
+        usePos = Qt.rect(mainRole.x + mainRole.x2 + maxDistance + 1, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     case 2:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.height / 3);
-        usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2, mainRole.width1, maxDistance);
+        usePos = Qt.rect(mainRole.x + mainRole.x1, mainRole.y + mainRole.y2 + maxDistance + 1, mainRole.width1, maxDistance);
         break;
     case 3:
         maxDistance = Math.ceil(itemViewPort.sizeMapBlockScaledSize.width / 3);
-        usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
+        usePos = Qt.rect(mainRole.x + mainRole.x1 - maxDistance - 1, mainRole.y + mainRole.y1, maxDistance, mainRole.height1);
         break;
     default:
         return -1;

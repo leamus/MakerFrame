@@ -1051,11 +1051,11 @@ Item {
                     text: '关于'
                     onClicked: {
                         if($Platform.compileType === 'debug') {
-                            _private.loadModule('mainAbout.qml');
+                            loader.loadModule('mainAbout.qml');
                             //userMainProject.source = 'mainAbout.qml';
                         }
                         else {
-                            _private.loadModule('mainAbout.qml');
+                            loader.loadModule('mainAbout.qml');
                             //userMainProject.source = 'mainAbout.qml';
                         }
                     }
@@ -1226,7 +1226,7 @@ Item {
             }
 
 
-            //_private.loadModule('');
+            //loader.loadModule('');
             _private.changeProject(item);
 
 
@@ -1314,7 +1314,62 @@ Item {
     Loader {
         id: loader
 
+
+        //载入模块
+        function loadModule(url, ...params) {
+            //console.debug('~~~loadModule:', url, params);
+
+
+            //if(url.length !== 0 && !checkCurrentProjectName())
+            //    return false;
+
+            //if(loader.status === Loader.Loading) {
+            //    console.warn('[!mainGameMaker]loader status is Loading');
+            //    return false;
+            //}
+
+
+            //loader.visible = true;
+            //loader.focus = true;
+            //loader.forceActiveFocus();
+
+
+            if(status === Loader.Loading) {
+                console.debug('[mainGameMaker]loadModule cache:', url);
+
+                vLoaderCache = url;
+            }
+            else {
+                console.debug('[mainGameMaker]loadModule:', url, params);
+
+
+                //clearComponentCache();
+                //trimComponentCache();
+
+
+                vInitParams = params;
+                if($CommonLibJS.isString(url)) //载入路径
+                    //source = url;
+                    setSource(url);
+                else //载入Component；注意QUrl类型也是 object
+                    sourceComponent = url;
+
+
+                /*if(loader.status === Loader.Ready) {
+                    if(loader.item.init)
+                        loader.item.init();
+
+                    console.debug('[mainGameMaker]Loader.Ready');
+                    //loader.item.forceActiveFocus();
+                }*/
+            }
+        }
+
+
         property var vInitParams: [] //调用init时给的参数
+
+        //Loader的status为Loading时先缓存起来，否则容易出问题（比如闪退）
+        property var vLoaderCache: null
 
         visible: false
         focus: true
@@ -1334,15 +1389,20 @@ Item {
 
             function onSg_close() {
                 //loader.source = '';
-                _private.loadModule('');
+                loader.loadModule('');
             }
         }
 
 
         onStatusChanged: {
-            console.debug('[mainGameMaker]loader:', source, status);
+            console.debug('[mainGameMaker]loader:', source, status, vLoaderCache);
 
             if(status === Loader.Ready) {
+                /*/~~~~~~注意：QML有个Bug（调用 clearComponentCache 后如果后面有 新创建的组件 访问根元素和其属性（不知单纯访问会不会）都会报警告！！！），所以必须让clearComponentCache放在最后执行（两个方法：1是使用runNextEventLoop，2是放在onLoaded最后）；
+                $CommonLibJS.runNextEventLoop(function() {
+                    $showBusyIndicator(false);
+                }, '$showBusyIndicator');
+                */
             }
             else if(status === Loader.Error) {
                 setSource('');
@@ -1361,6 +1421,16 @@ Item {
             if(status !== Loader.Loading) {
                 $clearComponentCache();
                 $trimComponentCache();
+
+
+                //要在下一个事件循环中改变，因为立即loadModule的话，onLoaded仍然会在后面调用，此时 item 已经不是之前的item了，所以先让onLoaded执行完再改loadModule；
+                $CommonLibJS.runNextEventLoop(function() {
+                    if(vLoaderCache) {
+                        const cache = vLoaderCache;
+                        vLoaderCache = null;
+                        loadModule(cache);
+                    }
+                }, 'Load vLoaderCache');
             }
         }
 
@@ -1554,44 +1624,6 @@ Item {
             return true;
         }
 
-        //载入模块
-        function loadModule(module, ...params) {
-            //console.debug('~~~loadModule:', module, params);
-
-
-            //if(module.length !== 0 && !checkCurrentProjectName())
-            //    return false;
-
-            //if(loader.status === Loader.Loading) {
-            //    console.warn('[!mainGameMaker]loader status is Loading');
-            //    return false;
-            //}
-
-
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-
-            loader.vInitParams = params;
-            if($CommonLibJS.isObject(module)) {
-                loader.sourceComponent = module;
-            }
-            else {
-                //loader.source = module;
-                loader.setSource(module);
-            }
-
-            /*if(loader.status === Loader.Ready) {
-                if(loader.item.init)
-                    loader.item.init();
-
-                console.debug('[mainGameMaker]Loader.Ready');
-                //loader.item.forceActiveFocus();
-            }*/
-
-            return true;
-        }
-
 
         //切换工程，转移和检查工程引擎变量
         function changeProject(newProject='', oldProject=null) {
@@ -1775,155 +1807,155 @@ Item {
 
         function mapEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainMapEditor.qml');
+                loader.loadModule('mainMapEditor.qml');
                 //userMainProject.source = 'mainMapEditor.qml';
             }
             else {
-                _private.loadModule('mainMapEditor.qml');
+                loader.loadModule('mainMapEditor.qml');
                 //userMainProject.source = 'mainMapEditor.qml';
             }
         }
         function roleEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainRoleEditor.qml');
+                loader.loadModule('mainRoleEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
             else {
-                _private.loadModule('mainRoleEditor.qml');
+                loader.loadModule('mainRoleEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
         }
         function spriteEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainSpriteEditor.qml');
+                loader.loadModule('mainSpriteEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
             else {
-                _private.loadModule('mainSpriteEditor.qml');
+                loader.loadModule('mainSpriteEditor.qml');
                 //userMainProject.source = 'eventMaker.qml';
             }
         }
         function goodsEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainGoodsEditor.qml');
+                loader.loadModule('mainGoodsEditor.qml');
                 //userMainProject.source = 'mainGoodsEditor.qml';
             }
             else {
-                _private.loadModule('mainGoodsEditor.qml');
+                loader.loadModule('mainGoodsEditor.qml');
                 //userMainProject.source = 'mainGoodsEditor.qml';
             }
         }
         function fightRoleEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainFightRoleEditor.qml');
+                loader.loadModule('mainFightRoleEditor.qml');
                 //userMainProject.source = 'mainFightRoleEditor.qml';
             }
             else {
-                _private.loadModule('mainFightRoleEditor.qml');
+                loader.loadModule('mainFightRoleEditor.qml');
                 //userMainProject.source = 'mainFightRoleEditor.qml';
             }
         }
         function fightSkillEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainFightSkillEditor.qml');
+                loader.loadModule('mainFightSkillEditor.qml');
                 //userMainProject.source = 'mainFightSkillEditor.qml';
             }
             else {
-                _private.loadModule('mainFightSkillEditor.qml');
+                loader.loadModule('mainFightSkillEditor.qml');
                 //userMainProject.source = 'mainFightSkillEditor.qml';
             }
         }
         function fightScriptEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainFightScriptEditor.qml');
+                loader.loadModule('mainFightScriptEditor.qml');
                 //userMainProject.source = 'mainFightScriptEditor.qml';
             }
             else {
-                _private.loadModule('mainFightScriptEditor.qml');
+                loader.loadModule('mainFightScriptEditor.qml');
                 //userMainProject.source = 'mainFightScriptEditor.qml';
             }
         }
         function startScriptEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('StartScriptEditor.qml');
+                loader.loadModule('StartScriptEditor.qml');
                 //userMainProject.source = 'StartScriptEditor.qml';
             }
             else {
-                _private.loadModule('StartScriptEditor.qml');
+                loader.loadModule('StartScriptEditor.qml');
                 //userMainProject.source = 'StartScriptEditor.qml';
             }
         }
         function commonScriptEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('CommonScriptEditor.qml');
+                loader.loadModule('CommonScriptEditor.qml');
                 //userMainProject.source = 'CommonScriptEditor.qml';
             }
             else {
-                _private.loadModule('CommonScriptEditor.qml');
+                loader.loadModule('CommonScriptEditor.qml');
                 //userMainProject.source = 'CommonScriptEditor.qml';
             }
         }
         function scriptEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule(compScriptEditor, {
+                loader.loadModule(compScriptEditor, {
                     BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName,
                     //RelativePath: '',
                     //ChoiceButton: 0b11,
                     //PathText: 0b11,
                     RunButton: 0b11,
                 });
-                //_private.loadModule('ScriptEditor.qml');
+                //loader.loadModule('ScriptEditor.qml');
                 //userMainProject.source = 'ScriptEditor.qml';
             }
             else {
-                _private.loadModule(compScriptEditor, {
+                loader.loadModule(compScriptEditor, {
                     BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName,
                     //RelativePath: '',
                     //ChoiceButton: 0b11,
                     //PathText: 0b11,
                     RunButton: 0b11,
                 });
-                //_private.loadModule('ScriptEditor.qml');
+                //loader.loadModule('ScriptEditor.qml');
                 //userMainProject.source = 'ScriptEditor.qml';
             }
         }
         function pluginsManage() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainPlugins.qml');
+                loader.loadModule('mainPlugins.qml');
                 //userMainProject.source = 'mainPlugins.qml';
             }
             else {
-                _private.loadModule('mainPlugins.qml');
+                loader.loadModule('mainPlugins.qml');
                 //userMainProject.source = 'mainPlugins.qml';
             }
         }
         function imageEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainImageEditor.qml');
+                loader.loadModule('mainImageEditor.qml');
                 //userMainProject.source = 'mainImageEditor.qml';
             }
             else {
-                _private.loadModule('mainImageEditor.qml');
+                loader.loadModule('mainImageEditor.qml');
                 //userMainProject.source = 'mainImageEditor.qml';
             }
         }
         function musicEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainMusicEditor.qml');
+                loader.loadModule('mainMusicEditor.qml');
                 //userMainProject.source = 'mainMusicEditor.qml';
             }
             else {
-                _private.loadModule('mainMusicEditor.qml');
+                loader.loadModule('mainMusicEditor.qml');
                 //userMainProject.source = 'mainMusicEditor.qml';
             }
         }
         function videoEditor() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainVideoEditor.qml');
+                loader.loadModule('mainVideoEditor.qml');
                 //userMainProject.source = 'mainVideoEditor.qml';
             }
             else {
-                _private.loadModule('mainVideoEditor.qml');
+                loader.loadModule('mainVideoEditor.qml');
                 //userMainProject.source = 'mainVideoEditor.qml';
             }
         }
@@ -1934,53 +1966,53 @@ Item {
 
         function pluginsManager() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('PluginsManager.qml');
+                loader.loadModule('PluginsManager.qml');
                 //userMainProject.source = 'PluginsManager.qml';
             }
             else {
-                _private.loadModule('PluginsManager.qml');
+                loader.loadModule('PluginsManager.qml');
                 //userMainProject.source = 'PluginsManager.qml';
             }
         }
 
         function pluginsDownload() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('PluginsDownload.qml');
+                loader.loadModule('PluginsDownload.qml');
                 //userMainProject.source = 'PluginsDownload.qml';
             }
             else {
-                _private.loadModule('PluginsDownload.qml');
+                loader.loadModule('PluginsDownload.qml');
                 //userMainProject.source = 'PluginsDownload.qml';
             }
         }
 
         function gameStart() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('Core/GameScene.qml');
+                loader.loadModule('Core/GameScene.qml');
                 //userMainProject.source = 'Core/GameScene.qml';
             }
             else {
-                _private.loadModule('Core/GameScene.qml');
+                loader.loadModule('Core/GameScene.qml');
                 //userMainProject.source = 'Core/GameScene.qml';
             }
         }
         function gameTest() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainGameTest.qml');
+                loader.loadModule('mainGameTest.qml');
                 //userMainProject.source = 'mainGameTest.qml';
             }
             else {
-                _private.loadModule('mainGameTest.qml');
+                loader.loadModule('mainGameTest.qml');
                 //userMainProject.source = 'mainGameTest.qml';
             }
         }
         function gamePackage() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainPackage.qml');
+                loader.loadModule('mainPackage.qml');
                 //userMainProject.source = 'mainPackage.qml';
             }
             else {
-                _private.loadModule('mainPackage.qml');
+                loader.loadModule('mainPackage.qml');
                 //userMainProject.source = 'mainPackage.qml';
             }
         }
@@ -2150,31 +2182,31 @@ Item {
 
         function tutorial() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainTutorial.qml');
+                loader.loadModule('mainTutorial.qml');
                 //userMainProject.source = 'mainTutorial.qml';
             }
             else {
-                _private.loadModule('mainTutorial.qml');
+                loader.loadModule('mainTutorial.qml');
                 //userMainProject.source = 'mainTutorial.qml';
             }
         }
         function agreement() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainAgreement.qml');
+                loader.loadModule('mainAgreement.qml');
                 //userMainProject.source = 'mainAgreement.qml';
             }
             else {
-                _private.loadModule('mainAgreement.qml');
+                loader.loadModule('mainAgreement.qml');
                 //userMainProject.source = 'mainAgreement.qml';
             }
         }
         function updateLog() {
             if($Platform.compileType === 'debug') {
-                _private.loadModule('mainUpdateLog.qml');
+                loader.loadModule('mainUpdateLog.qml');
                 //userMainProject.source = 'mainUpdateLog.qml';
             }
             else {
-                _private.loadModule('mainUpdateLog.qml');
+                loader.loadModule('mainUpdateLog.qml');
                 //userMainProject.source = 'mainUpdateLog.qml';
             }
         }

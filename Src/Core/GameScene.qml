@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.14
 import QtGraphicalEffects 1.0
 import QtMultimedia 5.14
 import Qt.labs.settings 1.1
+//import QtTest 1.14
 
 
 //引入Qt定义的类
@@ -595,11 +596,21 @@ Item {
     property QtObject game: QtObject {
 
         //功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
-        //参数：forceRepaint表示是否强制重绘（为false时表示如果map与已载入的相同，则不重绘）；
-        //  userData是用户传入数据，后期调用的钩子函数会传入；
+        //参数：
+        //  map：地图资源名，或对象（属性有RID、$name、$scale）；
+        //  flags：从右到左：是否强制重绘（如果map与已载入的相同，则不重绘）；是否清空所有npc；
+        //  userData：用户传入数据，后期调用的钩子函数会传入；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
         //示例：yield game.loadmap('地图资源名')；
-        function loadmap(map, forceRepaint=false, ...userData) {
+        function loadmap(map, flags=0b10, ...userData) {
+            if(flags === true) //兼容旧代码forceRepaint
+                flags = 0b11;
+            else if(!$CommonLibJS.isValidNumber(flags))
+                flags = 0b10;
+            else
+                flags = parseInt(flags);
+            const forceRepaint = !!(flags & 0b1);
+
             //let _resolve, _reject;
 
             //！如果使用生成器方式，则将 resolve 和 reject 删除即可，再用return返回数据；
@@ -661,7 +672,8 @@ Item {
                     }
                     _private.objTmpMapComponents = {};
 
-                    game.delrole(-1);
+                    if(flags & 0b10)
+                        game.delrole(-1);
 
                     _private.objTimers = {};
 
@@ -2332,6 +2344,8 @@ Item {
                 if(count > 0 && goods.$count === undefined)
                     goods.$count = count;
                 goods = GameSceneJS.getGoodsObject(goods, false);
+                if(!goods)
+                    return null;
 
                 if(!goods.$count)
                     goods.$count = 0;
@@ -2343,6 +2357,8 @@ Item {
             }
             else if($CommonLibJS.isString(goods)) { //如果直接是字符串
                 goods = GameSceneJS.getGoodsObject(goods, count > 0 ? {$count: count} : undefined);
+                if(!goods)
+                    return null;
 
                 if(!goods.$count)
                     goods.$count = 0;
@@ -4381,10 +4397,11 @@ Item {
 
         //将场景缩放n倍；可以是小数。
         readonly property var scale: function(n) {
-            itemViewPort.gameScene.scale = parseFloat(n);
-            setSceneToRole();
-
-            game.gd['$sys_scale'] = parseFloat(n);
+            if($CommonLibJS.isValidNumber(n)) {
+                game.gd['$sys_scale'] = itemViewPort.gameScene.scale = parseFloat(n);
+                setSceneToRole();
+            }
+            return game.gd['$sys_scale'];
         }
 
         //场景跟随某个角色 或 自由移动
@@ -4416,7 +4433,7 @@ Item {
 
         //暂停游戏。
         readonly property var pause: function(name='$user_pause', times=1) {
-            if(name === undefined || name === null)
+            if(name === false || name === null)
                 return !$CommonLibJS.objectIsEmpty(_private.config.objPauseNames);
             if(name === true)
                 return _private.config.objPauseNames;
@@ -4461,6 +4478,8 @@ Item {
             if(name === true) {
                 _private.config.objPauseNames = {};
             }
+            else if(name === false || name === null)
+                return $CommonLibJS.objectIsEmpty(_private.config.objPauseNames);
             else {
                 if(_private.config.objPauseNames[name]) {
                     if(times > 0)
@@ -4846,7 +4865,7 @@ Item {
 
                         //地图
                         if(game.gd['$sys_map'].$rid)
-                            yield game.loadmap(game.gd['$sys_map'].$rid, null, true);
+                            yield game.loadmap(game.gd['$sys_map'].$rid, /*true*/);
 
 
                         //载入afterLoad脚本
@@ -5291,7 +5310,7 @@ Item {
         }*/
 
 
-        //系统 数据 和 函数（一般特殊需求）
+        //系统 数据 和 函数（特殊需要）
         readonly property var $sys: ({
             release: release,
             init: _init,
@@ -9164,6 +9183,10 @@ Item {
     }
     Keys.onSpacePressed: {
         event.accepted = true;
+
+        if(game.pause(null))
+            $Frame.sl_simulatedMouseClick(game.$sys.screen.width / 2, game.$sys.screen.height / 2);
+        console.debug('[GameScene]Space Key');
     }
 
 

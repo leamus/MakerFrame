@@ -30,7 +30,7 @@ const data = (function() {
                 ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
                 ['地图名', 'string', undefined, 0, '', 'darkgreen'],
                 ['缩放倍数', 'number', undefined, 0, '', 'blue'],
-                ['是否重绘', 'bool', 'false', 0, '', 'blue'],
+                ['flags', 'number', '0b10', 0, '', 'blue'],
                 ['载入一张地图（长按编辑框可选择）。', 'label'],
             ],
         },
