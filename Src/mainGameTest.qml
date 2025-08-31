@@ -359,6 +359,9 @@ Item {
 
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor

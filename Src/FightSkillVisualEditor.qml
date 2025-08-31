@@ -38,7 +38,7 @@ Item {
         _private.jsLoader.clear();
     }
 
-    signal sg_compile(string code);
+    signal sg_compile(var result);
 
 
     function init(filePath) {
@@ -46,6 +46,8 @@ Item {
             _private.filepath = filePath;
         _private.loadData();
     }
+
+    readonly property var compile: _private.compile
 
 
     anchors.fill: parent
@@ -135,7 +137,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[选择Buff类型]', '毒','乱','封','眠','攻','防','速','灵','幸'],
+                        let data = [['[选择Buff类型]', '毒(0)','乱(1)','封(2)','眠(3)','攻击(4)','防御(5)','速度(6)','灵力(7)','幸运(8)'],
                                     ['', 0,1,2,3,4,5,6,7,8]];
 
                         $list.open({
@@ -404,7 +406,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[倍率参考对象]', '本人','对方'],
+                        let data = [['[倍率参考对象]', '本人(0)','对方(1)'],
                                     ['', '0','1']];
 
                         $list.open({
@@ -439,7 +441,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（装备后）','二段血（装备后）','三段血（装备后）','一段MP（装备后）','二段MP（装备后）','攻击（装备后）','防御（装备后）','速度（装备后）','幸运（装备后）','灵力（装备后）'],
+                        let data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（增益后）','二段血（增益后）','三段血（增益后）','一段MP（增益后）','二段MP（增益后）','攻击（增益后）','防御（增益后）','速度（增益后）','幸运（增益后）','灵力（增益后）'],
                                     ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
 
                         $list.open({
@@ -708,7 +710,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['己方', '对方'],
+                                let data = [['己方(1)', '对方(2)'],
                                             ['1', '2']];
 
                                 $list.open({
@@ -750,7 +752,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['单体', '全体'],
+                                let data = [['单体(1)', '全体(-1)'],
                                             ['1', '-1']];
 
                                 $list.open({
@@ -803,7 +805,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '额外属性:'
+                            text: '额外数据:'
                         }
 
                         TextField {
@@ -813,7 +815,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: ''
-                            placeholderText: '额外属性'
+                            placeholderText: '额外数据'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1267,14 +1269,9 @@ Item {
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
-                    let jsScript = _private.compile();
-                    if(jsScript === false)
+                    const result = _private.compileAndShowResult();
+                    if(result[0] === false)
                         return;
-
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
-                    root.sg_compile(jsScript[1]);
-
-                    console.debug('[FightSkillVisualEditor]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
@@ -1633,8 +1630,8 @@ Item {
         }
 
 
-        //编译（结果为字符串）
-        function compile() {
+        //编译（结果为数组：[code, 编译结果, 错误]）
+        function compile(checkResult=true) {
             let bCheck = true;
             do {
                 let typeTextFields = $Frame.sl_findChildren(layoutBuff, 'Type');
@@ -1688,21 +1685,7 @@ Item {
                 }
             } while(0);
             if(!bCheck) {
-                $dialog.show({
-                    Msg: '有必填项没有完成',
-                    Buttons: Dialog.Yes,
-                    OnAccepted: function() {
-                        //root.forceActiveFocus();
-                    },
-                    OnRejected: ()=>{
-                        //root.forceActiveFocus();
-                    },
-                    /*OnDiscarded: ()=>{
-                        $dialog.close();
-                        //root.forceActiveFocus();
-                    },*/
-                });
-                return false;
+                return [false, null, new Error('有必填项没有完成')];
             }
 
 
@@ -1797,17 +1780,15 @@ Item {
                             props += `effect = targetCombatant.${treferenceproperty} * ${tvalue};\r\n`;
                         props += `targetCombatant.$properties.${teffectproperty} += effect;\r\n`;
                         //props += `game.addprops(targetCombatant, {'${tarr[0]}': ${tvalue}}, 2);`;
-                        props += `yield ({Type: 30, Interval: 300, Color: 'red', Text: effect, FontSize: 20, Combatant: targetCombatant, Position: undefined});\r\n`;
                         props += `yield ({Type: 1});\r\n`;
-                        props += '\r\n';
+                        props += `yield ({Type: 30, Interval: 300, Color: 'red', Text: effect, FontSize: 20, Combatant: targetCombatant, Position: undefined});\r\n`;
                     }
                     else {
                         //let tvalue = (tarr[1] === '0' ? `[${tvalue}]` : `[${tarr[1]}, ${tvalue}]`);
                         //props += `game.addprops(targetCombatant, {'${teffectproperty}': ${tvalue}});`;
                         props += `targetCombatant.$properties.${teffectproperty} += ${tvalue};\r\n`;
-                        props += `yield ({Type: 30, Interval: 300, Color: 'red', Text: '${tvalue}', FontSize: 20, Combatant: targetCombatant, Position: undefined});`;
-                        props += `yield ({Type: 1});`;
-                        props += '\r\n';
+                        props += `yield ({Type: 1});\r\n`;
+                        props += `yield ({Type: 30, Interval: 300, Color: 'red', Text: '${tvalue}', FontSize: 20, Combatant: targetCombatant, Position: undefined});\r\n`;
                     }
                 }
                 playScript = $CommonLibJS.replaceAll(playScript, '$$addprops$$', props);
@@ -1950,11 +1931,36 @@ Item {
 
 
             try {
-                eval(data);
+                if(checkResult)
+                    eval(data);
             }
             catch(e) {
+                return [-1, data, e];
+            }
+
+            return [true, data, null];
+        }
+
+        function compileAndShowResult() {
+            const result = _private.compile(true);
+            let errorMsg;
+
+            console.debug('[FightSkillVisualEditor]compile:', _private.filepath, result);
+
+            switch(result[0]) {
+            case true:
+                break;
+            case false:
+                errorMsg = result[2].toString();
+                break;
+            case -1:
+            default:
+                errorMsg = '错误：' + result[2].toString() + '<BR>请检查各参数';
+            }
+
+            if(errorMsg)
                 $dialog.show({
-                    Msg: '错误：' + e.toString() + '<BR>请检查各参数',
+                    Msg: errorMsg,
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //root.forceActiveFocus();
@@ -1967,30 +1973,30 @@ Item {
                         //root.forceActiveFocus();
                     },*/
                 });
-                return [false, data];
-            }
 
-            return [true, data];
+            if(result[1] !== null)
+                //let ret = $Frame.sl_fileWrite(result, _private.filepath + '.js', 0);
+                root.sg_compile(result[1]);
+
+            return result;
         }
+
 
         function close() {
             $dialog.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    let jsScript = _private.compile();
-                    if(jsScript === false)
+                    const result = _private.compileAndShowResult();
+                    if(result[0] === false)
                         return;
-
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
-                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
-                    if(jsScript[0])
+                    if(result[0])
                         sg_close();
 
-                    ///root.forceActiveFocus();
+                    //root.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     sg_close();
@@ -2145,7 +2151,8 @@ $$check$$
             //kill 特效，1次，等待播放结束，特效ID，对方和位置
             yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, ID: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
             //效果，Skill：KillType：
-            SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
+            //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
+            SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
             effect = SkillEffectResult.shift().HP;
             game.addprops(targetCombatant, {'HP': [-effect[0], -effect[1]]});
             //刷新人物信息
@@ -2192,7 +2199,8 @@ $$check$$
                 if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
                 //Params：传递给通用算法的参数
-                SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
+                //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
+                SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
                 effect = SkillEffectResult.shift().HP;
                 game.addprops(targetCombatant, {'HP': [-effect[0], -effect[1]]});
                 yield ({Type: 1});

@@ -266,9 +266,8 @@ Item {
             enemyCount = fight.fightScript.$enemyCount;   //如果是数字
         }
 
-        fight.enemies.length = enemyCount;
-
-        for(let i = 0; i < fight.enemies.length; ++i) {
+        //fight.enemies.length = enemyCount;
+        for(let i = 0; i < enemyCount; ++i) {
             let tIndex;
             if(enemyRandom) //随机
                 tIndex = $CommonLibJS.random(0, fight.fightScript.$enemiesData.length);
@@ -276,7 +275,9 @@ Item {
                 tIndex = i % fight.fightScript.$enemiesData.length;
 
             //创建敌人
-            fight.enemies[i] = game.$sys.getFightRoleObject(fight.fightScript.$enemiesData[tIndex], true);
+            const enemy = game.$sys.getFightRoleObject(fight.fightScript.$enemiesData[tIndex], true);
+            if(enemy)
+                fight.enemies.push(enemy);
 
             //从 propertiesWithExtra 设置人物的 HP和MP
             //fight.run(function() {
@@ -610,7 +611,7 @@ Item {
         //params是给战斗脚本$createData的参数；
         //会覆盖之前的fighton；
         function fighton(fightScript, probability=5, interval=1000, flag=0b11) {
-            game.gd['$sys_random_fight'] = [fightScript, probability, flag, interval];
+            game.gd['$sys_random_fight'] = [fightScript, probability, interval, flag];
 
             game.deltimer('$sys_random_fight_timer', true);
             game.addtimer('$sys_random_fight_timer', interval, -1, 0b11);

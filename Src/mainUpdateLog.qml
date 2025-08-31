@@ -154,15 +154,15 @@ Item {
     C表示Bug修复或新增功能，完全兼容旧工程；
 
 2025/2/9：发布 1.15.3.250209 版本（框架 1.6.6.250209版本）
-1、增加：底层加入加载Qt插件（可以用Qt插件和QML插件来扩展功能了）；
-2、增加：各种字符转换函数；
+1、新增：底层加入加载Qt插件（可以用Qt插件和QML插件来扩展功能了）；
+2、新增：各种字符转换函数；
 *3、修改：修改函数名 loadSpriteEffect 为 getSpriteEffect，unloadSpriteEffect 为 putSpriteEffect，loadRole 为 createRole；
 4、修改：将SCodes、QNanoPainter、Libhv、SerialPort、QZXing、Lua、SDL、QtWebAPP改为Qt插件，框架引擎不再依赖它们，可以热插拔使用；
-5、增加：给 异步 增加$context（上下文）和$defer（结束时回调函数）功能；
-6、增加：QML-Push库；
-7、增加：应用程序的一些相关函数；
-8、增加：关闭音效game.stopsoundeffect函数；
-9、增加：game.showimage和game.showsprite的坐标功能；
+5、新增：给 异步 增加$context（上下文）和$defer（结束时回调函数）功能；
+6、新增：QML-Push库；
+7、新增：应用程序的一些相关函数；
+8、新增：关闭音效game.stopsoundeffect函数；
+9、新增：game.showimage和game.showsprite的坐标功能；
 10、增强：sl_fileRead和sl_fileWrite二进制读写功能；
 11、增强：game.usegoods功能；
 **12、修改：game.usegoods、game.equip、game.unload的实现流程和方式（所有道具脚本的$equipScript需要修改）；
@@ -216,14 +216,14 @@ Item {
 **60、修改：game.loadmap参数修改（2、3参数互换位置，且userData改为...参数），对应的回调函数 $beforeLoadmap 和 $afterLoadmap 改为 map（对象）和 ...userData；
 61、修复：起始脚本可视化编辑start函数并编译后重复套start的Bug；
 *62、修改：$Global.$sys的属性名；
-63、增加：示例下载列表和多个示例工程；
+63、新增：示例下载列表和多个示例工程；
 64、修改：在线插件文件组织方式；
 65、修复：彻底修复Menu和Dialog的坑导致的focus不对的问题（各种绕过。。。）；
 66、修复：$CommonLibJS.isQtObjectDestroyed函数返回值相反的Bug；
 67、修复：游戏测试的一些Bugs；
 68、修复：game.delsprite和game.delimage直接给组件时不会删除的Bug；
 69、修复：地图编辑器的2个Bugs（1是无法在退出对话框时输出png；2是新建地图在退出对话框中会保存错误）；
-70、增加：项目根目录增加 ~Cache 文件夹，用来临时保存地图输出和插件下载；
+70、新增：项目根目录新增 ~Cache 文件夹，用来临时保存地图输出和插件下载；
 71、修复：修复和增强game.showimage、game.delimage、game.showsprite、game.delsprite的一些问题和功能；
 72、修改：把itemRootScaled修改为FocusScope类型，并将$list组件放入它的焦点作用域，防止使用rootWindow下的组件时焦点混乱；
 73、新增：树莓派（RaspberryPi Arm64 bookworm）平台包；
@@ -241,7 +241,14 @@ Item {
 85、修复：fight.over强制退出无效的问题；
 86、新增：模拟鼠标相关函数；
 87、新增：QGuiApplication和QApplication相关函数；
-88、其他：优化调整很多代码和细节，修复一些Bugs；
+88、修复：读档后无法遇敌（两个变量保存反了）；
+89、优化：战斗加载不存在的战斗角色时不会再卡死，而是跳过；
+90、新增：按Enter键可以控制game.msg和game.talk组件；
+91、修复：脚本编辑器无法保存的Bug；
+92、修复：HP、MP恢复会超上限的问题；
+93、新增：一键编译所有可视化；
+94、优化：删除C++大量遗留无用代码；
+95、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；
@@ -282,7 +289,7 @@ Item {
 2024/12/12：发布 1.13.11.241212 版本（框架 1.6.2.241212版本）
 1、修复：Win 下拖动qml文件到鹰歌，鹰歌一直忙碌的问题；
 2、修复：无法读取可视化js插件的问题；
-3、增加：常用媒体播放（包含图片、音乐和视频，win下可拖到鹰歌窗口，安卓可直接打开）；
+3、新增：常用媒体播放（包含图片、音乐和视频，win下可拖到鹰歌窗口，安卓可直接打开）；
 4、修改：教程界面和分类；
 5、修改：优化rcc命令底层的反打包；
 6、修复：game.run使用数组（兼容旧代码）时无效的Bug；
@@ -290,18 +297,18 @@ Item {
 8、其他：优化很多代码、调整很多小细节、修复一些Bugs；
 
 2024/11/19：发布 1.13.10.241119 版本（Updater 1.5.16.241119版本，框架 1.6.1.241119版本）
-1、增加：封装了Libhv的HTTPServer来实现简单的HTTP服务器；
-2、增加：QWebApp库（后期再封装）；
-3、增加：QextSerialPort串口库；
+1、新增：封装了Libhv的HTTPServer来实现简单的HTTP服务器；
+2、新增：QWebApp库（后期再封装）；
+3、新增：QextSerialPort串口库；
 **4、修改：将TapSDK更新到v4最新版（GameMakerGlobal.qml中也多了tds_ClientToken属性必须设置），实名认证函数也有变化，且旧游戏需要Tap后台提工单升级SDK版本；
 5、修改：TapAD更新到最新版；
 6、新增：安卓端最新支持 能使用文件管理器选择鹰歌打开任何文件（可以作为万能播放器使用），QML文件默认直接运行；
 7、新增：安卓端最新支持 能使用Scheme URL（比如用链接来传递数据）；
 8、新增：安卓端最新支持 能分享到鹰歌来进一步处理；
 9、修复：Updater升级检测时文件本地版本如果大于远程则死循环的Bug；
-10、增加：Windows系统托盘图标；
+10、新增：Windows系统托盘图标；
 11、修复：QML的Loader的一个Bug（Loading时如果调用sl_clearComponentCache会有概率闪退的坑）；
-12、增加：安卓的很多路径函数；
+12、新增：安卓的很多路径函数；
 13、修复：下载文件失败后没有删除文件的问题（0字节）；
 14、修改：调整game.playsoundeffect函数的参数；
 15、修改：更新所有三方库到最新版；
@@ -326,7 +333,7 @@ Item {
 2024/10/10：发布 1.13.7.241010 版本（Updater 1.5.15.241010版本，框架 1.5.1.241010版本）
 1、增强：game.run的功能；
 2、修复：可视化的协程命令的错误；
-3、增加：摇杆方向的图片替换；
+3、新增：摇杆方向的图片替换；
 4、修复：脚本编辑器的一些小问题；
 5、修复：战斗人物准备显示问题 和 背包道具的使用和装备Bug；
 6、优化：重构并整理优化Java代码（将大部分扩展代码移动到了Module中，供热更新修改方便）；
@@ -337,7 +344,7 @@ Item {
 11、其他：优化代码、修复一些Bugs；
 
 2024/9/29：发布 1.13.6.240929 版本
-1、增加：Windows下打包安卓的功能；
+1、新增：Windows下打包安卓的功能；
 2、修复：队列中运行exitGame报错问题；
 *3、优化：getgoods函数；
 4、其他：优化代码、修复很多Bugs；
@@ -346,7 +353,7 @@ Item {
 1、修改：将AsyncScriptQueue改名为ScriptQueue；
 2、修改：优化背包、交易内的道具列表样式；
 **3、修改：通用脚本的$showGoodsName实现；
-4、增加：异步脚本AsyncScript类，增加waitAll函数等待所有生成器执行完毕；
+4、新增：异步脚本AsyncScript类，增加waitAll函数等待所有生成器执行完毕；
 5、修复：常年来的一个Bug，QML会释放CPP的QObject及子类对象的问题（Qt的坑）；
 6、修复：角色编辑器 中 p按钮播放错误的问题；
 7、修复：角色的动作使用特效（特效为序列图片文件时）的路径错误；
@@ -354,10 +361,10 @@ Item {
 9、修改：控制广告点击频率，增加广告调试参数；
 10、优化：角色的数据结构和一些实现；
 11、修复：如果退出错误时会导致后续工作没有进行（比如恢复旋转屏幕）；
-12、增加：增加角色的名字文本风格设置；
+12、新增：增加角色的名字文本风格设置；
 *13、修改：角色的说话风格配置放在$role配置里；
 14、修改：游戏退出时，游戏的所有释放代码会按正常流程走（之前是所有yield强制返回），解决了游戏退出时有可能需要一些IO等待的需求；
-15、增加：通用脚本增加自定义按键事件处理函数；
+15、新增：通用脚本增加自定义按键事件处理函数；
 16、其他：优化代码、修复很多Bugs；
 
 2024/8/30：发布 1.13.4.240830 版本（框架 1.4.4.240830版本）
@@ -365,14 +372,14 @@ Item {
 2、修复：导入工程时工程文件夹名缺少问题；
 3、修复：一些 枚举 没有注册到 QML 的问题；
 *4、增强：game.role、game.hero 的搜索对象功能；
-*5、增加：战斗人物、道具、技能 的 $id，默认为$rid（参数为字符串时）或 $rid + 随机字符（参数为对象时），且字符串搜索时按$id；
-6、增加：game.playsoundeffect(soundeffectName, channel=-1)命令，可以异步调用；
+*5、新增：战斗人物、道具、技能 的 $id，默认为$rid（参数为字符串时）或 $rid + 随机字符（参数为对象时），且字符串搜索时按$id；
+6、新增：game.playsoundeffect(soundeffectName, channel=-1)命令，可以异步调用；
 *7、增强：game.pausesoundeffect、game.resumesoundeffect命令，使之支持单个音频channel的暂停和继续；
 8、修改：创建音频播放通道（目前9个），将所有待播放音频，根据规则放入到这9个通道中播放；
 9、增强：广告插件函数改为可异步写法；
 10、增强：异步脚本队列和异步脚本对函数和生成器的运行方式不同（函数和生成器函数会在下一个事件循环中运行，而生成器是立即运行）；
 **11、修改：game.msg的style参数去掉Type，用MinWidth、MaxWidth、MinHeight、MaxHeight取代；
-12、增加：game.talk的style参数增加MinHeight、MaxHeight；
+12、新增：game.talk的style参数增加MinHeight、MaxHeight；
 13、修复：一个严重的bug，缓存的特效信号会无限连接函数；
 14、修复：战斗结束后组件没有清除的问题；
 15、修改：Cache缓存对象，create返回为数组（对象和是否新建的标记）；
@@ -380,8 +387,8 @@ Item {
 17、修复：第10条增强带来的坑（比如退出存档错误）；
 18、修改：广告代码中的用户自定义Data改为CustomData；
 19、修改：Request函数参数增加CustomData属性，返回对象会带着它（$customData）；
-20、增加：网络时间获取插件（的Promise.race使用3个api来获取）；
-21、增加：内核增加我设计的线程池机制；
+20、新增：网络时间获取插件（的Promise.race使用3个api来获取）；
+21、新增：内核增加我设计的线程池机制；
 22、两种方式实现了 多线程池的JS脚本（QtConcurrent和QThread，前者方便和WorkerScript差不多；后者基于我设计的线程池，功能更多，可以控制线程，比如等待、强制结束）；
 23、其他：优化代码、修复Bugs；
 
@@ -402,7 +409,7 @@ Item {
 2024/7/29：发布 1.13.2.240729 版本（框架 1.4.2.240729版本）
 1、*修改：将game.playvideo也改为可异步；
 2、**修改：将 game.loadmap、game.usegoods、game.load、game.gameover、game.plugin、game.save 修改为 yield 即可（统一用法），剩下的init和release不常用就不改了；
-3、增加：由于XMLHttpRequest不能设置Cookies、User-Agent等头，所以用Qt的QNetworkAccessManager、QNetworkRequest、QNetworkReply封装了一个网络访问函数request，用法和之前的一样；
+3、新增：由于XMLHttpRequest不能设置Cookies、User-Agent等头，所以用Qt的QNetworkAccessManager、QNetworkRequest、QNetworkReply封装了一个网络访问函数request，用法和之前的一样；
 4、修改：角色编辑器 中头像，宽高如果或为0，则隐藏；
 5、修改：插件管理 和 插件下载，返回主插件页面时刷新；
 6、其他：修复和优化很多代码；
@@ -416,14 +423,14 @@ Item {
 6、修改：将 msg、talk、menu、input 4种组件，改为多次调用多次创建的方式，互不影响（以前只有msg和menu是这样）；
 7、修复：交易无法关闭菜单Bug、定时器事件触发时变量名写错Bug、GameMenu有个组件名写错Bug；
 8、增强：游戏 读档和退出 时资源释放机制（各游戏组件释放会调用回调函数、定时器释放后会停止并触发）；
-9、增加：引擎可以将qrc打包为rcc资源，也可以解包；
+9、新增：引擎可以将qrc打包为rcc资源，也可以解包；
 **10、将底层提供的槽函数（sl_开头）和信号（sg_开头）全部严格按标准重命名了，使用FrameManager和Platform的系统函数要注意改一下了！
 11、优化：很多代码；
 
 2024/7/16：发布 1.12.4.240716 版本
 1、修改：增强 loadSpriteEffect和loadRole 函数功能；
 2、修改：调整 特效的 序列图片文件 和 经典行列图 的数据，且兼容了旧数据；
-3、增加：request函数来使用HTTP服务，自动识别Data，可根据数据大小来决定是否压缩；
+3、新增：request函数来使用HTTP服务，自动识别Data，可根据数据大小来决定是否压缩；
 4、修改：将Async改名为AsyncScriptQueue；
 5、新增：重新设计了一套非常好用、类似await async语法和用法的机制，不用放在异步脚本队列里就直接可以运行的异步脚本（asyncScript）；
 6、修改：将 6+1个带yield的命令（msg、talk、menu、input、window、trade、wait）修改为兼容新增加的异步脚本机制，方法为：a、将这6+1个命令的最后一个参数callback设置为0即可；b、或者命令名+1（比如game.msg1），参数与原函数完全相同；
@@ -570,7 +577,7 @@ Item {
 2024/4/22：发布 1.10.1.240422 版本
 1、修复game.equip装备位置的一个Bug；
 2、调整增强 角色、特效 编辑器；
-3、增加 道具、战斗角色、战斗脚本、技能 的额外属性；
+3、增加 道具、战斗角色、战斗脚本、技能 的可视化的额外数据；
 *4、调整 可视化指令 显示特效 和 显示图片；
 5、修复可视化编译的一个Bug；
 6、增强game.talk功能；

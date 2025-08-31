@@ -662,7 +662,7 @@ function $Combatant(fightRoleRID, showName) {
 
         //战斗选择
         $choice: {
-            $type: -1,  //选择的类型（主要是这个来判断!!）。0，；1，休息；2，道具；3，技能；4，（逃跑）；-1为没选择；-2为随机选择普通攻击（倒序开始）
+            $type: -1,  //选择的类型（主要是这个来判断!!）。0为休息；1为防御；2为道具；3为技能；4为逃跑；-1为没选择；-2为随机选择普通攻击（倒序开始）
             $attack: undefined, //攻击选择的技能或道具    //（-1为获得普通攻击（倒序），-2为休息，undefined为没选择）
             $targets: undefined, //技能的每个选择步骤值数组，值类型：战斗人物数组[FightRole]或-1（全部）；菜单选项下标；
         },
@@ -906,6 +906,13 @@ function levelUp(combatant, level=0, refresh=true) {
 //计算 combatant 装备后的属性 并返回
 //$equipEffectAlgorithm为某道具装备脚本
 function computeCombatantPropertiesWithExtra(combatant) {
+    //越界调整
+    (combatant.$properties.HP[1] > combatant.$properties.HP[2]) ? combatant.$properties.HP[1] = combatant.$properties.HP[2] : null;
+    (combatant.$properties.HP[0] > combatant.$properties.HP[1]) ? combatant.$properties.HP[0] = combatant.$properties.HP[1] : null;
+    (combatant.$properties.MP[0] > combatant.$properties.MP[1]) ? combatant.$properties.MP[0] = combatant.$properties.MP[1] : null;
+
+
+
     //累加装备、Buff后的属性
     combatant.$$propertiesWithExtra = $CommonLibJS.deepCopyObject(combatant.$properties);
 
@@ -1318,7 +1325,7 @@ function getBuff(combatant, buffCode, params={}) {
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffScript: function*(combatant, objBuff) {
-                $fightCombatantSetChoice(combatant, 1, false);
+                $fightCombatantSetChoice(combatant, 0, false);
                 ///combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
 
@@ -1384,7 +1391,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 0:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 1, false);
+            $fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1394,7 +1401,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 1:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 1, false);
+            $fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1404,7 +1411,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 2:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 1, false);
+            $fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1414,7 +1421,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 3:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 1, false);
+            $fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -2035,7 +2042,8 @@ function $fightCombatantMeleePositionAlgorithm(combatant, targetCombatant) {
 
     //x偏移（targetCombatant的左或右边）
     let tx = combatantComp.x < targetCombatantComp.x ? -combatantComp.width : combatantComp.width;
-    let position = combatantComp.mapFromItem(targetCombatantComp, tx, 0);
+    let ty = 0; //combatantComp.y < targetCombatantComp.y ? -combatantComp.height : combatantComp.height;
+    let position = combatantComp.mapFromItem(targetCombatantComp, tx, ty);
 
     return Qt.point(position.x + combatantComp.x, position.y + combatantComp.y);
 }
@@ -2055,23 +2063,15 @@ function $fightSkillMeleePositionAlgorithm(combatant, spriteEffect) {
 function $fightCombatantSetChoice(combatant, type, bSaveLast) {
     switch(type) {
     case -1:    //未选择
-        combatant.$$fightData.$choice.$type = -1;
+    case 0:     //休息
+    case 1:     //防御
+    default:
+        combatant.$$fightData.$choice.$type = type;
         combatant.$$fightData.$choice.$attack = undefined;
         combatant.$$fightData.$choice.$targets = undefined;
         if(bSaveLast) {
             //fight.$sys.saveLast(combatant);
-            combatant.$$fightData.$lastChoice.$type = -1;
-            combatant.$$fightData.$lastChoice.$attack = undefined;
-            combatant.$$fightData.$lastChoice.$targets = undefined;
-        }
-        break;
-    case 1:     //休息
-        combatant.$$fightData.$choice.$type = 1;
-        combatant.$$fightData.$choice.$attack = undefined;
-        combatant.$$fightData.$choice.$targets = undefined;
-        if(bSaveLast) {
-            //fight.$sys.saveLast(combatant);
-            combatant.$$fightData.$lastChoice.$type = 1;
+            combatant.$$fightData.$lastChoice.$type = type;
             combatant.$$fightData.$lastChoice.$attack = undefined;
             combatant.$$fightData.$lastChoice.$targets = undefined;
         }
@@ -2099,7 +2099,7 @@ var $fightMenus = {
         function(combatantIndex) {
             let combatant = fight.myCombatants[combatantIndex];
 
-            $fightCombatantSetChoice(combatant, 1, true);
+            $fightCombatantSetChoice(combatant, 0, true);
             ///combatant.$$fightData.$choice.$type = 1;
             //combatant.$$fightData.$choice.$attack = undefined;
             //combatant.$$fightData.$choice.$targets = undefined;
@@ -2237,6 +2237,8 @@ function $readSavesInfo(count=3) {
         visible: true
         focus: true
         anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
 
         strTitle: '游戏通用算法脚本'

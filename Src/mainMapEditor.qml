@@ -58,109 +58,75 @@ Item {
     }
 
 
-    L_List {
-        id: l_listMaps
+    ColumnLayout {
+        anchors.fill: parent
 
-        //visible: false
-
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
-
-
-        onSg_canceled: {
-            //visible = false;
-            //loader.visible = true;
-            //root.focus = true;
-            //root.forceActiveFocus();
-            //loader.item.focus = true;
-            sg_close();
+        L_List {
+            id: l_listMaps
+    
+            //visible: false
+            //anchors.fill: parent
+            //width: parent.width
+            //height: parent.height
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+    
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
+    
+    
+            onSg_canceled: {
+                //visible = false;
+                //loader.visible = true;
+                //root.focus = true;
+                //root.forceActiveFocus();
+                //loader.item.focus = true;
+                sg_close();
+            }
+    
+            onSg_clicked: {
+                _private.openItem(item);
+            }
+    
+            onSg_removeClicked: {
+                if(index === 0) {
+                    return;
+                }
+    
+    
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
+    
+                $dialog.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Yes | Dialog.Cancel,
+                    OnAccepted: ()=>{
+                        console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
+                        removeItem(index);
+    
+                        //l_listMaps.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //l_listMaps.forceActiveFocus();
+                    },
+                });
+            }
         }
 
-        onSg_clicked: {
-            //if(!loader.item)
-            //    return false;
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
 
-            //if(index === 0) {
-            /*if(item === '..') {
-                visible = false;
-                return;
-            }*/
+            Button {
+                id: buttonCreate
 
+                //Layout.preferredWidth: 60
 
-            //visible = false;
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.item.focus = true;
-            //root.focus = true;
-            //root.forceActiveFocus();
-
-
-            textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.enabled = true;
-
-            if(index === 0) {
-                dialogMapData.nCreateMapType = 1;
-                dialogMapData.open();
-                dialogMapData.forceActiveFocus();
-
-                _private.strMapRID = '';
-
-                return;
+                text: '新建'
+                onClicked: {
+                    _private.openItem(null);
+                }
             }
-            else
-                _private.strMapRID = item;
-
-
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
-            //let cfg = File.read(filePath);
-            let cfg = $Frame.sl_fileRead(filePath);
-            //console.debug('[mainMapEditor]filePath：', filePath);
-
-            if(!cfg)
-                return false;
-            cfg = JSON.parse(cfg);
-            //console.debug('cfg', cfg);
-            //loader.setSource('./MapEditor.qml', {});
-            //loader.item.openMap(cfg);
-
-
-            dialogMapData.nCreateMapType = 2;
-
-            dialogMapData.mapData = cfg;
-
-            textMapWidth.text = cfg.MapSize[0];
-            textMapHeight.text = cfg.MapSize[1];
-            textBlockWidth.text = cfg.MapBlockSize[0];
-            textBlockHeight.text = cfg.MapBlockSize[1];
-            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
-            textMapBlockResourceName.text = cfg.MapBlockImage[0];
-            //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
-
-            dialogMapData.open();
-            dialogMapData.forceActiveFocus();
-        }
-
-        onSg_removeClicked: {
-            if(index === 0) {
-                return;
-            }
-
-
-            let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
-
-            $dialog.show({
-                Msg: '确认删除 <font color="red">' + item + '</font> ？',
-                Buttons: Dialog.Yes | Dialog.Cancel,
-                OnAccepted: ()=>{
-                    console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                    removeItem(index);
-
-                    //l_listMaps.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    //l_listMaps.forceActiveFocus();
-                },
-            });
         }
     }
 
@@ -508,6 +474,9 @@ Item {
         id: l_listMapBlockResource
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
@@ -875,9 +844,9 @@ Item {
             //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
 
             //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
-            let list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00)
-            list.unshift('【新建地图】');
-            l_listMaps.removeButtonVisible = {0: false, '-1': true};
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //list.unshift('【新建地图】');
+            //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
@@ -885,6 +854,71 @@ Item {
             //console.debug('path:', $GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
             //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
             //console.debug('path:', Qt.resolvedUrl($GlobalJS._FixLocalPath_W($Platform.externalDataPath)));
+        }
+
+        function openItem(item) {
+            //if(!loader.item)
+            //    return false;
+
+            //if(index === 0) {
+            /*if(item === '..') {
+                visible = false;
+                return;
+            }*/
+
+
+            textMapBlockImageURL.enabled = false;
+            textMapBlockResourceName.enabled = true;
+
+            if(!item) {
+                dialogMapData.nCreateMapType = 1;
+                dialogMapData.open();
+                dialogMapData.forceActiveFocus();
+
+                _private.strMapRID = '';
+
+                //return;
+            }
+            else {
+                _private.strMapRID = item;
+
+
+                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
+                //let cfg = File.read(filePath);
+                let cfg = $Frame.sl_fileRead(filePath);
+                //console.debug('[mainMapEditor]filePath：', filePath);
+
+                if(!cfg)
+                    return false;
+                cfg = JSON.parse(cfg);
+                //console.debug('cfg', cfg);
+                //loader.setSource('./MapEditor.qml', {});
+                //loader.item.openMap(cfg);
+
+
+                dialogMapData.nCreateMapType = 2;
+
+                dialogMapData.mapData = cfg;
+
+                textMapWidth.text = cfg.MapSize[0];
+                textMapHeight.text = cfg.MapSize[1];
+                textBlockWidth.text = cfg.MapBlockSize[0];
+                textBlockHeight.text = cfg.MapBlockSize[1];
+                textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
+                textMapBlockResourceName.text = cfg.MapBlockImage[0];
+                //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
+
+                dialogMapData.open();
+                dialogMapData.forceActiveFocus();
+            }
+
+
+            //visible = false;
+            //loader.visible = true;
+            //loader.focus = true;
+            //loader.item.focus = true;
+            //root.focus = true;
+            //root.forceActiveFocus();
         }
     }
 

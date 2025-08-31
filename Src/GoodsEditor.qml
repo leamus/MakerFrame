@@ -402,8 +402,8 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            function onSg_compile(code) {
-                notepadGoodsScript.setPlainText(code);
+            function onSg_compile(result) {
+                notepadGoodsScript.setPlainText(result);
                 notepadGoodsScript.toBegin();
             }
         }

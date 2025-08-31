@@ -179,7 +179,7 @@ function* loadResources() {
         }
     };*/
 
-    //摇杆 配置
+    //摇杆 配置（使用 game.$sys.getCommonScriptResource(''); 也可）
     //const joystickDefaultConfig = $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$joystick');
     const joystickDefaultConfig = $GameMakerGlobalJS.$config.$joystick;
     const joystickConfig = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$joystick'), joystickDefaultConfig);
@@ -304,26 +304,27 @@ function* loadResources() {
 
 
 
+    //下面函数使用game.$sys.getCommonScriptResource('');也可
     game.$sys.protoObjects.fightRole = $CommonLibJS.shortCircuit(0b1111,
         $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$fightRole'),
         //$CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$protoObjects', '$fightRole'),
         $GameMakerGlobalJS.$config.$protoObjects.$fightRole,
-        );
+    );
     game.$sys.protoObjects.goods = $CommonLibJS.shortCircuit(0b1111,
         $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$goods'),
         //$CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$protoObjects', '$goods'),
         $GameMakerGlobalJS.$config.$protoObjects.$goods,
-        );
+    );
     game.$sys.protoObjects.skill = $CommonLibJS.shortCircuit(0b1111,
         $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$skill'),
         //$CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$protoObjects', '$skill'),
         $GameMakerGlobalJS.$config.$protoObjects.$skill,
-        );
+    );
     game.$sys.protoObjects.fightScript = $CommonLibJS.shortCircuit(0b1111,
         $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$protoObjects', '$fightScript'),
         //$CommonLibJS.getObjectValue($GameMakerGlobalJS, '$config', '$protoObjects', '$fightScript'),
         $GameMakerGlobalJS.$config.$protoObjects.$fightScript,
-        );
+    );
 
 
 
@@ -765,7 +766,9 @@ function* unloadResources() {
 
 
 //返回 通用脚本中的某个函数或变量，如果没有则返回系统的
+//  与 game.$sys.resources.commonScripts 的区别：函数可以返回前者不存在的对象下级属性
 function getCommonScriptResource(...names) {
+    //return $CommonLibJS.getObjectValue(_private.objCommonScripts, ...names); //这个可能返回不了 对象下一层的值（因为_private.objCommonScripts是覆盖的，所以比如$config只能返回$userscript的）
     return $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, ...names), $CommonLibJS.getObjectValue($GameMakerGlobalJS, ...names));
 }
 
@@ -1778,6 +1781,30 @@ function openMap(map, forceRepaint=false) {
 
 function buttonAClicked() {
     console.debug('[GameScene]buttonAClicked');
+
+
+    //检测所有游戏组件
+    //over:
+    for(let i in _private.arrGameComponents) {
+        switch(_private.arrGameComponents[i].objectName) {
+        case 'RoleMessage':
+        case 'GameMessage':
+            _private.arrGameComponents[i].clicked();
+            //break over;
+            return;
+        case 'GameMenu':
+        case 'GameInput':
+        default:
+            break;
+        }
+    }
+
+
+    //检测 主角非操作状态 或 游戏暂停
+    if(mainRole.$$nActionType === -1 ||
+            !$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
+        return;
+
 
     let bScriptQueueIsEmpty = _private.scriptQueue.isEmpty();
 

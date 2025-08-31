@@ -328,7 +328,6 @@ let data = (function() {
 
 
     FightRoleVisualEditor {
-
         id: fightRoleVisualEditor
 
         anchors.fill: parent
@@ -346,8 +345,8 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            function onSg_compile(code) {
-                notepadFightRoleProperty.setPlainText(code);
+            function onSg_compile(result) {
+                notepadFightRoleProperty.setPlainText(result);
                 notepadFightRoleProperty.toBegin();
             }
         }

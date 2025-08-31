@@ -58,84 +58,106 @@ Item {
     }
 
 
-    L_List {
-        id: l_listFightRole
+    ColumnLayout {
+        anchors.fill: parent
 
-        //visible: false
+        L_List {
+            id: l_listFightRole
 
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
+            //visible: false
+            //anchors.fill: parent
+            //width: parent.width
+            //height: parent.height
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
-
-        onSg_canceled: {
-            //visible = false;
-            //loader.visible = true;
-            //root.focus = true;
-            //root.forceActiveFocus();
-            //loader.item.focus = true;
-            sg_close();
-        }
-
-        onSg_clicked: {
-            if(!loader.item)
-                return false;
-
-            //if(item === '..') {
-            //    $list.visible = false;
-            //    return;
-            //}
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
 
 
-            //visible = false;
-            loader.visible = true;
-            //loader.focus = true;
-            loader.forceActiveFocus();
-            //loader.item.focus = true;
-            loader.item.forceActiveFocus();
-
-
-            if(index === 0) {
-                loader.item.init();
-
-                return;
+            onSg_canceled: {
+                //visible = false;
+                //loader.visible = true;
+                //root.focus = true;
+                //root.forceActiveFocus();
+                //loader.item.focus = true;
+                sg_close();
             }
 
-
-            /*
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_role.json';
-
-            console.debug('[mainFightRoleEditor]filePath：', filePath);
-
-            //let cfg = File.read(filePath);
-            let cfg = $Frame.sl_fileRead(filePath);
-
-            if(cfg) {
-                cfg = JSON.parse(cfg);
-                //console.debug('cfg', cfg);
-                //loader.setSource('./MapEditor_1.qml', {});
-                loader.item.openFightRole(cfg);
+            onSg_clicked: {
+                _private.openItem(item);
             }
-            */
 
-            loader.item.init(item);
+            onSg_removeClicked: {
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item;
+
+                $dialog.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        console.debug('[mainFightRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
+                        removeItem(index);
+
+                        //l_listFightRole.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //l_listFightRole.forceActiveFocus();
+                    },
+                });
+            }
         }
 
-        onSg_removeClicked: {
-            let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item;
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
 
-            $dialog.show({
-                Msg: '确认删除 <font color="red">' + item + '</font> ？',
-                Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function() {
-                    console.debug('[mainFightRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                    removeItem(index);
+            Button {
+                id: buttonCreate
 
-                    //l_listFightRole.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    //l_listFightRole.forceActiveFocus();
-                },
-            });
+                //Layout.preferredWidth: 60
+
+                text: '新建'
+                onClicked: {
+                    _private.openItem(null);
+                }
+            }
+
+            Button {
+                id: buttonCompileAll
+
+                //Layout.preferredWidth: 60
+
+                text: '编译全部可视化'
+                onClicked: {
+                    $dialog.show({
+                        Msg: '确定编译全部可视化？<BR>注意：该操作会覆盖所有目标脚本，且不可逆！',
+                        Buttons: Dialog.Ok | Dialog.Cancel,
+                        OnAccepted: function() {
+                            //l_listFightRole.forceActiveFocus();
+                            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+                            for(let tn of list) {
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + tn + GameMakerGlobal.separator;
+                                if(!$Frame.sl_fileExists(path + 'fight_role.vjs')) {
+                                    console.info('[mainFightRoleEditor]没有可视化文件:', tn);
+                                    continue;
+                                }
+
+                                fightRoleVisualEditor.init(path + 'fight_role.vjs');
+                                const result = fightRoleVisualEditor.compile(false);
+                                console.debug('[mainFightRoleEditor]result:', result);
+                                if(result[1])
+                                    $Frame.sl_fileWrite(result[1], path + 'fight_role.js', 0);
+                                else
+                                    console.warn('[!mainFightRoleEditor]ERROR:', result[2].toString());
+                            }
+                        },
+                        OnRejected: ()=>{
+                            //l_listFightRole.forceActiveFocus();
+                        },
+                    });
+                }
+            }
         }
     }
 
@@ -224,6 +246,33 @@ Item {
     }
 
 
+    FightRoleVisualEditor {
+        id: fightRoleVisualEditor
+
+        anchors.fill: parent
+
+        visible: false
+
+        /*
+        Connections {
+            target: fightRoleVisualEditor
+            //忽略没有的信号
+            ignoreUnknownSignals: true
+
+            function onSg_close() {
+                fightRoleVisualEditor.visible = false;
+
+                root.forceActiveFocus();
+            }
+
+            function onSg_compile(result) {
+                console.debug('', result);
+            }
+        }
+        */
+    }
+
+
 
     //配置
     QtObject {
@@ -234,11 +283,56 @@ Item {
         id: _private
 
         function refresh() {
-            let list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00)
-            list.unshift('【新建战斗角色】');
-            l_listFightRole.removeButtonVisible = {0: false, '-1': true};
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //list.unshift('【新建战斗角色】');
+            //l_listFightRole.removeButtonVisible = {0: false, '-1': true};
             l_listFightRole.show(list);
 
+        }
+
+        function openItem(item) {
+            if(!loader.item)
+                return false;
+
+            //if(item === '..') {
+            //    $list.visible = false;
+            //    return;
+            //}
+
+
+            /*if(index === 0) {
+                item = null;
+            }
+            else if(index === 1) {
+            }
+            */
+
+
+            /*
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_role.json';
+
+            console.debug('[mainFightRoleEditor]filePath：', filePath);
+
+            //let cfg = File.read(filePath);
+            let cfg = $Frame.sl_fileRead(filePath);
+
+            if(cfg) {
+                cfg = JSON.parse(cfg);
+                //console.debug('cfg', cfg);
+                //loader.setSource('./MapEditor_1.qml', {});
+                loader.item.openFightRole(cfg);
+            }
+            */
+
+            loader.item.init(item);
+
+
+            //visible = false;
+            loader.visible = true;
+            //loader.focus = true;
+            loader.forceActiveFocus();
+            //loader.item.focus = true;
+            loader.item.forceActiveFocus();
         }
     }
 

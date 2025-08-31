@@ -128,7 +128,8 @@ let data = (function() {
             //kill 特效，1次，等待播放结束，特效ID，对方和位置
             yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'Kill1', Combatant: targetCombatant, Position: 1});
             //效果，Skill：KillType：
-            SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
+            //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
+            SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
             harm = SkillEffectResult.shift().HP;
             game.addprops(targetCombatant, {'HP': [-harm[0], -harm[1]]});
             //刷新人物信息
@@ -144,7 +145,8 @@ let data = (function() {
                 yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant, Target: targetCombatant});
                 yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'Kill2', Combatant: targetCombatant, Position: 1});
 
-                SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {Skill: 1}});
+                //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
+                SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
                 harm = SkillEffectResult.shift().HP;
                 game.addprops(targetCombatant, {'HP': [-harm[0], -harm[1]]});
                 //刷新人物信息
@@ -406,8 +408,8 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            function onSg_compile(code) {
-                notepadFightSkillScript.setPlainText(code);
+            function onSg_compile(result) {
+                notepadFightSkillScript.setPlainText(result);
                 notepadFightSkillScript.toBegin();
             }
         }

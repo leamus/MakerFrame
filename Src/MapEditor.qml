@@ -2960,6 +2960,8 @@ Item {
 
         visible: false
         anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
 
         strTitle: `${_private.strMapRID}(${textMapName.text.trim()})(地图脚本)`

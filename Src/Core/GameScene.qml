@@ -2276,7 +2276,7 @@ Item {
         //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
         //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
         //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
-        //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties，1为propertiesWithExtra）；
+        //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
         //  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
         //  成功返回战斗角色对象；失败返回false；
         readonly property var addprops: function(fighthero, props={}, type=[1,1], flags=0b11) {
@@ -2297,7 +2297,7 @@ Item {
             //参考属性（乘以比例时的参考属性）
             let properties2;
             if($CommonLibJS.isNumber(type)) {
-                properties2 = fighthero.$$propertiesWithExtra;
+                properties2 = fighthero.$properties; //fighthero.$$propertiesWithExtra;
             }
             else {
                 if(type[1] === 1)
@@ -4447,14 +4447,18 @@ Item {
 
             //暂停所有人物动作
             for(let tr in _private.arrMainRoles) {
-                let role = _private.arrMainRoles[tr];
-                role.$props.$$running_backup = role.sprite.sprite.bRunning;
-                role.sprite.sprite.bRunning = false;
+                const role = _private.arrMainRoles[tr];
+                if(role.$props.$$running_backup === undefined) {
+                    role.$props.$$running_backup = role.sprite.sprite.bRunning;
+                    role.sprite.sprite.bRunning = false;
+                }
             }
             for(let tr in _private.objRoles) {
-                let role = _private.objRoles[tr];
-                role.$props.$$running_backup = role.sprite.sprite.bRunning;
-                role.sprite.sprite.bRunning = false;
+                const role = _private.objRoles[tr];
+                if(role.$props.$$running_backup === undefined) {
+                    role.$props.$$running_backup = role.sprite.sprite.bRunning;
+                    role.sprite.sprite.bRunning = false;
+                }
             }
 
             if(_private.config.objPauseNames[name] > 0) {
@@ -4499,18 +4503,22 @@ Item {
             if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 timer.start();
                 //_private.config.bPauseGame = false;
-            }
 
-            //恢复所有人物动作
-            for(let tr in _private.arrMainRoles) {
-                let role = _private.arrMainRoles[tr];
-                if(role.$props.$$running_backup)
-                    role.sprite.sprite.bRunning = role.$props.$$running_backup;
-            }
-            for(let tr in _private.objRoles) {
-                let role = _private.objRoles[tr];
-                if(role.$props.$$running_backup)
-                    role.sprite.sprite.bRunning = role.$props.$$running_backup;
+                //恢复所有人物动作
+                for(let tr in _private.arrMainRoles) {
+                    const role = _private.arrMainRoles[tr];
+                    if(role.$props.$$running_backup !== undefined) {
+                        role.sprite.sprite.bRunning = role.$props.$$running_backup;
+                        delete role.$props.$$running_backup;
+                    }
+                }
+                for(let tr in _private.objRoles) {
+                    const role = _private.objRoles[tr];
+                    if(role.$props.$$running_backup !== undefined) {
+                        role.sprite.sprite.bRunning = role.$props.$$running_backup;
+                        delete role.$props.$$running_backup;
+                    }
+                }
             }
 
             //joystick.enabled = true;
@@ -5468,13 +5476,14 @@ Item {
 
             readonly property var map: [itemViewPort.canvasBackMap, itemViewPort.canvasFrontMap]
 
+            readonly property alias components: _private.arrGameComponents
             readonly property alias msgs: itemGameMsgs
             readonly property alias talks: itemRoleMsgs
             readonly property alias menus: itemGameMenus
             readonly property alias inputs: itemGameInputs
-            readonly property alias buttons: itemButtons
-
             readonly property alias waitTimers: itemWaitTimers
+
+            readonly property alias buttons: itemButtons
 
             readonly property alias trade: dialogTrade
             readonly property alias window: gameMenuWindow
@@ -6934,8 +6943,8 @@ Item {
 
         property var objCommonScripts: ({})     //系统 和 用户 合并后的 通用脚本（用户脚本优先，没有的使用 GameMakerGlobal.js，注意只包含函数和var变量，不包含let/const变量）；
 
-        //所有插件脚本
-        property var objPlugins: ({})
+        property var objPlugins: ({}) //所有插件脚本
+        property var arrGameComponents: [] //存储所有游戏组件（4种：GameMsg、RoleMsg、GameMenu、GameInput）
 
         //JS引擎，用来载入外部JS文件
         readonly property var jsLoader: new $GlobalJS.JSLoader(rootGameScene)
@@ -7327,6 +7336,7 @@ Item {
 
         Item {
             id: rootRoleMsg
+            objectName: 'RoleMessage'
 
 
 
@@ -7446,8 +7456,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = $GameMakerGlobalJS.$config.$styles.$talk;
-                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk') || styleSystem;
+                const styleSystem = $GameMakerGlobalJS.$config.$styles.$talk;
+                const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$talk') || styleSystem;
                 let tn;
 
 
@@ -7629,9 +7639,18 @@ Item {
 
 
             Component.onCompleted: {
+                _private.arrGameComponents.unshift(this);
             }
             Component.onDestruction: {
                 //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
+
+
+                for(let i in _private.arrGameComponents) {
+                    if(_private.arrGameComponents[i] === this) {
+                        delete _private.arrGameComponents[i];
+                        break;
+                    }
+                }
             }
         }
     }
@@ -7642,6 +7661,7 @@ Item {
 
         Item {
             id: rootGameMsgDialog
+            objectName: 'GameMessage'
 
 
             //signal accepted();
@@ -7727,14 +7747,12 @@ Item {
 
 
                 //样式
-                if(style === undefined || style === null)
+                if(!style)
                     style = {};
                 else if($CommonLibJS.isValidNumber(style))
                     style = {};
-
-
-                let styleSystem = $GameMakerGlobalJS.$config.$styles.$msg;
-                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$msg') || styleSystem;
+                const styleSystem = $GameMakerGlobalJS.$config.$styles.$msg;
+                const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$msg') || styleSystem;
                 let tn;
 
                 messageGame.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -7912,9 +7930,18 @@ Item {
 
 
             Component.onCompleted: {
+                _private.arrGameComponents.unshift(this);
             }
             Component.onDestruction: {
                 //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
+
+
+                for(let i in _private.arrGameComponents) {
+                    if(_private.arrGameComponents[i] === this) {
+                        delete _private.arrGameComponents[i];
+                        break;
+                    }
+                }
             }
         }
     }
@@ -7925,6 +7952,7 @@ Item {
 
         Item {
             id: rootGameMenu
+            objectName: 'GameMenu'
 
 
             function over(index=-2) {
@@ -7987,8 +8015,8 @@ Item {
                 //样式
                 if(!style)
                     style = {};
-                let styleSystem = $GameMakerGlobalJS.$config.$styles.$menu;
-                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$menu') || styleSystem;
+                const styleSystem = $GameMakerGlobalJS.$config.$styles.$menu;
+                const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$menu') || styleSystem;
                 let tn;
 
                 maskMenu.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
@@ -8098,9 +8126,18 @@ Item {
 
 
             Component.onCompleted: {
+                _private.arrGameComponents.unshift(this);
             }
             Component.onDestruction: {
                 //over(-1); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
+
+
+                for(let i in _private.arrGameComponents) {
+                    if(_private.arrGameComponents[i] === this) {
+                        delete _private.arrGameComponents[i];
+                        break;
+                    }
+                }
             }
         }
     }
@@ -8111,6 +8148,7 @@ Item {
 
         Item {
             id: rootGameInput
+            objectName: 'GameInput'
 
 
             function over(text=null) {
@@ -8183,10 +8221,10 @@ Item {
 
 
                 //样式
-                if(style === undefined || style === null)
+                if(!style)
                     style = {};
-                let styleSystem = $GameMakerGlobalJS.$config.$styles.$input;
-                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$input') || styleSystem;
+                const styleSystem = $GameMakerGlobalJS.$config.$styles.$input;
+                const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$styles', '$input') || styleSystem;
                 let tn;
 
                 rectGameInput.color = style.BackgroundColor || styleUser.$backgroundColor || styleSystem.$backgroundColor;
@@ -8382,9 +8420,18 @@ Item {
 
 
             Component.onCompleted: {
+                _private.arrGameComponents.unshift(this);
             }
             Component.onDestruction: {
                 //over(''); //加上可能会在 释放环境后 才运行用户回调函数，然后导致报错；
+
+
+                for(let i in _private.arrGameComponents) {
+                    if(_private.arrGameComponents[i] === this) {
+                        delete _private.arrGameComponents[i];
+                        break;
+                    }
+                }
             }
         }
     }
@@ -8800,8 +8847,8 @@ Item {
                 //console.debug('[GameScene]Role Component.onCompleted');
 
 
-                let styleSystem = $GameMakerGlobalJS.$config.$role;
-                let styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$role') || styleSystem;
+                const styleSystem = $GameMakerGlobalJS.$config.$role;
+                const styleUser = $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$role') || styleSystem;
                 let tn;
 
                 bSmooth = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(styleUser, '$smooth'), $CommonLibJS.getObjectValue(styleSystem, '$smooth'), true);
@@ -9179,14 +9226,14 @@ Item {
         rootGameScene.forceActiveFocus();
         event.accepted = true;
 
-        console.debug('[GameScene]Tab Key');
+        console.debug('[GameScene]Keys.onTabPressed');
     }
     Keys.onSpacePressed: {
         event.accepted = true;
 
-        if(game.pause(null))
-            $Frame.sl_simulatedMouseClick(game.$sys.screen.width / 2, game.$sys.screen.height / 2);
-        console.debug('[GameScene]Space Key');
+        //if(game.pause(null) && $Frame.sl_simulatedMouseClick)
+        //    $Frame.sl_simulatedMouseClick(game.$sys.screen.width / 2, game.$sys.screen.height / 2);
+        console.debug('[GameScene]Keys.onSpacePressed');
     }
 
 
@@ -9213,11 +9260,9 @@ Item {
             if(_private.arrPressedKeys.indexOf(event.key) === -1)
                 _private.arrPressedKeys.push(event.key);
 
-            if(mainRole.$$nActionType === -1)
-                return;
 
-
-            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
+            if(mainRole.$$nActionType !== -1 &&
+                    $CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 //mainRole.$$nActionType = 1;
 
                 _private.startMove(1, event.key);
@@ -9233,12 +9278,8 @@ Item {
                 return;
             }
 
-            if(mainRole.$$nActionType === -1)
-                return;
 
-
-            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
-                GameSceneJS.buttonAClicked();
+            GameSceneJS.buttonAClicked();
 
 
             event.accepted = true;
@@ -9279,11 +9320,8 @@ Item {
             _private.arrPressedKeys.splice(_private.arrPressedKeys.indexOf(event.key), 1);
 
 
-            if(mainRole.$$nActionType === -1)
-                return;
-
-
-            if($CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
+            if(mainRole.$$nActionType !== -1 &&
+                    $CommonLibJS.objectIsEmpty(_private.config.objPauseNames)) {
                 _private.stopMove(1, event.key);
             }
 

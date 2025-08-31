@@ -59,6 +59,8 @@ function loadLast(combatant=true, type=0) {
 
 //重置刷新战斗人物（创建时调用）
 function resetFightRole(fightRole, fightRoleComp, index, teamID) {
+    //if(!fightRole)
+    //    return false;
 
     $GameMakerGlobalJS.resetFightRole(fightRole, index, teamID, fight.myCombatants, fight.enemies);
 
@@ -81,7 +83,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
     fightRole.$$fightData.$info.$comp = fightRoleComp;
     fightRole.$$fightData.$info.$spriteEffect = fightRoleComp.spriteEffect;
 
-    //let fightCombatantChoice = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$fightCombatantChoice'))
+    //let fightCombatantChoice = game.$sys.getCommonScriptResource('$fightCombatantChoice');
 
     //fightRole.$$fightData.$choice.$type = -1;
     ////fightRole.$$fightData.$lastChoice.$type = -1;
@@ -119,6 +121,8 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
     //刷新血条
     //if(fightRole.$$propertiesWithExtra.HP[0] <= 0)
     //    fightRole.$$propertiesWithExtra.HP[0] = 1;
+
+    //return true;
 }
 
 
@@ -720,6 +724,8 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
 
             }
 
+            combatantComp.numberanimationSpriteEffectX.easing.type = combatantActionSpriteData.XEasingType ?? Easing.OutSine;
+            combatantComp.numberanimationSpriteEffectY.easing.type = combatantActionSpriteData.YEasingType ?? Easing.OutSine;
             ////combatantSpriteEffect.numberanimationSpriteEffectX.target = combatantSpriteEffect;
             combatantComp.numberanimationSpriteEffectX.duration = combatantActionSpriteData.Duration;
             combatantComp.numberanimationSpriteEffectX.start();
@@ -1525,7 +1531,7 @@ function* gfFighting() {
         for(let tcombatant of fight.myCombatants) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                //let fightCombatantChoice = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$fightCombatantChoice'))
+                //let fightCombatantChoice = game.$sys.getCommonScriptResource('$fightCombatantChoice');
                 game.$sys.resources.commonScripts.$fightCombatantSetChoice(tcombatant, -1, false);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
@@ -1537,7 +1543,7 @@ function* gfFighting() {
         for(let tcombatant of fight.enemies) {
             //if(tcombatant.$$propertiesWithExtra.HP[0] > 0) {
             //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-                //let fightCombatantChoice = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$fightCombatantChoice'))
+                //let fightCombatantChoice = game.$sys.getCommonScriptResource('$fightCombatantChoice');
                 game.$sys.resources.commonScripts.$fightCombatantSetChoice(tcombatant, -1, true);
                 //tcombatant.$$fightData.$choice.$targets = undefined;
                 ////tcombatant.$$fightData.$lastChoice.$targets = tcombatant.$$fightData.$choice.$targets;
@@ -1661,8 +1667,8 @@ function* runAway() {
     for(let i = 0; i < fight.myCombatants.length; ++i) {
         if(game.$sys.resources.commonScripts.$combatantIsValid(fight.myCombatants[i])) {
         //if(repeaterMyCombatants.itemAt(i).opacity !== 0) {
-            //let fightCombatantChoice = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$fightCombatantChoice'), $CommonLibJS.getObjectValue($GameMakerGlobalJS, '$fightCombatantChoice'))
-            game.$sys.resources.commonScripts.$fightCombatantSetChoice(fight.myCombatants[i], 1, false);
+            //let fightCombatantChoice = game.$sys.getCommonScriptResource('$fightCombatantChoice');
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(fight.myCombatants[i], 0, false);
             //fight.myCombatants[i].$$fightData.$choice.$type = 1;
             //fight.myCombatants[i].$$fightData.$choice.$attack = undefined;
             //fight.myCombatants[i].$$fightData.$choice.$targets = undefined;

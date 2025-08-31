@@ -2038,6 +2038,8 @@ Item {
 
         visible: false
         anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
 
         strTitle: `${_private.strRoleRID}(${textRoleName.text.trim()})(角色脚本)`
@@ -2375,6 +2377,9 @@ Item {
         id: l_listRoleResource
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor

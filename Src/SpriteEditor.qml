@@ -1013,6 +1013,8 @@ Item {
 
         visible: false
         anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
 
         strTitle: `${_private.strSpriteRID}(特效脚本)`
@@ -1348,6 +1350,9 @@ Item {
         id: l_listSpriteImageResource
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor
@@ -1722,6 +1727,9 @@ Item {
         id: l_listSpriteSoundResource
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor

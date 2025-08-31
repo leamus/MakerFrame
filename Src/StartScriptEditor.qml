@@ -92,6 +92,8 @@ game.goon();
         visible: true
         focus: true
         anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
 
         strTitle: '游戏开始脚本'

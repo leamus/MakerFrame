@@ -362,8 +362,8 @@ let data = (function() {
                 root.forceActiveFocus();
             }
 
-            function onSg_compile(code) {
-                notepadScript.setPlainText(code);
+            function onSg_compile(result) {
+                notepadScript.setPlainText(result);
                 notepadScript.toBegin();
             }
         }

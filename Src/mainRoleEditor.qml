@@ -58,82 +58,71 @@ Item {
     }
 
 
-    L_List {
-        id: l_listRole
+    ColumnLayout {
+        anchors.fill: parent
 
-        //visible: false
+        L_List {
+            id: l_listRole
 
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
+            //visible: false
+            //anchors.fill: parent
+            //width: parent.width
+            //height: parent.height
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
-
-        onSg_canceled: {
-            //visible = false;
-            //loader.visible = true;
-            //root.focus = true;
-            //root.forceActiveFocus();
-            //loader.item.focus = true;
-
-            sg_close();
-        }
-
-        onSg_clicked: {
-            if(!loader.item)
-                return false;
-
-            //if(item === '..') {
-            //    l_listRole.visible = false;
-            //    return;
-            //}
+            color: Global.style.backgroundColor
+            colorText: Global.style.primaryTextColor
 
 
-            //visible = false;
-            loader.visible = true;
-            //loader.focus = true;
-            loader.forceActiveFocus();
-            //loader.item.focus = true;
-            loader.item.forceActiveFocus();
+            onSg_canceled: {
+                //visible = false;
+                //loader.visible = true;
+                //root.focus = true;
+                //root.forceActiveFocus();
+                //loader.item.focus = true;
 
-
-            if(index === 0) {
-                loader.item.newRole();
-
-                return;
+                sg_close();
             }
 
+            onSg_clicked: {
+                _private.openItem(item);
+            }
 
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.json';
-            console.debug('[mainRoleEditor]filePath:', filePath);
+            onSg_removeClicked: {
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
 
-            let cfg = $Frame.sl_fileRead(filePath);
-            //let cfg = File.read(filePath);
+                $dialog.show({
+                    Msg: '确认删除 <font color="red">' + item + '</font> ？',
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        console.debug('[mainRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
+                        removeItem(index);
 
-            if(!cfg)
-                return false;
-
-            cfg = JSON.parse(cfg);
-            //console.debug('cfg', cfg);
-            //loader.setSource('./MapEditor_1.qml', {});
-
-            loader.item.openRole(cfg, item);
+                        //l_listRole.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //l_listRole.forceActiveFocus();
+                    },
+                });
+            }
         }
 
-        onSg_removeClicked: {
-            let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
+        RowLayout {
+            //Layout.preferredWidth: root.width * 0.96
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.preferredHeight: 50
 
-            $dialog.show({
-                Msg: '确认删除 <font color="red">' + item + '</font> ？',
-                Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function() {
-                    console.debug('[mainRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                    removeItem(index);
+            Button {
+                id: buttonCreate
 
-                    //l_listRole.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    //l_listRole.forceActiveFocus();
-                },
-            });
+                //Layout.preferredWidth: 60
+
+                text: '新建'
+                onClicked: {
+                    _private.openItem(null);
+                }
+            }
         }
     }
 
@@ -232,11 +221,48 @@ Item {
         id: _private
 
         function refresh() {
-            let list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00)
-            list.unshift('【新建角色】');
-            l_listRole.removeButtonVisible = {0: false, '-1': true};
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //list.unshift('【新建角色】');
+            //l_listRole.removeButtonVisible = {0: false, '-1': true};
             l_listRole.show(list);
 
+        }
+
+        function openItem(item) {
+            if(!loader.item)
+                return false;
+
+            //if(item === '..') {
+            //    l_listRole.visible = false;
+            //    return;
+            //}
+
+
+            if(!item) {
+                loader.item.newRole();
+            }
+            else {
+                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.json';
+                console.debug('[mainRoleEditor]filePath:', filePath);
+
+                let cfg = $Frame.sl_fileRead(filePath);
+                //let cfg = File.read(filePath);
+                if(!cfg)
+                    return false;
+                cfg = JSON.parse(cfg);
+                //console.debug('cfg', cfg);
+                //loader.setSource('./MapEditor_1.qml', {});
+
+                loader.item.openRole(cfg, item);
+            }
+
+
+            //visible = false;
+            loader.visible = true;
+            //loader.focus = true;
+            loader.forceActiveFocus();
+            //loader.item.focus = true;
+            loader.item.forceActiveFocus();
         }
     }
 

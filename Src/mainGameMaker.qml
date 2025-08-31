@@ -59,6 +59,8 @@ Item {
 
         ScriptEditor {
             anchors.fill: parent
+            //width: parent.width
+            //height: parent.height
 
             //strBasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
             //strTitle: '脚本编辑'
@@ -1204,6 +1206,9 @@ Item {
         id: l_listProjects
 
         visible: false
+        anchors.fill: parent
+        //width: parent.width
+        //height: parent.height
 
         color: Global.style.backgroundColor
         colorText: Global.style.primaryTextColor

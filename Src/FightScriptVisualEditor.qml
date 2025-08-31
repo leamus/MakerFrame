@@ -39,7 +39,7 @@ Item {
         mediaPlayer.stop();
     }
 
-    signal sg_compile(string code);
+    signal sg_compile(var result);
 
 
     function init(filePath) {
@@ -47,6 +47,8 @@ Item {
             _private.filepath = filePath;
         _private.loadData();
     }
+
+    readonly property var compile: _private.compile
 
 
     anchors.fill: parent
@@ -400,7 +402,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['随机1-3个', '顺序2个', '全部顺序出现'],
+                                let data = [['随机1-3个(m, n)', '顺序2个(n)', '全部顺序出现(true)'],
                                             ['1, 3', '2', 'true']];
 
                                 $list.open({
@@ -425,7 +427,7 @@ Item {
                         Layout.preferredHeight: 30
 
                         Label {
-                            text: '额外属性:'
+                            text: '额外数据:'
                         }
 
                         TextField {
@@ -435,7 +437,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
                             text: ''
-                            placeholderText: '额外属性'
+                            placeholderText: '额外数据'
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -594,14 +596,9 @@ Item {
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
-                    let jsScript = _private.compile();
-                    if(jsScript === false)
+                    const result = _private.compileAndShowResult();
+                    if(result[0] === false)
                         return;
-
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
-                    root.sg_compile(jsScript[1]);
-
-                    console.debug('[FightScriptVisualEditor]compile:', _private.filepath, jsScript);
                 }
             }
             Button {
@@ -740,8 +737,8 @@ Item {
         }
 
 
-        //编译（结果为字符串）
-        function compile() {
+        //编译（结果为数组：[code, 编译结果, 错误]）
+        function compile(checkResult=true) {
             let bCheck = true;
             do {
                 let enemyTextFields = $Frame.sl_findChildren(layoutEnemyLayout, 'Enemy');
@@ -766,21 +763,7 @@ Item {
                 }
             } while(0);
             if(!bCheck) {
-                $dialog.show({
-                    Msg: '有必填项没有完成',
-                    Buttons: Dialog.Yes,
-                    OnAccepted: function() {
-                        //root.forceActiveFocus();
-                    },
-                    OnRejected: ()=>{
-                        //root.forceActiveFocus();
-                    },
-                    /*OnDiscarded: ()=>{
-                        $dialog.close();
-                        //root.forceActiveFocus();
-                    },*/
-                });
-                return false;
+                return [false, null, new Error('有必填项没有完成')];
             }
 
 
@@ -835,11 +818,36 @@ Item {
 
 
             try {
-                eval(data);
+                if(checkResult)
+                    eval(data);
             }
             catch(e) {
+                return [-1, data, e];
+            }
+
+            return [true, data, null];
+        }
+
+        function compileAndShowResult() {
+            const result = _private.compile(true);
+            let errorMsg;
+
+            console.debug('[FightScriptVisualEditor]compile:', _private.filepath, result);
+
+            switch(result[0]) {
+            case true:
+                break;
+            case false:
+                errorMsg = result[2].toString();
+                break;
+            case -1:
+            default:
+                errorMsg = '错误：' + result[2].toString() + '<BR>请检查各参数';
+            }
+
+            if(errorMsg)
                 $dialog.show({
-                    Msg: '错误：' + e.toString() + '<BR>请检查各参数',
+                    Msg: errorMsg,
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //root.forceActiveFocus();
@@ -852,27 +860,27 @@ Item {
                         //root.forceActiveFocus();
                     },*/
                 });
-                return [false, data];
-            }
 
-            return [true, data];
+            if(result[1] !== null)
+                //let ret = $Frame.sl_fileWrite(result, _private.filepath + '.js', 0);
+                root.sg_compile(result[1]);
+
+            return result;
         }
+
 
         function close() {
             $dialog.show({
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    let jsScript = _private.compile();
-                    if(jsScript === false)
+                    const result = _private.compileAndShowResult();
+                    if(result[0] === false)
                         return;
-
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
-                    root.sg_compile(jsScript[1]);
 
                     saveData();
 
-                    if(jsScript[0])
+                    if(result[0])
                         sg_close();
 
                     ///root.forceActiveFocus();
