@@ -103,7 +103,7 @@ Item {
                     let s = game.$sys.resources.commonScripts.$readSavesInfo(3);
                     let c = yield game.menu('选择存档', [...s, '取消']);
                     if(c < s.length) {
-                        ////$CommonLibJS.setTimeout(function() {yield game.load('存档' + c)}, 0, game);
+                        ////$CommonLibJS.setTimeout([function() {yield game.load('存档' + c)}, 1, game], 0);
                         if(yield game.load('存档' + c)) {
                             yield game.msg('读档成功');
                         }

@@ -278,16 +278,16 @@ function choicedSkillOrGoods(used, type) {
 
     //检测技能 或 道具是否可以使用（我方人物刚选择技能时判断）
     if(type === 3 || type === 2) {
-        let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(used, combatant, 0);
-        if($CommonLibJS.isString(checkSkill)) {   //如果不可用
-            fight.msg(checkSkill || '不能选择', 50);
+        let checkResult = game.$sys.resources.commonScripts.$checkSkillOrGoods(used, combatant, 0);
+        if($CommonLibJS.isString(checkResult)) {   //如果不可用
+            fight.msg(checkResult || '不能选择', 50);
             return;
         }
-        else if($CommonLibJS.isArray(checkSkill)) {   //如果不可用
-            fight.msg(...checkSkill);
+        else if($CommonLibJS.isArray(checkResult)) {   //如果不可用
+            fight.msg(...checkResult);
             return;
         }
-        else if(checkSkill !== true) {   //如果不可用
+        else if(checkResult !== true) {   //如果不可用
             fight.msg('不能选择', 50);
             return;
         }
@@ -326,15 +326,15 @@ function choicedSkillOrGoods(used, type) {
 
         //如果有 $fightScript 和 $choiceScript
         if($CommonLibJS.isObject(goods.$commons.$fightScript) && goods.$commons.$fightScript.$choiceScript) {
-            _private.genFightChoice = goods.$commons.$fightScript.$choiceScript(goods, combatant);
+            _private.genFightChoice = goods.$commons.$fightScript.$choiceScript.call(goods, goods, combatant);
         }
         //!!兼容旧代码
         else if($CommonLibJS.isArray(goods.$commons.$fightScript) && goods.$commons.$fightScript[0]) {
-            _private.genFightChoice = goods.$commons.$fightScript[0](goods, combatant);
+            _private.genFightChoice = goods.$commons.$fightScript[0].call(goods, goods, combatant);
         }
         //使用技能的
         else if(skill && skill.$commons.$choiceScript)
-            _private.genFightChoice = skill.$commons.$choiceScript(skill, combatant);
+            _private.genFightChoice = skill.$commons.$choiceScript.call(skill, skill, combatant);
         else if(!skill) {   //如果不可用
             fight.msg('道具不能使用', 50);
             return;
@@ -398,16 +398,16 @@ function skillStepChoiced(type, value) {
             //    return;
 
             //检测技能 或 道具是否可以使用（我方人物选择技能的步骤完毕时判断）
-            let checkSkill = game.$sys.resources.commonScripts.$commonCheckSkill(skillOrGoods, combatant, 1);
-            if($CommonLibJS.isString(checkSkill)) {   //如果技能不可用
-                fight.msg(checkSkill || '不能使用', 50);
+            let checkResult = game.$sys.resources.commonScripts.$checkSkillOrGoods(skillOrGoods, combatant, 1);
+            if($CommonLibJS.isString(checkResult)) {   //如果技能不可用
+                fight.msg(checkResult || '不能使用', 50);
                 return;
             }
-            else if($CommonLibJS.isArray(checkSkill)) {   //如果技能不可用
-                fight.msg(...checkSkill);
+            else if($CommonLibJS.isArray(checkResult)) {   //如果技能不可用
+                fight.msg(...checkResult);
                 return;
             }
-            else if(checkSkill !== true) {   //如果技能不可用
+            else if(checkResult !== true) {   //如果技能不可用
                 fight.msg('不能使用', 50);
                 return;
             }
@@ -1033,7 +1033,9 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
     if(!fightrole.$commons.$actions)
         return false;
 
-    let actions = fightrole.$commons.$actions(fightrole);
+    let actions = fightrole.$commons.$actions;
+    if($CommonLibJS.isFunction(actions))
+        actions = actions.call(fightrole, fightrole);
 
     if(!actions[action]) {
         if(!actions['Normal'])
@@ -1168,7 +1170,7 @@ function* fnRound() {
 
                     //得到技能生成器函数
                     const genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
-                    //const ret1 = _private.scriptQueue.create(fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript', );
+                    //const ret1 = _private.scriptQueue.create([fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript'], );
                     ///$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
                     if($CommonLibJS.isGenerator(genActionAndSprite)) {
@@ -1264,8 +1266,8 @@ function* fnRound() {
                     genActionAndSprite = goodsInfo.$commons.$fightScript['$overScript'](goods, combatant);
                 else if(goodsInfo.$commons.$fightScript[2]) //!!兼容旧代码
                     genActionAndSprite = goodsInfo.$commons.$fightScript[2](goods, combatant);
-                //const ret1 = _private.scriptQueue.create(genActionAndSprite ?? null, -1, true, '$completeScript', );
-                //$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: genActionAndSprite ?? null, Tips: '$completeScript'}, );
+                //const ret1 = _private.scriptQueue.create([genActionAndSprite ?? null, -1, true, '$completeScript'], );
+                ///$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: genActionAndSprite ?? null, Tips: '$completeScript'}, );
 
                 if($CommonLibJS.isGenerator(genActionAndSprite)) {
                     while(1) {
@@ -1397,25 +1399,47 @@ function* gfFighting() {
 
         //运行两个回合脚本（阶段1）
 
-        //回合开始脚本
-        //if(_private.fightRoundScript) {
-        //    fight.run(_private.fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round21');
-        //}
-
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
-        const fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript;
+
+        let fightRoundScript;
+        do {
+            if(fightRoundScript = fight.fightScript.$commons.$fightRoundScript/* || fight.fightScript.$commons.FightRoundScript*/) {
+            }
+            else if(fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript) {
+            }
+            else
+                break;
+            let r = fightRoundScript.call(fight.fightScript, _private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            //yield fight.run({Script: fightRoundScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight round2:' + step});
+        } while(0);
+
+        //if('FightRoundScript' in fight.fightScript)
+        if(Object.keys(fight.fightScript).indexOf('FightRoundScript') >= 0) {
+            let r = fight.fightScript.FightRoundScript.call(fight.fightScript, _private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            //yield fight.run({Script: fight.fightScript.FightRoundScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight round3:' + step});
+        }
+
+        /*const fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript;
         if(fightRoundScript) { //$CommonLibJS.checkCallable
-            //fight.run(fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round11'});
+            //fight.run({Script: fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Running: 1, Tips: 'fight round11'});
             let r = fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
             if($CommonLibJS.isGenerator(r))r = yield* r;
         }
+        */
+
+        //回合开始脚本
+        ///if(_private.fightRoundScript) {
+        ///    fight.run({Script: _private.fightRoundScript(_private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript), Tips: 'fight round21'});
+        ///}
 
 
         //等待脚本队列运行完毕，再继续执行：
 
         //方案一：
-        //fight.run(()=>{_private.genFighting.next();}, {Running: 1, Tips: 'genFighting.next1'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
+        //fight.run({Script: ()=>{_private.genFighting.next();}, Running: 1, Tips: 'genFighting.next1'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         //fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         //yield 10;
 
@@ -1467,14 +1491,14 @@ function* gfFighting() {
 
         //回合开始脚本
         //if(_private.fightRoundScript) {
-        //    fight.run(_private.fightRoundScript( _private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight round22');
+        //    fight.run({Script: _private.fightRoundScript( _private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript), Tips: 'fight round22'});
         //}
 
         //通用回合开始脚本
         //console.debug('运行回合事件!!!', _private.nRound)
         //const fightRoundScript = game.$sys.resources.commonScripts.$commonFightRoundScript;
         if(fightRoundScript) { //$CommonLibJS.checkCallable
-            //fight.run(fightRoundScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 1, Tips: 'fight round12'});
+            //fight.run({Script: fightRoundScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Running: 1, Tips: 'fight round12'});
             let r = fightRoundScript(_private.nRound, 1, [fight.myCombatants, fight.enemies], fight.fightScript);
             if($CommonLibJS.isGenerator(r))r = yield* r;
         }
@@ -1483,7 +1507,7 @@ function* gfFighting() {
         //等待脚本队列运行完毕，再继续执行：
 
         //方案一：
-        //fight.run(()=>{_private.genFighting.next();}, {Running: 1, Tips: 'genFighting.next2'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
+        //fight.run({Script: ()=>{_private.genFighting.next();}, Running: 1, Tips: 'genFighting.next2'});    //!!!这样的写法是，等待 事件队列 运行完毕再继续下一行代码，否则提前运行会出错!!!
         //fight.$sys.continueFight(1);   //这样的写法是，等待 事件队列 运行完毕再发送一个 genFighting.next 事件，否则：1、提前运行会出错!!!2、用async运行genFighting会导致生成器递归错误!!!
         //yield 10;
 
@@ -1501,16 +1525,16 @@ function* gfFighting() {
         if(!_private.scriptQueue.isEmpty()) {
 
             //将 continueFight 放在脚本队列最后
-            fight.run(function() {
+            fight.run({Script: function() {
 
                 //!!这里使用事件的形式执行continueFight（让执行的函数栈跳出 scriptQueue）
                 //否则导致递归代码：在 scriptQueue执行genFighting（执行continueFight），continueFight又会继续向下执行到scriptQueue，导致递归运行!!!
-                $CommonLibJS.setTimeout(function() {
+                $CommonLibJS.setTimeout([function() {
                     //开始运行
                     fight.$sys.continueFight();
-                },0,rootFightScene, 'fight.$sys.continueFight');
+                }, 1, rootFightScene, 'fight.$sys.continueFight'], 0, );
 
-            }, 'continueFight');
+            }, Tips: 'continueFight'});
 
             //开始执行脚本队列
             //fight.run(false);
@@ -1558,15 +1582,15 @@ function* gfFighting() {
         /*/运行两个回合脚本（阶段3）
 
         //通用回合开始脚本
-        if(_private.scriptQueue.create(fightRoundScript.call({game, fight} ?? null, 0, true, '', _private.nRound, 1) === 0)
-        //if($GlobalJS.createScript(_private.scriptQueue, 0, 0, fightRoundScript.call({game, fight}, _private.nRound, 1)) === 0)
+        if(_private.scriptQueue.create([fightRoundScript.call({game, fight} ?? null, 0, true, ''], _private.nRound, 1) === 0)
+        ///if($GlobalJS.createScript(_private.scriptQueue, 0, 0, fightRoundScript.call({game, fight}, _private.nRound, 1)) === 0)
             _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
 
         //回合开始脚本
         if(_private.fightRoundScript) {
             //console.debug('运行回合事件!!!', _private.nRound)
-            if(_private.scriptQueue.create(_private.fightRoundScript(_private.nRound, 1) ?? null, -1, true, '', ) === 0)
-            //if($GlobalJS.createScript(_private.scriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
+            if(_private.scriptQueue.create([_private.fightRoundScript(_private.nRound, 1) ?? null, -1, true, ''], ) === 0)
+            ///if($GlobalJS.createScript(_private.scriptQueue, 0, 0, _private.fightRoundScript(_private.nRound, 1), ) === 0)
                 _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
         }*/
 
@@ -1676,9 +1700,9 @@ function* runAway() {
     }
         //!!这里使用事件的形式执行genFighting，因为genFighting中也有 fight 脚本，貌似对之后的脚本造成了影响!!
         //if(flag !== true)
-        //$CommonLibJS.runNextEventLoop(function() {
+        //$CommonLibJS.runNextEventLoop([function() {
         //    let ret1 = _private.genFighting.next();
-        //}/*,0,rootFightScene*/,'fight runaway');
+        //},'fight runaway']);
         //fight.$sys.continueFight(1);
 
     return false;
@@ -1696,11 +1720,35 @@ function fightOver(result, force=false) {
 
     //if(result !== undefined && result !== null) {
         //战斗结束脚本
-        //if(_private.fightEndScript) {
-        //    fight.run(_private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), 'fight end');
-        //}
 
-        fight.run(game.$sys.resources.commonScripts.$commonFightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, {Running: 2, Tips: 'fight end2'});
+        fight.run({Script: function*() {
+            let fightEndScript;
+            do {
+                if(fightEndScript = fight.fightScript.$commons.$fightEndScript/* || fight.fightScript.$commons.FightEndScript*/) {
+                }
+                else if(fightEndScript = game.$sys.resources.commonScripts.$commonFightEndScript) {
+                }
+                else
+                    break;
+                let r = fightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript);
+                if($CommonLibJS.isGenerator(r))r = yield* r;
+                //yield fight.run({Script: fightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight end2'});
+            } while(0);
+
+            //if('FightEndScript' in fight.fightScript)
+            if(Object.keys(fight.fightScript).indexOf('FightEndScript') >= 0) {
+                let r = fight.fightScript.FightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript);
+                if($CommonLibJS.isGenerator(r))r = yield* r;
+                //yield fight.run({Script: fight.fightScript.FightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight end3'});
+            }
+        }, Running: 2, Tips: 'fight end2'});
+
+        //fight.run({Script: game.$sys.resources.commonScripts.$commonFightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Running: 2, Tips: 'fight end2'});
+
+        ///if(_private.fightEndScript) {
+        ///    fight.run({Script: _private.fightEndScript(result, [fight.myCombatants, fight.enemies], fight.fightScript), Tips: 'fight end'});
+        ///}
+
     //}
 }
 

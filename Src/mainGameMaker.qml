@@ -1404,9 +1404,9 @@ Item {
 
             if(status === Loader.Ready) {
                 /*/~~~~~~注意：QML有个Bug（调用 clearComponentCache 后如果后面有 新创建的组件 访问根元素和其属性（不知单纯访问会不会）都会报警告！！！），所以必须让clearComponentCache放在最后执行（两个方法：1是使用runNextEventLoop，2是放在onLoaded最后）；
-                $CommonLibJS.runNextEventLoop(function() {
+                $CommonLibJS.runNextEventLoop([function() {
                     $showBusyIndicator(false);
-                }, '$showBusyIndicator');
+                }, '$showBusyIndicator']);
                 */
             }
             else if(status === Loader.Error) {
@@ -1429,13 +1429,13 @@ Item {
 
 
                 //要在下一个事件循环中改变，因为立即loadModule的话，onLoaded仍然会在后面调用，此时 item 已经不是之前的item了，所以先让onLoaded执行完再改loadModule；
-                $CommonLibJS.runNextEventLoop(function() {
+                $CommonLibJS.runNextEventLoop([function() {
                     if(vLoaderCache) {
                         const cache = vLoaderCache;
                         vLoaderCache = null;
                         loadModule(cache);
                     }
-                }, 'Load vLoaderCache');
+                }, 'Load vLoaderCache']);
             }
         }
 

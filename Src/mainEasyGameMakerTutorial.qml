@@ -511,7 +511,7 @@ Item {
 
 <font color='yellow'>game.loadjson(fileName, filePath="")</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
 
-<font color='yellow'>game.run(vScript, scriptProps=-1, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
+<font color='yellow'>game.run(script, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
 <font color='yellow'>game.script(fileName, filePath)</font>：执行脚本文件（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）；参数同game.loadjson。
 <font color='yellow'>game.lastreturn</font>：脚本上次返回的值；
 <font color='yellow'>game.lastvalue</font>：脚本上次返回的值（return+yield）；
@@ -540,7 +540,7 @@ Item {
 <font color='yellow'>fight.background(image)</font>：切换战斗背景图片；image为图片名。
 
 
-<font color='yellow'>fight.run(vScript, scriptProps=-1, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入fight系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
+<font color='yellow'>fight.run(script, ...params)</font>：执行脚本命令（注意：此命令会将脚本放入fight系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
 
 //得到某个战斗角色的 所有 普通技能 和 技能；
 //types：技能的type，系统默认0为普通攻击，1为技能
@@ -739,7 +739,7 @@ NPC事件的四种写法（前两种支持同步调用）：
       $type：1为选敌方；2为选我方；0为不选（全体技能）；
       $choiceScript：选择技能时脚本
       $playScript：技能产生的效果 和 动画（最复杂难理解的地方，但可以做出各种不错的特效动画效果）；
-      $check：是否可以触发（可以用MP判断）；
+      $checkScript：是否可以触发（可以用MP判断）；
   5、战斗脚本
     说明：
         $backgroundImage：背景图文件；
@@ -758,12 +758,14 @@ NPC事件的四种写法（前两种支持同步调用）：
     function $runAwayAlgorithm(team, roleIndex) {
     //战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
     function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
+    //战斗初始化通用脚本；
+    function* $commonFightInitScript(teams, fightData) {
     //战斗开始通用脚本；
-    function* $commonFightStartScript() {
+    function* $commonFightStartScript(teams, fightData) {
     //战斗回合通用脚本；
-    function* $commonFightRoundScript(round) {
+    function* $commonFightRoundScript(round, step, teams, fightData) {
     //战斗结束通用脚本；
-    function* $commonFightEndScript(r, exp, money) {
+    function* $commonFightEndScript(res, teams, fightData) {
     //恢复算法
     function $resumeEventScript(combatant) {
   7、通用升级链算法（集成在了通用脚本里）：

@@ -30,7 +30,7 @@ Item {
 
     signal sg_close();
     onSg_close: {
-        for(let tc of _private.arrCacheComponent) {
+        for(const tc of _private.arrCacheComponent) {
             tc.destroy();
         }
         _private.arrCacheComponent = [];
@@ -89,7 +89,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
+                        const data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
                                     ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
 
                         $list.open({
@@ -124,7 +124,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['固定值（整数）：20','倍率（小数）：2.0'],
+                        const data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
                         $list.open({
@@ -151,7 +151,7 @@ Item {
                     text: 'X'
 
                     onClicked: {
-                        for(let tc in _private.arrCacheComponent) {
+                        for(const tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
                                 _private.arrCacheComponent.splice(tc, 1);
                                 break;
@@ -458,7 +458,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['白', '红', '绿', '蓝', '黑', '灰', '黄'], ['white', 'red', 'green', 'blue', 'black', 'gray', 'yellow']]
+                                const data = [['白', '红', '绿', '蓝', '黑', '灰', '黄'], ['white', 'red', 'green', 'blue', 'black', 'gray', 'yellow']]
                                 $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
@@ -599,7 +599,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
                                 $list.open({
                                     Data: path,
@@ -642,7 +642,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gf[""]']];
+                                const data = [['无', '函数', '全局函数'], ['', 'function*(goods, combatant){}', 'game.gf[""]']];
                                 $list.open({
                                     Data: data[0],
                                     OnClicked: (index, item)=>{
@@ -684,7 +684,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = ['头戴', '身穿', '武器', '鞋子'];
+                                const data = ['头戴', '身穿', '武器', '鞋子'];
                                 $list.open({
                                     Data: data,
                                     OnClicked: (index, item)=>{
@@ -726,7 +726,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
                                 $list.open({
                                     Data: path,
@@ -785,13 +785,13 @@ Item {
                             text: '增加效果'
 
                             onClicked: {
-                                let c = comp.createObject(layoutEffectsLayout);
+                                const c = comp.createObject(layoutEffectsLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }
@@ -1072,6 +1072,7 @@ Item {
                 position = textPosition.text.trim();
                 skills = $CommonLibJS.array2string(textSkills.text.trim().split(','));
                 useScript = strTemplateUseScript2;
+                equipScript = _private.strTemplateEquipment1;
 
 
                 if(propertyTextFields.length > 0) {
@@ -1092,10 +1093,10 @@ Item {
                         else
                             strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                     }
-                    equipScript = _private.strTemplateEquipment1.replace(/\$\$equipEffectAlgorithm\$\$/g, strEffects);
+                    equipScript = equipScript.replace(/\$\$equipEffectAlgorithm\$\$/g, strEffects);
                 }
                 else {
-                    equipScript = _private.strTemplateEquipment1.replace(/\$\$equipEffectAlgorithm\$\$/g, '');
+                    equipScript = equipScript.replace(/\$\$equipEffectAlgorithm\$\$/g, '');
                 }
 
                 break;
@@ -1124,13 +1125,17 @@ Item {
                             strEffects += 'game.addprops(combatant, {"%1": %2}, 2);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                     }
 
+                    useScript = _private.strTemplateUseScript1;
+
                     if(textUseScript.text.trim() !== '')
-                        strEffects += 'game.run(%1(goods, combatant) ?? null, -1);\r\n'.arg(textUseScript.text.trim());
+                        useScript = useScript.replace(/\$\$useScript\$\$/g, 'game.run((%1)(goods, combatant) ?? null);\r\n'.arg(textUseScript.text));
+                    //    strEffects += 'game.run((%1)(goods, combatant) ?? null);\r\n'.arg(textUseScript.text.trim());
                     else
-                        strEffects += 'game.removegoods(goods, 1);   //背包道具-1\r\n';
+                        useScript = useScript.replace(/\$\$useScript\$\$/g, '');
+                    //    strEffects += 'game.removegoods(goods, 1);   //背包道具-1\r\n';
 
 
-                    useScript = _private.strTemplateUseScript1.replace(/\$\$useEffect\$\$/g, strEffects);
+                    useScript = useScript.replace(/\$\$useEffect\$\$/g, strEffects);
                 }
                 else {
                     useScript = _private.strTemplateUseScript2;
@@ -1262,13 +1267,13 @@ Item {
         property string strTemplate: `
 
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 goods 来引用；会保存到存档中；
     //params：使用对象{RID:xxx, Params: 。。。}创建道具时的对象参数。
-    let $createData = function(params) {
+    const $createData = function(params) {
 
         return {
             /*
@@ -1297,7 +1302,7 @@ let data = (function() {
 
 
     //公用属性，用 goods.$commons 或 goods 来引用；
-    let $commons = {
+    const $commons = {
 
         //游戏中显示的 名称和描述
         $name: '$$name$$',
@@ -1343,14 +1348,16 @@ $$equipEffectAlgorithm$$
 
     //装备脚本
     $$equipScript: function*(goods, combatant, params) {
-        let r = game.$sys.resources.commonScripts.$equipScript(goods, combatant, params);
+        //调用通用
+        let r = game.$sys.resources.commonScripts.$commonEquipScript.call(this, goods, combatant, params);
         if($CommonLibJS.isGenerator(r))r = yield* r;
         return r;
     },
 
     /*/卸载装备脚本
-    $unloadScript: function*(goods, combatant, params) {
-        let r = game.$sys.resources.commonScripts.$unloadScript(goods, combatant, params);
+    $unloadScript: function*(positionName, combatant, params) {
+        //调用通用
+        let r = game.$sys.resources.commonScripts.$commonUnloadScript.call(this, positionName, combatant, params);
         if($CommonLibJS.isGenerator(r))r = yield* r;
         return r;
     },*/
@@ -1366,11 +1373,19 @@ $$equipEffectAlgorithm$$
         property string strTemplateUseScript1: `
     //使用脚本
     $$useScript: function*(goods, combatant, params) {
-        params = function*(goods, combatant, params) {
+        //params = function*(goods, combatant) { //可以作为回调
+        //}
+
+        //调用通用
+        let r = game.$sys.resources.commonScripts.$commonUseScript.call(this, goods, combatant, params);
+        if($CommonLibJS.isGenerator(r))r = yield* r;
+        if(r.length > 0) {
+            //修改属性
+            //game.addprops(combatant, {HP: [10, 5]});
+            //yield game.msg('...', 50);
             $$useEffect$$
         }
-        let r = game.$sys.resources.commonScripts.$useScript(goods, combatant, params);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
+        $$useScript$$
         return r;
     },
 `
@@ -1396,10 +1411,10 @@ $$equipEffectAlgorithm$$
         */
         $$choiceScript: null,
         //是否可用；如果为null自动调用 goods.$$fight[0] 的
-        $$check: function(goods, combatant, stage) {
+        $$checkScript: function(goods, combatant, stage) {
             //调用技能的
             let skill = goods.$$fight[0];
-            return skill.$$check(skill, combatant, stage);
+            return skill.$$checkScript(skill, combatant, stage);
         },
 
         //完成代码（收尾用）；skill的playScript执行完毕会执行它

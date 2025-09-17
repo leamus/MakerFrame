@@ -209,7 +209,8 @@ Item {
                     //CustomData: customData,
                 }, 2);
                 console.info(res.responseText, res.$$json);
-            } catch(e) {
+            }
+            catch(e) {
                 console.info(e, e.$params.$$json);
             }
         });
@@ -369,10 +370,10 @@ Item {
     let lib = $Frame.sl_loadLibrary(libName);
     if(lib !== null) {
         //运行Qt函数（参数是QVariant类型）
-        let res = lib.sl_runQtFunction('func', args);
+        let res = lib.sl_runQtFunction('funtionName', args);
         或：
         //运行普通函数（参数是字符串，需自己处理）
-        let res = lib.sl_runFunction('func', 'args...');
+        let res = lib.sl_runFunction('funtionName', 'args');
     }
 9、安卓广告  //~~~~~~~
     目前支持 Tap和CSJ（穿山甲） 两个广告SDK，用法基本相同；
@@ -427,8 +428,8 @@ Item {
 
 10、协程（已经被我封装的用法类似async/await）   //~~~~~~~
     用法一（函数形式，简单使用）：
-      $CommonLibJS.asyncScript(func, tips, ...params)；
-      参数：func为函数、生成器函数或生成器（区别：函数和生成器函数在下一个事件循环中运行，而生成器直接运行）；tips是字符串；params是给func的参数；
+      $CommonLibJS.asyncScript(scriptInfo, ...params)；
+      参数：scriptInfo为函数、生成器函数、生成器或数组（第2个参数为tips字符串）（区别：函数和生成器函数在下一个事件循环中运行，而生成器直接运行）；params是给scriptInfo的参数；
       如果是生成器函数或生成器：
         function*() {
             ...
@@ -436,7 +437,8 @@ Item {
             ...
             try{
               res2 = yield x2;
-            } catch(e) {
+            }
+            catch(e) {
               ...
             }
             ...
@@ -484,11 +486,11 @@ Item {
     注意：如果在游戏中，可以用 game.async 代替 $CommonLibJS.asyncScript。
 
 11、脚本队列
-    游戏中已经封装了一个 主脚本队列，用game.run(vScript, scriptProps=-1, ...params)来运行，具体见命令教程；
+    游戏中已经封装了一个 主脚本队列，用game.run(script, ...params)来运行，具体见命令教程；
     另一种底层用法：
       scriptQueue = new $CommonLibJS.ScriptQueue();  //创建一个脚本队列
-      //$GlobalJS.createScript(scriptQueue, {Type: 0, Priority: -1, Script: genfunc(...) ?? null, Tips: 'tips'}, ...params);   //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
-      const ret = scriptQueue.create(genfunc(...) ?? null, -1, true, 'tips', ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
+      //const ret = scriptQueue.create([genfunc(...) ?? null, -1, true, 'tips'], ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
+      const ret = scriptQueue.create(genfunc(...) ?? null, ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       scriptQueue.clear(5);     //清空脚本队列；参数不同效果不同；
       scriptQueue.run(value);   //运行一次脚本队列；参数为给脚本中断的yield返回值；
       scriptQueue.runNextEventLoop('tips'); //运行一次脚本队列；放在下次事件循环中；

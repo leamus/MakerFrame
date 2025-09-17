@@ -709,7 +709,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             ],
         },
         '调用函数/生成器': {
-            command: ['调用函数/生成器', 'game.run(%1,%2);', '调用函数/生成器', 0, true, 'red', 'white'],
+            command: ['调用函数/生成器', 'game.run({Script: %1, Priority: %2});', '调用函数/生成器', 0, true, 'red', 'white'],
             params: [
                 ['*名称', 'name', true, 0, '名称', 'green'],
                 ['优先级', 'number', '-1', 0, '-1', 'blue'],
@@ -734,7 +734,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['协程', 'game.async(%1);', '协程', 0, true, 'red', 'white'],
             params: [
                 ['*名称', 'name', true, 0, '名称', 'green'],
-                [' 用协程运行 函数、生成器函数、生成器对象（和game.run的区别是会立即运行，不会放入事件队列）。', 'label'],
+                [' 用协程运行 函数、生成器函数、生成器对象（和game.run的区别是不会放入事件队列）。', 'label'],
             ],
         },
 

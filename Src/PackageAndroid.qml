@@ -418,34 +418,36 @@ Item {
             imageIcon.source = $GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
             if(!content) {
-                textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
+                textResult.append('读取 GameMakerGlobal.qml 失败');
                 ++error;
             }
+            else {
+                regExp = /category: '(\S*)'/g;
+                res = regExp.exec(content);
+                textGameName.text = res[1];
 
-            regExp = /category: '(\S*)'/g;
-            res = regExp.exec(content);
-            textGameName.text = res[1];
+                regExp = /property string strTDSClientID: '(\w*)'/g;
+                res = regExp.exec(content);
+                textTapClientID.text = res[1];
 
-            regExp = /property string strTDSClientID: '(\w*)'/g;
-            res = regExp.exec(content);
-            textTapClientID.text = res[1];
-
-            regExp = /property string strTDSClientToken: '(\w*)'/g;
-            res = regExp.exec(content);
-            textTapClientToken.text = res[1];
+                regExp = /property string strTDSClientToken: '(\w*)'/g;
+                res = regExp.exec(content);
+                textTapClientToken.text = res[1];
+            }
 
 
             content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content) {
-                textResult.text += '读取 AndroidManifest.xml 失败\r\n';
+                textResult.append('读取 AndroidManifest.xml 失败');
                 ++error;
             }
-
-            regExp = /package="(\S*)"/g;
-            res = regExp.exec(content);
-            textPackageName.text = res[1];
+            else {
+                regExp = /package="(\S*)"/g;
+                res = regExp.exec(content);
+                textPackageName.text = res[1];
+            }
 
 
             if(error === 0)
@@ -461,9 +463,9 @@ Item {
             textResult.text = '';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
             if(!content)
-                textResult.text += '读取 GameMakerGlobal.qml 失败\r\n';
+                textResult.append('读取 GameMakerGlobal.qml 失败');
             else {
                 regExp = /(category: ')\S*(')/g;
                 content = content.replace(regExp, '$1' + textGameName.text + '$2');
@@ -475,18 +477,18 @@ Item {
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/GameMakerGlobal.qml');
+                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
                 if(res === 0) {
-                    textResult.text += '写入 GameMakerGlobal.qml 成功\r\n';
+                    textResult.append('写入 GameMakerGlobal.qml 成功');
                 }
                 else
-                    textResult.text += '写入 GameMakerGlobal.qml 失败\r\n';
+                    textResult.append('写入 GameMakerGlobal.qml 失败');
                 //console.warn(content);
             }
 
             content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content)
-                textResult.text += '读取 AndroidManifest.xml 失败\r\n';
+                textResult.append('读取 AndroidManifest.xml 失败');
             else {
                 regExp = /(android:label=")\S*(")/g;
                 content = content.replace(regExp, '$1' + textGameName.text + '$2');
@@ -540,10 +542,10 @@ Item {
 
                 res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
                 if(res === 0) {
-                    textResult.text += '写入 AndroidManifest.xml 成功\r\n';
+                    textResult.append('写入 AndroidManifest.xml 成功');
                 }
                 else
-                    textResult.text += '写入 AndroidManifest.xml 失败\r\n';
+                    textResult.append('写入 AndroidManifest.xml 失败');
                 //console.warn(content);
             }
 
@@ -588,7 +590,7 @@ Item {
 
             //let strPackageDir = path + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
 
-            //1：只更新工程；2：全部更新；
+            //0：全部更新；1：只更新工程；2：只修改配置；
             function continueScript(packageType) {
                 $dialog.show({
                     Msg: '请等待...',
@@ -603,36 +605,40 @@ Item {
                     },
                 });
 
-                $showBusyIndicator(true);
-
-
-                $CommonLibJS.setTimeout(function() {
+                $showBusyIndicator(true, function() {
                     let ret;
 
                     try {
-                        if(packageType === 1) { //只是工程
-                            $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
-
-                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
-                        }
-                        else if(packageType === 0) { //全部
+                        if(packageType === 0) { //全部
                             $Frame.sl_removeRecursively(strPackageDir);
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
 
                             ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+
+                            modifyConfig();
                         }
-                    } catch(e) {
+                        else if(packageType === 1) { //只是工程
+                            $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
+
+                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                        }
+                        else
+                            modifyConfig();
+                    }
+                    catch(e) {
                         $CommonLibJS.printException(e);
+
                         return;
-                    } finally {
+                    }
+                    finally {
                         $showBusyIndicator(false);
 
                         $dialog.close();
                     }
 
 
-                    modifyConfig();
+                    textResult.append('注意：如果使用apktool编译失败，尝试进入 "设置->编译->更换工具->重置"，重新下载aapt，如果下载无进度，则在 "更换工具" 页面点 "服务器"，更换源再尝试下载。');
 
 
                     $dialog.show({
@@ -645,7 +651,7 @@ Item {
                             //root.forceActiveFocus();
                         },
                     });
-                }, 200, root);
+                });
 
                 //root.forceActiveFocus();
             }
@@ -654,7 +660,7 @@ Item {
             if(comboType.currentIndex === 0) { //需要两个压缩文件
                 if(missingFiles !== '') {
                     $dialog.show({
-                        Msg: '请将 <font color="red">%1</font> 环境文件下载并放入 <font color="red">%2</font> 文件夹下（可以在gitee、github或Q群里下载）'.arg(missingFiles).arg(path),
+                        Msg: '请将 <font color="red">%1</font> 环境文件下载并放入 <font color="red">%2</font> 文件夹下（可以在gitee、github或Q群里下载）。'.arg(missingFiles).arg(path),
                         Buttons: Dialog.Yes,
                         OnAccepted: function() {
                             //root.forceActiveFocus();
@@ -670,7 +676,7 @@ Item {
             else { //需要 AndroidManifest.xml 和其他配置文件
                 if(!$Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
                     $dialog.show({
-                        Msg: '没有找到配置文件，请先选择“重新生成全部文件”',
+                        Msg: '没有找到配置文件，请先选择“重新生成全部文件”。',
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
                             //root.forceActiveFocus();

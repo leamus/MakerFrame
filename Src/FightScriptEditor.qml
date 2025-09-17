@@ -35,11 +35,11 @@ Item {
     function init(fightScriptName) {
 
         if(fightScriptName) {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScriptName + GameMakerGlobal.separator + 'fight_script.js';
-            //let data = File.read(filePath);
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScriptName + GameMakerGlobal.separator + 'fight_script.js';
+            //const data = File.read(filePath);
             //console.debug('[FightScriptEditor]filePath：', filePath);
 
-            let data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
                 _private.strSavedName = textFightScriptName.text = fightScriptName;
@@ -54,12 +54,12 @@ Item {
         _private.strSavedName = textFightScriptName.text = '';
         notepadScript.setPlainText("
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 fightData 来引用；
-    let $createData = function(params) {
+    const $createData = function(params) {
         return {
             //背景图
             $backgroundImage: 'FightScene.jpg',
@@ -83,7 +83,7 @@ let data = (function() {
 
 
     //公用属性，用 fightData.$commons 或 fightData 来引用；
-    let $commons = {
+    const $commons = {
 
         /*
         //背景图
@@ -107,14 +107,26 @@ let data = (function() {
 
 
         $fightInitScript: function*(teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightInitScript.call(fightData, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             yield fight.msg('战斗初始化事件', 0);
         },
 
         $fightStartScript: function*(teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightStartScript.call(fightData, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             yield fight.msg('战斗开始事件');
         },
 
         $fightRoundScript: function*(round, step, teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightRoundScript.call(fightData, round, step, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             switch(step) {  //step：0，回合开始；1，选择完毕
             case 0:
                 yield fight.msg('第%1回合'.arg(round));
@@ -124,21 +136,22 @@ let data = (function() {
             }
         },
 
-        $fightEndScript: function*(r, step, teams, fightData) {
-            //step：为0是战斗结束时调用；为1时返回地图时调用
-            //r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
-            //  这里可以修改r，然后会传递给 通用战斗结束函数
-            //console.debug(JSON.stringify(r));
-            //r.result = 666;
+        $fightEndScript: function*(res, teams, fightData) {
+            //res中包含：result（战斗结果：0平1胜-1败-2逃跑）、money、exp、goods
+            //  这里可以修改res，然后会传递给 通用战斗结束函数
+            //  比如：res.result = 666;
+            //  console.debug(JSON.stringify(res));
 
-            switch(step) {  //step：0，战斗结束；1，返回地图
-            case 0:
-                //yield fight.msg('战斗结束事件：' + r.result);
-                break;
-            case 1:
-                //yield game.msg('返回地图事件');
-                break;
-            }
+            yield fight.msg('战斗结束事件：' + res.result, 0, '', 500);
+
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightEndScript.call(fightData, res, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
+            //返回地图后运行
+            game.run(function*() {
+                yield game.msg('返回地图事件', 0, '', 500);
+            }());
         },
     };
 
@@ -191,7 +204,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadScript.textDocument));
+                    const e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadScript.textDocument));
 
                     if(e) {
                         $dialog.show({
@@ -255,7 +268,7 @@ let data = (function() {
                         });
                         return;
                     }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
+                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
 
                     fightScriptVisualEditor.forceActiveFocus();
                     fightScriptVisualEditor.visible = true;
@@ -404,14 +417,14 @@ let data = (function() {
                 return false;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName;
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadScript.textDocument), path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
+                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_script.vjs';
                     if(textFightScriptName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
                         ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightScriptName.text + GameMakerGlobal.separator + 'fight_script.vjs', true);
                     }

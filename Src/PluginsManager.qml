@@ -384,7 +384,7 @@ Item {
                         Msg: '确认删除 <font color="red">' + item + '</font> ？<br>' + description,
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
-                            $CommonLibJS.asyncScript(function*() {
+                            $CommonLibJS.asyncScript([function*() {
                                 console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), $Frame.sl_dirExists(pluginDirPath));
 
                                 let removeFlag = false;
@@ -427,7 +427,7 @@ Item {
                                 }
 
                                 ///$list.forceActiveFocus();
-                            }, 'remove plugin');
+                            }, 'remove plugin']);
                         },
                         OnRejected: ()=>{
                             //$list.forceActiveFocus();

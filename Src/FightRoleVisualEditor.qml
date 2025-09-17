@@ -30,7 +30,7 @@ Item {
 
     signal sg_close();
     onSg_close: {
-        for(let tc of _private.arrCacheComponent) {
+        for(const tc of _private.arrCacheComponent) {
             tc.destroy();
         }
         _private.arrCacheComponent = [];
@@ -97,7 +97,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let data = [['[动作名]Normal为普通状态，已存在', 'Kill（普通攻击）','Skill（释放技能）'],
+                        const data = [['[动作名]Normal为普通状态，已存在', 'Kill（普通攻击）','Skill（释放技能）'],
                                     ['', 'Kill','Skill']];
 
                         $list.open({
@@ -138,7 +138,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
                         $list.open({
                             Data: path,
@@ -173,7 +173,7 @@ Item {
                     text: 'X'
 
                     onClicked: {
-                        for(let tc in _private.arrCacheComponent) {
+                        for(const tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
                                 _private.arrCacheComponent.splice(tc, 1);
                                 break;
@@ -456,7 +456,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.imageResourcePath();
+                                const path = GameMakerGlobal.imageResourcePath();
 
                                 $list.open({
                                     Data: path,
@@ -552,7 +552,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
 
                                 $list.open({
                                     Data: path,
@@ -593,7 +593,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
                                 $list.open({
                                     Data: path,
@@ -634,7 +634,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
                                 $list.open({
                                     Data: path,
@@ -737,13 +737,13 @@ Item {
                             text: '增加动作'
 
                             onClicked: {
-                                let c = comp.createObject(layoutActionLayout);
+                                const c = comp.createObject(layoutActionLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }
@@ -831,7 +831,7 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                                            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
                                             $list.open({
                                                 Data: path,
@@ -1368,13 +1368,13 @@ Item {
         property string strTemplate: `
 
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 combatant 来引用；会保存到存档中；
     //params：使用对象{RID:xxx, Params: 。。。}创建时的对象参数。
-    let $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
+    const $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
         return {
             $name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$, $$ExtraProperties$$
         };
@@ -1382,12 +1382,12 @@ let data = (function() {
 
 
     //公用属性，可用 combatant.$commons 或 combatant 来引用；
-    let $commons = {
+    const $commons = {
 
         //$name: '$$name$$', $properties: {HP: [$$HP$$,$$HP$$,$$HP$$], MP: [$$MP$$, $$MP$$], attack: $$attack$$, defense: $$defense$$, power: $$power$$, luck: $$luck$$, speed: $$speed$$}, $avatar: '$$avatar$$', $size: [$$size$$], $color: 'white', $skills: $$skills$$, $goods: $$goods$$, $equipment: $$equipment$$, $money: $$money$$, $EXP: $$EXP$$, $$ExtraProperties$$
 
 
-        //动作包含的 精灵名
+        //动作包含的 精灵名（可以为函数或对象）
         $actions: function(combatant) {
             return {$$actions$$};
         },
@@ -1438,14 +1438,14 @@ let data = (function() {
 
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
-        let levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
         if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
         if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }
     */
     //方法2：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
-        let levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        const levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
         try {
             $commons.levelInfos = JSON.parse(levelInfos);
         }

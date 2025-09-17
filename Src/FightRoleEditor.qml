@@ -35,8 +35,8 @@ Item {
     function init(fightRoleName) {
 
         if(fightRoleName) {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + fightRoleName + GameMakerGlobal.separator + 'fight_role.js';
-            let data = $Frame.sl_fileRead(filePath);
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + fightRoleName + GameMakerGlobal.separator + 'fight_role.js';
+            const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
                 _private.strSavedName = textFightRoleName.text = fightRoleName;
@@ -50,13 +50,13 @@ Item {
         _private.strSavedName = textFightRoleName.text = '';
         notepadFightRoleProperty.setPlainText("
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 combatant 来引用；会保存到存档中；
     //params：使用对象{RID:xxx, Params: 。。。}创建时的对象参数。
-    let $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
+    const $createData = function(params) { //创建战斗角色时的初始数据，可忽略（在战斗脚本中写）；
         return {
             $name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: 'avatar.png', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
         };
@@ -64,12 +64,12 @@ let data = (function() {
 
 
     //公用属性，用 combatant.$commons 或 combatant 来引用；
-    let $commons = {
+    const $commons = {
 
         //$name: '敌人1', $properties: {HP: [60,60,60]}, $avatar: 'avatar.png', $size: [60, 60], $color: 'white', $skills: [{RID: 'fight'}], $goods: [], $equipment: [], $money: 6, $EXP: 6,
 
 
-        //动作包含的 精灵名
+        //动作包含的 精灵名（可以为函数或对象）
         $actions: function(combatant) {
             return {
                 'Normal': 'killer_normal',
@@ -123,14 +123,14 @@ let data = (function() {
 
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
-        let levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
         if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
         if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }
     */
     //方法2：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
-        let levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        const levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
         try {
             $commons.levelInfos = JSON.parse(levelInfos);
         }
@@ -187,7 +187,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument));
+                    const e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument));
 
                     if(e) {
                         $dialog.show({
@@ -250,7 +250,7 @@ let data = (function() {
                         });
                         return;
                     }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
 
                     fightRoleVisualEditor.forceActiveFocus();
                     fightRoleVisualEditor.visible = true;
@@ -392,14 +392,14 @@ let data = (function() {
                 return false;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
                     if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
                         ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.vjs', true);
                     }

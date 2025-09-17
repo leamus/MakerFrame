@@ -239,14 +239,14 @@ Item {
         onWidthChanged: {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
-            //$CommonLibJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
-            //$CommonLibJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+            //$CommonLibJS.runNextEventLoop([refreshToResolveBug,'refreshToResolveBug']);
+            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, root, 'refreshToResolveBug'], 1);
         }
         onHeightChanged: {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
-            //$CommonLibJS.runNextEventLoop(refreshToResolveBug,'refreshToResolveBug');
-            //$CommonLibJS.setTimeout(refreshToResolveBug, 1, root, 'refreshToResolveBug');
+            //$CommonLibJS.runNextEventLoop([refreshToResolveBug,'refreshToResolveBug']);
+            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, root, 'refreshToResolveBug'], 1);
         }
 
         //anchors.horizontalCenter: parent.horizontalCenter
@@ -314,6 +314,7 @@ Item {
 
             if(currentFrame === frameCount - 1) {    //结束信号
                 root.sg_looped();
+                //reverse = !reverse;
             }
 
             if(bTest)

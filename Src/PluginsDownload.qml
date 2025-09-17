@@ -299,7 +299,7 @@ Item {
                             }, 2).$$then(function(xhr) {
                                 $dialog.close();
 
-                                $CommonLibJS.asyncScript(setup(), 'setup');
+                                $CommonLibJS.asyncScript([setup(), 'setup']);
                             }).$$catch(function(e) {
                                 //$dialog.close();
 

@@ -1559,10 +1559,10 @@ Item {
                                 const c = compActions2.createObject(layoutAction2);
                                 layoutAction2.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }
@@ -1671,10 +1671,10 @@ Item {
                                     const c = compActions1.createObject(layoutAction1);
                                     layoutAction1.arrCacheComponent.push(c);
 
-                                    $CommonLibJS.setTimeout(function() {
+                                    $CommonLibJS.setTimeout([function() {
                                         if(flickable.contentHeight > flickable.height)
                                             flickable.contentY = flickable.contentHeight - flickable.height;
-                                        }, 1, root, '');
+                                        }, 1, root, ''], 1);
 
                                 }
                             }

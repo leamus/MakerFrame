@@ -248,7 +248,18 @@ Item {
 92、修复：HP、MP恢复会超上限的问题；
 93、新增：一键编译所有可视化；
 94、优化：删除C++大量遗留无用代码；
-95、其他：优化调整很多代码和细节，修复一些Bugs；
+95、修复：game.usegoods的fighthero为null时报错卡死的Bug；
+96、新增：hero和role增加$frame属性功能（显示第几帧）；
+**97、修改：优化和修复usegoods、equip和unload相关代码，且相应的通用脚本里的函数修改了名字（增加了common）和参数；
+98、修复：打包时找不到GameMakerGlobal.qml导致报错；
+99、**修改：战斗脚本调用机制（4个函数：先调用战斗脚本再调用通用脚本）；
+100、**修改：战斗技能调用机制（$check函数改为$checkScript，且先调用战斗脚本再调用通用脚本）；
+101、修复：道具可视化的一个Bug；
+102、**修改：将 两个runNextEventLoop、asyncScript、AsyncScript.async、game.async的第2个参数tips删除（调用更简便，其实tips是为了给我调试方便查看，我改为第一个参数可以为 函数和tips 的数组）；
+103、**修改：将setTimeout和setInterval改为和标准一样的参数形式；
+104、**修改：修改game.run、fight.run参数（类似上面，调用更简便）；
+105、**修改：修改ScriptQueue的create参数（类似上面，调用更简便）；
+106、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

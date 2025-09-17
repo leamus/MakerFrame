@@ -35,11 +35,11 @@ Item {
     function init(goodsName) {
 
         if(goodsName) {
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + goodsName + GameMakerGlobal.separator + 'goods.js';
-            //let data = File.read(filePath);
+            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + goodsName + GameMakerGlobal.separator + 'goods.js';
+            //const data = File.read(filePath);
             //console.debug('[GoodsEditor]filePath：', filePath);
 
-            let data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
                 //data = JSON.parse(data);
@@ -56,13 +56,13 @@ Item {
 
         notepadGoodsScript.setPlainText("
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 goods 来引用；会保存到存档中；
     //params：使用对象{RID:xxx, Params: 。。。}创建道具时的对象参数。
-    let $createData = function(params) {
+    const $createData = function(params) {
 
         return {
             //游戏中显示的 名称和描述
@@ -88,7 +88,7 @@ let data = (function() {
 
     //公用属性，用 goods.$commons 或 goods 来引用；
     //可以用 计算属性，格式：get $description() {return this.xxx;},
-    let $commons = {
+    const $commons = {
 
         /*
         //游戏中显示的 名称和描述
@@ -119,13 +119,17 @@ let data = (function() {
 
         //使用脚本
         $useScript: function*(goods, combatant, params) {
-            params = function*(goods, combatant, params) {
+            //params = function*(goods, combatant) { //可以作为回调
+            //}
+
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonUseScript.call(this, goods, combatant, params);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            if(r.length > 0) {
                 //修改属性
                 //game.addprops(combatant, {HP: [10, 5]});
                 //yield game.msg('...', 50);
             }
-            let r = game.$sys.resources.commonScripts.$useScript(goods, combatant, params);
-            if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },
         //这样写不会显示 使用 选项
@@ -133,7 +137,8 @@ let data = (function() {
 
         /*/装备脚本
         $equipScript: function*(goods, combatant, params) {
-            let r = game.$sys.resources.commonScripts.$equipScript(goods, combatant, params);
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonEquipScript.call(this, goods, combatant, params);
             if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },*/
@@ -141,8 +146,9 @@ let data = (function() {
         $equipScript: null,
 
         /*/卸载装备脚本
-        $unloadScript: function*(goods, combatant, params) {
-            let r = game.$sys.resources.commonScripts.$unloadScript(goods, combatant, params);
+        $unloadScript: function*(positionName, combatant, params) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonUnloadScript.call(this, positionName, combatant, params);
             if($CommonLibJS.isGenerator(r))r = yield* r;
             return r;
         },*/
@@ -164,10 +170,10 @@ let data = (function() {
             */
             $choiceScript: null,
             //是否可用；如果为null自动调用 goods.$fight[0] 的
-            $check: function(goods, combatant, stage) {
+            $checkScript: function(goods, combatant, stage) {
                 //调用技能的
                 let skill = goods.$fight[0];
-                return skill.$check(skill, combatant, stage);
+                return skill.$checkScript(skill, combatant, stage);
             },
 
             //完成代码（收尾用）；skill的playScript执行完毕会执行它
@@ -230,7 +236,7 @@ let data = (function() {
                 text: '查'
 
                 onClicked: {
-                    let e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadGoodsScript.textDocument));
+                    const e = $GlobalJS.checkJSCode($Frame.sl_toPlainText(notepadGoodsScript.textDocument));
 
                     if(e) {
                         $dialog.show({
@@ -294,7 +300,7 @@ let data = (function() {
                         });
                         return;
                     }
-                    let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
+                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
 
                     goodsVisualEditor.forceActiveFocus();
                     goodsVisualEditor.visible = true;
@@ -449,14 +455,14 @@ let data = (function() {
                 return false;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    let oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
+                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
                     if(textGoodsName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
                         ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
                     }

@@ -533,10 +533,10 @@ Item {
                                 let c = compCondition.createObject(layoutConditionLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }
@@ -646,10 +646,10 @@ Item {
                                 let c = compEffect.createObject(layoutEffectsLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }

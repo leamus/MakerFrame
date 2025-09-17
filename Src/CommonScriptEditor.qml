@@ -460,7 +460,7 @@ function* $afterLoad() {
 function* $beforeLoadmap(map, ...userData) {
     /*if($CommonLibJS.isArray(game.gd['$sys_before_loadmap'])) {
         for(let ts of game.gd['$sys_before_loadmap'])
-            game.run(ts(mapName) ?? null, {Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
+            game.run({Script: ts(mapName) ?? null, Priority: -3, Type: 0, Running: 0, Tips: 'beforeLoadmap'});
     }
     */
     //game.run(function*(){yield game.msg(game.d['$sys_map'].$name);});
@@ -472,112 +472,11 @@ function* $beforeLoadmap(map, ...userData) {
 function* $afterLoadmap(map, ...userData) {
     /*if($CommonLibJS.isArray(game.gd['$sys_after_loadmap'])) {
         for(let ts of game.gd['$sys_after_loadmap'])
-            game.run(ts(mapName) ?? null, {Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
+            game.run({Script: ts(mapName) ?? null, Priority: -1, Type: 0, Running: 0, Tips: 'afterLoadmap'});
     }
     */
 
     return null;
-}
-
-
-//使用道具通用函数
-function* $useScript(goods, combatant, params) {
-    if(combatant === undefined || combatant === null)
-        combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
-
-    if($CommonLibJS.checkCallable(params)) {
-        //game.addprops(combatant, {HP: [10, 5]});
-        //yield game.msg('...', 50);
-        //console.debug(goods.$rid, combatant);
-
-        //yield* eval(`(function*(){${params}})()`);
-
-        let r = params.call(goods, goods, combatant, params);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-    }
-
-    //如果道具在背包中
-    if(goods.$location === 1) {
-        game.removegoods(goods, 1);	 //背包道具-1
-    }
-
-    return true;
-}
-
-//装备道具通用函数
-function* $equipScript(goods, combatant, params) {
-    if(combatant === undefined || combatant === null)
-        combatant = yield game.menu('选择角色', game.fighthero(-1, 1), true); //选择角色
-
-    let position = goods.$position;
-    let oldEquip = combatant.$equipment[position];
-
-    //如果道具在背包中
-    if(goods.$location === 1) {
-        game.removegoods(goods, 1);	 //背包道具-1
-    }
-    //如果goods的位置为非0，则新建一个goods，防止一个goods在多个位置出现；
-    if(goods.$location > 0)
-        goods = game.$sys.getGoodsObject(goods, {$count: 1});
-
-
-    /*/方案一：如果有旧装备，且有rid相同，且新旧都能叠加
-    if(oldEquip !== undefined && oldEquip.$rid === goods.$rid && oldEquip.$stackable && goods.$stackable) {
-        let newCount = oldEquip.$count + goods.$count;
-        if(newCount < 0) {
-            //return newCount;
-            //return null;
-            delete combatant.$equipment[position];
-        }
-        else if(newCount === 0) {
-            /*
-            if($config.$names.$equipReservedSlots.indexOf(position) !== -1)
-                combatant.$equipment[position] = undefined;
-            else
-                delete combatant.$equipment[position];
-            * /
-            delete combatant.$equipment[position];
-        }
-        else
-            oldEquip.$count = newCount;
-
-        //return newCount;
-        return true;
-    }
-    */
-
-    //方案二：脱下原装备，装备新装备
-    game.getgoods(yield game.unload(combatant, position)); //脱下装备，放入背包
-    //if(oldEquip === undefined || oldEquip.$rid !== goods) {    //如果原来没有装备
-    //if(oldEquip)
-    //    oldEquip.$location = 0;
-
-    if(goods.$count > 0) { //如果有个数，正常装备
-        goods.$location = 2;
-        combatant.$equipment[position] = goods;
-    }
-
-
-    //yield game.msg('装备脚本信息');
-    //console.debug(goods, c);
-
-    return true;
-}
-
-//卸下装备通用函数
-function* $unloadScript(goods, combatant, params) {
-    let positionName = goods.$position;
-    /*
-    if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
-        combatant.$equipment[positionName] = undefined;
-    else
-        delete combatant.$equipment[positionName];
-    */
-    delete combatant.$equipment[positionName];
-
-    goods.$location = 0;
-
-    return goods;
 }
 
 
@@ -848,17 +747,33 @@ function $showCombatantName(combatant, flags=null) {
 
 //刷新战斗人物
 function $refreshCombatant(combatant, checkLevel=true) {
-    //只有我方战斗人物才可以升级
-    if(checkLevel && combatant.$index >= 0)
-        levelUp(combatant, 0, false);
+    function refresh(combatant) {
+        //只有我方战斗人物才可以升级
+        if(checkLevel && combatant.$index >= 0)
+            levelUp(combatant, 0, false);
 
-    //战斗时，由于是脚本系统运行，所以必须放在最前才能使血量实时更新
-    //game.run(function() {
-        //计算新属性
-        computeCombatantPropertiesWithExtra(combatant);
-        //刷新战斗时人物数据
-        //fight.$sys.refreshCombatant(combatant);
-    //}, {Priority: 0, Tips: 'refreshCombatant1'});
+        //战斗时，由于是脚本系统运行，所以必须放在最前才能使血量实时更新
+        //game.run({Script: function() {
+            //计算新属性
+            computeCombatantPropertiesWithExtra(combatant);
+            //刷新战斗时人物数据
+            //fight.$sys.refreshCombatant(combatant);
+        //}, Priority: 0, Tips: 'refreshCombatant1'});
+    }
+    if($CommonLibJS.isArray(combatant))
+        ;
+    else if(combatant === true)
+        combatant = game.fighthero(-1);
+    else if(combatant) {
+        refresh(combatant);
+        return [combatant];
+    }
+    else
+        combatant = [];
+    for(let c of combatant)
+        refresh(c);
+
+    return combatant;
 }
 
 
@@ -888,17 +803,17 @@ function levelUp(combatant, level=0, refresh=true) {
 
 
     //检测升级
-    game.run(levelupscript(combatant, level), 'levelupscript');
+    game.run({Script: levelupscript(combatant, level), Tips: 'levelupscript'});
 
 
     //强制刷新
     if(refresh)
-        game.run(function() {
+        game.run({Script: function() {
             //计算新属性
             computeCombatantPropertiesWithExtra(combatant);
             //刷新战斗时人物数据
             //fight.$sys.refreshCombatant(combatant);
-        }, 'refreshCombatant2');
+        }, Tips: 'refreshCombatant2'});
 }
 
 
@@ -984,6 +899,201 @@ function $combatantIsValid(combatant) {
     if(combatant.$$fightData.$info && combatant.$$fightData.$info.$index >= 0 && combatant.$$propertiesWithExtra.HP[0] > 0)
         return true;
     return false;
+}
+
+
+
+//使用道具通用函数，返回需要刷新的combatants（数组）
+//  combatant为数组、对象、true（刷新全部）、假（不刷新）
+function* $commonUseScript(goods, combatant, params=1) {
+    let ret;
+    let count;
+    if($CommonLibJS.checkCallable(params)) {
+        //game.addprops(combatant, {HP: [10, 5]});
+        //yield game.msg('...', 50);
+        //console.debug(goods.$rid, combatant);
+
+        //yield* eval(`(function*(){${params}})()`);
+
+        let r = params.call(goods, goods, combatant);
+        if($CommonLibJS.isGenerator(r))r = yield* r;
+        return r;
+    }
+    else if($CommonLibJS.isValidNumber(params, 0b1)) {
+        count = parseInt(params);
+    }
+    else
+        count = 1;
+
+    //如果道具在背包中
+    if(goods.$location === 1) {
+        ret = game.removegoods(goods, count);
+        if(!(ret >= 0)) //如果没有扣减成功
+            return null;
+    }
+
+    ret = undefined;
+    if($CommonLibJS.isArray(combatant))
+        combatant = yield game.menu('选择角色', combatant, true); //选择角色
+    else if($CommonLibJS.isObject(combatant))
+        ;
+    else {
+        if(combatant === true) {
+            ret = game.fighthero(-1, 1);
+            combatant = yield game.menu('选择角色', ret, true); //选择角色
+        }
+        else if(combatant === false)
+            ret = game.fighthero(-1, 1);
+        else //if(!combatant)
+            ret = [];
+    }
+    if(ret === undefined)
+        ret = [combatant];
+
+    return ret;
+}
+
+//装备道具通用函数
+function* $commonEquipScript(goods, combatant, params=1) {
+    let ret;
+    let count;
+    if($CommonLibJS.checkCallable(params)) {
+        //game.addprops(combatant, {HP: [10, 5]});
+        //yield game.msg('...', 50);
+        //console.debug(goods.$rid, combatant);
+
+        //yield* eval(`(function*(){${params}})()`);
+
+        let r = params.call(goods, goods, combatant);
+        if($CommonLibJS.isGenerator(r))r = yield* r;
+        return r;
+    }
+    else if($CommonLibJS.isValidNumber(params, 0b1)) {
+        count = parseInt(params);
+    }
+    else
+        count = 1;
+
+    //如果道具在背包中
+    if(goods.$location === 1) {
+        ret = game.removegoods(goods, count);
+        if(!(ret >= 0)) //如果没有扣减成功
+            return null;
+    }
+
+    ret = undefined;
+    if($CommonLibJS.isArray(combatant))
+        combatant = yield game.menu('选择角色', combatant, true); //选择角色
+    else if($CommonLibJS.isObject(combatant))
+        ;
+    else {
+        if(combatant === true) {
+            ret = game.fighthero(-1, 1);
+            combatant = yield game.menu('选择角色', ret, true); //选择角色
+        }
+        else if(combatant === false)
+            ret = game.fighthero(-1, 1);
+        else //if(!combatant)
+            ret = [];
+    }
+    if(ret === undefined)
+        ret = [combatant];
+
+    if(!$CommonLibJS.isObject(combatant.$equipment))
+        combatant.$equipment = {};
+
+
+    let positionName = goods.$positionName;
+    let oldEquip = combatant.$equipment[positionName];
+
+    //如果goods的位置为非0，则新建一个goods，防止一个goods在多个位置出现；
+    if(goods.$location > 0)
+        goods = game.$sys.getGoodsObject(goods, {$count: count});
+
+
+    /*/方案一：如果有旧装备，且有rid相同，且新旧都能叠加
+    if(oldEquip !== undefined && oldEquip.$rid === goods.$rid && oldEquip.$stackable && goods.$stackable) {
+        let newCount = oldEquip.$count + goods.$count;
+        if(newCount < 0) {
+            //return newCount;
+            //return null;
+            delete combatant.$equipment[positionName];
+        }
+        else if(newCount === 0) {
+            /*
+            if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+                combatant.$equipment[positionName] = undefined;
+            else
+                delete combatant.$equipment[positionName];
+            * /
+            delete combatant.$equipment[positionName];
+        }
+        else
+            oldEquip.$count = newCount;
+
+        //return newCount;
+        return true;
+    }
+    */
+
+    //方案二：脱下原装备，装备新装备
+    game.getgoods(yield game.unload(combatant, positionName)); //脱下装备，放入背包
+    //if(oldEquip === undefined || oldEquip.$rid !== goods) {    //如果原来没有装备
+    //if(oldEquip)
+    //    oldEquip.$location = 0;
+
+    if(goods.$count > 0) { //如果有个数，正常装备
+        goods.$location = 2;
+        combatant.$equipment[positionName] = goods;
+    }
+
+
+    //yield game.msg('装备脚本信息');
+    //console.debug(goods, c);
+
+    return ret;
+}
+
+//卸下装备通用函数
+function* $commonUnloadScript(positionName, combatant, params=-1) {
+    let count;
+    let goods = combatant.$equipment[positionName];
+
+    if($CommonLibJS.checkCallable(params)) {
+        //game.addprops(combatant, {HP: [10, 5]});
+        //yield game.msg('...', 50);
+        //console.debug(goods.$rid, combatant);
+
+        //yield* eval(`(function*(){${params}})()`);
+
+        let r = params.call(goods, positionName, combatant);
+        if($CommonLibJS.isGenerator(r))r = yield* r;
+        return r;
+    }
+    else if($CommonLibJS.isValidNumber(params, 0b1)) {
+        count = parseInt(params);
+    }
+    else
+        count = 1;
+
+    if(count > 0 && count < goods.$count) {
+        let ret = game.removegoods(goods, count);
+        goods = game.$sys.getGoodsObject(goods, {$count: count, $location: 0});
+    }
+    else if(count === 0)
+        return false;
+    else {
+        /*
+        if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+            combatant.$equipment[positionName] = undefined;
+        else
+            delete combatant.$equipment[positionName];
+        */
+        delete combatant.$equipment[positionName];
+        goods.$location = 0;
+    }
+
+    return goods;
 }
 
 
@@ -1545,8 +1655,8 @@ function* combatantRoundEffects(combatant, round, stage) {
 //返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
 //stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
 //会检测技能、道具的相关函数并调用返回；
-function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
-    let choiceType = combatant.$$fightData.$choice.$type;//choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
+function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
+    let choiceType = combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
     //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
     let goods = null;
     let fightSkill = null;
@@ -1594,46 +1704,7 @@ function $commonCheckSkill(fightSkillOrGoods, combatant, stage) {
         }
     }
 
-
-    //使用技能的check
-    let useSkillCheck = false;
-    //如果选择的是道具
-    if(choiceType === 2) {
-        //如果都有定义
-        if($CommonLibJS.isObject(goods.$fightScript) && goods.$fightScript.$check !== undefined) {
-            if($CommonLibJS.isFunction(goods.$fightScript.$check)) {
-                return goods.$fightScript.$check(goods, combatant, stage);
-            }
-            else
-                return goods.$fightScript.$check;
-        }
-        //!!兼容旧代码
-        else if($CommonLibJS.isArray(goods.$fightScript) && goods.$fightScript[1] !== undefined) {
-            if($CommonLibJS.isFunction(goods.$fightScript[1])) {
-                return goods.$fightScript[1](goods, combatant, stage);
-            }
-            else
-                return goods.$fightScript[1];
-        }
-        //没定义，则按skill的check来
-        else if(fightSkill)
-            useSkillCheck = true;
-        else
-            return undefined;
-
-    }
-    //如果选择的是技能
-    if(useSkillCheck || choiceType === 3) {
-        if($CommonLibJS.isFunction(fightSkill.$check)) {
-            return fightSkill.$check(fightSkill, combatant, stage);
-        }
-        else
-            return fightSkill.$check;
-    }
-    else
-        console.warn('[!CommonScript]commonCheckSkill:', choiceType);
-
-    //return true;
+    return true;
 }
 
 
@@ -1728,6 +1799,11 @@ function* $commonFightInitScript(teams, fightData) {
             game.playmusic(fightData.$music);
     }
 
+    if($CommonLibJS.isValidNumber(fightData.$runAway))
+        fight.runaway(fightData.$runAway);
+    else
+        fight.runaway(true);
+
 
     /*/选择上场战斗人物代码
 
@@ -1775,21 +1851,6 @@ function* $commonFightInitScript(teams, fightData) {
     yield fight.msg('通用战斗初始化事件', 0, '', 500);
 
 
-    let fightInitScript = fightData.$commons.$fightInitScript/* || fightData.$commons.FightInitScript*/;
-    if(fightInitScript) {
-        let r = fightInitScript.call(fightData, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightInitScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight init2'});
-    }
-
-    //if('FightInitScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightInitScript') >= 0) {
-        let r = fightData.FightInitScript.call(fightData, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightData.FightInitScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight init3'});
-    }
-
-
     return null;
 }
 
@@ -1799,24 +1860,6 @@ function* $commonFightStartScript(teams, fightData) {
     //let fight = this.fight;
 
     yield fight.msg('战斗开始通用脚本', 0, '', 500);
-
-
-
-    //战斗开始脚本
-    let fightStartScript = fightData.$commons.$fightStartScript/* || fightData.$commons.FightStartScript*/;
-    if(fightStartScript) {
-        let r = fightStartScript.call(fightData, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightStartScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight start2'});
-    }
-
-    //fighting战斗的回调函数
-    //if('FightStartScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightStartScript') >= 0) {
-        let r = fightData.FightStartScript.call(fightData, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightData.FightStartScript.call(fightData, teams, fightData) ?? null, {Priority: -2, Tips: 'fight start3'});
-    }
 
 
     return null;
@@ -1830,25 +1873,6 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
     //let fight = this.fight;
 
 
-    /*/战斗回合脚本
-    let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript* /;
-    if(fightRoundScript) {
-        let r = fightRoundScript.call(fightData, round, step, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round2:' + step});
-    }
-
-    //fighting战斗的回调函数
-    //if('FightRoundScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
-        let r = fightData.FightRoundScript.call(fightData, round, step, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightData.FightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round3:' + step});
-    }
-    */
-
-
-
     switch(step) {
     case 0:
         //teams = [...teams[0], ...teams[1]];
@@ -1858,9 +1882,8 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
             //自动重复上次类型，也可以根据需要改写
             fight.$sys.loadLast();
             /*$CommonLibJS.runNextEventLoop(function() {
-                    fight.$sys.continueFight();
-                },
-            );*/
+                fight.$sys.continueFight();
+            },);*/
         }
 
 
@@ -1869,24 +1892,6 @@ function* $commonFightRoundScript(round, step, teams, fightData) {
         break;
     case 1:
         break;
-    }
-
-
-
-    //战斗回合脚本
-    let fightRoundScript = fightData.$commons.$fightRoundScript/* || fightData.$commons.FightRoundScript*/;
-    if(fightRoundScript) {
-        let r = fightRoundScript.call(fightData, round, step, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round2:' + step});
-    }
-
-    //fighting战斗的回调函数
-    //if('FightRoundScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightRoundScript') >= 0) {
-        let r = fightData.FightRoundScript.call(fightData, round, step, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightData.FightRoundScript.call(fightData, round, step, teams, fightData) ?? null, {Priority: -2, Tips: 'fight round3:' + step});
     }
 
 
@@ -1901,24 +1906,6 @@ function* $commonFightEndScript(res, teams, fightData) {
 
     //let game = this.game;
     //let fight = this.fight;
-
-
-    //战斗结束脚本1
-    let fightEndScript = fightData.$commons.$fightEndScript/* || fightData.$commons.FightEndScript*/;
-    if(fightEndScript) {
-        let r = fightEndScript.call(fightData, res, 0, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightEndScript.call(fightData, res, 0, teams, fightData) ?? null, {Priority: -2, Tips: 'fight end20'});
-    }
-
-    //fighting战斗的回调函数
-    //if('FightEndScript' in fightData)
-    if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
-        let r = fightData.FightEndScript.call(fightData, res, 0, teams, fightData);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //yield fight.run(fightData.FightEndScript.call(fightData, res, 0, teams, fightData) ?? null, {Priority: -2, Tips: 'fight end30'});
-    }
-
 
 
     let bGetGoods = false;
@@ -1955,22 +1942,6 @@ function* $commonFightEndScript(res, teams, fightData) {
     //返回地图代码
     game.run(function*() {
         fight.over();
-
-
-        //战斗结束脚本2
-        if(fightEndScript) {
-            let r = fightEndScript.call(fightData, res, 1, teams, fightData);
-            if($CommonLibJS.isGenerator(r))r = yield* r;
-            //game.run(fightEndScript.bind(fightData), {Tips: 'fight end21'}, res, 1, teams, fightData);
-        }
-
-        //fighting战斗的回调函数
-        //if('FightEndScript' in fightData)
-        if(Object.keys(fightData).indexOf('FightEndScript') >= 0) {
-            let r = fightData.FightEndScript.call(fightData, res, 1, teams, fightData);
-            if($CommonLibJS.isGenerator(r))r = yield* r;
-            //game.run(fightData.FightEndScript.bind(fightData), {Tips: 'fight end31'}, res, 1, teams, fightData);
-        }
 
 
         //增加经验

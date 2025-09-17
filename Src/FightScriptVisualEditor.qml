@@ -31,7 +31,7 @@ Item {
 
     signal sg_close();
     onSg_close: {
-        for(let tc of _private.arrCacheComponent) {
+        for(const tc of _private.arrCacheComponent) {
             tc.destroy();
         }
         _private.arrCacheComponent = [];
@@ -98,7 +98,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
                         $list.open({
                             Data: path,
@@ -139,7 +139,7 @@ Item {
                     text: 'X'
 
                     onClicked: {
-                        for(let tc in _private.arrCacheComponent) {
+                        for(const tc in _private.arrCacheComponent) {
                             if(_private.arrCacheComponent[tc] === tRoot) {
                                 _private.arrCacheComponent.splice(tc, 1);
                                 break;
@@ -360,7 +360,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['百分比，比如0.1', '调用系统算法'],
+                                const data = [['百分比，比如0.1', '调用系统算法'],
                                             ['0.1', 'true']];
 
                                 $list.open({
@@ -402,7 +402,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let data = [['随机1-3个(m, n)', '顺序2个(n)', '全部顺序出现(true)'],
+                                const data = [['随机1-3个(m, n)', '顺序2个(n)', '全部顺序出现(true)'],
                                             ['1, 3', '2', 'true']];
 
                                 $list.open({
@@ -459,13 +459,13 @@ Item {
                             text: '增加敌人'
 
                             onClicked: {
-                                let c = comp.createObject(layoutEnemyLayout);
+                                const c = comp.createObject(layoutEnemyLayout);
                                 _private.arrCacheComponent.push(c);
 
-                                $CommonLibJS.setTimeout(function() {
+                                $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, '');
+                                    }, 1, root, ''], 1);
 
                             }
                         }
@@ -529,7 +529,7 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+                                            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
 
                                             $list.open({
                                                 Data: path,
@@ -906,12 +906,12 @@ Item {
         property string strTemplate: `
 
 //闭包写法
-let data = (function() {
+const data = (function() {
 
 
 
     //独立属性，用 fightData 来引用；
-    let $createData = function(params) {
+    const $createData = function(params) {
         /*return {
             //背景图
             $backgroundImage: '$$backgroundImage$$',
@@ -930,7 +930,7 @@ $$enemiesData$$
 
 
     //公用属性，用 fightData.$commons 或 fightData 来引用；
-    let $commons = {
+    const $commons = {
 
         //背景图
         $backgroundImage: '$$backgroundImage$$',
@@ -947,14 +947,26 @@ $$enemiesData$$
 
 
         $fightInitScript: function*(teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightInitScript.call(fightData, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             //yield fight.msg('战斗初始化事件', 0);
         },
 
         $fightStartScript: function*(teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightStartScript.call(fightData, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             //yield fight.msg('战斗开始事件');
         },
 
         $fightRoundScript: function*(round, step, teams, fightData) {
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightRoundScript.call(fightData, round, step, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
             switch(step) {  //step：0，回合开始；1，选择完毕
             case 0:
                 //yield fight.msg('第%1回合'.arg(round));
@@ -964,21 +976,22 @@ $$enemiesData$$
             }
         },
 
-        $fightEndScript: function*(r, step, teams, fightData) {
-            //step：为0是战斗结束时调用；为1时返回地图时调用
-            //r中包含：result（战斗结果（0平1胜-1败-2逃跑））、money、exp、goods
-            //  这里可以修改r，然后会传递给 通用战斗结束函数
-            //console.debug(JSON.stringify(r));
-            //r.result = 666;
+        $fightEndScript: function*(res, teams, fightData) {
+            //res中包含：result（战斗结果：0平1胜-1败-2逃跑）、money、exp、goods
+            //  这里可以修改res，然后会传递给 通用战斗结束函数
+            //  比如：res.result = 666;
+            //  console.debug(JSON.stringify(res));
 
-            switch(step) {  //step：0，战斗结束；1，返回地图
-            case 0:
-                //yield fight.msg('战斗结束事件：' + r.result);
-                break;
-            case 1:
-                //yield game.msg('返回地图事件');
-                break;
-            }
+            //yield fight.msg('战斗结束事件：' + res.result, 0, '', 500);
+
+            //调用通用
+            let r = game.$sys.resources.commonScripts.$commonFightEndScript.call(fightData, res, teams, fightData);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+
+            //返回地图后运行
+            game.run(function*() {
+                //yield game.msg('返回地图事件', 0, '', 500);
+            }());
         },
     };
 
