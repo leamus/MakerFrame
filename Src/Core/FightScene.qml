@@ -2230,8 +2230,10 @@ Item {
     Component.onDestruction: {
 
         //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
-        //if($Frame.sl_globalObject().fight === fight)
-        //    delete $Frame.sl_globalObject().fight;
+        if($Frame.sl_globalObject().fight === fight)
+            delete $Frame.sl_globalObject().fight;
+        else
+            console.warn('[!FightScene]fight被多次创建？');
 
         console.debug('[FightScene]Component.onDestruction');
     }

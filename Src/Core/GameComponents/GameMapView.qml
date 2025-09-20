@@ -656,8 +656,7 @@ Item {
 
                         //循环绘制地图块
                         /* 之前的
-                        for(let i = 0; i < mapInfo.data.length; i++)
-                        {
+                        for(let i = 0; i < mapInfo.data.length; i++) {
                             //x1、y1为源，x2、y2为目标
                             let x1 = mapInfo.data[i] % mapInfo.MapSize[0];    //12
                             let y1 = parseInt(mapInfo.data[i] / mapInfo.MapSize[0]);  //16
@@ -855,8 +854,7 @@ Item {
 
                         //循环绘制地图块
                         /* 之前的
-                        for(let i = 0; i < mapInfo.data.length; i++)
-                        {
+                        for(let i = 0; i < mapInfo.data.length; i++) {
                             //x1、y1为源，x2、y2为目标
                             let x1 = mapInfo.data[i] % mapInfo.MapSize[0];    //12
                             let y1 = parseInt(mapInfo.data[i] / mapInfo.MapSize[0]);  //16

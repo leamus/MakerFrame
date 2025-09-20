@@ -603,7 +603,6 @@ const mappingCombatantProperty = {
     级别: 'level',
 };
 
-
 function 属性(p, n=0) {
     let ret;
     if($CommonLibJS.isValidNumber(n, 0b1)) {
@@ -619,7 +618,6 @@ function 属性(p, n=0) {
     }
     return ret;
 }
-
 function 附加属性(p, n=0) {
     let ret;
     if($CommonLibJS.isValidNumber(n, 0b1)) {
@@ -635,7 +633,6 @@ function 附加属性(p, n=0) {
     }
     return ret;
 }
-
 $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
 
@@ -1435,7 +1432,7 @@ function getBuff(combatant, buffCode, params={}) {
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffScript: function*(combatant, objBuff) {
-                $fightCombatantSetChoice(combatant, 0, false);
+                game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
                 ///combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
 
@@ -1501,7 +1498,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 0:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1511,7 +1508,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 1:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1521,7 +1518,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 2:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1531,7 +1528,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 3:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1539,7 +1536,7 @@ function $combatantRoundScript(combatant, round, stage) {
         }
         //如果没有回合，则加这句清空此次的战斗选择数据
         //else
-        //    $fightCombatantSetChoice(combatant, -1, false);
+        //    game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, -1, false);
         //    //fight.$sys.loadLast(combatant);
         break;
     }
@@ -1921,11 +1918,12 @@ function* $commonFightEndScript(res, teams, fightData) {
     game.money(res.money);
 
 
+    const moneyName = game.$sys.getCommonScriptResource('$config', '$names', '$money');
     if(res.result === 1) {
-        yield fight.msg('战斗胜利<BR>获得  %1经验，%2%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
+        yield fight.msg('战斗胜利<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg(moneyName));
     }
     else if(res.result === -1) {
-        yield fight.msg('战斗失败<BR>获得  %1经验，%2%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
+        yield fight.msg('战斗失败<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg(moneyName));
     }
     if(bGetGoods)
         yield fight.msg(msgGoods);
@@ -2070,7 +2068,7 @@ var $fightMenus = {
         function(combatantIndex) {
             let combatant = fight.myCombatants[combatantIndex];
 
-            $fightCombatantSetChoice(combatant, 0, true);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, true);
             ///combatant.$$fightData.$choice.$type = 1;
             //combatant.$$fightData.$choice.$attack = undefined;
             //combatant.$$fightData.$choice.$targets = undefined;

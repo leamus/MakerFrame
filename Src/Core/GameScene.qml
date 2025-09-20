@@ -5028,7 +5028,11 @@ Item {
             }
             //!!兼容旧代码
             else if($CommonLibJS.isArray(scriptInfo)) {
-                scriptInfo = {Script: scriptInfo[0], Tips: scriptInfo[1]};
+                scriptInfo = {
+                    Script: scriptInfo[0],
+                    //Priority: ,
+                    Tips: scriptInfo[1],
+                };
             }
             else {
                 scriptInfo = {Script: scriptInfo};
@@ -9359,6 +9363,8 @@ Item {
             delete $Frame.sl_globalObject().game;
             delete $Frame.sl_globalObject().g;
         }
+        else
+            console.warn('[!GameScene]game被多次创建？');
 
         console.debug('[GameScene]Component.onDestruction:', Qt.resolvedUrl('.'));
     }

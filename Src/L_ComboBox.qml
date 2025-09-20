@@ -24,12 +24,11 @@ Item {
 
 
 
-    Text
-    {
+    Text {
         id: labelText
         width: 130
         height: 30
-        font.family: "微软雅黑"
+        font.family: '微软雅黑'
         font.pointSize: 15
         color: comboBoxComponentItem.color
 

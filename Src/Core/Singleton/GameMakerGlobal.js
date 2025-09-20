@@ -639,7 +639,6 @@ const mappingCombatantProperty = {
     级别: 'level',
 };
 
-
 function 属性(p, n=0) {
     let ret;
     if($CommonLibJS.isValidNumber(n, 0b1)) {
@@ -655,7 +654,6 @@ function 属性(p, n=0) {
     }
     return ret;
 }
-
 function 附加属性(p, n=0) {
     let ret;
     if($CommonLibJS.isValidNumber(n, 0b1)) {
@@ -671,7 +669,6 @@ function 附加属性(p, n=0) {
     }
     return ret;
 }
-
 $Combatant.prototype.属性 = 属性;
 $Combatant.prototype.附加属性 = 附加属性;
 
@@ -1229,7 +1226,7 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
 }
 
 //通用技能播放脚本
-function* commonSkillPlayScript(skill, combatant) {
+function* $commonSkillPlayScript(skill, combatant) {
     //普通攻击
     if(skill.$type === 0) {
         //单体
@@ -1599,7 +1596,7 @@ function getBuff(combatant, buffCode, params={}) {
             round: round || 5,
             //执行脚本，objBuff为 本buff对象
             buffScript: function*(combatant, objBuff) {
-                $fightCombatantSetChoice(combatant, 0, false);
+                game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
                 ///combatant.$$fightData.$choice.$type = 1;
                 ////combatant.$$fightData.$choice.$targets = -2;
 
@@ -1665,7 +1662,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 0:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1675,7 +1672,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 1:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1685,7 +1682,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 2:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1695,7 +1692,7 @@ function $combatantRoundScript(combatant, round, stage) {
     case 3:
         //跳过下场 的或 没血的
         if(combatant.$$fightData.$info.$index < 0 || combatant.$$propertiesWithExtra.HP[0] <= 0) {
-            $fightCombatantSetChoice(combatant, 0, false);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, false);
             ///combatant.$$fightData.$choice.$type = 1;
 
             //去掉，则死亡后仍然有buff效果
@@ -1703,7 +1700,7 @@ function $combatantRoundScript(combatant, round, stage) {
         }
         //如果没有回合，则加这句清空此次的战斗选择数据
         //else
-        //    $fightCombatantSetChoice(combatant, -1, false);
+        //    game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, -1, false);
         //    //fight.$sys.loadLast(combatant);
         break;
     }
@@ -2085,11 +2082,12 @@ function* $commonFightEndScript(res, teams, fightData) {
     game.money(res.money);
 
 
+    const moneyName = game.$sys.getCommonScriptResource('$config', '$names', '$money');
     if(res.result === 1) {
-        yield fight.msg('战斗胜利<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
+        yield fight.msg('战斗胜利<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg(moneyName));
     }
     else if(res.result === -1) {
-        yield fight.msg('战斗失败<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg($config.$names.$money));
+        yield fight.msg('战斗失败<BR>获得  %1经验，%2%3'.arg(res.exp).arg(res.money).arg(moneyName));
     }
     if(bGetGoods)
         yield fight.msg(msgGoods);
@@ -2234,7 +2232,7 @@ var $fightMenus = {
         function(combatantIndex) {
             let combatant = fight.myCombatants[combatantIndex];
 
-            $fightCombatantSetChoice(combatant, 0, true);
+            game.$sys.resources.commonScripts.$fightCombatantSetChoice(combatant, 0, true);
             ///combatant.$$fightData.$choice.$type = 1;
             //combatant.$$fightData.$choice.$attack = undefined;
             //combatant.$$fightData.$choice.$targets = undefined;
@@ -3551,8 +3549,7 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     //伤害
     let harm, t;
 
-    if($CommonLibJS.randTarget(role2.luck / 5 + role2.speed / 5)) //miss各占%20
-    {
+    if($CommonLibJS.randTarget(role2.luck / 5 + role2.speed / 5)) { //miss各占%20
         return [{property: 'remainHP', value: 0, target: team2[roleIndex2]}];
     }
 
@@ -3563,28 +3560,22 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     let PropFlag = 0;
     var attackPropValue = role1.$properties[role1.$$fightData.attackProp]; //攻击属性 的 值
 
-    if((role1.$$fightData.attackProp + 1) % 5 === role2.$$fightData.defenseProp)        //属性攻击成功
-    {
+    if((role1.$$fightData.attackProp + 1) % 5 === role2.$$fightData.defenseProp) { //属性攻击成功
         PropFlag = 1;
     }
-    else if((role2.$$fightData.attackProp + 1) % 5 === role1.$$fightData.defenseProp)   //失败
-    {
+    else if((role2.$$fightData.attackProp + 1) % 5 === role1.$$fightData.defenseProp) { //失败
         PropFlag = -1;
     }
 
-    if(PropFlag === 1)  //附加使用成功
-    {
-        if(role1.$$fightData.attackProp === 2)  //雷属性
-        {
+    if(PropFlag === 1) { //附加使用成功
+        if(role1.$$fightData.attackProp === 2) { //雷属性
             harm = t * $CommonLibJS.random(attackPropValue + 1,attackPropValue * 4 + 1) / 100 + t;  //max <5倍
         }
-        else   //其他属性
-        {
+        else { //其他属性
             harm = t * $CommonLibJS.random(attackPropValue + 1,attackPropValue * 2 + 1) / 100 + t;  //属性效果 <3倍
         }
     }
-    else if(PropFlag === -1) //失败
-    {
+    else if(PropFlag === -1) { //失败
         harm = t - t * $CommonLibJS.random((100 - attackPropValue) * 2,(100 - attackPropValue) * 5) / 500;  //属性效果 减小
     }
     else
@@ -3595,8 +3586,7 @@ function fightSkillAlgorithm1(team1, roleIndex1, team2, roleIndex2, skillEffect)
     //计算防御
     //中 防御降低
     t = role2.defense;
-    if(role2.$$fightData.bufferProps.defenceDown !== 0) //对方中火
-    {
+    if(role2.$$fightData.bufferProps.defenceDown !== 0) { //对方中火
         t = t * $CommonLibJS.random(2, 50) / 100;
     }
 
