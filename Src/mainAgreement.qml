@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
 
         Notepad {
-            id: msgBox
+            id: notepad
 
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -187,7 +187,7 @@ Item {
     6.3、本协议适用中华人民共和国法律。
 
 `
-        msgBox.text = $CommonLibJS.convertToHTML(t);
+        notepad.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainAgreement]Component.onCompleted');
     }

@@ -33,14 +33,22 @@ Item {
 
 
 
-    function init(cfg) {
-        if(cfg && cfg.Map)
-            textMapRID.text = cfg.Map;
-        if(cfg && cfg.Role)
-            textRoleRID.text = cfg.Role;
-        if(cfg && cfg.Position) {
-            textMapBlockX.text = cfg.Position[0];
-            textMapBlockY.text = cfg.Position[1];
+    function $load(cfg) {
+        root.forceActiveFocus();
+
+        return init(cfg);
+    }
+
+    function init(cfg={}) {
+        if(cfg) {
+            if(cfg.Map)
+                textMapRID.text = cfg.Map;
+            if(cfg.Role)
+                textRoleRID.text = cfg.Role;
+            if(cfg.Position) {
+                textMapBlockX.text = cfg.Position[0];
+                textMapBlockY.text = cfg.Position[1];
+            }
         }
     }
     function start() {
@@ -244,7 +252,7 @@ Item {
         id: loaderGameScene
 
         visible: false
-        focus: true
+        //focus: true
 
         anchors.fill: parent
 
@@ -311,12 +319,12 @@ Item {
 
 
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //focus = true;
+                ///focus = true;
                 forceActiveFocus();
 
-                //item.focus = true;
-                if(item.forceActiveFocus)
-                    item.forceActiveFocus();
+                ///item.focus = true;
+                //if(item.forceActiveFocus)
+                //    item.forceActiveFocus();
 
 
                 //item.testFresh();
@@ -334,8 +342,8 @@ Item {
                 }
 
 
-                if(item.init)
-                    item.init(tScript, true);
+                //if(item.$load)
+                    item.$load(tScript, true);
 
                 visible = true;
             }

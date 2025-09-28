@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
 
         Notepad {
-            id: msgBox
+            id: notepad
 
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -298,7 +298,7 @@ undefined：没有赋值变量 和 没有定义的数组下标值、对象key �
     当值为 false、0、undefined、null、""、0 或 NaN 为 假。
     用 !可以取反：!真 为 假，!假 为 真。
 `;
-        msgBox.text = $CommonLibJS.convertToHTML(t);
+        notepad.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainEasyJavaScriptTutorial]Component.onCompleted');
     }

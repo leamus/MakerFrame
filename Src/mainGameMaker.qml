@@ -34,6 +34,7 @@ import './Core'
 
 Item {
     id: rootGameMaker
+    objectName: 'GameMaker'
 
 
     signal sg_close();
@@ -80,7 +81,7 @@ Item {
 
             onSg_close: function(saved) {
                 //scriptEditor.visible = false;
-                //root.forceActiveFocus();
+                //rootGameMaker.forceActiveFocus();
             }
         }
     }
@@ -1291,15 +1292,15 @@ Item {
 
             console.debug('[mainGameMaker]You chose:', fileUrl, fileUrls);
 
-            let fUrl;
+            let furl;
             if(Qt.platform.os === 'android')
-                fUrl = $Platform.sl_getRealPathFromURI(fileUrl.toString());
+                furl = $Platform.sl_getRealPathFromURI(fileUrl.toString());
             else
-                fUrl = $Frame.sl_urlDecode(fileUrl.toString());
+                furl = $Frame.sl_urlDecode(fileUrl.toString());
 
-            //console.error('!!!', fUrl, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()))
+            //console.error('!!!', furl, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()))
 
-            _private.unzipProjectPackage(fUrl);
+            _private.unzipProjectPackage(furl);
         }
         onRejected: {
             console.debug('[mainGameMaker]onRejected');
@@ -1318,6 +1319,7 @@ Item {
     //主窗口加载
     Loader {
         id: loader
+        objectName: 'GameMakerLoader'
 
 
         //载入模块
@@ -1340,12 +1342,12 @@ Item {
 
 
             if(status === Loader.Loading) {
-                console.debug('[mainGameMaker]loadModule cache:', url);
+                console.debug('[mainGameMaker]loadModule cache:', url, params, status);
 
                 vLoaderCache = url;
             }
             else {
-                console.debug('[mainGameMaker]loadModule:', url, params);
+                console.debug('[mainGameMaker]loadModule:', url, params, status);
 
 
                 //clearComponentCache();
@@ -1361,8 +1363,8 @@ Item {
 
 
                 /*if(loader.status === Loader.Ready) {
-                    if(loader.item.init)
-                        loader.item.init();
+                    if(loader.item.$load)
+                        loader.item.$load();
 
                     console.debug('[mainGameMaker]Loader.Ready');
                     //loader.item.forceActiveFocus();
@@ -1444,15 +1446,15 @@ Item {
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //focus = true;
+                ///focus = true;
                 forceActiveFocus();
 
-                //item.focus = true;
-                if(item.forceActiveFocus)
-                    item.forceActiveFocus();
+                ///item.focus = true;
+                //if(item.forceActiveFocus)
+                //    item.forceActiveFocus();
 
-                if(item.init)
-                    item.init(...vInitParams);
+                if(item.$load)
+                    item.$load(...vInitParams);
 
                 visible = true;
             }
@@ -1669,7 +1671,7 @@ Item {
 
                     _private.changeProject($dialog.input);
 
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+                    const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
                     $Frame.sl_dirCreate(projectPath);
 
 
@@ -1684,45 +1686,12 @@ Item {
                             */
 
 
-                            let resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + '$资源模板.zip';
-
+                            const resTemplate = GameMakerGlobal.config.strWorkPath + GameMakerGlobal.separator + '$资源模板.zip';
                             function _continue() {
-                                $dialog.show({
-                                    Msg: '正在解压，请等待',
-                                    Buttons: Dialog.NoButton,
-                                    OnAccepted: function() {
-                                        $dialog.show();
-                                        //$dialog.forceActiveFocus();
-                                    },
-                                    OnRejected: ()=>{
-                                        $dialog.show();
-                                        //$dialog.forceActiveFocus();
-                                    },
-                                });
-
-                                //$Frame.sl_dirCreate(projectPath);
-                                let ret = $Frame.sl_extractDir(resTemplate, projectPath);
-
-                                if(ret.length > 0) {
-                                    //_private.changeProject('Leamus');
-
-                                    //console.debug(ret, projectPath);
-                                }
-
-                                $dialog.show({
-                                    Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
-                                    Buttons: Dialog.Ok,
-                                    OnAccepted: function() {
-                                        //rootGameMaker.forceActiveFocus();
-                                    },
-                                    OnRejected: ()=>{
-                                        //rootGameMaker.forceActiveFocus();
-                                    },
-                                });
+                                const ret = unzipFile(resTemplate, projectPath);
+                                if(ret.length > 0)
+                                    ;
                             }
-
-                            //enabled = false;
-
                             if(!$Frame.sl_fileExists(resTemplate)) {
                                 //https://qiniu.leamus.cn/$资源模板.zip
 
@@ -1731,6 +1700,8 @@ Item {
                             }
                             else
                                 _continue();
+
+                            //enabled = false;
 
                             /*
                                 },
@@ -2078,7 +2049,7 @@ Item {
 
         //function downloadDemoProject() {
         function importProject() {
-            const jsLoader = new $GlobalJS.JSLoader(rootGameMaker);
+            const jsLoader = new $CommonLibJS.JSLoader(rootGameMaker, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL));
             let menuList;
             const menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Projects/menu.js');
             if(!menuJS) {
@@ -2117,47 +2088,17 @@ Item {
                             OnAccepted: function() {
                                 //rootGameMaker.enabled = false;
 
-                                const projectName = $Frame.sl_completeBaseName(menuJS.infos[item]['Path']);
                                 const fileName = $Frame.sl_fileName(menuJS.infos[item]['Path']);
+                                const projectName = $Frame.sl_completeBaseName(menuJS.infos[item]['Path']);
                                 const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + projectName;
                                 //https://qiniu.leamus.cn/$Leamus.zip
                                 //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
 
 
                                 function _continue() {
-                                    $dialog.show({
-                                        Msg: '正在解压，请等待',
-                                        Buttons: Dialog.NoButton,
-                                        OnAccepted: function() {
-                                            $dialog.show();
-                                            //$dialog.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            $dialog.show();
-                                            //$dialog.forceActiveFocus();
-                                        },
-                                    });
-
-                                    $Frame.sl_dirCreate(projectPath);
-                                    let ret = $Frame.sl_extractDir(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + fileName, projectPath);
-
-                                    if(ret.length > 0) {
+                                    const ret = unzipFile(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + fileName, projectPath);
+                                    if(ret.length > 0)
                                         _private.changeProject(projectName);
-
-                                        //console.debug(ret, projectPath);
-                                    }
-
-                                    $dialog.show({
-                                        Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
-                                        Buttons: Dialog.Ok,
-                                        FocusItem: $list,
-                                        OnAccepted: function() {
-                                            //$list.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            //$list.forceActiveFocus();
-                                        },
-                                    });
                                 }
 
                                 downloadFile(menuJS.infos[item]['Path'], GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + fileName,
@@ -2214,6 +2155,24 @@ Item {
                 loader.loadModule('mainUpdateLog.qml');
                 //userMainProject.source = 'mainUpdateLog.qml';
             }
+        }
+
+        function unzipProjectPackage(fURL) {
+            const projectName = $Frame.sl_completeBaseName(fURL);
+            const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + projectName;
+            const msg = $Frame.sl_dirExists(projectPath) ? '<br>注意：目标工程已存在，继续解压会替换目标项目中的同名文件！' : '';
+            $dialog.show({
+                Msg: '确认解包吗？' + msg,
+                Buttons: Dialog.Ok | Dialog.Cancel,
+                OnAccepted: function() {
+                    const ret = unzipFile($GlobalJS.toPath(fURL), projectPath);
+                    if(ret.length > 0)
+                        _private.changeProject(projectName);
+                },
+                OnRejected: ()=>{
+                    //rootGameMaker.forceActiveFocus();
+                },
+            });
         }
 
 
@@ -2295,58 +2254,52 @@ Item {
             });
         }
 
-        function unzipProjectPackage(fUrl) {
+        function unzipFile(filePath, dirPath) {
             $dialog.show({
-                Msg: '确认解包吗？这会替换目标项目中的同名文件！',
-                Buttons: Dialog.Ok | Dialog.Cancel,
+                Msg: '正在解压，请等待',
+                Buttons: Dialog.NoButton,
                 OnAccepted: function() {
-                    $dialog.show({
-                        Msg: '正在解压，请等待',
-                        Buttons: Dialog.NoButton,
-                        OnAccepted: function() {
-                            $dialog.show();
-                            //$dialog.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            $dialog.show();
-                            //$dialog.forceActiveFocus();
-                        },
-                    });
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    $dialog.show();
+                    //$dialog.forceActiveFocus();
+                },
+            });
 
-                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+            //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
 
-                    let projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
-                    //console.debug('[mainGameMaker]path:', fUrl, projectPath, $Frame.sl_completeBaseName(fUrl))
+            //console.debug('[mainGameMaker]path:', filePath, dirPath, $Frame.sl_completeBaseName(filePath))
 
-                    $Frame.sl_dirCreate(projectPath);
-                    let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
+            if(!$Frame.sl_dirExists(dirPath))
+                $Frame.sl_dirCreate(dirPath);
+            const ret = $Frame.sl_extractDir(/*$GlobalJS.toPath*/(filePath), dirPath);
 
-                    if(ret.length > 0) {
-                        _private.changeProject($Frame.sl_completeBaseName(fUrl));
+            if(ret.length > 0) {
+                //_private.changeProject($Frame.sl_completeBaseName(filePath));
 
-                        //console.debug('[mainGameMaker]', ret, projectPath);
-                    }
+                //console.debug('[mainGameMaker]', ret, dirPath);
+            }
 
-                    $dialog.show({
-                        Msg: ret.length > 0 ? ('成功:' + projectPath) : '失败',
-                        Buttons: Dialog.Ok,
-                        OnAccepted: function() {
-                            //rootGameMaker.forceActiveFocus();
-                        },
-                        OnRejected: ()=>{
-                            //rootGameMaker.forceActiveFocus();
-                        },
-                    });
+            $dialog.show({
+                Msg: ret.length > 0 ? ('成功:' + dirPath) : '失败',
+                Buttons: Dialog.Ok,
+                OnAccepted: function() {
+                    //rootGameMaker.forceActiveFocus();
                 },
                 OnRejected: ()=>{
                     //rootGameMaker.forceActiveFocus();
                 },
             });
+
+            return ret;
         }
 
 
+
         //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
-        readonly property var jsLoader: new $GlobalJS.JSLoader(rootGameMaker)
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
         property var jsGameVisualScript: null
 
         property var fnBackupOpenFile: null

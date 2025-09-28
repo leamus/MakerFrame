@@ -37,7 +37,7 @@ Item {
 
 
 
-    function init() {
+    function $load(...params) {
         //_private.arrImages = $Frame.sl_dirList(GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();

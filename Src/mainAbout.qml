@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
 
         Notepad {
-            id: msgBox
+            id: notepad
 
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -292,7 +292,7 @@ Item {
 30.CRC16、CRC32；
 31.读写Excel；
 `;
-        msgBox.text = $CommonLibJS.convertToHTML(t);
+        notepad.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainAbout]Component.onCompleted');
     }

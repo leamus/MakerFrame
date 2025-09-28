@@ -602,6 +602,15 @@ Item {
             if($CommonLibJS.isObject(scriptInfo)) { //如果是参数对象
                 scriptInfo.ScriptQueue = _private.scriptQueue;
             }
+            //!!兼容旧代码
+            else if($CommonLibJS.isArray(scriptInfo)) {
+                scriptInfo = {
+                    Script: scriptInfo[0],
+                    //Priority: ,
+                    Tips: scriptInfo[1],
+                    ScriptQueue: _private.scriptQueue,
+                };
+            }
             else {
                 scriptInfo = {Script: scriptInfo, ScriptQueue: _private.scriptQueue};
             }
@@ -1407,7 +1416,7 @@ Item {
 
 
 
-                    //第一次根据配置 初始化 组件
+                    //第一次根据配置 创建 组件
                     function init() {
                         for(let bar of _private.config.fightRoleBarConfig) {
                             //文本
@@ -2139,7 +2148,7 @@ Item {
         //property var genFighting
         //readonly property var scriptQueueFighting: new $CommonLibJS.ScriptQueue()
 
-        readonly property var asyncScript: new $CommonLibJS.AsyncScript();
+        readonly property var asyncScript: new $CommonLibJS.AsyncScript()
 
         //异步脚本（播放特效、事件等）
         readonly property var scriptQueue: new $CommonLibJS.ScriptQueue()

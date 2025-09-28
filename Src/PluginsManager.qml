@@ -43,7 +43,7 @@ Item {
     signal sg_close();
 
 
-    function init() {
+    function $load(...params) {
         _private.refresh();
     }
 
@@ -179,15 +179,15 @@ Item {
 
             try {
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                //focus = true;
+                ///focus = true;
                 forceActiveFocus();
 
-                //item.focus = true;
-                if(item.forceActiveFocus)
-                    item.forceActiveFocus();
+                ///item.focus = true;
+                //if(item.forceActiveFocus)
+                //    item.forceActiveFocus();
 
-                if(item.init)
-                    item.init();
+                //if(item.$load)
+                //    item.$load();
 
                 visible = true;
 
@@ -236,7 +236,7 @@ Item {
     QtObject {
         id: _private
 
-        property var jsLoader: new $GlobalJS.JSLoader(root)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
         property var arrPluginsShowName: []
         property var arrPluginsName: []
@@ -266,12 +266,12 @@ Item {
                 for(let tc1 of $Frame.sl_dirList($GlobalJS.toPath(pluginsRootPath + tc0 + GameMakerGlobal.separator), [], 0x001 | 0x2000 | 0x4000, 0)) {
                     let showName = '';
 
-                    let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
+                    const jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
 
                     if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
 
                         try {
-                            let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                            const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
 
 
                             //放入 _private.objPlugins 中
@@ -315,7 +315,7 @@ Item {
 
                     if($Frame.sl_fileExists($GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.js'))) {
                         try {
-                            let ts = _private.jsLoader.load($GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.js'));
+                            const ts = _private.jsLoader.load($GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.js'));
 
                             if(ts.$load) {
                                 ts.$load(itemExtendsRoot);
@@ -368,7 +368,7 @@ Item {
                     let description = '';
                     if($Frame.sl_fileExists($GlobalJS.toPath(pluginDirPath + GameMakerGlobal.separator + 'main.js'))) {
                         try {
-                            let ts = _private.jsLoader.load($GlobalJS.toURL(pluginDirPath + GameMakerGlobal.separator + 'main.js'));
+                            const ts = _private.jsLoader.load($GlobalJS.toURL(pluginDirPath + GameMakerGlobal.separator + 'main.js'));
 
                             if(ts.$description) {
                                 description = '\r\n' + '描述：' + ts.$description;
@@ -388,10 +388,10 @@ Item {
                                 console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), $Frame.sl_dirExists(pluginDirPath));
 
                                 let removeFlag = false;
-                                let jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
+                                const jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
                                 if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                     try {
-                                        let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                                        const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                         let ret;
 
                                         if($CommonLibJS.isFunction(ts.$uninstall)) {

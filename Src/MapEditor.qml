@@ -102,9 +102,10 @@ Item {
 
 
 
-    function init(mapRID) {
+    /*function init(mapRID) {
         //textMapRID.text = _private.strMapRID = mapRID;
     }
+    */
 
     //创建新地图
     function newMap(cfg) {
@@ -451,7 +452,7 @@ Item {
 
 
                     scriptEditor.visible = true;
-                    scriptEditor.forceActiveFocus();
+                    scriptEditor.editor.forceActiveFocus();
                 }
             }
 
@@ -2964,10 +2965,10 @@ Item {
         //height: parent.height
 
 
-        strTitle: `${_private.strMapRID}(${textMapName.text.trim()})(地图脚本)`
+        strTitle: `地图脚本：${_private.strMapRID}(${textMapName.text.trim()})`
         /*fnAfterCompile: function(code) {return code;}*/
 
-        visualScriptEditor.strTitle: strTitle
+        visualScriptEditor.strTitle: strTitle + '($filename$)'
 
         visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
         visualScriptEditor.nLoadType: 1
@@ -3110,6 +3111,7 @@ Item {
             }
 
             visible = true;
+            qmlObject.forceActiveFocus();
         }
 
         /*//HotLoader可自动链接 sg_close
@@ -3226,10 +3228,10 @@ Item {
             //if($Frame.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
             scriptEditor.init({
-                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
-                RelativePath: GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator + 'map.js',
-                ChoiceButton: 0b0,
-                PathText: 0b0,
+                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator,
+                RelativePath: 'map.js',
+                ChoiceButton: 0b11,
+                PathText: 0b11,
                 RunButton: 0b0,
             });
             //scriptEditor.text = $Frame.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');

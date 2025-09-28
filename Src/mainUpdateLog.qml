@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
 
         Notepad {
-            id: msgBox
+            id: notepad
 
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -229,7 +229,7 @@ Item {
 73、新增：树莓派（RaspberryPi Arm64 bookworm）平台包；
 74、修复：特效编辑器 使用复制创建新特效时仍然指向原特效且无法保存的Bug；
 75、修复：特效编辑器和角色编辑器另存为时没有保存js和vjs的Bug；
-76、新增：命令行运行和多次打开时命令行参数转移；
+76、新增：命令行参数运行 和 多次打开时命令行参数转移；
 77、新增：QUrl的包装类、创建函数和封装其各种操作函数；
 78、修复：一个千年老Bug，大部分场景不会出错，只有BBKRPG引擎缩放场景且地图小于场景大小时出现显示位置不对；
 79、修复：新建的特效和角色在退出提示保存并保存时直接退出的Bug；
@@ -255,11 +255,16 @@ Item {
 99、**修改：战斗脚本调用机制（4个函数：先调用战斗脚本再调用通用脚本）；
 100、**修改：战斗技能调用机制（$check函数改为$checkScript，且先调用战斗脚本再调用通用脚本）；
 101、修复：道具可视化的一个Bug；
-102、**修改：将 两个runNextEventLoop、asyncScript、AsyncScript.async、game.async的第2个参数tips删除（调用更简便，其实tips是为了给我调试方便查看，我改为第一个参数可以为 函数和tips 的数组）；
+102、**修改：将 两个runNextEventLoop、asyncScript、AsyncScript.async、game.async的第2个参数tips删除（调用更简便，其实tips是为了给我调试方便查看，我改为第一个参数可以为带更多参数的数组）；
 103、**修改：将setTimeout和setInterval改为和标准一样的参数形式；
 104、**修改：修改game.run、fight.run参数（类似上面，调用更简便）；
 105、**修改：修改ScriptQueue的create参数（类似上面，调用更简便）；
-106、其他：优化调整很多代码和细节，修复一些Bugs；
+106、修复：动态载入qml时（三种方法）的focus混乱的Bug（改为默认由用户自己的qml指定）；
+107、修复：单例类QML和JS的一个坑（JSLoader载JS文件会丢失环境）；
+108、增加：插件$init函数增加参数loadResources，可以用此来优化插件加载速度（比如Pymo和BBKRPG插件）；
+109、修复：修复一些焦点问题，和因为焦点导致输入法乱跳的问题；
+110、修复：不规则插件名会导致无法安装插件的Bug；
+111、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；
@@ -1832,7 +1837,7 @@ Item {
 
 2022/3/23：发布0.2.0版本
 `;
-        msgBox.text = $CommonLibJS.convertToHTML(t);
+        notepad.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainUpdateLog]Component.onCompleted');
     }

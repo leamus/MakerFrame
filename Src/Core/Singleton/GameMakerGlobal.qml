@@ -284,7 +284,7 @@ QtObject {
 
 
 
-        console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobal, GameMakerGlobalJS, Qt.resolvedUrl('.'));
+        console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobal, GameMakerGlobalJS/*, $window*/, Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
         //!!解决 assets BUG

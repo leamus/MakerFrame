@@ -58,7 +58,7 @@ Item {
         anchors.centerIn: parent
 
         Notepad {
-            id: msgBox
+            id: notepad
 
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
@@ -784,7 +784,7 @@ NPC事件的四种写法（前两种支持同步调用）：
     a、经不准确测试，地图编辑器最多支持1920*1920像素（32位armv7）和3200*3200像素（64位armv8），太大有可能导致绘制卡顿或报错、黑屏等问题，这是由于引擎使用了QML的Canvas组件，效率比较低，后期如果用nano/opengl库会好很多（目前只是集成还没有替换）；
   5、想起来再说。
 `
-        msgBox.text = $CommonLibJS.convertToHTML(t);
+        notepad.text = $CommonLibJS.convertToHTML(t);
 
         console.debug('[mainEasyGameMakerTutorial]Component.onCompleted');
     }

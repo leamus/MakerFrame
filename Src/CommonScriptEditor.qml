@@ -34,7 +34,7 @@ Item {
 
 
 
-    function init() {
+    function $load(...params) {
         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
         console.debug('[CommonScriptEditor]filePath:', path);
@@ -1653,7 +1653,8 @@ function* combatantRoundEffects(combatant, round, stage) {
 //stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
 //会检测技能、道具的相关函数并调用返回；
 function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
-    let choiceType = combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
+    //！！！鹰250927：这里新修改：道具脚本的$checkScript调用时只会传递Skill，所以这里改为$objectType，且下面不用判断为道具了吧；
+    let choiceType = fightSkillOrGoods.$objectType; //combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
     //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
     let goods = null;
     let fightSkill = null;
@@ -2185,7 +2186,7 @@ function $readSavesInfo(count=3) {
             Default: defaultCode,
         });
 
-        scriptEditor.forceActiveFocus();
+        //scriptEditor.editor.forceActiveFocus();
     }
 
 
@@ -2204,7 +2205,7 @@ function $readSavesInfo(count=3) {
         id: scriptEditor
 
         visible: true
-        focus: true
+        //focus: true
         anchors.fill: parent
         //width: parent.width
         //height: parent.height

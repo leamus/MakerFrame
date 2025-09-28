@@ -32,7 +32,7 @@ Item {
     signal sg_close();
 
 
-    function init() {
+    function $load(...params) {
         _private.refresh();
     }
 
@@ -144,7 +144,7 @@ Item {
 
     QtObject {
         id: _private
-        property var jsLoader: new $GlobalJS.JSLoader(root)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
         function refresh() {
 

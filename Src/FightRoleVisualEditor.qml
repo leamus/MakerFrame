@@ -1356,7 +1356,7 @@ Item {
 
 
 
-        property var jsLoader: new $GlobalJS.JSLoader(root)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
 
         //创建的组件缓存

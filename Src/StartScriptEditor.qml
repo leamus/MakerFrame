@@ -34,7 +34,7 @@ Item {
 
 
 
-    function init() {
+    function $load(...params) {
         let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
         /*if($Frame.sl_fileExists(path + 'main.js')) {
@@ -71,7 +71,7 @@ game.goon();
             Default: defaultCode,
         });
 
-        scriptEditor.forceActiveFocus();
+        //scriptEditor.editor.forceActiveFocus();
     }
 
 
@@ -90,7 +90,7 @@ game.goon();
         id: scriptEditor
 
         visible: true
-        focus: true
+        //focus: true
         anchors.fill: parent
         //width: parent.width
         //height: parent.height

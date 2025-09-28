@@ -136,7 +136,7 @@ Item {
 
 
 
-    function init(startScript=true, bLoadResources=true, gameData=null) {
+    function $load(startScript=true, bLoadResources=true, gameData=null) {
 
         //console.debug(_private.scriptQueue.getScriptInfos().$$toJson());
         _private.scriptQueue.clear(5);
@@ -150,14 +150,14 @@ Item {
         //let priority = 0;
 
 
-        game.run({Script: _init(startScript, bLoadResources, gameData) ?? null, Priority: -1, Running: 1, Tips: 'init'});
+        game.run({Script: init(startScript, bLoadResources, gameData) ?? null, Priority: -1, Running: 1, Tips: 'init'});
     }
 
     //游戏初始化脚本
     //startScript为true，则载入main.js；为函数/生成器，则直接运行startScript；为false则不执行；
     //bLoadResources为是否载入资源（刚进入游戏时为true，其他情况比如读档为false，gameData为读档的数据）；
     //必须用yield*标记来让它运行完毕（第一次使用则不必）；
-    function* _init(startScript=true, bLoadResources=true, gameData=null) {
+    function* init(startScript=true, bLoadResources=true, gameData=null) {
         console.debug('[GameScene]init:', startScript, bLoadResources, gameData);
 
         //game.run({Script: function*() {
@@ -243,8 +243,7 @@ Item {
                 if(plugin.$init && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
                     try {
                         //console.warn(plugin.$init)
-                        //plugin.$init();
-                        let r = plugin.$init();
+                        let r = plugin.$init(bLoadResources);
                         if($CommonLibJS.isGenerator(r))r = yield* r;
                     }
                     catch(e) {
@@ -380,8 +379,7 @@ Item {
                 const plugin = _private.objPlugins[tc][tp];
                 if(plugin.$release && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
                     try {
-                        //plugin.$release();
-                        let r = plugin.$release();
+                        let r = plugin.$release(bUnloadResources);
                         if($CommonLibJS.isGenerator(r))r = yield* r;
                     }
                     catch(e) {
@@ -4798,7 +4796,7 @@ Item {
             const _load = function(resolve, reject) {
                 //_resolve = resolve; _reject = reject;
 
-                //这里用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
+                //用asyncScript的原因是：release需要清空scriptQueue 和 $asyncScript，可能会导致下面脚本执行时中断而导致没有执行完毕；
                 $CommonLibJS.asyncScript([function*() {
                 //game.run({Script: function*() {
                 //game.async([function*() { //效果和run一样，但使用async能更好的在async函数里使用；
@@ -4840,7 +4838,7 @@ Item {
 
                     yield* release(false);
                     game.run({Script: function*() { //这样写是因为要把下面代码放入系统scriptQueue中运行（不是必须但我建议这样），且放在队列最前面，运行完毕后再进行下一个脚本（因为要求load要运行完毕）；
-                        yield* _init(false, false, ret['Data']);
+                        yield* init(false, false, ret['Data']);
 
 
 
@@ -4892,7 +4890,7 @@ Item {
                     yield* release(false);
                     //yield* game.$sys.init(true, false);
                     game.run({Script: function*() {
-                        yield* _init(true, false);
+                        yield* init(true, false);
                     }, Priority: -2, Type: 0, Running: 0, Tips: 'restart'});
 
                     //return resolve(true);
@@ -4934,7 +4932,7 @@ Item {
                             if($CommonLibJS.isGenerator(r))r = yield* r;
                         }
                         if(plugin.$init) { //$CommonLibJS.checkCallable
-                            let r = plugin.$init();
+                            let r = plugin.$init(true);
                             if($CommonLibJS.isGenerator(r))r = yield* r;
                         }
 
@@ -5304,7 +5302,7 @@ Item {
         //系统 数据 和 函数（特殊需要）
         readonly property var $sys: ({
             release: release,
-            init: _init,
+            init: init,
             exit: _private.exitGame,
             showExitDialog: _private.showExitDialog,
 
@@ -6930,7 +6928,7 @@ Item {
         property var arrGameComponents: [] //存储所有游戏组件（4种：GameMsg、RoleMsg、GameMenu、GameInput）
 
         //JS引擎，用来载入外部JS文件
-        readonly property var jsLoader: new $GlobalJS.JSLoader(rootGameScene)
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameScene, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
         //媒体列表 信息
         //property var objImages: ({})         //{图片名: 图片路径}
