@@ -87,65 +87,79 @@ Item {
         width: parent.width * 0.8
         anchors.centerIn: parent
 
-        TextField {
-            id: textMapRID
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+        RowLayout {
+            Layout.fillWidth: true
 
-            //selectByKeyboard: true
-            selectByMouse: true
-            //wrapMode: TextEdit.Wrap
+            TextField {
+                id: textMapRID
 
-        }
+                Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 50
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-        Button {
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+                placeholderText: '选择地图'
 
-            text: '选择地图'
-            onClicked: {
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+            }
 
-                l_listChoice.visible = true;
-                //l_listChoice.focus = true;
-                //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 50
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-                l_listChoice.choicedComponent = textMapRID;
+                text: '选择地图'
+
+                onClicked: {
+
+                    l_listChoice.visible = true;
+                    //l_listChoice.focus = true;
+                    //l_listChoice.forceActiveFocus();
+                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
+
+                    l_listChoice.choicedComponent = textMapRID;
+                }
             }
         }
 
-        TextField {
-            id: textRoleRID
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+        RowLayout {
+            Layout.fillWidth: true
 
-            //selectByKeyboard: true
-            selectByMouse: true
-            //wrapMode: TextEdit.Wrap
+            TextField {
+                id: textRoleRID
 
-        }
+                Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 50
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-        Button {
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+                placeholderText: '选择角色'
 
-            text: '选择角色'
-            onClicked: {
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+            }
 
-                l_listChoice.visible = true;
-                //l_listChoice.focus = true;
-                //l_listChoice.forceActiveFocus();
-                l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
+            Button {
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: parent.width
+                Layout.preferredHeight: 50
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-                l_listChoice.choicedComponent = textRoleRID;
+                text: '选择角色'
+
+                onClicked: {
+
+                    l_listChoice.visible = true;
+                    //l_listChoice.focus = true;
+                    //l_listChoice.forceActiveFocus();
+                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
+
+                    l_listChoice.choicedComponent = textRoleRID;
+                }
             }
         }
 
@@ -161,8 +175,9 @@ Item {
             TextField {
                 id: textMapBlockX
                 Layout.fillWidth: true
+
                 text: '0'
-                placeholderText: '0'
+                placeholderText: 'x'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -172,8 +187,9 @@ Item {
             TextField {
                 id: textMapBlockY
                 Layout.fillWidth: true
+
                 text: '0'
-                placeholderText: '0'
+                placeholderText: 'y'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -184,10 +200,10 @@ Item {
         Button {
             id: buttonStart
 
-            //Layout.fillWidth: true
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+            Layout.fillWidth: true
+            //Layout.preferredWidth: parent.width
             Layout.preferredHeight: 50
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             text: '开　始'
 
@@ -201,21 +217,24 @@ Item {
             visible: false
 
             //Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.preferredHeight: 50
+            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Label {
                 //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
                 text: '主角大小：'
             }
 
             TextField {
                 id: textMainRoleWidth
+
                 Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
                 text: '50'
 
                 //selectByKeyboard: true
@@ -225,16 +244,19 @@ Item {
 
             Label {
                 //Layout.preferredWidth: 80
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 10
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
                 text: '*'
             }
 
             TextField {
                 id: textMainRoleHeight
+
                 Layout.preferredWidth: 50
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                 Layout.preferredHeight: 30
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
                 text: '80'
 
                 //selectByKeyboard: true

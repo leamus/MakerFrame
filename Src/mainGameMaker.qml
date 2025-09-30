@@ -2006,11 +2006,6 @@ Item {
         }
 
         function exportProject() {
-            if(!_private.checkCurrentProjectName()) {
-                return;
-            }
-
-
             $dialog.show({
                 Msg: '正在压缩，请等待',
                 Buttons: Dialog.NoButton,
@@ -2024,21 +2019,25 @@ Item {
                 },
             });
 
-            let destPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
-            let ret = $Frame.sl_compressDir(
-                destPath + '.zip',
-                destPath
-            );
+            $showBusyIndicator(true, function() {
+                let destPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+                let ret = $Frame.sl_compressDir(
+                    destPath + '.zip',
+                    destPath
+                );
 
-            $dialog.show({
-                Msg: ret ? ('成功:' + destPath + '.zip') : '失败',
-                Buttons: Dialog.Ok,
-                OnAccepted: function() {
-                    //rootGameMaker.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    //rootGameMaker.forceActiveFocus();
-                },
+                //$showBusyIndicator(false);
+
+                $dialog.show({
+                    Msg: ret ? ('成功:' + destPath + '.zip') : '失败',
+                    Buttons: Dialog.Ok,
+                    OnAccepted: function() {
+                        //rootGameMaker.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //rootGameMaker.forceActiveFocus();
+                    },
+                });
             });
         }
         /*function importProject() {

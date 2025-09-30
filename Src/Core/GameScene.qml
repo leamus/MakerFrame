@@ -162,17 +162,6 @@ Item {
 
         //game.run({Script: function*() {
 
-        game.gd['$sys_fight_heros'] = [];
-        //game.gd['$sys_hidden_fight_heros'] = [];
-        game.gd['$sys_money'] = 0;
-        game.gd['$sys_goods'] = [];
-        game.gd['$sys_map'] = {};
-        game.gd['$sys_fps'] = 16;
-        game.gd['$sys_main_roles'] = [];
-        game.gd['$sys_sound'] = 0b11;
-        game.gd['$sys_music'] = '';
-        game.gd['$sys_scale'] = 1;
-
 
         if(bLoadResources)
             yield* GameSceneJS.loadResources();
@@ -182,6 +171,18 @@ Item {
         if(gameData) //！！！注意测试有没有问题（250623）
             //$CommonLibJS.copyPropertiesToObject(game.gd, gameData);
             game.gd = gameData;
+        else {
+            game.gd['$sys_fight_heros'] = [];
+            //game.gd['$sys_hidden_fight_heros'] = [];
+            game.gd['$sys_money'] = 0;
+            game.gd['$sys_goods'] = [];
+            game.gd['$sys_map'] = {};
+            game.gd['$sys_fps'] = 16;
+            game.gd['$sys_main_roles'] = [];
+            game.gd['$sys_sound'] = 0b11;
+            game.gd['$sys_music'] = '';
+            game.gd['$sys_scale'] = 1;
+        }
 
 
         game.$sys.reloadFightRoles();
