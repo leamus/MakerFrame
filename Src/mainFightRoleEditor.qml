@@ -131,10 +131,11 @@ Item {
                 text: '编译全部可视化'
                 onClicked: {
                     $dialog.show({
-                        Msg: '确定编译全部可视化？<BR>注意：该操作会覆盖所有目标脚本，且不可逆！',
+                        Msg: '确定？<BR>注意：该操作会覆盖所有目标脚本，且不可逆！',
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
                             //l_listFightRole.forceActiveFocus();
+                            let count = 0;
                             const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
                             for(let tn of list) {
                                 const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + tn + GameMakerGlobal.separator;
@@ -146,11 +147,20 @@ Item {
                                 fightRoleVisualEditor.init(path + 'fight_role.vjs');
                                 const result = fightRoleVisualEditor.compile(false);
                                 console.debug('[mainFightRoleEditor]result:', result);
-                                if(result[1])
+                                if(result[1]) {
                                     $Frame.sl_fileWrite(result[1], path + 'fight_role.js', 0);
+                                    ++count;
+                                }
                                 else
                                     console.warn('[!mainFightRoleEditor]ERROR:', result[2].toString());
                             }
+
+                            $dialog.show({
+                                Msg: '成功编译 %1 个脚本'.arg(count),
+                                Buttons: Dialog.Ok,
+                                OnRejected: ()=>{
+                                },
+                            });
                         },
                         OnRejected: ()=>{
                             //l_listFightRole.forceActiveFocus();

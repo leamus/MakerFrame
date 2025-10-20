@@ -768,8 +768,8 @@ Item {
                 //if(item.forceActiveFocus)
                 //    item.forceActiveFocus();
 
-                //if(item.init)
-                //    item.init(_private.strMapRID);
+                //if(item.$load)
+                //    item.$load(_private.strMapRID);
 
                 visible = true;
 

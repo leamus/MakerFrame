@@ -5253,20 +5253,25 @@ Item {
         }
 
 
+        //手动写入引擎变量（默认退出游戏时写入）
+        function savecd() {
+            GameMakerGlobal.settings.setValue('Projects/' + GameMakerGlobal.config.strCurrentProjectName, game.cd);
+            //return true;
+        }
+
         //局部/全局 数据/方法
-        //d和f是地图变量，切换地图时清空
+        //d和f是地图变量，切换地图时清空；
         property var d: ({})
         property var f: ({})
-        //gd和gf是全局变量，读档会清空；gd会自动存档读档
+        //gd和gf是全局变量，读档会清空；gd会自动存档读档；
         property var gd: ({})
         property var gf: ({})
-        //cd是共享变量，进入游戏时初始化，读档不会清空
+        //cd是引擎变量，整个游戏可用，进入游戏引擎时会读取，退出游戏时保存，读档不会清空；
         property var cd: ({})
+        //引擎函数，整个游戏可用，游戏退出后清空；（可以保存与运行工程生命周期一致的数据）
+        property var cf: ({})
         //在f和gf中定义某些特定功能的函数，系统会自动触发（优先级：地图脚本高于f高于gf）
         //  比如地图事件、地图离开事件、NPC交互事件、地图点击事件、NPC点击事件、定时器事件、NPC抵达事件、NPC触碰事件
-
-        //用户游戏数据（可以保存与运行工程生命周期一致的数据）
-        property var g: ({})
 
 
 

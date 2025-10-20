@@ -131,10 +131,11 @@ Item {
                 text: '编译全部可视化'
                 onClicked: {
                     $dialog.show({
-                        Msg: '确定编译全部可视化？<BR>注意：该操作会覆盖所有目标脚本，且不可逆！',
+                        Msg: '确定？<BR>注意：该操作会覆盖所有目标脚本，且不可逆！',
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
                             //l_listGoods.forceActiveFocus();
+                            let count = 0;
                             const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
                             for(let tn of list) {
                                 const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + tn + GameMakerGlobal.separator;
@@ -146,11 +147,20 @@ Item {
                                 goodsVisualEditor.init(path + 'goods.vjs');
                                 const result = goodsVisualEditor.compile(false);
                                 console.debug('[mainGoodsEditor]result:', result);
-                                if(result[1])
+                                if(result[1]) {
                                     $Frame.sl_fileWrite(result[1], path + 'goods.js', 0);
+                                    ++count;
+                                }
                                 else
                                     console.warn('[!mainGoodsEditor]ERROR:', result[2].toString());
                             }
+
+                            $dialog.show({
+                                Msg: '成功编译 %1 个脚本'.arg(count),
+                                Buttons: Dialog.Ok,
+                                OnRejected: ()=>{
+                                },
+                            });
                         },
                         OnRejected: ()=>{
                             //l_listGoods.forceActiveFocus();
@@ -283,8 +293,8 @@ Item {
 
         function refresh() {
             const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
-            //list.unshift('【新建道具】', '【一键编译全部可视化】');
-            //l_listGoods.removeButtonVisible = {0: false, 1: false, '-1': true};
+            //list.unshift('【新建道具】');
+            //l_listGoods.removeButtonVisible = {0: false, '-1': true};
             l_listGoods.show(list);
 
         }

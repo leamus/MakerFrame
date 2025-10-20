@@ -610,6 +610,13 @@ Item {
                             _private.updateLog();
                         }
                     }
+                    MenuItem {
+                        text: '建议意见'
+                        height: _config.nMenuItemHeight
+                        onClicked: {
+                            _private.suggest();
+                        }
+                    }
 
 
                     onAboutToHide: {
@@ -2026,7 +2033,7 @@ Item {
                     destPath
                 );
 
-                //$showBusyIndicator(false);
+                $showBusyIndicator(false);
 
                 $dialog.show({
                     Msg: ret ? ('成功:' + destPath + '.zip') : '失败',
@@ -2074,7 +2081,7 @@ Item {
 
                         $dialog.show({
                             TextFormat: Label.PlainText,
-                            Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载（由于服务器带宽低，下载人数多时会慢一些）？'
+                            Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？\r\n注意：由于服务器带宽低，下载人数多时会慢一些。'
                                 .arg(menuJS.infos[item]['Name'])
                                 .arg(menuJS.infos[item]['Version'])
                                 .arg(menuJS.infos[item]['Update'])
@@ -2083,7 +2090,6 @@ Item {
                                 .arg(menuJS.infos[item]['Description'])
                             ,
                             Buttons: Dialog.Yes | Dialog.No,
-                            FocusItem: $list,
                             OnAccepted: function() {
                                 //rootGameMaker.enabled = false;
 
@@ -2153,6 +2159,28 @@ Item {
             else {
                 loader.loadModule('mainUpdateLog.qml');
                 //userMainProject.source = 'mainUpdateLog.qml';
+            }
+        }
+        function suggest() {
+            if($globalData.$userData === undefined) {
+                $dialog.show({
+                    Msg: '请先登录',
+                    Buttons: Dialog.Ok,
+                    OnAccepted: function() {
+                    },
+                    OnRejected: ()=>{
+                    },
+                });
+                return;
+            }
+
+            if($Platform.compileType === 'debug') {
+                loader.loadModule('mainSuggest.qml');
+                //userMainProject.source = 'mainSuggest.qml';
+            }
+            else {
+                loader.loadModule('mainSuggest.qml');
+                //userMainProject.source = 'mainSuggest.qml';
             }
         }
 
