@@ -95,6 +95,12 @@ Item {
     }
 
 
+    /*GameMakerGlobal {
+        id: gameMakerGlobal
+    }
+    */
+
+
     ColumnLayout {
         height: parent.height * 0.9
         width: parent.width * 0.9
@@ -1435,6 +1441,7 @@ Item {
             if(status !== Loader.Loading) {
                 $clearComponentCache();
                 $trimComponentCache();
+                gc();
 
 
                 //要在下一个事件循环中改变，因为立即loadModule的话，onLoaded仍然会在后面调用，此时 item 已经不是之前的item了，所以先让onLoaded执行完再改loadModule；

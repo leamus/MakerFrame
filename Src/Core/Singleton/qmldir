@@ -19,3 +19,4 @@ module Singleton_GameMakerGlobal
 
 
 singleton GameMakerGlobal 1.0 GameMakerGlobal.qml
+#GameMakerGlobal 1.0 GameMakerGlobal.qml

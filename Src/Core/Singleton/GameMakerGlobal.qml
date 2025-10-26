@@ -22,17 +22,23 @@ import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
 
 QtObject {
+    id: root
+    objectName: 'GameMakerGlobal'
 
     //引擎版本
-    property string version: '1.15.3.250209'
+    readonly property string version: '1.15.3.250209'
 
-    property string separator: $Platform.sl_separator(true)
+    readonly property string separator: $Platform.sl_separator(true)
+
+    //保存 Component 附加组件
+    //单例的一个BUG：使用单例对象无法访问到Component，但内部使用root可以访问到；
+    readonly property var $component: Component //root.Component
 
 
 
     //可存储配置
     //  目前存储：Projects/工程名（game.cd引擎变量，用到了$sys_sound）、$RunTimes、$RunDuration
-    property Settings settings: Settings {
+    readonly property Settings settings: Settings {
         id: settings
         category: 'GameMaker'    //类别
         //fileName: 'GameMaker.ini'
@@ -47,7 +53,7 @@ QtObject {
 
 
     //配置
-    property QtObject config: QtObject {
+    readonly property QtObject config: QtObject {
         //调试（显示一些调试功能）
         //property bool bDebug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool bDebug: parseInt($Frame.config.Debug) === 0 ? false : true
@@ -220,7 +226,7 @@ QtObject {
 
 
     //使用时长
-    property Timer timer: Timer {
+    readonly property Timer timer: Timer {
         //id: timer
 
         property var nLastTime: new Date().getTime()
@@ -244,15 +250,21 @@ QtObject {
 
 
     Component.onCompleted: {
+        let gameMakerGlobal;
         //!!解决 assets BUG
-        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
-            return;
+        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0) {
+            gameMakerGlobal = root;
+            console.info('[!GameMakerGlobal]file:assets:/ 开头，需额外处理');
+            //return;
+        }
+        else
+            gameMakerGlobal = GameMakerGlobal;
 
-        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
-            console.warn('[!GameMakerGlobal]已经存在单例类，请重启框架或返回原引擎');
+        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
+            console.warn('[!GameMakerGlobal]已存在不同单例类，请重启框架或返回原引擎');
 
             Global.aliasGlobal.dialog.show({
-                Msg: '已经存在单例类，请重启框架或返回原引擎，否则数据出错',
+                Msg: '已存在不同单例类，请重启框架或返回原引擎，否则数据出错',
                 //Buttons: 0,
                 OnAccepted: function() {
                 },
@@ -262,8 +274,8 @@ QtObject {
             return;
         }
 
-        $Frame.sl_globalObject().$GameMakerGlobal = GameMakerGlobal;
-        $Frame.sl_globalObject().GameMakerGlobal = GameMakerGlobal;
+        $Frame.sl_globalObject().$GameMakerGlobal = gameMakerGlobal;
+        $Frame.sl_globalObject().GameMakerGlobal = gameMakerGlobal;
         $Frame.sl_globalObject().$GameMakerGlobalJS = GameMakerGlobalJS;
         $Frame.sl_globalObject().GameMakerGlobalJS = GameMakerGlobalJS;
 
@@ -284,15 +296,21 @@ QtObject {
 
 
 
-        console.debug('[GameMakerGlobal]Component.onCompleted:', GameMakerGlobal, GameMakerGlobalJS/*, $window*/, Qt.resolvedUrl('.'));
+        console.debug('[GameMakerGlobal]Component.onCompleted:', gameMakerGlobal, GameMakerGlobalJS/*, $window*/, gameMakerGlobal.Component, root.Component, gameMakerGlobal === root, Qt.resolvedUrl('.'), );
     }
     Component.onDestruction: {
+        let gameMakerGlobal;
         //!!解决 assets BUG
-        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0)
-            return;
+        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0) {
+            gameMakerGlobal = root;
+            console.debug('[GameMakerGlobal]file:assets:/ 开头，需额外处理');
+            //return;
+        }
+        else
+            gameMakerGlobal = GameMakerGlobal;
 
-        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== GameMakerGlobal) {
-            console.warn('[!GameMakerGlobal]已经存在单例类');
+        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
+            console.warn('[!GameMakerGlobal]已存在不同单例类');
             return;
         }
 
