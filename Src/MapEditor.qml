@@ -2844,7 +2844,7 @@ Item {
 
         title: '保存文件'
         //folder: shortcuts.home
-        folder: $GlobalJS._FixLocalPath_W('Map')
+        folder: $GlobalJS.toReadWriteURL('Map')
 
         selectMultiple: false
         selectExisting: true
@@ -3233,7 +3233,9 @@ Item {
                 ChoiceButton: 0b11,
                 PathText: 0b11,
                 RunButton: 0b0,
+                //Focus: false,
             });
+            //scriptEditor.editor.forceActiveFocus();
             //scriptEditor.text = $Frame.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();

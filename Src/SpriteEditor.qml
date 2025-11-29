@@ -2158,7 +2158,9 @@ function $refresh(index, imageAnimate, path) {
                 ChoiceButton: 0b0,
                 PathText: 0b0,
                 RunButton: 0b0,
+                //Focus: false,
             });
+            //scriptEditor.editor.forceActiveFocus();
             //scriptEditor.text = $Frame.sl_fileRead(path + 'sprite.js') || '';
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();

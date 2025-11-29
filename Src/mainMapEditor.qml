@@ -497,7 +497,9 @@ Item {
             checkboxSaveResource.enabled = false;
 
 
-            dialogMapData.visible = true;
+            root.forceActiveFocus(); //对话框关闭时不要跳回搜索框（否则键盘会显示一下）
+            dialogMapData.open();
+            //dialogMapData.forceActiveFocus();
 
 
             //let cfg = File.read(fileUrl.toString());
@@ -512,7 +514,9 @@ Item {
         }
 
         onSg_canceled: {
-            dialogMapData.visible = true;
+            root.forceActiveFocus(); //对话框关闭时不要跳回搜索框（否则键盘会显示一下）
+            dialogMapData.open();
+            //dialogMapData.forceActiveFocus();
 
             visible = false;
             //loader.visible = true;
@@ -663,7 +667,7 @@ Item {
         title: '选择地图文件'
         selectMultiple: false
         //folder: shortcuts.home
-        folder: $GlobalJS._FixLocalPath_W($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+        folder: $GlobalJS.toReadWriteURL($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
         nameFilters: [ 'Json files (*.json *.map *.jsn)', 'All files (*)' ]
         selectExisting: true
         selectFolder: false
@@ -834,7 +838,7 @@ Item {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = $GlobalJS._FixLocalPath_W($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+            //filedialogOpenMap.folder = $GlobalJS.toReadWriteURL($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
             //console.debug('filedialogOpenMap.folder:', filedialogOpenMap.folder)
@@ -851,9 +855,9 @@ Item {
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug('path:', $GlobalJS._FixLocalPath_W(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', $GlobalJS.toReadWriteURL(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
             //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
-            //console.debug('path:', Qt.resolvedUrl($GlobalJS._FixLocalPath_W($Platform.externalDataPath)));
+            //console.debug('path:', Qt.resolvedUrl($GlobalJS.toReadWriteURL($Platform.externalDataPath)));
         }
 
         function openItem(item) {
@@ -872,8 +876,9 @@ Item {
 
             if(!item) {
                 dialogMapData.nCreateMapType = 1;
+                root.forceActiveFocus(); //对话框关闭时不要跳回搜索框（否则键盘会显示一下）
                 dialogMapData.open();
-                dialogMapData.forceActiveFocus();
+                //dialogMapData.forceActiveFocus();
 
                 _private.strMapRID = '';
 
@@ -908,8 +913,9 @@ Item {
                 textMapBlockResourceName.text = cfg.MapBlockImage[0];
                 //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 
+                root.forceActiveFocus(); //对话框关闭时不要跳回搜索框（否则键盘会显示一下）
                 dialogMapData.open();
-                dialogMapData.forceActiveFocus();
+                //dialogMapData.forceActiveFocus();
             }
 
 

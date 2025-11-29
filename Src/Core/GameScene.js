@@ -355,7 +355,7 @@ function* loadResources() {
 
             if(info) {
                 info = JSON.parse(info);
-                let t = $GlobalJS._eval(info['Goods']);
+                let t = _eval(info['Goods']);
                 if(t) {
                     _private.goodsResource[item] = t;
                     _private.goodsResource[item].$rid = item;
@@ -390,7 +390,7 @@ function* loadResources() {
 
             if(info) {
                 info = JSON.parse(info);
-                let t = $GlobalJS._eval(info['FightSkill']);
+                let t = _eval(info['FightSkill']);
                 if(t) {
                     _private.skillsResource[item] = t;
                     _private.skillsResource[item].$rid = item;
@@ -565,7 +565,7 @@ function* loadResources() {
 
     /*data = game.loadjson('common_algorithm.json');
     if(data) {
-        let ret = $GlobalJS._eval(data['FightAlgorithm']);
+        let ret = _eval(data['FightAlgorithm']);
     }*/
 
 
@@ -581,7 +581,7 @@ function* loadResources() {
 
     /*info = game.loadjson('level_chain.json');
     if(info) {
-        let ret = $GlobalJS._eval(info['LevelChainScript']);
+        let ret = _eval(info['LevelChainScript']);
         _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelUpScript;
         _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelAlgorithm;
     }

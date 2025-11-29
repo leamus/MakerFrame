@@ -42,18 +42,16 @@ Item {
             const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
-                //data = JSON.parse(data);
-                //console.debug('data', data);
                 _private.strSavedName = textGoodsName.text = goodsName;
                 notepadGoodsScript.setPlainText(data);
                 notepadGoodsScript.toBegin();
+                notepadGoodsScript.forceActiveFocus();
 
                 return;
             }
         }
 
         _private.strSavedName = textGoodsName.text = '';
-
         notepadGoodsScript.setPlainText("
 //闭包写法
 const data = (function() {
@@ -197,7 +195,7 @@ const data = (function() {
         );
 
         notepadGoodsScript.toBegin();
-
+        notepadGoodsScript.forceActiveFocus();
     }
 
 

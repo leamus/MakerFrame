@@ -218,7 +218,7 @@ Item {
         //    return;
 
 
-        //data = $GlobalJS._eval(data.FightScript);
+        //data = _eval(data.FightScript);
         //let data = game.$sys.getFightScriptResource(fightScriptName);
         //_private.fightInfo = data;
         //_private.fightRoundScript = fightScript.$commons.$fightRoundScript || '';
@@ -226,7 +226,7 @@ Item {
         //_private.fightEndScript = fightScript.$commons.$fightEndScript || '';
 
         /*try {
-            data = $GlobalJS._eval(data.FightScript);
+            data = _eval(data.FightScript);
         }
         catch(e) {
             $CommonLibJS.printException(e);
@@ -2074,7 +2074,7 @@ Item {
         onAccepted: {
             //gameMap.focus = true;
             rootFightScene.forceActiveFocus();
-            //$GlobalJS._eval(textScript.text);
+            //_eval(textScript.text);
             console.debug(eval(textScript.text));
             //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }

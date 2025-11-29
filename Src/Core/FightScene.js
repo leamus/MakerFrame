@@ -965,7 +965,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         /*/或者显示 Data字符串方法 的返回值（可以使用 SkillEffectResult 对象）
         if(combatantActionSpriteData.Data) {
             //console.debug(SkillEffectResult[0].value)
-            wordmove.text.text = $GlobalJS._eval(combatantActionSpriteData.Data, '', {SkillEffectResult: SkillEffectResult});
+            wordmove.text.text = _eval(combatantActionSpriteData.Data, {SkillEffectResult: SkillEffectResult});
             //console.debug(wordmove.text.text)
         }*/
 
@@ -1855,7 +1855,7 @@ function loadFightSkillInfo(fightSkillName) {
             data = JSON.parse(data);
             //console.debug('data', data);
             try {
-                data = $GlobalJS._eval(data.FightSkill);
+                data = _eval(data.FightSkill);
             }
             catch(e) {
                 CommonLibJS.printException(e);
@@ -1868,7 +1868,7 @@ function loadFightSkillInfo(fightSkillName) {
         * /
         let data = game.loadjson(GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
         if(data) {
-            return $GlobalJS._eval(data.FightSkill);
+            return _eval(data.FightSkill);
         }
     }
     return undefined;

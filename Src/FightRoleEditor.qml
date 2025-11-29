@@ -42,6 +42,7 @@ Item {
                 _private.strSavedName = textFightRoleName.text = fightRoleName;
                 notepadFightRoleProperty.setPlainText(data);
                 notepadFightRoleProperty.toBegin();
+                notepadFightRoleProperty.forceActiveFocus();
 
                 return;
             }
@@ -146,8 +147,7 @@ const data = (function() {
 "
         );
         notepadFightRoleProperty.toBegin();
-
-
+        notepadFightRoleProperty.forceActiveFocus();
     }
 
 

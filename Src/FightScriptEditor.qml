@@ -43,9 +43,9 @@ Item {
 
             if(data) {
                 _private.strSavedName = textFightScriptName.text = fightScriptName;
-
                 notepadScript.setPlainText(data);
                 notepadScript.toBegin();
+                notepadScript.forceActiveFocus();
 
                 return;
             }
@@ -164,8 +164,7 @@ const data = (function() {
 "
         );
         notepadScript.toBegin();
-
-        //console.debug('data', data);
+        notepadScript.forceActiveFocus();
     }
 
 

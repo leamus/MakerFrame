@@ -42,10 +42,10 @@ Item {
             const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
-                //console.debug('data', data);
                 _private.strSavedName = textFightSkillName.text = fightSkillName;
                 notepadFightSkillScript.setPlainText(data);
                 notepadFightSkillScript.toBegin();
+                notepadFightSkillScript.forceActiveFocus();
 
                 return;
             }
@@ -207,7 +207,7 @@ const data = (function() {
 "
         );
         notepadFightSkillScript.toBegin();
-
+        notepadFightSkillScript.forceActiveFocus();
     }
 
 

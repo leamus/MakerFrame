@@ -341,7 +341,7 @@ Item {
             //loader.focus = true;
             loader.forceActiveFocus();
             //loader.item.focus = true;
-            loader.item.forceActiveFocus();
+            //loader.item.forceActiveFocus();
         }
     }
 

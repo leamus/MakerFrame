@@ -252,19 +252,22 @@ QtObject {
     Component.onCompleted: {
         let gameMakerGlobal;
         //!!解决 assets BUG
-        if(Qt.platform.os === 'android' && Qt.resolvedUrl('.').indexOf('file:assets:/') === 0) {
+        if(Qt.resolvedUrl('.').indexOf('file:assets:/') === 0) {
             gameMakerGlobal = root;
-            console.info('[!GameMakerGlobal]file:assets:/ 开头，需额外处理');
+            console.info('[GameMakerGlobal]file:assets:/ 开头，需额外处理');
+            if(Qt.platform.os !== 'android')
+                console.warn('[!GameMakerGlobal]非安卓环境？');
             //return;
         }
         else
             gameMakerGlobal = GameMakerGlobal;
 
         if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
-            console.warn('[!GameMakerGlobal]已存在不同单例类，请重启框架或返回原引擎');
+            const msg = '已存在不同GameMakerGlobal单例类，请重启框架或返回原引擎，否则数据出错';
+            console.warn('[!GameMakerGlobal]' + msg);
 
             Global.aliasGlobal.dialog.show({
-                Msg: '已存在不同单例类，请重启框架或返回原引擎，否则数据出错',
+                Msg: msg,
                 //Buttons: 0,
                 OnAccepted: function() {
                 },

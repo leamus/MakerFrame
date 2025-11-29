@@ -5121,7 +5121,7 @@ Item {
                     }*/
 
                     //方案2：或使用这个：
-                    scriptInfo.Script = $CommonLibJS._eval(scriptInfo.Script);
+                    scriptInfo.Script = _eval(scriptInfo.Script);
                     if(!scriptInfo.Script)
                         return -2;
 
@@ -5141,7 +5141,7 @@ Item {
                 //执行脚本，必须返回3种类型之一
                 scriptInfo.Script = $Frame.sl_evaluateFile(scriptInfo.Script); //!!用这个好处是自带提供错误的文件路径（我做的Eval也可以了）
 
-                //scriptInfo.Script = _evalFile(scriptInfo.Script, {evaluateFilePath: $Frame.sl_absolutePath(scriptInfo.Script)});//!!用这个好处是有 导入此JS的QML的 上下文环境
+                //scriptInfo.Script = $CommonLibJS._evalFile(scriptInfo.Script, {evaluateFilePath: $Frame.sl_absolutePath(scriptInfo.Script)});//!!用这个好处是有 导入此JS的QML的 上下文环境
             }
 
             //如果是当前脚本，则立即运行，否则等正在执行脚本完毕
@@ -5220,7 +5220,7 @@ Item {
         //运行代码；
         //在这里执行会有上下文环境
         readonly property var evalcode: function(data, filePath='', envs={}) {
-            return $CommonLibJS._eval(data, filePath, envs);
+            return _eval(data, filePath, envs);
         }
 
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
@@ -5231,7 +5231,19 @@ Item {
             else
                 filePath = filePath + GameMakerGlobal.separator + fileName;
 
-            $CommonLibJS._evalFile(filePath, envs);
+
+            //return $CommonLibJS._evalFile(filePath, envs);
+
+
+            if(!$Frame.sl_fileExists(filePath))
+                throw new Error('不存在文件:' + filePath);
+
+            const data = $Frame.sl_fileRead(filePath);
+            //const cfg = File.read(filePath);
+
+            //if(!data)
+            //    return false;
+            return _eval(data, envs);
         }
 
         //用C++执行脚本；已注入game和fight环境
