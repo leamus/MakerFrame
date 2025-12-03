@@ -795,7 +795,7 @@ Item {
 
                                 //_private.loadScript(textSpriteRID.text);
                                 if(!scriptEditor.text &&
-                                        !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js')) {
+                                        !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js')) {
                                     if(comboType.currentIndex === 1)
                                         scriptEditor.text = _private.strTemplateCode0;
                                     else
@@ -1022,7 +1022,7 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName
+        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
         visualScriptEditor.nLoadType: 1
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
@@ -1815,7 +1815,7 @@ Item {
                 return;
             }
 
-            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
+            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
 
             function fnSave() {
                 if(_private.exportSprite()) {
@@ -2108,7 +2108,7 @@ function $refresh(index, imageAnimate, path) {
                 spriteEffect.height = parseInt(textSpriteHeight.text);
 
 
-                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
+                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
                 if($Frame.sl_fileExists(jsPath)) {
                     _private.jsLoader.clear();
                     const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
@@ -2149,11 +2149,11 @@ function $refresh(index, imageAnimate, path) {
                 return;
             }
 
-            //const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator;
+            //const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator;
             //if($Frame.sl_fileExists(path + 'sprite.js')) {
             //File.read(path + 'sprite.js');
             scriptEditor.init({
-                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
+                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
                 RelativePath: GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator + 'sprite.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
@@ -2175,13 +2175,13 @@ function $refresh(index, imageAnimate, path) {
                 else
                     scriptEditor.text = '';
 
-                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
+                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text;
                 const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'sprite.js', 0);
             }
             else if(textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) { //另存为
-                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js';
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.js';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.js';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -2194,9 +2194,9 @@ function $refresh(index, imageAnimate, path) {
         function copyVJS() {
             //如果路径不为空，且是另存为，则复制vjs文件
             if(_private.strSpriteRID !== '' && textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) {
-                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.vjs';
+                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + _private.strSpriteRID + GameMakerGlobal.separator + 'sprite.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.vjs';
+                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + textSpriteRID.text + GameMakerGlobal.separator + 'sprite.vjs';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -2213,7 +2213,7 @@ function $refresh(index, imageAnimate, path) {
         function exportSprite() {
 
             const spriteRID = textSpriteRID.text;
-            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator + 'sprite.json';
+            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteRID + GameMakerGlobal.separator + 'sprite.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);

@@ -4602,7 +4602,7 @@ Item {
         readonly property var checksave: function(data) {
             if($CommonLibJS.isString(data)) {
                 data = data.trim();
-                let filePath = $GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + data + '.json');
+                let filePath = $GlobalJS.toPath(GameMakerGlobal.config.strSaveDataPath + data + '.json');
                 if(!$Frame.sl_fileExists(filePath))
                     return false;
 
@@ -4739,7 +4739,7 @@ Item {
 
                     let ret;
                     if($CommonLibJS.isString(fileName)) {
-                        const filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
+                        const filePath = GameMakerGlobal.config.strSaveDataPath + fileName + '.json';
 
                         //!!!导出为文件
                         //console.debug(JSON.stringify(outputData));
@@ -4834,7 +4834,7 @@ Item {
                     }
 
 
-                    //const filePath = GameMakerGlobal.config.strSaveDataPath + GameMakerGlobal.separator + fileName + '.json';
+                    //const filePath = GameMakerGlobal.config.strSaveDataPath + fileName + '.json';
 
 
                     yield* release(false);
@@ -5135,7 +5135,7 @@ Item {
 
                 //console.debug('scriptInfo.Script:', scriptInfo.Script);
 
-                //scriptInfo.Script = GameMakerGlobal.config.strProjectRootPath + $Platform.sl_separator(true) + GameMakerGlobal.config.strCurrentProjectName + $Platform.sl_separator(true) + scriptInfo.Script;
+                //scriptInfo.Script = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + scriptInfo.Script;
                 //此脚本所在路径 注入到全局上下文环境（如果使用evaluateFile只能这样全局上下文环境，目前再没有给evaluate传递上下文环境的办法）
                 $Frame.sl_globalObject().evaluateFilePath = $Frame.sl_absolutePath(scriptInfo.Script);
                 //执行脚本，必须返回3种类型之一
@@ -5288,7 +5288,7 @@ Item {
 
 
         //项目根目录
-        property string $projectpath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
+        property string $projectpath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
 
 
         //用户脚本（用户 common_script.js，如果没有则指向 $GameMakerGlobalJS）

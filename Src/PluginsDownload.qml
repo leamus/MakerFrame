@@ -92,10 +92,10 @@ Item {
 
                     //console.error('!!!', fUrl, fileUrl)
 
-                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName);
+                    //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName);
 
-                    //const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + $Frame.sl_completeBaseName(fUrl);
-                    const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+                    //const projectPath = GameMakerGlobal.config.strProjectRootPath + $Frame.sl_completeBaseName(fUrl);
+                    const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
 
                     //$Frame.sl_dirCreate(projectPath);
                     let ret = $Frame.sl_extractDir($GlobalJS.toPath(fUrl), projectPath);
@@ -197,7 +197,7 @@ Item {
                         ,
                         Buttons: Dialog.Yes | Dialog.No,
                         OnAccepted: function() {
-                            const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+                            const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                             const zipPath = projectPath + '~Cache' + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + pluginJS.$path[0] + GameMakerGlobal.separator + pluginJS.$file;
                             const pluginPath = pluginJS.$path.join(GameMakerGlobal.separator).trim();
                             const jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath + GameMakerGlobal.separator + 'main.js';

@@ -68,35 +68,36 @@ QtObject {
         property string strWorkPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return $Platform.externalDataPath + separator + 'GameMaker';
-                //return 'assets:';   //'.'  //':'
+            case 'openharmony':
+                return $Platform.externalDataPath + separator + 'GameMaker' + separator;
+                //return 'assets:/';   //'./'  //':/'
             case 'windows':
                 if($Platform.compileType === 'release')
-                    return 'GameMaker';
+                    return 'GameMaker' + separator;
                 else
-                    return 'F:/_Projects/Pets/MakerFrame/GameMaker';
+                    return 'F:/_Projects/Pets/MakerFrame/GameMaker/';
             default:
-                return 'GameMaker';
-                //return '.';
+                return 'GameMaker' + separator;
+                //return './';
             }
         }
 
         //项目根目录
         property string strProjectRootPath: {
-            return strWorkPath + separator + 'Projects';
+            return strWorkPath + 'Projects/';
         }
 
         //存档目录
         property string strSaveDataPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return strWorkPath + separator + 'SaveData' + separator + strCurrentProjectName;
-                //return $Platform.externalDataPath + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData';
-                //return $Platform.sl_getSdcardPath() + separator + 'Leamus' + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData';
+                return strWorkPath + 'SaveData' + separator + strCurrentProjectName + separator;
+                //return $Platform.externalDataPath + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData' + separator;
+                //return $Platform.sl_getSdcardPath() + separator + 'Leamus' + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData' + separator;
             case 'windows':
             default:
-                return strWorkPath + separator + 'SaveData' + separator + strCurrentProjectName;
-                //return 'SaveData';
+                return strWorkPath + 'SaveData' + separator + strCurrentProjectName + separator;
+                //return 'SaveData' + separator;
             }
         }
 
@@ -134,21 +135,21 @@ QtObject {
 
     function mapResourceURL(filepath) {return $GlobalJS.toURL(mapResourcePath(filepath));}
     function mapResourcePath(filepath) {
-        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMapResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strMapResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
     function spriteResourceURL(filepath) {return $GlobalJS.toURL(spriteResourcePath(filepath));}
     function spriteResourcePath(filepath) {
-        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSpriteResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strSpriteResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
     }
     function goodsResourceURL(filepath) {return $GlobalJS.toURL(goodsResourcePath(filepath));}
     function goodsResourcePath(filepath) {
-        let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strGoodsResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strGoodsResourceDirName;
         if(filepath)
             return ret + separator + filepath;
         return ret;
@@ -159,13 +160,13 @@ QtObject {
     function soundResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
-            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
         else if(filepath.indexOf(':') >= 0)
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strSoundResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strSoundResourceDirName;
             if(filepath)
                 return ret + separator + filepath;
             return ret;
@@ -176,13 +177,13 @@ QtObject {
     function musicResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
-            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
         else if(filepath.indexOf(':') >= 0)
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strMusicResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strMusicResourceDirName;
             if(filepath)
                 return ret + separator + filepath;
             return ret;
@@ -193,13 +194,13 @@ QtObject {
     function imageResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
-            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
         else if(filepath.indexOf(':') >= 0)
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strImageResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strImageResourceDirName;
             if(filepath)
                 return ret + separator + filepath;
             return ret;
@@ -210,13 +211,13 @@ QtObject {
     function videoResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.indexOf('/') === 0)
-            return config.strProjectRootPath + separator + config.strCurrentProjectName + filepath;
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
         else if(filepath.indexOf(':') >= 0)
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + separator + config.strCurrentProjectName + separator + config.strVideoResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strVideoResourceDirName;
             if(filepath)
                 return ret + separator + filepath;
             return ret;

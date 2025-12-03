@@ -255,7 +255,7 @@ Item {
             objPlugins = {};
 
             //载入扩展 插件/组件
-            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator;
+            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator;
 
             //循环三方根目录
             for(let tc0 of $Frame.sl_dirList($GlobalJS.toPath(pluginsRootPath), [], 0x001 | 0x2000 | 0x4000, 0)) {

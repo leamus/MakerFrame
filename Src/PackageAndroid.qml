@@ -614,14 +614,14 @@ Item {
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
                             ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
 
-                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
 
                             modifyConfig();
                         }
                         else if(packageType === 1) { //只是工程
                             $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
 
-                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
                         }
                         else
                             modifyConfig();
@@ -740,7 +740,7 @@ Item {
 
 
     Component.onCompleted: {
-        //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+        //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName;
         textPackageDirPath.text = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
         _private.refresh();
 

@@ -89,7 +89,7 @@ Item {
             }
 
             onSg_removeClicked: {
-                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item;
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item;
 
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -136,9 +136,9 @@ Item {
                         OnAccepted: function() {
                             //l_listFightSkill.forceActiveFocus();
                             let count = 0;
-                            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+                            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
                             for(let tn of list) {
-                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + tn + GameMakerGlobal.separator;
+                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + tn + GameMakerGlobal.separator;
                                 if(!$Frame.sl_fileExists(path + 'fight_skill.vjs')) {
                                     console.info('[mainFightSkillEditor]没有可视化文件:', tn);
                                     continue;
@@ -292,7 +292,7 @@ Item {
         id: _private
 
         function refresh() {
-            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建技能】');
             //l_listFightSkill.removeButtonVisible = {0: false, '-1': true};
             l_listFightSkill.show(list);
@@ -318,7 +318,7 @@ Item {
 
 
             /*
-            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_skill.json';
+            let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'fight_skill.json';
 
             console.debug('[mainFightSkillEditor]filePath：', filePath);
 

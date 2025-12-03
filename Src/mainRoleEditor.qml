@@ -90,7 +90,7 @@ Item {
             }
 
             onSg_removeClicked: {
-                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
 
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -220,7 +220,7 @@ Item {
         id: _private
 
         function refresh() {
-            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建角色】');
             //l_listRole.removeButtonVisible = {0: false, '-1': true};
             l_listRole.show(list);
@@ -241,7 +241,7 @@ Item {
                 loader.item.newRole();
             }
             else {
-                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.json';
+                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.json';
                 console.debug('[mainRoleEditor]filePath:', filePath);
 
                 let cfg = $Frame.sl_fileRead(filePath);

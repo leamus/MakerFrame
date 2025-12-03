@@ -147,7 +147,7 @@ Item {
 
         if(root.nSpriteType === 0) {
             //读特效信息
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
             //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + 'sprite.json'));
             //if(info)
             //    info = JSON.parse(info);

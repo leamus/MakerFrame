@@ -147,7 +147,7 @@ Item {
 <CENTER><B>关　于</B></CENTER>
 
   简介：
-1.鹰歌软件框架MakerFrame 是一款由 Qt（C++）、QML（JavaScript）、JAVA（Android） 构建，供二次开发软件和游戏的开放式跨平台框架，它可以运行在Windows、Android、iOS、MacOS、Linux（Debian、Ubuntu、RaspberryPi以及国产化的Openkylin、UOS）等主流平台上，并提供了上架应用商店、广告接口、网络（各种协议和下载）、资源整合打包、屏幕自适应、热更新、数据库、几种图形引擎、文件（夹）操作、压缩解压、进程、线程池、异步脚本（协程）、JS脚本引擎、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、以及各种三方库和SDK等丰富的底层功能和扩展，能满足各种软件开发和多种类型的引擎及游戏的一款超级APP；
+1.鹰歌软件框架MakerFrame 是一款由 Qt（C++）、QML（JavaScript）、JAVA（Android） 构建，供二次开发软件和游戏的开放式跨平台框架，它可以运行在Windows、Android、OpenHarmony、iOS、MacOS、Linux（Debian、Ubuntu、RaspberryPi以及国产化的Openkylin、UOS）等主流平台上，并提供了上架应用商店、广告接口、网络（各种协议和下载）、资源整合打包、屏幕自适应、热更新、数据库、几种图形引擎、文件（夹）操作、压缩解压、进程、线程池、异步脚本（协程）、JS脚本引擎、脚本/事件队列、项目打包生成、平台分发上架、媒体播放器、浏览器内核、以及各种三方库和SDK等丰富的底层功能和扩展，能满足各种软件开发和多种类型的引擎及游戏的一款超级APP；
 2.鹰歌游戏引擎GameMaker 是基于 鹰歌软件框架MakerFrame 开发的一套开放式（支持RPG、ARPG、策略与战旗、文字AVG、放置类等几乎所有2D类型）游戏开发引擎和运行环境，主要由QML（JavaScript）编写，支持图形化编辑器（如 地图编辑器、角色编辑器、特效编辑器、道具编辑器、技能编辑器、战斗人物编辑器、战斗脚本编辑器、升级链编辑器、图片音乐视频管理、图形化脚本编程等）、代码或两者结合的方式来设计游戏和开发插件；
 
   QQ：85885245
@@ -165,13 +165,13 @@ Item {
 1.Windows版本：将Qt环境（Qt_v5.15.12_win_x64）和框架引擎（MakerFrame_鹰歌框架引擎_win_x64_vXXX）解压并放在一起 ，双击“_运行鹰歌.bat”；
 2.Android：安装运行 MakerFrame_鹰歌框架引擎_xxx_armeabi-v7a.apk 或 MakerFrame_鹰歌框架引擎_xxx_arm64-v8a.apk 即可；
 3.Linux：目前在OpenKylin和RaspberryPi系统上发布了DEB安装包，并上架了Openkylin的应用商店（应该支持Debian、Ubuntu及衍生的操作系统）；
-4.苹果iOS、MacOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布；
+4.OpenHarmony、苹果iOS、MacOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布；
 5.打开软件后，进入GameMaker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了；
 6.各平台的框架引擎都支持热更新（打开软件后会自动检测并更新 动态链接库内核、QML底层库和Java代码库Dex），无需重新下载安装新版，QML游戏引擎在线版也是即时更新的（服务器带宽较慢，可能升级和下载时间会稍微长一点）。
 
 
   功能和特色：
-1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、Android（6.0及以上）、MacOS、iOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin、Deepin和UOS、Arm的RaspberryPi）等操作系统上，目前OpenKylin和Deepin已成立Sig并上架到了应用商店；
+1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、Android（6.0及以上）、OpenHarmony、MacOS、iOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin、Deepin和UOS、Arm的RaspberryPi）等操作系统上，目前OpenKylin和Deepin已成立Sig并上架到了应用商店；
 2.全功能网络：支持 TCP、UDP、HTTP（XmlHttpRequest和QNetwork封装的两种方式，后者自由度更高）、WebSocket（QML）、MQTT、串口（QextSerialPort）等多种常用协议的服务端和客户端开发，也可自己封装其他协议；API使用非常简单，支持异步函数的同步写法；支持互联网、局域网、蓝牙、NFC等通信方式；
 3.配套的后台服务软件和数据库：已有PHP开发的弱网系统（Workerman/Webman高并发服务），C++开发的联机系统（IOCP高并发模型），配套Redis、MySQL来做缓存和存储，支持注册登录、房间及管理、聊天、联机对战（帧同步）等功能，可万人同时在线；数据存储自由度高，支持JSON，各平台共享；
 4.多种发布形式：能生成对应平台的安装包exe、apk、bin、deb等（可发布在Steam、Tap、OpenKylin等应用商店），也能生成框架引擎能载入运行的游戏ROM包；资源和代码支持源文件形式，也支持压缩、打包、加密的形式，一定程度上可防逆向；ROM可以分发到各平台，或上传到官网，用链接、二维码、分享等形式来载入运行；

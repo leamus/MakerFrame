@@ -27,7 +27,7 @@ const data = (function() {
         '载入地图': {
             command: ['载入地图', 'yield game.loadmap({RID: %1, $name: %2, $scale: %3}, %4);', '载入一张地图', 0, true, 'red', 'white'],
             params: [
-                ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
+                ['*@地图资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, 'green'],
                 ['地图名', 'string', undefined, 0, '', 'darkgreen'],
                 ['缩放倍数', 'number', undefined, 0, '', 'blue'],
                 ['flags', 'number', '0b10', 0, '', 'blue'],
@@ -102,7 +102,7 @@ const data = (function() {
         '创建主角': {
             command: ['创建主角', 'game.createhero({RID:%1, $name:%2});', '创建主角', 0, true, 'red', 'white'],
             params: [
-                ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
+                ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                 ['主角名/id', 'string', undefined, 0, '', 'darkgreen'],
                 ['主角名/id 为标识，操作和特定事件名使用，不可重复；如果省略，系统会自动使用随机标识；<br>命令返回主角组件对象。', 'label'],
             ],
@@ -139,7 +139,7 @@ const data = (function() {
         '创建NPC': {
             command: ['创建NPC', 'game.createrole({RID: %1, $id: %2, $name: %2, $bx: %3, $by: %4, $action: %5, $start: %6, $direction: %7});', '', 0, true, 'red', 'white'],
             params: [
-                ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
+                ['*@角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, 'green'],
                 ['NPC名/id', 'string', undefined, 0, '', 'darkgreen'],
                 ['*地图块x', 'number', true, 0, '', 'blue'],
                 ['*地图块y', 'number', true, 0, '', 'blue'],
@@ -259,7 +259,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '显示特效': {
             command: ['显示特效', 'game.showsprite(Object.assign({RID: %1, $id: %2, $x: %4, $y: %5, $width: %6, $height: %7, $parent: %3, $loops: %8}, %9));', '显示特效', 0, true, 'red', 'white'],
             params: [
-                ['*@特效资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, 'green'],
+                ['*@特效资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, 'green'],
                 ['id', 'string', undefined, 0, '', 'green'],
                 ['目标组件', 'string|number', undefined, 2, [['屏幕', '视窗', '场景', '地图', '地图地板', '角色'], ['0', '1', '2', '3', '4', '"角色名/id"'], ''], 'green'],
                 ['x', 'unformatted', '-1', 0, '', 'darkgreen'],
@@ -366,7 +366,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '创建战斗主角': {
             command: ['创建战斗主角', 'game.createfighthero(%1);', '创建战斗主角', 0, true, 'red', 'white'],
             params: [
-                ['*@战斗角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, 'green'],
+                ['*@战斗角色资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName, 'green'],
                 ['长按编辑框可选择。', 'label'],
             ],
         },
@@ -389,7 +389,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['获得技能', 'game.getskill(%1,%2,%3);', '获得技能', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['*@技能名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
+                ['*@技能名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@位置', 'number', true, 2, [['追加', '替换(输入数字下标)'], ['-1', ''], '-1'], 'darkgreen'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -398,7 +398,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['移除技能', 'game.removeskill(%1,%2,%3);', '移除技能', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['*@技能名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
+                ['*@技能名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -407,7 +407,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['技能对象', 'game.skill(%1,%2,%3)', '技能对象', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['*@技能资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
+                ['*@技能资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName, 'darkgreen'],
                 ['*@类型', 'json', true, 2, [['所有', '普通攻击', '技能'], ['{}', '{type: 0}', '{type: 1}'], '{}'], 'darkgreen'],
                 ['注意：命令返回的是所有为 技能资源名 的技能对象数组；', 'label'],
                 ['长按编辑框可选择。', 'label'],
@@ -435,7 +435,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '获得道具': {
             command: ['获得道具', 'game.getgoods(%1,%2);', '获得道具', 0, true, 'red', 'white'],
             params: [
-                ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
+                ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['*个数', 'number', true, 0, '1', 'darkgreen'],
                 ['命令返回背包内此道具的总数；', 'label'],
                 ['长按编辑框可选择。', 'label'],
@@ -445,7 +445,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '移除道具': {
             command: ['移除道具', 'game.removegoods(%1,%2);', '移除道具', 0, true, 'red', 'white'],
             params: [
-                ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
+                ['*@道具资源名', 'string|number', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['*个数', 'number', true, 0, '1', 'darkgreen'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -470,7 +470,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['使用道具', 'yield game.usegoods(%1,%2);', '使用道具', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
+                ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['注意：只是调用道具的 $commons.$useScript 脚本；', 'label'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -479,7 +479,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
             command: ['装备道具', 'yield game.equip(%1,%2);', '装备道具', 0, true, 'red', 'white'],
             params: [
                 ['*@战斗角色', 'string|number', true, 2, [['战斗角色游戏名或下标（数字）'], ['']], 'darkgreen'],
-                ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
+                ['*@道具资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName, 'darkgreen'],
                 ['长按编辑框可选择。', 'label'],
             ],
         },
@@ -520,7 +520,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '进入战斗': {
             command: ['进入战斗', 'fight.fighting({RID: %1, %2});', '进入战斗', 0, true, 'red', 'white'],
             params: [
-                ['*@战斗脚本资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
+                ['*@战斗脚本资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                 ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                 ['长按编辑框可选择。', 'label'],
             ],
@@ -528,7 +528,7 @@ e、地图地板（game.$sys.ground），创建的组件会改变大小和随地
         '开启随机战斗': {
             command: ['开启随机战斗', 'fight.fighton({RID: %1, %2},%3,%4);', '开启随机战斗', 0, true, 'red', 'white'],
             params: [
-                ['*@战斗脚本资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
+                ['*@战斗脚本资源名', 'string', true, 1, GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName, 'darkgreen'],
                 ['@参数', 'json', undefined, 2, [['战斗结束函数'], ['FightEndScript: 名称']], 'green'],
                 ['几率(百分之)', 'number', '5', 0, '5', 'darkgreen'],
                 ['@方式', 'number', '3', 2, [['全部开启', '主角静止时遇敌', '主角行动时遇敌'], ['3', '2', '1'], '3'], 'darkgreen'],

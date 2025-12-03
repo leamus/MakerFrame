@@ -118,7 +118,7 @@ Item {
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textMapRID;
                 }
@@ -156,7 +156,7 @@ Item {
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textRoleRID;
                 }
@@ -325,7 +325,7 @@ Item {
             console.debug('[mainGameTest]loaderGameScene onLoaded');
 
             try {
-                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
+                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
                 //let cfg = File.read(filePath);
                 let cfg = $Frame.sl_fileRead(filePath);
                 //console.debug('cfg', cfg, filePath);

@@ -94,7 +94,7 @@ Item {
                 }
     
     
-                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
+                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
     
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -336,7 +336,7 @@ Item {
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                //filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapResourceDirName + GameMakerGlobal.separator + textMapBlockResourceName.text;
+                //filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapResourceDirName + GameMakerGlobal.separator + textMapBlockResourceName.text;
                 let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
@@ -483,7 +483,7 @@ Item {
 
 
         onSg_clicked: {
-            //let filepath = GameMakerGlobal.config.strProjectRootPath + '/' + GameMakerGlobal.config.strCurrentProjectName + '/' + GameMakerGlobal.config.strMapResourceDirName + '/' + item;
+            //let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/' + GameMakerGlobal.config.strMapResourceDirName + '/' + item;
 
             textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(item);
             textMapBlockResourceName.text = item;
@@ -526,7 +526,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Resources' + GameMakerGlobal.separator + 'Maps' + GameMakerGlobal.separator + item;
+            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Resources' + GameMakerGlobal.separator + 'Maps' + GameMakerGlobal.separator + item;
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -845,17 +845,17 @@ Item {
             //filedialogOpenMap.open();
 
 
-            //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
+            //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
 
-            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
-            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
+            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建地图】');
             //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug('path:', $GlobalJS.toReadWriteURL(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', $GlobalJS.toReadWriteURL(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
             //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
             //console.debug('path:', Qt.resolvedUrl($GlobalJS.toReadWriteURL($Platform.externalDataPath)));
         }
@@ -888,7 +888,7 @@ Item {
                 _private.strMapRID = item;
 
 
-                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
+                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
                 //let cfg = File.read(filePath);
                 let cfg = $Frame.sl_fileRead(filePath);
                 //console.debug('[mainMapEditor]filePath：', filePath);
