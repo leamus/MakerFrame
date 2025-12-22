@@ -21,8 +21,8 @@ Item {
     property alias imageHandle: imageHandle
 
 
-    implicitWidth: 20 * Screen.pixelDensity
-    implicitHeight: 20 * Screen.pixelDensity
+    implicitWidth: 20 * $Global.pixelDensity
+    implicitHeight: 20 * $Global.pixelDensity
 
 
 
@@ -31,7 +31,7 @@ Item {
         id: rectBackground
 
         anchors.fill: parent
-        border.width: 2 * Screen.pixelDensity
+        border.width: 2 * $Global.pixelDensity
         border.color: '#1e1b18'
         radius: width / 2
     }
@@ -47,8 +47,8 @@ Item {
     Rectangle {
         id: rectHandle
 
-        width: 6 * Screen.pixelDensity
-        height: 6 * Screen.pixelDensity
+        width: 6 * $Global.pixelDensity
+        height: 6 * $Global.pixelDensity
 
         anchors.centerIn: joystick
 

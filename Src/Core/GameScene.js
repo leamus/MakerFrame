@@ -184,10 +184,10 @@ function* loadResources() {
     const joystickDefaultConfig = $GameMakerGlobalJS.$config.$joystick;
     const joystickConfig = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(game.$userscripts, '$config', '$joystick'), joystickDefaultConfig);
 
-    joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * $aliasGlobal.Screen.pixelDensity;
-    joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * $aliasGlobal.Screen.pixelDensity;
-    joystick.anchors.leftMargin = (joystickConfig.$left ?? joystickDefaultConfig.$left) * $aliasGlobal.Screen.pixelDensity;
-    joystick.anchors.bottomMargin = (joystickConfig.$bottom ?? joystickDefaultConfig.$bottom) * $aliasGlobal.Screen.pixelDensity;
+    joystick.width = (joystickConfig.$size ?? joystickDefaultConfig.$size) * $Global.pixelDensity;
+    joystick.height = (joystickConfig.$size ?? joystickDefaultConfig.$size)  * $Global.pixelDensity;
+    joystick.anchors.leftMargin = (joystickConfig.$left ?? joystickDefaultConfig.$left) * $Global.pixelDensity;
+    joystick.anchors.bottomMargin = (joystickConfig.$bottom ?? joystickDefaultConfig.$bottom) * $Global.pixelDensity;
     joystick.opacity = (joystickConfig.$opacity ?? joystickDefaultConfig.$opacity);
     joystick.rJoystickMinimumProportion = (joystickConfig.$joystickMinimumProportion ?? joystickDefaultConfig.$joystickMinimumProportion);
     joystick.imageHandle.source = (joystickConfig.$image ?? joystickDefaultConfig.$image);
@@ -254,16 +254,16 @@ function* loadResources() {
         for(let tb = 0; tb < buttonsConfig.length; ++tb) {
             const tConfig = buttonsConfig[tb];
             const button = compButtons.createObject(itemButtons);
-            button.width = tConfig.$size * $aliasGlobal.Screen.pixelDensity;
-            button.height = tConfig.$size * $aliasGlobal.Screen.pixelDensity;
+            button.width = tConfig.$size * $Global.pixelDensity;
+            button.height = tConfig.$size * $Global.pixelDensity;
             if(tConfig.$color !== undefined)
                 button.color = tConfig.$color;
             if(tConfig.$opacity !== undefined)
                 button.opacity = tConfig.$opacity;
             if(tConfig.$image)
                 button.image.source = GameMakerGlobal.imageResourceURL(tConfig.$image);
-            button.anchors.rightMargin = tConfig.$right * $aliasGlobal.Screen.pixelDensity;
-            button.anchors.bottomMargin = tConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
+            button.anchors.rightMargin = tConfig.$right * $Global.pixelDensity;
+            button.anchors.bottomMargin = tConfig.$bottom * $Global.pixelDensity;
 
             if(tConfig.$pressed)  //$CommonLibJS.checkCallable(fn, 0b11)
                 button.sg_pressed.connect(function() {
@@ -281,24 +281,24 @@ function* loadResources() {
 
     } while(0);
 
-    /*buttonA.width = buttonAConfig.$size * $aliasGlobal.Screen.pixelDensity;
-    buttonA.height = buttonAConfig.$size * $aliasGlobal.Screen.pixelDensity;
+    /*buttonA.width = buttonAConfig.$size * $Global.pixelDensity;
+    buttonA.height = buttonAConfig.$size * $Global.pixelDensity;
     buttonA.color = buttonAConfig.$color;
     buttonA.opacity = buttonAConfig.$opacity;
     if(buttonAConfig.$image)
         buttonA.image.source = GameMakerGlobal.imageResourceURL(buttonAConfig.$image);
-    buttonA.anchors.rightMargin = buttonAConfig.$right * $aliasGlobal.Screen.pixelDensity;
-    buttonA.anchors.bottomMargin = buttonAConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
+    buttonA.anchors.rightMargin = buttonAConfig.$right * $Global.pixelDensity;
+    buttonA.anchors.bottomMargin = buttonAConfig.$bottom * $Global.pixelDensity;
     buttonA.buttonClicked = buttonAConfig.$clicked;
 
-    buttonMenu.width = buttonMenuConfig.$size * $aliasGlobal.Screen.pixelDensity;
-    buttonMenu.height = buttonMenuConfig.$size * $aliasGlobal.Screen.pixelDensity;
+    buttonMenu.width = buttonMenuConfig.$size * $Global.pixelDensity;
+    buttonMenu.height = buttonMenuConfig.$size * $Global.pixelDensity;
     buttonMenu.color = buttonMenuConfig.$color;
     buttonMenu.opacity = buttonMenuConfig.$opacity;
     if(buttonMenuConfig.$image)
         buttonMenu.image.source = GameMakerGlobal.imageResourceURL(buttonMenuConfig.$image);
-    buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * $aliasGlobal.Screen.pixelDensity;
-    buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * $aliasGlobal.Screen.pixelDensity;
+    buttonMenu.anchors.rightMargin = buttonMenuConfig.$right * $Global.pixelDensity;
+    buttonMenu.anchors.bottomMargin = buttonMenuConfig.$bottom * $Global.pixelDensity;
     buttonMenu.buttonClicked = buttonMenuConfig.$clicked;
     */
 
@@ -637,30 +637,37 @@ function* loadResources() {
                 continue;
 
             try {
-                let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                const plugin = _private.jsLoader.load($GlobalJS.toURL(jsPath));
 
 
                 //放入 _private.objPlugins 中
-                //if(ts.$pluginId !== undefined) {    //插件有ID
-                //    _private.objPlugins[ts.$pluginId] = ts;
+                //if(plugin.$pluginId !== undefined) {    //插件有ID
+                //    _private.objPlugins[plugin.$pluginId] = plugin;
                 //}
-                if(!$CommonLibJS.isObject(_private.objPlugins[tc0]))
+                if(!$CommonLibJS.isObject(_private.objPlugins[tc0])) {
                     _private.objPlugins[tc0] = {};
-                _private.objPlugins[tc0][tc1] = ts;
+                    _private.objPluginsStatus[tc0] = {};
+                }
+                _private.objPlugins[tc0][tc1] = plugin;
+                _private.objPluginsStatus[tc0][tc1] = 0;
 
 
-                if(ts.$load && ts.$autoLoad !== false) { //$CommonLibJS.checkCallable
-                    try {
-                        //ts.$load();
-                        //game.run({Script: ts.$load() ?? null, Tips: 'plugin_load:' + tc0 + tc1});
-                        let r = ts.$load(tc0 + GameMakerGlobal.separator + tc1);
-                        if($CommonLibJS.isGenerator(r))r = yield* r;
+                if(plugin.$autoLoad || plugin.$autoLoad === undefined) {
+                    if(plugin.$load) { //$CommonLibJS.checkCallable
+                        try {
+                            //plugin.$load();
+                            //game.run({Script: plugin.$load() ?? null, Tips: 'plugin_load:' + tc0 + tc1});
+                            let r = plugin.$load(tc0 + GameMakerGlobal.separator + tc1);
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
+                        }
+                        catch(e) {
+                            $CommonLibJS.printException(e);
+                            console.warn('[!GameScene]插件$load函数调用错误：', tc0, tc1);
+                            //throw err;
+                        }
                     }
-                    catch(e) {
-                        $CommonLibJS.printException(e);
-                        console.warn('[!GameScene]插件$load函数调用错误：', tc0, tc1);
-                        //throw err;
-                    }
+
+                    _private.objPluginsStatus[tc0][tc1] = 1;
                 }
             }
             catch(e) {
@@ -683,18 +690,23 @@ function* unloadResources() {
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc]) {
             const plugin = _private.objPlugins[tc][tp];
-            if(plugin.$unload && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
-                try {
-                    //plugin.$unload();
-                    //game.run({Script: plugin.$unload() ?? null, Tips: 'plugin_unload:' + tc + tp});
-                    let r = plugin.$unload();
-                    if($CommonLibJS.isGenerator(r))r = yield* r;
+            //if(plugin.$autoLoad === -1) {
+            if(_private.objPluginsStatus[tc][tp] === 1) {
+                if(plugin.$unload) { //$CommonLibJS.checkCallable
+                    try {
+                        //plugin.$unload();
+                        //game.run({Script: plugin.$unload() ?? null, Tips: 'plugin_unload:' + tc + tp});
+                        let r = plugin.$unload();
+                        if($CommonLibJS.isGenerator(r))r = yield* r;
+                    }
+                    catch(e) {
+                        $CommonLibJS.printException(e);
+                        console.warn('[!GameScene]插件$unload函数调用错误：', tc, tp);
+                        //throw err;
+                    }
                 }
-                catch(e) {
-                    $CommonLibJS.printException(e);
-                    console.warn('[!GameScene]插件$unload函数调用错误：', tc, tp);
-                    //throw err;
-                }
+
+                _private.objPluginsStatus[tc][tp] = 0;
             }
         }
 
@@ -742,6 +754,7 @@ function* unloadResources() {
     game.$userscripts = null;
 
     _private.objPlugins = {};
+    _private.objPluginsStatus = {};
 
     _private.jsLoader.clear();
 
@@ -2949,7 +2962,7 @@ function onTriggered() {
     //插件
     for(let tc in _private.objPlugins)
         for(let tp in _private.objPlugins[tc])
-            if(_private.objPlugins[tc][tp].$timerTriggered && _private.objPlugins[tc][tp].$autoLoad !== false)
+            if(_private.objPlugins[tc][tp].$timerTriggered && _private.objPluginsStatus[tc][tp] === 2)
                 game.run({Script: _private.objPlugins[tc][tp].$timerTriggered(realinterval) ?? null, Tips: 'plugin $timerTriggered:' + tc + '-' + tp});
 
     /*/精确控制下一帧（有问题）

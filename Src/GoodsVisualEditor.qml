@@ -60,7 +60,7 @@ Item {
     Component {
         id: comp
 
-        Item {
+        RowLayout {
             id: tRoot
 
             //property alias label: tlable.text
@@ -70,101 +70,97 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            RowLayout {
-                anchors.fill: parent
 
-                TextField {
-                    id: ttextproperty
+            TextField {
+                id: ttextproperty
 
-                    objectName: 'Property'
+                objectName: 'Property'
 
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    text: ''
-                    placeholderText: '*@属性'
+                text: ''
+                placeholderText: '*@属性'
 
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
 
-                    onPressAndHold: {
-                        const data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
-                                    ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
+                onPressAndHold: {
+                    const data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
+                                ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
 
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
 
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextParams
-
-                    objectName: 'Effect'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: ''
-                    placeholderText: '*@效果值'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['固定值（整数）：20','倍率（小数）：2.0'],
-                                    ['20','2.0']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                Button {
-                    id: tbutton
-
-                    implicitWidth: 30
-
-                    text: 'X'
-
-                    onClicked: {
-                        for(const tc in _private.arrCacheComponent) {
-                            if(_private.arrCacheComponent[tc] === tRoot) {
-                                _private.arrCacheComponent.splice(tc, 1);
-                                break;
-                            }
-
-                        }
-                        tRoot.destroy();
-
-                        root.forceActiveFocus();
-                    }
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
             }
 
+            TextField {
+                id: ttextParams
+
+                objectName: 'Effect'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: ''
+                placeholderText: '*@效果值'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['固定值（整数）：20','倍率（小数）：2.0'],
+                                ['20','2.0']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            Button {
+                id: tbutton
+
+                implicitWidth: 30
+
+                text: 'X'
+
+                onClicked: {
+                    for(const tc in _private.arrCacheComponent) {
+                        if(_private.arrCacheComponent[tc] === tRoot) {
+                            _private.arrCacheComponent.splice(tc, 1);
+                            break;
+                        }
+
+                    }
+                    tRoot.destroy();
+
+                    root.forceActiveFocus();
+                }
+            }
         }
     }
 
@@ -300,7 +296,8 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 30
+                        Layout.fillHeight: true
+                        //Layout.preferredHeight: 30
 
                         Label {
                             text: '描述:'
@@ -317,7 +314,7 @@ Item {
 
                             //selectByKeyboard: true
                             selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
+                            wrapMode: TextArea.Wrap
                         }
                     }
 
@@ -534,7 +531,7 @@ Item {
                             Layout.preferredWidth: 10
 
                             text: '*'
-                            //font.pointSize: _config.nLabelFontSize
+                            //font.pointSize: _private.config.nLabelFontSize
                         }
                         TextField {
                             id: textImageHeight
@@ -745,7 +742,6 @@ Item {
                         }
                     }
 
-
                     RowLayout {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 30
@@ -804,7 +800,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@属性'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -812,7 +808,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@效果值'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -835,10 +831,15 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 30
+            //Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '保存'
                 font.pointSize: 9
                 onClicked: {
@@ -846,6 +847,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '读取'
                 font.pointSize: 9
                 onClicked: {
@@ -853,6 +859,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
@@ -862,6 +873,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '关闭'
                 font.pointSize: 9
                 onClicked: {
@@ -870,6 +886,11 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '帮助'
                 font.pointSize: 9
                 onClicked: {
@@ -895,13 +916,6 @@ Item {
     }
 
 
-
-    //配置
-    QtObject {
-        id: _config
-
-        property int nLabelFontSize: 10
-    }
 
     QtObject {
         id: _private
@@ -1256,6 +1270,13 @@ Item {
             });
         }
 
+
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+        }
 
 
         //创建的组件缓存

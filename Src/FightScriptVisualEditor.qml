@@ -332,8 +332,13 @@ Item {
                             onClicked: {
                                 if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                                     mediaPlayer.stop();
-                                else
-                                    mediaPlayer.play();
+                                else {
+                                    let music = textMusic.text.trim();
+                                    if(music.length !== 0 && $Frame.sl_fileExists(GameMakerGlobal.musicResourcePath(music))) {
+                                        mediaPlayer.source = GameMakerGlobal.musicResourceURL(music);
+                                        mediaPlayer.play();
+                                    }
+                                }
                             }
                         }
                     }
@@ -478,7 +483,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@敌人角色'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -486,7 +491,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '参数（可省略）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -570,7 +575,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 30
+            //Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredWidth: parent.width
             //Layout.preferredHeight: parent.height
@@ -579,6 +584,11 @@ Item {
 
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '保存'
                 font.pointSize: 9
                 onClicked: {
@@ -586,6 +596,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '读取'
                 font.pointSize: 9
                 onClicked: {
@@ -593,6 +608,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
@@ -602,6 +622,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '关闭'
                 font.pointSize: 9
                 onClicked: {
@@ -610,6 +635,11 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '帮助'
                 font.pointSize: 9
                 onClicked: {
@@ -637,13 +667,6 @@ Item {
     MediaPlayer {
         id: mediaPlayer
 
-        source: {
-            if(textMusic.text.length === 0)
-                return '';
-            if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
-                return '';
-            return GameMakerGlobal.musicResourceURL(textMusic.text)
-        }
         //loops: MediaPlayer.Infinite
         loops: 1
         notifyInterval: 200
@@ -651,13 +674,6 @@ Item {
     }
 
 
-
-    //配置
-    QtObject {
-        id: _config
-
-        property int nLabelFontSize: 10
-    }
 
     QtObject {
         id: _private
@@ -895,6 +911,13 @@ Item {
             });
         }
 
+
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+        }
 
 
         //创建的组件缓存

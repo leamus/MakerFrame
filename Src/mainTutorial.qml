@@ -251,7 +251,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('上架游戏：')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -266,7 +266,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">侠道仙缘(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -285,7 +285,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">BOSS凶猛(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -312,7 +312,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">剑心之誓(快爆)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -331,7 +331,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">猎魔人(快爆)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -350,7 +350,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">封魔传记(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -377,7 +377,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">英语杀(Tap)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -396,7 +396,7 @@ Item {
                     //Layout.fillHeight: true
 
 
-                    font.pointSize: 12
+                    font.pointSize: _private.config.nTextFontSize
                     text: qsTr('<a href="#">英语杀(Steam)</a>')
 
                     horizontalAlignment: Label.AlignHCenter
@@ -446,6 +446,17 @@ Item {
                 //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
+                $dialog.show({
+                    Msg: '%1 载入错误，请确保相关模块、插件安装正确'.arg(source),
+                    Buttons: Dialog.Ok,
+                    OnAccepted: function() {
+                        //root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //root.forceActiveFocus();
+                    },
+                });
+
                 setSource('');
 
                 $showBusyIndicator(false);
@@ -493,12 +504,6 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
 
@@ -511,6 +516,14 @@ Item {
             loader.setSource(url);
 
             return true;
+        }
+
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            //字体大小
+            property int nTextFontSize: 11
         }
     }
 

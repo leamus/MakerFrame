@@ -391,8 +391,13 @@ Item {
                     //implicitHeight很大时会滚动，implicitHeight很小时会按顺序排列
                     //height: flickableGoods.height < implicitHeight ? flickableGoods.height : implicitHeight
                     //height: parent.height
+
                     //nItemMaxHeight: 100
-                    //nItemMinHeight: 50
+                    nItemMinHeight: 50
+                    nItemHeight: -1 //implicitHeight
+
+                    rItemFontSize: 12
+
 
                     //双击后弹出信息
                     onSg_doubleChoice: {
@@ -417,9 +422,10 @@ Item {
                     //implicitHeight很大时会滚动，implicitHeight很小时会按顺序排列
                     //height: flickableGoods.height < implicitHeight ? flickableGoods.height : implicitHeight
                     //height: parent.height
-                    //nItemMaxHeight: 100
-                    //nItemMinHeight: 50
 
+                    //nItemMaxHeight: 100
+                    nItemMinHeight: 50
+                    nItemHeight: -1 //implicitHeight
 
                     rItemFontSize: 12
 
@@ -466,9 +472,7 @@ Item {
                         //itemUseOrEquip.visible = true;
                     }
                 }
-
             }
-
         }
 
 

@@ -62,7 +62,7 @@ Item {
     Component {
         id: comp
 
-        Item {
+        RowLayout {
             id: tRoot
 
             //property alias label: tlable.text
@@ -72,121 +72,119 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            RowLayout {
-                anchors.fill: parent
 
-                Label {
-                    //id: tlable
-                    visible: false
-                    text: '*@动作名'
+            Label {
+                //id: tlable
+                visible: false
+                text: '*@动作名'
+            }
+
+            TextField {
+                id: ttext
+
+                objectName: 'ActionName'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: ''
+                placeholderText: '*@动作名'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[动作名]Normal为普通状态，已存在', 'Kill（普通攻击）','Skill（释放技能）'],
+                                ['', 'Kill','Skill']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
+            }
 
-                TextField {
-                    id: ttext
+            Label {
+                //id: tlable
+                visible: false
+                text: '@特效名'
+            }
 
-                    objectName: 'ActionName'
+            TextField {
+                id: ttextSpriteName
 
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                objectName: 'SpriteName'
 
-                    text: ''
-                    placeholderText: '*@动作名'
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
+                text: ''
+                placeholderText: '@特效名'
 
-                    onPressAndHold: {
-                        const data = [['[动作名]Normal为普通状态，已存在', 'Kill（普通攻击）','Skill（释放技能）'],
-                                    ['', 'Kill','Skill']];
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
 
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
+                onPressAndHold: {
+                    const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
 
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
+                    $list.open({
+                        Data: path,
+                        OnClicked: (index, item)=>{
+                            text = item;
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
+            }
 
-                Label {
-                    //id: tlable
-                    visible: false
-                    text: '@特效名'
-                }
-
-                TextField {
-                    id: ttextSpriteName
-
-                    objectName: 'SpriteName'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: ''
-                    placeholderText: '@特效名'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-
-                        $list.open({
-                            Data: path,
-                            OnClicked: (index, item)=>{
-                                text = item;
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                Button {
-                    implicitWidth: 30
-                    text: 'P'
-                    onClicked: {
-                        rectSpriteEffectBackground.visible = true;
-                        _private.refreshSpriteEffect(ttextSpriteName.text);
-                    }
-                }
-
-                Button {
-                    id: tbutton
-
-                    implicitWidth: 30
-
-                    text: 'X'
-
-                    onClicked: {
-                        for(const tc in _private.arrCacheComponent) {
-                            if(_private.arrCacheComponent[tc] === tRoot) {
-                                _private.arrCacheComponent.splice(tc, 1);
-                                break;
-                            }
-
-                        }
-                        tRoot.destroy();
-
-                        root.forceActiveFocus();
+            Button {
+                implicitWidth: 30
+                text: 'P'
+                onClicked: {
+                    if($GameMakerGlobalJS.loadSpriteEffect(ttextSpriteName.text, spriteEffectComp, _private.jsLoader)) {
+                        spriteEffectComp.start();
+                        rectSpriteEffectBackground.show();
                     }
                 }
             }
 
+            Button {
+                id: tbutton
+
+                implicitWidth: 30
+
+                text: 'X'
+
+                onClicked: {
+                    for(const tc in _private.arrCacheComponent) {
+                        if(_private.arrCacheComponent[tc] === tRoot) {
+                            _private.arrCacheComponent.splice(tc, 1);
+                            break;
+                        }
+
+                    }
+                    tRoot.destroy();
+
+                    root.forceActiveFocus();
+                }
+            }
         }
     }
 
@@ -484,7 +482,7 @@ Item {
 
                             text: '60'
                             placeholderText: '头像宽'
-                            //font.pointSize: _config.nLabelFontSize
+                            //font.pointSize: _private.config.nLabelFontSize
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -496,7 +494,7 @@ Item {
                             Layout.preferredWidth: 10
 
                             text: '*'
-                            //font.pointSize: _config.nLabelFontSize
+                            //font.pointSize: _private.config.nLabelFontSize
                         }
                         //头像高
                         TextField {
@@ -509,7 +507,7 @@ Item {
 
                             text: '60'
                             placeholderText: '头像高'
-                            //font.pointSize: _config.nLabelFontSize
+                            //font.pointSize: _private.config.nLabelFontSize
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -756,7 +754,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@动作名'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -764,7 +762,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '@特效名'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -852,8 +850,10 @@ Item {
                                         implicitWidth: 30
                                         text: 'P'
                                         onClicked: {
-                                            rectSpriteEffectBackground.visible = true;
-                                            _private.refreshSpriteEffect(textSpriteName.text);
+                                            if($GameMakerGlobalJS.loadSpriteEffect(textSpriteName.text, spriteEffectComp, _private.jsLoader)) {
+                                                spriteEffectComp.start();
+                                                rectSpriteEffectBackground.show();
+                                            }
                                         }
                                     }
                                 }
@@ -868,10 +868,15 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 30
+            //Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '保存'
                 font.pointSize: 9
                 onClicked: {
@@ -879,6 +884,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '读取'
                 font.pointSize: 9
                 onClicked: {
@@ -886,6 +896,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
@@ -895,6 +910,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '关闭'
                 font.pointSize: 9
                 onClicked: {
@@ -903,6 +923,11 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '帮助'
                 font.pointSize: 9
                 onClicked: {
@@ -931,7 +956,25 @@ Item {
 
     Rectangle {
         id: rectSpriteEffectBackground
+
+        function show() {
+            rectSpriteEffectBackground.visible = true;
+        }
+        function close() {
+            spriteEffectComp.stop();
+            rectSpriteEffectBackground.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+        }
+        Keys.onEscapePressed: function(event) {
+            close();
+        }
+        Keys.onBackPressed: function(event) {
+            close();
+        }
+
         visible: false
+        focus: visible
         anchors.fill: parent
 
         color: '#7F000000'
@@ -977,136 +1020,15 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                spriteEffectComp.stop();
-                rectSpriteEffectBackground.visible = false;
+                rectSpriteEffectBackground.close();
             }
         }
     }
 
 
-
-    //配置
-    QtObject {
-        id: _config
-
-        property int nLabelFontSize: 10
-    }
 
     QtObject {
         id: _private
-
-
-        //刷新特效；
-        function refreshSpriteEffect(spriteName) {
-            //console.debug('[FightScene]getSpriteEffect0');
-
-            //读特效信息
-            let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
-
-            let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
-            if(spriteResourceInfo)
-                spriteResourceInfo = JSON.parse(spriteResourceInfo);
-            else
-                return false;
-
-            let script;
-
-            if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
-                _private.jsLoader.clear();
-                script = _private.jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
-            }
-
-
-            spriteEffectComp.nSpriteType = spriteResourceInfo.SpriteType;
-            spriteEffectComp.sprite.stop();
-
-
-            //spriteEffectComp.$info = spriteResourceInfo;
-            //spriteEffectComp.$script = spriteResourceInfo.$script;
-
-
-            /*switch(spriteResourceInfo.SpriteType) {
-            case 1:
-                spriteEffectComp.sourceComponent = compSpriteEffect;
-                break;
-            case 2:
-                spriteEffectComp.sourceComponent = compDirSpriteEffect;
-                break;
-            }
-            */
-
-
-            spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(spriteResourceInfo.Image);
-
-            //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
-            //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
-            spriteEffectComp.rXOffset = spriteResourceInfo.XOffset ?? 0;
-            spriteEffectComp.rYOffset = spriteResourceInfo.YOffset ?? 0;
-            spriteEffectComp.opacity = spriteResourceInfo.Opacity ?? 1;
-            spriteEffectComp.rXScale = spriteResourceInfo.XScale ?? 1;
-            spriteEffectComp.rYScale = spriteResourceInfo.YScale ?? 1;
-
-            spriteEffectComp.strSoundeffectName = spriteResourceInfo.Sound ?? '';
-
-            spriteEffectComp.nSoundeffectDelay = spriteResourceInfo.SoundDelay ?? 0;
-
-            spriteEffectComp.nLoops = -1;
-            //spriteEffectComp.restart();
-
-            let t = spriteResourceInfo.SpriteSize;
-            spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
-            spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
-
-
-            //！！！兼容旧代码
-            if(spriteEffectComp.nSpriteType === 1) {
-                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
-                0);
-                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
-                0);
-
-                //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
-                let t = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
-                );
-                spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
-
-                t = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
-                );
-                spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
-            }
-            else if(spriteEffectComp.nSpriteType === 2) {
-                let t = spriteResourceInfo.FrameData;
-
-                //！！！兼容旧代码
-                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
-                0);
-                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
-                0);
-                spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
-                0);
-
-
-                if(script)
-                    spriteEffectComp.sprite.fnRefresh = script.$refresh;
-            }
-            spriteEffectComp.start();
-
-            return true;
-        }
 
 
         function saveData() {
@@ -1354,6 +1276,13 @@ Item {
             });
         }
 
+
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+        }
 
 
         property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))

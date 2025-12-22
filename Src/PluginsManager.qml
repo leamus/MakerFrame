@@ -285,7 +285,7 @@ Item {
                             //_private.objPlugins[tc0][tc1] = ts;
 
 
-                            /*if(ts.$load && ts.$autoLoad !== false) {
+                            /*if(ts.$load && (ts.$autoLoad || ts.$autoLoad === undefined)) {
                                 ts.$load();
                             }
                             */

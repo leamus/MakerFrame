@@ -258,11 +258,17 @@ Item {
             //菜单
             GameMenu {
                 id: gameMenu
+
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 border.color: 'white'
                 radius: height / 20
+
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
+
 
                 onSg_choice: function(index) {
 

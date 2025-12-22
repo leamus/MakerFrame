@@ -199,8 +199,10 @@ Item {
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: '上一个'
+                        text: '←' //⬅
                         textTips.color: 'white'
+                        font.pointSize: 12
+                        font.bold: true
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
                         border.width: 1
@@ -215,8 +217,10 @@ Item {
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: '下一个'
+                        text: '→' //➡
                         textTips.color: 'white'
+                        font.pointSize: 12
+                        font.bold: true
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
                         border.width: 1
@@ -231,8 +235,10 @@ Item {
                     ColorButton {
                         Layout.alignment: Qt.AlignRight
 
-                        text: '关闭'
+                        text: 'X'
                         textTips.color: 'white'
+                        font.pointSize: 12
+                        font.bold: true
                         colors: ['blue', 'darkblue', 'darkgreen']
                         border.color: 'white'
                         border.width: 1
@@ -246,12 +252,12 @@ Item {
         }
 
 
-        //道具说明框（包括位置、颜色、文字等）
+        //战斗人物说明框（包括位置、颜色、文字等）
         Notepad {
             id: textFightRoleInfo
 
             Layout.preferredWidth: parent.width
-            Layout.maximumHeight: 100
+            //Layout.maximumHeight: 100
             Layout.preferredHeight: textFightRoleInfo.textArea.implicitHeight
 
 
@@ -269,7 +275,7 @@ Item {
             textArea.selectByMouse: false
             textArea.color: 'white'
             //textArea.color: Global.style.foreground
-            textArea.font.pointSize: 16
+            textArea.font.pointSize: 12
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap
 
@@ -310,8 +316,16 @@ Item {
 
             GameMenu {
                 id: gamemenuEquipment
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
+
+                rItemFontSize: 12
+
 
                 onSg_choice: {
                     if(root.arrEquipmentPositions[index] === undefined)
@@ -346,8 +360,16 @@ Item {
 
             GameMenu {
                 id: gamemenuSkills
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
+
+                rItemFontSize: 12
+
 
                 onSg_choice: {
                     let combatant = game.gd[strTeamName][root.nFightRoleIndex];
@@ -361,6 +383,7 @@ Item {
             }
         }
 
+        //道具/技能说明框（包括位置、颜色、文字等）
         Notepad {
             id: msgDetail
 
@@ -379,7 +402,7 @@ Item {
             textArea.selectByMouse: false
             textArea.color: 'white'
             //textArea.color: Global.style.foreground
-            textArea.font.pointSize: 16
+            textArea.font.pointSize: 12
             textArea.font.bold: true
             textArea.wrapMode: Text.Wrap
 

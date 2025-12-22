@@ -278,7 +278,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: ''
                     placeholderText: '*动作名'
 
@@ -301,7 +301,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: ''
                     placeholderText: '*@特效名'
 
@@ -405,7 +405,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: ''
                     placeholderText: '*动作名'
 
@@ -428,7 +428,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: '0'
                     placeholderText: '*起始序号'
 
@@ -451,7 +451,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: '4'
                     placeholderText: '*帧数'
 
@@ -474,7 +474,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    font.pointSize: _config.nTextFontSize
+                    font.pointSize: _private.config.nTextFontSize
                     text: '100'
                     placeholderText: '*帧速度'
 
@@ -636,11 +636,65 @@ Item {
                         }
                     }
 
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        //Layout.preferredHeight: 50
+
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: '名字'
+                            font.pointSize: _private.config.nLabelFontSize
+                        }
+
+                        TextField {
+                            id: textRoleName
+
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 50)
+                            Layout.maximumWidth: 100
+                            //Layout.preferredHeight: _private.nColumnHeight
+                            Layout.fillWidth: true
+
+                            text: ''
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
+
+                            //selectByKeyboard: true
+                            selectByMouse: true
+                            //wrapMode: TextEdit.Wrap
+
+                            onEditingFinished: {
+                                //text = !isNaN(parseInt(text)) ? parseInt(text) : '1';
+
+                                //_private.refreshRole();
+                            }
+                        }
+                        Label {
+                            //Layout.preferredWidth: 80
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 10
+
+                            text: '显示'
+                            font.pointSize: _private.config.nLabelFontSize
+                        }
+
+                        CheckBox {
+                            id: checkboxShowName
+                            checked: true
+                        }
+                    /*
 
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.96
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
+                    */
 
                         Label {
                             //Layout.preferredWidth: 80
@@ -648,18 +702,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '移速'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleSpeed
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0.1'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -678,7 +737,7 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '可穿透'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         /*CheckBox {
@@ -690,12 +749,17 @@ Item {
                         TextField {
                             id: textPenetrate
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -707,78 +771,40 @@ Item {
                                 //_private.refreshRole();
                             }
                         }
-
-                        Label {
-                            //Layout.preferredWidth: 80
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            //Layout.preferredHeight: 10
-
-                            text: '名字'
-                            font.pointSize: _config.nLabelFontSize
-                        }
-
-                        TextField {
-                            id: textRoleName
-
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 50)
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            //Layout.preferredHeight: _private.nColumnHeight
-
-                            text: ''
-                            font.pointSize: _config.nTextFontSize
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
-
-                            onEditingFinished: {
-                                //text = !isNaN(parseInt(text)) ? parseInt(text) : '1';
-
-                                //_private.refreshRole();
-                            }
-                        }
-                        Label {
-                            //Layout.preferredWidth: 80
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            //Layout.preferredHeight: 10
-
-                            text: '显示'
-                            font.pointSize: _config.nLabelFontSize
-                        }
-
-                        CheckBox {
-                            id: checkboxShowName
-                            checked: true
-                        }
-
                     }
 
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.96
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         Label {
-                            //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-                            //Layout.preferredHeight: 10
+                            //Layout.preferredWidth: 80
+                            Layout.maximumWidth: 100
+                            //Layout.preferredHeight: _private.nColumnHeight
+                            Layout.fillWidth: true
 
                             text: '@头像和大小'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         //头像
                         TextField {
                             id: textAvatar
 
-                            //Layout.preferredWidth: 50
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 90)
+                            Layout.maximumWidth: 100
                             //Layout.preferredHeight: _private.nColumnHeight
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 90)
+                            //Layout.fillWidth: true
 
                             text: ''
                             placeholderText: '@头像图片'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -807,13 +833,18 @@ Item {
                         TextField {
                             id: textAvatarWidth
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '60'
                             placeholderText: '头像宽'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -831,20 +862,25 @@ Item {
                             Layout.preferredWidth: 10
 
                             text: '*'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         //头像高
                         TextField {
                             id: textAvatarHeight
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '60'
                             placeholderText: '头像高'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -861,16 +897,22 @@ Item {
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.96
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         Label {
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: '[影子]'
-                            font.pointSize: _config.nLabelFontSize
+                            text: `<font color="${Global.style.color(Global.style.Red)}"><b>[影子]</b></font>`
+                            font.pointSize: _private.config.nLabelFontSize
                         }
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        //Layout.preferredHeight: 50
 
                         Label {
                             //Layout.preferredWidth: 80
@@ -878,18 +920,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '偏移和大小'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleRealX
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -905,12 +952,17 @@ Item {
                         TextField {
                             id: textRoleRealY
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -926,12 +978,17 @@ Item {
                         TextField {
                             id: textRoleRealWidth
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '50'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -950,18 +1007,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '*'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleRealHeight
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
-                            font.pointSize: _config.nTextFontSize
                             text: '80'
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -980,18 +1042,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '透明度'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleShadowOpacity
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0.5'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1006,21 +1073,29 @@ Item {
                     }
 
                     RowLayout {
-                        visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
-
                         //Layout.preferredWidth: root.width * 0.96
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
+                        visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
 
                         Label {
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: '[角色]'
-                            font.pointSize: _config.nLabelFontSize
+                            text: `<font color="${Global.style.color(Global.style.Red)}"><b>[角色]</b></font>`
+                            font.pointSize: _private.config.nLabelFontSize
                         }
+
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        //Layout.preferredHeight: 50
+
+                        visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
 
                         Label {
                             //Layout.preferredWidth: 80
@@ -1028,18 +1103,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '偏移和大小'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleXOffset
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1055,12 +1135,17 @@ Item {
                         TextField {
                             id: textRoleYOffset
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1076,12 +1161,17 @@ Item {
                         TextField {
                             id: textRoleWidth
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '50'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1100,18 +1190,23 @@ Item {
                             //Layout.preferredHeight: 10
 
                             text: '*'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                         }
 
                         TextField {
                             id: textRoleHeight
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '80'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1124,8 +1219,17 @@ Item {
                             }
                         }
 
+                    }
+
+                    RowLayout {
+                        //Layout.preferredWidth: root.width * 0.96
+                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        //Layout.preferredHeight: 50
+
+                        visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
+
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
@@ -1135,12 +1239,17 @@ Item {
                         TextField {
                             id: textRoleFrameXScale
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '1.0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1156,12 +1265,17 @@ Item {
                         TextField {
                             id: textRoleFrameYScale
 
-                            Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '1.0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -1176,17 +1290,17 @@ Item {
                     }
 
                     /*RowLayout {
-                        visible: comboType.currentIndex === 0
-
                         //Layout.preferredWidth: root.width * 0.96
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
+
+                        visible: comboType.currentIndex === 0
 
                     }*/
 
 
                     ColumnLayout {
-                        Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                        //Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                         Layout.preferredWidth: parent.width
 
                         visible: comboType.currentIndex === 0
@@ -1195,17 +1309,22 @@ Item {
                         RowLayout {
                             //Layout.preferredWidth: root.width * 0.96
                             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                            Layout.preferredHeight: 50
-
+                            //Layout.preferredHeight: 50
 
                             Label {
                                 //Layout.preferredWidth: 80
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: '[帧]'
-                                font.pointSize: _config.nLabelFontSize
+                                text: `<font color="${Global.style.color(Global.style.Red)}"><b>[帧]</b></font>`
+                                font.pointSize: _private.config.nLabelFontSize
                             }
+                        }
+
+                        RowLayout {
+                            //Layout.preferredWidth: root.width * 0.96
+                            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                            //Layout.preferredHeight: 50
 
                             Label {
                                 //Layout.preferredWidth: 80
@@ -1213,18 +1332,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '宽高'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleFrameWidth
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '37'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1243,17 +1367,22 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '*'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
                             TextField {
                                 id: textRoleFrameHeight
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '58'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1272,18 +1401,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '帧数'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleFrameCount
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '3'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1303,18 +1437,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '速度（ms）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleFrameInterval
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '100'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1333,7 +1472,7 @@ Item {
                         RowLayout {
                             //Layout.preferredWidth: root.width * 0.96
                             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                            Layout.preferredHeight: 50
+                            //Layout.preferredHeight: 50
 
                             Label {
                                 //Layout.preferredWidth: 80
@@ -1341,18 +1480,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '上向（列行）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleUpIndexX
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1367,12 +1511,17 @@ Item {
                             TextField {
                                 id: textRoleUpIndexY
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1390,18 +1539,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '右向（列行）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleRightIndexX
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1416,12 +1570,17 @@ Item {
                             TextField {
                                 id: textRoleRightIndexY
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1438,7 +1597,7 @@ Item {
                         RowLayout {
                             //Layout.preferredWidth: root.width * 0.96
                             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                            Layout.preferredHeight: 50
+                            //Layout.preferredHeight: 50
 
                             Label {
                                 //Layout.preferredWidth: 80
@@ -1446,18 +1605,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '下向（列行）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleDownIndexX
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1472,12 +1636,17 @@ Item {
                             TextField {
                                 id: textRoleDownIndexY
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1495,18 +1664,23 @@ Item {
                                 //Layout.preferredHeight: 10
 
                                 text: '左向（列行）'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                             }
 
                             TextField {
                                 id: textRoleLeftIndexX
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1521,12 +1695,17 @@ Item {
                             TextField {
                                 id: textRoleLeftIndexY
 
-                                Layout.preferredWidth: Math.max(contentWidth + 10, 20)
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                                Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                                Layout.maximumWidth: 30
                                 //Layout.preferredHeight: _private.nColumnHeight
+                                //Layout.fillWidth: true
 
                                 text: '0'
-                                font.pointSize: _config.nTextFontSize
+                                font.pointSize: _private.config.nTextFontSize
+
+                                horizontalAlignment: TextField.AlignHCenter
+                                verticalAlignment: TextField.AlignVCenter
 
                                 //selectByKeyboard: true
                                 selectByMouse: true
@@ -1575,7 +1754,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*动作名'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -1583,7 +1762,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@特效名'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -1652,7 +1831,7 @@ Item {
 
                             color: 'red'
                             text: '注意：图片文件夹请自行复制到资源目录；预览请先保存'
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize - 2
 
                             horizontalAlignment: Label.AlignHCenter
                             verticalAlignment: Label.AlignVCenter
@@ -1688,7 +1867,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*动作名'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -1696,7 +1875,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*起始序号'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -1704,7 +1883,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*帧数'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -1712,7 +1891,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*帧速度'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -1754,12 +1933,12 @@ Item {
 
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
-                //anchors.margins: 1 * Screen.pixelDensity
+                //anchors.margins: 1 * $Global.pixelDensity
                 transformOrigin: Item.TopLeft
                 opacity: 0.9
                 //scale: 0.5
-                implicitWidth: 20 * Screen.pixelDensity
-                implicitHeight: 20 * Screen.pixelDensity
+                implicitWidth: 20 * $Global.pixelDensity
+                implicitHeight: 20 * $Global.pixelDensity
 
                 onPressedChanged: {
                     if(pressed === false) {
@@ -1888,10 +2067,10 @@ Item {
             Image {
                 id: imageAvatar
 
-                visible: !(parseInt(textAvatarWidth.text) === 0 || parseInt(textAvatarHeight.text) === 0)
-
                 Layout.preferredWidth: parseInt(textAvatarWidth.text)
                 Layout.preferredHeight: parseInt(textAvatarHeight.text)
+
+                visible: !(parseInt(textAvatarWidth.text) === 0 || parseInt(textAvatarHeight.text) === 0)
 
                 source: {
                     if(textAvatar.text.length === 0)
@@ -1911,16 +2090,18 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
+
                 text: '图片资源'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     textRoleImageURL.enabled = false;
@@ -1932,14 +2113,15 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 visible: false
 
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
                 text: '刷新'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     _private.refreshRole();
@@ -1947,12 +2129,13 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '保存'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     //_private.strRoleRID = textRoleRID.text;
@@ -1962,13 +2145,15 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 visible: comboType.currentIndex === 0// || comboType.currentIndex === 2
+
                 text: '原图'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     if(textRoleImageURL.text)
@@ -1977,12 +2162,13 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '帮助'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
 
@@ -2007,13 +2193,15 @@ Item {
             }
 
             Button {
-                visible: $Platform.compileType === 'debug' ? true : false
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
+                visible: $Platform.compileType === 'debug' ? true : false
 
                 text: 'Test'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     /*role.sprite.running = true;
@@ -2154,7 +2342,9 @@ Item {
 
                 TextField {
                     id: textRoleImageURL
+
                     Layout.fillWidth: true
+
                     placeholderText: ''
 
                     //selectByKeyboard: true
@@ -2169,7 +2359,9 @@ Item {
 
                 TextField {
                     id: textRoleImageResourceName
+
                     Layout.fillWidth: true
+
                     placeholderText: '素材名'
 
                     //selectByKeyboard: true
@@ -2537,6 +2729,7 @@ Item {
                     id: textRoleRID
 
                     Layout.fillWidth: true
+
                     placeholderText: '深林孤鹰'
                     text: ''
 
@@ -2552,7 +2745,9 @@ Item {
                 }
                 TextField {
                     id: textMapScale
+
                     Layout.fillWidth: true
+
                     selectByMouse: true
                     placeholderText: '1'
                     text: '1'
@@ -3181,15 +3376,15 @@ function $refresh(index, imageAnimate, path) {
                 },
             });
         }
-    }
 
-    //配置
-    QtObject {
-        id: _config
 
-        property int nLabelFontSize: 10
-        property int nButtonFontSize: 12
-        property int nTextFontSize: 10
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+            property int nButtonFontSize: 9
+            property int nTextFontSize: 10
+        }
     }
 
 

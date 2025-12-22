@@ -119,7 +119,7 @@ Item {
             //width: parent.width
 
 
-            font.pointSize: 22
+            font.pointSize: 18
             font.bold: true
             text: qsTr('鹰歌游戏引擎 GameMaker')
 
@@ -141,17 +141,22 @@ Item {
             //anchors.verticalCenter: parent.verticalCenter
             //height: 50
             //width: parent.width
-            font.pointSize: 16
+            font.pointSize: 12
             text: qsTr('当前工程：' + GameMakerGlobal.config.strCurrentProjectName)
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
         }
 
+        Item {
+            Layout.preferredHeight: 1
+            Layout.fillHeight: true
+        }
+
 
         ColumnLayout {
             Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 5
+            Layout.preferredHeight: 9
             //Layout.preferredHeight: parent.height * 0.7
             //Layout.fillHeight: false
 
@@ -211,11 +216,14 @@ Item {
 
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: '工程管理'
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     menuProjectManager.open();
                     menuProjectManager.enabled = true;
@@ -232,7 +240,7 @@ Item {
 
                     MenuItem {
                         text: '新建工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         //focusPolicy: Qt.NoFocus
                         //hoverEnabled: false
                         onClicked: {
@@ -241,14 +249,14 @@ Item {
                     }
                     MenuItem {
                         text: '打开工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.openProject();
                         }
                     }
                     MenuItem {
                         text: '重命名工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.renameProject();
                         }
@@ -256,7 +264,7 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '导出工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             if(!_private.checkCurrentProjectName()) {
                                 return;
@@ -266,14 +274,14 @@ Item {
                     }
                     MenuItem {
                         text: '导入工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.importProject();
                         }
                     }
                     /*MenuItem {
                         text: '下载示例工程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.downloadDemoProject();
                         }
@@ -282,7 +290,7 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '打包项目'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             if(!_private.checkCurrentProjectName()) {
                                 return;
@@ -292,7 +300,7 @@ Item {
                     }
                     MenuItem {
                         text: '平台分发'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.future();
                         }
@@ -312,16 +320,24 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillHeight: true
+                Layout.preferredHeight: 0.5
+            }
+
             Button {
                 //id: buttonProjectManage
 
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: '游戏编辑器'
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -341,7 +357,7 @@ Item {
 
                     MenuItem {
                         text: '地图编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.mapEditor();
                         }
@@ -349,14 +365,14 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '角色编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.roleEditor();
                         }
                     }
                     MenuItem {
                         text: '特效编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.spriteEditor();
                         }
@@ -364,28 +380,28 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '道具编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.goodsEditor();
                         }
                     }
                     MenuItem {
                         text: '战斗技能编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.fightSkillEditor();
                         }
                     }
                     MenuItem {
                         text: '战斗角色编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.fightRoleEditor();
                         }
                     }
                     MenuItem {
                         text: '战斗脚本编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.fightScriptEditor();
                         }
@@ -393,21 +409,21 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '起始脚本编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.startScriptEditor();
                         }
                     }
                     MenuItem {
                         text: '通用脚本编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.commonScriptEditor();
                         }
                     }
                     MenuItem {
                         text: '脚本编辑器'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.scriptEditor();
                         }
@@ -415,7 +431,7 @@ Item {
                     MenuSeparator { }
                     MenuItem {
                         text: '测　试'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.gameTest();
                         }
@@ -430,16 +446,24 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillHeight: true
+                Layout.preferredHeight: 0.5
+            }
+
             Button {
                 //id: buttonProjectManage
 
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: '媒体资源管理'
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -459,35 +483,35 @@ Item {
 
                     MenuItem {
                         text: '图片管理'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.imageEditor();
                         }
                     }
                     MenuItem {
                         text: '音乐管理'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.musicEditor();
                         }
                     }
                     MenuItem {
                         text: '视频管理'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.videoEditor();
                         }
                     }
                     /*MenuItem {
                         text: '压缩文件夹'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.compressDir();
                         }
                     }
                     MenuItem {
                         text: '解压文件夹'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.uncompressDir();
                         }
@@ -503,16 +527,24 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillHeight: true
+                Layout.preferredHeight: 0.5
+            }
+
             Button {
                 //id: buttonProjectManage
 
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: '插件管理'
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -532,14 +564,14 @@ Item {
 
                     MenuItem {
                         text: '插件管理'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.pluginsManager();
                         }
                     }
                     MenuItem {
                         text: '插件下载'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.pluginsDownload();
                         }
@@ -554,15 +586,23 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillHeight: true
+                Layout.preferredHeight: 0.5
+            }
+
             Button {
                 //Layout.fillWidth: true
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: `<font color="${Global.style.color(Global.style.Red)}"><b>开始游戏</b></font>`
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     if(!_private.checkCurrentProjectName()) {
                         return;
@@ -571,16 +611,24 @@ Item {
                 }
             }
 
+            Item {
+                Layout.fillHeight: true
+                Layout.preferredHeight: 0.5
+            }
+
             Button {
                 //id: buttonProjectManage
 
                 Layout.preferredWidth: parent.width / 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredHeight: 50
+                Layout.preferredHeight: 1
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
+                Layout.maximumHeight: implicitHeight * 1.2
 
                 text: '文　档'
+                font.pointSize: _private.config.nButtonTextSize
+
                 onClicked: {
                     menuDocuments.open();
                     menuDocuments.enabled = true;
@@ -597,28 +645,28 @@ Item {
 
                     MenuItem {
                         text: '教　程'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.tutorial();
                         }
                     }
                     MenuItem {
                         text: '使用协议'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.agreement();
                         }
                     }
                     MenuItem {
                         text: '更新日志'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.updateLog();
                         }
                     }
                     MenuItem {
                         text: '建议意见'
-                        height: _config.nMenuItemHeight
+                        height: _private.config.nMenuItemHeight
                         onClicked: {
                             _private.suggest();
                         }
@@ -1115,7 +1163,7 @@ Item {
             Layout.preferredHeight: 1
         }
 
-        RowLayout {
+        ColumnLayout {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
@@ -1124,13 +1172,38 @@ Item {
             //Layout.fillHeight: true
 
             Label {
+                //anchors.right: parent.right
+                //anchors.bottom: parent.bottom
+                //anchors.rightMargin: 20
+                //anchors.horizontalCenter: parent.horizontalCenter
+                //anchors.verticalCenter: parent.verticalCenter
+                //height: 50
+                //width: parent.width
+                Layout.preferredWidth: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                //Layout.fillHeight: true
+                //Layout.fillWidth: true
+                //Layout.preferredWidth: 1
+
+                font.pointSize: 12
+                text: qsTr('<a href="https://afdian.com/a/Leamus">爱发电</a>')
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
+
+                onLinkActivated: {
+                    Qt.openUrlExternally(link);
+                }
+            }
+
+            Label {
                 //anchors.left: parent.left
                 //anchors.bottom: parent.bottom
                 //anchors.leftMargin: 20
                 //anchors.horizontalCenter: parent.horizontalCenter
                 //anchors.verticalCenter: parent.verticalCenter
                 //height: 50
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                Layout.preferredWidth: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
                 //Layout.fillHeight: true
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
@@ -1151,30 +1224,8 @@ Item {
                 //anchors.verticalCenter: parent.verticalCenter
                 //height: 50
                 //width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                //Layout.fillHeight: true
-                //Layout.fillWidth: true
-                //Layout.preferredWidth: 1
-
-                font.pointSize: 12
-                text: qsTr('<a href="https://afdian.com/a/Leamus">爱发电</a>')
-                horizontalAlignment: Label.AlignHCenter
-                verticalAlignment: Label.AlignVCenter
-
-                onLinkActivated: {
-                    Qt.openUrlExternally(link);
-                }
-            }
-
-            Label {
-                //anchors.right: parent.right
-                //anchors.bottom: parent.bottom
-                //anchors.rightMargin: 20
-                //anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.verticalCenter: parent.verticalCenter
-                //height: 50
-                //width: parent.width
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                Layout.preferredWidth: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
                 //Layout.fillHeight: true
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: 1
@@ -1616,14 +1667,6 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-
-        property int nMenuItemHeight: 39
-    }
-
-
     QtObject {
         id: _private
 
@@ -2008,7 +2051,7 @@ Item {
         }
         function future() {
             $dialog.show({
-                Msg: '敬请期待~',
+                Msg: '正在开发中，敬请期待~',
                 Buttons: Dialog.Ok,
                 OnAccepted: function() {
                     //rootGameMaker.forceActiveFocus();
@@ -2331,6 +2374,16 @@ Item {
         }
 
 
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            //字体大小
+            property int nButtonTextSize: 12
+
+            property int nMenuItemHeight: 39
+
+        }
 
         //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
         readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))

@@ -553,7 +553,8 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                visible: $Platform.compileType === 'debug'
+                visible: false
+
 
                 font.pointSize: _config.nFontPointSize
                 text: '调试'
@@ -3596,7 +3597,7 @@ Item {
         property int nMapDrawScale: 1
 
         //按钮字体大小
-        property int nFontPointSize: 9
+        property int nFontPointSize: 6
 
     }
 

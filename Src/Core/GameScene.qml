@@ -163,8 +163,10 @@ Item {
         //game.run({Script: function*() {
 
 
-        if(bLoadResources)
+        if(bLoadResources) {
             yield* GameSceneJS.loadResources();
+            _private.nStage = 1;
+        }
 
 
         //恢复游戏数据
@@ -241,17 +243,22 @@ Item {
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc]) {
                 const plugin = _private.objPlugins[tc][tp];
-                if(plugin.$init && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
-                    try {
-                        //console.warn(plugin.$init)
-                        let r = plugin.$init(bLoadResources);
-                        if($CommonLibJS.isGenerator(r))r = yield* r;
+                //if(plugin.$autoLoad === 1) {
+                if(_private.objPluginsStatus[tc][tp] === 1) {
+                    if(plugin.$init) { //$CommonLibJS.checkCallable
+                        try {
+                            //console.warn(plugin.$init)
+                            let r = plugin.$init(bLoadResources);
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
+                        }
+                        catch(e) {
+                            $CommonLibJS.printException(e);
+                            console.warn('[!GameScene]插件$init函数调用错误：', tc, tp);
+                            //throw err;
+                        }
                     }
-                    catch(e) {
-                        $CommonLibJS.printException(e);
-                        console.warn('[!GameScene]插件$init函数调用错误：', tc, tp);
-                        //throw err;
-                    }
+
+                    _private.objPluginsStatus[tc][tp] = 2;
                 }
             }
 
@@ -268,6 +275,9 @@ Item {
                 //throw err;
             }
         }
+
+
+        _private.nStage = 2;
 
 
         //game.pause();
@@ -334,6 +344,10 @@ Item {
         //    setSceneToRole();
         //},1,rootGameScene], 10);
 
+
+        _private.nStage = 3;
+
+
         console.debug('[GameScene]init over');
     }
 
@@ -343,6 +357,8 @@ Item {
     //必须用yield标记来让它运行完毕
     function* release(bUnloadResources=true) {
         console.debug('[GameScene]release');
+
+        _private.nStage = 10;
 
         //scriptQueue.runNextEventLoop('release');
 
@@ -378,16 +394,21 @@ Item {
         for(let tc in _private.objPlugins)
             for(let tp in _private.objPlugins[tc]) {
                 const plugin = _private.objPlugins[tc][tp];
-                if(plugin.$release && plugin.$autoLoad !== false) { //$CommonLibJS.checkCallable
-                    try {
-                        let r = plugin.$release(bUnloadResources);
-                        if($CommonLibJS.isGenerator(r))r = yield* r;
+                //if(plugin.$autoLoad === 2) {
+                if(_private.objPluginsStatus[tc][tp] === 2) {
+                    if(plugin.$release) { //$CommonLibJS.checkCallable
+                        try {
+                            let r = plugin.$release(bUnloadResources);
+                            if($CommonLibJS.isGenerator(r))r = yield* r;
+                        }
+                        catch(e) {
+                            $CommonLibJS.printException(e);
+                            console.warn('[!GameScene]插件$release函数调用错误：', tc, tp);
+                            //throw err;
+                        }
                     }
-                    catch(e) {
-                        $CommonLibJS.printException(e);
-                        console.warn('[!GameScene]插件$release函数调用错误：', tc, tp);
-                        //throw err;
-                    }
+
+                    _private.objPluginsStatus[tc][tp] = 1;
                 }
             }
 
@@ -496,7 +517,7 @@ Item {
         mainRole.$$mapEventsTriggering = {};
 
 
-        _private.nStage = 0;
+        _private.nStatus = 0;
 
 
         loaderFightScene.visible = false;
@@ -505,8 +526,13 @@ Item {
         itemViewPort.release();
 
 
-        if(bUnloadResources)
+        _private.nStage = 11;
+
+
+        if(bUnloadResources) {
             yield* GameSceneJS.unloadResources();
+            _private.nStage = 12;
+        }
         //}(), Priority: -2, Type: 0, Running: 1, Tips: 'release'});
 
 
@@ -3260,7 +3286,7 @@ Item {
             else if(videoParams.$width === -1)
                 videoOutput.width = rootGameScene.width;
             else if($CommonLibJS.isValidNumber(videoParams.$width)) {
-                videoOutput.width = videoParams.$width * Screen.pixelDensity;
+                videoOutput.width = videoParams.$width * $Global.pixelDensity;
             }
 
             if(videoParams.$videoOutput.$height === undefined && videoParams.$height === undefined)
@@ -3268,7 +3294,7 @@ Item {
             else if(videoParams.$height === -1)
                 videoOutput.height = rootGameScene.height;
             else if($CommonLibJS.isValidNumber(videoParams.$height)) {
-                videoOutput.height = videoParams.$height * Screen.pixelDensity;
+                videoOutput.height = videoParams.$height * $Global.pixelDensity;
             }
 
 
@@ -3503,7 +3529,7 @@ Item {
                 switch(imageParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
-                    tmp.width = imageParams.$width[0] * Screen.pixelDensity;
+                    tmp.width = imageParams.$width[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -3527,7 +3553,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(imageParams.$width)) {
-                tmp.width = imageParams.$width * Screen.pixelDensity;
+                tmp.width = imageParams.$width * $Global.pixelDensity;
             }
 
             //默认原高
@@ -3540,7 +3566,7 @@ Item {
                 switch(imageParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
-                    tmp.height = imageParams.$height[0] * Screen.pixelDensity;
+                    tmp.height = imageParams.$height[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -3564,7 +3590,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(imageParams.$height)) {
-                tmp.height = imageParams.$height * Screen.pixelDensity;
+                tmp.height = imageParams.$height * $Global.pixelDensity;
             }
 
             //宽度适应高度、高度适应宽度（乘以倍率）
@@ -3585,7 +3611,7 @@ Item {
                 switch(imageParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
-                    tmp.x = imageParams.$x[0] * Screen.pixelDensity;
+                    tmp.x = imageParams.$x[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -3597,7 +3623,7 @@ Item {
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * Screen.pixelDensity + (parentComp.width - tmp.width) / 2});
+                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * $Global.pixelDensity + (parentComp.width - tmp.width) / 2});
                     break;
                 //如果是 居中偏移父组件的百分比
                 case 5:
@@ -3609,7 +3635,7 @@ Item {
                     break;
                 //如果是 右对齐偏移固定长度
                 case 7:
-                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * Screen.pixelDensity + (parentComp.width - tmp.width)});
+                    tmp.x = Qt.binding(function(){return imageParams.$x[0] * $Global.pixelDensity + (parentComp.width - tmp.width)});
                     break;
                 //如果是 右对齐偏移父组件的百分比
                 case 8:
@@ -3625,7 +3651,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(imageParams.$x)) {
-                tmp.x = imageParams.$x * Screen.pixelDensity;
+                tmp.x = imageParams.$x * $Global.pixelDensity;
             }
 
             //默认
@@ -3639,7 +3665,7 @@ Item {
                 switch(imageParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
-                    tmp.y = imageParams.$y[0] * Screen.pixelDensity;
+                    tmp.y = imageParams.$y[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -3651,7 +3677,7 @@ Item {
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * Screen.pixelDensity + (parentComp.height - tmp.height) / 2});
+                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * $Global.pixelDensity + (parentComp.height - tmp.height) / 2});
                     break;
                 //如果是 居中偏移父组件的百分比
                 case 5:
@@ -3663,7 +3689,7 @@ Item {
                     break;
                 //如果是 下对齐偏移固定长度
                 case 7:
-                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * Screen.pixelDensity + (parentComp.height - tmp.height)});
+                    tmp.y = Qt.binding(function(){return imageParams.$y[0] * $Global.pixelDensity + (parentComp.height - tmp.height)});
                     break;
                 //如果是 下对齐偏移父组件的百分比
                 case 8:
@@ -3679,7 +3705,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(imageParams.$y)) {
-                tmp.y = imageParams.$y * Screen.pixelDensity;
+                tmp.y = imageParams.$y * $Global.pixelDensity;
             }
 
 
@@ -3983,7 +4009,7 @@ Item {
                 switch(spriteParams.$width[1]) {
                 //如果是 固定宽度
                 case 1:
-                    sprite.width = spriteParams.$width[0] * Screen.pixelDensity;
+                    sprite.width = spriteParams.$width[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -4007,7 +4033,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(spriteParams.$width)) {
-                sprite.width = spriteParams.$width * Screen.pixelDensity;
+                sprite.width = spriteParams.$width * $Global.pixelDensity;
             }
 
             //默认原高
@@ -4021,7 +4047,7 @@ Item {
                 switch(spriteParams.$height[1]) {
                 //如果是 固定高度
                 case 1:
-                    sprite.height = spriteParams.$height[0] * Screen.pixelDensity;
+                    sprite.height = spriteParams.$height[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -4045,7 +4071,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(spriteParams.$height)) {
-                sprite.height = spriteParams.$height * Screen.pixelDensity;
+                sprite.height = spriteParams.$height * $Global.pixelDensity;
             }
 
             //宽度适应高度、高度适应宽度（乘以倍率）
@@ -4066,7 +4092,7 @@ Item {
                 switch(spriteParams.$x[1]) {
                 //如果是 固定长度
                 case 1:
-                    sprite.x = spriteParams.$x[0] * Screen.pixelDensity;
+                    sprite.x = spriteParams.$x[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -4078,7 +4104,7 @@ Item {
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * Screen.pixelDensity + (parentComp.width - sprite.width) / 2});
+                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * $Global.pixelDensity + (parentComp.width - sprite.width) / 2});
                     break;
                 //如果是 居中偏移父组件的百分比
                 case 5:
@@ -4090,7 +4116,7 @@ Item {
                     break;
                 //如果是 右对齐偏移固定长度
                 case 7:
-                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * Screen.pixelDensity + (parentComp.width - sprite.width)});
+                    sprite.x = Qt.binding(function(){return spriteParams.$x[0] * $Global.pixelDensity + (parentComp.width - sprite.width)});
                     break;
                 //如果是 右对齐偏移父组件的百分比
                 case 8:
@@ -4106,7 +4132,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(spriteParams.$x)) {
-                sprite.x = spriteParams.$x * Screen.pixelDensity;
+                sprite.x = spriteParams.$x * $Global.pixelDensity;
             }
 
             //默认
@@ -4120,7 +4146,7 @@ Item {
                 switch(spriteParams.$y[1]) {
                 //如果是 固定长度
                 case 1:
-                    sprite.y = spriteParams.$y[0] * Screen.pixelDensity;
+                    sprite.y = spriteParams.$y[0] * $Global.pixelDensity;
                     break;
                 //如果是 父组件百分比
                 case 2:
@@ -4132,7 +4158,7 @@ Item {
                     break;
                 //如果是 居中偏移固定长度
                 case 4:
-                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * Screen.pixelDensity + (parentComp.height - sprite.height) / 2});
+                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * $Global.pixelDensity + (parentComp.height - sprite.height) / 2});
                     break;
                 //如果是 居中偏移父组件的百分比
                 case 5:
@@ -4144,7 +4170,7 @@ Item {
                     break;
                 //如果是 下对齐偏移固定长度
                 case 7:
-                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * Screen.pixelDensity + (parentComp.height - sprite.height)});
+                    sprite.y = Qt.binding(function(){return spriteParams.$y[0] * $Global.pixelDensity + (parentComp.height - sprite.height)});
                     break;
                 //如果是 下对齐偏移父组件的百分比
                 case 8:
@@ -4160,7 +4186,7 @@ Item {
                 }
             }
             else if($CommonLibJS.isValidNumber(spriteParams.$y)) {
-                sprite.y = spriteParams.$y * Screen.pixelDensity;
+                sprite.y = spriteParams.$y * $Global.pixelDensity;
             }
 
 
@@ -4417,7 +4443,7 @@ Item {
                 return _private.config.objPauseNames;
 
             //战斗模式不能设置
-            //if(_private.nStage === 1)
+            //if(_private.nStatus === 1)
             //    return;
 
             timer.stop();
@@ -4453,7 +4479,7 @@ Item {
         //继续游戏。
         readonly property var goon: function(name='$user_pause', times=-1) {
             //战斗模式不能设置
-            //if(_private.nStage === 1)
+            //if(_private.nStatus === 1)
             //    return;
 
 
@@ -4924,17 +4950,20 @@ Item {
 
                     //const plugin = _private.objPlugins[params[0]][params[1]];
                     const plugin = $CommonLibJS.getObjectValue(_private.objPlugins, params[0], params[1]);
-                    if(plugin && plugin.$autoLoad === false) {
-                        plugin.$autoLoad = true;
-
+                    //if(plugin && !(plugin.$autoLoad || plugin.$autoLoad === undefined)) {
+                    if(plugin && _private.objPluginsStatus[params[0]][params[1]] === 0) {
                         //game.run({Script: function*() {
                         if(plugin.$load) { //$CommonLibJS.checkCallable
                             let r = plugin.$load(params[0] + GameMakerGlobal.separator + params[1]);
                             if($CommonLibJS.isGenerator(r))r = yield* r;
                         }
-                        if(plugin.$init) { //$CommonLibJS.checkCallable
-                            let r = plugin.$init(true);
-                            if($CommonLibJS.isGenerator(r))r = yield* r;
+                        _private.objPluginsStatus[params[0]][params[1]] = 1;
+                        if(_private.nStage > 0) { //必须载入全部资源后才能init
+                            if(plugin.$init) { //$CommonLibJS.checkCallable
+                                let r = plugin.$init(null);
+                                if($CommonLibJS.isGenerator(r))r = yield* r;
+                            }
+                            _private.objPluginsStatus[params[0]][params[1]] = 2;
                         }
 
                         return resolve(plugin);
@@ -4966,10 +4995,10 @@ Item {
 
 
         //设置游戏阶段（地图0、战斗1），内部使用
-        readonly property var stage: function(nStage=null) {
-            if(nStage === undefined || nStage === null)
-                return _private.nStage;
-            return (_private.nStage = nStage);
+        readonly property var status: function(s=null) {
+            if(s === undefined || s === null)
+                return _private.nStatus;
+            return (_private.nStatus = s);
         }
 
 
@@ -5679,14 +5708,14 @@ Item {
 
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            anchors.leftMargin: 6 * Screen.pixelDensity
-            anchors.bottomMargin: 7 * Screen.pixelDensity
+            anchors.leftMargin: 6 * $Global.pixelDensity
+            anchors.bottomMargin: 7 * $Global.pixelDensity
             //anchors.verticalCenterOffset: -100
             //anchors.horizontalCenterOffset: -100
-            //anchors.margins: 1 * Screen.pixelDensity
+            //anchors.margins: 1 * $Global.pixelDensity
 
-            width: 20 * Screen.pixelDensity
-            height: 20 * Screen.pixelDensity
+            width: 20 * $Global.pixelDensity
+            height: 20 * $Global.pixelDensity
 
             transformOrigin: Item.BottomLeft
 
@@ -5750,14 +5779,14 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            anchors.rightMargin: 10 * Screen.pixelDensity
-            anchors.bottomMargin: 16 * Screen.pixelDensity
+            anchors.rightMargin: 10 * $Global.pixelDensity
+            anchors.bottomMargin: 16 * $Global.pixelDensity
 
             //anchors.verticalCenterOffset: -100
             //anchors.horizontalCenterOffset: -100
 
-            width: 6 * Screen.pixelDensity
-            height: 6 * Screen.pixelDensity
+            width: 6 * $Global.pixelDensity
+            height: 6 * $Global.pixelDensity
 
 
             color: 'red'
@@ -5786,14 +5815,14 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            anchors.rightMargin: 16 * Screen.pixelDensity
-            anchors.bottomMargin: 8 * Screen.pixelDensity
+            anchors.rightMargin: 16 * $Global.pixelDensity
+            anchors.bottomMargin: 8 * $Global.pixelDensity
 
             //anchors.verticalCenterOffset: -100
             //anchors.horizontalCenterOffset: -100
 
-            width: 6 * Screen.pixelDensity
-            height: 6 * Screen.pixelDensity
+            width: 6 * $Global.pixelDensity
+            height: 6 * $Global.pixelDensity
 
 
             color: 'blue'
@@ -6917,11 +6946,14 @@ Item {
             //mainRole.$$nActionType = 10;
         }
 
+        //游戏状态（0：刚开始；1：资源载入（loadResources）结束；2：游戏初始化（init）结束；3、起始脚本载入结束，正式开始；10：开始释放资源；11：释放资源结束（release）；12：资源卸载结束（unloadResources）；）
+        property int nStage: 0
+
         //场景跟踪角色
         property var sceneRole: null //mainRole
 
         //游戏目前阶段（0：正常；1：战斗）
-        property int nStage: 0
+        property int nStatus: 0
 
 
         //临时保存屏幕旋转
@@ -6942,7 +6974,8 @@ Item {
 
         property var objCommonScripts: ({})     //系统 和 用户 合并后的 通用脚本（用户脚本优先，没有的使用 GameMakerGlobal.js，注意只包含函数和var变量，不包含let/const变量）；
 
-        property var objPlugins: ({}) //所有插件脚本
+        property var objPlugins: ({}) //所有插件脚本对象
+        property var objPluginsStatus: ({}) //所有插件脚本状态
         property var arrGameComponents: [] //存储所有游戏组件（4种：GameMsg、RoleMsg、GameMenu、GameInput）
 
         //JS引擎，用来载入外部JS文件
@@ -8024,6 +8057,12 @@ Item {
                 tn = style.ItemHeight || styleUser.$itemHeight || styleSystem.$itemHeight;
                 if(tn > 0)
                     menuGame.nItemHeight = tn;
+                tn = style.ItemMaxHeight || styleUser.$itemMaxHeight || styleSystem.$itemMaxHeight;
+                if(tn > 0)
+                    menuGame.nItemMaxHeight = tn;
+                tn = style.ItemMinHeight || styleUser.$itemMinHeight || styleSystem.$itemMinHeight;
+                if(tn > 0)
+                    menuGame.nItemMinHeight = tn;
                 tn = style.TitleHeight || styleUser.$titleHeight || styleSystem.$titleHeight;
                 if(tn > 0)
                     menuGame.nTitleHeight = tn;
@@ -8106,18 +8145,19 @@ Item {
                 GameMenu {
                     id: menuGame
 
-                    //radius: rootGameMenu.radius
-
                     width: parent.width
                     height: parent.height
+                    //height: parent.height / 2
+                    //anchors.centerIn: parent
 
-                    nTitleHeight: textMenuTitle.implicitHeight
+                    //radius: rootGameMenu.radius
+
+                    nTitleHeight: implicitHeight
+                    nItemMinHeight: 50
+                    nItemHeight: -1 //implicitHeight
                     colorTitleColor: '#EE00CC99'
                     strTitle: ''
                     nWrapMode: TextEdit.WordWrap
-
-                    //height: parent.height / 2
-                    //anchors.centerIn: parent
 
                     onSg_choice: rootGameMenu.over(index);
                 }
@@ -8453,14 +8493,14 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            anchors.rightMargin: 16 * Screen.pixelDensity
-            anchors.bottomMargin: 8 * Screen.pixelDensity
+            anchors.rightMargin: 16 * $Global.pixelDensity
+            anchors.bottomMargin: 8 * $Global.pixelDensity
 
             //anchors.verticalCenterOffset: -100
             //anchors.horizontalCenterOffset: -100
 
-            width: 6 * Screen.pixelDensity
-            height: 6 * Screen.pixelDensity
+            width: 6 * $Global.pixelDensity
+            height: 6 * $Global.pixelDensity
 
 
             color: 'white'

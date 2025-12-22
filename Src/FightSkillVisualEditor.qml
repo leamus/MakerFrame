@@ -62,7 +62,7 @@ Item {
     Component {
         id: compBuff
 
-        Item {
+        RowLayout {
             id: tRootBuff
 
             //property alias label: tlable.text
@@ -73,227 +73,221 @@ Item {
             Layout.preferredHeight: 30
 
 
-            RowLayout {
-                anchors.fill: parent
+            Label {
+                //id: tlable
+                visible: false
+                text: '*@类型'
+            }
 
+            /*ComboBox {
+                id: tcomboType
 
-                Label {
-                    //id: tlable
-                    visible: false
-                    text: '*@类型'
+                objectName: 'Type'
+
+                Layout.fillWidth: true
+
+                model: ['毒','乱','封','眠','攻','防','速','灵','幸']
+
+                background: Rectangle {
+                    //implicitWidth: comboBoxComponentItem.comboBoxWidth
+                    implicitHeight: 35
+                    //border.color: control.pressed ? '#6495ED' : '#696969'
+                    //border.width: control.visualFocus ? 2 : 1
+                    color: 'transparent'
+                    //border.color: comboBoxComponentItem.color
+                    border.width: 2
+                    radius: 6
                 }
+                onActivated: {
+                    console.debug('[FightSkillVisualEditor]ComboBox:', comboType.currentIndex,
+                                  comboType.currentText,
+                                  comboType.currentValue);
 
-                /*ComboBox {
-                    id: tcomboType
-
-                    objectName: 'Type'
-
-                    Layout.fillWidth: true
-
-                    model: ['毒','乱','封','眠','攻','防','速','灵','幸']
-
-                    background: Rectangle {
-                        //implicitWidth: comboBoxComponentItem.comboBoxWidth
-                        implicitHeight: 35
-                        //border.color: control.pressed ? '#6495ED' : '#696969'
-                        //border.width: control.visualFocus ? 2 : 1
-                        color: 'transparent'
-                        //border.color: comboBoxComponentItem.color
-                        border.width: 2
-                        radius: 6
+                    switch(currentIndex) {
+                    case 1:
+                    case 2:
+                    case 3:
+                        ttextEffect.visible = false;
+                        ttextEffect.text = '0';
+                    break;
+                    default:
+                        ttextEffect.visible = true;
                     }
-                    onActivated: {
-                        console.debug('[FightSkillVisualEditor]ComboBox:', comboType.currentIndex,
-                                      comboType.currentText,
-                                      comboType.currentValue);
 
-                        switch(currentIndex) {
-                        case 1:
-                        case 2:
-                        case 3:
-                            ttextEffect.visible = false;
-                            ttextEffect.text = '0';
-                        break;
-                        default:
-                            ttextEffect.visible = true;
-                        }
-
-                    }
                 }
-                */
-                TextField {
-                    id: ttextType
+            }
+            */
+            TextField {
+                id: ttextType
 
-                    objectName: 'Type'
+                objectName: 'Type'
 
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    text: ''
-                    placeholderText: '*@类型'
+                text: ''
+                placeholderText: '*@类型'
 
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
 
-                    onPressAndHold: {
-                        const data = [['[选择Buff类型]', '毒(0)','乱(1)','封(2)','眠(3)','攻击(4)','防御(5)','速度(6)','灵力(7)','幸运(8)'],
-                                    ['', 0,1,2,3,4,5,6,7,8]];
+                onPressAndHold: {
+                    const data = [['[选择Buff类型]', '毒(0)','乱(1)','封(2)','眠(3)','攻击(4)','防御(5)','速度(6)','灵力(7)','幸运(8)'],
+                                ['', 0,1,2,3,4,5,6,7,8]];
 
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
 
-                                switch(index) {
-                                case 1:
-                                case 2:
-                                case 3:
-                                    ttextEffect.visible = false;
-                                    ttextEffect.text = '0';
-                                break;
-                                default:
-                                    ttextEffect.visible = true;
-                                }
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextEffect
-
-                    objectName: 'Effect'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: '0'
-                    placeholderText: '*@效果'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[Buff效果]', '固定值（整数）：20','倍率（小数）：2.0'],
-                                    ['', '20','2.0']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextRound
-
-                    objectName: 'Round'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: '2'
-                    placeholderText: '*@回合'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[持续回合数]', '2回合','5回合'],
-                                    ['', '2','5']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextProbability
-
-                    objectName: 'Probability'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: '0.5'
-                    placeholderText: '*@概率'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[获得Buff概率]', '50%','100%'],
-                                    ['', '0.5','1']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                Button {
-                    id: tbutton
-
-                    implicitWidth: 30
-
-                    text: 'X'
-
-                    onClicked: {
-                        for(const tc in _private.arrCacheComponent) {
-                            if(_private.arrCacheComponent[tc] === tRootBuff) {
-                                _private.arrCacheComponent.splice(tc, 1);
-                                break;
+                            switch(index) {
+                            case 1:
+                            case 2:
+                            case 3:
+                                ttextEffect.visible = false;
+                                ttextEffect.text = '0';
+                            break;
+                            default:
+                                ttextEffect.visible = true;
                             }
 
-                        }
-                        tRootBuff.destroy();
-
-                        root.forceActiveFocus();
-                    }
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
             }
 
+            TextField {
+                id: ttextEffect
+
+                objectName: 'Effect'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: '0'
+                placeholderText: '*@效果'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[Buff效果]', '固定值（整数）：20','倍率（小数）：2.0'],
+                                ['', '20','2.0']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            TextField {
+                id: ttextRound
+
+                objectName: 'Round'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: '2'
+                placeholderText: '*@回合'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[持续回合数]', '2回合','5回合'],
+                                ['', '2','5']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            TextField {
+                id: ttextProbability
+
+                objectName: 'Probability'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: '0.5'
+                placeholderText: '*@概率'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[获得Buff概率]', '50%','100%'],
+                                ['', '0.5','1']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            Button {
+                id: tbutton
+
+                implicitWidth: 30
+
+                text: 'X'
+
+                onClicked: {
+                    for(const tc in _private.arrCacheComponent) {
+                        if(_private.arrCacheComponent[tc] === tRootBuff) {
+                            _private.arrCacheComponent.splice(tc, 1);
+                            break;
+                        }
+
+                    }
+                    tRootBuff.destroy();
+
+                    root.forceActiveFocus();
+                }
+            }
         }
     }
 
@@ -301,7 +295,7 @@ Item {
     Component {
         id: compEffect
 
-        Item {
+        RowLayout {
             id: tRootEffect
 
             //property alias label: tlable.text
@@ -311,177 +305,172 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 30
 
-            RowLayout {
-                anchors.fill: parent
+            Label {
+                //id: tlable
+                visible: false
+                text: '*效果'
+            }
 
-                Label {
-                    //id: tlable
-                    visible: false
-                    text: '*效果'
-                }
+            TextField {
+                id: ttextType
 
-                TextField {
-                    id: ttextType
+                objectName: 'Type'
 
-                    objectName: 'Type'
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                text: ''
+                placeholderText: '*@属性'
 
-                    text: ''
-                    placeholderText: '*@属性'
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
 
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
+                onPressAndHold: {
+                    const data = [['[影响属性]', '一段HP','二段HP','一段MP'],
+                                ['', 'HP, 0','HP, 1','MP, 0']];
 
-                    onPressAndHold: {
-                        const data = [['[影响属性]', '一段HP','二段HP','一段MP'],
-                                    ['', 'HP, 0','HP, 1','MP, 0']];
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
 
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextEffect
-
-                    objectName: 'Effect'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: '0'
-                    placeholderText: '*@效果'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[效果]', '固定值（整数）：20','倍率（小数）：2.0'],
-                                    ['', '20','2.0']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextCombatant
-
-                    objectName: 'Combatant'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: '0'
-                    placeholderText: '*@倍率参考对象'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[倍率参考对象]', '本人(0)','对方(1)'],
-                                    ['', '0','1']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                TextField {
-                    id: ttextproperty
-
-                    objectName: 'Property'
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
-
-                    text: ''
-                    placeholderText: '*@倍率参考属性'
-
-                    //selectByKeyboard: true
-                    selectByMouse: true
-                    //wrapMode: TextEdit.Wrap
-
-                    onPressAndHold: {
-                        const data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（增益后）','二段血（增益后）','三段血（增益后）','一段MP（增益后）','二段MP（增益后）','攻击（增益后）','防御（增益后）','速度（增益后）','幸运（增益后）','灵力（增益后）'],
-                                    ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
-
-                        $list.open({
-                            Data: data[0],
-                            OnClicked: (index, item)=>{
-                                text = data[1][index];
-
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                            OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
-                            },
-                        });
-                    }
-                }
-
-                Button {
-                    id: tbutton
-
-                    implicitWidth: 30
-
-                    text: 'X'
-
-                    onClicked: {
-                        for(const tc in _private.arrCacheComponent) {
-                            if(_private.arrCacheComponent[tc] === tRootEffect) {
-                                _private.arrCacheComponent.splice(tc, 1);
-                                break;
-                            }
-
-                        }
-                        tRootEffect.destroy();
-
-                        root.forceActiveFocus();
-                    }
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
             }
 
+            TextField {
+                id: ttextEffect
+
+                objectName: 'Effect'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: '0'
+                placeholderText: '*@效果'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[效果]', '固定值（整数）：20','倍率（小数）：2.0'],
+                                ['', '20','2.0']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            TextField {
+                id: ttextCombatant
+
+                objectName: 'Combatant'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: '0'
+                placeholderText: '*@倍率参考对象'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[倍率参考对象]', '本人(0)','对方(1)'],
+                                ['', '0','1']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            TextField {
+                id: ttextproperty
+
+                objectName: 'Property'
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+
+                text: ''
+                placeholderText: '*@倍率参考属性'
+
+                //selectByKeyboard: true
+                selectByMouse: true
+                //wrapMode: TextEdit.Wrap
+
+                onPressAndHold: {
+                    const data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（增益后）','二段血（增益后）','三段血（增益后）','一段MP（增益后）','二段MP（增益后）','攻击（增益后）','防御（增益后）','速度（增益后）','幸运（增益后）','灵力（增益后）'],
+                                ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
+
+                    $list.open({
+                        Data: data[0],
+                        OnClicked: (index, item)=>{
+                            text = data[1][index];
+
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                        OnCanceled: ()=>{
+                            $list.visible = false;
+                            root.forceActiveFocus();
+                        },
+                    });
+                }
+            }
+
+            Button {
+                id: tbutton
+
+                implicitWidth: 30
+
+                text: 'X'
+
+                onClicked: {
+                    for(const tc in _private.arrCacheComponent) {
+                        if(_private.arrCacheComponent[tc] === tRootEffect) {
+                            _private.arrCacheComponent.splice(tc, 1);
+                            break;
+                        }
+
+                    }
+                    tRootEffect.destroy();
+
+                    root.forceActiveFocus();
+                }
+            }
         }
     }
 
@@ -617,7 +606,8 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 30
+                        Layout.fillHeight: true
+                        //Layout.preferredHeight: 30
 
                         Label {
                             text: '技能描述:'
@@ -629,12 +619,12 @@ Item {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
 
-                            text: '60'
+                            text: ''
                             placeholderText: '技能描述'
 
                             //selectByKeyboard: true
                             selectByMouse: true
-                            //wrapMode: TextEdit.Wrap
+                            wrapMode: TextArea.Wrap
                         }
                     }
 
@@ -682,8 +672,10 @@ Item {
                             implicitWidth: 30
                             text: 'P'
                             onClicked: {
-                                rectSpriteEffectBackground.visible = true;
-                                _private.refreshSpriteEffect(textSkillEffect.text);
+                                if($GameMakerGlobalJS.loadSpriteEffect(textSkillEffect.text, spriteEffectComp, _private.jsLoader)) {
+                                    spriteEffectComp.start();
+                                    rectSpriteEffectBackground.show();
+                                }
                             }
                         }
                     }
@@ -856,7 +848,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@Buff类型'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -864,7 +856,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@Buff效果'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -872,7 +864,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@持续回合数'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -880,7 +872,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@概率'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -931,7 +923,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@影响属性'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -939,7 +931,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@效果值'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -947,7 +939,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@倍率参考对象'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -955,7 +947,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@倍率参考属性'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -1246,10 +1238,15 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 30
+            //Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '保存'
                 font.pointSize: 9
                 onClicked: {
@@ -1257,6 +1254,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '读取'
                 font.pointSize: 9
                 onClicked: {
@@ -1264,6 +1266,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '编译'
                 font.pointSize: 9
                 onClicked: {
@@ -1273,6 +1280,11 @@ Item {
                 }
             }
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '关闭'
                 font.pointSize: 9
                 onClicked: {
@@ -1281,6 +1293,11 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                //Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 text: '帮助'
                 font.pointSize: 9
                 onClicked: {
@@ -1309,7 +1326,25 @@ Item {
 
     Rectangle {
         id: rectSpriteEffectBackground
+
+        function show() {
+            rectSpriteEffectBackground.visible = true;
+        }
+        function close() {
+            spriteEffectComp.stop();
+            rectSpriteEffectBackground.visible = false;
+            //root.focus = true;
+            root.forceActiveFocus();
+        }
+        Keys.onEscapePressed: function(event) {
+            close();
+        }
+        Keys.onBackPressed: function(event) {
+            close();
+        }
+
         visible: false
+        focus: visible
         anchors.fill: parent
 
         color: '#7F000000'
@@ -1355,136 +1390,15 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                spriteEffectComp.stop();
-                rectSpriteEffectBackground.visible = false;
+                rectSpriteEffectBackground.close();
             }
         }
     }
 
 
-
-    //配置
-    QtObject {
-        id: _config
-
-        property int nLabelFontSize: 10
-    }
 
     QtObject {
         id: _private
-
-
-        //刷新特效；
-        function refreshSpriteEffect(spriteName) {
-            //console.debug('[FightScene]getSpriteEffect0');
-
-            //读特效信息
-            let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
-
-            let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
-            if(spriteResourceInfo)
-                spriteResourceInfo = JSON.parse(spriteResourceInfo);
-            else
-                return false;
-
-            let script;
-
-            if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
-                _private.jsLoader.clear();
-                script = _private.jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
-            }
-
-
-            spriteEffectComp.nSpriteType = spriteResourceInfo.SpriteType;
-            spriteEffectComp.sprite.stop();
-
-
-            //spriteEffectComp.$info = spriteResourceInfo;
-            //spriteEffectComp.$script = spriteResourceInfo.$script;
-
-
-            /*switch(spriteResourceInfo.SpriteType) {
-            case 1:
-                spriteEffectComp.sourceComponent = compSpriteEffect;
-                break;
-            case 2:
-                spriteEffectComp.sourceComponent = compDirSpriteEffect;
-                break;
-            }
-            */
-
-
-            spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(spriteResourceInfo.Image);
-
-            //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
-            //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
-            spriteEffectComp.rXOffset = spriteResourceInfo.XOffset ?? 0;
-            spriteEffectComp.rYOffset = spriteResourceInfo.YOffset ?? 0;
-            spriteEffectComp.opacity = spriteResourceInfo.Opacity ?? 1;
-            spriteEffectComp.rXScale = spriteResourceInfo.XScale ?? 1;
-            spriteEffectComp.rYScale = spriteResourceInfo.YScale ?? 1;
-
-            spriteEffectComp.strSoundeffectName = spriteResourceInfo.Sound ?? '';
-
-            spriteEffectComp.nSoundeffectDelay = spriteResourceInfo.SoundDelay ?? 0;
-
-            spriteEffectComp.nLoops = -1;
-            //spriteEffectComp.restart();
-
-            let t = spriteResourceInfo.SpriteSize;
-            spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
-            spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
-
-
-            //！！！兼容旧代码
-            if(spriteEffectComp.nSpriteType === 1) {
-                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
-                0);
-                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
-                0);
-
-                //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
-                let t = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
-                );
-                spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
-
-                t = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
-                );
-                spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
-            }
-            else if(spriteEffectComp.nSpriteType === 2) {
-                let t = spriteResourceInfo.FrameData;
-
-                //！！！兼容旧代码
-                spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
-                0);
-                spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
-                0);
-                spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
-                    $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
-                0);
-
-
-                if(script)
-                    spriteEffectComp.sprite.fnRefresh = script.$refresh;
-            }
-            spriteEffectComp.start();
-
-            return true;
-        }
 
 
         function changeType() {
@@ -2006,6 +1920,13 @@ Item {
             });
         }
 
+
+
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 7
+        }
 
 
         property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))

@@ -258,7 +258,9 @@ var $config = {
             $maskColor: '#7FFFFFFF',
             $borderColor: 'white',
             $backgroundColor: '#CF6699FF',
-            $itemHeight: 60,
+            $itemHeight: -1,
+            $itemMaxHeight: -1,
+            $itemMinHeight: 45,
             $titleHeight: 39,
             $itemFontSize: 16,
             $itemFontColor: 'white',
@@ -294,7 +296,9 @@ var $config = {
             $menu: {
                 $borderColor: 'white',
                 $backgroundColor: '#CF6699FF',
-                $itemHeight: 60,
+                $itemHeight: -1,
+                $itemMaxHeight: -1,
+                $itemMinHeight: 45,
                 $titleHeight: 39,
                 $itemFontSize: 16,
                 $itemFontColor: 'white',
@@ -1782,7 +1786,7 @@ function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesCom
 function* $commonFightInitScript(teams, fightData) {
 
     //game.pause('$fight');
-    //game.stage(1);
+    //game.status(1);
 
 
     if(fightData.$backgroundImage) {
@@ -1965,7 +1969,7 @@ function* $commonFightEndScript(res, teams, fightData) {
             game.restart();
         }
 
-        //game.stage(0);
+        //game.status(0);
         //game.goon('$fight');
 
         return null;

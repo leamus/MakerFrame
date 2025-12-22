@@ -186,6 +186,10 @@ Item {
                 Layout.fillHeight: true
 
                 nTitleHeight: 30
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
+
                 colorTitleColor: 'darkred'
                 strTitle: '买'
                 //每页个数
@@ -258,6 +262,10 @@ Item {
                 Layout.fillHeight: true
 
                 nTitleHeight: 30
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
+
                 colorTitleColor: 'darkred'
                 strTitle: '卖'
                 //每页个数

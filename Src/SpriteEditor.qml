@@ -271,10 +271,10 @@ Item {
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -282,7 +282,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -292,12 +292,17 @@ Item {
                         TextField {
                             id: textSpriteWidth
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '50'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -311,7 +316,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -321,12 +326,17 @@ Item {
                         TextField {
                             id: textSpriteHeight
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '50'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -340,7 +350,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -350,12 +360,17 @@ Item {
                         TextField {
                             id: textSpriteOpacity
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '1.0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -367,17 +382,16 @@ Item {
                                 _private.refreshSprite();
                             }
                         }
-
                     }
 
 
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -387,12 +401,17 @@ Item {
                         TextField {
                             id: textSpriteFrameOffsetX
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -408,12 +427,17 @@ Item {
                         TextField {
                             id: textSpriteFrameOffsetY
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -427,7 +451,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -437,12 +461,17 @@ Item {
                         TextField {
                             id: textSpriteFrameXScale
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '1.0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -458,12 +487,17 @@ Item {
                         TextField {
                             id: textSpriteFrameYScale
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '1.0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -480,10 +514,10 @@ Item {
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -491,7 +525,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -501,12 +535,17 @@ Item {
                         TextField {
                             id: textSoundDelay
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -523,11 +562,11 @@ Item {
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -535,7 +574,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -545,12 +584,17 @@ Item {
                         TextField {
                             id: textSpriteFrameCount
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '3'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -564,7 +608,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -574,12 +618,17 @@ Item {
                         TextField {
                             id: textSpriteFrameInterval
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '100'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -597,13 +646,13 @@ Item {
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         visible: comboType.currentIndex === 0
 
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -613,12 +662,17 @@ Item {
                         TextField {
                             id: textSpriteFrameWidth
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '37'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -632,7 +686,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -641,12 +695,17 @@ Item {
                         TextField {
                             id: textSpriteFrameHeight
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '58'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -660,7 +719,7 @@ Item {
                         }
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -670,12 +729,17 @@ Item {
                         TextField {
                             id: textSpriteFrameOffsetColumn
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -690,12 +754,17 @@ Item {
                         TextField {
                             id: textSpriteFrameOffsetRow
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -707,19 +776,18 @@ Item {
                                 _private.refreshSprite();
                             }
                         }
-
                     }
 
                     RowLayout {
                         //Layout.preferredWidth: root.width * 0.9
                         Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
 
                         visible: comboType.currentIndex === 1
 
 
                         Label {
-                            font.pointSize: _config.nLabelFontSize
+                            font.pointSize: _private.config.nLabelFontSize
                             //Layout.preferredWidth: 80
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             Layout.preferredHeight: 10
@@ -729,12 +797,17 @@ Item {
                         TextField {
                             id: textSpriteFrameStartIndex
 
-                            Layout.preferredWidth: Math.max(contentWidth + 9, 9)
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
+                            Layout.preferredWidth: Math.max(contentWidth + 5, 20)
+                            Layout.maximumWidth: 30
                             //Layout.preferredHeight: _private.nColumnHeight
+                            //Layout.fillWidth: true
 
                             text: '0'
-                            font.pointSize: _config.nTextFontSize
+                            font.pointSize: _private.config.nTextFontSize
+
+                            horizontalAlignment: TextField.AlignHCenter
+                            verticalAlignment: TextField.AlignVCenter
 
                             //selectByKeyboard: true
                             selectByMouse: true
@@ -757,7 +830,7 @@ Item {
 
                         color: 'red'
                         text: '注意：图片文件夹请自行复制到资源目录；预览请先保存'
-                        font.pointSize: _config.nTextFontSize
+                        font.pointSize: _private.config.nTextFontSize - 2
 
                         horizontalAlignment: Label.AlignHCenter
                         verticalAlignment: Label.AlignVCenter
@@ -765,7 +838,7 @@ Item {
                     }
 
                     RowLayout {
-                        Layout.preferredHeight: 50
+                        //Layout.preferredHeight: 50
                         Layout.fillWidth: true
 
                         //visible: comboType.currentIndex === 1
@@ -874,15 +947,16 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.9
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '图片资源'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     textSpriteImageURL.enabled = false;
@@ -894,12 +968,13 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '音效'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     textSpriteSoundURL.enabled = false;
@@ -911,14 +986,15 @@ Item {
             }
 
             Button {
+                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
+                Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
                 visible: false
 
-                //Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
-
                 text: '刷新'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     _private.refreshSprite();
@@ -926,12 +1002,13 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '保存'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     //_private.strSpriteRID = textSpriteRID.text;
@@ -941,14 +1018,15 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 visible: comboType.currentIndex === 0
 
                 text: '原图'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     if(textSpriteImageURL.text)
@@ -957,12 +1035,13 @@ Item {
             }
 
             Button {
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
 
                 text: '帮助'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
 
@@ -982,13 +1061,15 @@ Item {
             }
 
             Button {
-                visible: $Platform.compileType === 'debug' ? true : false
-                //Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
+                Layout.maximumWidth: implicitWidth
                 Layout.preferredHeight: 50
+                Layout.fillWidth: true
+
+                visible: $Platform.compileType === 'debug' ? true : false
 
                 text: 'Test'
-                font.pointSize: _config.nButtonFontSize
+                font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
                     /*spriteEffect.sprite.running = true;
@@ -1131,6 +1212,7 @@ Item {
                     id: textSpriteImageURL
 
                     Layout.fillWidth: true
+
                     placeholderText: ''
 
                     //selectByKeyboard: true
@@ -1147,6 +1229,7 @@ Item {
                     id: textSpriteImageResourceName
 
                     Layout.fillWidth: true
+
                     placeholderText: '素材名'
 
                     //selectByKeyboard: true
@@ -1505,6 +1588,7 @@ Item {
                     id: textSpriteSoundURL
 
                     Layout.fillWidth: true
+
                     placeholderText: ''
 
                     //selectByKeyboard: true
@@ -1521,6 +1605,7 @@ Item {
                     id: textSpriteSoundResourceName
 
                     Layout.fillWidth: true
+
                     placeholderText: '素材名'
 
                     //selectByKeyboard: true
@@ -1885,6 +1970,7 @@ Item {
                     id: textSpriteRID
 
                     Layout.fillWidth: true
+
                     placeholderText: '深林孤鹰'
                     text: ''
 
@@ -1900,7 +1986,9 @@ Item {
                 }
                 TextField {
                     id: textMapScale
+
                     Layout.fillWidth: true
+
                     selectByMouse: true
                     placeholderText: '1'
                     text: '1'
@@ -2304,15 +2392,15 @@ function $refresh(index, imageAnimate, path) {
                 },
             });
         }
-    }
 
-    //配置
-    QtObject {
-        id: _config
 
-        property int nLabelFontSize: 10
-        property int nButtonFontSize: 12
-        property int nTextFontSize: 10
+        property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+            property int nButtonFontSize: 9
+            property int nTextFontSize: 10
+        }
     }
 
 

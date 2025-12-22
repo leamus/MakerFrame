@@ -483,7 +483,7 @@ Item {
         });
         //输出 1,3,4,5,2,（等待1s）,7,6,8
 
-    注意：如果在游戏中，可以用 game.async 代替 $CommonLibJS.asyncScript。
+    注意：如果在游戏引擎中，可以用 game.async 代替 $CommonLibJS.asyncScript。
 
 11、脚本队列
     游戏中已经封装了一个 主脚本队列，用game.run(script, ...params)来运行，具体见命令教程；
@@ -571,8 +571,10 @@ Item {
     g、播放音频视频；
     h、数据库（SQLite、SQLITECIPHER等）操作；
     i、各种格式文件操作（ini、json、js）；
-        其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、封装了部分QObject方法、给QML发送队列事件；
     j、扩展自定义可视化命令；
+    k、封装了QCoreApplication、QGuiApplication、QApplication、QUrl、部分QObject、QMetaObject方法；
+    l、Qt和QML插件系统，游戏引擎插件系统；
+    、其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、给QML发送队列事件、模拟键盘和鼠标事件；
 `;
         notepad.text = $CommonLibJS.convertToHTML(t);
 

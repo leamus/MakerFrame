@@ -478,8 +478,7 @@ Item {
         rootGameScene.focus = true;
 
 
-        game.stage(0);
-        //_private.nStage = 0;
+        game.status(0);
         game.goon('$fight');
 
         //game.run(true);
@@ -635,7 +634,7 @@ Item {
             }
 
             game.run({Script: function*() {
-                if(game.stage() !== 0)
+                if(game.status() !== 0)
                     return false;
 
 
@@ -647,8 +646,7 @@ Item {
                 }
 
                 game.pause('$fight');
-                //_private.nStage = 1;
-                game.stage(1);
+                game.status(1);
 
 
                 //loaderFightScene.test();
@@ -656,9 +654,9 @@ Item {
                 fight.run(init(fightScript) ?? null, {Tips: 'FightScene fighting'});
 
 
-                //暂停脚本，直到stage为0
+                //暂停脚本，直到status为0
                 // 鹰：必须写在这里，因为如果有多个fighting同时运行，则会出错（因为Timer会一直game.run）
-                //while(game.stage() !== 0)
+                //while(game.status() !== 0)
                 //    yield null;
 
             }(), Tips: 'FightScene fighting'});
@@ -1694,6 +1692,10 @@ Item {
         height: implicitHeight
         anchors.centerIn: parent
 
+        //nItemMaxHeight: 100
+        nItemMinHeight: 50
+        nItemHeight: -1 //implicitHeight
+
         onSg_choice: {
             //hide();
             menuFightRoleChoice.visible = false;
@@ -1892,12 +1894,15 @@ Item {
         /*GameMenu {
             id: menuGame
 
-            Layout.preferredWidth: Screen.pixelDensity * 20
+            Layout.preferredWidth: $Global.pixelDensity * 20
             Layout.alignment: Qt.AlignHCenter
             //width: parent.width
-
             //height: parent.height / 2
             //anchors.centerIn: parent
+
+            //nItemMaxHeight: 100
+            nItemMinHeight: 50
+            nItemHeight: -1 //implicitHeight
 
             onSg_choice: {
                 fight.myCombatants[0].$$fightData.defenseProp = fight.myCombatants[0].$$fightData.attackProp = index;
@@ -1997,19 +2002,24 @@ Item {
             //技能或道具 选择菜单
             GameMenu {
                 id: menuSkillsOrGoods
+
                 //保存类型；3为技能，2为物品
                 property int nType: -1
 
-                //radius: rectMenu.radius
-
-                width: parent.width
-                height: parent.height
                 //Layout.preferredHeight: implicitHeight
                 //Layout.fillHeight: true
-
-                strTitle: '选择'
+                width: parent.width
+                height: parent.height
                 //height: parent.height / 2
                 //anchors.centerIn: parent
+
+                //radius: rectMenu.radius
+
+                strTitle: '选择'
+
+                //nItemMaxHeight: 100
+                nItemMinHeight: 50
+                nItemHeight: -1 //implicitHeight
 
                 onSg_choice: {
                     rectSkills.visible = false;

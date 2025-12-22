@@ -211,7 +211,9 @@ var $config = {
             $maskColor: '#7FFFFFFF',
             $borderColor: 'white',
             $backgroundColor: '#CF6699FF',
-            $itemHeight: 60,
+            $itemHeight: -1,
+            $itemMaxHeight: -1,
+            $itemMinHeight: 45,
             $titleHeight: 39,
             $itemFontSize: 16,
             $itemFontColor: 'white',
@@ -247,7 +249,9 @@ var $config = {
             $menu: {
                 $borderColor: 'white',
                 $backgroundColor: '#CF6699FF',
-                $itemHeight: 60,
+                $itemHeight: -1,
+                $itemMaxHeight: -1,
+                $itemMinHeight: 45,
                 $titleHeight: 39,
                 $itemFontSize: 16,
                 $itemFontColor: 'white',
@@ -1946,7 +1950,7 @@ function $checkAllCombatants(myCombatants, myCombatantsComp, enemies, enemiesCom
 function* $commonFightInitScript(teams, fightData) {
 
     //game.pause('$fight');
-    //game.stage(1);
+    //game.status(1);
 
 
     if(fightData.$backgroundImage) {
@@ -2129,7 +2133,7 @@ function* $commonFightEndScript(res, teams, fightData) {
             game.restart();
         }
 
-        //game.stage(0);
+        //game.status(0);
         //game.goon('$fight');
 
         return null;
@@ -3493,6 +3497,123 @@ function commonLevelAlgorithm(combatant, targetLevel) {
         },
         Skills: skills,
     };
+}
+
+
+
+
+
+
+//载入特效；
+function loadSpriteEffect(spriteName, spriteEffectComp, jsLoader) {
+    //console.debug('[FightScene]getSpriteEffect0');
+
+    //读特效信息
+    let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
+
+    let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
+    if(spriteResourceInfo)
+        spriteResourceInfo = JSON.parse(spriteResourceInfo);
+    else
+        return false;
+
+    let script;
+
+    if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
+        jsLoader.clear();
+        script = jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
+    }
+
+
+    spriteEffectComp.nSpriteType = spriteResourceInfo.SpriteType;
+    spriteEffectComp.sprite.stop();
+
+
+    //spriteEffectComp.$info = spriteResourceInfo;
+    //spriteEffectComp.$script = spriteResourceInfo.$script;
+
+
+    /*switch(spriteResourceInfo.SpriteType) {
+    case 1:
+        spriteEffectComp.sourceComponent = compSpriteEffect;
+        break;
+    case 2:
+        spriteEffectComp.sourceComponent = compDirSpriteEffect;
+        break;
+    }
+    */
+
+
+    spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(spriteResourceInfo.Image);
+
+    //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
+    //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
+    spriteEffectComp.rXOffset = spriteResourceInfo.XOffset ?? 0;
+    spriteEffectComp.rYOffset = spriteResourceInfo.YOffset ?? 0;
+    spriteEffectComp.opacity = spriteResourceInfo.Opacity ?? 1;
+    spriteEffectComp.rXScale = spriteResourceInfo.XScale ?? 1;
+    spriteEffectComp.rYScale = spriteResourceInfo.YScale ?? 1;
+
+    spriteEffectComp.strSoundeffectName = spriteResourceInfo.Sound ?? '';
+
+    spriteEffectComp.nSoundeffectDelay = spriteResourceInfo.SoundDelay ?? 0;
+
+    spriteEffectComp.nLoops = -1;
+    //spriteEffectComp.restart();
+
+    let t = spriteResourceInfo.SpriteSize;
+    spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
+    spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
+
+
+    //！！！兼容旧代码
+    if(spriteEffectComp.nSpriteType === 1) {
+        spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
+        0);
+        spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
+        0);
+
+        //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
+        let t = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
+        );
+        spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
+
+        t = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
+        );
+        spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
+    }
+    else if(spriteEffectComp.nSpriteType === 2) {
+        let t = spriteResourceInfo.FrameData;
+
+        //！！！兼容旧代码
+        spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
+        0);
+        spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
+        0);
+        spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
+        0);
+
+
+        if(script)
+            spriteEffectComp.sprite.fnRefresh = script.$refresh;
+    }
+    //spriteEffectComp.start();
+
+    return true;
 }
 
 

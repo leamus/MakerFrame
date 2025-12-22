@@ -78,8 +78,11 @@ Item {
         //implicitHeight很大时会滚动，implicitHeight很小时会按顺序排列
         //height: flickableSkills.height < implicitHeight ? flickableSkills.height : implicitHeight
         //height: parent.height
+
         //nItemMaxHeight: 100
-        //nItemMinHeight: 50
+        nItemMinHeight: 50
+        nItemHeight: -1 //implicitHeight
+
 
         onSg_choice: function(index) {
             let continueScript;

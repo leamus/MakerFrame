@@ -150,16 +150,16 @@ Rectangle {
 
 
 
-    //一个选项的最大最小高度（宽度自适应）
-    //property int nItemMaxHeight: 60
-    //property int nItemMinHeight: 20
-    property int nItemHeight: 60    //选项高度
-    property real rItemFontSize: 16  //选项字体大小
-    property color colorItemFontColor: 'white'  //选项字体颜色
+    //一个选项的高度 或 最大最小高度（-1表示自适应）
+    property int nItemMaxHeight: -1
+    property int nItemMinHeight: -1
+    property int nItemHeight: -1 //选项高度（如果为-1则用Max和Min自动调节）
+    property real rItemFontSize: 16 //选项字体大小
+    property color colorItemFontColor: 'white' //选项字体颜色
     property color colorItemColor1: '#00FFFFFF' //选项静止颜色
     property color colorItemColor2: '#66FFFFFF' //选项被选颜色
-    property color colorItemBorderColor: '#60FFFFFF'    //选项边框颜色
-    property real rTitleFontSize: 16     //标题字体大小
+    property color colorItemBorderColor: '#60FFFFFF' //选项边框颜色
+    property real rTitleFontSize: 16 //标题字体大小
     property int nTitleHeight: 39
     property color colorTitleColor: '#EE00CC99' //标题颜色
     property color colorTitleFontColor: 'white' //标题文字颜色
@@ -284,8 +284,17 @@ Rectangle {
             Layout.fillWidth: true
             //Layout.maximumHeight: nItemMaxHeight
             //Layout.minimumHeight: nItemMinHeight
-            Layout.preferredHeight: nItemHeight
-            Layout.fillHeight: true
+            Layout.preferredHeight: {
+                if(nItemHeight > 0)
+                    return nItemHeight;
+                let v = text.implicitHeight;
+                if(nItemMinHeight > 0)
+                    v = Math.max(v, nItemMinHeight);
+                if(nItemMaxHeight > 0)
+                    v = Math.min(v, nItemMaxHeight);
+                return v;
+            }
+            //Layout.fillHeight: true
             //Layout.preferredHeight: parent.height / _private.nShowItemCount
 
 
