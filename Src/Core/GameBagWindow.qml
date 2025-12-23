@@ -191,31 +191,62 @@ Item {
         height: parent.height * 0.9
         anchors.centerIn: parent
 
+        spacing: 2
+
         //金钱背景
         Rectangle {
             id: rectMoney
 
             Layout.fillWidth: true
-            Layout.maximumHeight: 60
-            Layout.preferredHeight: textMoney.implicitHeight
+            //Layout.maximumHeight: 60
+            Layout.preferredHeight: 50 //textMoney.implicitHeight
             //Layout.fillHeight: true
 
             color: 'darkblue'
 
-            //金钱文字
-            Text {
-                id: textMoney
+            RowLayout {
+                //Layout.preferredWidth: parent.width
+                //Layout.preferredHeight: 60
+                //Layout.fillWidth: true
                 anchors.fill: parent
 
-                color: 'white'
+                //金钱文字
+                Text {
+                    id: textMoney
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    //anchors.fill: parent
 
-                font.pointSize: 16
-                font.bold: true
-                text: ''
-                wrapMode: Text.Wrap
+                    color: 'white'
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    font.pointSize: 16
+                    font.bold: true
+                    text: ''
+                    wrapMode: Text.Wrap
+                }
+
+                //关闭按钮
+                ColorButton {
+                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                    //Layout.fillWidth: true
+                    //width: parent.width
+
+                    text: 'X'
+                    textTips.color: 'white'
+                    font.pointSize: 12
+                    font.bold: true
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
+
+                    onSg_clicked: {
+                        root.hide();
+                    }
+                }
             }
         }
 
@@ -325,6 +356,8 @@ Item {
             //Layout.preferredWidth: parent.width
             //Layout.maximumHeight: parent.height / 3
 
+            spacing: 2
+
             //道具说明框（包括位置、颜色、文字等）
             Notepad {
                 id: textGoodsInfo
@@ -349,15 +382,13 @@ Item {
                 textArea.selectByMouse: false
                 textArea.color: 'white'
                 //textArea.color: Global.style.foreground
-                textArea.font.pointSize: 16
+                textArea.font.pointSize: 12
                 textArea.font.bold: true
                 textArea.wrapMode: Text.Wrap
 
                 //horizontalAlignment: Text.AlignHCenter
                 //verticalAlignment: Text.AlignVCenter
 
-                font.pointSize: 16
-                font.bold: true
                 text: ''
                 //wrapMode: Text.Wrap
 
@@ -375,6 +406,8 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
+
+                spacing: 2
 
                 //战斗人物的列表
                 GameMenu {
@@ -477,96 +510,104 @@ Item {
 
 
         //操作的一排按钮
-        RowLayout {
+        Rectangle {
             Layout.fillWidth: true
-            //Layout.preferredHeight: 30
+            //Layout.preferredWidth: parent.width
+            Layout.preferredHeight: rowlayoutOperate.implicitHeight
 
-            //使用按钮
-            ColorButton {
-                id: buttonUse
+            color: 'blue'
 
-                Layout.fillWidth: true
-                //width: parent.width
+            //操作的一排按钮布局
+            RowLayout {
+                id: rowlayoutOperate
 
-                text: '使用'
-                textTips.font.pointSize: 12
+                anchors.fill: parent
 
-                //点击后操作
-                onSg_clicked: {
-                    if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
-                        return;
+                spacing: 0
 
-                    //_private.close();
+                //使用按钮
+                ColorButton {
+                    id: buttonUse
 
-                    let index = gameFightRoleMenu.nChoiceIndex;
-                    let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
+                    Layout.alignment: Qt.AlignHCenter
+                    //Layout.fillWidth: true
 
-                    //脚本执行完毕后刷新背包
-                    game.run(function*() {
-                        yield game.usegoods(index, goods);
+                    textTips.color: 'white'
+                    textTips.font.pointSize: 12
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
+                    text: '使用'
+                    onSg_clicked: {
+                        if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
+                            return;
+
+                        //_private.close();
+
+                        let index = gameFightRoleMenu.nChoiceIndex;
+                        let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
+
+                        //脚本执行完毕后刷新背包
+                        game.run(function*() {
+                            yield game.usegoods(index, goods);
+                            root.showGoods(root.nlastShowType);
+                        }());
+                    }
+                }
+                //装备按钮
+                ColorButton {
+                    id: buttonEquip
+
+                    Layout.alignment: Qt.AlignHCenter
+                    //Layout.fillWidth: true
+
+                    textTips.color: 'white'
+                    textTips.font.pointSize: 12
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
+                    text: '装备'
+                    onSg_clicked: {
+                        if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
+                            return;
+
+                        //_private.close();
+
+                        let index = gameFightRoleMenu.nChoiceIndex;
+                        let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
+                        //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
+
+                        //脚本执行完毕后刷新背包
+                        game.run(function*() {
+                            yield game.equip(index, goods, null);
+                            root.showGoods(root.nlastShowType);
+                        });
+                    }
+                }
+                //丢弃按钮
+                ColorButton {
+                    id: buttonDiscardGoods
+
+                    Layout.alignment: Qt.AlignHCenter
+                    //Layout.fillWidth: true
+
+                    textTips.color: 'white'
+                    textTips.font.pointSize: 12
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
+                    text: '丢弃'
+                    onSg_clicked: {
+                        if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
+                            return;
+
+                        let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
+                        //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
+
+                        game.removegoods(goods);
+
                         root.showGoods(root.nlastShowType);
-                    }());
-                }
-            }
-
-            //装备按钮
-            ColorButton {
-                id: buttonEquip
-
-                Layout.fillWidth: true
-                //width: parent.width
-
-                text: '装备'
-                textTips.font.pointSize: 12
-                onSg_clicked: {
-                    if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
-                        return;
-
-                    //_private.close();
-
-                    let index = gameFightRoleMenu.nChoiceIndex;
-                    let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
-
-                    //脚本执行完毕后刷新背包
-                    game.run(function*() {
-                        yield game.equip(index, goods, null);
-                        root.showGoods(root.nlastShowType);
-                    });
-                }
-            }
-
-            //丢弃按钮
-            ColorButton {
-                id: buttonDiscardGoods
-
-                Layout.fillWidth: true
-                //width: parent.width
-
-                text: '丢弃'
-                textTips.font.pointSize: 12
-                onSg_clicked: {
-                    if(gameGoodsMenu.nChoiceIndex < 0 || gameGoodsMenu.nChoiceIndex >= gameGoodsMenu.arrGoods.length)
-                        return;
-
-                    let goods = gameGoodsMenu.arrGoods[gameGoodsMenu.nChoiceIndex];
-                    //let goodsInfo = game.$sys.getGoodsResource(goods.$rid);
-
-                    game.removegoods(goods);
-
-                    root.showGoods(root.nlastShowType);
-                }
-            }
-
-            //关闭按钮
-            ColorButton {
-                //Layout.fillWidth: true
-                //width: parent.width
-
-                text: '关闭'
-                textTips.font.pointSize: 12
-                onSg_clicked: {
-                    root.hide();
+                    }
                 }
             }
         }

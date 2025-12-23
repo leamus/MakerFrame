@@ -161,91 +161,86 @@ Item {
         height: parent.height * 0.9
         anchors.centerIn: parent
 
+        spacing: 2
 
-        RowLayout {
-            //Layout.alignment: Qt.AlignRight
+
+        Rectangle {
             Layout.fillWidth: true
+            //Layout.preferredWidth: parent.width
             Layout.preferredHeight: 60
+            color: 'blue'
 
+            RowLayout {
+                //Layout.alignment: Qt.AlignRight
+                //Layout.fillWidth: true
+                anchors.fill: parent
 
-            Rectangle {
-                Layout.fillWidth: true
-                //Layout.preferredWidth: parent.width
-                Layout.preferredHeight: 60
-                color: 'blue'
+                Text {
+                    id: textFightRoleName
 
-                RowLayout {
-                    //Layout.alignment: Qt.AlignRight
-                    //Layout.fillWidth: true
-                    anchors.fill: parent
+                    Layout.fillWidth: true
+                    //anchors.fill: parent
 
-                    Text {
-                        id: textFightRoleName
+                    color: 'white'
 
-                        Layout.fillWidth: true
-                        //anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
 
-                        color: 'white'
+                    font.pointSize: 16
+                    font.bold: true
+                    text: ''
+                    wrapMode: Text.Wrap
+                }
 
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                ColorButton {
+                    Layout.alignment: Qt.AlignRight
 
-                        font.pointSize: 16
-                        font.bold: true
-                        text: ''
-                        wrapMode: Text.Wrap
-                    }
+                    text: '←' //⬅
+                    textTips.color: 'white'
+                    font.pointSize: 12
+                    font.bold: true
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
 
-                    ColorButton {
-                        Layout.alignment: Qt.AlignRight
-
-                        text: '←' //⬅
-                        textTips.color: 'white'
-                        font.pointSize: 12
-                        font.bold: true
-                        colors: ['blue', 'darkblue', 'darkgreen']
-                        border.color: 'white'
-                        border.width: 1
-
-                        onSg_clicked: {
-                            if(root.nFightRoleIndex > 0) {
-                                --root.nFightRoleIndex;
-                                root.refresh();
-                            }
+                    onSg_clicked: {
+                        if(root.nFightRoleIndex > 0) {
+                            --root.nFightRoleIndex;
+                            root.refresh();
                         }
                     }
-                    ColorButton {
-                        Layout.alignment: Qt.AlignRight
+                }
+                ColorButton {
+                    Layout.alignment: Qt.AlignRight
 
-                        text: '→' //➡
-                        textTips.color: 'white'
-                        font.pointSize: 12
-                        font.bold: true
-                        colors: ['blue', 'darkblue', 'darkgreen']
-                        border.color: 'white'
-                        border.width: 1
+                    text: '→' //➡
+                    textTips.color: 'white'
+                    font.pointSize: 12
+                    font.bold: true
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
 
-                        onSg_clicked: {
-                            if(game.gd[strTeamName].length - 1 > root.nFightRoleIndex) {
-                                ++root.nFightRoleIndex;
-                                root.refresh();
-                            }
+                    onSg_clicked: {
+                        if(game.gd[strTeamName].length - 1 > root.nFightRoleIndex) {
+                            ++root.nFightRoleIndex;
+                            root.refresh();
                         }
                     }
-                    ColorButton {
-                        Layout.alignment: Qt.AlignRight
+                }
+                ColorButton {
+                    Layout.alignment: Qt.AlignRight
 
-                        text: 'X'
-                        textTips.color: 'white'
-                        font.pointSize: 12
-                        font.bold: true
-                        colors: ['blue', 'darkblue', 'darkgreen']
-                        border.color: 'white'
-                        border.width: 1
+                    text: 'X'
+                    textTips.color: 'white'
+                    font.pointSize: 12
+                    font.bold: true
+                    colors: ['blue', 'darkblue', 'darkgreen']
+                    border.color: 'white'
+                    border.width: 1
 
-                        onSg_clicked: {
-                            root.hide();
-                        }
+                    onSg_clicked: {
+                        root.hide();
                     }
                 }
             }
@@ -313,6 +308,8 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            spacing: 2
 
             GameMenu {
                 id: gamemenuEquipment

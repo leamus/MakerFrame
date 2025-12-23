@@ -114,16 +114,18 @@ Item {
         height: parent.height * 0.8
         anchors.centerIn: parent
 
+        spacing: 2
+
 
         Rectangle {
 
             //width: parent.width
             //height: textGoodsInfo.implicitHeight
             Layout.fillWidth: true
-            Layout.preferredHeight: buttonCloseTrade.implicitHeight
+            Layout.preferredHeight: 50
             //Layout.preferredWidth: parent.width
 
-            color: 'blue'
+            color: 'darkblue'
 
             RowLayout {
                 //Layout.preferredWidth: parent.width
@@ -137,7 +139,6 @@ Item {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.fillWidth: true
                     //Layout.preferredHeight: 60
-
                     //anchors.fill: parent
 
                     color: 'white'
@@ -155,13 +156,14 @@ Item {
                     id: buttonCloseTrade
 
 
-                    Layout.preferredWidth: 60
                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-
+                    //Layout.preferredWidth: 60
                     //Layout.preferredHeight: parent.height
 
-                    text: '关闭'
+                    text: 'X'
                     textTips.color: 'white'
+                    font.pointSize: 12
+                    font.bold: true
                     colors: ['blue', 'darkblue', 'darkgreen']
                     border.color: 'white'
                     border.width: 1
@@ -177,7 +179,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            spacing: 0
+            spacing: 2
 
             GameMenu {
                 id: gamemenuSaleGoods
@@ -189,6 +191,8 @@ Item {
                 //nItemMaxHeight: 100
                 nItemMinHeight: 50
                 nItemHeight: -1 //implicitHeight
+
+                rItemFontSize: 12
 
                 colorTitleColor: 'darkred'
                 strTitle: '买'
@@ -266,6 +270,8 @@ Item {
                 nItemMinHeight: 50
                 nItemHeight: -1 //implicitHeight
 
+                rItemFontSize: 12
+
                 colorTitleColor: 'darkred'
                 strTitle: '卖'
                 //每页个数
@@ -332,7 +338,7 @@ Item {
 
             textArea.color: 'white'
             //textArea.color: Global.style.foreground
-            textArea.font.pointSize: 16
+            textArea.font.pointSize: 12
             textArea.font.bold: true
             //textArea.enabled: false
             textArea.readOnly: true

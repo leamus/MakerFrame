@@ -320,6 +320,7 @@ Rectangle {
 
     ColumnLayout {
         id: columnRoot
+
         anchors.fill: parent
 
         spacing: 0
@@ -404,10 +405,10 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 
-                        font.pointSize: 16
+                        font.pointSize: 12
                         font.bold: true
                         //wrapMode: Text.Wrap
-                        text: '<-'
+                        text: '←' //⬅
                     }
 
                     MouseArea {
@@ -438,7 +439,7 @@ Rectangle {
                     font.pointSize: 9
                     font.bold: true
 
-                    text: `个数：${arrList.length}(${nPageIndex + 1}/${nMaxPage})`
+                    text: `数量：${arrList.length}(${nPageIndex + 1}/${nMaxPage})`
                 }
 
                 //右按钮
@@ -458,10 +459,10 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 
-                        font.pointSize: 16
+                        font.pointSize: 12
                         font.bold: true
                         //wrapMode: Text.Wrap
-                        text: '->'
+                        text: '→' //➡
                     }
 
                     MouseArea {
@@ -494,8 +495,10 @@ Rectangle {
 
             ColumnLayout {
                 id: columnChoices
+
                 //anchors.fill: parent
                 width: parent.width
+
                 spacing: 0
             }
         }
