@@ -155,7 +155,7 @@ Item {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
 
                 text: '提　交'
                 onClicked: {
@@ -244,7 +244,7 @@ Item {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
 
                 text: '返　回'
                 onClicked: {
@@ -256,14 +256,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         //验证码密钥
         property string strKey: ''

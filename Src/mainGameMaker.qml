@@ -1171,27 +1171,68 @@ Item {
             //Layout.minimumHeight: 20
             //Layout.fillHeight: true
 
-            Label {
-                //anchors.right: parent.right
-                //anchors.bottom: parent.bottom
-                //anchors.rightMargin: 20
-                //anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.verticalCenter: parent.verticalCenter
-                //height: 50
-                //width: parent.width
-                Layout.preferredWidth: parent.width
+            RowLayout {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                Layout.fillWidth: true
+                //Layout.preferredHeight: 0
+                Layout.minimumHeight: 0
                 //Layout.fillHeight: true
-                //Layout.fillWidth: true
-                //Layout.preferredWidth: 1
 
-                font.pointSize: 12
-                text: qsTr('<a href="https://afdian.com/a/Leamus">爱发电</a>')
-                horizontalAlignment: Label.AlignHCenter
-                verticalAlignment: Label.AlignVCenter
+                Item {
+                    Layout.fillWidth: true
+                }
 
-                onLinkActivated: {
-                    Qt.openUrlExternally(link);
+                Label {
+                    //anchors.right: parent.right
+                    //anchors.bottom: parent.bottom
+                    //anchors.rightMargin: 20
+                    //anchors.horizontalCenter: parent.horizontalCenter
+                    //anchors.verticalCenter: parent.verticalCenter
+                    //height: 50
+                    //width: parent.width
+                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                    //Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr('<a href="https://afdian.com/a/Leamus">爱发电</a>')
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally(link);
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Label {
+                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                    //Layout.preferredWidth: implicitWidth
+                    //Layout.maximumWidth: parent.width
+                    //Layout.fillWidth: true
+                    //Layout.fillHeight: true
+
+
+                    font.pointSize: 12
+                    text: qsTr('<a href="http://makerframe.leamus.cn/Privacy.html">隐私政策</a>')
+
+                    horizontalAlignment: Label.AlignHCenter
+                    verticalAlignment: Label.AlignVCenter
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally(link);
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
                 }
             }
 
@@ -1649,9 +1690,9 @@ Item {
                 Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width * 0.4
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.preferredHeight: 50
-                Layout.minimumHeight: 20
-                Layout.maximumHeight: 50
+                //Layout.preferredHeight: 50
+                //Layout.minimumHeight: 20
+                //Layout.maximumHeight: 50
                 //Layout.fillHeight: true
 
                 Button {
@@ -2375,7 +2416,7 @@ Item {
 
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             //字体大小
@@ -2428,7 +2469,7 @@ Item {
 
         if(GameMakerGlobal.settings.$RunTimes === 0) {
         //if(GameMakerGlobal.settings.value('$RunTimes', 0) === 0) {
-            rectHelpWindow.showMsg('<font size=6>  初来乍到？先进入 教程 来了解一下引擎吧，或者下载 示例工程 试玩，还可以加群下载各种资源和工程。</font>');
+            rectHelpWindow.showMsg('<font size=6>初来乍到，请阅读并同意<a href="http://makerframe.leamus.cn/Privacy.html">隐私政策</a>。<br>进入 教程 先来了解一下引擎吧，或者在 导入工程 里下载示例 试玩。</font>');
             //GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else {

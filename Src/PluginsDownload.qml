@@ -136,14 +136,14 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
+
         property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
         function refresh() {
@@ -200,23 +200,28 @@ Item {
                             const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
                             const zipPath = projectPath + '~Cache' + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + pluginJS.$path[0] + GameMakerGlobal.separator + pluginJS.$file;
                             const pluginPath = pluginJS.$path.join(GameMakerGlobal.separator).trim();
-                            const jsPath = projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath + GameMakerGlobal.separator + 'main.js';
+                            const pluginDirPath = projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath;
+                            const jsPath = pluginDirPath + GameMakerGlobal.separator + 'main.js';
 
+                            //删除插件
                             function* remove() {
+                                let removeFlag = false;
                                 if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                     try {
-                                        const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                                        let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                         let ret;
 
-                                        if($CommonLibJS.isFunction(ts.$uninstall)) {
+                                        if($CommonLibJS.isFunction(ts.$uninstall))
                                             ret = ts.$uninstall();
-                                        }
-                                        else
-                                            ret = yield* ts.$uninstall();
+                                        else if($CommonLibJS.isGeneratorFunction(ts.$uninstall))
+                                            ts = ts.$uninstall();
+                                        if($CommonLibJS.isGenerator(ts.$uninstall))
+                                            ret = yield* ts;
 
                                         if(ret === undefined || ret === null) {
-                                            //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
-                                            $Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
+                                            //console.debug('删除', pluginDirPath);
+                                            //$Frame.sl_removeRecursively(pluginDirPath);
+                                            removeFlag = true;
                                         }
                                         else if(ret === false)
                                             return;
@@ -224,12 +229,23 @@ Item {
                                         //itemExtendsRoot.forceActiveFocus();
                                         //$list.visible = false;
 
+                                        console.debug('[PluginsManager]ret:', ret);
                                     }
                                     catch(e) {
-                                        console.error('[!PluginsDownload]', e);
+                                        $CommonLibJS.printException(e);
                                         //return -1;
                                     }
                                 }
+                                else
+                                    removeFlag = true;
+
+                                if(removeFlag) {
+                                    $Frame.sl_removeRecursively(pluginDirPath);
+                                    //$list.removeItem(index);
+                                    //_private.refresh();
+                                }
+
+                                ///$list.forceActiveFocus();
                             }
 
                             function* setup() {
@@ -244,15 +260,17 @@ Item {
 
                                     if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                         try {
-                                            const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                                            let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                             let ret;
 
-                                            if($CommonLibJS.isFunction(ts.$install)) {
+                                            if($CommonLibJS.isFunction(ts.$install))
                                                 ret = ts.$install();
-                                            }
-                                            else
-                                                ret = yield* ts.$install();
+                                            else if($CommonLibJS.isGeneratorFunction(ts.$install))
+                                                ts = ts.$install();
+                                            if($CommonLibJS.isGenerator(ts.$install))
+                                                ret = yield* ts;
 
+                                            //返回false表示安装失败，则删除
                                             if(ret === false) {
                                                 //console.debug('删除', projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);
                                                 //$Frame.sl_removeRecursively(projectPath + 'Plugins' + GameMakerGlobal.separator + pluginPath);

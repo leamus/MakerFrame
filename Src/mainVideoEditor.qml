@@ -151,7 +151,7 @@ Item {
             Button {
                 id: buttonAddVideo
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '新增'
                 onClicked: {
@@ -162,7 +162,7 @@ Item {
             Button {
                 id: buttonModifyVideo
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '修改'
                 onClicked: {
@@ -210,7 +210,7 @@ Item {
             Button {
                 id: buttonPlayVideo
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
@@ -226,7 +226,7 @@ Item {
 
                 visible: false
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '停止'
                 onClicked: {
@@ -427,6 +427,11 @@ Item {
     QtObject {
         id: _private
 
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
+
         //资源数据
         //property var arrVideos: ([])
 
@@ -475,11 +480,6 @@ Item {
             //console.debug('resolve:', Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
             //console.debug('file:', GameMakerGlobal.videoResourceURL(textVideoName.text), $Frame.sl_fileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
         }
-    }
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 

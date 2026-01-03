@@ -284,6 +284,7 @@ const data = (function() {
                 //Layout.preferredHeight: 50
 
                 text: 'V'
+
                 onClicked: {
                     if(!_private.strSavedName) {
                         $dialog.show({
@@ -350,7 +351,7 @@ const data = (function() {
         RowLayout {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
             Layout.bottomMargin: 10
 
 
@@ -379,6 +380,7 @@ const data = (function() {
                 //Layout.preferredHeight: 50
 
                 text: '保存'
+
                 onClicked: {
                     _private.save();
                 }
@@ -415,13 +417,13 @@ const data = (function() {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         //保存后的名字
         property string strSavedName: ''

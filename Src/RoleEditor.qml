@@ -2095,7 +2095,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 visible: comboType.currentIndex === 0 || comboType.currentIndex === 1
@@ -2115,7 +2115,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 visible: false
@@ -2131,7 +2131,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 text: '保存'
@@ -2147,7 +2147,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 visible: comboType.currentIndex === 0// || comboType.currentIndex === 2
@@ -2164,7 +2164,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 text: '帮助'
@@ -2195,7 +2195,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
                 Layout.maximumWidth: implicitWidth
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.fillWidth: true
 
                 visible: $Platform.compileType === 'debug' ? true : false
@@ -3378,7 +3378,7 @@ function $refresh(index, imageAnimate, path) {
         }
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             property int nLabelFontSize: 10

@@ -224,7 +224,7 @@ Item {
 
         let data = $Frame.sl_fileRead(path);
         if(data)
-            return data.split('\r\n');
+            return data.split(/\r?\n/);
         return null;
     }
     */

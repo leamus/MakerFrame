@@ -123,13 +123,13 @@ game.goon();
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
     QtObject {
         id: _private
+
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
 
 
         //js名

@@ -89,7 +89,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '关　于'
             onClicked: {
@@ -101,7 +101,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '引擎简易教程'
             onClicked: {
@@ -113,7 +113,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: 'JavaScript简易教程'
             onClicked: {
@@ -125,7 +125,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '高级玩法教程'
             onClicked: {
@@ -137,7 +137,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '官方在线教程'
             onClicked: {
@@ -174,7 +174,7 @@ Item {
             Layout.fillWidth: false
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
             Layout.minimumHeight: 20
             Layout.fillHeight: false
 
@@ -519,7 +519,7 @@ Item {
         }
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             //字体大小

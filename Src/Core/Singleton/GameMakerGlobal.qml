@@ -52,8 +52,7 @@ QtObject {
 
 
 
-    //配置
-    readonly property QtObject config: QtObject {
+    readonly property QtObject config: QtObject { //配置
         //调试（显示一些调试功能）
         //property bool bDebug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool bDebug: parseInt($Frame.config.Debug) === 0 ? false : true

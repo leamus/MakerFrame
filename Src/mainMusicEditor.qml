@@ -177,12 +177,12 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
                 id: buttonAddMusic
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '新增'
                 onClicked: {
@@ -193,7 +193,7 @@ Item {
             Button {
                 id: buttonModifyMusic
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '修改'
                 onClicked: {
@@ -241,7 +241,7 @@ Item {
             Button {
                 id: buttonPlayMusic
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: mediaPlayer.playbackState === MediaPlayer.PlayingState ? '暂停' : '播放'
                 onClicked: {
@@ -255,7 +255,7 @@ Item {
             Button {
                 id: buttonStopMusic
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '停止'
                 onClicked: {
@@ -363,6 +363,11 @@ Item {
     QtObject {
         id: _private
 
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
+
         //音乐资源数据
         //property var arrMusic: ([])
 
@@ -401,12 +406,6 @@ Item {
             //console.debug('resolve:', Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
             //console.debug('file:', GameMakerGlobal.musicResourceURL(textMusicName.text), $Frame.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
-    }
-
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 

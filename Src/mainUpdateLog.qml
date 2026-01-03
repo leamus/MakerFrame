@@ -95,7 +95,7 @@ Item {
             //Layout.fillWidth: true
             //Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '返　回'
             onClicked: {
@@ -106,15 +106,12 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
 
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
     }
 
 
@@ -275,7 +272,8 @@ Item {
 119、修复：sl_toURL、sl_toPath的返回不正确Bug；
 120、修复：访问HTTP如果错误会导致闪退的BUG（sender()的坑，安卓上不知为何不会出现）；
 121、修改：为适配OpenHarmony修改、修复了很多屏幕适配问题；
-122、其他：优化调整很多代码和细节，修复一些Bugs；
+122、修复：无法删除老旧插件的Bug；
+123、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

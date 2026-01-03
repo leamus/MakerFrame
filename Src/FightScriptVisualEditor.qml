@@ -913,7 +913,7 @@ Item {
 
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             property int nLabelFontSize: 10

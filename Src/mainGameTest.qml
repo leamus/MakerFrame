@@ -108,7 +108,7 @@ Item {
             Button {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
                 text: '选择地图'
@@ -146,7 +146,7 @@ Item {
             Button {
                 //Layout.fillWidth: true
                 //Layout.preferredWidth: parent.width
-                Layout.preferredHeight: 50
+                //Layout.preferredHeight: 50
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
                 text: '选择角色'
@@ -202,7 +202,7 @@ Item {
 
             Layout.fillWidth: true
             //Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             text: '开　始'
@@ -423,14 +423,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         function start() {
             if(textMapRID.text === ''/* || textRoleRID.text === ''*/)

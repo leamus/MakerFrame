@@ -169,9 +169,7 @@ Item {
                 id: tbutton
 
                 implicitWidth: 30
-
                 text: 'X'
-
                 onClicked: {
                     for(const tc in _private.arrCacheComponent) {
                         if(_private.arrCacheComponent[tc] === tRoot) {
@@ -1278,7 +1276,7 @@ Item {
 
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             property int nLabelFontSize: 10

@@ -670,7 +670,9 @@ Item {
 
                         Button {
                             implicitWidth: 30
+
                             text: 'P'
+
                             onClicked: {
                                 if($GameMakerGlobalJS.loadSpriteEffect(textSkillEffect.text, spriteEffectComp, _private.jsLoader)) {
                                     spriteEffectComp.start();
@@ -1922,7 +1924,7 @@ Item {
 
 
 
-        property QtObject config: QtObject { //配置
+        readonly property QtObject config: QtObject { //配置
             //id: _config
 
             property int nLabelFontSize: 7

@@ -227,14 +227,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
 
@@ -361,14 +360,15 @@ Item {
                     sg_close();
                 },
                 OnRemoveClicked: (index, item)=>{
-                    let tc0 = arrPluginsName[index][0];
-                    let tc1 = arrPluginsName[index][1];
-                    let pluginDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1;
+                    const tc0 = arrPluginsName[index][0];
+                    const tc1 = arrPluginsName[index][1];
+                    const pluginDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1;
+                    const jsPath = pluginDirPath + GameMakerGlobal.separator + 'main.js';
 
                     let description = '';
-                    if($Frame.sl_fileExists($GlobalJS.toPath(pluginDirPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                         try {
-                            const ts = _private.jsLoader.load($GlobalJS.toURL(pluginDirPath + GameMakerGlobal.separator + 'main.js'));
+                            const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
 
                             if(ts.$description) {
                                 description = '\r\n' + '描述：' + ts.$description;
@@ -388,20 +388,21 @@ Item {
                                 console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), $Frame.sl_dirExists(pluginDirPath));
 
                                 let removeFlag = false;
-                                const jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
                                 if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
                                     try {
-                                        const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                                        let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
                                         let ret;
 
-                                        if($CommonLibJS.isFunction(ts.$uninstall)) {
+                                        if($CommonLibJS.isFunction(ts.$uninstall))
                                             ret = ts.$uninstall();
-                                        }
-                                        else
-                                            ret = yield* ts.$uninstall();
+                                        else if($CommonLibJS.isGeneratorFunction(ts.$uninstall))
+                                            ts = ts.$uninstall();
+                                        if($CommonLibJS.isGenerator(ts.$uninstall))
+                                            ret = yield* ts;
 
                                         if(ret === undefined || ret === null) {
                                             //console.debug('删除', pluginDirPath);
+                                            //$Frame.sl_removeRecursively(pluginDirPath);
                                             removeFlag = true;
                                         }
                                         else if(ret === false)
@@ -413,7 +414,7 @@ Item {
                                         console.debug('[PluginsManager]ret:', ret);
                                     }
                                     catch(e) {
-                                        console.error('[!PluginsManager]', e);
+                                        $CommonLibJS.printException(e);
                                         //return -1;
                                     }
                                 }

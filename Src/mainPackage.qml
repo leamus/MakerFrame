@@ -82,7 +82,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.9
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '打包Windows'
             onClicked: {
@@ -108,7 +108,7 @@ Item {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.9
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             text: '打包Android'
             onClicked: {
@@ -199,14 +199,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         function loadModule(url) {
             //loader.visible = true;

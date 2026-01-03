@@ -549,7 +549,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@属性'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -557,7 +557,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*值'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -662,7 +662,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@属性'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -670,7 +670,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*@类型'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                             Label {
@@ -678,7 +678,7 @@ Item {
                                 Layout.fillWidth: true
 
                                 text: '*值'
-                                font.pointSize: _config.nLabelFontSize
+                                font.pointSize: _private.config.nLabelFontSize
                                 color: Global.style.color(Global.style.Orange)
                             }
                         }
@@ -701,7 +701,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 30
+            //Layout.preferredHeight: 30
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
             Button {
@@ -767,15 +767,15 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-
-        property int nLabelFontSize: 10
-    }
-
     QtObject {
         id: _private
+
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+
+            property int nLabelFontSize: 10
+        }
 
 
         function changeType() {

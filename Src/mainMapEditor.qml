@@ -115,7 +115,7 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
                 id: buttonCreate
@@ -274,8 +274,8 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
 
                 Button {
-                    text: '选择Tile文件'
                     Layout.fillWidth: true
+                    text: '选择Tile文件'
                     onClicked: {
                         //dialogMapData.nChoiceType = 1;
                         filedialogOpenMapBlock.open();
@@ -283,8 +283,8 @@ Item {
                     }
                 }
                 Button {
-                    text: '选择素材'
                     Layout.fillWidth: true
+                    text: '选择素材'
                     onClicked: {
                         //dialogMapData.nChoiceType = 2;
 
@@ -825,13 +825,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         property string strMapRID: ''
 

@@ -111,7 +111,7 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
                 id: buttonCreate
@@ -211,13 +211,13 @@ Item {
 
 
 
-    //配置
-    QtObject {
-        id: _config
-    }
-
     QtObject {
         id: _private
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
 
         function refresh() {
             const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);

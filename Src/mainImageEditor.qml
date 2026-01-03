@@ -148,12 +148,12 @@ Item {
         RowLayout {
             //Layout.preferredWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            Layout.preferredHeight: 50
+            //Layout.preferredHeight: 50
 
             Button {
                 id: buttonAddImage
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '新增'
                 onClicked: {
@@ -164,7 +164,7 @@ Item {
             Button {
                 id: buttonModifyImage
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '修改'
                 onClicked: {
@@ -212,7 +212,7 @@ Item {
             Button {
                 id: buttonPlayImage
 
-                Layout.preferredWidth: 60
+                //Layout.preferredWidth: 60
 
                 text: '显示'
                 onClicked: {
@@ -400,6 +400,11 @@ Item {
     QtObject {
         id: _private
 
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
+
         //图片资源数据
         //property var arrImages: ([])
 
@@ -452,12 +457,6 @@ Item {
                 root.forceActiveFocus();
             }
         }
-    }
-
-
-    //配置
-    QtObject {
-        id: _config
     }
 
 
