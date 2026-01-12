@@ -9393,6 +9393,7 @@ Item {
                 //return Number(new Date());
                 return new Date().getTime();
             },
+            //set(value) {},
         });
         /*Object.defineProperty(game, 'http', {
             enumerable: false,
@@ -9400,6 +9401,7 @@ Item {
             get() {
                 return new XMLHttpRequest;
             },
+            //set(value) {},
         });
         */
 

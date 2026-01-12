@@ -181,7 +181,7 @@ Item {
 
                     implicitWidth: 30
 
-                    text: 'X'
+                    text: '×'
 
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {
@@ -293,7 +293,7 @@ Item {
 
                     implicitWidth: 30
 
-                    text: 'X'
+                    text: '×'
 
                     onClicked: {
                         for(let tc in _private.arrCacheComponent) {

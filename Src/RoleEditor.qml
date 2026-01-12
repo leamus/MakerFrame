@@ -351,7 +351,7 @@ Item {
                     visible: bShowDelete
                     implicitWidth: 30
 
-                    text: 'X'
+                    text: '×'
 
                     onClicked: {
                         for(let tc in layoutAction2.arrCacheComponent) {
@@ -505,7 +505,7 @@ Item {
                     visible: bShowDelete
                     implicitWidth: 30
 
-                    text: 'X'
+                    text: '×'
 
                     onClicked: {
                         for(let tc in layoutAction1.arrCacheComponent) {
@@ -1789,15 +1789,15 @@ Item {
 
                             if(!_private.strRoleRID) {
                                 $dialog.show({
-                                        Msg: '请先保存角色',
-                                        Buttons: Dialog.Yes,
-                                        OnAccepted: function() {
-                                            //root.forceActiveFocus();
-                                        },
-                                        OnRejected: ()=>{
-                                            //root.forceActiveFocus();
-                                        },
-                                    });
+                                    Msg: '请先保存角色',
+                                    Buttons: Dialog.Yes,
+                                    OnAccepted: function() {
+                                        //root.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        //root.forceActiveFocus();
+                                    },
+                                });
 
                                 return;
                             }

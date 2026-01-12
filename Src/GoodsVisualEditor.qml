@@ -146,7 +146,7 @@ Item {
 
                 implicitWidth: 30
 
-                text: 'X'
+                text: '×'
 
                 onClicked: {
                     for(const tc in _private.arrCacheComponent) {

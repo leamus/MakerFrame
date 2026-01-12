@@ -306,9 +306,9 @@ Item {
                         }
                     }
                     /* 貌似和MenuItem一样
-                    Action { text: "Cut" }
-                    Action { text: "Copy" }
-                    Action { text: "Paste" }
+                    Action { text: 'Cut' }
+                    Action { text: 'Copy' }
+                    Action { text: 'Paste' }
                     */
 
 
@@ -2278,9 +2278,9 @@ Item {
         function unzipProjectPackage(fURL) {
             const projectName = $Frame.sl_completeBaseName(fURL);
             const projectPath = GameMakerGlobal.config.strProjectRootPath + projectName;
-            const msg = $Frame.sl_dirExists(projectPath) ? '<br>注意：目标工程已存在，继续解压会替换目标项目中的同名文件！' : '';
+            const msg = $Frame.sl_dirExists(projectPath) ? '<br><font color="red">注意</font>：目标工程已存在，继续解压会覆盖目标项目中的同名文件！' : '';
             $dialog.show({
-                Msg: '确认解包吗？' + msg,
+                Msg: '确认导入工程吗？' + msg,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
                     const ret = unzipFile($GlobalJS.toPath(fURL), projectPath);

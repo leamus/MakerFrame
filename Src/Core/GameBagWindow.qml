@@ -235,7 +235,7 @@ Item {
                     //Layout.fillWidth: true
                     //width: parent.width
 
-                    text: 'X'
+                    text: '×'
                     textTips.color: 'white'
                     font.pointSize: 12
                     font.bold: true

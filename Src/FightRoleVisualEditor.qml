@@ -169,7 +169,7 @@ Item {
                 id: tbutton
 
                 implicitWidth: 30
-                text: 'X'
+                text: '×'
                 onClicked: {
                     for(const tc in _private.arrCacheComponent) {
                         if(_private.arrCacheComponent[tc] === tRoot) {

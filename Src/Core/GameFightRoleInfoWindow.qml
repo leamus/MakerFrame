@@ -231,7 +231,7 @@ Item {
                 ColorButton {
                     Layout.alignment: Qt.AlignRight
 
-                    text: 'X'
+                    text: '×'
                     textTips.color: 'white'
                     font.pointSize: 12
                     font.bold: true

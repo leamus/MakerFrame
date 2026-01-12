@@ -160,7 +160,7 @@ Item {
                     //Layout.preferredWidth: 60
                     //Layout.preferredHeight: parent.height
 
-                    text: 'X'
+                    text: '×'
                     textTips.color: 'white'
                     font.pointSize: 12
                     font.bold: true

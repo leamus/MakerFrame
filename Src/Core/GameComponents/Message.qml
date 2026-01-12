@@ -146,12 +146,13 @@ Notepad {
     textArea.readOnly: true
     textArea.color: 'white'
     //textArea.color: Global.style.foreground
-    textArea.selectByKeyboard: false
-    textArea.selectByMouse: false
     textArea.wrapMode: TextArea.WrapAnywhere
 
     //textArea.horizontalAlignment: TextArea.AlignLeft //TextArea.AlignHCenter //TextArea.AlignJustify
     //textArea.verticalAlignment: TextArea.AlignTop //TextArea.AlignVCenter
+
+    textArea.selectByKeyboard: false
+    textArea.selectByMouse: false
 
 
     /*
