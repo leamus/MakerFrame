@@ -621,10 +621,10 @@ Item {
 
                             text: ''
                             placeholderText: '技能描述'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
                             wrapMode: TextArea.Wrap
+
+                            selectByKeyboard: true
+                            selectByMouse: true
                         }
                     }
 

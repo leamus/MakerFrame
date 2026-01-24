@@ -84,7 +84,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             //Layout.preferredHeight: 50
 
-            text: '打包Windows'
+            text: '打包桌面端（Windows/Linux/MacOS等平台）'
             onClicked: {
                 /*$dialog.show({
                     Msg: '有需要时再做~',

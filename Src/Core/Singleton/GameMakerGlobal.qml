@@ -53,7 +53,7 @@ QtObject {
 
 
     readonly property QtObject config: QtObject { //配置
-        //调试（显示一些调试功能）
+        //调试（游戏显示一些调试功能，比如存档不检测、游戏场景显示FPS、战场上显示调试按钮）
         //property bool bDebug: Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool bDebug: parseInt($Frame.config.Debug) === 0 ? false : true
         //property bool bDebug: parseInt($Frame.sl_configValue('Debug', 0)) === 0 ? false : true

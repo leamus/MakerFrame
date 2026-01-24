@@ -4748,7 +4748,7 @@ Item {
                     outputData.Version = '0.6';
                     outputData.Name = showName;
                     outputData.Type = compressionLevel === 0 ? 0 : 1;
-                    outputData.Time = $CommonLibJS.formatDate('YYYY-mm-dd HH:MM:SS'); //'YYYY-mm-dd HH:MM:SS sss'
+                    outputData.Time = $CommonLibJS.formatDate('YYYY-mm-dd HH:MM:SS'); //'YYYY-mm-dd HH:MM:SS zzz'
                     if(compressionLevel !== 0) {    //压缩
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
                         outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 1).toString();
@@ -6780,7 +6780,8 @@ Item {
         //width: textFPS.width + textPos.width
         width: 150
         //height: $Platform.compileType === 'debug' ? textFPS.implicitHeight : textFPS.implicitHeight
-        height: GameMakerGlobal.config.bDebug === true ? textFPS.implicitHeight : textFPS.implicitHeight
+        //height: GameMakerGlobal.config.bDebug === true ? textFPS.implicitHeight : textFPS.implicitHeight
+        height: textFPS.implicitHeight
 
         color: '#90FFFFFF'
 
@@ -6849,7 +6850,6 @@ Item {
             id: textScript
 
             width: parent.width
-
 
             placeholderText: '输入脚本命令'
             textFormat: TextArea.PlainText

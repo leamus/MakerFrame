@@ -190,11 +190,11 @@ Item {
                 text: '简易画板'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule('PaintView.qml');
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule('PaintView.qml');
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
@@ -212,11 +212,11 @@ Item {
                 text: '简易画板2'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule('NanoPaintView.qml');
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule('NanoPaintView.qml');
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }

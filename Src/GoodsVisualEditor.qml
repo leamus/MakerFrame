@@ -311,10 +311,10 @@ Item {
 
                             text: ''
                             placeholderText: '描述'
-
-                            //selectByKeyboard: true
-                            selectByMouse: true
                             wrapMode: TextArea.Wrap
+
+                            selectByKeyboard: true
+                            selectByMouse: true
                         }
                     }
 

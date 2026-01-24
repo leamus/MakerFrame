@@ -2022,12 +2022,13 @@ Item {
 
         TextArea {
             id: textScript
+
             width: parent.width
             placeholderText: '输入脚本命令'
+            wrapMode: TextEdit.Wrap
 
             selectByKeyboard: true
             selectByMouse: true
-            wrapMode: TextEdit.Wrap
         }
 
         onAccepted: {

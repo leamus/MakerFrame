@@ -90,14 +90,14 @@ Item {
             Layout.fillWidth: true
 
             Label {
-                text: '*游戏名：'
+                text: '*APP名：'
             }
             TextField {
-                id: textGameName
+                id: textAPPName
 
                 Layout.fillWidth: true
 
-                placeholderText: '游戏名'
+                placeholderText: 'APP名'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -168,6 +168,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
+            visible: _private.nPackageType !== 1
 
             Label {
                 text: 'Tap Client ID：'
@@ -188,6 +189,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
+            visible: _private.nPackageType !== 1
 
             Label {
                 text: 'Tap Client Token：'
@@ -246,7 +248,8 @@ Item {
         Label {
             Layout.fillWidth: true
 
-            wrapMode: Label.Wrap
+            wrapMode: Label.WrapAnywhere
+
             text: {
                 if(Qt.platform.os === 'android')
                     return '<font color="red">注意：Android下需要安装 Apktool M 或 MT 软件辅助打包</font>'
@@ -269,8 +272,9 @@ Item {
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
+            textArea.wrapMode: TextArea.WrapAnywhere
             //textArea.color: Global.style.foreground
-            //textArea.readOnly: true
+            textArea.readOnly: true
             textArea.selectByMouse: false
 
         }
@@ -390,12 +394,14 @@ Item {
     QObject {
         id: _private
 
+        property int nPackageType: 0 //1为app；2为Game
+
         //property string strPackageDir: 'D:/Documents/Desktop/QtEnv/_MakerFrame/Packages/Android/MakerFrame_鹰歌软件框架游戏引擎_ALL_Qt5.15.2'
         property alias strPackageDir: textPackageDirPath.text
 
         //初始化，刷新配置
         function refresh() {
-            textGameName.text = '';
+            textAPPName.text = '';
             textPackageName.text = '';
             textIconPath.text = '';
             textTapClientID.text = '';
@@ -420,13 +426,19 @@ Item {
 
             content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
             if(!content) {
-                textResult.append('读取 GameMakerGlobal.qml 失败');
-                ++error;
+                nPackageType = 1;
+                textResult.append('没有 GameMakerGlobal.qml 文件，打包为 APP');
+                //++error;
             }
             else {
+                nPackageType = 2;
+                textResult.append('打包为 Game');
+
+                /*
                 regExp = /category: '(\S*)'/g;
                 res = regExp.exec(content);
-                textGameName.text = res[1];
+                textAPPName.text = res[1];
+                */
 
                 regExp = /property string strTDSClientID: '(\w*)'/g;
                 res = regExp.exec(content);
@@ -444,6 +456,10 @@ Item {
                 ++error;
             }
             else {
+                regExp = /android:label="(\S*)"/g;
+                res = regExp.exec(content);
+                textAPPName.text = res[1];
+
                 regExp = /package="(\S*)"/g;
                 res = regExp.exec(content);
                 textPackageName.text = res[1];
@@ -451,7 +467,7 @@ Item {
 
 
             if(error === 0)
-                textResult.text = '读取打包文件夹配置成功';
+                textResult.append('读取打包文件夹配置成功<br>注意：1、如果项目中有使用插件，请先将插件自行解压到assets/Plugins目录下，并将所有so文件移动到lib/xxx目录下再进行打包。<br>2、如果打包为APP，则将主qml改名为main.qml并放在assets/QML文件夹下（可在FrameConfig.qml中修改），框架会自动载入。<br>3、其他高级配置在 GameMakerGlobal.qml、AndroidManifest.xml 和 QML/LGlobal目录下。');
         }
 
         //修改配置文件（GameMakerGlobal.qml、AndroidManifest.xml）
@@ -464,11 +480,12 @@ Item {
 
 
             content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
-            if(!content)
-                textResult.append('读取 GameMakerGlobal.qml 失败');
+            if(!content) {
+                //textResult.append('读取 GameMakerGlobal.qml 失败');
+            }
             else {
                 regExp = /(category: ')\S*(')/g;
-                content = content.replace(regExp, '$1' + textGameName.text + '$2');
+                content = content.replace(regExp, '$1' + textAPPName.text + '$2');
 
                 regExp = /(property string strTDSClientID: ')\w*(')/g;
                 content = content.replace(regExp, '$1' + textTapClientID.text + '$2');
@@ -487,11 +504,12 @@ Item {
             }
 
             content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
-            if(!content)
+            if(!content) {
                 textResult.append('读取 AndroidManifest.xml 失败');
+            }
             else {
                 regExp = /(android:label=")\S*(")/g;
-                content = content.replace(regExp, '$1' + textGameName.text + '$2');
+                content = content.replace(regExp, '$1' + textAPPName.text + '$2');
 
 
                 regExp = /(package=")\S*(")/g;

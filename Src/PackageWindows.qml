@@ -71,11 +71,12 @@ Item {
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
+            textArea.wrapMode: TextArea.WrapAnywhere
             //textArea.color: Global.style.foreground
             //textArea.readOnly: true
             textArea.selectByMouse: false
 
-            text: '生成Windows版本很简单，只需下载并解压 QtEnv_Win_x64_xxx.rar/QtEnv_Win_x86_xxx.rar 和 MakerFrame_GameRuntime_Win_x64_xxx.rar/MakerFrame_GameRuntime_Win_x86_xxx.rar 并解压在一起，将工程命名为Project放在其根目录即可'
+            text: '生成Windows版本很简单，只需下载并解压 QtEnv_Win_x64_xxx.rar/QtEnv_Win_x86_xxx.rar 和 MakerFrame_GameRuntime_Win_x64_xxx.rar/MakerFrame_GameRuntime_Win_x86_xxx.rar 并解压在一起，将工程命名为Project（可在GameMakerGlobal.qml中修改）修改放在项目根目录即可。<br>注意：1、如果项目中有使用插件，请先将插件自行解压到项目根目录的Plugins目录下。Mac、Linux及相关衍生版本打包类似。<br>2、如果打包为APP，则将主qml改名为main.qml并放在QML文件夹下（可在FrameConfig.qml中修改），框架会自动载入。<br>3、其他高级配置在 GameMakerGlobal.qml 和 QML/LGlobal目录下。'
         }
 
         Button {

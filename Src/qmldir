@@ -3,8 +3,6 @@ module GameMaker
 
 
 
-ColorPicker 1.0 ColorPicker.qml
-
 StartScriptEditor 1.0 StartScriptEditor.qml
 CommonScriptEditor 1.0 CommonScriptEditor.qml
 
