@@ -40,30 +40,30 @@ Notepad {
 
 
         //先设置为最宽（implicitHeight会变）
-        root.width = nMaxWidth;
+        root.width = rMaxWidth;
         textArea.text = pretext + msg;
         //如果是自适应宽
         if(type & 0b1) {
-            if(textArea.implicitWidth < nMinWidth)
-                root.width = nMinWidth;
-            else if(textArea.implicitWidth > nMaxWidth)
-                root.width = nMaxWidth;
+            if(textArea.implicitWidth < rMinWidth)
+                root.width = rMinWidth;
+            else if(textArea.implicitWidth > rMaxWidth)
+                root.width = rMaxWidth;
             else
                 root.width = textArea.implicitWidth;
         }
         else
-            root.width = Qt.binding(()=>nMaxWidth);
+            root.width = Qt.binding(()=>rMaxWidth);
         //如果是自适应高
         if(type & 0b10) {
-            if(textArea.implicitHeight < nMinHeight)
-                root.height = nMinHeight;
-            else if(textArea.implicitHeight > nMaxHeight)
-                root.height = nMaxHeight;
+            if(textArea.implicitHeight < rMinHeight)
+                root.height = rMinHeight;
+            else if(textArea.implicitHeight > rMaxHeight)
+                root.height = rMaxHeight;
             else
                 root.height = textArea.implicitHeight;
         }
         else
-            root.height = Qt.binding(()=>nMaxHeight);
+            root.height = Qt.binding(()=>rMaxHeight);
 
 
 
@@ -119,13 +119,15 @@ Notepad {
     property alias timer: timer
 
 
-    property int nMinWidth: 0
-    property int nMaxWidth: Screen.desktopAvailableWidth * 0.9
-    property int nMinHeight: 0
-    property int nMaxHeight: Screen.desktopAvailableHeight * 0.9
-    //最小为2行，最大为3.5行
-    //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
-    //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
+    property real rMinWidth: 0
+    property real rMaxWidth: Screen.desktopAvailableWidth * 0.9
+    property real rMinHeight: 0
+    property real rMaxHeight: Screen.desktopAvailableHeight * 0.9
+    //最小为2行，最大为3.5行的算法
+    //rMinHeight: textArea.contentHeight / textArea.lineCount * 2 + textArea.topPadding + textArea.bottomPadding
+    //rMaxHeight: textArea.contentHeight / textArea.lineCount * 3.5 + textArea.topPadding + textArea.bottomPadding
+    //rMinHeight: GlobalJS.getTextAreaLineHeight(textArea, 2)
+    //rMaxHeight: GlobalJS.getTextAreaLineHeight(textArea, 3.5)
 
 
     width: parent.width

@@ -331,19 +331,21 @@ Item {
             Layout.preferredHeight: textArea.implicitHeight
             //Layout.fillHeight: true
 
+
             color: 'darkblue'
 
-            //horizontalAlignment: Text.AlignHCenter
-            textArea.verticalAlignment: Text.AlignVCenter
-
-            textArea.color: 'white'
-            //textArea.color: Global.style.foreground
-            textArea.font.pointSize: 12
-            textArea.font.bold: true
+            textArea.color: 'white' //Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
+
+            textArea.wrapMode: TextArea.WrapAnywhere
+            textArea.horizontalAlignment: TextArea.AlignJustify
+            //textArea.verticalAlignment: TextArea.AlignVCenter
+
             textArea.selectByMouse: false
-            textArea.wrapMode: Text.Wrap
+
+            textArea.font.pointSize: 12
+            textArea.font.bold: true
 
             textArea.background: Rectangle {
                 color: 'transparent'

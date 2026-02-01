@@ -5307,9 +5307,8 @@ Item {
         //gd和gf是全局变量，读档会清空；gd会自动存档读档；
         property var gd: ({})
         property var gf: ({})
-        //cd是引擎变量，整个游戏可用，进入游戏引擎时会读取，退出游戏时保存，读档不会清空；
+        //cd和cf是引擎变量，整个游戏可用，读档不会清空；cd进入游戏引擎时会读取，退出游戏时保存；cf游戏退出后清空（可以保存与运行工程生命周期一致的数据）；
         property var cd: ({})
-        //引擎函数，整个游戏可用，游戏退出后清空；（可以保存与运行工程生命周期一致的数据）
         property var cf: ({})
         //在f和gf中定义某些特定功能的函数，系统会自动触发（优先级：地图脚本高于f高于gf）
         //  比如地图事件、地图离开事件、NPC交互事件、地图点击事件、NPC点击事件、定时器事件、NPC抵达事件、NPC触碰事件
@@ -7515,35 +7514,37 @@ Item {
                 maskMessageRole.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
                 //let type = $CommonLibJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
-                tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageRole.nMinWidth;
+                tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageRole.rMinWidth;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.width;
-                messageRole.nMinWidth = tn;
-                tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageRole.nMaxWidth;
+                messageRole.rMinWidth = tn;
+                tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageRole.rMaxWidth;
                 if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
-                    messageRole.nMaxWidth = Qt.binding(()=>parent.width);
+                    messageRole.rMaxWidth = Qt.binding(()=>parent.width);
                 }
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.width;
-                    messageRole.nMaxWidth = tn;
+                    messageRole.rMaxWidth = tn;
                 }
-                tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageRole.nMinHeight;
+                tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageRole.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
                 else if(tn.toString().indexOf('.') >= 0)
-                    tn = parseInt((messageRole.textArea.contentHeight) / messageRole.textArea.lineCount) * parseFloat(tn) + messageRole.textArea.nPadding * 2;
-                messageRole.nMinHeight = tn;
-                tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageRole.nMaxHeight;
+                    //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
+                    tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
+                messageRole.rMinHeight = tn;
+                tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageRole.rMaxHeight;
                 if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
-                    messageRole.nMaxHeight = Qt.binding(()=>parent.height);
+                    messageRole.rMaxHeight = Qt.binding(()=>parent.height);
                 }
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
                     else if(tn.toString().indexOf('.') >= 0)
-                        tn = parseInt((messageRole.textArea.contentHeight) / messageRole.textArea.lineCount) * parseFloat(tn) + messageRole.textArea.nPadding * 2;
-                    messageRole.nMaxHeight = tn;
+                        //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
+                        tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
+                    messageRole.rMaxHeight = tn;
                 }
 
                 //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
@@ -7628,6 +7629,11 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
+
+                textArea.wrapMode: TextArea.WrapAnywhere
+                //textArea.horizontalAlignment: TextArea.AlignJustify
+                //textArea.verticalAlignment: TextArea.AlignVCenter
+
                 //textArea.font.pointSize: 16
 
                 textArea.onReleased: {
@@ -7636,12 +7642,11 @@ Item {
                 }
 
 
-                nMinWidth: parent.width
-                nMaxWidth: -1
+                rMinWidth: parent.width
+                rMaxWidth: parent.width
                 //最小为2行，最大为3.5行
-                nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
-                nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
-                //nMaxHeight: 90
+                rMinHeight: GlobalJS.getTextAreaLineHeight(textArea, 2)
+                rMaxHeight: GlobalJS.getTextAreaLineHeight(textArea, 3.5)
 
 
                 onSg_over: {
@@ -7799,35 +7804,37 @@ Item {
                 maskMessageGame.color = style.MaskColor || styleUser.$maskColor || styleSystem.$maskColor;
 
                 //let type = $CommonLibJS.shortCircuit(0b1, style.Type, styleUser.$type, styleSystem.$type);
-                tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageGame.nMinWidth;
+                tn = style.MinWidth || styleUser.$minWidth || styleSystem.$minWidth || messageGame.rMinWidth;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.width;
-                messageGame.nMinWidth = tn;
-                tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageGame.nMaxWidth;
+                messageGame.rMinWidth = tn;
+                tn = style.MaxWidth || styleUser.$maxWidth || styleSystem.$maxWidth || messageGame.rMaxWidth;
                 if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
-                    messageGame.nMaxWidth = Qt.binding(()=>parent.width);
+                    messageGame.rMaxWidth = Qt.binding(()=>parent.width);
                 }
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.width;
-                    messageGame.nMaxWidth = tn;
+                    messageGame.rMaxWidth = tn;
                 }
-                tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageGame.nMinHeight;
+                tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageGame.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
                 else if(tn.toString().indexOf('.') >= 0)
-                    tn = parseInt((messageGame.textArea.contentHeight) / messageGame.textArea.lineCount) * parseFloat(tn) + messageGame.textArea.nPadding * 2;
-                messageGame.nMinHeight = tn;
-                tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageGame.nMaxHeight;
+                    //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
+                    tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
+                messageGame.rMinHeight = tn;
+                tn = style.MaxHeight || styleUser.$maxHeight || styleSystem.$maxHeight || messageGame.rMaxHeight;
                 if(!$CommonLibJS.isValidNumber(tn, 0b1) || tn <= 0) {
-                    messageGame.nMaxHeight = Qt.binding(()=>parent.height);
+                    messageGame.rMaxHeight = Qt.binding(()=>parent.height);
                 }
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
                     else if(tn.toString().indexOf('.') >= 0)
-                        tn = parseInt((messageGame.textArea.contentHeight) / messageGame.textArea.lineCount) * parseFloat(tn) + messageGame.textArea.nPadding * 2;
-                    messageGame.nMaxHeight = tn;
+                        //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
+                        tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
+                    messageGame.rMaxHeight = tn;
                 }
 
                 //-1：即点即关闭；0：等待显示完毕(需点击）；>0：显示完毕后过keeptime毫秒自动关闭（不需点击）；
@@ -7913,6 +7920,11 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
+
+                textArea.wrapMode: TextArea.WrapAnywhere
+                //textArea.horizontalAlignment: TextArea.AlignJustify
+                //textArea.verticalAlignment: TextArea.AlignVCenter
+
                 //textArea.font.pointSize: 16
 
                 textArea.onReleased: {
@@ -7921,13 +7933,10 @@ Item {
                 }
 
 
-                nMinWidth: 0
-                nMaxWidth: parent.width * 0.7
-                nMinHeight: 0
-                nMaxHeight: parent.height * 0.7
-                //最小为2行，最大为3.5行
-                //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
-                //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
+                rMinWidth: 0
+                rMaxWidth: parent.width * 0.7
+                rMinHeight: 0
+                rMaxHeight: parent.height * 0.7
 
 
                 onSg_over: {
@@ -8404,7 +8413,9 @@ Item {
                         id: rectGameInput
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                         Layout.preferredWidth: parent.width
-                        Layout.preferredHeight: textGameInput.implicitHeight
+                        //Layout.preferredHeight: textGameInput.implicitHeight
+                        //Layout.preferredHeight: Math.max((textGameInput.textArea.contentHeight / textGameInput.textArea.lineCount * 2 + textGameInput.textArea.topPadding + textGameInput.textArea.bottomPadding), textGameInput.textArea.implicitHeight)
+                        Layout.preferredHeight: Math.min(Math.max(GlobalJS.getTextAreaLineHeight(textGameInput.textArea, 2), textGameInput.textArea.implicitHeight), rootGameInput.height * 0.7)
 
 
                         color: Global.style.backgroundColor
@@ -8427,6 +8438,10 @@ Item {
                             //textArea.readOnly: true
                             //textArea.wrapMode: Text.Wrap
                             textArea.textFormat: TextArea.PlainText
+
+                            textArea.wrapMode: TextArea.WrapAnywhere
+                            textArea.horizontalAlignment: TextArea.AlignJustify
+                            //textArea.verticalAlignment: TextArea.AlignVCenter
 
                             textArea.selectByKeyboard: true
                             textArea.selectByMouse: true
@@ -8602,17 +8617,23 @@ Item {
 
                 textArea.enabled: false
                 textArea.readOnly: true
+
+                textArea.wrapMode: TextArea.WrapAnywhere
+                //textArea.horizontalAlignment: TextArea.AlignJustify
+                //textArea.verticalAlignment: TextArea.AlignVCenter
+
                 //textArea.font.pointSize: 16
                 //textArea.font.pixelSize: 16
 
 
-                nMinWidth: 0
-                //nMaxWidth: parent.width
-                nMinHeight: 0
-                //nMaxHeight: 66
+                rMinWidth: 0
+                //rMaxWidth: parent.width
+                rMinHeight: 0
+                //rMaxHeight: 66
                 //最小为1行，最大为1.5行
-                //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 1 + textArea.nPadding * 2
-                nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 1.5 + textArea.nPadding * 2
+                //rMinHeight: textArea.contentHeight / textArea.lineCount * 1 + textArea.topPadding + textArea.bottomPadding
+                //rMaxHeight: textArea.contentHeight / textArea.lineCount * 1.5 + textArea.topPadding + textArea.bottomPadding
+                rMaxHeight: GlobalJS.getTextAreaLineHeight(textArea, 1.5)
 
 
                 onSg_over: {

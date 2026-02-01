@@ -1,5 +1,6 @@
 ﻿import QtQuick 2.14
 import QtQuick.Layouts 1.14
+import QtQuick.Controls 2.14
 import QtQuick.Window 2.14
 
 
@@ -372,25 +373,21 @@ Item {
                 //Layout.maximumHeight: parent.height * 0.3
 
 
+                color: 'darkblue'
+                text: ''
+
                 //textArea.enabled: false
                 textArea.readOnly: true
-                color: 'darkblue'
+                textArea.color: 'white' //Global.style.foreground
 
-                //horizontalAlignment: Text.AlignHCenter
-                //textArea.verticalAlignment: Text.AlignVCenter
+                textArea.wrapMode: TextArea.WrapAnywhere
+                textArea.horizontalAlignment: TextArea.AlignJustify
+                //textArea.verticalAlignment: TextArea.AlignVCenter
 
                 textArea.selectByMouse: false
-                textArea.color: 'white'
-                //textArea.color: Global.style.foreground
+
                 textArea.font.pointSize: 12
                 textArea.font.bold: true
-                textArea.wrapMode: Text.Wrap
-
-                //horizontalAlignment: Text.AlignHCenter
-                //verticalAlignment: Text.AlignVCenter
-
-                text: ''
-                //wrapMode: Text.Wrap
 
                 textArea.background: Rectangle {
                     color: 'transparent'

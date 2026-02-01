@@ -2142,7 +2142,7 @@ function* $commonFightEndScript(res, teams, fightData) {
     //console.debug(JSON.stringify(res), res.exp, res.money);
 
 
-    return null;
+    return res;
 }
 
 

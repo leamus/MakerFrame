@@ -74,6 +74,10 @@ Item {
             //textArea.enabled: false
             textArea.readOnly: true
 
+            textArea.wrapMode: TextArea.WrapAnywhere
+            textArea.horizontalAlignment: TextArea.AlignJustify
+            //textArea.verticalAlignment: TextArea.AlignVCenter
+
             //textArea.selectByMouse: false
 
             textArea.font {
@@ -162,13 +166,14 @@ Item {
 1.Windows版本：将Qt环境（Qt_v5.15.12_win_x64）和框架引擎（MakerFrame_鹰歌框架引擎_win_x64_vXXX）解压并放在一起 ，双击“_运行鹰歌.bat”；
 2.Android：安装运行 MakerFrame_鹰歌框架引擎_xxx_armeabi-v7a.apk 或 MakerFrame_鹰歌框架引擎_xxx_arm64-v8a.apk 即可；
 3.Linux：目前在OpenKylin和RaspberryPi系统上发布了DEB安装包，并上架了Openkylin的应用商店（应该支持Debian、Ubuntu及衍生的操作系统）；
-4.OpenHarmony、苹果iOS、MacOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布；
-5.打开软件后，进入GameMaker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了；
-6.各平台的框架引擎都支持热更新（打开软件后会自动检测并更新 动态链接库内核、QML底层库和Java代码库Dex），无需重新下载安装新版，QML游戏引擎在线版也是即时更新的（服务器带宽较慢，可能升级和下载时间会稍微长一点）。
+4.OpenHarmony：目前已上架；
+5.iOS、MacOS、其他架构Linux（RedHat、UOS国产化系统、Arm架构相关）等：已经适配，但由于精力和经济问题（iOS应用市场还需要付费上架），以后再发布；
+6.打开软件后，进入GameMaker主界面，再点击 示例工程，请等待下载完毕后，点击 开始运行-》运行 就OK了；
+7.各平台的框架引擎都支持热更新（打开软件后会自动检测并更新 动态链接库内核、QML底层库和Java代码库Dex），无需重新下载安装新版，QML游戏引擎在线版也是即时更新的（服务器带宽较慢，可能升级和下载时间会稍微长一点）。
 
 
   功能和特色：
-1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、Android（6.0及以上）、OpenHarmony、MacOS、iOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin、Deepin和UOS、Arm的RaspberryPi）等操作系统上，目前OpenKylin和Deepin已成立Sig并上架到了应用商店；
+1.跨平台：框架引擎和游戏都可完美运行在Windows（win7及以上）、Android（6.0及以上）、OpenHarmony、iOS、MacOS、Linux（包括Ubuntu、Debian、国产化的OpenKylin、Deepin和UOS、Arm的RaspberryPi）等操作系统上，目前OpenHarmony、OpenKylin和Deepin已成立Sig并上架到了应用商店；
 2.全功能网络：支持 TCP、UDP、HTTP（XmlHttpRequest和QNetwork封装的两种方式，后者自由度更高）、WebSocket（QML）、MQTT、串口（QextSerialPort）等多种常用协议的服务端和客户端开发，也可自己封装其他协议；API使用非常简单，支持异步函数的同步写法；支持互联网、局域网、蓝牙、NFC等通信方式；
 3.配套的后台服务软件和数据库：已有PHP开发的弱网系统（Workerman/Webman高并发服务），C++开发的联机系统（IOCP高并发模型），配套Redis、MySQL来做缓存和存储，支持注册登录、房间及管理、聊天、联机对战（帧同步）等功能，可万人同时在线；数据存储自由度高，支持JSON，各平台共享；
 4.多种发布形式：能生成对应平台的安装包exe、apk、bin、deb等（可发布在Steam、Tap、OpenKylin等应用商店），也能生成框架引擎能载入运行的游戏ROM包；资源和代码支持源文件形式，也支持压缩、打包、加密的形式，一定程度上可防逆向；ROM可以分发到各平台，或上传到官网，用链接、二维码、分享等形式来载入运行；
@@ -194,9 +199,9 @@ Item {
 15.框架集成其他三方库和SDK：
   已集成资源打包（Qt的rcc程序的功能：将QRC和各种资源文件打包为RCC），同时支持解包；
   已集成Box2D-qml和Bacon2D库，QML可使用物理引擎来做插件、游戏等；
-  已集成Tap实名认证，完美支持上架Tap（侠道仙缘已上架到Tap和OpenKylin应用商店）；
-  已集成Tap广告；
-  已集成穿山甲广告；
+  （安卓）已集成Tap实名认证，完美支持上架Tap（侠道仙缘已上架到Tap和OpenKylin应用商店）；
+  （安卓）已集成Tap广告；
+  （安卓）已集成穿山甲广告；
   已集成OpenSSL库，支持RSA创建密钥对、RSA加解密和签名验证、sha256摘要、DES对称加解密等；
   已集成压缩、解压的zlib库和Quazip库（支持gzip，压缩、解压ZIP文件和目录等）；
   已集成SQLITECIPHER库（加密Sqlite）；
@@ -219,7 +224,7 @@ Item {
     能使用Scheme URL（比如用链接来传递数据）；
     能分享媒体到鹰歌来进一步处理；
     支持安卓的一些本地功能，比如小窗/画中画、消息、服务等；
-  Windows：
+  Windows/Linux/MacOS：
     支持拖动文件到窗口进行处理（可以作为万能播放器使用），QML文件默认直接运行；
 
 
@@ -242,12 +247,14 @@ Item {
 
   特别鸣谢：
 1.OpenKylin官方的支持；
-2.荔竹的策划和demo游戏工程；
-3.吾爱的代码版测试、建议和他的游戏工程（已上架Tap和openKylin应用商店）；
-4.落雪的工程和游戏（已上架好游快爆）；
-5.金牌服务的建议和游戏工程；
-6.网友（落冥迦、工作台等人）的参与使用；
-7.所有鹰歌使用的第三方的扩展、插件、库、SDK等的作者、机构、公司；
+2.华为官方和OpenHarmony三方Qt社区的支持；
+3.荔竹的策划和Demo游戏工程；
+4.吾爱的代码版测试、建议和他的游戏工程（已上架Tap和openKylin应用商店）；
+5.落冥迦的参与；
+6.落雪的工程和游戏（已上架好游快爆）；
+7.金牌服务的建议和游戏工程；
+8.各路网友（工作台等）的参与使用；
+9.所有鹰歌使用的第三方的扩展、插件、库、SDK等的作者、机构、公司；
 
 
 

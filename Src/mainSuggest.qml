@@ -91,6 +91,10 @@ Item {
             //textArea.enabled: false
             //textArea.readOnly: true
 
+            textArea.wrapMode: TextArea.WrapAnywhere
+            textArea.horizontalAlignment: TextArea.AlignJustify
+            //textArea.verticalAlignment: TextArea.AlignVCenter
+
             //textArea.selectByMouse: false
 
             textArea.font {

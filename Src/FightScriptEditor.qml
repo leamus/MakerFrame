@@ -304,6 +304,10 @@ const data = (function() {
                 textArea.text: ''
                 textArea.placeholderText: '请输入脚本代码'
 
+                textArea.wrapMode: TextArea.WrapAnywhere
+                textArea.horizontalAlignment: TextArea.AlignJustify
+                //textArea.verticalAlignment: TextArea.AlignVCenter
+
                 textArea.background: Rectangle {
                     //color: 'transparent'
                     color: Global.style.backgroundColor

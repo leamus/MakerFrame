@@ -766,10 +766,15 @@ Item {
 
                         //textArea.enabled: false
                         textArea.readOnly: true
+
+                        textArea.wrapMode: TextArea.WrapAnywhere
+                        textArea.horizontalAlignment: TextArea.AlignJustify
+                        //textArea.verticalAlignment: TextArea.AlignVCenter
+
                         textArea.font.pointSize: 16
 
 
-                        nMaxHeight: 32
+                        rMaxHeight: 32
 
 
                         onSg_over: {

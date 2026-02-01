@@ -74,6 +74,10 @@ Item {
             //textArea.enabled: false
             textArea.readOnly: true
 
+            textArea.wrapMode: TextArea.WrapAnywhere
+            textArea.horizontalAlignment: TextArea.AlignJustify
+            //textArea.verticalAlignment: TextArea.AlignVCenter
+
             //textArea.selectByMouse: false
 
             textArea.font {
@@ -150,15 +154,17 @@ Item {
     var/let/const 变量名 【= 初始值】;
   后期也可以取值或赋值：
     变量名 = 新值;
-  游戏环境中已经有一些个特定对象，可以存储用户的所有变量和值，用法：
-    game.gd['名称'] = 变量/值;
-    game.d['名称'] = 变量/值;
-  区别：
+
+  游戏引擎中已经定义了一些特定对象，可以根据不同需要来存储用户的变量和方法：
     game.gd：全局变量，在所有的脚本里都可以使用（生命周期为整个游戏，存档读档都是自动存取它，可以存放金钱、事件标记等等）；
     game.d：地图变量，在地图中有效，切换地图后会清空，可做临时变量；
     game.gf：也是全局变量，但它不会自动存档读档，它一般用来存放游戏全局函数，一些特定事件就会从它的函数里寻找；而且它会自动读取工程根目录下的 game.js 并存入；
     game.f：类似game.d，也是地图变量，它一般用来存放地图函数，一些特定事件也是从它的函数里寻找（优先于game.gf）；
     game.cd：引擎变量，一般比较少用，全局可用，只要进入游戏就一直可用，跨存档共享，比如可以存放玩家的总游戏时长；
+    game.cf：引擎变量，游戏退出后清空（可以保存与运行工程生命周期一致的数据）。
+    例子：
+      game.gd['名称'] = 变量/值;
+      game.d['名称'] = 变量/值;
 
 
 2、数据类型

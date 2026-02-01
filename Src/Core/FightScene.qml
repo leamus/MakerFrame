@@ -1801,16 +1801,18 @@ Item {
 
         textArea.enabled: false
         textArea.readOnly: true
+
+        textArea.wrapMode: TextArea.WrapAnywhere
+        textArea.horizontalAlignment: TextArea.AlignJustify
+        //textArea.verticalAlignment: TextArea.AlignVCenter
+
         textArea.font.pointSize: 16
 
 
-        nMinWidth: 0
-        //nMaxWidth: parent.width
-        nMinHeight: 0
-        nMaxHeight: parent.height * 0.7
-        //最小为2行，最大为3.5行
-        //nMinHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 2 + textArea.nPadding * 2
-        //nMaxHeight: parseInt((textArea.contentHeight) / textArea.lineCount) * 3.5 + textArea.nPadding * 2
+        rMinWidth: 0
+        //rMaxWidth: parent.width
+        rMinHeight: 0
+        rMaxHeight: parent.height * 0.7
 
 
         //text: ''

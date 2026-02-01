@@ -265,6 +265,15 @@ Item {
             Layout.fillHeight: true
 
 
+            //textArea.color: Global.style.foreground
+            textArea.readOnly: true
+
+            textArea.wrapMode: TextArea.WrapAnywhere
+            textArea.horizontalAlignment: TextArea.AlignJustify
+            //textArea.verticalAlignment: TextArea.AlignVCenter
+
+            textArea.selectByMouse: false
+
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
@@ -272,11 +281,6 @@ Item {
                 border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
-            textArea.wrapMode: TextArea.WrapAnywhere
-            //textArea.color: Global.style.foreground
-            textArea.readOnly: true
-            textArea.selectByMouse: false
-
         }
 
         Button {

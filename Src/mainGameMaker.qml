@@ -1668,6 +1668,11 @@ Item {
                     //textArea.color: Global.style.foreground
                     //textArea.enabled: false
                     textArea.readOnly: true
+
+                    textArea.wrapMode: TextArea.WrapAnywhere
+                    textArea.horizontalAlignment: TextArea.AlignJustify
+                    //textArea.verticalAlignment: TextArea.AlignVCenter
+
                     textArea.selectByMouse: false
 
                     textArea.text: ''
