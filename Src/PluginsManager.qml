@@ -43,8 +43,13 @@ Item {
     signal sg_close();
 
 
-    function $load(...params) {
-        _private.refresh();
+    function $load(type) {
+        _private.nType = type;
+
+        if(type === 2)
+            _private.refreshDownloadList();
+        else
+            _private.refreshPluginsList();
     }
 
 
@@ -79,9 +84,10 @@ Item {
                 itemExtendsRoot.children[tc].destroy();
             }
 
+            _private.refreshPluginsList();
+
             //$list.visible = true;
             //$list.forceActiveFocus();
-            _private.refresh();
         }
 
 
@@ -161,9 +167,7 @@ Item {
                 root.forceActiveFocus();
 
 
-                //$list.visible = true;
-                //$list.forceActiveFocus();
-                _private.refresh();
+                _private.refreshPluginsList();
             }
             else if(status === Loader.Loading) {
                 $showBusyIndicator(true);
@@ -190,9 +194,6 @@ Item {
                 //    item.$load();
 
                 visible = true;
-
-
-                $list.visible = false;
             }
             catch(e) {
                 throw e;
@@ -230,45 +231,31 @@ Item {
     QtObject {
         id: _private
 
-        readonly property QtObject config: QtObject { //配置
-            //id: _config
-        }
-
-
-        property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
-
-        property var arrPluginsShowName: []
-        property var arrPluginsName: []
-        property var objPlugins: ({})
-
-
-        function refresh() {
+        function refreshPluginsList() {
             jsLoader.clear();
 
             $clearComponentCache();
             $trimComponentCache();
 
 
-            arrPluginsShowName = [];
-            arrPluginsName = [];
-            objPlugins = {};
+            const arrPluginsShowName = [];
+            const arrPluginsPath = [];
+            //const objPlugins = {};
 
             //载入扩展 插件/组件
-            let pluginsRootPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator;
+            const pluginsRootPath = (nType === 1 ? (GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName) : ($Platform.externalDataPath + '/GameMaker')) + '/Plugins/';
 
             //循环三方根目录
-            for(let tc0 of $Frame.sl_dirList($GlobalJS.toPath(pluginsRootPath), [], 0x001 | 0x2000 | 0x4000, 0)) {
+            for(const tc0 of $Frame.sl_dirList(pluginsRootPath, [], 0x001 | 0x2000 | 0x4000, 0)) {
                 //if(tc0 === '$Leamus')
                 //    continue;
 
                 //循环三方插件目录
-                for(let tc1 of $Frame.sl_dirList($GlobalJS.toPath(pluginsRootPath + tc0 + GameMakerGlobal.separator), [], 0x001 | 0x2000 | 0x4000, 0)) {
+                for(const tc1 of $Frame.sl_dirList(pluginsRootPath + tc0 + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0)) {
                     let showName = '';
 
                     const jsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'main.js';
-
-                    if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
-
+                    if($Frame.sl_fileExists(jsPath)) {
                         try {
                             const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
 
@@ -293,11 +280,12 @@ Item {
                         }
                         catch(e) {
                             console.error('[!PluginsManager]', e);
+                            //$CommonLibJS.printException(e);
                             continue;
                         }
                     }
 
-                    arrPluginsName.push([tc0, tc1]);
+                    arrPluginsPath.push([tc0, tc1]);
                     arrPluginsShowName.push('%1(%2/%3)'.arg(showName).arg(tc0).arg(tc1));
                 }
             }
@@ -308,14 +296,31 @@ Item {
                 RemoveButtonVisible: true,
                 Data: arrPluginsShowName,
                 OnClicked: (index, item)=>{
-                    let tc0 = arrPluginsName[index][0];
-                    let tc1 = arrPluginsName[index][1];
-                    let extendsDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends';
+                    const tc0 = arrPluginsPath[index][0];
+                    const tc1 = arrPluginsPath[index][1];
+                    const extendsPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Extends' + GameMakerGlobal.separator;
 
-                    if($Frame.sl_fileExists($GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.js'))) {
+                    if($Frame.sl_fileExists(extendsPath + 'main.qml')) {
+                        //console.debug('[PluginsManager]main.qml path:', $GlobalJS.toURL(extendsPath + 'main.qml'));
+
+                        if($Frame.sl_isSymLink(extendsPath + 'main.qml')) //$Frame.sl_isSymbolicLink
+                            //loaderExtends.source = $GlobalJS.toURL(extendsPath + 'main.qml');
+                            loaderExtends.setSource($GlobalJS.toURL($Frame.sl_fileSymLinkTarget(extendsPath + 'main.qml')));
+                        else
+                            //loaderExtends.source = $GlobalJS.toURL(extendsPath + 'main.qml');
+                            loaderExtends.setSource($GlobalJS.toURL(extendsPath + 'main.qml'));
+
+                        $list.visible = false;
+
+                        return 2;
+                    }
+                    else if($Frame.sl_fileExists(extendsPath + 'main.js')) {
                         try {
-                            const ts = _private.jsLoader.load($GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.js'));
-
+                            let ts;
+                            if($Frame.sl_isSymLink(extendsPath + 'main.js')) //$Frame.sl_isSymbolicLink
+                                ts = _private.jsLoader.load($GlobalJS.toURL($Frame.sl_fileSymLinkTarget(extendsPath + 'main.js')));
+                            else
+                                ts = _private.jsLoader.load($GlobalJS.toURL(extendsPath + 'main.js'));
                             if(ts.$load) {
                                 ts.$load(itemExtendsRoot);
                             }
@@ -327,15 +332,9 @@ Item {
                         }
                         catch(e) {
                             console.error('[!PluginsManager]', e);
+                            //$CommonLibJS.printException(e);
                             return -1;
                         }
-                    }
-                    else if($Frame.sl_fileExists($GlobalJS.toPath(extendsDirPath + GameMakerGlobal.separator + 'main.qml'))) {
-                        //console.debug('[PluginsManager]main.qml path:', $GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml'));
-                        //loaderExtends.source = $GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml');
-                        loaderExtends.setSource($GlobalJS.toURL(extendsDirPath + GameMakerGlobal.separator + 'main.qml'));
-
-                        return 2;
                     }
 
 
@@ -360,24 +359,27 @@ Item {
                     sg_close();
                 },
                 OnRemoveClicked: (index, item)=>{
-                    const tc0 = arrPluginsName[index][0];
-                    const tc1 = arrPluginsName[index][1];
-                    const pluginDirPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1;
-                    const jsPath = pluginDirPath + GameMakerGlobal.separator + 'main.js';
+                    const tc0 = arrPluginsPath[index][0];
+                    const tc1 = arrPluginsPath[index][1];
+                    const pluginPath = pluginsRootPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator;
+                    const jsPath = pluginPath + 'main.js';
 
                     let description = '';
-                    if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
+                    if($Frame.sl_fileExists(jsPath)) {
                         try {
                             const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
-
                             if(ts.$description) {
                                 description = '\r\n' + '描述：' + ts.$description;
                             }
                         }
                         catch(e) {
                             console.error('[!PluginsManager]', e);
+                            //$CommonLibJS.printException(e);
                         }
                     }
+
+                    console.debug('[PluginsManager]删除：' + pluginPath, Qt.resolvedUrl(pluginPath), $Frame.sl_dirExists(pluginPath));
+
                     $dialog.show({
                         TextFormat: Label.RichText,
                         //TextFormat: Label.PlainText,
@@ -385,46 +387,10 @@ Item {
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
                             $CommonLibJS.asyncScript([function*() {
-                                console.debug('[PluginsManager]删除：' + pluginDirPath, Qt.resolvedUrl(pluginDirPath), $Frame.sl_dirExists(pluginDirPath));
-
-                                let removeFlag = false;
-                                if($Frame.sl_fileExists($GlobalJS.toPath(jsPath))) {
-                                    try {
-                                        let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
-                                        let ret;
-
-                                        if($CommonLibJS.isFunction(ts.$uninstall))
-                                            ret = ts.$uninstall();
-                                        else if($CommonLibJS.isGeneratorFunction(ts.$uninstall))
-                                            ts = ts.$uninstall();
-                                        if($CommonLibJS.isGenerator(ts.$uninstall))
-                                            ret = yield* ts;
-
-                                        if(ret === undefined || ret === null) {
-                                            //console.debug('删除', pluginDirPath);
-                                            //$Frame.sl_removeRecursively(pluginDirPath);
-                                            removeFlag = true;
-                                        }
-                                        else if(ret === false)
-                                            return;
-
-                                        //itemExtendsRoot.forceActiveFocus();
-                                        //$list.visible = false;
-
-                                        console.debug('[PluginsManager]ret:', ret);
-                                    }
-                                    catch(e) {
-                                        $CommonLibJS.printException(e);
-                                        //return -1;
-                                    }
-                                }
-                                else
-                                    removeFlag = true;
-
-                                if(removeFlag) {
-                                    $Frame.sl_removeRecursively(pluginDirPath);
+                                if(yield* removePlugin(jsPath)) {
+                                    $Frame.sl_removeRecursively(pluginPath);
                                     $list.removeItem(index);
-                                    _private.refresh();
+                                    _private.refreshPluginsList();
                                 }
 
                                 ///$list.forceActiveFocus();
@@ -434,10 +400,286 @@ Item {
                             //$list.forceActiveFocus();
                         },
                     });
-
                 },
             });
         }
+
+        function refreshDownloadList() {
+            let menuNames = ['【本地载入】'];
+
+            const menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js');
+            if(menuJS)
+                menuNames = menuNames.concat(Object.keys(menuJS.infos));
+            //console.debug('[PluginsManager]menuJS:', menuJS, menuJS.infos, Object.keys(menuJS.infos), JSON.stringify(menuJS.infos));
+
+            //const projectPath = GameMakerGlobal.config.strProjectRootPath + $Frame.sl_completeBaseName(url);
+            const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+
+            $list.open({
+                RemoveButtonVisible: false,
+                Data: menuNames,
+                OnClicked: (index, item)=>{
+                    if(index === 0) {
+                    //if(!$CommonLibJS.isObject(menuJS.infos[item])) {
+                        $fileDialog.show({
+                            Title: '选择插件文件',
+                            NameFilters: [ 'zip files (*.zip)', 'All files (*)' ],
+                            //Folder: $GlobalJS.toURL($Platform.externalDataPath), //shortcuts.home
+                            SelectMultiple: false,
+                            SelectExisting: true,
+                            SelectFolder: false,
+                            //ConvertURL: false,
+                            OnAccepted: function(url, urls) {
+                                $dialog.show({
+                                    Msg: '确认本地安装吗？此操作会替换插件中的同名文件，且不会调用安装脚本！',
+                                    Buttons: Dialog.Ok | Dialog.Cancel,
+                                    OnAccepted: function() {
+                                        $CommonLibJS.asyncScript([setupPlugin(projectPath, $GlobalJS.toPath(url), null), 'setup']);
+                                    },
+                                    OnRejected: ()=>{
+                                        //root.forceActiveFocus();
+                                    },
+                                });
+                            },
+                        });
+                        return;
+                    }
+
+                    const pluginJS = jsLoader.load(menuJS.infos[item]['Path']);
+                    if(!pluginJS) {
+                        $dialog.show({
+                            TextFormat: Label.PlainText,
+                            Msg: '错误',
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                //root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                //root.forceActiveFocus();
+                            },
+                        });
+                        return;
+                    }
+
+                    //console.debug('[PluginsManager]pluginJS:', pluginJS, pluginJS.$$type, pluginJS.$$keys);
+
+                    $dialog.show({
+                        TextFormat: Label.PlainText,
+                        Msg: '名称：%1\r\n版本：%2\r\n日期：%3\r\n作者：%4\r\n大小：%5\r\n描述：%6\r\n确定下载？'
+                            .arg(pluginJS.$name)
+                            .arg(pluginJS.$version)
+                            .arg(pluginJS.$update)
+                            .arg(pluginJS.$author)
+                            .arg(pluginJS.$size)
+                            .arg(pluginJS.$description)
+                        ,
+                        Buttons: Dialog.Yes | Dialog.No,
+                        OnAccepted: function() {
+                            const zipPath = projectPath + '~Cache' + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + pluginJS.$path[0] + GameMakerGlobal.separator + pluginJS.$file;
+                            const pluginRPath = pluginJS.$path.join(GameMakerGlobal.separator).trim();
+                            const pluginPath = projectPath + 'Plugins' + GameMakerGlobal.separator + pluginRPath + GameMakerGlobal.separator;
+                            //const jsPath = pluginPath + 'main.js';
+
+                            //方法一：
+                            /*const httpReply = */$CommonLibJS.request({
+                                Url: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1/%2'.arg(pluginRPath).arg(pluginJS.$file),
+                                Method: 'GET',
+                                //Data: {},
+                                //Gzip: [1, 1024],
+                                //Headers: {},
+                                FilePath: zipPath,
+                                //Params: ,
+                            }, 2).$$then(function(xhr) {
+                                $dialog.close();
+
+                                $CommonLibJS.asyncScript([setupPlugin(projectPath, zipPath, pluginPath), 'setup']);
+                            }).$$catch(function(e) {
+                                //$dialog.close();
+
+                                $dialog.show({
+                                    Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
+                                    Buttons: Dialog.Yes,
+                                    OnAccepted: function() {
+                                        //root.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        //root.forceActiveFocus();
+                                    },
+                                });
+                            });
+
+                            /*/方法二：
+                            const httpReply = $Frame.sl_downloadFile('http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1'.arg(pluginJS.$file), zipPath);
+                            httpReply.sg_finished.connect(function(httpReply) {
+                                const networkReply = httpReply.networkReply;
+                                const code = $Frame.sl_objectProperty('Code', networkReply);
+                                console.debug('[PluginsManager]下载完毕', httpReply, networkReply, code, $Frame.sl_objectProperty('Data', networkReply));
+
+                                $Frame.sl_deleteLater(httpReply);
+
+
+                                $dialog.close();
+
+                                if(code !== 0) {
+                                    $dialog.show({
+                                        Msg: '下载失败(%1)'.arg(code),
+                                        Buttons: Dialog.Yes,
+                                        OnAccepted: function() {
+                                            //root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            //root.forceActiveFocus();
+                                        },
+                                    });
+                                    return;
+                                }
+
+                                setup();
+                            });
+                            */
+
+
+                            $dialog.show({
+                                Msg: '正在下载，请等待（请勿进行其他操作）',
+                                Buttons: Dialog.NoButton,
+                                OnAccepted: function() {
+                                    $dialog.show();
+                                    //$dialog.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    $dialog.show();
+                                    //$dialog.forceActiveFocus();
+                                },
+                            });
+
+
+
+                            //root.forceActiveFocus();
+                        },
+                        OnRejected: ()=>{
+                            //root.forceActiveFocus();
+                        },
+                    });
+
+                    //$list.visible = false;
+                    //root.forceActiveFocus();
+                },
+                OnCanceled: ()=>{
+                    $list.visible = false;
+                    //root.forceActiveFocus();
+                    sg_close();
+                },
+            });
+        }
+
+        function* setupPlugin(projectPath, zipPath, pluginPath) {
+            console.debug('[PluginsManager]setupPlugin', projectPath, zipPath, pluginPath);
+
+            const jsPath = pluginPath ? (pluginPath + 'main.js') : null;
+            if(pluginPath && (yield* removePlugin(jsPath))) {
+                $Frame.sl_removeRecursively(pluginPath);
+                //$list.removeItem(index);
+                //_private.refreshDownloadList();
+            }
+
+            let ret = $Frame.sl_extractDir(zipPath, projectPath);
+
+            let msg;
+            if(ret.length > 0) {
+                //console.debug(ret, projectPath);
+                msg = '安装成功';
+
+                if(pluginPath && $Frame.sl_fileExists(jsPath)) {
+                    try {
+                        let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                        let ret;
+
+                        if($CommonLibJS.isFunction(ts.$install))
+                            ret = ts.$install();
+                        else if($CommonLibJS.isGeneratorFunction(ts.$install))
+                            ret = ts.$install();
+                        if($CommonLibJS.isGenerator(ret))
+                            ret = yield* ret;
+
+                        //返回false表示安装失败，则删除
+                        if(ret === false) {
+                            //console.debug('删除', pluginPath);
+                            if(yield* removePlugin(jsPath)) {
+                                $Frame.sl_removeRecursively(pluginPath);
+                                //$list.removeItem(index);
+                                //_private.refreshDownloadList();
+                            }
+
+                            return;
+                        }
+
+                    }
+                    catch(e) {
+                        console.error('[!PluginsManager]', e);
+                        //return -1;
+                    }
+                }
+            }
+            else
+                msg = '安装失败';
+
+            $dialog.show({
+                Msg: msg,
+                Buttons: Dialog.Yes,
+                OnAccepted: function() {
+                    //root.forceActiveFocus();
+                },
+                OnRejected: ()=>{
+                    //root.forceActiveFocus();
+                },
+            });
+        }
+
+        //删除插件
+        function* removePlugin(jsPath) {
+            let removeFlag = false;
+            if($Frame.sl_fileExists(jsPath)) {
+                try {
+                    let ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
+                    let ret;
+
+                    if($CommonLibJS.isFunction(ts.$uninstall))
+                        ret = ts.$uninstall();
+                    else if($CommonLibJS.isGeneratorFunction(ts.$uninstall))
+                        ret = ts.$uninstall();
+                    if($CommonLibJS.isGenerator(ret))
+                        ret = yield* ret;
+
+                    if(ret === undefined || ret === null) {
+                        removeFlag = true;
+                    }
+                    else if(ret === false)
+                        return false;
+
+                    console.debug('[PluginsManager]removePlugin ret:', ret);
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //return -1;
+                }
+            }
+            else
+                removeFlag = true;
+
+            return removeFlag;
+        }
+
+
+
+        readonly property QtObject config: QtObject { //配置
+            //id: _config
+        }
+
+
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+
+
+        property int nType: -1
     }
 
 

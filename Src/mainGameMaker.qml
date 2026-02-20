@@ -542,7 +542,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.maximumHeight: implicitHeight * 1.2
 
-                text: '插件管理'
+                text: '插　件'
                 font.pointSize: _private.config.nButtonTextSize
 
                 onClicked: {
@@ -566,14 +566,25 @@ Item {
                         text: '插件管理'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
-                            _private.pluginsManager();
+                            _private.pluginsManager(1);
                         }
                     }
                     MenuItem {
                         text: '插件下载'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
-                            _private.pluginsDownload();
+                            _private.pluginsManager(2);
+                            //_private.pluginsDownload();
+                        }
+                    }
+
+                    MenuSeparator { }
+
+                    MenuItem {
+                        text: '全局插件'
+                        height: _private.config.nMenuItemHeight
+                        onClicked: {
+                            _private.pluginsManager(0);
                         }
                     }
 
@@ -643,6 +654,13 @@ Item {
                     x: parent.width - 103
                     y: Qt.platform.os === 'android' ? -130 : 0
 
+                    MenuItem {
+                        text: '关　于'
+                        height: _private.config.nMenuItemHeight
+                        onClicked: {
+                            _private.about();
+                        }
+                    }
                     MenuItem {
                         text: '教　程'
                         height: _private.config.nMenuItemHeight
@@ -1374,53 +1392,6 @@ Item {
 
 
 
-    //打开工程 对话框
-    Dialog1.FileDialog {
-        id: filedialogOpenProject
-
-        visible: false
-
-        title: '选择项目包文件'
-        //folder: shortcuts.home
-        folder: GameMakerGlobal.config.strProjectRootPath
-        nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: false
-
-        onAccepted: {
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-            //rootGameMaker.focus = true;
-            //rootGameMaker.forceActiveFocus();
-
-            console.debug('[mainGameMaker]You chose:', fileUrl, fileUrls);
-
-            let furl;
-            if(Qt.platform.os === 'android')
-                furl = $Platform.sl_getRealPathFromURI(fileUrl.toString());
-            else
-                furl = $Frame.sl_urlDecode(fileUrl.toString());
-
-            //console.error('!!!', furl, fileUrl, $Frame.sl_absolutePath(fileUrl.toString()))
-
-            _private.unzipProjectPackage(furl);
-        }
-        onRejected: {
-            console.debug('[mainGameMaker]onRejected');
-            //rootGameMaker.forceActiveFocus();
-
-
-            //sg_close();
-        }
-        Component.onCompleted: {
-            //visible = true;
-        }
-    }
-
-
-
     //主窗口加载
     Loader {
         id: loader
@@ -1507,14 +1478,9 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainGameMaker]loader:', source, status, vLoaderCache);
+            console.debug('[mainGameMaker]loader onStatusChanged:', source, status, vLoaderCache);
 
             if(status === Loader.Ready) {
-                /*/~~~~~~注意：QML有个Bug（调用 clearComponentCache 后如果后面有 新创建的组件 访问根元素和其属性（不知单纯访问会不会）都会报警告！！！），所以必须让clearComponentCache放在最后执行（两个方法：1是使用runNextEventLoop，2是放在onLoaded最后）；
-                $CommonLibJS.runNextEventLoop([function() {
-                    $showBusyIndicator(false);
-                }, '$showBusyIndicator']);
-                */
             }
             else if(status === Loader.Error) {
                 setSource('');
@@ -1523,6 +1489,10 @@ Item {
             }
             else if(status === Loader.Null) {
                 visible = false;
+
+                //if(nStatusBackup === Loader.Loading)
+                //    showBusyIndicator(false);
+
 
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
@@ -1535,7 +1505,6 @@ Item {
                 $trimComponentCache();
                 gc();
 
-
                 //要在下一个事件循环中改变，因为立即loadModule的话，onLoaded仍然会在后面调用，此时 item 已经不是之前的item了，所以先让onLoaded执行完再改loadModule；
                 $CommonLibJS.runNextEventLoop([function() {
                     if(vLoaderCache) {
@@ -1545,6 +1514,8 @@ Item {
                     }
                 }, 'Load vLoaderCache']);
             }
+
+            //nStatusBackup = status;
         }
 
         onLoaded: {
@@ -2043,18 +2014,18 @@ Item {
         function uncompressDir() {
         }
 
-        function pluginsManager() {
+        function pluginsManager(type) {
             if($Platform.compileType === 'debug') {
-                loader.loadModule('PluginsManager.qml');
+                loader.loadModule('PluginsManager.qml', type);
                 //userMainProject.source = 'PluginsManager.qml';
             }
             else {
-                loader.loadModule('PluginsManager.qml');
+                loader.loadModule('PluginsManager.qml', type);
                 //userMainProject.source = 'PluginsManager.qml';
             }
         }
 
-        function pluginsDownload() {
+        /*function pluginsDownload() {
             if($Platform.compileType === 'debug') {
                 loader.loadModule('PluginsDownload.qml');
                 //userMainProject.source = 'PluginsDownload.qml';
@@ -2064,6 +2035,7 @@ Item {
                 //userMainProject.source = 'PluginsDownload.qml';
             }
         }
+        */
 
         function gameStart() {
             if($Platform.compileType === 'debug') {
@@ -2143,15 +2115,10 @@ Item {
                 });
             });
         }
-        /*function importProject() {
-            filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
-            filedialogOpenProject.open();
-        }
-        */
 
         //function downloadDemoProject() {
         function importProject() {
-            const jsLoader = new $CommonLibJS.JSLoader(rootGameMaker, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL));
+            const jsLoader = new $CommonLibJS.JSLoader(rootGameMaker, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/);
             let menuList;
             const menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Projects/menu.js');
             if(!menuJS) {
@@ -2170,8 +2137,18 @@ Item {
                     Data: menuList,
                     OnClicked: (index, item)=>{
                         if(index === 0) {
-                            filedialogOpenProject.folder = GameMakerGlobal.config.strProjectRootPath;
-                            filedialogOpenProject.open();
+                            $fileDialog.show({
+                                Title: '选择项目包文件',
+                                //NameFilters: [ 'zip files (*.zip)', 'All files (*)' ],
+                                Folder: $GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                                SelectMultiple: false,
+                                SelectExisting: true,
+                                SelectFolder: false,
+                                //ConvertURL: false,
+                                OnAccepted: function(url, urls) {
+                                    _private.unzipProjectPackage(url);
+                                },
+                            });
                             return;
                         }
 
@@ -2227,6 +2204,16 @@ Item {
             //});
         }
 
+        function about() {
+            if($Platform.compileType === 'debug') {
+                loader.loadModule('mainAbout.qml');
+                //userMainProject.source = 'mainAbout.qml';
+            }
+            else {
+                loader.loadModule('mainAbout.qml');
+                //userMainProject.source = 'mainAbout.qml';
+            }
+        }
         function tutorial() {
             if($Platform.compileType === 'debug') {
                 loader.loadModule('mainTutorial.qml');
@@ -2318,7 +2305,7 @@ Item {
                 //$dialog.close();
 
                 $dialog.show({
-                    Msg: '下载失败(%1,%2)'.arg(e.$params.code).arg(e.$params.error),
+                    Msg: '下载失败(%1,%2,%3)'.arg(e.$params.code).arg(e.$params.error).arg(e.$params.status),
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //rootGameMaker.forceActiveFocus();
@@ -2432,7 +2419,7 @@ Item {
         }
 
         //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
-        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
         property var jsGameVisualScript: null
 
         property var fnBackupOpenFile: null

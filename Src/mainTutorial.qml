@@ -85,7 +85,7 @@ Item {
         }
 
 
-        Button {
+        /*Button {
             //Layout.fillWidth: true
             Layout.preferredWidth: parent.width * 0.69
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -96,6 +96,7 @@ Item {
                 _private.loadModule('mainAbout.qml');
             }
         }
+        */
 
         Button {
             //Layout.fillWidth: true
@@ -190,11 +191,11 @@ Item {
                 text: '简易画板'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/PaintView.qml'));
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/PaintView.qml'));
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
@@ -212,11 +213,11 @@ Item {
                 text: '简易画板2'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/NanoPaintView.qml'));
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_currentPath() + '/Plugins/$QNanoPainter/QML/NanoPaintView.qml'));
+                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
@@ -226,6 +227,161 @@ Item {
         Item {
             Layout.fillHeight: true
             Layout.preferredHeight: 1
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+            Layout.fillWidth: true
+            //Layout.preferredHeight: 0
+            Layout.minimumHeight: 0
+            //Layout.fillHeight: true
+
+            visible: Qt.platform.os === 'android'
+
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            Label {
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                //Layout.preferredWidth: implicitWidth
+                //Layout.maximumWidth: parent.width
+                //Layout.fillWidth: true
+                //Layout.fillHeight: true
+
+
+                font.pointSize: 12
+                text: qsTr('广告测试：')
+
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
+            }
+
+            Item {
+                Layout.fillWidth: true
+
+                visible: Qt.platform.os === 'android' && $Platform.Tap
+            }
+
+            Label {
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                //Layout.preferredWidth: implicitWidth
+                //Layout.maximumWidth: parent.width
+                //Layout.fillWidth: true
+                //Layout.fillHeight: true
+
+                visible: Qt.platform.os === 'android' && $Platform.Tap
+
+
+                font.pointSize: 12
+                text: qsTr('<a href="#">Tap广告</a>')
+
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
+
+                onLinkActivated: {
+                    $CommonLibJS.asyncScript([function*() {
+                        try {
+                            const res = yield $Platform.Tap.ad({
+                                Callback: function(adData, customData) {
+                                    console.debug('[menu]Tap AD Callback:', JSON.stringify(adData), customData);
+
+                                    $dialog.show({
+                                        Msg: '仅供测试',
+                                        Buttons: Dialog.Ok,
+                                        OnAccepted: function() {
+                                            //root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            //root.forceActiveFocus();
+                                        },
+                                    });
+                                },
+                                CustomData: 666,
+                                Info: true,
+                                Type: 1,
+                                Flags: 0b111,
+                                ErrorCallback: function(e) {
+                                    console.warn(e, JSON.stringify(e.$params)); //code, msg, data
+                                },
+                            });
+                            console.debug('[menu]Tap AD res:', JSON.stringify(res));
+                        }
+                        catch(e) {
+                            console.warn('[!menu]Tap AD Error:', e, JSON.stringify(e.$params));
+                        }
+                    }, 'onLinkActivated: Tap']);
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+
+                visible: Qt.platform.os === 'android' && $Platform.CSJ
+            }
+
+            Label {
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                //Layout.preferredWidth: implicitWidth
+                //Layout.maximumWidth: parent.width
+                //Layout.fillWidth: true
+                //Layout.fillHeight: true
+
+                visible: Qt.platform.os === 'android' && $Platform.CSJ
+
+
+                font.pointSize: 12
+                text: qsTr('<a href="#">穿山甲广告</a>')
+
+                horizontalAlignment: Label.AlignHCenter
+                verticalAlignment: Label.AlignVCenter
+
+                onLinkActivated: {
+                    $CommonLibJS.asyncScript([function*() {
+                        try {
+                            const res = yield $Platform.CSJ.ad({
+                                Callback: function(adData, customData) {
+                                    console.debug('[menu]CSJ AD Callback:', JSON.stringify(adData), customData);
+
+                                    $dialog.show({
+                                        Msg: '仅供测试',
+                                        Buttons: Dialog.Ok,
+                                        OnAccepted: function() {
+                                            //root.forceActiveFocus();
+                                        },
+                                        OnRejected: ()=>{
+                                            //root.forceActiveFocus();
+                                        },
+                                    });
+                                },
+                                Data: 999,
+                                Info: true,
+                                Type: 1,
+                                Flags: 0b111,
+                                ErrorCallback: function(e) {
+                                    console.warn(e, JSON.stringify(e.$params)); //code, msg, data
+                                },
+                            });
+                            console.debug('[menu]CSJ AD res:', JSON.stringify(res));
+                        }
+                        catch(e) {
+                            console.warn('[!menu]CSJ AD Error:', e, JSON.stringify(e.$params));
+                        }
+                    }, 'onLinkActivated: CSJ']);
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+        }
+
+        Item {
+            //Layout.fillHeight: true
+            Layout.preferredHeight: 20
+
+            visible: Qt.platform.os === 'android'
         }
 
         ColumnLayout {

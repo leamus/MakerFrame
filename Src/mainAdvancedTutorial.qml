@@ -526,8 +526,8 @@ Item {
     cacheSprites.put(spriteEffectComp); //释放到缓存池
     cacheSprites.clear();   //清空缓冲池
 
-13、IO高级操作
-  文件：
+13、IO高级操作 //~~~~~~~
+  文件（QFile）：
     //var f = $Frame.sl_file('c:/1321.txt', 2);
     //或：
     var f = $Frame.sl_file();
@@ -536,22 +536,24 @@ Item {
     //读写：f.io（QIODevice封装类）、f.io.ts（QTextStream封装类）、f.io.ds（QDataStream封装类）
     f.io.sl_write('深林孤鹰');f.sl_flush();
     f.io.ts.sl_write('深林孤鹰');f.io.ts.sl_flush();
-    g.io.ds.sl_write('1234');
+    f.io.ds.sl_write('1234');
     f.sl_deleteLater();
-  二进制（QBuffer）：
+  二进制（QBuffer）：推荐，可以混用ts、ds
     var b = $Frame.sl_buffer();
     b.io.sl_open(3);
     //读写：b.io（QIODevice封装类）、b.io.ts（QTextStream封装类）、b.io.ds（QDataStream封装类）
-    b.io.sl_write('深林孤鹰');b.sl_flush();
+    b.io.sl_write('深林孤鹰');
     b.io.ts.sl_write('深林孤鹰');b.io.ts.sl_flush();
-    b.io.ds.sl_write('1234');
+    b.io.ds.sl_write('1234'); //注意：ds写入的QString包含长度
+    b.data; //b.buffer //b.byteArray;
     b.sl_deleteLater();
-  二进制（QByteArray）：
+  二进制（QByteArray）：ts和ds有自己的指针，最好不要混用
     var b = $Frame.sl_byteArray();
     //读写：b.ts（QTextStream封装类）、b.ds（QDataStream封装类）
     b.sl_append('深林孤鹰');
     b.ts.sl_write('深林孤鹰');b.ts.sl_flush();
-    b.ds.sl_write('1234');
+    b.ds.sl_write('1234'); //注意：ds写入的QString包含长度
+    b.data;
     b.sl_deleteLater();
 
 14、简单打包流程（详细见官网教程）

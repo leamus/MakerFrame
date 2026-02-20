@@ -24,4 +24,3 @@ PackageWindows 1.0 PackageWindows.qml
 PackageAndroid 1.0 PackageAndroid.qml
 
 PluginsManager 1.0 PluginsManager.qml
-PluginsDownload 1.0 PluginsDownload.qml

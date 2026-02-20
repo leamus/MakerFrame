@@ -622,61 +622,69 @@ function* loadResources() {
 
 
 //载入扩展 插件/组件
-    let pluginPath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'Plugins') + GameMakerGlobal.separator;
+    function* loadPlugins(pluginPath) {
+        //循环三方根目录
+        for(const tc0 of $Frame.sl_dirList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0)) {
+            //if(tc0 === '$Leamus')
+            //    continue;
 
-    //循环三方根目录
-    for(let tc0 of $Frame.sl_dirList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0)) {
-        //if(tc0 === '$Leamus')
-        //    continue;
-
-        //循环三方插件目录
-        for(let tc1 of $Frame.sl_dirList(pluginPath + tc0 + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0)) {
-
-            let jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Components' + GameMakerGlobal.separator + 'main.js';
-            if(!$Frame.sl_fileExists(jsPath))
-                continue;
-
-            try {
-                const plugin = _private.jsLoader.load($GlobalJS.toURL(jsPath));
-
-
-                //放入 _private.objPlugins 中
-                //if(plugin.$pluginId !== undefined) {    //插件有ID
-                //    _private.objPlugins[plugin.$pluginId] = plugin;
-                //}
-                if(!$CommonLibJS.isObject(_private.objPlugins[tc0])) {
-                    _private.objPlugins[tc0] = {};
-                    _private.objPluginsStatus[tc0] = {};
+            //循环三方插件目录
+            for(const tc1 of $Frame.sl_dirList(pluginPath + tc0 + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0)) {
+                if($CommonLibJS.getObjectValue(_private.objPlugins, tc0, tc1) !== undefined) {
+                    console.debug('[GameScene]已经载入相同插件，跳过:', tc0, tc1);
+                    continue;
                 }
-                _private.objPlugins[tc0][tc1] = plugin;
-                _private.objPluginsStatus[tc0][tc1] = 0;
+
+                const jsPath = pluginPath + tc0 + GameMakerGlobal.separator + tc1 + GameMakerGlobal.separator + 'Components' + GameMakerGlobal.separator + 'main.js';
+                if(!$Frame.sl_fileExists(jsPath))
+                    continue;
+
+                try {
+                    const plugin = _private.jsLoader.load($GlobalJS.toURL(jsPath));
 
 
-                if(plugin.$autoLoad || plugin.$autoLoad === undefined) {
-                    if(plugin.$load) { //$CommonLibJS.checkCallable
-                        try {
-                            //plugin.$load();
-                            //game.run({Script: plugin.$load() ?? null, Tips: 'plugin_load:' + tc0 + tc1});
-                            let r = plugin.$load(tc0 + GameMakerGlobal.separator + tc1);
-                            if($CommonLibJS.isGenerator(r))r = yield* r;
-                        }
-                        catch(e) {
-                            $CommonLibJS.printException(e);
-                            console.warn('[!GameScene]插件$load函数调用错误：', tc0, tc1);
-                            //throw err;
-                        }
+                    //放入 _private.objPlugins 中
+                    //if(plugin.$pluginId !== undefined) {    //插件有ID
+                    //    _private.objPlugins[plugin.$pluginId] = plugin;
+                    //}
+                    if(!$CommonLibJS.isObject(_private.objPlugins[tc0])) {
+                        _private.objPlugins[tc0] = {};
+                        _private.objPluginsStatus[tc0] = {};
                     }
+                    _private.objPlugins[tc0][tc1] = plugin;
+                    _private.objPluginsStatus[tc0][tc1] = 0;
 
-                    _private.objPluginsStatus[tc0][tc1] = 1;
+
+                    if(plugin.$autoLoad || plugin.$autoLoad === undefined) {
+                        if(plugin.$load) { //$CommonLibJS.checkCallable
+                            try {
+                                //plugin.$load();
+                                //game.run({Script: plugin.$load() ?? null, Tips: 'plugin_load:' + tc0 + tc1});
+                                let r = plugin.$load(tc0 + GameMakerGlobal.separator + tc1);
+                                if($CommonLibJS.isGenerator(r))r = yield* r;
+                            }
+                            catch(e) {
+                                $CommonLibJS.printException(e);
+                                console.warn('[!GameScene]插件$load函数调用错误：', tc0, tc1);
+                                //throw err;
+                            }
+                        }
+
+                        _private.objPluginsStatus[tc0][tc1] = 1;
+                    }
                 }
-            }
-            catch(e) {
-                //console.error('[!GameScene]加载插件错误：', e);
-                $CommonLibJS.printException(e, jsPath);
-                continue;
+                catch(e) {
+                    //console.error('[!GameScene]加载插件错误：', e);
+                    $CommonLibJS.printException(e, jsPath);
+                    continue;
+                }
             }
         }
     }
+    //载入全局插件和工程插件（工程优先）
+    yield* loadPlugins(game.$projectpath + '/Plugins/');
+    yield* loadPlugins($Platform.externalDataPath + '/GameMaker/Plugins/');
+
 
     console.debug('[GameScene]loadResources over');
 }

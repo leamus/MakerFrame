@@ -71,10 +71,9 @@ QtObject {
                 return $Platform.externalDataPath + separator + 'GameMaker' + separator;
                 //return 'assets:/';   //'./'  //':/'
             case 'windows':
-                if($Platform.compileType === 'release')
-                    return 'GameMaker' + separator;
-                else
-                    return 'F:/_Projects/Pets/MakerFrame/GameMaker/';
+                //if($Platform.compileType === 'debug')
+                //    return 'F:/_Projects/Pets/MakerFrame/GameMaker/';
+                //return 'GameMaker' + separator;
             default:
                 return 'GameMaker' + separator;
                 //return './';

@@ -6978,7 +6978,7 @@ Item {
         property var arrGameComponents: [] //存储所有游戏组件（4种：GameMsg、RoleMsg、GameMenu、GameInput）
 
         //JS引擎，用来载入外部JS文件
-        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameScene, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameScene, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
 
         //媒体列表 信息
         //property var objImages: ({})         //{图片名: 图片路径}

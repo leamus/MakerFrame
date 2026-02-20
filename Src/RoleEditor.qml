@@ -2855,7 +2855,7 @@ Item {
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, (qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL))
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
 
         property string strTemplateCode0: `
 //保存坐标偏移数据
