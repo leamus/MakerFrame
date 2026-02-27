@@ -1022,7 +1022,7 @@ function* $commonEquipScript(goods, combatant, params=1) {
         }
         else if(newCount === 0) {
             /*
-            if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+            if($config.$names.$equipReservedSlots.includes(positionName))
                 combatant.$equipment[positionName] = undefined;
             else
                 delete combatant.$equipment[positionName];
@@ -1085,7 +1085,7 @@ function* $commonUnloadScript(positionName, combatant, params=-1) {
         return false;
     else {
         /*
-        if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+        if($config.$names.$equipReservedSlots.includes(positionName))
             combatant.$equipment[positionName] = undefined;
         else
             delete combatant.$equipment[positionName];
@@ -2220,8 +2220,8 @@ function $readSavesInfo(count=3) {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-        visualScriptEditor.nLoadType: 1
+        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo

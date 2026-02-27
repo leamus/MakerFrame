@@ -314,16 +314,15 @@ Item {
 
                         $list.open({
                             Data: path,
-                            CustomData: this,
-                            OnClicked: (index, item, customData)=>{
+                            OnClicked: (index, item)=>{
                                 text = item;
 
-                                $list.visible = false;
-                                customData.forceActiveFocus();
+                                $list.close();
+                                //root.forceActiveFocus();
                             },
-                            OnCanceled: (customData)=>{
-                                $list.visible = false;
-                                customData.forceActiveFocus();
+                            OnCanceled: ()=>{
+                                $list.close();
+                                //root.forceActiveFocus();
                             },
                         });
                     }
@@ -818,12 +817,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1917,7 +1916,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.maximumWidth: parent.width
+            //Layout.maximumWidth: parent.width
             Layout.maximumHeight: parent.height / 2
 
 
@@ -2235,8 +2234,8 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-        visualScriptEditor.nLoadType: 1
+        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
@@ -2608,7 +2607,7 @@ Item {
         onSg_canceled: {
             dialogRoleData.visible = true;
 
-            visible = false;
+            close();
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
@@ -2855,7 +2854,7 @@ Item {
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
 
         property string strTemplateCode0: `
 //保存坐标偏移数据

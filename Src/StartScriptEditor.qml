@@ -99,7 +99,7 @@ game.goon();
         strTitle: '游戏开始脚本'
         fnAfterCompile: function(code) {
             console.debug('[StartScriptEditor]code:', code);
-            //if(code.indexOf('function* $start() {') < 0 && code.indexOf('function* start() {') < 0) {
+            //if(!code.includes('function* $start() {') && !code.includes('function* start() {')) {
             if(!/function\s*\*{0,1}\s*\${0,1}start\s*\(/.test(code)) {
                 code = _private.strTemplate.replace(/\$\$START_SCRIPT\$\$/g, code);
             }
@@ -108,8 +108,8 @@ game.goon();
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-        visualScriptEditor.nLoadType: 1
+        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo

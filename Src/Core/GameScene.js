@@ -355,7 +355,7 @@ function* loadResources() {
 
             if(info) {
                 info = JSON.parse(info);
-                let t = _eval(info['Goods']);
+                let t = $eval(info['Goods']);
                 if(t) {
                     _private.goodsResource[item] = t;
                     _private.goodsResource[item].$rid = item;
@@ -390,7 +390,7 @@ function* loadResources() {
 
             if(info) {
                 info = JSON.parse(info);
-                let t = _eval(info['FightSkill']);
+                let t = $eval(info['FightSkill']);
                 if(t) {
                     _private.skillsResource[item] = t;
                     _private.skillsResource[item].$rid = item;
@@ -565,7 +565,7 @@ function* loadResources() {
 
     /*data = game.loadjson('common_algorithm.json');
     if(data) {
-        let ret = _eval(data['FightAlgorithm']);
+        let ret = $eval(data['FightAlgorithm']);
     }*/
 
 
@@ -581,7 +581,7 @@ function* loadResources() {
 
     /*info = game.loadjson('level_chain.json');
     if(info) {
-        let ret = _eval(info['LevelChainScript']);
+        let ret = $eval(info['LevelChainScript']);
         _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelUpScript;
         _private.objCommonScripts.$commonLevelUpScript = ret.$commonLevelAlgorithm;
     }
@@ -1879,7 +1879,7 @@ function buttonAClicked() {
     //循环地图事件（优先）
     for(let event in itemViewPort.mapEventBlocks) {
         //console.debug('[GameScene]检测事件：', event, mainRoleUseBlocks);
-        if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {  //如果事件触发
+        if(mainRoleUseBlocks.includes(parseInt(event))) {  //如果事件触发
             //console.debug('[GameScene]mapEvent触发:', event, mainRoleUseBlocks, itemViewPort.mapEventBlocks[event]);    //触发
             GameSceneJS.mapEvent(itemViewPort.mapEventBlocks[event], mainRole);   //触发事件
 
@@ -2603,7 +2603,7 @@ function onTriggered() {
         for(let event in itemViewPort.mapEventBlocks) {
             //console.debug('[GameScene]检测事件：', event, roleUseBlocks);
             //如果占用块包含事件块，则事件触发
-            if(roleUseBlocks.indexOf(parseInt(event)) > -1) {
+            if(roleUseBlocks.includes(parseInt(event))) {
                 let isTriggered = role.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
                     tEvents[itemViewPort.mapEventBlocks[event]];
 
@@ -2863,7 +2863,7 @@ function onTriggered() {
         for(let event in itemViewPort.mapEventBlocks) {
             //console.debug('[GameScene]检测事件：', event, mainRoleUseBlocks);
             //如果占用块包含事件块，则事件触发
-            if(mainRoleUseBlocks.indexOf(parseInt(event)) > -1) {
+            if(mainRoleUseBlocks.includes(parseInt(event))) {
                 let isTriggered = mainRole.$$mapEventsTriggering[itemViewPort.mapEventBlocks[event]] ||
                     tEvents[itemViewPort.mapEventBlocks[event]];
 
@@ -2927,13 +2927,13 @@ function onTriggered() {
 
         //let arrKeys = Object.keys(_private.arrPressedKeys);
         if(_private.arrPressedKeys.length > 0) {
-            if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0)
+            if(_private.arrPressedKeys.includes(Qt.Key_Left))
                 offsetMoveX = -Math.round(dta);
-            else if(_private.arrPressedKeys.indexOf(Qt.Key_Right) >= 0)
+            else if(_private.arrPressedKeys.includes(Qt.Key_Right))
                 offsetMoveX = Math.round(dta);
-            if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0)
+            if(_private.arrPressedKeys.includes(Qt.Key_Up))
                 offsetMoveY = -Math.round(dta);
-            else if(_private.arrPressedKeys.indexOf(Qt.Key_Down) >= 0)
+            else if(_private.arrPressedKeys.includes(Qt.Key_Down))
                 offsetMoveY = Math.round(dta);
         }
         //如果开启摇杆加速，且用的不是键盘，则乘以摇杆偏移

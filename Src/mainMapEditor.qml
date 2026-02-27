@@ -76,12 +76,13 @@ Item {
     
     
             onSg_canceled: {
-                //visible = false;
+                //close();
                 //loader.visible = true;
                 //root.focus = true;
                 //root.forceActiveFocus();
                 //loader.item.focus = true;
-                sg_close();
+
+                root.sg_close();
             }
     
             onSg_clicked: {
@@ -160,6 +161,7 @@ Item {
             RowLayout {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
+
                 Label {
                     text: qsTr('地图大小（宽*高）：')
                 }
@@ -193,6 +195,7 @@ Item {
             RowLayout {
                 //Layout.preferredWidth: parent.width
                 Layout.maximumWidth: parent.width
+
                 Label {
                     text: qsTr('地图块大小（宽*高）：')
                 }
@@ -370,7 +373,7 @@ Item {
 
 
 
-            loader.source = './MapEditor.qml';
+            loader.load('./MapEditor.qml');
         }
         onRejected: {
             textMapBlockImageURL.text = '';
@@ -581,7 +584,7 @@ Item {
                 return false;
             cfg = JSON.parse(cfg);
             //console.debug('cfg', cfg);
-            loader.setSource('./MapEditor.qml', {});
+            loader.load('./MapEditor.qml', {});
             loader.item.openMap(cfg);
         }
         onRejected: {
@@ -687,7 +690,7 @@ Item {
                 return false;
             cfg = JSON.parse(cfg);
             //console.debug('cfg', cfg);
-            //loader.setSource('./MapEditor.qml', {});
+            //loader.load('./MapEditor.qml', {});
             loader.item.openMap(cfg);
         }
         onRejected: {
@@ -700,14 +703,15 @@ Item {
 
 
 
-    Loader {
+    L_Loader {
         id: loader
+
 
         visible: false
         focus: true
+        clip: true
 
         anchors.fill: parent
-
 
         //source: './MapEditor.qml'
         asynchronous: true
@@ -723,21 +727,18 @@ Item {
                 //!!!!!!作用：绕过 多次载入地图编辑器时黑屏 的问题
                 //  经详细排查，貌似是内存不足（创建新图层引起的），但奇怪的是，即使destroy成功，内存也不会释放，但这个Loader释放后就正常了。
                 //  游戏中因为没有创建新图层所以不会有问题。
-                loader.source = '';
+                loader.close();
             }
         }
 
 
         onStatusChanged: {
-            console.debug('[mainMapEditor]loader:', source, status);
+            console.debug('[mainMapEditor]loader onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
-                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
-                setSource('');
-
-                $showBusyIndicator(false);
+                close();
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -749,11 +750,6 @@ Item {
                 _private.refresh();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
             }
         }
 
@@ -761,16 +757,9 @@ Item {
             console.debug('[mainMapEditor]loader onLoaded');
 
             try {
-                //_private.refresh();
-
-
                 //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
                 ///focus = true;
                 forceActiveFocus();
-
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
 
                 //if(item.$load)
                 //    item.$load(_private.strMapRID);
@@ -778,10 +767,13 @@ Item {
                 visible = true;
 
 
+                //_private.refresh();
+
+
                 //创建地图工作
 
                 if(dialogMapData.nCreateMapType === 1) {
-                    //loader.setSource('./MapEditor.qml', {});
+                    //loader.load('./MapEditor.qml', {});
                     //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
                     loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
                         MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
@@ -818,7 +810,6 @@ Item {
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -897,7 +888,7 @@ Item {
                     return false;
                 cfg = JSON.parse(cfg);
                 //console.debug('cfg', cfg);
-                //loader.setSource('./MapEditor.qml', {});
+                //loader.load('./MapEditor.qml', {});
                 //loader.item.openMap(cfg);
 
 

@@ -234,7 +234,7 @@ Item {
             cfg.MapEventList = [];
             //读取事件数据，创建事件
             for(let i in cfg.MapEventData) {
-                if(cfg.MapEventList.indexOf(cfg.MapEventData[i]) < 0)
+                if(!cfg.MapEventList.includes(cfg.MapEventData[i]))
                     cfg.MapEventList.push(cfg.MapEventData[i]);
             }
             console.debug('[MapEditor]兼容OK');
@@ -298,7 +298,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.maximumWidth: parent.width
+            //Layout.maximumWidth: parent.width
             Layout.preferredHeight: 42
             Layout.minimumHeight: 0
             Layout.maximumHeight: 42
@@ -601,7 +601,7 @@ Item {
             property int nBar: 0
 
             Layout.fillWidth: true
-            Layout.maximumWidth: parent.width
+            //Layout.maximumWidth: parent.width
             Layout.preferredHeight: 42
             Layout.minimumHeight: 0
             Layout.maximumHeight: 42
@@ -614,7 +614,7 @@ Item {
 
             RowLayout {
                 /*Layout.fillWidth: true
-                Layout.maximumWidth: parent.width
+                //Layout.maximumWidth: parent.width
                 Layout.preferredHeight: 30
                 Layout.minimumHeight: 0
                 Layout.maximumHeight: 30
@@ -759,7 +759,7 @@ Item {
 
             RowLayout {
                 /*Layout.fillWidth: true
-                Layout.maximumWidth: parent.width
+                //Layout.maximumWidth: parent.width
                 Layout.preferredHeight: 30
                 Layout.minimumHeight: 0
                 Layout.maximumHeight: 30
@@ -899,7 +899,7 @@ Item {
 
             RowLayout {
                 /*Layout.fillWidth: true
-                Layout.maximumWidth: parent.width
+                //Layout.maximumWidth: parent.width
                 Layout.preferredHeight: 30
                 Layout.minimumHeight: 0
                 Layout.maximumHeight: 30
@@ -1387,7 +1387,7 @@ Item {
             Layout.maximumHeight: flickable.contentHeight < parent.height ? flickable.contentHeight : parent.height;
             Layout.fillHeight: true
             //Layout.preferredWidth: parent.width
-            Layout.maximumWidth: parent.width
+            //Layout.maximumWidth: parent.width
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
 
@@ -1755,10 +1755,10 @@ Item {
                             ctx.strokeStyle = 'blue';
                             ctx.lineWidth = 1;
                             ctx.font = 'bold %1px 微软雅黑'.arg(_private.config.sizeMapBlockSize.height / 2 / _private.config.nMapDrawScale);
-                            //console.debug('tmpEventIndex', tmpEventIndex, objMapEventsData[i], tmpEventIndex.indexOf(objMapEventsData[i]), tmpEventIndex.indexOf(objMapEventsData[i]).toString())
+                            //console.debug('tmpEventIndex', tmpEventIndex, objMapEventsData[i], tmpEventIndex.indexOf(objMapEventsData[i]), tmpEventIndex.indexOf(objMapEventsData[i]).toString());
                             ctx.strokeText(text, (bx + 0.4) * _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale, (by + 0.2 + 0.5) * _private.config.sizeMapBlockSize.height / _private.config.nMapDrawScale, _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale);
 
-                            //console.debug('绘制方块', bx, by, (bx + 0.4), (by + 0.2), (bx + 0.4) * _private.config.sizeMapBlockSize.width)
+                            //console.debug('绘制方块', bx, by, (bx + 0.4), (by + 0.2), (bx + 0.4) * _private.config.sizeMapBlockSize.width);
                         }
                     }
 
@@ -2970,8 +2970,8 @@ Item {
 
         visualScriptEditor.strTitle: strTitle + '($filename$)'
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-        visualScriptEditor.nLoadType: 1
+        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
@@ -3040,7 +3040,6 @@ Item {
 
         anchors.fill: parent
         visible: false
-
 
         source: './mainGameTest.qml'
         asynchronous: false

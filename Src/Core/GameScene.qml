@@ -624,6 +624,9 @@ Item {
 
 
 
+    property var $eval: /*(loader.item ? loader.item.$eval : null) ?? */(()=>(c)=>eval(c))()
+
+
     //property alias g: rootGameScene.game
     property QtObject game: QtObject {
 
@@ -1386,7 +1389,7 @@ Item {
                     let usedProps = ['RID', '$id', '$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$frame', '$realSize', '$start'];
                     //for(let tp in props) {
                     for(let tp of Object.keys(props)) {
-                        if(usedProps.indexOf(tp) >= 0)
+                        if(usedProps.includes(tp))
                             continue;
                         heroComp[tp]/* = hero[tp]*/ = props[tp];
                     }
@@ -1782,7 +1785,7 @@ Item {
                     let usedProps = ['RID', '$id', '$name', '$showName', '$penetrate', '$speed', '$scale', '$avatar', '$avatarSize', '$targetBx', '$targetBy', '$targetX', '$targetY', '$targetBlocks', '$targetPositions', '$targetBlockAuto', '$action', '$x', '$y', '$bx', '$by', '$direction', '$frame', '$realSize', '$start'];
                     //for(let tp in props) {
                     for(let tp of Object.keys(props)) {
-                        if(usedProps.indexOf(tp) >= 0)
+                        if(usedProps.includes(tp))
                             continue;
                         roleComp[tp]/* = role[tp]*/ = props[tp];
                     }
@@ -2362,7 +2365,7 @@ Item {
             if(fighthero.$properties.remainHP < 0)
                 fighthero.$properties.remainHP = 0;
 
-            if(tKeys.indexOf('remainMP') >= 0 && tKeys.indexOf('MP') >= 0)
+            if(tKeys.includes('remainMP') && tKeys.includes('MP'))
                 if(fighthero.$properties.remainMP > fighthero.$$propertiesWithExtra.MP)
                     fighthero.$properties.remainMP = fighthero.$$propertiesWithExtra.MP;
             */
@@ -3305,7 +3308,7 @@ Item {
             /*
             let tKeys = Object.keys(videoOutput);
             for(let tp in videoParams)
-                if(tKeys.indexOf(tp) >= 0)
+                if(tKeys.includes(tp))
                     videoOutput[tp] = videoParams[tp];
             */
 
@@ -3499,7 +3502,7 @@ Item {
                 /*
                 let tKeys = Object.keys(tmp);
                 for(let tp in imageParams)
-                    if(tKeys.indexOf(tp) >= 0)
+                    if(tKeys.includes(tp))
                         tmp[tp] = imageParams[tp];
                 */
             //}
@@ -4230,7 +4233,7 @@ Item {
             /*/复制属性
             let tKeys = Object.keys(sprite);
             for(let tp in spriteParams)
-                if(tKeys.indexOf(tp) >= 0)
+                if(tKeys.includes(tp))
                     sprite[tp] = spriteParams[tp];
             */
 
@@ -5010,7 +5013,7 @@ Item {
             if(!filePath)
                 return null;
 
-            if(filePath.indexOf('/') === 0)
+            if(filePath.startsWith('/'))
                 filePath = game.$projectpath + GameMakerGlobal.separator + filePath;
             
             const data = $Frame.sl_fileRead(filePath);
@@ -5075,7 +5078,7 @@ Item {
                 AutoRunNext: scriptInfo.AutoRunNext ?? true,
                 ScriptQueue: scriptInfo.ScriptQueue || _private.scriptQueue,
             };
-            scriptInfo.Value = Object.keys(scriptInfo).indexOf('Value') < 0 ? scriptInfo.ScriptQueue.lastEscapeValue : scriptInfo.Value;
+            scriptInfo.Value = !scriptInfo.hasOwnProperty('Value') ? scriptInfo.ScriptQueue.lastEscapeValue : scriptInfo.Value;
             //}
             //else {
             //    console.warn('[!GameScene]run参数错误');
@@ -5150,7 +5153,7 @@ Item {
                     }*/
 
                     //方案2：或使用这个：
-                    scriptInfo.Script = _eval(scriptInfo.Script);
+                    scriptInfo.Script = $eval(scriptInfo.Script);
                     if(!scriptInfo.Script)
                         return -2;
 
@@ -5249,7 +5252,7 @@ Item {
         //运行代码；
         //在这里执行会有上下文环境
         readonly property var evalcode: function(data, filePath='', envs={}) {
-            return _eval(data, filePath, envs);
+            return $eval(data, filePath, envs);
         }
 
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
@@ -5272,7 +5275,7 @@ Item {
 
             //if(!data)
             //    return false;
-            return _eval(data, envs);
+            return $eval(data, envs);
         }
 
         //用C++执行脚本；已注入game和fight环境
@@ -6978,7 +6981,7 @@ Item {
         property var arrGameComponents: [] //存储所有游戏组件（4种：GameMsg、RoleMsg、GameMenu、GameInput）
 
         //JS引擎，用来载入外部JS文件
-        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameScene, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameScene, /*(...params)=>Qt.createQmlObject(...params)*/)
 
         //媒体列表 信息
         //property var objImages: ({})         //{图片名: 图片路径}
@@ -7089,23 +7092,23 @@ Item {
                 }
                 //多向
                 else {
-                    if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0 && _private.arrPressedKeys.indexOf(Qt.Key_Right) >= 0) {
+                    if(_private.arrPressedKeys.includes(Qt.Key_Left) && _private.arrPressedKeys.includes(Qt.Key_Right)) {
                         mainRole.$$arrMoveDirection[0] = 0;
                     }
-                    else if(_private.arrPressedKeys.indexOf(Qt.Key_Left) < 0 && _private.arrPressedKeys.indexOf(Qt.Key_Right) < 0) {
+                    else if(!_private.arrPressedKeys.includes(Qt.Key_Left) && !_private.arrPressedKeys.includes(Qt.Key_Right)) {
                         mainRole.$$arrMoveDirection[0] = 0;
                     }
                     else {
-                        if(_private.arrPressedKeys.indexOf(Qt.Key_Left) >= 0)
+                        if(_private.arrPressedKeys.includes(Qt.Key_Left))
                             mainRole.$$arrMoveDirection[0] = -1;
                         else
                             mainRole.$$arrMoveDirection[0] = 1;
                     }
 
-                    if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0 && _private.arrPressedKeys.indexOf(Qt.Key_Down) >= 0) {
+                    if(_private.arrPressedKeys.includes(Qt.Key_Up) && _private.arrPressedKeys.includes(Qt.Key_Down)) {
                         mainRole.$$arrMoveDirection[1] = 0;
                     }
-                    else if(_private.arrPressedKeys.indexOf(Qt.Key_Up) < 0 && _private.arrPressedKeys.indexOf(Qt.Key_Down) < 0) {
+                    else if(!_private.arrPressedKeys.includes(Qt.Key_Up) && !_private.arrPressedKeys.includes(Qt.Key_Down)) {
                         mainRole.$$arrMoveDirection[1] = 0;
                     }
                     else {
@@ -7113,7 +7116,7 @@ Item {
                             mainRole.$$arrMoveDirection[0] = mainRole.$$arrMoveDirection[0] === -1 ? -0.7 : 0.7;
                         }
 
-                        if(_private.arrPressedKeys.indexOf(Qt.Key_Up) >= 0) {
+                        if(_private.arrPressedKeys.includes(Qt.Key_Up)) {
                             if(mainRole.$$arrMoveDirection[0] !== 0) {
                                 mainRole.$$arrMoveDirection[1] = -0.7;
                             }
@@ -7530,7 +7533,7 @@ Item {
                 tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageRole.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
-                else if(tn.toString().indexOf('.') >= 0)
+                else if(tn.toString().includes('.'))
                     //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
                     tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
                 messageRole.rMinHeight = tn;
@@ -7541,7 +7544,7 @@ Item {
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
-                    else if(tn.toString().indexOf('.') >= 0)
+                    else if(tn.toString().includes('.'))
                         //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
                         tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
                     messageRole.rMaxHeight = tn;
@@ -7820,7 +7823,7 @@ Item {
                 tn = style.MinHeight || styleUser.$minHeight || styleSystem.$minHeight || messageGame.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
-                else if(tn.toString().indexOf('.') >= 0)
+                else if(tn.toString().includes('.'))
                     //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
                     tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
                 messageGame.rMinHeight = tn;
@@ -7831,7 +7834,7 @@ Item {
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
-                    else if(tn.toString().indexOf('.') >= 0)
+                    else if(tn.toString().includes('.'))
                         //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
                         tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
                     messageGame.rMaxHeight = tn;
@@ -9317,7 +9320,7 @@ Item {
             }
 
             //_private.arrPressedKeys[key] = true; //保存键盘按下
-            if(_private.arrPressedKeys.indexOf(event.key) === -1)
+            if(!_private.arrPressedKeys.includes(event.key))
                 _private.arrPressedKeys.push(event.key);
 
 

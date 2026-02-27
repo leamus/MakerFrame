@@ -76,13 +76,13 @@ Item {
 
 
             onSg_canceled: {
-                //visible = false;
+                //close();
                 //loader.visible = true;
                 //root.focus = true;
                 //root.forceActiveFocus();
                 //loader.item.focus = true;
 
-                sg_close();
+                root.sg_close();
             }
 
             onSg_clicked: {
@@ -128,14 +128,15 @@ Item {
 
 
 
-    Loader {
+    L_Loader {
         id: loader
+
 
         visible: false
         focus: true
+        clip: true
 
         anchors.fill: parent
-
 
         source: './RoleEditor.qml'
         asynchronous: true
@@ -158,15 +159,12 @@ Item {
 
 
         onStatusChanged: {
-            console.debug('[mainRoleEditor]loader:', source, status);
+            console.debug('[mainRoleEditor]loader onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
-                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
-                setSource('');
-
-                $showBusyIndicator(false);
+                //close();
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -175,11 +173,6 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
             }
         }
 
@@ -191,10 +184,6 @@ Item {
                 ///focus = true;
                 //forceActiveFocus();
 
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
-
                 //if(item.$load)
                 //    item.$load();
 
@@ -204,7 +193,6 @@ Item {
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -250,7 +238,7 @@ Item {
                     return false;
                 cfg = JSON.parse(cfg);
                 //console.debug('cfg', cfg);
-                //loader.setSource('./MapEditor_1.qml', {});
+                //loader.load('./MapEditor_1.qml', {});
 
                 loader.item.openRole(cfg, item);
             }

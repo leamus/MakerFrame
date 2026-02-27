@@ -73,7 +73,7 @@ Item {
         let arrMyGoods = [];    //道具名
         for(let g of game.gd['$sys_goods']) {
             if(mygoodsinclude === true ||
-                    ($CommonLibJS.isArray(mygoodsinclude) && mygoodsinclude.indexOf(g.$rid) >= 0)) {
+                    ($CommonLibJS.isArray(mygoodsinclude) && mygoodsinclude.includes(g.$rid))) {
 
                 //let goodsInfo = _private.goodsResource[g.$rid];
                 let tgoods = game.$sys.getGoodsObject(g, false);

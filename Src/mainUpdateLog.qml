@@ -63,7 +63,7 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
+            //Layout.maximumHeight: parent.height
             Layout.fillHeight: true
 
 
@@ -289,7 +289,16 @@ Item {
 132、新增：命令行按上下键可以选择历史命令；
 133、新增：引擎全局插件；
 134、新增：Qt插件和QML插件管理，且更改了存放文件夹；
-135、其他：优化调整很多代码和细节，修复一些Bugs；
+135、优化：VisualScript可视化脚本的载入方式（全局和插件）；
+136、修复：每次返回主界面创建WebView时貌似小概率会闪退，原因未知，改为点击再加载貌似解决了；
+137、修复：解决了很多遗留的焦点问题；
+138、新增：可以从内存读取资源文件，可以支持加密资源文件了；
+139、优化：优化并重写小程序和引擎扩展的安装、卸载、运行代码，安装支持本地文件并能调用函数了；
+140、优化：合并Window和SubWindow到一个文件，并优化了很多相关代码；
+141、优化：抽离和优化L_Loader，用起来更方便；
+142、修复：Notepad经常循环绑定的警告；
+143、优化：调试窗口功能；
+144、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

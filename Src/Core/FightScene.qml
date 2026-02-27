@@ -218,7 +218,7 @@ Item {
         //    return;
 
 
-        //data = _eval(data.FightScript);
+        //data = $eval(data.FightScript);
         //let data = game.$sys.getFightScriptResource(fightScriptName);
         //_private.fightInfo = data;
         //_private.fightRoundScript = fightScript.$commons.$fightRoundScript || '';
@@ -226,7 +226,7 @@ Item {
         //_private.fightEndScript = fightScript.$commons.$fightEndScript || '';
 
         /*try {
-            data = _eval(data.FightScript);
+            data = $eval(data.FightScript);
         }
         catch(e) {
             $CommonLibJS.printException(e);
@@ -299,7 +299,8 @@ Item {
         } while(0);
 
         //if('FightInitScript' in fight.fightScript)
-        if(Object.keys(fight.fightScript).indexOf('FightInitScript') >= 0) {
+        //if(Object.keys(fight.fightScript).indexOf('FightInitScript') >= 0) {
+        if(fight.fightScript.hasOwnProperty('FightInitScript')) {
             let r = fight.fightScript.FightInitScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript);
             if($CommonLibJS.isGenerator(r))r = yield* r;
             //yield fight.run({Script: fight.fightScript.FightInitScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight init3'});
@@ -386,7 +387,8 @@ Item {
         } while(0);
 
         //if('FightStartScript' in fight.fightScript)
-        if(Object.keys(fight.fightScript).indexOf('FightStartScript') >= 0) {
+        //if(Object.keys(fight.fightScript).indexOf('FightStartScript') >= 0) {
+        if(fight.fightScript.hasOwnProperty('FightStartScript')) {
             let r = fight.fightScript.FightStartScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript);
             if($CommonLibJS.isGenerator(r))r = yield* r;
             //yield fight.run({Script: fight.fightScript.FightStartScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight start3'});
@@ -2087,7 +2089,7 @@ Item {
         onAccepted: {
             //gameMap.focus = true;
             rootFightScene.forceActiveFocus();
-            //_eval(textScript.text);
+            //$eval(textScript.text);
             console.debug(eval(textScript.text));
             //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
         }

@@ -93,7 +93,7 @@ Item {
 
             text: '关　于'
             onClicked: {
-                _private.loadModule('mainAbout.qml');
+                loader.load('mainAbout.qml');
             }
         }
         */
@@ -106,7 +106,7 @@ Item {
 
             text: '引擎简易教程'
             onClicked: {
-                _private.loadModule('mainEasyGameMakerTutorial.qml');
+                loader.load('mainEasyGameMakerTutorial.qml');
             }
         }
 
@@ -118,7 +118,7 @@ Item {
 
             text: 'JavaScript简易教程'
             onClicked: {
-                _private.loadModule('mainEasyJavaScriptTutorial.qml');
+                loader.load('mainEasyJavaScriptTutorial.qml');
             }
         }
 
@@ -130,7 +130,7 @@ Item {
 
             text: '高级玩法教程'
             onClicked: {
-                _private.loadModule('mainAdvancedTutorial.qml');
+                loader.load('mainAdvancedTutorial.qml');
             }
         }
 
@@ -191,11 +191,11 @@ Item {
                 text: '简易画板'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
+                        loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
+                        loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
@@ -213,11 +213,11 @@ Item {
                 text: '简易画板2'
                 onClicked: {
                     if($Platform.compileType === 'debug') {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
+                        loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                     else {
-                        _private.loadModule($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
+                        loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
                         //userMainProject.source = 'mainMapEditor.qml';
                     }
                 }
@@ -569,16 +569,17 @@ Item {
 
 
 
-    Loader {
+    L_Loader {
         id: loader
+
 
         visible: false
         focus: true
+        clip: true
 
         anchors.fill: parent
 
-
-        source: ''
+        //source: ''
         asynchronous: true
 
 
@@ -589,17 +590,15 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                //loader.source = '';
-                _private.loadModule('');
+                loader.close();
             }
         }
 
 
         onStatusChanged: {
-            console.debug('[mainTutorial]loader:', source, status);
+            console.debug('[mainTutorial]loader onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
-                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
                 $dialog.show({
@@ -613,9 +612,7 @@ Item {
                     },
                 });
 
-                setSource('');
-
-                $showBusyIndicator(false);
+                //close();
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -624,11 +621,6 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
             }
         }
 
@@ -640,10 +632,6 @@ Item {
                 ///focus = true;
                 forceActiveFocus();
 
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
-
                 //if(item.$load)
                 //    item.$load();
 
@@ -653,7 +641,6 @@ Item {
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -662,17 +649,6 @@ Item {
 
     QtObject {
         id: _private
-
-        function loadModule(url) {
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-
-            //loader.source = url;
-            loader.setSource(url);
-
-            return true;
-        }
 
 
         readonly property QtObject config: QtObject { //配置

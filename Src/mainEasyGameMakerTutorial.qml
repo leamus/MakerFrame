@@ -63,7 +63,7 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
+            //Layout.maximumHeight: parent.height
             Layout.fillHeight: true
 
 

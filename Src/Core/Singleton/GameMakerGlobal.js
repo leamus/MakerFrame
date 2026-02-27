@@ -1058,7 +1058,7 @@ function* $commonEquipScript(goods, combatant, params=1) {
         }
         else if(newCount === 0) {
             /*
-            if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+            if($config.$names.$equipReservedSlots.includes(positionName))
                 combatant.$equipment[positionName] = undefined;
             else
                 delete combatant.$equipment[positionName];
@@ -1121,7 +1121,7 @@ function* $commonUnloadScript(positionName, combatant, params=-1) {
         return false;
     else {
         /*
-        if($config.$names.$equipReservedSlots.indexOf(positionName) !== -1)
+        if($config.$names.$equipReservedSlots.includes(positionName))
             combatant.$equipment[positionName] = undefined;
         else
             delete combatant.$equipment[positionName];
@@ -2423,7 +2423,7 @@ function addProps(combatant, incrementProps, type=1, propertyFlag=0) {
             tp = tp[0].trim();
 
             //如果有这个属性
-            if(tKeys.indexOf(tp) >= 0) {
+            if(tKeys.includes(tp)) {
                 //如果 战斗人物属性 是数组值（多段类型：{HP: [。。。]}）
                 if($CommonLibJS.isArray(props[tp])) {
                     //循环数组
@@ -3223,7 +3223,7 @@ function getCombatantSkills(combatant, types=[0, 1], flags=0b11) {
     if(flags & 0b1) {
         //人物所有的
         for(let skill of combatant.$skills) {
-            if(types.indexOf(skill.$type) >= 0) {
+            if(types.includes(skill.$type)) {
                 arrSkillsName.push(skill.$name);
                 arrSkills.push(skill);
             }
@@ -3248,7 +3248,7 @@ function getCombatantSkills(combatant, types=[0, 1], flags=0b11) {
                         $CommonLibJS.copyPropertiesToObject(skill, tskill);
                     }*/
 
-                    if(types.indexOf(skill.$type) >= 0) {
+                    if(types.includes(skill.$type)) {
                         arrSkillsName.push(skill.$name);
                         arrSkills.push(skill);
                     }

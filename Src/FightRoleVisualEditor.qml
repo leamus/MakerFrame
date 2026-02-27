@@ -103,12 +103,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -143,12 +143,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = item;
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -459,12 +459,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -555,12 +555,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -596,12 +596,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -637,12 +637,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -834,12 +834,12 @@ Item {
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    $list.visible = false;
-                                                    root.forceActiveFocus();
+                                                    $list.close();
+                                                    //root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    $list.visible = false;
-                                                    root.forceActiveFocus();
+                                                    $list.close();
+                                                    //root.forceActiveFocus();
                                                 },
                                             });
                                         }
@@ -1283,7 +1283,7 @@ Item {
         }
 
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
 
 
         //创建的组件缓存

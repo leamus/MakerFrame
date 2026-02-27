@@ -18,13 +18,13 @@ import _Global.Button 1.0
 //import '..'
 
 
-import "qrc:/QML"
+import 'qrc:/QML'
 
 
-//import "GameMakerGlobal.js" as GameMakerGlobalJS
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
-//import "GameScene.js" as GameSceneJS
-//import "File.js" as File
+//import 'GameScene.js' as GameSceneJS
+//import 'File.js' as File
 
 
 
@@ -44,16 +44,16 @@ Item {
         //如果需要载入（这里其实可以废弃了）
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + GameMakerGlobal.separator + "map.json"));
-            //console.debug("cfg", cfg, mapPath);
+            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + GameMakerGlobal.separator + 'map.json'));
+            //console.debug('cfg', cfg, mapPath);
 
             if(!tmapInfo) {
                 console.warn('[!GameMapView]Map load ERROR:', mapPath);
                 return false;
             }
             tmapInfo = JSON.parse(tmapInfo);
-            //console.debug("cfg", cfg);
-            //loader.setSource("./MapEditor_1.qml", {});
+            //console.debug('cfg', cfg);
+            //loader.setSource('./MapEditor_1.qml', {});
         }
 
 
@@ -86,8 +86,8 @@ Item {
         if(itemContainer.height < gameScene.height)
             itemContainer.y = parseInt((height - itemContainer.height * gameScene.scale) / 2 / gameScene.scale);
 
-        //console.debug("!!!", itemContainer.width, gameScene.scale, width, itemContainer.x);
-        //console.debug("!!!", itemContainer.height, gameScene.scale, height, itemContainer.y);
+        //console.debug('!!!', itemContainer.width, gameScene.scale, width, itemContainer.x);
+        //console.debug('!!!', itemContainer.height, gameScene.scale, height, itemContainer.y);
 
 
         //卸载原地图块图片
@@ -104,20 +104,20 @@ Item {
         for(let tc in itemBackMapContainer.arrCanvas) {
             itemBackMapContainer.arrCanvas[tc].loadImage(imageMapBlock.source);
             if(itemBackMapContainer.arrCanvas[tc].isImageLoaded(imageMapBlock.source)) {
-                //console.debug("[GameMapView]Canvas.loadImage载入OK，requestPaint");
+                //console.debug('[GameMapView]Canvas.loadImage载入OK，requestPaint');
                 itemBackMapContainer.arrCanvas[tc].requestPaint();
             }
             //else
-                //console.debug("[GameMapView]Canvas.loadImage载入NO，等待回调。。。");
+                //console.debug('[GameMapView]Canvas.loadImage载入NO，等待回调。。。');
         }
         for(let tc in itemFrontMapContainer.arrCanvas) {
             itemFrontMapContainer.arrCanvas[tc].loadImage(imageMapBlock.source);
             if(itemFrontMapContainer.arrCanvas[tc].isImageLoaded(imageMapBlock.source)) {
-                //console.debug("[GameMapView]canvasBackMap.loadImage载入OK，requestPaint");
+                //console.debug('[GameMapView]canvasBackMap.loadImage载入OK，requestPaint');
                 itemFrontMapContainer.arrCanvas[tc].requestPaint();
             }
             //else
-                //console.debug("[GameMapView]Canvas.loadImage载入NO，等待回调。。。");
+                //console.debug('[GameMapView]Canvas.loadImage载入NO，等待回调。。。');
         }
 
 
@@ -137,7 +137,7 @@ Item {
 
 
         console.debug('[GameMapView]openMap', mapPath, itemViewPort.itemContainer.width, itemViewPort.itemContainer.height);
-        //console.debug("mapEventBlocks,mapSpecialBlocks", JSON.stringify(mapEventBlocks), JSON.stringify(mapSpecialBlocks));
+        //console.debug('mapEventBlocks,mapSpecialBlocks', JSON.stringify(mapEventBlocks), JSON.stringify(mapSpecialBlocks));
 
         return mapInfo;
     }
@@ -160,12 +160,12 @@ Item {
 
         //canvasBackMap.unloadImage(imageMapBlock.source);
         //canvasFrontMap.unloadImage(imageMapBlock.source);
-        imageMapBlock.source = "";
+        imageMapBlock.source = '';
 
     }
 
     //块坐标对应的真实坐标
-    //bx、by为块坐标；dx、dy为偏移坐标（为小数则偏移多少个块，为整数则偏移多少坐标）
+    //bx、by为块坐标；dx、dy为偏移坐标（可以为数字或字符串，为小数则偏移多少个块，为整数则偏移多少坐标）
     function getMapBlockPos(bx, by, dx=0.5, dy=0.5) {
         if(!mapInfo)
             return false;
@@ -186,22 +186,19 @@ Item {
         //在目标图块最中央的 地图的坐标
         let targetX;
         let targetY;
-        if(dx.toString().indexOf('.') < 0)
-            targetX = parseInt((bx) * sizeMapBlockScaledSize.width);
-        else {
-            targetX = parseInt((bx + dx) * sizeMapBlockScaledSize.width);
-            dx = 0;
-        }
-        if(dy.toString().indexOf('.') < 0)
-            targetY = parseInt((by) * sizeMapBlockScaledSize.height);
-        else {
-            targetY = parseInt((by + dy) * sizeMapBlockScaledSize.height);
-            dy = 0;
-        }
+        if(dx.toString().includes('.'))
+            targetX = parseInt((bx + parseFloat(dx)) * sizeMapBlockScaledSize.width);
+        else 
+            targetX = parseInt((bx) * sizeMapBlockScaledSize.width) + parseInt(dx);
+        if(dy.toString().includes('.'))
+            targetY = parseInt((by + parseFloat(dy)) * sizeMapBlockScaledSize.height);
+        else
+            targetY = parseInt((by) * sizeMapBlockScaledSize.height) + parseInt(dy);
+
         //let targetX = role.x + role.x1 + parseInt(role.width1 / 2);
         //let targetY = role.y + role.y1 + parseInt(role.height1 / 2);
 
-        return [targetX + dx, targetY + dy];
+        return [targetX, targetY];
     }
 
     //移动场景中心到地图的x、y
@@ -413,22 +410,22 @@ Item {
 
                 //地图块没有准备好
                 /*if(imageMapBlock.status !== Image.Ready) {
-                    console.debug("[GameMapView]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                    console.debug('[GameMapView]canvasMapBlock：地图块图片没有准备好：', imageMapBlock.source.status);
                     return;
                 }*/
 
                 if(!available) {
-                    console.debug("[GameMapView]canvasMask：地图块没有准备好：");
+                    console.debug('[GameMapView]canvasMask：地图块没有准备好：');
                     return;
                 }
                 /*if(!isImageLoaded(imageMapBlock.source)) {
-                    console.debug("[GameMapView]canvasBackMap：地图块图片没有载入：");
+                    console.debug('[GameMapView]canvasBackMap：地图块图片没有载入：');
                     //loadImage(imageMapBlock.source);
                     return;
                 }*/
 
 
-                let ctx = getContext("2d");
+                let ctx = getContext('2d');
 
                 //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
                 //ctx.fillRect(0, 0, width, height);
@@ -456,20 +453,20 @@ Item {
                 //requestPaint();
 
 
-                console.debug("[GameMapView]canvasMask onPaint");
+                console.debug('[GameMapView]canvasMask onPaint');
             }
 
             onImageLoaded: {    //载入图片完成
                 requestPaint(); //重新绘图
 
-                console.debug("[GameMapView]canvasMask onImageLoaded");
+                console.debug('[GameMapView]canvasMask onImageLoaded');
             }
 
 
             Component.onCompleted: {
                 //loadImage(image1);  //载入图片
                 //loadImage(image2);
-                console.debug("[GameMapView]canvasMask Component.onCompleted");
+                console.debug('[GameMapView]canvasMask Component.onCompleted');
             }
         }
     }
@@ -529,7 +526,7 @@ Item {
         ]
 
 
-        //color: "black"
+        //color: 'black'
 
 
 
@@ -538,8 +535,8 @@ Item {
             id: itemContainer
 
 
-            //property var image1: "1.jpg"
-            //property var image2: "2.png"
+            //property var image1: '1.jpg'
+            //property var image2: '2.png'
 
 
             //width: 800
@@ -578,7 +575,7 @@ Item {
 
             Image { //预先载入图片
                 id: imageMapBlock
-                //source: "file:./1.png"
+                //source: 'file:./1.png'
                 visible: false
 
                 onStatusChanged: {
@@ -590,12 +587,12 @@ Item {
                             itemFrontMapContainer.arrCanvas[tc].requestPaint();
                         }
 
-                        console.debug("[GameMapView]Image.Ready");
+                        console.debug('[GameMapView]Image.Ready');
                     }
                     */
                 }
                 Component.onCompleted: {
-                    console.debug("[GameMapView]Image Component.onCompleted");
+                    console.debug('[GameMapView]Image Component.onCompleted');
                 }
             }
 
@@ -633,22 +630,22 @@ Item {
 
                         //地图块没有准备好
                         /*if(imageMapBlock.status !== Image.Ready) {
-                            console.debug("[GameMapView]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                            console.debug('[GameMapView]canvasMapBlock：地图块图片没有准备好：', imageMapBlock.source.status);
                             return;
                         }*/
 
                         if(!available) {
-                            console.debug("[GameMapView]canvasBackMap：地图块没有准备好：");
+                            console.debug('[GameMapView]canvasBackMap：地图块没有准备好：');
                             return;
                         }
                         if(!isImageLoaded(imageMapBlock.source)) {
-                            console.debug("[GameMapView]canvasBackMap：地图块图片没有载入：");
+                            console.debug('[GameMapView]canvasBackMap：地图块图片没有载入：');
                             //loadImage(imageMapBlock.source);
                             return;
                         }
 
 
-                        let ctx = getContext("2d");
+                        let ctx = getContext('2d');
 
                         //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
                         //ctx.fillRect(0, 0, width, height);
@@ -672,7 +669,7 @@ Item {
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
                             if(y2 > mapInfo.MapSize[1]) {
-                                console.warn("WARNING!!!too many rows");
+                                console.warn('WARNING!!!too many rows');
                                 break;
                             }
                         }
@@ -680,7 +677,7 @@ Item {
 
                         //绘制每一层
                         for(let k = 0; k < mapInfo.MapCount; ++k) {
-                            //console.debug("k:", k);
+                            //console.debug('k:', k);
 
                             //如果前景色需要半透明，则背景的每一层都必须绘制，如果没有半透明，则不需要绘制不属于地板层的
                             if(rMapOpacity >= 1)
@@ -689,10 +686,10 @@ Item {
                                     continue;
 
                             for(let j = 0; j < mapInfo.MapData[k].length; ++j) {
-                            //	console.debug("j:", j);
+                            //	console.debug('j:', j);
                                 //循环绘制地图块
                                 for(let i = 0; i < mapInfo.MapData[k][j].length; ++i) {
-                            //		console.debug("i:", i);
+                            //		console.debug('i:', i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
                                     //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
@@ -707,7 +704,7 @@ Item {
                                     let x2 = i * mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
                                     let y2 = j * mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
-                                    //console.debug(k,j,i, ":", x1,y1,x2,y2);
+                                    //console.debug(k,j,i, ':', x1,y1,x2,y2);
                                     //console.debug(mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
 
                                     ctx.drawImage(imageMapBlock.source,
@@ -720,26 +717,26 @@ Item {
                             }
                         }
 
-                        console.debug("[GameMapView]canvasMapBack onPaint");
+                        console.debug('[GameMapView]canvasMapBack onPaint');
                     }
 
                     onPainted: {
                         itemBackMapContainer.visible = true;
 
-                        console.debug("[GameMapView]canvasMapBack onPainted");
+                        console.debug('[GameMapView]canvasMapBack onPainted');
                     }
 
                     onImageLoaded: {    //载入图片完成
                         requestPaint(); //重新绘图
 
-                        console.debug("[GameMapView]canvasMapBack onImageLoaded");
+                        console.debug('[GameMapView]canvasMapBack onImageLoaded');
                     }
 
 
                     Component.onCompleted: {
                         //loadImage(image1);  //载入图片
                         //loadImage(image2);
-                        console.debug("[GameMapView]canvasMapBack Component.onCompleted");
+                        console.debug('[GameMapView]canvasMapBack Component.onCompleted');
                     }
                 }
             }
@@ -782,7 +779,7 @@ Item {
                         }
                     }
 
-                    property string $name: ""
+                    property string $name: ''
 
                     //其他属性（用户自定义）
                     property var props: ({})
@@ -794,7 +791,7 @@ Item {
 
 
                     Component.onCompleted: {
-                        //console.debug("[GameMapView]Role Component.onCompleted");
+                        //console.debug('[GameMapView]Role Component.onCompleted');
                     }
                 }
                 */
@@ -836,22 +833,22 @@ Item {
 
                         //地图块没有准备好
                         /*if(imageMapBlock.status !== Image.Ready) {
-                            console.debug("[GameMapView]canvasMapBlock：地图块图片没有准备好：", imageMapBlock.source.status);
+                            console.debug('[GameMapView]canvasMapBlock：地图块图片没有准备好：', imageMapBlock.source.status);
                             return;
                         }*/
 
                         if(!available) {
-                            console.debug("[GameMapView]canvasFrontMap：地图块没有准备好：");
+                            console.debug('[GameMapView]canvasFrontMap：地图块没有准备好：');
                             return;
                         }
                         if(!isImageLoaded(imageMapBlock.source)) {
-                            console.debug("[GameMapView]canvasFrontMap：地图块图片没有载入：");
+                            console.debug('[GameMapView]canvasFrontMap：地图块图片没有载入：');
                             //loadImage(imageMapBlock.source);
                             return;
                         }
 
 
-                        let ctx = getContext("2d");
+                        let ctx = getContext('2d');
 
                         //ctx.fillStyle = Qt.rgba(1, 0, 0, 1);
                         //ctx.fillRect(0, 0, width, height);
@@ -875,7 +872,7 @@ Item {
                             //ctx.drawImage(imageMapBlock2.source, 0, 0, 100, 100);
 
                             if(y2 > mapInfo.MapSize[1]) {
-                                console.warn("WARNING!!!too many rows");
+                                console.warn('WARNING!!!too many rows');
                                 break;
                             }
                         }
@@ -883,17 +880,17 @@ Item {
 
                         //绘制每一层
                         for(let k = 0; k < mapInfo.MapCount; ++k) {
-                            //console.debug("k:", k);
+                            //console.debug('k:', k);
 
                             //跳过地板层
                             if(k < mapInfo.MapOfRole)
                                 continue;
 
                             for(let j = 0; j < mapInfo.MapData[k].length; ++j) {
-                            //	console.debug("j:", j);
+                            //	console.debug('j:', j);
                                 //循环绘制地图块
                                 for(let i = 0; i < mapInfo.MapData[k][j].length; ++i) {
-                            //		console.debug("i:", i);
+                            //		console.debug('i:', i);
 
                                     ctx.fillStyle = Qt.rgba(255, 0, 0, 1);
                                     //ctx.fillRect(x2, y2, sizeMapBlockScaledSize.width, sizeMapBlockScaledSize.height);
@@ -908,7 +905,7 @@ Item {
                                     let x2 = i * mapInfo.MapBlockSize[0] / _private.nMapDrawScale;
                                     let y2 = j * mapInfo.MapBlockSize[1] / _private.nMapDrawScale;
 
-                                    //console.debug(k,j,i, ":", x1,y1,x2,y2);
+                                    //console.debug(k,j,i, ':', x1,y1,x2,y2);
                                     //console.debug(mapInfo.MapBlockSize[0], mapInfo.MapBlockSize[1], imageMapBlock, imageMapBlock.source);
 
                                     ctx.drawImage(imageMapBlock.source,
@@ -921,26 +918,26 @@ Item {
                             }
                         }
 
-                        console.debug("[GameMapView]canvasFrontMap onPaint");
+                        console.debug('[GameMapView]canvasFrontMap onPaint');
                     }
 
                     onPainted: {
                         itemFrontMapContainer.visible = true;
 
-                        console.debug("[GameMapView]canvasMapFront onPainted");
+                        console.debug('[GameMapView]canvasMapFront onPainted');
                     }
 
                     onImageLoaded: {    //载入图片完成
                         requestPaint(); //重新绘图
 
-                        console.debug("[GameMapView]canvasFrontMap onImageLoaded");
+                        console.debug('[GameMapView]canvasFrontMap onImageLoaded');
                     }
 
 
                     Component.onCompleted: {
                         //loadImage(image1);  //载入图片
                         //loadImage(image2);
-                        console.debug("[GameMapView]canvasFrontMap Component.onCompleted");
+                        console.debug('[GameMapView]canvasFrontMap Component.onCompleted');
                     }
                 }
             }
@@ -964,11 +961,11 @@ Item {
 
     /*/游戏对话框
     Dialog {
-        id: loaderGameMsg
+        id: dialogGameMsg
 
         property alias textGameMsg: textGameMsg.text
 
-        title: ""
+        title: ''
         width: 300
         height: 200
         standardButtons: Dialog.Ok | Dialog.Cancel
@@ -978,16 +975,16 @@ Item {
 
         Text {
             id: textGameMsg
-            text: qsTr("")
+            text: qsTr('')
         }
 
 
         MultiPointTouchArea {
             anchors.fill: parent
-            enabled: loaderGameMsg.standardButtons === Dialog.NoButton
+            enabled: dialogGameMsg.standardButtons === Dialog.NoButton
             onPressed: {
                 //rootGameScene.forceActiveFocus();
-                loaderGameMsg.reject();
+                dialogGameMsg.reject();
             }
         }
 
@@ -1001,7 +998,7 @@ Item {
             //gameMap.focus = true;
             if(_private.config.bPauseGame)
                 game.goon();
-            //console.log("Cancel clicked");
+            //console.log('Cancel clicked');
         }
     }*/
 
@@ -1009,11 +1006,11 @@ Item {
     Component.onCompleted: {
         nMapMaxPixelCount = ($Platform.sysInfo.sizes === 32 ? 60*60*32*32 : 100*100*32*32);
 
-        console.debug("[GameMapView]Component.onCompleted");
+        console.debug('[GameMapView]Component.onCompleted');
     }
 
     Component.onDestruction: {
-        console.debug("[GameMapView]Component.onDestruction");
+        console.debug('[GameMapView]Component.onDestruction');
     }
 }
 

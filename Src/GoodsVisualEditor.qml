@@ -95,12 +95,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -130,12 +130,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -420,12 +420,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -461,12 +461,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -500,12 +500,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -603,12 +603,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -645,12 +645,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -687,12 +687,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -730,12 +730,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1102,7 +1102,7 @@ Item {
                             propertyName = propertyName[0].trim();
 
                         //倍率
-                        if(effectTextFields[tt].text.indexOf('.') >= 0)
+                        if(effectTextFields[tt].text.includes('.'))
                             strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += combatant.$$properties.%1 * %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                         else
                             strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
@@ -1133,7 +1133,7 @@ Item {
                         let propertyName = propertyTextFields[tt].text.trim();
 
                         //倍率
-                        if(effectTextFields[tt].text.indexOf('.') >= 0)
+                        if(effectTextFields[tt].text.includes('.'))
                             strEffects += 'game.addprops(combatant, {"%1": %2}, 1);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
                         else
                             strEffects += 'game.addprops(combatant, {"%1": %2}, 2);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());

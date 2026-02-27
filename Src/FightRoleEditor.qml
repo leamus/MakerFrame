@@ -265,8 +265,8 @@ const data = (function() {
 
             Layout.preferredWidth: parent.width * 0.96
 
-            Layout.preferredHeight: textArea.contentHeight
-            Layout.maximumHeight: parent.height
+            Layout.preferredHeight: textArea.implicitHeight
+            //Layout.maximumHeight: parent.height
             Layout.minimumHeight: 50
             Layout.fillHeight: true
 

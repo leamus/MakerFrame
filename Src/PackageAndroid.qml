@@ -360,10 +360,10 @@ Item {
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {
-                if(strFileUrl.indexOf('primary') >= 0) {
+                if(strFileUrl.includes('primary')) {
                     textImageResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
                 }
-                else if(strFileUrl.indexOf('document/') >= 0) {
+                else if(strFileUrl.includes('document/')) {
                     let tt = strFileUrl.indexOf('%3A');
                     textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
@@ -595,7 +595,7 @@ Item {
             let needFilesIndex = [];
             for(let fileName in zipFiles) {
                 for(let needFileName in needFilesName) {
-                    if(zipFiles[fileName].indexOf(needFilesName[needFileName]) >= 0) {
+                    if(zipFiles[fileName].includes(needFilesName[needFileName])) {
                         needFilesIndex[needFileName] = fileName;
                         break;
                     }
@@ -604,9 +604,9 @@ Item {
             */
 
             let missingFiles = '';
-            if(!zipFiles[0] || zipFiles[0].indexOf('MakerFrame_GameRuntime_Android_') < 0)
+            if(!zipFiles[0] || !zipFiles[0].includes('MakerFrame_GameRuntime_Android_'))
                 missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
-            if(!zipFiles[1] || zipFiles[1].indexOf('MakerFrame_Package_Android_') < 0)
+            if(!zipFiles[1] || !zipFiles[1].includes('MakerFrame_Package_Android_'))
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
 
 

@@ -152,12 +152,12 @@ Item {
                                 ttextEffect.visible = true;
                             }
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -187,12 +187,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -222,12 +222,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -257,12 +257,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -335,12 +335,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -370,12 +370,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -405,12 +405,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -440,12 +440,12 @@ Item {
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.visible = false;
-                            root.forceActiveFocus();
+                            $list.close();
+                            //root.forceActiveFocus();
                         },
                     });
                 }
@@ -657,12 +657,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -711,12 +711,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -752,12 +752,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1134,12 +1134,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1175,12 +1175,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -1678,7 +1678,7 @@ Item {
                     let tcombatant = combatantTextFields[tt].text.trim();
 
                     //倍率
-                    if(tvalue.indexOf('.') >= 0) {
+                    if(tvalue.includes('.')) {
 
                         let treferenceproperty = propertyTextFields[tt].text.trim().split(',');
                         if(treferenceproperty.length === 1)
@@ -1749,7 +1749,7 @@ Item {
 
                 switch(parseInt(typeTextFields[tt].text)) {
                 case 0:
-                    let ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
+                    let ttype = (tvalue.includes('.') ? '2' : '1');
                     buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});`;
@@ -1774,7 +1774,7 @@ Item {
                     buffs += '\r\n';
                     break;
                 default:
-                    ttype = (tvalue.indexOf('.') >= 0 ? '2' : '1');
+                    ttype = (tvalue.includes('.') ? '2' : '1');
                     switch(parseInt(typeTextFields[tt].text)) {
                     case 4:
                         buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
@@ -1931,7 +1931,7 @@ Item {
         }
 
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
 
 
         //创建的组件缓存

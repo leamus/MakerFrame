@@ -889,7 +889,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.maximumWidth: parent.width
+            //Layout.maximumWidth: parent.width
             Layout.maximumHeight: parent.height / 2
 
             Rectangle {
@@ -1103,8 +1103,8 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-        visualScriptEditor.nLoadType: 1
+        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
         visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
         visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
@@ -1472,7 +1472,7 @@ Item {
         onSg_canceled: {
             dialogSpriteImageData.visible = true;
 
-            visible = false;
+            close();
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
@@ -1852,11 +1852,11 @@ Item {
         onSg_canceled: {
             dialogSpriteSoundData.visible = true;
 
+            close();
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
             //loader.item.focus = true;
-            visible = false;
         }
 
         onSg_removeClicked: {
@@ -2096,7 +2096,7 @@ Item {
         property string strTextBackupSpriteSoundURL
         property string strTextBackupSpriteSoundResourceName
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
 
         property string strTemplateCode0: `
 //保存坐标偏移数据

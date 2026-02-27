@@ -265,6 +265,7 @@ Loader {
     //property bool bStartToRunning: false
 
 
+    clip: true
     width: if(parent)parent.width
     height: if(parent)parent.height
 

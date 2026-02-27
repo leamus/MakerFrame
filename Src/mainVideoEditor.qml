@@ -117,7 +117,7 @@ Item {
             }
 
             onSg_canceled: {
-                sg_close();
+                root.sg_close();
             }
         }
 
@@ -153,7 +153,7 @@ Item {
 
                 //Layout.preferredWidth: 60
 
-                text: '新增'
+                text: '添加'
                 onClicked: {
                     filedialog.open();
                 }
@@ -180,8 +180,8 @@ Item {
                             //root.forceActiveFocus();
 
                             let newFileName = $dialog.input.trim();
-                            //if(_private.arrVideos.indexOf(newFileName) >= 0) {
-                            if(listview.listData.indexOf(newFileName) >= 0) {
+                            //if(_private.arrVideos.includes(newFileName)) {
+                            if(listview.listData.includes(newFileName)) {
                                 if(newFileName === oldFileName)
                                     return;
 
@@ -358,10 +358,10 @@ Item {
             /*let strFileUrl = fileUrl.toString();
 
             if(Qt.platform.os === 'android') {
-                if(strFileUrl.indexOf('primary') >= 0) {
+                if(strFileUrl.includes('primary')) {
                     textVideoResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
                 }
-                else if(strFileUrl.indexOf('document/') >= 0) {
+                else if(strFileUrl.includes('document/')) {
                     let tt = strFileUrl.indexOf('%3A');
                     textVideoResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
                 }
@@ -390,8 +390,8 @@ Item {
                     //root.forceActiveFocus();
 
                     let newFileName = $dialog.input.trim();
-                    //if(_private.arrVideos.indexOf(newFileName) >= 0) {
-                    if(listview.listData.indexOf(newFileName) >= 0) {
+                    //if(_private.arrVideos.includes(newFileName)) {
+                    if(listview.listData.includes(newFileName)) {
                         $dialog.msg = '文件名重复，请重新输入';
                         //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
                         $dialog.show();

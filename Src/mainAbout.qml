@@ -63,7 +63,7 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
+            //Layout.maximumHeight: parent.height
             Layout.fillHeight: true
 
 
@@ -177,7 +177,7 @@ Item {
 2.全功能网络：支持 TCP、UDP、HTTP（XmlHttpRequest和QNetwork封装的两种方式，后者自由度更高）、WebSocket（QML）、MQTT、串口（QextSerialPort）等多种常用协议的服务端和客户端开发，也可自己封装其他协议；API使用非常简单，支持异步函数的同步写法；支持互联网、局域网、蓝牙、NFC等通信方式；
 3.配套的后台服务软件和数据库：已有PHP开发的弱网系统（Workerman/Webman高并发服务），C++开发的联机系统（IOCP高并发模型），配套Redis、MySQL来做缓存和存储，支持注册登录、房间及管理、聊天、联机对战（帧同步）等功能，可万人同时在线；数据存储自由度高，支持JSON，各平台共享；
 4.多种发布形式：能生成对应平台的安装包exe、apk、bin、deb等（可发布在Steam、Tap、OpenKylin等应用商店），也能生成框架引擎能载入运行的游戏ROM包；资源和代码支持源文件形式，也支持压缩、打包、加密的形式，一定程度上可防逆向；ROM可以分发到各平台，或上传到官网，用链接、二维码、分享等形式来载入运行；
-5.热更新：框架底层采用我编写的 升级加载运行器，能运行前检测并热更新框架引擎的所有核心库（so/dll、dex、rcc），不用繁琐的下载和重新安装，过程完全自动且无感；
+5.热更新：框架底层采用我编写的 升级加载运行器，能运行前检测并热更新框架引擎的所有核心库（so/dll、dex、rcc），不用繁琐的下载和重新安装，完全自动且无感的升级到最新版，省心省力；
 6.屏幕自适应：在任何分辨率，各种不同大小的屏幕下有相同的显示效果；开发时框架引擎还提供了不同的方式来解决各种屏幕的自适应效果，比如 整体缩放（原创）、虚拟坐标（原创）、点（Point）坐标、布局（Layout）等；
 7.多层次的架构设计，能满足从小白到大神不同技术层次的玩家（见 架构设计）；
 8.简便易用的接口/API：用极少的JS代码就能调用各接口API和功能，比如文件系统、文件读写、二进制操作、网络（Request和长链接）、实名认证、接入穿山甲和Tap广告和扫描/生成二维码等；

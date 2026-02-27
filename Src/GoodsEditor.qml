@@ -313,7 +313,7 @@ const data = (function() {
             Layout.maximumWidth: root.width * 0.96
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
+            //Layout.maximumHeight: parent.height
             Layout.fillHeight: true
 
 
@@ -322,8 +322,8 @@ const data = (function() {
 
                 Layout.preferredWidth: parent.width
 
-                Layout.preferredHeight: textArea.contentHeight
-                Layout.maximumHeight: parent.height
+                Layout.preferredHeight: textArea.implicitHeight
+                //Layout.maximumHeight: parent.height
                 Layout.minimumHeight: 50
                 Layout.fillHeight: true
 

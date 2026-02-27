@@ -41,6 +41,8 @@ Item {
 
 
 
+    property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+
     readonly property var showMsg: rectHelpWindow.showMsg
 
 
@@ -69,8 +71,8 @@ Item {
 
             //visualScriptEditor.strTitle: strTitle
 
-            visualScriptEditor.strSearchPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
-            visualScriptEditor.nLoadType: 1
+            visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+            visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
             //visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
             //visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
@@ -186,10 +188,12 @@ Item {
                     MenuItem {
                         text: 'MenuItem'
                         onClicked: {
-                            console.warn(9)
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
+                            console.warn(9);
                         }
                         onTriggered: {
-                            console.warn(99)
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
+                            console.warn(99);
                         }
                     }
                     MenuSeparator { }
@@ -244,6 +248,7 @@ Item {
                         //focusPolicy: Qt.NoFocus
                         //hoverEnabled: false
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.newProject();
                         }
                     }
@@ -251,6 +256,7 @@ Item {
                         text: '打开工程'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.openProject();
                         }
                     }
@@ -258,6 +264,7 @@ Item {
                         text: '重命名工程'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.renameProject();
                         }
                     }
@@ -269,6 +276,7 @@ Item {
                             if(!_private.checkCurrentProjectName()) {
                                 return;
                             }
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.exportProject();
                         }
                     }
@@ -276,6 +284,7 @@ Item {
                         text: '导入工程'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.importProject();
                         }
                     }
@@ -283,6 +292,7 @@ Item {
                         text: '下载示例工程'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.downloadDemoProject();
                         }
                     }
@@ -295,6 +305,7 @@ Item {
                             if(!_private.checkCurrentProjectName()) {
                                 return;
                             }
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.gamePackage();
                         }
                     }
@@ -302,6 +313,7 @@ Item {
                         text: '平台分发'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.future();
                         }
                     }
@@ -359,6 +371,7 @@ Item {
                         text: '地图编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.mapEditor();
                         }
                     }
@@ -367,6 +380,7 @@ Item {
                         text: '角色编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.roleEditor();
                         }
                     }
@@ -374,6 +388,7 @@ Item {
                         text: '特效编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.spriteEditor();
                         }
                     }
@@ -382,6 +397,7 @@ Item {
                         text: '道具编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.goodsEditor();
                         }
                     }
@@ -389,6 +405,7 @@ Item {
                         text: '战斗技能编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.fightSkillEditor();
                         }
                     }
@@ -396,6 +413,7 @@ Item {
                         text: '战斗角色编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.fightRoleEditor();
                         }
                     }
@@ -403,6 +421,7 @@ Item {
                         text: '战斗脚本编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.fightScriptEditor();
                         }
                     }
@@ -411,6 +430,7 @@ Item {
                         text: '起始脚本编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.startScriptEditor();
                         }
                     }
@@ -418,6 +438,7 @@ Item {
                         text: '通用脚本编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.commonScriptEditor();
                         }
                     }
@@ -425,6 +446,7 @@ Item {
                         text: '脚本编辑器'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.scriptEditor();
                         }
                     }
@@ -433,6 +455,7 @@ Item {
                         text: '测　试'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.gameTest();
                         }
                     }
@@ -461,7 +484,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.maximumHeight: implicitHeight * 1.2
 
-                text: '媒体资源管理'
+                text: '媒体资源'
                 font.pointSize: _private.config.nButtonTextSize
 
                 onClicked: {
@@ -485,6 +508,7 @@ Item {
                         text: '图片管理'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.imageEditor();
                         }
                     }
@@ -492,6 +516,7 @@ Item {
                         text: '音乐管理'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.musicEditor();
                         }
                     }
@@ -499,6 +524,7 @@ Item {
                         text: '视频管理'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.videoEditor();
                         }
                     }
@@ -506,6 +532,7 @@ Item {
                         text: '压缩文件夹'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.compressDir();
                         }
                     }
@@ -513,6 +540,7 @@ Item {
                         text: '解压文件夹'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.uncompressDir();
                         }
                     }
@@ -566,6 +594,7 @@ Item {
                         text: '插件管理'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.pluginsManager(1);
                         }
                     }
@@ -573,6 +602,7 @@ Item {
                         text: '插件下载'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.pluginsManager(2);
                             //_private.pluginsDownload();
                         }
@@ -584,6 +614,7 @@ Item {
                         text: '全局插件'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.pluginsManager(0);
                         }
                     }
@@ -658,6 +689,7 @@ Item {
                         text: '关　于'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.about();
                         }
                     }
@@ -665,6 +697,7 @@ Item {
                         text: '教　程'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.tutorial();
                         }
                     }
@@ -672,6 +705,7 @@ Item {
                         text: '使用协议'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.agreement();
                         }
                     }
@@ -679,6 +713,7 @@ Item {
                         text: '更新日志'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.updateLog();
                         }
                     }
@@ -686,6 +721,7 @@ Item {
                         text: '建议意见'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
+                            $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
                             _private.suggest();
                         }
                     }
@@ -1325,143 +1361,45 @@ Item {
 
 
 
-    //工程目录
-    L_List {
-        id: l_listProjects
-
-        visible: false
-        anchors.fill: parent
-        //width: parent.width
-        //height: parent.height
-
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
-
-
-
-        onSg_canceled: {
-            visible = false;
-            //loader.visible = true;
-            //rootGameMaker.focus = true;
-            rootGameMaker.forceActiveFocus();
-            //loader.item.focus = true;
-        }
-
-        onSg_clicked: {
-            if(item === '..') {
-                visible = false;
-                rootGameMaker.forceActiveFocus();
-                return;
-            }
-
-
-            //loader.loadModule('');
-            _private.changeProject(item);
-
-
-            visible = false;
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.item.focus = true;
-            //rootGameMaker.focus = true;
-            rootGameMaker.forceActiveFocus();
-        }
-
-        onSg_removeClicked: {
-            let dirUrl = GameMakerGlobal.config.strProjectRootPath + item;
-
-            $dialog.show({
-                Msg: '确认删除 <font color="red">' + item + '</font> ?',
-                Buttons: Dialog.Ok | Dialog.Cancel,
-                OnAccepted: function() {
-                    console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-
-                    removeItem(index);
-
-                    GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
-                    _private.changeProject('');
-
-                    //l_listProjects.forceActiveFocus();
-                },
-                OnRejected: ()=>{
-                    //l_listProjects.forceActiveFocus();
-                },
-            });
-        }
-    }
-
-
-
     //主窗口加载
-    Loader {
+    L_Loader {
         id: loader
         objectName: 'GameMakerLoader'
 
 
         //载入模块
-        function loadModule(url, ...params) {
-            //console.debug('~~~loadModule:', url, params);
+        function loadModule(url=null, ...params) {
+            //console.debug('loadModule:', url, params);
 
 
             //if(url.length !== 0 && !checkCurrentProjectName())
             //    return false;
 
-            //if(loader.status === Loader.Loading) {
-            //    console.warn('[!mainGameMaker]loader status is Loading');
-            //    return false;
-            //}
 
-
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-
-
-            if(status === Loader.Loading) {
-                console.debug('[mainGameMaker]loadModule cache:', url, params, status);
-
-                vLoaderCache = url;
-            }
-            else {
-                console.debug('[mainGameMaker]loadModule:', url, params, status);
-
-
-                //clearComponentCache();
-                //trimComponentCache();
-
-
+            if(status === Loader.Loading)
+                vInitParamsBackup = params;
+            else
                 vInitParams = params;
-                if($CommonLibJS.isString(url)) //载入路径
-                    //source = url;
-                    setSource(url);
-                else //载入Component；注意QUrl类型也是 object
-                    sourceComponent = url;
+            load($CommonLibJS.isString(url) ? Qt.resolvedUrl(url) : url, undefined, );
+        }
 
-
-                /*if(loader.status === Loader.Ready) {
-                    if(loader.item.$load)
-                        loader.item.$load();
-
-                    console.debug('[mainGameMaker]Loader.Ready');
-                    //loader.item.forceActiveFocus();
-                }*/
-            }
+        fnCustomLoad: function(url, properties) {
+            loadModule(url, ...vInitParamsBackup);
+            vInitParamsBackup = null;
         }
 
 
-        property var vInitParams: [] //调用init时给的参数
-
-        //Loader的status为Loading时先缓存起来，否则容易出问题（比如闪退）
-        property var vLoaderCache: null
+        property var vInitParams: [] //调用item.$init时给的参数
+        property var vInitParamsBackup: [] //调用item.$init时给的参数 备份
 
         visible: false
         focus: true
+        clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
-
-        source: ''
-        asynchronous: true
+        //source: ''
+        //asynchronous: true
 
 
 
@@ -1471,51 +1409,28 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                //loader.source = '';
-                loader.loadModule('');
+                loader.close();
             }
         }
 
 
+
         onStatusChanged: {
-            console.debug('[mainGameMaker]loader onStatusChanged:', source, status, vLoaderCache);
+            console.debug('[mainGameMaker]loader onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
-                setSource('');
-
-                $showBusyIndicator(false);
+                //close();
             }
             else if(status === Loader.Null) {
                 visible = false;
-
-                //if(nStatusBackup === Loader.Loading)
-                //    showBusyIndicator(false);
-
 
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
             }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
-                gc();
-
-                //要在下一个事件循环中改变，因为立即loadModule的话，onLoaded仍然会在后面调用，此时 item 已经不是之前的item了，所以先让onLoaded执行完再改loadModule；
-                $CommonLibJS.runNextEventLoop([function() {
-                    if(vLoaderCache) {
-                        const cache = vLoaderCache;
-                        vLoaderCache = null;
-                        loadModule(cache);
-                    }
-                }, 'Load vLoaderCache']);
-            }
-
-            //nStatusBackup = status;
         }
 
         onLoaded: {
@@ -1526,10 +1441,6 @@ Item {
                 ///focus = true;
                 forceActiveFocus();
 
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
-
                 if(item.$load)
                     item.$load(...vInitParams);
 
@@ -1539,7 +1450,6 @@ Item {
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -1617,7 +1527,7 @@ Item {
                 //Layout.preferredWidth: parent.width * 0.4
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 //Layout.preferredHeight: 50
-                Layout.maximumHeight: parent.height
+                //Layout.maximumHeight: parent.height
                 Layout.minimumHeight: 20
                 Layout.fillHeight: true
 
@@ -1801,10 +1711,65 @@ Item {
         }
 
         function openProject() {
-            l_listProjects.show(GameMakerGlobal.config.strProjectRootPath, [], 0x001 | 0x2000, 0x00);
-            l_listProjects.visible = true;
-            //l_listProjects.focus = true;
-            //l_listProjects.forceActiveFocus();
+            $list.open({
+                RemoveButtonVisible: true,
+                Data: GameMakerGlobal.config.strProjectRootPath,
+                Params: [[], 0x001 | 0x2000, 0x00],
+                OnClicked: (index, item)=>{
+                    if(item === '..') {
+                        $list.close();
+                        return;
+                    }
+
+
+                    //loader.loadModule();
+                    _private.changeProject(item);
+
+
+                    $list.close();
+                    //rootGameMaker.forceActiveFocus();
+                },
+                OnCanceled: ()=>{
+
+                    $list.close();
+                    //rootGameMaker.forceActiveFocus();
+                },
+                OnRemoveClicked: (index, item)=>{
+                    let dirUrl = GameMakerGlobal.config.strProjectRootPath + item;
+
+                    $dialog.show({
+                        Msg: '确认删除 <font color="red">' + item + '</font> ?',
+                        Buttons: Dialog.Ok | Dialog.Cancel,
+                        OnAccepted: function() {
+                            console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), );
+
+                            if(!$Frame.sl_removeRecursively(dirUrl)) {
+                                $dialog.show({
+                                    Msg: '删除失败',
+                                    Buttons: Dialog.Yes,
+                                    OnAccepted: function() {
+                                        //rootGameMaker.forceActiveFocus();
+                                    },
+                                    OnRejected: ()=>{
+                                        //rootGameMaker.forceActiveFocus();
+                                    },
+                                });
+                                return;
+                            }
+
+                            $list.removeItem(index);
+
+                            GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
+                            _private.changeProject('');
+
+                            //$list.close();
+                        },
+                        OnRejected: ()=>{
+                            //$list.close();
+                        },
+                    });
+                }
+            });
         }
 
         function renameProject() {
@@ -2118,9 +2083,10 @@ Item {
 
         //function downloadDemoProject() {
         function importProject() {
-            const jsLoader = new $CommonLibJS.JSLoader(rootGameMaker, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/);
+            //const jsLoader = new $CommonLibJS.JSLoader(rootGameMaker, /*(...params)=>Qt.createQmlObject(...params)*/);
+            const menuURL = 'http://MakerFrame.Leamus.cn/GameMaker/Projects/menu.js';
             let menuList;
-            const menuJS = jsLoader.load('http://MakerFrame.Leamus.cn/GameMaker/Projects/menu.js');
+            const menuJS = jsLoader.load(menuURL);
             if(!menuJS) {
                 menuList = [];
                 //return false;
@@ -2190,14 +2156,15 @@ Item {
                             },
                         });
 
-                        //$list.visible = false;
+                        //$list.close();
                         //rootGameMaker.forceActiveFocus();
                     },
                     OnCanceled: ()=>{
-                        jsLoader.clear();
+                        //jsLoader.clear();
+                        jsLoader.unload(menuURL);
 
-                        $list.visible = false;
-                        rootGameMaker.forceActiveFocus();
+                        $list.close();
+                        //rootGameMaker.forceActiveFocus();
                     },
                 });
                 //$showBusyIndicator(false);
@@ -2419,7 +2386,7 @@ Item {
         }
 
         //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
-        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, /*(qml, parent, fileURL)=>Qt.createQmlObject(qml, parent, fileURL)*/)
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, /*(...params)=>Qt.createQmlObject(...params)*/)
         property var jsGameVisualScript: null
 
         property var fnBackupOpenFile: null
@@ -2481,12 +2448,11 @@ Item {
         _private.fnBackupOpenFile = $globalData.$openFile;
         $globalData.$openFile = (url, type)=>{
             //如果是文件夹
-            if($Frame.sl_isDir($GlobalJS.toPath(url))) {
+            if(/*$CommonLibJS.isArray(url) || */$Frame.sl_isDir($GlobalJS.toPath(url)))
                 return false;
-            }
 
 
-            const fileExtName = $Frame.sl_completeSuffix(url).toLowerCase();
+            const fileExtName = $Frame.sl_suffix(url).toLowerCase();
             if(fileExtName === 'zip') {
                 _private.unzipProjectPackage(url);
 
@@ -2496,15 +2462,15 @@ Item {
                 return false;
         }
 
+        //$$eval = (()=>(c)=>eval(c))();
 
 
-        //let d = console.debug;
-        //console.debug = 123;
-        //d('!!!!!!!!!!!', d, console.debug, d === console.debug);
 
         console.debug('[mainGameMaker]Component.onCompleted:', Qt.resolvedUrl('.'));
     }
     Component.onDestruction: {
+        //$$eval = null;
+
         $globalData.$openFile = _private.fnBackupOpenFile;
 
 

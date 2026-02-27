@@ -270,16 +270,17 @@ Item {
 
     //游戏场景
     //关闭时会释放，这样如果有资源释放失败（GameScene的ReleaseResource）也没问题；
-    Loader {
+    L_Loader {
         id: loaderGameScene
+
 
         visible: false
         //focus: true
+        clip: true
 
         anchors.fill: parent
 
-
-        source: ''
+        //source: ''
         asynchronous: true
 
 
@@ -290,34 +291,30 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
+                loaderGameScene.close();
                 _private.gameSceneClose();
             }
         }
 
 
         onStatusChanged: {
-            console.debug('[mainGameTest]loaderGameScene:', source, status);
+            console.debug('[mainGameTest]loaderGameScene onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
-                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
-                _private.gameSceneClose();
-
-                $showBusyIndicator(false);
+                close();
             }
             else if(status === Loader.Null) {
                 visible = false;
 
                 //root.focus = true;
                 root.forceActiveFocus();
+
+
+                _private.gameSceneClose();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
             }
         }
 
@@ -325,6 +322,11 @@ Item {
             console.debug('[mainGameTest]loaderGameScene onLoaded');
 
             try {
+                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+                ///focus = true;
+                forceActiveFocus();
+
+
                 /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
                 //let cfg = File.read(filePath);
                 let cfg = $Frame.sl_fileRead(filePath);
@@ -334,19 +336,9 @@ Item {
                     return false;
                 cfg = JSON.parse(cfg);
                 //console.debug('cfg', cfg);
-                //loaderGameScene.setSource('./MapEditor_1.qml', {});
+                //loaderGameScene.load('./MapEditor_1.qml', {});
                 loaderGameScene.item.openMap(cfg);
                 */
-
-
-
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
-
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
 
 
                 //item.testFresh();
@@ -370,11 +362,11 @@ Item {
                 visible = true;
             }
             catch(e) {
+                loaderGameScene.close();
                 _private.gameSceneClose();
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -412,7 +404,7 @@ Item {
         }
 
         onSg_canceled: {
-            visible = false;
+            close();
             //loader.visible = true;
             //root.focus = true;
             root.forceActiveFocus();
@@ -438,14 +430,11 @@ Item {
 
             buttonStart.enabled = false;
 
-            loaderGameScene.source = './Core/GameScene.qml';
+            loaderGameScene.load('./Core/GameScene.qml');
         }
 
 
         function gameSceneClose() {
-            loaderGameScene.source = '';
-
-
             buttonStart.enabled = true;
         }
     }

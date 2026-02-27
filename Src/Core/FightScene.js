@@ -965,7 +965,7 @@ function actionSpritePlay(combatantActionSpriteData, combatant) {
         /*/或者显示 Data字符串方法 的返回值（可以使用 SkillEffectResult 对象）
         if(combatantActionSpriteData.Data) {
             //console.debug(SkillEffectResult[0].value)
-            wordmove.text.text = _eval(combatantActionSpriteData.Data, {SkillEffectResult: SkillEffectResult});
+            wordmove.text.text = $eval(combatantActionSpriteData.Data, {SkillEffectResult: SkillEffectResult});
             //console.debug(wordmove.text.text)
         }*/
 
@@ -1115,7 +1115,7 @@ function* fnRound() {
         }
 
         /*console.debug('', JSON.stringify(combatant, function(k, v) {
-            if(k.indexOf('$$') === 0)
+            if(k.startsWith('$$'))
                 return undefined;
             return v;
         }))*/
@@ -1416,7 +1416,8 @@ function* gfFighting() {
         } while(0);
 
         //if('FightRoundScript' in fight.fightScript)
-        if(Object.keys(fight.fightScript).indexOf('FightRoundScript') >= 0) {
+        //if(Object.keys(fight.fightScript).indexOf('FightRoundScript') >= 0) {
+        if(fight.fightScript.hasOwnProperty('FightRoundScript')) {
             let r = fight.fightScript.FightRoundScript.call(fight.fightScript, _private.nRound, 0, [fight.myCombatants, fight.enemies], fight.fightScript);
             if($CommonLibJS.isGenerator(r))r = yield* r;
             //yield fight.run({Script: fight.fightScript.FightRoundScript.call(fight.fightScript, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight round3:' + step});
@@ -1736,7 +1737,8 @@ function fightOver(result, force=false) {
             } while(0);
 
             //if('FightEndScript' in fight.fightScript)
-            if(Object.keys(fight.fightScript).indexOf('FightEndScript') >= 0) {
+            //if(Object.keys(fight.fightScript).indexOf('FightEndScript') >= 0) {
+            if(fight.fightScript.hasOwnProperty('FightEndScript')) {
                 let r = fight.fightScript.FightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript);
                 if($CommonLibJS.isGenerator(r))r = yield* r;
                 //yield fight.run({Script: fight.fightScript.FightEndScript.call(fight.fightScript, result, [fight.myCombatants, fight.enemies], fight.fightScript) ?? null, Priority: -2, Tips: 'fight end3'});
@@ -1855,7 +1857,7 @@ function loadFightSkillInfo(fightSkillName) {
             data = JSON.parse(data);
             //console.debug('data', data);
             try {
-                data = _eval(data.FightSkill);
+                data = $eval(data.FightSkill);
             }
             catch(e) {
                 CommonLibJS.printException(e);
@@ -1868,7 +1870,7 @@ function loadFightSkillInfo(fightSkillName) {
         * /
         let data = game.loadjson(GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
         if(data) {
-            return _eval(data.FightSkill);
+            return $eval(data.FightSkill);
         }
     }
     return undefined;

@@ -100,7 +100,7 @@ Item {
                 return;
                 */
 
-                _private.loadModule('PackageWindows.qml');
+                loader.load('PackageWindows.qml');
             }
         }
 
@@ -112,23 +112,24 @@ Item {
 
             text: '打包Android'
             onClicked: {
-                _private.loadModule('PackageAndroid.qml');
+                loader.load('PackageAndroid.qml');
             }
         }
     }
 
 
 
-    Loader {
+    L_Loader {
         id: loader
+
 
         visible: false
         focus: true
+        clip: true
 
         anchors.fill: parent
 
-
-        source: ''
+        //source: ''
         asynchronous: true
 
 
@@ -139,22 +140,18 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                //loader.source = '';
-                _private.loadModule('');
+                loader.close();
             }
         }
 
 
         onStatusChanged: {
-            console.debug('[mainPackage]loader:', source, status);
+            console.debug('[mainPackage]loader onStatusChanged:', source, status);
 
             if(status === Loader.Ready) {
-                //$showBusyIndicator(false);
             }
             else if(status === Loader.Error) {
-                setSource('');
-
-                $showBusyIndicator(false);
+                //close();
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -163,11 +160,6 @@ Item {
                 root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
-                $showBusyIndicator(true);
-            }
-            if(status !== Loader.Loading) {
-                $clearComponentCache();
-                $trimComponentCache();
             }
         }
 
@@ -179,10 +171,6 @@ Item {
                 ///focus = true;
                 forceActiveFocus();
 
-                ///item.focus = true;
-                //if(item.forceActiveFocus)
-                //    item.forceActiveFocus();
-
                 //if(item.$load)
                 //    item.$load();
 
@@ -192,7 +180,6 @@ Item {
                 throw e;
             }
             finally {
-                $showBusyIndicator(false);
             }
         }
     }
@@ -204,18 +191,6 @@ Item {
 
         readonly property QtObject config: QtObject { //配置
             //id: _config
-        }
-
-
-        function loadModule(url) {
-            //loader.visible = true;
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-
-            //loader.source = url;
-            loader.setSource(url);
-
-            return true;
         }
     }
 

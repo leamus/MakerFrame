@@ -105,12 +105,12 @@ Item {
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                $list.visible = false;
-                                root.forceActiveFocus();
+                                $list.close();
+                                //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.visible = false;
-                                root.forceActiveFocus();
+                                $list.close();
+                                //root.forceActiveFocus();
                             },
                         });
                     }
@@ -255,12 +255,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -316,12 +316,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         textMusic.text = item;
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -373,12 +373,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -415,12 +415,12 @@ Item {
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.visible = false;
-                                        root.forceActiveFocus();
+                                        $list.close();
+                                        //root.forceActiveFocus();
                                     },
                                 });
                             }
@@ -541,12 +541,12 @@ Item {
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    $list.visible = false;
-                                                    root.forceActiveFocus();
+                                                    $list.close();
+                                                    //root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    $list.visible = false;
-                                                    root.forceActiveFocus();
+                                                    $list.close();
+                                                    //root.forceActiveFocus();
                                                 },
                                             });
                                         }

@@ -63,7 +63,7 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
             //Layout.preferredHeight: 50
-            Layout.maximumHeight: parent.height
+            //Layout.maximumHeight: parent.height
             Layout.fillHeight: true
 
 
@@ -215,7 +215,7 @@ Item {
                 console.info(e, e.$params.$$json);
             }
         });
-4、HTTPServer(Libhv)    //~~~~~~
+4、HTTPServer(请先安装Libhv插件)    //~~~~~~
     示例：
     HTTPServer {
         id: httpServer
@@ -568,14 +568,14 @@ Item {
     a、文件、文件夹操作；
     b、压缩解压（zip）操作；
     c、剪切板操作（$Frame.sl_setClipboardText）；
-    d、动态载入卸载QRC资源：$Frame.sl_registerResource、$Frame.sl_unRegisterResource；
+    d、动态载入卸载RCC资源：$Frame.sl_registerResource、$Frame.sl_unRegisterResource；
     e、登录、联机、弱网等；
-    f、本地系统功能（二维码、摄像头、GPS、屏幕旋转、屏幕常量、请求权限等）；
+    f、本地系统信息和功能（二维码、摄像头、GPS、屏幕旋转、屏幕常亮、请求权限等）；
     g、播放音频视频；
     h、数据库（SQLite、SQLITECIPHER等）操作；
     i、各种格式文件操作（ini、json、js）；
     j、扩展自定义可视化命令；
-    k、封装了QCoreApplication、QGuiApplication、QApplication、QUrl、部分QObject、QMetaObject方法；
+    k、封装了QCoreApplication、QGuiApplication、QApplication、QUrl、QString、IO（QIODevice、QDataStream、QTextStream、QByteArray、QBuffer、QFile）、部分QObject、QMetaObject方法；
     l、Qt和QML插件系统，游戏引擎插件系统；
     、其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、给QML发送队列事件、模拟键盘和鼠标事件；
 `;
