@@ -46,14 +46,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -71,8 +71,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
     
-            color: Global.style.backgroundColor
-            colorText: Global.style.primaryTextColor
+            color: $Global.style.backgroundColor
+            colorText: $Global.style.primaryTextColor
     
     
             onSg_canceled: {
@@ -95,7 +95,7 @@ Item {
                 }
     
     
-                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item;
+                let dirUrl = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item;
     
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -291,7 +291,7 @@ Item {
                     onClicked: {
                         //dialogMapData.nChoiceType = 2;
 
-                        let path = GameMakerGlobal.mapResourcePath();
+                        let path = $GameMakerGlobal.mapResourcePath();
 
                         l_listMapBlockResource.show(path, [], 0x002, 0x00);
                         l_listMapBlockResource.visible = true;
@@ -339,8 +339,8 @@ Item {
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                //filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapResourceDirName + GameMakerGlobal.separator + textMapBlockResourceName.text;
-                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
+                //filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapResourceDirName + '/' + textMapBlockResourceName.text;
+                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝到资源目录失败';
@@ -361,7 +361,7 @@ Item {
                 //console.debug('ttt', textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
             }
 
-            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
+            textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
 
             if(!$Frame.sl_fileExists($GlobalJS.toPath(textMapBlockImageURL.text))) {
                 open();
@@ -373,7 +373,7 @@ Item {
 
 
 
-            loader.load('./MapEditor.qml');
+            loader.load(Qt.resolvedUrl('MapEditor.qml'));
         }
         onRejected: {
             textMapBlockImageURL.text = '';
@@ -481,14 +481,14 @@ Item {
         //width: parent.width
         //height: parent.height
 
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
+        color: $Global.style.backgroundColor
+        colorText: $Global.style.primaryTextColor
 
 
         onSg_clicked: {
-            //let filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/' + GameMakerGlobal.config.strMapResourceDirName + '/' + item;
+            //let filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapResourceDirName + '/' + item;
 
-            textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(item);
+            textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(item);
             textMapBlockResourceName.text = item;
             //console.debug('[mainMapEditor]List Clicked::', textMapBlockImageURL.text)
 
@@ -529,7 +529,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'Resources' + GameMakerGlobal.separator + 'Maps' + GameMakerGlobal.separator + item;
+            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Resources/Maps/' + item;
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -670,7 +670,7 @@ Item {
         title: '选择地图文件'
         selectMultiple: false
         //folder: shortcuts.home
-        folder: $GlobalJS.toReadWriteURL($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+        folder: $GlobalJS.toReadWriteURL($Platform.externalDataPath + '/Map')
         nameFilters: [ 'Json files (*.json *.map *.jsn)', 'All files (*)' ]
         selectExisting: true
         selectFolder: false
@@ -714,7 +714,7 @@ Item {
         anchors.fill: parent
 
         //source: './MapEditor.qml'
-        asynchronous: true
+        //asynchronous: true
 
 
 
@@ -756,61 +756,65 @@ Item {
         onLoaded: {
             console.debug('[mainMapEditor]loader onLoaded');
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            forceActiveFocus();
 
-                //if(item.$load)
-                //    item.$load(_private.strMapRID);
-
-                visible = true;
-
-
-                //_private.refresh();
-
-
-                //创建地图工作
-
-                if(dialogMapData.nCreateMapType === 1) {
-                    //loader.load('./MapEditor.qml', {});
-                    //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
-                    loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
-                        MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
-                        MapBlockImage: [textMapBlockResourceName.text]
-                    });
-
-                    //loader.item.testFresh();
-
+            /*if(item.$load) {
+                try {
+                    item.$load(_private.strMapRID);
                 }
-                else if(dialogMapData.nCreateMapType === 2) {
-
-                    dialogMapData.mapData.MapSize[0] = textMapWidth.text;
-                    dialogMapData.mapData.MapSize[1] = textMapHeight.text;
-                    dialogMapData.mapData.MapBlockSize[0] = textBlockWidth.text;
-                    dialogMapData.mapData.MapBlockSize[1] = textBlockHeight.text;
-                    dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
-
-                    loader.item.openMap(dialogMapData.mapData, _private.strMapRID);
-
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //console.warn('[!mainMapEditor]', e);
+                    //throw e;
                 }
-
-                textMapBlockImageURL.text = '';
-                textMapBlockImageURL.enabled = false;
-                textMapBlockResourceName.text = '';
-                textMapBlockResourceName.enabled = true;
-
-                labelDialogTips.text = '';
-
-
-
-                //console.debug('Ok clicked');
+                finally {
+                }
             }
-            catch(e) {
-                throw e;
+            */
+
+            visible = true;
+
+
+            //_private.refresh();
+
+
+            //创建地图工作
+
+            if(dialogMapData.nCreateMapType === 1) {
+                //loader.load('./MapEditor.qml', {});
+                //item.newMap({MapBlockSize: [30, 30], MapSize: [20, 20]});
+                loader.item.newMap({MapSize: [parseInt(textMapWidth.text), parseInt(textMapHeight.text)],
+                    MapBlockSize: [parseInt(textBlockWidth.text), parseInt(textBlockHeight.text)],
+                    MapBlockImage: [textMapBlockResourceName.text]
+                });
+
+                //loader.item.testFresh();
+
             }
-            finally {
+            else if(dialogMapData.nCreateMapType === 2) {
+
+                dialogMapData.mapData.MapSize[0] = textMapWidth.text;
+                dialogMapData.mapData.MapSize[1] = textMapHeight.text;
+                dialogMapData.mapData.MapBlockSize[0] = textBlockWidth.text;
+                dialogMapData.mapData.MapBlockSize[1] = textBlockHeight.text;
+                dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
+
+                loader.item.openMap(dialogMapData.mapData, _private.strMapRID);
+
             }
+
+            textMapBlockImageURL.text = '';
+            textMapBlockImageURL.enabled = false;
+            textMapBlockResourceName.text = '';
+            textMapBlockResourceName.enabled = true;
+
+            labelDialogTips.text = '';
+
+
+
+            //console.debug('Ok clicked');
         }
     }
 
@@ -829,24 +833,24 @@ Item {
         function refresh() {
 
             //console.debug(filedialogOpenMap.shortcuts, JSON.stringify(filedialogOpenMap.shortcuts))
-            //filedialogOpenMap.folder = $GlobalJS.toReadWriteURL($Platform.externalDataPath + GameMakerGlobal.separator + 'Map')
+            //filedialogOpenMap.folder = $GlobalJS.toReadWriteURL($Platform.externalDataPath + '/Map')
             //filedialogOpenMap.folder = filedialogOpenMap.shortcuts.pictures;
             //filedialogOpenMap.setFolder(filedialogOpenMap.shortcuts.pictures);
             //console.debug('filedialogOpenMap.folder:', filedialogOpenMap.folder)
             //filedialogOpenMap.open();
 
 
-            //console.debug(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator)
+            //console.debug($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/')
 
-            //l_listMaps.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000, 0x00);
-            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //l_listMaps.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/', [], 0x001 | 0x2000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/', [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建地图】');
             //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug('path:', $GlobalJS.toReadWriteURL(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', $GlobalJS.toReadWriteURL($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName))
             //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
             //console.debug('path:', Qt.resolvedUrl($GlobalJS.toReadWriteURL($Platform.externalDataPath)));
         }
@@ -879,7 +883,7 @@ Item {
                 _private.strMapRID = item;
 
 
-                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
+                const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item + '/map.json';
                 //let cfg = File.read(filePath);
                 let cfg = $Frame.sl_fileRead(filePath);
                 //console.debug('[mainMapEditor]filePath：', filePath);
@@ -900,7 +904,7 @@ Item {
                 textMapHeight.text = cfg.MapSize[1];
                 textBlockWidth.text = cfg.MapBlockSize[0];
                 textBlockHeight.text = cfg.MapBlockSize[1];
-                textMapBlockImageURL.text = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
+                textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
                 textMapBlockResourceName.text = cfg.MapBlockImage[0];
                 //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
 

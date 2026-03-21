@@ -21,7 +21,7 @@ import './Core'
 //import 'Core/GameComponents'
 
 
-import 'GameVisualScript.js' as GameVisualScriptJS
+//import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -245,9 +245,9 @@ Item {
         }
 
 
-        canvasEvent.rePaint();
-
-        canvasBlockSpecial.rePaint();
+        //这里不能立即绘制，等available为true才行
+        //canvasEvent.rePaint();
+        //canvasBlockSpecial.rePaint();
 
 
 
@@ -281,14 +281,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -579,7 +579,7 @@ Item {
                     //for(let j in cfg.MapData[k]) {
                     //arrMapData[k] = cfg.MapData[k];
                     */
-                    console.debug('[MapEditor]focus:', root.focus, rootFocusScopeScaled.focus, loaderUserMainProject.focus, rootWindow.focus);
+                    console.debug('[MapEditor]focus:', root.focus, rootFocusScopeScaled.focus, loaderUserMainProject.focus, $window.focus);
                     console.debug('[MapEditor]', filedialogOpenMapBlock.folder);
 
                     console.debug('[MapEditor]imageMapBlock:', itemMapBlockContainer.currentMapBlock.imageMapBlock.source);
@@ -1465,13 +1465,11 @@ Item {
                                 //y: canvasMapContainer.pointScaleCenterPos.y
                             }
                             /*xScale:
-                                rootWindow.width / Global.frameConfig.$sys.windowVirtualSize.width
+                                $window.width / $Global.frameConfig.$sys.windowVirtualSize.width
                             yScale:
-                                rootWindow.height / Global.frameConfig.$sys.windowVirtualSize.height
+                                $window.height / $Global.frameConfig.$sys.windowVirtualSize.height
                             */
                         }
-
-
                     ]
 
 
@@ -1694,6 +1692,12 @@ Item {
                                 ctx.fillStyle = Qt.rgba(1, 0.5, 0.5, 0.6);
                             ctx.fillRect(bx * _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale, by * _private.config.sizeMapBlockSize.height / _private.config.nMapDrawScale, _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale, _private.config.sizeMapBlockSize.height / _private.config.nMapDrawScale);
                         }
+
+
+                        onAvailableChanged: {
+                            console.debug('[MapEditor]canvasBlockSpecial available', available);
+                            rePaint();
+                        }
                     }
 
                     Canvas {
@@ -1712,7 +1716,7 @@ Item {
 
 
 
-                        //重新将 objMapBlockSpecialData 绘制
+                        //重新将 objMapEventsData 绘制
                         function rePaint() {
                             $CommonLibJS.Utils.clearCanvas(canvasEvent);
 
@@ -1759,6 +1763,12 @@ Item {
                             ctx.strokeText(text, (bx + 0.4) * _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale, (by + 0.2 + 0.5) * _private.config.sizeMapBlockSize.height / _private.config.nMapDrawScale, _private.config.sizeMapBlockSize.width / _private.config.nMapDrawScale);
 
                             //console.debug('绘制方块', bx, by, (bx + 0.4), (by + 0.2), (bx + 0.4) * _private.config.sizeMapBlockSize.width);
+                        }
+
+
+                        onAvailableChanged: {
+                            console.debug('[MapEditor]canvasEvent available', available);
+                            rePaint();
                         }
                     }
 
@@ -2258,7 +2268,7 @@ Item {
 
                     }
                     else {
-                        console.debug('objMapBlockSpecialData', objMapBlockSpecialData, parseInt(textMapBlockSpecial.text));
+                        console.debug('[MapEditor]objMapBlockSpecialData', objMapBlockSpecialData, parseInt(textMapBlockSpecial.text));
 
                         //如果已经定义过
                         //if(objMapBlockSpecialData[strIndex] !== undefined)
@@ -2592,7 +2602,7 @@ Item {
                 return;
             }
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
+            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
 
             function fnSave() {
                 if(_private.exportMap(null)) {
@@ -2931,17 +2941,17 @@ Item {
         }
 
         onPainted: {
-            let path = GameMakerGlobal.config.strProjectRootPath +
-                GameMakerGlobal.config.strCurrentProjectName +
-                GameMakerGlobal.separator + '~Cache' +
-                GameMakerGlobal.separator + 'Maps';
+            let path = $GameMakerGlobal.config.strProjectRootPath +
+                $GameMakerGlobal.config.strCurrentProjectName +
+                '/~Cache' +
+                '/Maps';
             //win下，Canvas.save 不支持 file: 开头的路径
             path = path.replace('file:/', '').replace('//', '');
 
             //if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
 
-            canvasExport.save(path + GameMakerGlobal.separator + textMapName.text.trim() + '.png');
+            canvasExport.save(path + '/' + textMapName.text.trim() + '.png');
             //$Frame.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
 
@@ -2970,11 +2980,11 @@ Item {
 
         visualScriptEditor.strTitle: strTitle + '($filename$)'
 
-        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
-        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
+        visualScriptEditor.arrMajorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
-        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandsInfo: $GameVisualScriptJS.fnCommandsInfo()
+        visualScriptEditor.defaultCommandGroupsInfo: $GameVisualScriptJS.fnGroupsInfo()
         visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
@@ -3075,8 +3085,8 @@ Item {
             target: mask    //连同按钮一起缩放，否则只缩放界面
             ////pinch.dragAxis: Pinch.XAndYAxis
             //禁止旋转
-            maximumRotation: 0
-            minimumRotation: 0
+            //maximumRotation: 0
+            //minimumRotation: 0
         }
 
         onSg_close: function() {
@@ -3232,7 +3242,7 @@ Item {
             //导入图块文件（目前一张）
             //console.debug(cfg.MapBlockImage[0], typeof(cfg.MapBlockImage[0]) )
             root.arrMapBlockImageURL = cfg.MapBlockImage;
-            imageMapBlock1.source = GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
+            imageMapBlock1.source = $GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
 
 
             canvasMapBlock1.loadImage(imageMapBlock1.source);
@@ -3256,11 +3266,11 @@ Item {
                 return;
             }
 
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator;
+            //let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + mapRID + '/';
             //if($Frame.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
             scriptEditor.init({
-                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + mapRID + GameMakerGlobal.separator,
+                BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + mapRID + '/',
                 RelativePath: 'map.js',
                 ChoiceButton: 0b11,
                 PathText: 0b11,
@@ -3347,16 +3357,16 @@ Item {
             if(_private.strRoleRID === '') {
             }*/
 
-            let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
-            let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'map.js', 0);
+            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
+            let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0);
         }
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
             if(_private.strMapRID !== '' && textMapRID.text !== '' && _private.strMapRID !== textMapRID.text) {
-                let oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + _private.strMapRID + GameMakerGlobal.separator + 'map.vjs';
+                let oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + _private.strMapRID + '/map.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    let newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text + GameMakerGlobal.separator + 'map.vjs';
+                    let newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text + '/map.vjs';
                     let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3367,7 +3377,7 @@ Item {
             if(textMapRID.text.length === 0 || textMapName.text.length === 0)
                 return false;
 
-            let newPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + textMapRID.text;
+            let newPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
 
             //if(!$Frame.sl_dirExists(newPath))
                 $Frame.sl_dirCreate(newPath);
@@ -3427,8 +3437,8 @@ Item {
             }
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
-            //let ret = File.write(path + GameMakerGlobal.separator + 'map.json', JSON.stringify(outputData));
-            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), newPath + GameMakerGlobal.separator + 'map.json', 0);
+            //let ret = File.write(path + '/map.json', JSON.stringify(outputData));
+            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), newPath + '/map.json', 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 
@@ -3437,7 +3447,7 @@ Item {
             copyVJS();
 
 
-            console.debug('[MapEditor]exportMap ret:', ret, newPath + GameMakerGlobal.separator + 'map.json');
+            console.debug('[MapEditor]exportMap ret:', ret, newPath + '/map.json');
             console.debug('[MapEditor]exportMap:', JSON.stringify(outputData));
             //console.debug('[MapEditor]exportMap objEventsData:', JSON.stringify(objEventsData));
 

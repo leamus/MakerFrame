@@ -197,7 +197,7 @@ Item {
         let data;
         if(fightScriptData) {
 
-            let filePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + 'fight_script.json');
+            let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + fightScript + '/fight_script.json');
             //let data = File.read(filePath);
             //console.debug('[GameFightScript]filePath：', filePath);
 
@@ -213,7 +213,7 @@ Item {
             return;
         */
 
-        //let data = game.loadjson(GameMakerGlobal.config.strFightScriptDirName + GameMakerGlobal.separator + fightScript + GameMakerGlobal.separator + 'fight_script.js');
+        //let data = game.loadjson($GameMakerGlobal.config.strFightScriptDirName + '/' + fightScript + '/fight_script.js');
         //if(!data)
         //    return;
 
@@ -409,7 +409,7 @@ Item {
             //}
 
 
-        //}, 1, rootFightScene], 1, );
+        //}, 1, ], 1, );
 
 
 
@@ -584,8 +584,8 @@ Item {
 
         //换背景图
         readonly property var background: function(image='') {
-            //console.debug('image:::', image, GameMakerGlobal.imageResourceURL(image));
-            imageBackground.source = GameMakerGlobal.imageResourceURL(image);
+            //console.debug('image:::', image, $GameMakerGlobal.imageResourceURL(image));
+            imageBackground.source = $GameMakerGlobal.imageResourceURL(image);
         }
 
         readonly property var runaway: function(value=null) {
@@ -777,7 +777,7 @@ Item {
                             //开始运行
                             //_private.scriptQueueFighting.run();
                             _private.genFighting.next();
-                        }, 1, rootFightScene, 'fight.continueFight'], delay, );
+                        }, 1, 'fight.continueFight', ], delay, );
 
                     }, Tips: 'continueFight'});
                     */
@@ -1065,7 +1065,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: 'black'
         //radius: 9
     }
@@ -1980,7 +1980,7 @@ Item {
         Mask {
             anchors.fill: parent
             //opacity: 0
-            //color: Global.style.backgroundColor
+            //color: $Global.style.backgroundColor
             color: '#10000000'
             //radius: 9
 
@@ -2039,7 +2039,7 @@ Item {
 
     //战场上的调试按钮
     Row {
-        visible: GameMakerGlobal.config.bDebug
+        visible: $GameMakerGlobal.config.bDebug
 
         ColorButton {
             text: '调试'
@@ -2203,7 +2203,7 @@ Item {
     }
 
     Connections {
-        target: rootWindow
+        target: $mainWindow
         //忽略没有的信号
         ignoreUnknownSignals: true
 
@@ -2246,18 +2246,19 @@ Item {
         */
 
 
-        $Frame.sl_globalObject().fight = fight;
+        //$Frame.sl_globalObject().fight = fight;
 
         console.debug('[FightScene]Component.onCompleted');
     }
 
     Component.onDestruction: {
 
-        //鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
+        /*/鹰：有可能多次创建GameScene，所以要删除最后一次赋值的（比如热重载地图测试时，不过已经解决了）；
         if($Frame.sl_globalObject().fight === fight)
             delete $Frame.sl_globalObject().fight;
         else
             console.warn('[!FightScene]fight被多次创建？');
+        */
 
         console.debug('[FightScene]Component.onDestruction');
     }

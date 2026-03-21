@@ -35,7 +35,7 @@ Item {
     function init(fightRoleName) {
 
         if(fightRoleName) {
-            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + fightRoleName + GameMakerGlobal.separator + 'fight_role.js';
+            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + fightRoleName + '/fight_role.js';
             const data = $Frame.sl_fileRead(filePath);
 
             if(data) {
@@ -125,8 +125,8 @@ const data = (function() {
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
         const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
-        if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
-        if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
+        if(levelChain && levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
+        if(levelChain && levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }
     */
     //方法2：
@@ -159,14 +159,14 @@ const data = (function() {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -251,7 +251,7 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + _private.strSavedName + '/fight_role.vjs';
 
                     fightRoleVisualEditor.forceActiveFocus();
                     fightRoleVisualEditor.visible = true;
@@ -285,8 +285,8 @@ const data = (function() {
 
             textArea.background: Rectangle {
                 //color: 'transparent'
-                color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
 
@@ -398,16 +398,16 @@ const data = (function() {
                 return false;
             }
 
-            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.js', 0);
+                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_role.vjs';
+                    const oldFilePath = path + '/' + _private.strSavedName + '/fight_role.vjs';
                     if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightRoleName.text + GameMakerGlobal.separator + 'fight_role.vjs', true);
+                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textFightRoleName.text + '/fight_role.vjs', true);
                     }
                 }
 
@@ -417,7 +417,7 @@ const data = (function() {
                 //root.forceActiveFocus();
             }
 
-            if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textFightRoleName.text)) {
+            if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_dirExists(path + '/' + textFightRoleName.text)) {
                 $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

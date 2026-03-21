@@ -55,7 +55,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -136,8 +136,9 @@ Item {
                     const data = [['[选择Buff类型]', '毒(0)','乱(1)','封(2)','眠(3)','攻击(4)','防御(5)','速度(6)','灵力(7)','幸运(8)'],
                                 ['', 0,1,2,3,4,5,6,7,8]];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
@@ -152,11 +153,11 @@ Item {
                                 ttextEffect.visible = true;
                             }
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -182,16 +183,17 @@ Item {
                     const data = [['[Buff效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                 ['', '20','2.0']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -217,16 +219,17 @@ Item {
                     const data = [['[持续回合数]', '2回合','5回合'],
                                 ['', '2','5']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -252,16 +255,17 @@ Item {
                     const data = [['[获得Buff概率]', '50%','100%'],
                                 ['', '0.5','1']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -330,16 +334,17 @@ Item {
                     const data = [['[影响属性]', '一段HP','二段HP','一段MP'],
                                 ['', 'HP, 0','HP, 1','MP, 0']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -365,16 +370,17 @@ Item {
                     const data = [['[效果]', '固定值（整数）：20','倍率（小数）：2.0'],
                                 ['', '20','2.0']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -400,16 +406,17 @@ Item {
                     const data = [['[倍率参考对象]', '本人(0)','对方(1)'],
                                 ['', '0','1']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -435,16 +442,17 @@ Item {
                     const data = [['[倍率参考属性]', '一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力', '一段血（增益后）','二段血（增益后）','三段血（增益后）','一段MP（增益后）','二段MP（增益后）','攻击（增益后）','防御（增益后）','速度（增益后）','幸运（增益后）','灵力（增益后）'],
                                 ['', '$properties.HP,0','$properties.HP,1','$properties.HP,2','$properties.MP,0','$properties.MP,1','$properties.attack','$properties.defense','$properties.speed','$properties.luck','$properties.power', '$$propertiesWithExtra.HP,0','$$propertiesWithExtra.HP,1','$$propertiesWithExtra.HP,2','$$propertiesWithExtra.MP,0','$$propertiesWithExtra.MP,1','$$propertiesWithExtra.attack','$$propertiesWithExtra.defense','$$propertiesWithExtra.speed','$$propertiesWithExtra.luck','$$propertiesWithExtra.power']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -479,7 +487,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -650,18 +658,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -674,10 +683,7 @@ Item {
                             text: 'P'
 
                             onClicked: {
-                                if($GameMakerGlobalJS.loadSpriteEffect(textSkillEffect.text, spriteEffectComp, _private.jsLoader)) {
-                                    spriteEffectComp.start();
-                                    rectSpriteEffectBackground.show();
-                                }
+                                rectSpriteEffectBackground.show(textSkillEffect.text);
                             }
                         }
                     }
@@ -706,16 +712,17 @@ Item {
                             onPressAndHold: {
                                 const data = [['己方(1)', '对方(2)'], ['1', '2']];
 
-                                $list.open({
+                                const list = $showList({
                                     Data: data[0],
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -747,16 +754,17 @@ Item {
                             onPressAndHold: {
                                 const data = [['单体(1)', '全体(-1)'], ['1', '-1']];
 
-                                $list.open({
+                                const list = $showList({
                                     Data: data[0],
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -837,7 +845,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -851,7 +859,7 @@ Item {
 
                                 text: '*@Buff类型'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -859,7 +867,7 @@ Item {
 
                                 text: '*@Buff效果'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -867,7 +875,7 @@ Item {
 
                                 text: '*@持续回合数'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -875,7 +883,7 @@ Item {
 
                                 text: '*@概率'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -912,7 +920,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -926,7 +934,7 @@ Item {
 
                                 text: '*@影响属性'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -934,7 +942,7 @@ Item {
 
                                 text: '*@效果值'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -942,7 +950,7 @@ Item {
 
                                 text: '*@倍率参考对象'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -950,7 +958,7 @@ Item {
 
                                 text: '*@倍率参考属性'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -1127,18 +1135,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -1168,18 +1177,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+                                let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -1317,11 +1327,10 @@ Item {
 注意：
   1、必须点击 编译 才可以使用；
   2、注意代码格式的符号必须是英文半角，中文或全角会报错；
-'
-                )}
+')
+                }
             }
         }
-
     }
 
 
@@ -1329,11 +1338,36 @@ Item {
     Rectangle {
         id: rectSpriteEffectBackground
 
-        function show() {
-            rectSpriteEffectBackground.visible = true;
+        function show(spriteName) {
+            _private.jsLoader.clear();
+            if($GameMakerGlobalJS.getSpriteEffect(spriteName, spriteEffectComp, {Loops: AnimatedSprite.Infinite}, _private.jsLoader)) {
+                spriteEffectComp.start();
+
+
+                rectSpriteEffectBackground.visible = true;
+                //focus = true;
+                forceActiveFocus();
+            }
+            else
+                $dialog.show({
+                    Msg: '不存在：' + spriteName,
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        //root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        $dialog.close();
+                        //root.forceActiveFocus();
+                    },*/
+                });
         }
         function close() {
             spriteEffectComp.stop();
+
+
             rectSpriteEffectBackground.visible = false;
             //root.focus = true;
             root.forceActiveFocus();
@@ -1855,7 +1889,7 @@ Item {
             return [true, data, null];
         }
 
-        function compileAndShowResult() {
+        function compileAndShowResult(showSuccess=true) {
             const result = _private.compile(true);
             let errorMsg;
 
@@ -1872,9 +1906,9 @@ Item {
                 errorMsg = '错误：' + result[2].toString() + '<BR>请检查各参数';
             }
 
-            if(errorMsg)
+            if(showSuccess || errorMsg)
                 $dialog.show({
-                    Msg: errorMsg,
+                    Msg: errorMsg ?? '编译完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //root.forceActiveFocus();
@@ -1901,7 +1935,7 @@ Item {
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    const result = _private.compileAndShowResult();
+                    const result = _private.compileAndShowResult(false);
                     if(result[0] === false)
                         return;
 

@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrMusic = $Frame.sl_dirList(GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrMusic = $Frame.sl_dirList($GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainMusicEditor]_private.arrMusic', JSON.stringify(_private.arrMusic))
         _private.refresh();
     }
@@ -52,14 +52,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -73,8 +73,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            color: Global.style.backgroundColor
-            colorText: Global.style.primaryTextColor
+            color: $Global.style.backgroundColor
+            colorText: $Global.style.primaryTextColor
 
             bHighLightSelected: true
 
@@ -107,7 +107,7 @@ Item {
                     OnAccepted: function() {
                         //root.forceActiveFocus();
 
-                        $Frame.sl_fileDelete(GameMakerGlobal.musicResourcePath(item));
+                        $Frame.sl_fileDelete($GameMakerGlobal.musicResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -222,10 +222,10 @@ Item {
                                 //$dialog.forceActiveFocus();
                             }
                             else {
-                                let ret = $Frame.sl_fileRename(GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename($GameMakerGlobal.musicResourcePath(oldFileName), $GameMakerGlobal.musicResourcePath(newFileName));
                                 if(ret <= 0) {
                                     $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
-                                    console.error('[!mainMusicEditor]RenameFile ERROR:', GameMakerGlobal.musicResourcePath(oldFileName), GameMakerGlobal.musicResourcePath(newFileName));
+                                    console.error('[!mainMusicEditor]RenameFile ERROR:', $GameMakerGlobal.musicResourcePath(oldFileName), $GameMakerGlobal.musicResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -334,10 +334,10 @@ Item {
                         //$dialog.forceActiveFocus();
                     }
                     else {
-                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), $GameMakerGlobal.musicResourcePath(newFileName), true);
                         if(ret <= 0) {
                             $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainMusicEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.musicResourcePath(newFileName));
+                            console.error('[!mainMusicEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), $GameMakerGlobal.musicResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -375,7 +375,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrMusic = listview.show(GameMakerGlobal.musicResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrMusic = listview.show($GameMakerGlobal.musicResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrMusic.length === 0)
                 listview.listview.currentIndex = -1;
@@ -394,7 +394,7 @@ Item {
         }
 
         function playOrPause() {
-            mediaPlayer.source = GameMakerGlobal.musicResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);    //arrMusic[listview.listview.model.get(listview.listview.currentIndex).Index]
+            mediaPlayer.source = $GameMakerGlobal.musicResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);    //arrMusic[listview.listview.model.get(listview.listview.currentIndex).Index]
             if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                 mediaPlayer.pause();
             else
@@ -403,8 +403,8 @@ Item {
             sliderMusic.forceActiveFocus();
 
             //console.debug('mediaPlayer:', textMusicName.text, mediaPlayer.source);
-            //console.debug('resolve:', Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl(GameMakerGlobal.musicResourcePath(textMusicName.text)))
-            //console.debug('file:', GameMakerGlobal.musicResourceURL(textMusicName.text), $Frame.sl_fileExists(GameMakerGlobal.musicResourcePath(textMusicName.text)));
+            //console.debug('resolve:', Qt.resolvedUrl(textMusicName.text), Qt.resolvedUrl($GameMakerGlobal.musicResourcePath(textMusicName.text)))
+            //console.debug('file:', $GameMakerGlobal.musicResourceURL(textMusicName.text), $Frame.sl_fileExists($GameMakerGlobal.musicResourcePath(textMusicName.text)));
         }
     }
 

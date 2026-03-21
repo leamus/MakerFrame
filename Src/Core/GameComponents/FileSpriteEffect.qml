@@ -240,13 +240,13 @@ Item {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
             //$CommonLibJS.runNextEventLoop([refreshToResolveBug,'refreshToResolveBug']);
-            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, root, 'refreshToResolveBug'], 1);
+            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, 'refreshToResolveBug', ], 1);
         }
         onHeightChanged: {
             refreshToResolveBug();
             //Qt.callLater(refreshToResolveBug);
             //$CommonLibJS.runNextEventLoop([refreshToResolveBug,'refreshToResolveBug']);
-            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, root, 'refreshToResolveBug'], 1);
+            //$CommonLibJS.setTimeout([refreshToResolveBug, 1, 'refreshToResolveBug', ], 1);
         }
 
         //anchors.horizontalCenter: parent.horizontalCenter
@@ -456,7 +456,7 @@ Item {
 
         onTriggered: {
             if(nType === 1) {
-                soundeffect.source = GameMakerGlobal.soundResourceURL(root.strSoundeffectName);
+                soundeffect.source = $GameMakerGlobal.soundResourceURL(root.strSoundeffectName);
                 soundeffect.play();
             }
             else

@@ -21,7 +21,7 @@ import './Core'
 import 'Core/GameComponents'
 
 
-import 'GameVisualScript.js' as GameVisualScriptJS
+//import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -66,27 +66,27 @@ Item {
 
         textRoleImageURL.text = '';
         textRoleImageResourceName.text = '';
-//        textRoleFrameWidth.text = cfg.FrameSize[0].toString();
-//        textRoleFrameHeight.text = cfg.FrameSize[1].toString();
-//        textRoleFrameCount.text = cfg.FrameCount.toString();
+//        textRoleFrameWidth.text = info.FrameSize[0].toString();
+//        textRoleFrameHeight.text = info.FrameSize[1].toString();
+//        textRoleFrameCount.text = info.FrameCount.toString();
 
-//        textRoleUpIndexX.text = cfg.FrameIndex[0][0].toString();
-//        textRoleUpIndexY.text = cfg.FrameIndex[0][1].toString();
-//        textRoleRightIndexX.text = cfg.FrameIndex[1][0].toString();
-//        textRoleRightIndexY.text = cfg.FrameIndex[1][1].toString();
-//        textRoleDownIndexX.text = cfg.FrameIndex[2][0].toString();
-//        textRoleDownIndexY.text = cfg.FrameIndex[2][1].toString();
-//        textRoleLeftIndexX.text = cfg.FrameIndex[3][0].toString();
-//        textRoleLeftIndexY.text = cfg.FrameIndex[3][1].toString();
+//        textRoleUpIndexX.text = info.FrameInfo[0][0].toString();
+//        textRoleUpIndexY.text = info.FrameInfo[0][1].toString();
+//        textRoleRightIndexX.text = info.FrameInfo[1][0].toString();
+//        textRoleRightIndexY.text = info.FrameInfo[1][1].toString();
+//        textRoleDownIndexX.text = info.FrameInfo[2][0].toString();
+//        textRoleDownIndexY.text = info.FrameInfo[2][1].toString();
+//        textRoleLeftIndexX.text = info.FrameInfo[3][0].toString();
+//        textRoleLeftIndexY.text = info.FrameInfo[3][1].toString();
 
-//        textRoleFrameInterval.text = cfg.FrameInterval.toString();
-//        textRoleWidth.text = cfg.RoleSize[0].toString();
-//        textRoleHeight.text = cfg.RoleSize[1].toString();
-//        textRoleRealX.text = cfg.RealOffset[0].toString();
-//        textRoleRealY.text = cfg.RealOffset[1].toString();
-//        textRoleRealWidth.text = cfg.RealSize[0].toString();
-//        textRoleRealHeight.text = cfg.RealSize[1].toString();
-//        textRoleSpeed.text = cfg.MoveSpeed.toString();
+//        textRoleFrameInterval.text = info.FrameInterval.toString();
+//        textRoleWidth.text = info.RoleSize[0].toString();
+//        textRoleHeight.text = info.RoleSize[1].toString();
+//        textRoleRealX.text = info.RealOffset[0].toString();
+//        textRoleRealY.text = info.RealOffset[1].toString();
+//        textRoleRealWidth.text = info.RealSize[0].toString();
+//        textRoleRealHeight.text = info.RealSize[1].toString();
+//        textRoleSpeed.text = info.MoveSpeed.toString();
 
         _private.refreshRole();
 
@@ -95,80 +95,90 @@ Item {
     }
 
 
-    function openRole(cfg, roleRID) {
+    function openRole(roleRID) {
+        const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/role.json';
 
-        console.debug('[RoleEditor]openRole:', JSON.stringify(cfg));
+        let info = $Frame.sl_fileRead(filePath);
+        //let info = File.read(filePath);
+        if(!info)
+            return false;
+        info = JSON.parse(info);
 
-        //cfg.Version;
-        //cfg.RoleType;
+        console.debug('[RoleEditor]openRole:', roleRID, info/*, JSON.stringify(info)*/);
+
+        //info.Version;
+        //info.RoleType;
         _private.strRoleRID = textRoleRID.text = roleRID;
 
-        textRoleRealX.text = cfg.RealOffset[0].toString();
-        textRoleRealY.text = cfg.RealOffset[1].toString();
-        textRoleRealWidth.text = cfg.RealSize[0].toString();
-        textRoleRealHeight.text = cfg.RealSize[1].toString();
-        textRoleShadowOpacity.text = cfg.ShadowOpacity !== undefined ? cfg.ShadowOpacity.toString() : '0.3';
+        textRoleRealX.text = info.RealOffset[0].toString();
+        textRoleRealY.text = info.RealOffset[1].toString();
+        textRoleRealWidth.text = info.RealSize[0].toString();
+        textRoleRealHeight.text = info.RealSize[1].toString();
+        textRoleShadowOpacity.text = info.ShadowOpacity !== undefined ? info.ShadowOpacity.toString() : '0.3';
 
-        textRoleSpeed.text = cfg.MoveSpeed !== undefined ? cfg.MoveSpeed.toString() : '0.1';
-        //checkboxPenetrate.checked = !!cfg.Penetrate ?? false;
-        textPenetrate.text = cfg.Penetrate !== undefined ? cfg.Penetrate.toString() : '0';
-        textRoleName.text = cfg.RoleName ?? roleRID ?? '';
-        checkboxShowName.checked = !!cfg.ShowName ?? true;
-        textAvatar.text = cfg.Avatar !== undefined ? cfg.Avatar.toString() : '';
-        textAvatarWidth.text = (cfg.AvatarSize && cfg.AvatarSize[0] !== undefined ? cfg.AvatarSize[0].toString() : '60');
-        textAvatarHeight.text = (cfg.AvatarSize && cfg.AvatarSize[1] !== undefined ? cfg.AvatarSize[1].toString() : '60');
+        textRoleSpeed.text = info.MoveSpeed !== undefined ? info.MoveSpeed.toString() : '0.1';
+        //checkboxPenetrate.checked = !!info.Penetrate ?? false;
+        textPenetrate.text = info.Penetrate !== undefined ? info.Penetrate.toString() : '0';
+        textRoleName.text = info.RoleName ?? roleRID ?? '';
+        checkboxShowName.checked = !!info.ShowName ?? true;
+        textAvatar.text = info.Avatar !== undefined ? info.Avatar.toString() : '';
+        textAvatarWidth.text = (info.AvatarSize && info.AvatarSize[0] !== undefined ? info.AvatarSize[0].toString() : '60');
+        textAvatarHeight.text = (info.AvatarSize && info.AvatarSize[1] !== undefined ? info.AvatarSize[1].toString() : '60');
 
-        switch(cfg.SpriteType ?? 1) {
+        switch(info.SpriteType ?? 1) {
         case 0:
             comboType.currentIndex = 2;
             break;
         case 1:
         case 2:
         default:
-            comboType.currentIndex = (cfg.SpriteType ?? 1) - 1;
+            comboType.currentIndex = (info.SpriteType ?? 1) - 1;
             break;
         }
 
 
         if(comboType.currentIndex === 0) {
-            //textRoleImageURL.text = cfg.Image;
+            //textRoleImageURL.text = info.Image;
             //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
-            textRoleImageResourceName.text = cfg.Image;
-            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
+            textRoleImageResourceName.text = info.Image;
+            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(info.Image);
 
-            textRoleFrameWidth.text = cfg.FrameSize[0].toString();
-            textRoleFrameHeight.text = cfg.FrameSize[1].toString();
-            textRoleFrameCount.text = cfg.FrameCount.toString();
+            //！！！兼容旧代码
+            const frameInfo = info.FrameInfo ?? info;
+            textRoleFrameWidth.text = frameInfo.FrameSize[0].toString();
+            textRoleFrameHeight.text = frameInfo.FrameSize[1].toString();
+            textRoleFrameCount.text = frameInfo.FrameCount.toString();
 
-            textRoleFrameInterval.text = cfg.FrameInterval.toString();
+            textRoleFrameInterval.text = frameInfo.FrameInterval.toString();
             //role.width = parseInt(textRoleWidth.text);
             //role.height = parseInt(textRoleHeight.text);
 
-            textRoleXOffset.text = (cfg.RoleOffset && cfg.RoleOffset[0]) ? cfg.RoleOffset[0].toString() : '0';
-            textRoleYOffset.text = (cfg.RoleOffset && cfg.RoleOffset[1]) ? cfg.RoleOffset[1].toString() : '0';
-            textRoleWidth.text = cfg.RoleSize[0].toString();
-            textRoleHeight.text = cfg.RoleSize[1].toString();
-            textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
-            textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
+            textRoleXOffset.text = (info.RoleOffset && info.RoleOffset[0]) ? info.RoleOffset[0].toString() : '0';
+            textRoleYOffset.text = (info.RoleOffset && info.RoleOffset[1]) ? info.RoleOffset[1].toString() : '0';
+            textRoleWidth.text = info.RoleSize[0].toString();
+            textRoleHeight.text = info.RoleSize[1].toString();
+            textRoleFrameXScale.text = ((info.Scale && info.Scale[0] !== undefined) ? info.Scale[0].toString() : '1');
+            textRoleFrameYScale.text = ((info.Scale && info.Scale[1] !== undefined) ? info.Scale[1].toString() : '1');
 
-            //textRoleFangXiangIndex.text = cfg.FrameIndex.toString();
-            textRoleUpIndexX.text = cfg.FrameIndex[0][0].toString();
-            textRoleUpIndexY.text = cfg.FrameIndex[0][1].toString();
-            textRoleRightIndexX.text = cfg.FrameIndex[1][0].toString();
-            textRoleRightIndexY.text = cfg.FrameIndex[1][1].toString();
-            textRoleDownIndexX.text = cfg.FrameIndex[2][0].toString();
-            textRoleDownIndexY.text = cfg.FrameIndex[2][1].toString();
-            textRoleLeftIndexX.text = cfg.FrameIndex[3][0].toString();
-            textRoleLeftIndexY.text = cfg.FrameIndex[3][1].toString();
+            const frameIndex = frameInfo.FrameIndex;
+            //textRoleFangXiangIndex.text = frameIndex.toString();
+            textRoleUpIndexX.text = frameIndex[0][0].toString();
+            textRoleUpIndexY.text = frameIndex[0][1].toString();
+            textRoleRightIndexX.text = frameIndex[1][0].toString();
+            textRoleRightIndexY.text = frameIndex[1][1].toString();
+            textRoleDownIndexX.text = frameIndex[2][0].toString();
+            textRoleDownIndexY.text = frameIndex[2][1].toString();
+            textRoleLeftIndexX.text = frameIndex[3][0].toString();
+            textRoleLeftIndexY.text = frameIndex[3][1].toString();
         }
         else if(comboType.currentIndex === 1) {
-            //textRoleImageURL.text = cfg.Image;
+            //textRoleImageURL.text = info.Image;
             //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
-            textRoleImageResourceName.text = cfg.Image;
-            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(cfg.Image);
+            textRoleImageResourceName.text = info.Image;
+            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(info.Image);
 
-
-            for(let tt in cfg.FrameIndex) {
+            const frameInfo = info.FrameInfo ?? info.FrameIndex; //兼容旧代码！！！
+            for(let tt in frameInfo) {
                 let tObj;
                 if(tt === '$Up') {
                     tObj = layoutAction1.arrCacheComponent[0];
@@ -188,23 +198,23 @@ Item {
                 }
 
                 tObj.arrComps[0].text = tt;
-                tObj.arrComps[1].text = cfg.FrameIndex[tt][0];
-                tObj.arrComps[2].text = cfg.FrameIndex[tt][1];
-                tObj.arrComps[3].text = cfg.FrameIndex[tt][2];
+                tObj.arrComps[1].text = frameInfo[tt][0];
+                tObj.arrComps[2].text = frameInfo[tt][1];
+                tObj.arrComps[3].text = frameInfo[tt][2];
             }
 
 
-            textRoleXOffset.text = (cfg.RoleOffset && cfg.RoleOffset[0]) ? cfg.RoleOffset[0].toString() : '0';
-            textRoleYOffset.text = (cfg.RoleOffset && cfg.RoleOffset[1]) ? cfg.RoleOffset[1].toString() : '0';
-            textRoleWidth.text = cfg.RoleSize[0].toString();
-            textRoleHeight.text = cfg.RoleSize[1].toString();
-            textRoleFrameXScale.text = ((cfg.Scale && cfg.Scale[0] !== undefined) ? cfg.Scale[0].toString() : '1');
-            textRoleFrameYScale.text = ((cfg.Scale && cfg.Scale[1] !== undefined) ? cfg.Scale[1].toString() : '1');
+            textRoleXOffset.text = (info.RoleOffset && info.RoleOffset[0]) ? info.RoleOffset[0].toString() : '0';
+            textRoleYOffset.text = (info.RoleOffset && info.RoleOffset[1]) ? info.RoleOffset[1].toString() : '0';
+            textRoleWidth.text = info.RoleSize[0].toString();
+            textRoleHeight.text = info.RoleSize[1].toString();
+            textRoleFrameXScale.text = ((info.Scale && info.Scale[0] !== undefined) ? info.Scale[0].toString() : '1');
+            textRoleFrameYScale.text = ((info.Scale && info.Scale[1] !== undefined) ? info.Scale[1].toString() : '1');
 
         }
         else if(comboType.currentIndex === 2) {
-
-            for(let tt in cfg.FrameIndex) {
+            const frameInfo = info.FrameInfo ?? info.FrameIndex; //兼容旧代码！！！
+            for(let tt in frameInfo) {
                 let tObj;
                 if(tt === '$Up') {
                     tObj = layoutAction2.arrCacheComponent[0];
@@ -224,7 +234,7 @@ Item {
                 }
 
                 tObj.arrComps[0].text = tt;
-                tObj.arrComps[1].text = cfg.FrameIndex[tt][0];
+                tObj.arrComps[1].text = frameInfo[tt][0];
             }
         }
 
@@ -243,7 +253,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -310,18 +320,19 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                        const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
 
-                        $list.open({
+                        const list = $showList({
                             Data: path,
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -529,7 +540,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -810,18 +821,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.imageResourcePath();
+                                const path = $GameMakerGlobal.imageResourcePath();
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -903,7 +915,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: `<font color="${Global.style.color(Global.style.Red)}"><b>[影子]</b></font>`
+                            text: `<font color="${$Global.style.color($Global.style.Red)}"><b>[影子]</b></font>`
                             font.pointSize: _private.config.nLabelFontSize
                         }
                     }
@@ -1083,7 +1095,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                             //Layout.preferredHeight: 10
 
-                            text: `<font color="${Global.style.color(Global.style.Red)}"><b>[角色]</b></font>`
+                            text: `<font color="${$Global.style.color($Global.style.Red)}"><b>[角色]</b></font>`
                             font.pointSize: _private.config.nLabelFontSize
                         }
 
@@ -1315,7 +1327,7 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter// | Qt.AlignTop
                                 //Layout.preferredHeight: 10
 
-                                text: `<font color="${Global.style.color(Global.style.Red)}"><b>[帧]</b></font>`
+                                text: `<font color="${$Global.style.color($Global.style.Red)}"><b>[帧]</b></font>`
                                 font.pointSize: _private.config.nLabelFontSize
                             }
                         }
@@ -1740,7 +1752,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -1754,7 +1766,7 @@ Item {
 
                                 text: '*动作名'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1762,7 +1774,7 @@ Item {
 
                                 text: '*@特效名'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -1804,7 +1816,7 @@ Item {
 
                             //_private.loadScript(textRoleRID.text);
                             if(!scriptEditor.text &&
-                                    !$Frame.sl_fileExists(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js')) {
+                                    !$Frame.sl_fileExists($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.js')) {
                                 if(comboType.currentIndex === 1)
                                     scriptEditor.text = _private.strTemplateCode0;
                                 else
@@ -1852,7 +1864,7 @@ Item {
                                     $CommonLibJS.setTimeout([function() {
                                         if(flickable.contentHeight > flickable.height)
                                             flickable.contentY = flickable.contentHeight - flickable.height;
-                                        }, 1, root, ''], 1);
+                                        }, 1, '', ], 1);
 
                                 }
                             }
@@ -1867,7 +1879,7 @@ Item {
 
                                 text: '*动作名'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1875,7 +1887,7 @@ Item {
 
                                 text: '*起始序号'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1883,7 +1895,7 @@ Item {
 
                                 text: '*帧数'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -1891,7 +1903,7 @@ Item {
 
                                 text: '*帧速度'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -2002,6 +2014,9 @@ Item {
                 Role {
                     id: role
 
+                    property var $info: null //json文件
+                    property var $script: null //js脚本
+
                     //anchors.fill: parent
 
                     //width: 37;
@@ -2009,7 +2024,7 @@ Item {
 
                     //sizeFrame: Qt.size(37, 58);
                     /*nFrameCount: 3;
-                    objActionsData: [3,2,1,0];
+                    objActionsInfo: [3,2,1,0];
                     interval: 100;
                     width: 37;
                     height: 58;
@@ -2055,6 +2070,30 @@ Item {
                         wrapMode: Text.NoWrap
                     }
 
+                    sprite.onSg_started: {
+                        if($script && $script['$action_start'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_start'].call(role, strActionName, role) ?? null, '']);
+                    }
+                    sprite.onSg_refreshed: {
+                        if($script && $script['$action_refresh'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_refresh'].call(role, strActionName, role) ?? null, '']);
+                    }
+                    sprite.onSg_looped: {
+                        if($script && $script['$action_loop'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_loop'].call(role, strActionName, role) ?? null, '']);
+                    }
+                    sprite.onSg_finished: {
+                        if($script && $script['$action_finish'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_finish'].call(role, strActionName, role) ?? null, '']);
+                    }
+                    sprite.onSg_paused: {
+                        if($script && $script['$action_pause'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_pause'].call(role, strActionName, role) ?? null, '']);
+                    }
+                    sprite.onSg_stoped: {
+                        if($script && $script['$action_stop'])
+                            $CommonLibJS.$asyncScript.async([$script['$action_stop'].call(role, strActionName, role) ?? null, '']);
+                    }
                 }
             }
 
@@ -2074,9 +2113,9 @@ Item {
                 source: {
                     if(textAvatar.text.length === 0)
                         return '';
-                    if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                    if(!$Frame.sl_fileExists($GameMakerGlobal.imageResourcePath(textAvatar.text)))
                         return '';
-                    return GameMakerGlobal.imageResourceURL(textAvatar.text);
+                    return $GameMakerGlobal.imageResourceURL(textAvatar.text);
                 }
             }
 
@@ -2234,11 +2273,11 @@ Item {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
-        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
+        visualScriptEditor.arrMajorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
-        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandsInfo: $GameVisualScriptJS.fnCommandsInfo()
+        visualScriptEditor.defaultCommandGroupsInfo: $GameVisualScriptJS.fnGroupsInfo()
         visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 
@@ -2399,7 +2438,7 @@ Item {
                     onClicked: {
                         //dialogRoleData.nChoiceType = 2;
 
-                        const path = GameMakerGlobal.spriteResourcePath();
+                        const path = $GameMakerGlobal.spriteResourcePath();
 
                         if(comboType.currentIndex === 0)
                             l_listRoleResource.show(path, [], 0x002, 0x00);
@@ -2450,7 +2489,7 @@ Item {
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
+                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), $GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
@@ -2470,7 +2509,7 @@ Item {
             }
 
             //textRoleImageURL.text = textRoleImageResourceName.text;
-            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(textRoleImageResourceName.text);
+            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(textRoleImageResourceName.text);
 
 
             if(comboType.currentIndex === 0) {
@@ -2572,14 +2611,14 @@ Item {
         //width: parent.width
         //height: parent.height
 
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
+        color: $Global.style.backgroundColor
+        colorText: $Global.style.primaryTextColor
 
         //removeButtonVisible: false
 
 
         onSg_clicked: {
-            textRoleImageURL.text = GameMakerGlobal.spriteResourceURL(item);
+            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(item);
             textRoleImageResourceName.text = item;
 
             textRoleImageURL.enabled = false;
@@ -2615,7 +2654,7 @@ Item {
         }
 
         onSg_removeClicked: {
-            const filepath = GameMakerGlobal.spriteResourcePath(item);
+            const filepath = $GameMakerGlobal.spriteResourcePath(item);
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -2658,7 +2697,7 @@ Item {
                 return;
             }
 
-            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
+            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text;
 
             function fnSave() {
                 if(_private.exportRole()) {
@@ -2811,7 +2850,7 @@ Item {
 
         anchors.fill: parent
 
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
 
         Image {
@@ -2854,7 +2893,7 @@ Item {
         property string strTextBackupRoleImageURL
         property string strTextBackupRoleImageResourceName
 
-        property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
+        property var jsLoader: new $CommonLibJS.JSLoader(root, (...params)=>Qt.createQmlObject(...params))
 
         property string strTemplateCode0: `
 //保存坐标偏移数据
@@ -2864,7 +2903,7 @@ let imageFixPositions;
 function $refresh(index, imageAnimate, path) {
     if(imageFixPositions === undefined) {
         //读取坐标偏移文件并保存
-        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(path) + GameMakerGlobal.separator + 'x.txt');
+        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(path) + '/x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
@@ -2872,7 +2911,7 @@ function $refresh(index, imageAnimate, path) {
     }
 
     //设置图片路径（注意图片名字的生成，默认是 index序号+1，保留5位不足的补0，格式为png），请自行按需修改；
-    imageAnimate.source = path + GameMakerGlobal.separator + String(index+1).padStart(5, '0') + '.png';
+    imageAnimate.source = path + '/' + String(index+1).padStart(5, '0') + '.png';
     //从坐标偏移数据中读取坐标偏移并设置（默认index就是行数）；
     let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
     imageAnimate.rXOffset += parseInt(tx);
@@ -2895,64 +2934,25 @@ function $refresh(index, imageAnimate, path) {
 
 
         //刷新
-        function refreshRole() {
-            switch(comboType.currentIndex) {
-            case 2:
-                role.nSpriteType = 0;
-                break;
-            case 0:
-            case 1:
-            default:
-                role.nSpriteType = comboType.currentIndex + 1;
-                break;
-            }
-
-
+        function refreshRole(action=2) {
+            let frameInfo = {};
             if(comboType.currentIndex === 0) {
-                //role.objActionsData = textRoleFangXiangIndex.text.split(',');
-                role.objActionsData = {'$Up': [parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                    '$Right': [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                    '$Down': [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                    '$Left': [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)],
+                //frameIndex = textRoleFangXiangIndex.text.split(',');
+                frameInfo = {OffsetIndex: {'$Up': [parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                        '$Right': [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                        '$Down': [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                        '$Left': [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)],
+                    }, FrameCount: parseInt(textRoleFrameCount.text), FrameInterval: parseInt(textRoleFrameInterval.text),
+                    FrameSize: [parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text)],
                 };
 
-                //注意这个放在 role.sprite.sprite.width 和 role.sprite.sprite.height 之前
-                role.sprite.sprite.sizeFrame = Qt.size(parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text));
-
-
-                role.strSource = textRoleImageURL.text;
-
-                role.nFrameCount = parseInt(textRoleFrameCount.text);
-                role.nInterval = parseInt(textRoleFrameInterval.text);
-
-                role.width = parseInt(textRoleWidth.text);
-                role.height = parseInt(textRoleHeight.text);
                 //role.sprite.sprite.width = parseInt(textRoleWidth.text);
                 //role.sprite.sprite.height = parseInt(textRoleHeight.text);
                 //role.sprite.width = parseInt(textRoleWidth.text);
                 //role.sprite.height = parseInt(textRoleHeight.text);
-                role.rXOffset = parseInt(textRoleXOffset.text);
-                role.rYOffset = parseInt(textRoleYOffset.text);
-                role.rXScale = parseFloat(textRoleFrameXScale.text);
-                role.rYScale = parseFloat(textRoleFrameYScale.text);
 
             }
             else if(comboType.currentIndex === 1) {
-                role.strSource = textRoleImageURL.text;
-
-                role.width = parseInt(textRoleWidth.text);
-                role.height = parseInt(textRoleHeight.text);
-                //role.sprite.sprite.width = parseInt(textRoleWidth.text);
-                //role.sprite.sprite.height = parseInt(textRoleHeight.text);
-                //role.sprite.width = parseInt(textRoleWidth.text);
-                //role.sprite.height = parseInt(textRoleHeight.text);
-                role.rXOffset = parseInt(textRoleXOffset.text);
-                role.rYOffset = parseInt(textRoleYOffset.text);
-                role.rXScale = parseFloat(textRoleFrameXScale.text);
-                role.rYScale = parseFloat(textRoleFrameYScale.text);
-
-
-                role.objActionsData = {};
                 const actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
                 const frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
                 const frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
@@ -2960,49 +2960,32 @@ function $refresh(index, imageAnimate, path) {
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
-                        role.objActionsData[actionNames[tt].text.trim()] = [
+                        frameInfo[actionNames[tt].text.trim()] = [
                             parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
                         ];
                     else {
+                        textDialogMsg.text = '有必填项没填';
                         return false;
                     }
                 }
 
-
-                const jsPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
-                if($Frame.sl_fileExists(jsPath)) {
-                    _private.jsLoader.clear();
-                    const ts = _private.jsLoader.load($GlobalJS.toURL(jsPath));
-                    role.sprite.sprite.fnRefresh = ts.$refresh;
-                }
+                //role.sprite.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.sprite.height = parseInt(textRoleHeight.text);
+                //role.sprite.width = parseInt(textRoleWidth.text);
+                //role.sprite.height = parseInt(textRoleHeight.text);
             }
             else if(comboType.currentIndex === 2) {
                 //role.implicitWidth = parseInt(textRoleWidth.text);
                 //role.implicitHeight = parseInt(textRoleHeight.text);
 
-                role.objActionsData = {};
                 const actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
                 const SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim()) {
-                        //role.objActionsData[actionNames[tt].text.trim()] = [
-                        //    SpriteNames[tt].text.trim()
-                        //];
-
-                        const spritePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + SpriteNames[tt].text.trim();
-                        let info = $Frame.sl_fileRead($GlobalJS.toPath(spritePath + GameMakerGlobal.separator + 'sprite.json'));
-                        if(info)
-                            info = JSON.parse(info);
-                        //else
-                        //    return false;
-
-                        let ts = null;
-                        if($Frame.sl_fileExists(spritePath + GameMakerGlobal.separator + 'sprite.js')) {
-                            //_private.jsLoader.clear();
-                            ts = _private.jsLoader.load($GlobalJS.toURL(spritePath + GameMakerGlobal.separator + 'sprite.js'));
-                        }
-                        role.objActionsData[actionNames[tt].text.trim()] = {Info: info, Script: ts};
+                        frameInfo[actionNames[tt].text.trim()] = [
+                            SpriteNames[tt].text.trim()
+                        ];
                     }
                     else {
                         textDialogMsg.text = '有必填项没填';
@@ -3011,11 +2994,20 @@ function $refresh(index, imageAnimate, path) {
                 }
             }
 
-            role.x1 = parseInt(textRoleRealX.text);
-            role.y1 = parseInt(textRoleRealY.text);
-            role.width1 = parseInt(textRoleRealWidth.text);
-            role.height1 = parseInt(textRoleRealHeight.text);
-            role.rectShadow.opacity = parseFloat(textRoleShadowOpacity.text);
+            _private.jsLoader.clear();
+            $GameMakerGlobalJS.createRole({
+                SpriteType: comboType.currentIndex === 2 ? 0 : comboType.currentIndex + 1,
+                FrameInfo: frameInfo,
+                RoleSize: [parseInt(textRoleWidth.text), parseInt(textRoleHeight.text)],
+                RoleOffset: [parseInt(textRoleXOffset.text), parseInt(textRoleYOffset.text)],
+                Scale: [parseFloat(textRoleFrameXScale.text), parseFloat(textRoleFrameYScale.text)],
+                Image: textRoleImageResourceName.text,
+                RealOffset: [parseInt(textRoleRealX.text), parseInt(textRoleRealY.text)],
+                RealSize: [parseInt(textRoleRealWidth.text), parseInt(textRoleRealHeight.text)],
+                ShadowOpacity: parseFloat(textRoleShadowOpacity.text),
+                Script: _private.strRoleRID, //textRoleRID.text,
+            }, role, {}, _private.jsLoader);
+
 
             //role.moveSpeed = parseFloat(textRoleSpeed.text);
 
@@ -3024,11 +3016,11 @@ function $refresh(index, imageAnimate, path) {
             //rectRole.Layout.preferredHeight = rectRole.height = role.sprite.height;
 
 
-            role.reset();
+            role.reset(action);
 
             /*role.sizeFrame = Qt.size(37, 58);
             role.nFrameCount = 3;
-            role.objActionsData = [3,2,1,0];
+            role.objActionsInfo = [3,2,1,0];
             role.interval = 100;
             role.width = 37;
             role.height = 58;
@@ -3050,12 +3042,12 @@ function $refresh(index, imageAnimate, path) {
                 return;
             }
 
-            //const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator;
+            //const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/';
             //if($Frame.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
             scriptEditor.init({
-                BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator,
-                RelativePath: GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator + 'role.js',
+                BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
+                RelativePath: $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/role.js',
                 ChoiceButton: 0b0,
                 PathText: 0b0,
                 RunButton: 0b0,
@@ -3076,13 +3068,13 @@ function $refresh(index, imageAnimate, path) {
                 else
                     scriptEditor.text = '';
 
-                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text;
-                const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + GameMakerGlobal.separator + 'role.js', 0);
+                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text;
+                const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/role.js', 0);
             }
             else if(textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) { //另存为
-                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.js';
+                const oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.js';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.js';
+                    const newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text + '/role.js';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3095,9 +3087,9 @@ function $refresh(index, imageAnimate, path) {
         function copyVJS() {
             //如果路径不为空，且是另存为，则复制vjs文件
             if(_private.strRoleRID !== '' && textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) {
-                const oldFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + _private.strRoleRID + GameMakerGlobal.separator + 'role.vjs';
+                const oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + textRoleRID.text + GameMakerGlobal.separator + 'role.vjs';
+                    const newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text + '/role.vjs';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3115,7 +3107,7 @@ function $refresh(index, imageAnimate, path) {
 
             const roleRID = textRoleRID.text;
             const roleName = textRoleName.text || roleRID;
-            const filepath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + roleRID + GameMakerGlobal.separator + 'role.json';
+            const filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/role.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
@@ -3127,10 +3119,12 @@ function $refresh(index, imageAnimate, path) {
             outputData.RoleType = 1; //角色类型
             //outputData.MapScale = isNaN(parseFloat(textMapScale.text)) ? 1 : parseFloat(textMapScale.text);
             outputData.RoleSize = [role.implicitWidth, role.implicitHeight];
-            outputData.FrameSize = [role.sizeFrame.width, role.sizeFrame.height];
-            outputData.FrameCount = role.nFrameCount;
-            outputData.FrameIndex = role.objActionsData.toString();
-            outputData.FrameInterval = role.interval;
+            outputData.FrameInfo: {
+                FrameSize: [role.sizeFrame.width, role.sizeFrame.height],
+                FrameCount: role.nFrameCount,
+                FrameInterval: role.interval,
+                OffsetIndex: role.objActionsInfo.toString(),
+            }
             outputData.RealOffset = [role.x1, role.y1];
             outputData.RealSize = [role.width1, role.height1];
             outputData.MoveSpeed = role.moveSpeed;
@@ -3168,15 +3162,16 @@ function $refresh(index, imageAnimate, path) {
             if(comboType.currentIndex === 0) {
                 outputData.Image = textRoleImageResourceName.text;
 
-                //outputData.FrameIndex = textRoleFangXiangIndex.text;
-                outputData.FrameIndex = [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
-                                               [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
-                                               [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
-                                               [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]];
-
-                outputData.FrameSize = [parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text)];
-                outputData.FrameCount = parseInt(textRoleFrameCount.text);
-                outputData.FrameInterval = parseInt(textRoleFrameInterval.text);
+                outputData.FrameInfo = {
+                    OffsetIndex: [[parseInt(textRoleUpIndexX.text), parseInt(textRoleUpIndexY.text)],
+                       [parseInt(textRoleRightIndexX.text), parseInt(textRoleRightIndexY.text)],
+                       [parseInt(textRoleDownIndexX.text), parseInt(textRoleDownIndexY.text)],
+                       [parseInt(textRoleLeftIndexX.text), parseInt(textRoleLeftIndexY.text)]],
+                    //textRoleFangXiangIndex.text
+                    FrameSize: [parseInt(textRoleFrameWidth.text), parseInt(textRoleFrameHeight.text)],
+                    FrameCount: parseInt(textRoleFrameCount.text),
+                    FrameInterval: parseInt(textRoleFrameInterval.text),
+                };
 
                 outputData.RoleOffset = [parseInt(textRoleXOffset.text), parseInt(textRoleYOffset.text)];
                 outputData.RoleSize = [parseInt(textRoleWidth.text), parseInt(textRoleHeight.text)];
@@ -3186,7 +3181,7 @@ function $refresh(index, imageAnimate, path) {
                 outputData.Image = textRoleImageResourceName.text;
 
 
-                outputData.FrameIndex = {};
+                outputData.FrameInfo = {};
                 const actionNames = $Frame.sl_findChildren(layoutAction1, 'ActionName');
                 const frameStartIndexes = $Frame.sl_findChildren(layoutAction1, 'FrameStartIndex');
                 const frameCounts = $Frame.sl_findChildren(layoutAction1, 'FrameCount');
@@ -3194,7 +3189,7 @@ function $refresh(index, imageAnimate, path) {
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && frameStartIndexes[tt].text.trim() && frameCounts[tt].text.trim() && frameIntervals[tt].text.trim())
-                        outputData.FrameIndex[actionNames[tt].text.trim()] = [
+                        outputData.FrameInfo[actionNames[tt].text.trim()] = [
                             parseInt(frameStartIndexes[tt].text.trim()), parseInt(frameCounts[tt].text.trim()), parseInt(frameIntervals[tt].text.trim())
                         ];
                     else {
@@ -3209,13 +3204,13 @@ function $refresh(index, imageAnimate, path) {
                 outputData.Scale = [parseFloat(textRoleFrameXScale.text), parseFloat(textRoleFrameYScale.text)];
             }
             else if(comboType.currentIndex === 2) {
-                outputData.FrameIndex = {};
+                outputData.FrameInfo = {};
                 const actionNames = $Frame.sl_findChildren(layoutAction2, 'ActionName');
                 const SpriteNames = $Frame.sl_findChildren(layoutAction2, 'SpriteName');
 
                 for(let tt in actionNames) {
                     if(actionNames[tt].text.trim() && SpriteNames[tt].text.trim())
-                        outputData.FrameIndex[actionNames[tt].text.trim()] = [
+                        outputData.FrameInfo[actionNames[tt].text.trim()] = [
                             SpriteNames[tt].text.trim()
                         ];
                     else {
@@ -3251,7 +3246,7 @@ function $refresh(index, imageAnimate, path) {
 
         //type为0表示按钮，type为1表示键盘（会保存key）
         function doAction(type, action) {
-            _private.refreshRole();
+            //_private.refreshRole(-1);
 
             role.start(action);
 
@@ -3414,7 +3409,7 @@ function $refresh(index, imageAnimate, path) {
     }
     Keys.onReleased: function(event) {
         console.debug('[RoleEditor]Keys.onReleased:', event.key, event.isAutoRepeat);
-        //console.debug(role.objActionsData);
+        //console.debug(role.objActionsInfo);
         //console.debug(textRoleFangXiangIndex.text.split(','));
         event.accepted = true;
 

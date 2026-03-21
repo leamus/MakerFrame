@@ -21,7 +21,7 @@ import './Core'
 //import 'Core/GameComponents'
 
 
-import 'GameVisualScript.js' as GameVisualScriptJS
+//import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -35,7 +35,7 @@ Item {
 
 
     function $load(...params) {
-        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+        let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/';
 
         console.debug('[CommonScriptEditor]filePath:', path);
 
@@ -339,14 +339,21 @@ function* $gameInit(newGame) {
     game.gf.$plugins = {};
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
-    if($Frame.sl_fileExists($GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'game.js'))) {
-        let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'game.js'));
+    if($Frame.sl_fileExists(game.$projectpath + '/game.js')) {
+        let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(game.$projectpath + '/game.js'));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
             if(gameJS.$init) {
-                let r = gameJS.$init(newGame);
-                if($CommonLibJS.isGenerator(r))r = yield* r;
-                //game.run(gameJS.$init(newGame) ?? null);
+                try {
+                    let r = gameJS.$init(newGame);
+                    if($CommonLibJS.isGenerator(r))r = yield* r;
+                    //game.run(gameJS.$init(newGame) ?? null);
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    console.warn('[!CommonScript]game.js的$init函数调用错误');
+                    //throw e;
+                }
             }
         }
     }
@@ -356,9 +363,9 @@ function* $gameInit(newGame) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
             game.gf.$plugins[tp0][tp1] = {};
-            let gameJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
-            if($Frame.sl_fileExists($GlobalJS.toPath(gameJSPath + GameMakerGlobal.separator + 'game.js'))) {
-                let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(gameJSPath + GameMakerGlobal.separator + 'game.js'));
+            let gameJSPath = game.$projectpath + '/Plugins/' + tp0 + '/' + tp1 + '/Components';
+            if($Frame.sl_fileExists(gameJSPath + '/game.js')) {
+                let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(gameJSPath + '/game.js'));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
                     if(gameJS.$init) {
@@ -411,9 +418,16 @@ function* $gameInit(newGame) {
 function* $gameRelease(gameExit) {
     //调用项目的 game.js 的 $release
     if(game.gf.$release) {
-        let r = game.gf.$release(gameExit);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //game.run(game.gf.$release(gameExit) ?? null);
+        try {
+            let r = game.gf.$release(gameExit);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            //game.run(game.gf.$release(gameExit) ?? null);
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!CommonScript]game.js的$release函数调用错误');
+            //throw e;
+        }
     }
 
     /*/载入所有插件的 game.js 的 $release
@@ -671,12 +685,12 @@ function $showGoodsName(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
+        //let goodsPath = game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName + '/';
 
         //$CommonLibJS.showRichTextImage();
         tstr = ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(goodsPath + goods.$rid + GameMakerGlobal.separator + goods.$image).
-            arg(GameMakerGlobal.imageResourceURL(goods.$image)).
+            //arg(goodsPath + goods.$rid + '/' + goods.$image).
+            arg($GameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -720,7 +734,7 @@ function $showGoodsName(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 function $showCombatantName(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+    //let fightRolePath = game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/';
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -728,8 +742,8 @@ function $showCombatantName(combatant, flags=null) {
     if(flags['avatar'] && combatant.$avatar) {
         //$CommonLibJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(fightRolePath + combatant.$rid + GameMakerGlobal.separator + combatant.$avatar).
-            arg(GameMakerGlobal.imageResourceURL(combatant.$avatar)).
+            //arg(fightRolePath + combatant.$rid + '/' + combatant.$avatar).
+            arg($GameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -916,9 +930,17 @@ function* $commonUseScript(goods, combatant, params=1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, goods, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, goods, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!CommonScript]commonUseScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -965,9 +987,17 @@ function* $commonEquipScript(goods, combatant, params=1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, goods, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, goods, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!CommonScript]commonEquipScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -1067,9 +1097,17 @@ function* $commonUnloadScript(positionName, combatant, params=-1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, positionName, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, positionName, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!CommonScript]commonUnloadScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -1652,6 +1690,12 @@ function* combatantRoundEffects(combatant, round, stage) {
 
 
 
+//通用技能播放函数：如果技能的$playScript不为函数，则调用
+function* $commonPlayScript(fightSkill, combatant, ...params) {
+
+}
+
+
 //检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
 //返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
 //stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
@@ -2201,7 +2245,7 @@ function $readSavesInfo(count=3) {
 
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -2220,11 +2264,11 @@ function $readSavesInfo(count=3) {
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
-        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
+        visualScriptEditor.arrMajorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
-        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandsInfo: $GameVisualScriptJS.fnCommandsInfo()
+        visualScriptEditor.defaultCommandGroupsInfo: $GameVisualScriptJS.fnGroupsInfo()
         visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 

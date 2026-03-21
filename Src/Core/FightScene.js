@@ -1169,7 +1169,9 @@ function* fnRound() {
                     //console.debug('', SkillEffects);
 
                     //得到技能生成器函数
-                    const genActionAndSprite = fightSkillInfo.$commons.$playScript(fightSkill, combatant);
+                    const genActionAndSprite = $CommonLibJS.checkCallable(fightSkillInfo.$commons.$playScript) ?
+                        fightSkillInfo.$commons.$playScript.call(fightSkill, fightSkill, combatant) :
+                        game.$resources.commonScripts.$commonPlayScript.call(fightSkill, fightSkill, combatant, fightSkillInfo.$commons.$playScript);
                     //const ret1 = _private.scriptQueue.create([fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript'], );
                     ///$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
@@ -1533,7 +1535,7 @@ function* gfFighting() {
                 $CommonLibJS.setTimeout([function() {
                     //开始运行
                     fight.$sys.continueFight();
-                }, 1, rootFightScene, 'fight.$sys.continueFight'], 0, );
+                }, 1, 'fight.$sys.continueFight', ], 0, );
 
             }, Tips: 'continueFight'});
 
@@ -1813,7 +1815,7 @@ function readFightRole(role) {
         console.warn('[!FightScene]载入战斗精灵失败：' + role.$rid);
 
 
-    /*let filePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName + GameMakerGlobal.separator + role.$rid + GameMakerGlobal.separator + 'fight_role.json');
+    /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + role.$rid + '/fight_role.json');
 
     //console.debug('[FightScene]filePath：', filePath);
 
@@ -1847,7 +1849,7 @@ function loadFightSkillInfo(fightSkillName) {
 
     /*if(fightSkillName) {
 
-        /*let filePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
+        /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.json');
         //let data = File.read(filePath);
         //console.debug('[GameFightSkill]filePath：', filePath);
 
@@ -1868,7 +1870,7 @@ function loadFightSkillInfo(fightSkillName) {
         else
             console.warn('[!FightScene]Load Skill Fail:', filePath);
         * /
-        let data = game.loadjson(GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.json');
+        let data = game.loadjson($GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.json');
         if(data) {
             return $eval(data.FightSkill);
         }
@@ -1942,13 +1944,13 @@ function doSkillEffect1(team1, roleIndex1, team2, roleIndex2, skillEffect) {
     }* /
     name2 = role2.$name || '无名';
 
-    //console.debug(Global.frameData.arrayPets)
-    //console.debug(Global.frameData.arrayPets[0])
-    //console.debug(Global.frameData.arrayPets[0].$$fightData.attackProp)
+    //console.debug($Global.frameData.arrayPets)
+    //console.debug($Global.frameData.arrayPets[0])
+    //console.debug($Global.frameData.arrayPets[0].$$fightData.attackProp)
     //console.debug('debug1:', data2.choice)
 
-    //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Global.frameData.arrayEnemyPets[0].$$fightData.attackProp = Math.floor($GameCore.socketInfo.getRandomNumber(!$GameCore.netPlay) * 5)
-    //Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Math.floor($GameCore.socketInfo.getRandomNumber(!$GameCore.netPlay) * 5)
+    //$Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = $Global.frameData.arrayEnemyPets[0].$$fightData.attackProp = Math.floor($GameCore.socketInfo.getRandomNumber(!$GameCore.netPlay) * 5)
+    //$Global.frameData.arrayEnemyPets[0].$$fightData.defenseProp = Math.floor($GameCore.socketInfo.getRandomNumber(!$GameCore.netPlay) * 5)
 
     msgbox.textArea.append(name1 + '使用【' + $GameMakerGlobalJS.propertyName(role1.$$fightData.attackProp) + '】攻击');
     msgbox.textArea.append(name1 + '使用【' + $GameMakerGlobalJS.propertyName(role1.$$fightData.defenseProp) + '】防御');

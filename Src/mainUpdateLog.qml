@@ -40,14 +40,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -70,7 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
-            //textArea.color: Global.style.foreground
+            //textArea.color: $Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -89,8 +89,8 @@ Item {
                 //implicitHeight: 40
                 color: '#80000000'
                 //color: 'transparent'
-                //color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -283,12 +283,12 @@ Item {
 126、新增：日历组件；
 127、修复：Linux升级时Updater没有给运行权限导致无法运行的问题；
 128、新增：创建UUID；
-129、新增：我的应用 和 安装应用；
+129、新增：小程序 和 小程序管理（安装/卸载）；
 130、优化：FileDialog抽出到全局 并 绕坑。。。；
 131、修复：网络异常时无法安装本地插件 和 安装卸载没有调用install和uninstall函数 的bug；
 132、新增：命令行按上下键可以选择历史命令；
 133、新增：引擎全局插件；
-134、新增：Qt插件和QML插件管理，且更改了存放文件夹；
+134、新增：框架的 Qt插件和QML插件管理（安装/卸载），且更改了存放文件夹；
 135、优化：VisualScript可视化脚本的载入方式（全局和插件）；
 136、修复：每次返回主界面创建WebView时貌似小概率会闪退，原因未知，改为点击再加载貌似解决了；
 137、修复：解决了很多遗留的焦点问题；
@@ -297,8 +297,16 @@ Item {
 140、优化：合并Window和SubWindow到一个文件，并优化了很多相关代码；
 141、优化：抽离和优化L_Loader，用起来更方便；
 142、修复：Notepad经常循环绑定的警告；
-143、优化：调试窗口功能；
-144、其他：优化调整很多代码和细节，修复一些Bugs；
+143、优化：调试窗口功能（手机可以同时调试多个qml文件）；
+144、优化：取消GameMakerGlobal、GameMakerGlobalJS、game、fight、AsyncScript等单例和共享对象，重写相关代码，使引擎、游戏窗口可以真正多开且互不干扰！
+145、新增：可以多开 小程序、游戏引擎和游戏插件 窗口，长按列表项即可打开，桌面端为打开新窗口，手机端为应用内多窗口；
+146、新增：基于上面的优化，增加了一些奇怪又好玩的功能（比如多窗口可以拖动、缩放）；
+147、修复：地图编辑器中由于两个Canvas立即进入便绘制报错的Bug；
+148、新增：封装了QNetworkAccessManager的一些函数；
+149、新增：$showList函数，用来新建列表组件并显示；
+150、优化：Sprite和Role的创建函数合并，修改保存的json的FrameInfo字段（兼容旧格式）；
+151、新增：封装了QNetworkReply和NetworkRequest，可以直接操控它们（之前的sl_request仍然能用，是一种新的使用方式），优化了相关代码；
+152、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

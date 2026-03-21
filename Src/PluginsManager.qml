@@ -62,14 +62,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -127,21 +127,25 @@ Item {
         onLoaded: {
             console.debug('[PluginsManager]loaderExtends onLoaded');
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            forceActiveFocus();
 
-                //if(item.$load)
-                //    item.$load();
+            /*if(item.$load) {
+                try {
+                    item.$load();
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //console.warn('[!PluginsManager]', e);
+                    //throw e;
+                }
+                finally {
+                }
+            }
+            */
 
-                visible = true;
-            }
-            catch(e) {
-                throw e;
-            }
-            finally {
-            }
+            visible = true;
         }
 
 
@@ -167,37 +171,41 @@ Item {
         function showPlugins() {
             //jsLoader.clear();
 
-            const pluginsRootPath = (nType === 1 ? (GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName) : ($Platform.externalDataPath + '/GameMaker')) + '/Plugins/';
+            const pluginsRootPath = (nType === 1 ? ($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName) : ($Platform.externalDataPath + '/GameMaker')) + '/Plugins/';
             return _private.$extends.showExtends({
                 ExtendsRootPath: pluginsRootPath,
                 ExtendPathSearchDepth: 2,
                 ExtendRunRelativePath: 'Extends/',
-                CachePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
+                CachePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
                 ///JSLoader: _private.jsLoader,
                 ///JSExtendRootItem: itemExtendsRoot,
                 Callbacks: {
                     CloseCallback: ()=>sg_close(),
                     RunExtendCallback: function(url, type) {
-                        if(type === 1) //长按
-                            if(!$CommonLibJS.isMobile()) {
-                                return $openQML(url, -1);
-                            }
-                        return loaderExtends.load(url);
+                        if(type === 1) { //长按
+                            //if(!$CommonLibJS.isMobile()) {
+                                const win = $openQML(url, -2);
+                                return [/*win.bMainWindow ? 0 : 1*/1, win.$loader];
+                            //}
+                        }
+                        const res = loaderExtends.load(url);
+                        return [0, loaderExtends];
                     },
                     //UninstallCallback: function(extendsRootPath, rpath, type) {},
                 },
+                Parent: root,
             });
         }
 
         function showInstallPlugins() {
             return _private.$extends.showInstallExtends({
-                ExtendsRootPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/',
+                ExtendsRootPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/',
                 ExtendPathSearchDepth: 2,
-                InstallPath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/',
+                InstallPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
                 ///JSLoader: _private.jsLoader,
                 MenuURL: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js',
                 DownloadURL: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1/%2',
-                CachePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
+                CachePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
                 CacheExtendRootRelativePath: 'Plugins/',
                 //CustomMenus: [[], []],
                 Callbacks: {
@@ -205,6 +213,7 @@ Item {
                     //InstallCallback: function(cacheExtendRootPath, extendsRootPath, rpath) {},
                     //UninstallCallback: function(extendsRootPath, rpath, type) {},
                 },
+                Parent: root,
             });
         }
 
@@ -214,7 +223,7 @@ Item {
             //id: _config
         }
 
-        readonly property var $extends: $Extends.create(new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/))
+        readonly property var $extends: $Extends.create()
 
         //property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
 

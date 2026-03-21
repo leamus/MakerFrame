@@ -27,7 +27,8 @@ import './Core'
 
 //import '../../_Global/CommonLib.js' as CommonLibJS
 //import '../../_Global/Global.js' as GlobalJS
-//import 'GameVisualScript.js' as GameVisualScriptJS
+import './Core/GameMakerGlobal.js' as GameMakerGlobalJS
+import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -41,7 +42,17 @@ Item {
 
 
 
+    function $load() {
+    }
+
+
+
     property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+
+    readonly property alias $GameMakerGlobal: gameMakerGlobal
+    readonly property var $GameMakerGlobalJS: GameMakerGlobalJS
+    readonly property var $GameVisualScriptJS: GameVisualScriptJS
+
 
     readonly property var showMsg: rectHelpWindow.showMsg
 
@@ -53,7 +64,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -65,19 +76,19 @@ Item {
             //width: parent.width
             //height: parent.height
 
-            //strBasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName
+            //strBasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName
             //strTitle: '脚本编辑'
             /*fnAfterCompile: function(code) {return code;}*/
 
             //visualScriptEditor.strTitle: strTitle
 
-            visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
-            visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
+            visualScriptEditor.arrMajorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+            visualScriptEditor.arrMinorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
-            //visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-            //visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
-            visualScriptEditor.defaultCommandsInfo: _private.jsGameVisualScript.data.commandsInfo
-            visualScriptEditor.defaultCommandGroupsInfo: _private.jsGameVisualScript.data.groupsInfo
+            visualScriptEditor.defaultCommandsInfo: $GameVisualScriptJS.fnCommandsInfo()
+            visualScriptEditor.defaultCommandGroupsInfo: $GameVisualScriptJS.fnGroupsInfo()
+            //visualScriptEditor.defaultCommandsInfo: _private.jsGameVisualScript.data.commandsInfo
+            //visualScriptEditor.defaultCommandGroupsInfo: _private.jsGameVisualScript.data.groupsInfo
             //visualScriptEditor.defaultCommandTemplate: []
 
 
@@ -92,15 +103,14 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
 
-    /*GameMakerGlobal {
+    GameMakerGlobal {
         id: gameMakerGlobal
     }
-    */
 
 
     ColumnLayout {
@@ -144,7 +154,7 @@ Item {
             //height: 50
             //width: parent.width
             font.pointSize: 12
-            text: qsTr('当前工程：' + GameMakerGlobal.config.strCurrentProjectName)
+            text: qsTr('当前工程：' + $GameMakerGlobal.config.strCurrentProjectName)
 
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
@@ -642,7 +652,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.maximumHeight: implicitHeight * 1.2
 
-                text: `<font color="${Global.style.color(Global.style.Red)}"><b>开始游戏</b></font>`
+                text: `<font color="${$Global.style.color($Global.style.Red)}"><b>开始游戏</b></font>`
                 font.pointSize: _private.config.nButtonTextSize
 
                 onClicked: {
@@ -1326,7 +1336,7 @@ Item {
                 //Layout.preferredWidth: 1
 
                 font.pointSize: 12
-                text: qsTr('Ver：' + GameMakerGlobal.version)
+                text: qsTr('Ver：' + $GameMakerGlobal.version)
                 horizontalAlignment: Label.AlignHCenter
                 verticalAlignment: Label.AlignVCenter
 
@@ -1380,7 +1390,7 @@ Item {
                 vInitParamsBackup = params;
             else
                 vInitParams = params;
-            load($CommonLibJS.isString(url) ? Qt.resolvedUrl(url) : url, undefined, );
+            return load($CommonLibJS.isString(url) ? Qt.resolvedUrl(url) : url, undefined, );
         }
 
         fnCustomLoad: function(url, properties) {
@@ -1436,21 +1446,24 @@ Item {
         onLoaded: {
             console.debug('[mainGameMaker]loader onLoaded:', vInitParams);
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            forceActiveFocus();
 
-                if(item.$load)
+            if(item.$load) {
+                try {
                     item.$load(...vInitParams);
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //console.warn('[!mainGameMaker]', e);
+                    //throw e;
+                }
+                finally {
+                }
+            }
 
-                visible = true;
-            }
-            catch(e) {
-                throw e;
-            }
-            finally {
-            }
+            visible = true;
         }
     }
 
@@ -1507,7 +1520,7 @@ Item {
         Mask {
             anchors.fill: parent
             //opacity: 0
-            //color: Global.style.backgroundColor
+            //color: $Global.style.backgroundColor
             color: '#90000000'
             //radius: 9
 
@@ -1546,7 +1559,7 @@ Item {
 
 
                     textArea.color: 'white'
-                    //textArea.color: Global.style.foreground
+                    //textArea.color: $Global.style.foreground
                     //textArea.enabled: false
                     textArea.readOnly: true
 
@@ -1564,8 +1577,8 @@ Item {
                         //implicitHeight: 40
                         color: 'black'
                         //color: 'transparent'
-                        //color: Global.style.backgroundColor
-                        border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                        //color: $Global.style.backgroundColor
+                        border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                         border.width: parent.parent.textArea.activeFocus ? 2 : 1
                     }
                 }
@@ -1598,7 +1611,7 @@ Item {
         id: _private
 
         function checkCurrentProjectName() {
-            if(GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
+            if($GameMakerGlobal.config.strCurrentProjectName.trim().length === 0) {
                 $dialog.show({
                     Msg: '请先新建或选择一个工程',
                     Buttons: Dialog.Yes,
@@ -1619,16 +1632,16 @@ Item {
         //切换工程，转移和检查工程引擎变量
         function changeProject(newProject='', oldProject=null) {
             newProject = newProject.trim();
-            GameMakerGlobal.config.strCurrentProjectName = newProject;
+            $GameMakerGlobal.config.strCurrentProjectName = newProject;
             if(newProject.length === 0)
                 return;
 
             if(oldProject !== null) {
-                GameMakerGlobal.settings.setValue('Projects/' + newProject, GameMakerGlobal.settings.value('Projects/' + oldProject/*, {}*/)); //只有没有值（存undefined也算有值）的时候才返回默认值
-                GameMakerGlobal.settings.setValue('Projects/' + oldProject, undefined);
+                $GameMakerGlobal.settings.setValue('Projects/' + newProject, $GameMakerGlobal.settings.value('Projects/' + oldProject/*, {}*/)); //只有没有值（存undefined也算有值）的时候才返回默认值
+                $GameMakerGlobal.settings.setValue('Projects/' + oldProject, undefined);
             }
-            if(!GameMakerGlobal.settings.value('Projects/' + newProject))
-                GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
+            if(!$GameMakerGlobal.settings.value('Projects/' + newProject))
+                $GameMakerGlobal.settings.setValue('Projects/' + newProject, {});
         }
 
 
@@ -1639,7 +1652,7 @@ Item {
                 Input: '新建工程',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
+                    if($Frame.sl_dirExists($GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
                         $dialog.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
@@ -1655,7 +1668,7 @@ Item {
 
                     _private.changeProject($dialog.input);
 
-                    const projectPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName;
+                    const projectPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName;
                     $Frame.sl_dirCreate(projectPath);
 
 
@@ -1670,7 +1683,7 @@ Item {
                             */
 
 
-                            const resTemplate = GameMakerGlobal.config.strWorkPath + '$资源模板.zip';
+                            const resTemplate = $GameMakerGlobal.config.strWorkPath + '$资源模板.zip';
                             function _continue() {
                                 const ret = unzipFile(resTemplate, projectPath);
                                 if(ret.length > 0)
@@ -1711,13 +1724,14 @@ Item {
         }
 
         function openProject() {
-            $list.open({
+            const list = $showList({
                 RemoveButtonVisible: true,
-                Data: GameMakerGlobal.config.strProjectRootPath,
+                Data: $GameMakerGlobal.config.strProjectRootPath,
                 Params: [[], 0x001 | 0x2000, 0x00],
+                Parent: rootGameMaker,
                 OnClicked: (index, item)=>{
                     if(item === '..') {
-                        $list.close();
+                        list.close();
                         return;
                     }
 
@@ -1726,16 +1740,16 @@ Item {
                     _private.changeProject(item);
 
 
-                    $list.close();
+                    list.close();
                     //rootGameMaker.forceActiveFocus();
                 },
                 OnCanceled: ()=>{
 
-                    $list.close();
+                    list.close();
                     //rootGameMaker.forceActiveFocus();
                 },
                 OnRemoveClicked: (index, item)=>{
-                    let dirUrl = GameMakerGlobal.config.strProjectRootPath + item;
+                    let dirUrl = $GameMakerGlobal.config.strProjectRootPath + item;
 
                     $dialog.show({
                         Msg: '确认删除 <font color="red">' + item + '</font> ?',
@@ -1757,9 +1771,9 @@ Item {
                                 return;
                             }
 
-                            $list.removeItem(index);
+                            list.removeItem(index);
 
-                            GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
+                            $GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
                             _private.changeProject('');
 
                             //$list.close();
@@ -1775,10 +1789,10 @@ Item {
         function renameProject() {
             $dialog.show({
                 Msg: '输入工程名',
-                Input: GameMakerGlobal.config.strCurrentProjectName,
+                Input: $GameMakerGlobal.config.strCurrentProjectName,
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
+                    if($Frame.sl_dirExists($GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
                         $dialog.show({
                             Msg: '工程已存在',
                             Buttons: Dialog.Yes,
@@ -1792,11 +1806,11 @@ Item {
                         return;
                     }
 
-                    if($Frame.sl_fileRename(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + $dialog.input) > 0) {
-                        _private.changeProject($dialog.input, GameMakerGlobal.config.strCurrentProjectName);
+                    if($Frame.sl_fileRename($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, $GameMakerGlobal.config.strProjectRootPath + $dialog.input) > 0) {
+                        _private.changeProject($dialog.input, $GameMakerGlobal.config.strCurrentProjectName);
                     }
                     else {
-                        if($Frame.sl_dirExists(GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
+                        if($Frame.sl_dirExists($GameMakerGlobal.config.strProjectRootPath + $dialog.input)) {
                             $dialog.show({
                                 Msg: '重命名失败，请检查名称',
                                 Buttons: Dialog.Yes,
@@ -1809,7 +1823,7 @@ Item {
                             });
                             return;
                         }
-                        console.warn('[!mainGameMaker]重命名失败：', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, GameMakerGlobal.config.strProjectRootPath + $dialog.input);
+                        console.warn('[!mainGameMaker]重命名失败：', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, $GameMakerGlobal.config.strProjectRootPath + $dialog.input);
                     }
 
                     //rootGameMaker.forceActiveFocus();
@@ -1913,7 +1927,7 @@ Item {
         function scriptEditor() {
             if($Platform.compileType === 'debug') {
                 loader.loadModule(compScriptEditor, {
-                    BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName,
+                    BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName,
                     //RelativePath: '',
                     //ChoiceButton: 0b11,
                     //PathText: 0b11,
@@ -1924,7 +1938,7 @@ Item {
             }
             else {
                 loader.loadModule(compScriptEditor, {
-                    BasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName,
+                    BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName,
                     //RelativePath: '',
                     //ChoiceButton: 0b11,
                     //PathText: 0b11,
@@ -2060,7 +2074,7 @@ Item {
             });
 
             $showBusyIndicator(true, function() {
-                let destPath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName;
+                let destPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName;
                 let ret = $Frame.sl_compressDir(
                     destPath + '.zip',
                     destPath
@@ -2098,15 +2112,16 @@ Item {
             //console.debug(menuJS.infos, Object.keys(menuJS.infos), JSON.stringify(menuJS.infos));
 
             //$showBusyIndicator(true, function() {
-                $list.open({
+                const list = $showList({
                     RemoveButtonVisible: false,
                     Data: menuList,
+                    Parent: rootGameMaker,
                     OnClicked: (index, item)=>{
                         if(index === 0) {
                             $fileDialog.show({
                                 Title: '选择项目包文件',
                                 //NameFilters: [ 'zip files (*.zip)', 'All files (*)' ],
-                                Folder: $GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                                Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
                                 SelectMultiple: false,
                                 SelectExisting: true,
                                 SelectFolder: false,
@@ -2134,18 +2149,18 @@ Item {
 
                                 const fileName = $Frame.sl_fileName(menuJS.infos[item]['Path']);
                                 const projectName = $Frame.sl_completeBaseName(menuJS.infos[item]['Path']);
-                                const projectPath = GameMakerGlobal.config.strProjectRootPath + projectName;
+                                const projectPath = $GameMakerGlobal.config.strProjectRootPath + projectName;
                                 //https://qiniu.leamus.cn/$Leamus.zip
                                 //https://gitee.com/leamus/MakerFrame/raw/master/Examples/$Leamus.zip
 
 
                                 function _continue() {
-                                    const ret = unzipFile(GameMakerGlobal.config.strProjectRootPath + fileName, projectPath);
+                                    const ret = unzipFile($GameMakerGlobal.config.strProjectRootPath + fileName, projectPath);
                                     if(ret.length > 0)
                                         _private.changeProject(projectName);
                                 }
 
-                                downloadFile(menuJS.infos[item]['Path'], GameMakerGlobal.config.strProjectRootPath + fileName,
+                                downloadFile(menuJS.infos[item]['Path'], $GameMakerGlobal.config.strProjectRootPath + fileName,
                                     function() {/*rootGameMaker.enabled = true;*/ _continue();}, function() {/*rootGameMaker.enabled = true;*/});
 
 
@@ -2163,7 +2178,7 @@ Item {
                         //jsLoader.clear();
                         jsLoader.unload(menuURL);
 
-                        $list.close();
+                        list.close();
                         //rootGameMaker.forceActiveFocus();
                     },
                 });
@@ -2236,7 +2251,7 @@ Item {
 
         function unzipProjectPackage(fURL) {
             const projectName = $Frame.sl_completeBaseName(fURL);
-            const projectPath = GameMakerGlobal.config.strProjectRootPath + projectName;
+            const projectPath = $GameMakerGlobal.config.strProjectRootPath + projectName;
             const msg = $Frame.sl_dirExists(projectPath) ? '<br><font color="red">注意</font>：目标工程已存在，继续解压会覆盖目标项目中的同名文件！' : '';
             $dialog.show({
                 Msg: '确认导入工程吗？' + msg,
@@ -2345,7 +2360,7 @@ Item {
                 },
             });
 
-            //$Frame.sl_removeRecursively(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName);
+            //$Frame.sl_removeRecursively($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName);
 
             //console.debug('[mainGameMaker]path:', filePath, dirPath, $Frame.sl_completeBaseName(filePath))
 
@@ -2385,9 +2400,9 @@ Item {
 
         }
 
-        //因为GameVisualScript.js里用到了GameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
-        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, /*(...params)=>Qt.createQmlObject(...params)*/)
-        property var jsGameVisualScript: null
+        //因为GameVisualScript.js里用到了gameMakerGlobal.qml，而前者先于后者加载导致报错，所以使用了jsLoader延迟加载
+        readonly property var jsLoader: new $CommonLibJS.JSLoader(rootGameMaker, (...params)=>Qt.createQmlObject(...params))
+        //property var jsGameVisualScript: null
 
         property var fnBackupOpenFile: null
     }
@@ -2419,25 +2434,80 @@ Item {
 
     Component.onCompleted: {
         console.debug('[mainGameMaker]---------------Test------------------');
-        console.debug('[mainGameMaker]运行环境:', GameMakerGlobal.config.bDebug);
+        console.debug('[mainGameMaker]运行环境:', $GameMakerGlobal.config.bDebug);
 
 
 
-        _private.jsGameVisualScript = _private.jsLoader.load(Qt.resolvedUrl('GameVisualScript.js'));
+        /*Object.defineProperty(rootGameMaker, '$GameMakerGlobal', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return gameMakerGlobal;
+            },
+            //set(value) {},
+        });
+        */
+        //！！！兼容旧代码
+        Object.defineProperty(rootGameMaker, 'GameMakerGlobal', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return gameMakerGlobal;
+            },
+            //set(value) {},
+        });
+        /*
+        Object.defineProperty(rootGameMaker, '$GameMakerGlobalJS', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return GameMakerGlobalJS;
+            },
+            //set(value) {},
+        });
+        */
+        //！！！兼容旧代码
+        Object.defineProperty(rootGameMaker, 'GameMakerGlobalJS', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return GameMakerGlobalJS;
+            },
+            //set(value) {},
+        });
+        /*Object.defineProperty(rootGameMaker, 'game', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return loader.item ? loader.item.game : null;
+            },
+            //set(value) {},
+        });
+        Object.defineProperty(rootGameMaker, 'fight', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return loader.item ? loader.item.fight : null;
+            },
+            //set(value) {},
+        });
+        */
+
+        //_private.jsGameVisualScript = _private.jsLoader.load(Qt.resolvedUrl('GameVisualScript.js'));
 
 
-        if(GameMakerGlobal.settings.$RunTimes === 0) {
-        //if(GameMakerGlobal.settings.value('$RunTimes', 0) === 0) {
+        if($GameMakerGlobal.settings.$RunTimes === 0) {
+        //if($GameMakerGlobal.settings.value('$RunTimes', 0) === 0) {
             rectHelpWindow.showMsg('<font size=6>初来乍到，请阅读并同意<a href="http://makerframe.leamus.cn/Privacy.html">隐私政策</a>。<br>进入 教程 先来了解一下引擎吧，或者在 导入工程 里下载示例 试玩。</font>');
-            //GameMakerGlobal.settings.setValue('$RunTimes', 1);
+            //$GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else {
-            //GameMakerGlobal.settings.setValue('$RunTimes', parseInt(GameMakerGlobal.settings.value('$RunTimes', 0)) + 1);
+            //$GameMakerGlobal.settings.setValue('$RunTimes', parseInt($GameMakerGlobal.settings.value('$RunTimes', 0)) + 1);
         }
-        ++GameMakerGlobal.settings.$RunTimes;
+        ++$GameMakerGlobal.settings.$RunTimes;
 
-        //if(GameMakerGlobal.settings.value('$ProjectName'))
-        //    GameMakerGlobal.config.strCurrentProjectName = GameMakerGlobal.settings.value('$ProjectName');
+        //if($GameMakerGlobal.settings.value('$ProjectName'))
+        //    $GameMakerGlobal.config.strCurrentProjectName = $GameMakerGlobal.settings.value('$ProjectName');
 
 
 
@@ -2475,6 +2545,11 @@ Item {
 
 
         //delete $Frame.sl_globalObject().$GameMakerGlobal;
+
+
+
+        $GameMakerGlobal.settings.$CurrentProjectName = $GameMakerGlobal.config.strCurrentProjectName;
+
 
 
         console.debug('[mainGameMaker]Component.onDestruction:', Qt.resolvedUrl('.'));

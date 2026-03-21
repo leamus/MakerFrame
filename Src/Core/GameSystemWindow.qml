@@ -54,7 +54,7 @@ Item {
 
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: '#7FFFFFFF'
         //radius: 9
 
@@ -106,7 +106,7 @@ Item {
                     let s = game.$sys.resources.commonScripts.$readSavesInfo(3);
                     let c = yield game.menu('选择存档', [...s, '取消']);
                     if(c < s.length) {
-                        ////$CommonLibJS.setTimeout([function() {yield game.load('存档' + c)}, 1, game], 0);
+                        ////$CommonLibJS.setTimeout([function() {yield game.load('存档' + c)}, 1, ], 0);
                         if(yield game.load('存档' + c)) {
                             yield game.msg('读档成功');
                         }
@@ -143,7 +143,7 @@ Item {
                         }
                         /*
                         //全局音乐
-                        //if(GameMakerGlobal.settings.value('$PauseMusic')) {
+                        //if($GameMakerGlobal.settings.value('$PauseMusic')) {
                         //if(game.cd['$PauseMusic']) {
                         if(game.cd['$sys_sound'] & 0b1) {
                             //itemBackgroundMusic.resume(true);
@@ -171,7 +171,7 @@ Item {
                         }
                         /*
                         //全局音效
-                        //if(GameMakerGlobal.settings.value('$PauseSound')) {
+                        //if($GameMakerGlobal.settings.value('$PauseSound')) {
                         //if(game.cd['$PauseSound']) {
                         if(game.cd['$sys_sound'] & 0b10) {
                             //rootSoundEffect.resume(true);

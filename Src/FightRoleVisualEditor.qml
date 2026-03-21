@@ -55,7 +55,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -98,16 +98,17 @@ Item {
                     const data = [['[动作名]Normal为普通状态，已存在', 'Kill（普通攻击）','Skill（释放技能）'],
                                 ['', 'Kill','Skill']];
 
-                    $list.open({
+                    const list = $showList({
                         Data: data[0],
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = data[1][index];
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -136,18 +137,19 @@ Item {
                 //wrapMode: TextEdit.Wrap
 
                 onPressAndHold: {
-                    const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                    const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
 
-                    $list.open({
+                    const list = $showList({
                         Data: path,
+                        Parent: root,
                         OnClicked: (index, item)=>{
                             text = item;
 
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                         OnCanceled: ()=>{
-                            $list.close();
+                            list.close();
                             //root.forceActiveFocus();
                         },
                     });
@@ -158,10 +160,7 @@ Item {
                 implicitWidth: 30
                 text: 'P'
                 onClicked: {
-                    if($GameMakerGlobalJS.loadSpriteEffect(ttextSpriteName.text, spriteEffectComp, _private.jsLoader)) {
-                        spriteEffectComp.start();
-                        rectSpriteEffectBackground.show();
-                    }
+                    rectSpriteEffectBackground.show(ttextSpriteName.text);
                 }
             }
 
@@ -191,7 +190,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -452,18 +451,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.imageResourcePath();
+                                const path = $GameMakerGlobal.imageResourcePath();
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -519,9 +519,9 @@ Item {
                             source: {
                                 if(textAvatar.text.length === 0)
                                     return '';
-                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textAvatar.text)))
+                                if(!$Frame.sl_fileExists($GameMakerGlobal.imageResourcePath(textAvatar.text)))
                                     return '';
-                                return GameMakerGlobal.imageResourceURL(textAvatar.text);
+                                return $GameMakerGlobal.imageResourceURL(textAvatar.text);
                             }
                         }
                     }
@@ -548,18 +548,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -589,18 +590,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -630,18 +632,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -739,7 +742,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -753,7 +756,7 @@ Item {
 
                                 text: '*@动作名'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -761,7 +764,7 @@ Item {
 
                                 text: '@特效名'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -827,18 +830,19 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
+                                            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
 
-                                            $list.open({
+                                            const list = $showList({
                                                 Data: path,
+                                                Parent: root,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    $list.close();
+                                                    list.close();
                                                     //root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    $list.close();
+                                                    list.close();
                                                     //root.forceActiveFocus();
                                                 },
                                             });
@@ -848,10 +852,7 @@ Item {
                                         implicitWidth: 30
                                         text: 'P'
                                         onClicked: {
-                                            if($GameMakerGlobalJS.loadSpriteEffect(textSpriteName.text, spriteEffectComp, _private.jsLoader)) {
-                                                spriteEffectComp.start();
-                                                rectSpriteEffectBackground.show();
-                                            }
+                                            rectSpriteEffectBackground.show(textSpriteName.text);
                                         }
                                     }
                                 }
@@ -955,11 +956,36 @@ Item {
     Rectangle {
         id: rectSpriteEffectBackground
 
-        function show() {
-            rectSpriteEffectBackground.visible = true;
+        function show(spriteName) {
+            _private.jsLoader.clear();
+            if($GameMakerGlobalJS.getSpriteEffect(spriteName, spriteEffectComp, {Loops: AnimatedSprite.Infinite}, _private.jsLoader)) {
+                spriteEffectComp.start();
+
+
+                rectSpriteEffectBackground.visible = true;
+                //focus = true;
+                forceActiveFocus();
+            }
+            else
+                $dialog.show({
+                    Msg: '不存在：' + spriteName,
+                    Buttons: Dialog.Yes,
+                    OnAccepted: function() {
+                        //root.forceActiveFocus();
+                    },
+                    OnRejected: ()=>{
+                        //root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        $dialog.close();
+                        //root.forceActiveFocus();
+                    },*/
+                });
         }
         function close() {
             spriteEffectComp.stop();
+
+
             rectSpriteEffectBackground.visible = false;
             //root.focus = true;
             root.forceActiveFocus();
@@ -1207,7 +1233,7 @@ Item {
             return [true, data, null];
         }
 
-        function compileAndShowResult() {
+        function compileAndShowResult(showSuccess=true) {
             const result = _private.compile(true);
             let errorMsg;
 
@@ -1224,9 +1250,9 @@ Item {
                 errorMsg = '错误：' + result[2].toString() + '<BR>请检查各参数';
             }
 
-            if(errorMsg)
+            if(showSuccess || errorMsg)
                 $dialog.show({
-                    Msg: errorMsg,
+                    Msg: errorMsg ?? '编译完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //root.forceActiveFocus();
@@ -1253,7 +1279,7 @@ Item {
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    const result = _private.compileAndShowResult();
+                    const result = _private.compileAndShowResult(false);
                     if(result[0] === false)
                         return;
 
@@ -1366,8 +1392,8 @@ const data = (function() {
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
         const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
-        if(levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
-        if(levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
+        if(levelChain && levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
+        if(levelChain && levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }
     */
     //方法2：

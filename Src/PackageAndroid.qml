@@ -40,14 +40,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -265,7 +265,7 @@ Item {
             Layout.fillHeight: true
 
 
-            //textArea.color: Global.style.foreground
+            //textArea.color: $Global.style.foreground
             textArea.readOnly: true
 
             textArea.wrapMode: TextArea.WrapAnywhere
@@ -277,8 +277,8 @@ Item {
             textArea.background: Rectangle {
                 //implicitWidth: 200
                 //implicitHeight: 40
-                color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -303,7 +303,7 @@ Item {
 
         title: '选择文件夹'
         //folder: shortcuts.home
-        folder: $GlobalJS.toURL(GameMakerGlobal.config.strProjectRootPath)
+        folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath)
         //nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
 
         selectMultiple: false
@@ -428,27 +428,30 @@ Item {
             imageIcon.source = $GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
             if(!content) {
                 nPackageType = 1;
-                textResult.append('没有 GameMakerGlobal.qml 文件，打包为 APP');
+                textResult.append('没有 Config.js 文件，打包为 鹰歌框架APP');
                 //++error;
             }
             else {
                 nPackageType = 2;
-                textResult.append('打包为 Game');
+                textResult.append('打包为 鹰歌引擎Game');
 
-                /*
-                regExp = /category: '(\S*)'/g;
+                //不用Config.js，因为有可能是打包App
+                /*/regExp = /category: '(\S*)'/g;
+                regExp = /AppName = '(\S*)'/g;
                 res = regExp.exec(content);
                 textAPPName.text = res[1];
                 */
 
-                regExp = /property string strTDSClientID: '(\w*)'/g;
+                //regExp = /property string strTDSClientID: '(\w*)'/g;
+                regExp = /TDSClientID: '(\w*)'/g;
                 res = regExp.exec(content);
                 textTapClientID.text = res[1];
 
-                regExp = /property string strTDSClientToken: '(\w*)'/g;
+                //regExp = /property string strTDSClientToken: '(\w*)'/g;
+                regExp = /TDSClientToken: '(\w*)'/g;
                 res = regExp.exec(content);
                 textTapClientToken.text = res[1];
             }
@@ -471,10 +474,10 @@ Item {
 
 
             if(error === 0)
-                textResult.append('读取打包文件夹配置成功<br>注意：1、如果项目中有使用插件，请先将插件自行解压到assets/Plugins目录下，并将所有so文件移动到lib/xxx目录下再进行打包。<br>2、如果打包为APP，则将主qml改名为main.qml并放在assets/QML文件夹下（可在FrameConfig.qml中修改），框架会自动载入。<br>3、其他高级配置在 GameMakerGlobal.qml、AndroidManifest.xml 和 QML/LGlobal目录下。');
+                textResult.append('读取打包文件夹配置成功<br>注意：1、如果项目中有使用插件（Qt和QML），请先将插件自行解压到assets/Plugins目录下，并将所有so文件移动到lib/xxx/目录下再进行打包。<br>2、如果打包为APP，则将主qml改名为main.qml并放在assets/QML文件夹下（默认载入路径可在FrameConfig.qml中修改），框架会自动载入。<br>3、Config.js为简单配置，其他高级配置在 GameMakerSingleton.qml、GameMakerGlobal.qml、AndroidManifest.xml 和 QML/LGlobal目录下。');
         }
 
-        //修改配置文件（GameMakerGlobal.qml、AndroidManifest.xml）
+        //修改配置文件（Config.js、AndroidManifest.xml）
         function modifyConfig() {
             let content;
             let regExp;
@@ -483,27 +486,30 @@ Item {
             textResult.text = '';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
             if(!content) {
-                //textResult.append('读取 GameMakerGlobal.qml 失败');
+                textResult.append('读取 Config.js 失败，打包的可能是App');
             }
             else {
-                regExp = /(category: ')\S*(')/g;
+                //regExp = /(category: ')\S*(')/g;
+                regExp = /(AppName = ')\S*(')/g;
                 content = content.replace(regExp, '$1' + textAPPName.text + '$2');
 
-                regExp = /(property string strTDSClientID: ')\w*(')/g;
+                //regExp = /(property string strTDSClientID: ')\w*(')/g;
+                regExp = /(TDSClientID: ')\w*(')/g;
                 content = content.replace(regExp, '$1' + textTapClientID.text + '$2');
 
-                regExp = /(property string strTDSClientToken: ')\w*(')/g;
+                //regExp = /(property string strTDSClientToken: ')\w*(')/g;
+                regExp = /(TDSClientToken: ')\w*(')/g;
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/Singleton/GameMakerGlobal.qml');
+                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
                 if(res === 0) {
-                    textResult.append('写入 GameMakerGlobal.qml 成功');
+                    textResult.append('写入 Config.js 成功');
                 }
                 else
-                    textResult.append('写入 GameMakerGlobal.qml 失败');
+                    textResult.append('写入 Config.js 失败');
                 //console.warn(content);
             }
 
@@ -585,7 +591,7 @@ Item {
 
         //生成
         function make() {
-            let path = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games';
+            let path = $Platform.externalDataPath + '/GameMaker/Games';
 
             let zipFiles = $Frame.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
             zipFiles.sort();
@@ -610,7 +616,7 @@ Item {
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
 
 
-            //let strPackageDir = path + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+            //let strPackageDir = path + '/' + $GameMakerGlobal.config.strCurrentProjectName;
 
             //0：全部更新；1：只更新工程；2：只修改配置；
             function continueScript(packageType) {
@@ -633,17 +639,17 @@ Item {
                     try {
                         if(packageType === 0) { //全部
                             $Frame.sl_removeRecursively(strPackageDir);
-                            ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[0], strPackageDir);
-                            ret = $Frame.sl_extractDir(path + GameMakerGlobal.separator + zipFiles[1], strPackageDir);
+                            ret = $Frame.sl_extractDir(path + '/' + zipFiles[0], strPackageDir);
+                            ret = $Frame.sl_extractDir(path + '/' + zipFiles[1], strPackageDir);
 
-                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                            ret = $Frame.sl_dirCopy($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
 
                             modifyConfig();
                         }
                         else if(packageType === 1) { //只是工程
-                            $Frame.sl_removeRecursively(strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project');
+                            $Frame.sl_removeRecursively(strPackageDir + '/assets/Project');
 
-                            ret = $Frame.sl_dirCopy(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName, strPackageDir + GameMakerGlobal.separator + 'assets' + GameMakerGlobal.separator + 'Project', true, 0);
+                            ret = $Frame.sl_dirCopy($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
                         }
                         else
                             modifyConfig();
@@ -696,7 +702,7 @@ Item {
                 msg = '找到：<font color="red">' + zipFiles.join(',') + '</font><br><font color="red">注意：此操作会删除 打包文件夹的所有文件，请确保路径选择正确！</font><br>确定？';
             }
             else { //需要 AndroidManifest.xml 和其他配置文件
-                if(!$Frame.sl_fileExists(strPackageDir + GameMakerGlobal.separator + 'AndroidManifest.xml')) {
+                if(!$Frame.sl_fileExists(strPackageDir + '/AndroidManifest.xml')) {
                     $dialog.show({
                         Msg: '没有找到配置文件，请先选择“重新生成全部文件”。',
                         Buttons: Dialog.Yes | Dialog.No,
@@ -762,8 +768,8 @@ Item {
 
 
     Component.onCompleted: {
-        //textPackageDirPath.text = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName;
-        textPackageDirPath.text = $Platform.externalDataPath + GameMakerGlobal.separator + 'GameMaker' + GameMakerGlobal.separator + 'Games' + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName;
+        //textPackageDirPath.text = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName;
+        textPackageDirPath.text = $Platform.externalDataPath + '/GameMaker/Games/' + $GameMakerGlobal.config.strCurrentProjectName;
         _private.refresh();
 
         console.debug('[PackageAndroid]Component.onCompleted');

@@ -233,7 +233,7 @@ Item {
 
             anchors.fill: parent
             //opacity: 0
-            //color: Global.style.backgroundColor
+            //color: $Global.style.backgroundColor
             color: '#7FFFFFFF'
             //radius: 9
 
@@ -343,7 +343,7 @@ Item {
         Mask {
             anchors.fill: parent
             opacity: 0.6
-            //color: Global.style.backgroundColor
+            //color: $Global.style.backgroundColor
             color: 'lightgray'
             //radius: 9
 

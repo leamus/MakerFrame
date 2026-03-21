@@ -39,7 +39,7 @@ Item {
         //timerSound.stop();
         //root.sg_finished();
         if(bTest)
-            console.debug('!!!onFinished:', soundeffect.source, strSource);
+            console.debug('[DirSpriteEffect]onSg_finished:', soundeffect.source, strSource);
     }
     signal sg_paused();
     signal sg_stoped();
@@ -129,7 +129,7 @@ Item {
         if(strSource === '')
             return;
 
-        //imageAnimate.source = strSource + GameMakerGlobal.separator + root.fGetImageName(root.nCurrentFrame + root.nFrameStartIndex);
+        //imageAnimate.source = strSource + '/' + root.fGetImageName(root.nCurrentFrame + root.nFrameStartIndex);
         //let [tx, ty] = root.fGetImageFixPosition(root.nCurrentFrame + root.nFrameStartIndex, _private.arrFixPositionsData) || [0, 0];
         imageAnimate.rXOffset = root.rXOffset;    // + parseInt(tx);
         imageAnimate.rYOffset = root.rYOffset;      // + parseInt(ty);
@@ -507,7 +507,7 @@ Item {
 
         onTriggered: {
             if(nType === 1) {
-                soundeffect.source = GameMakerGlobal.soundResourceURL(root.strSoundeffectName);
+                soundeffect.source = $GameMakerGlobal.soundResourceURL(root.strSoundeffectName);
                 soundeffect.play();
             }
             else

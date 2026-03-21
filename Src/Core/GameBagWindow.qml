@@ -34,7 +34,7 @@ Item {
     function init() {
 
         //let fightheros = game.fighthero(-1, 1);
-        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName) + '/';
         let fightheros = game.fighthero(-1);
         let arrFightHerosName = [];
         for(let tf of fightheros) {
@@ -62,7 +62,7 @@ Item {
     //按类型 显示道具
     //type：-1，所有；1，可用；2，可装；3，战时；4，可卖；5，剧情类
     function showGoods(type=undefined) {
-        //let goodsPath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
+        //let goodsPath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName) + '/';
 
         if(type === undefined || type === null)
             type = nlastShowType;
@@ -174,7 +174,7 @@ Item {
 
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: '#7FFFFFFF'
         //radius: 9
 
@@ -378,7 +378,7 @@ Item {
 
                 //textArea.enabled: false
                 textArea.readOnly: true
-                textArea.color: 'white' //Global.style.foreground
+                textArea.color: 'white' //$Global.style.foreground
 
                 textArea.wrapMode: TextArea.WrapAnywhere
                 textArea.horizontalAlignment: TextArea.AlignJustify
@@ -391,8 +391,8 @@ Item {
 
                 textArea.background: Rectangle {
                     color: 'transparent'
-                    //color: Global.style.backgroundColor
-                    //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    //color: $Global.style.backgroundColor
+                    //border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                     //border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
             }

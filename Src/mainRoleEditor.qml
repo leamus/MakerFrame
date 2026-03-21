@@ -46,14 +46,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -71,8 +71,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            color: Global.style.backgroundColor
-            colorText: Global.style.primaryTextColor
+            color: $Global.style.backgroundColor
+            colorText: $Global.style.primaryTextColor
 
 
             onSg_canceled: {
@@ -90,7 +90,7 @@ Item {
             }
 
             onSg_removeClicked: {
-                let dirUrl = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item;
+                let dirUrl = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + item;
 
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
@@ -139,7 +139,7 @@ Item {
         anchors.fill: parent
 
         source: './RoleEditor.qml'
-        asynchronous: true
+        //asynchronous: true
 
 
 
@@ -179,21 +179,25 @@ Item {
         onLoaded: {
             console.debug('[mainRoleEditor]loader onLoaded');
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                //forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            //forceActiveFocus();
 
-                //if(item.$load)
-                //    item.$load();
+            /*if(item.$load) {
+                try {
+                    item.$load();
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //console.warn('[!mainRoleEditor]', e);
+                    //throw e;
+                }
+                finally {
+                }
+            }
+            */
 
-                //visible = true;
-            }
-            catch(e) {
-                throw e;
-            }
-            finally {
-            }
+            //visible = true;
         }
     }
 
@@ -208,7 +212,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建角色】');
             //l_listRole.removeButtonVisible = {0: false, '-1': true};
             l_listRole.show(list);
@@ -229,18 +233,7 @@ Item {
                 loader.item.newRole();
             }
             else {
-                const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'role.json';
-                console.debug('[mainRoleEditor]filePath:', filePath);
-
-                let cfg = $Frame.sl_fileRead(filePath);
-                //let cfg = File.read(filePath);
-                if(!cfg)
-                    return false;
-                cfg = JSON.parse(cfg);
-                //console.debug('cfg', cfg);
-                //loader.load('./MapEditor_1.qml', {});
-
-                loader.item.openRole(cfg, item);
+                loader.item.openRole(item);
             }
 
 

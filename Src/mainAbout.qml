@@ -40,14 +40,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -70,7 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
-            //textArea.color: Global.style.foreground
+            //textArea.color: $Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -89,8 +89,8 @@ Item {
                 //implicitHeight: 40
                 color: '#80000000'
                 //color: 'transparent'
-                //color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -182,21 +182,23 @@ Item {
 7.多层次的架构设计，能满足从小白到大神不同技术层次的玩家（见 架构设计）；
 8.简便易用的接口/API：用极少的JS代码就能调用各接口API和功能，比如文件系统、文件读写、二进制操作、网络（Request和长链接）、实名认证、接入穿山甲和Tap广告和扫描/生成二维码等；
 9.支持 Qt和QML插件（支持自动和手动加载，热插拔方式安装卸载）、C++编写的动态链接库、Java编写的安卓Dex库、QML资源RCC库，所以支持用Qt（C++）、QML（JavaScript）和Java（Android）等语言来开发 动态链接库、Dex和组件/插件，封装接口给JavaScript，然后用鹰歌框架引擎来载入和调用（比如 震动、GPS等功能）；
-10.已封装3种线程（池），提供线程控制和并行运算；
-11.已封装 JS脚本引擎、异步脚本 AsyncScript（协程）、脚本/事件队列 ScriptQueue 来解决JavaScript脚本文件的载入和运行（QML的JavaScript版本是ECMA6，不支持async/await写法，但我已经封装了一种类似async/await的同步脚本写法，非常简单好用；QML本身对外部JavaScript的载入和运行机制也不太友好方便，但我也解决了这个问题）；
-12.存储/数据库/缓存：可采用远程Redis、Mysql和本地的Sqlite（未加密）、SQLITECIPHER（加密）、JSON、XML及QML的LocalStorage等；
-13.引入了QML/JavaScript语言 和 所有QML基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
+10.支持框架内开发、安装和运行小程序，使框架真正成为一个大而全的容器；
+11.为开发小程序或qml插件提供非常方便的热重载的调试功能；
+12.已封装3种线程（池），提供线程控制和并行运算；
+13.已封装 JS脚本引擎、异步脚本 AsyncScript（协程）、脚本/事件队列 ScriptQueue 来解决JavaScript脚本文件的载入和运行（QML的JavaScript版本是ECMA6，不支持async/await写法，但我已经封装了一种类似async/await的同步脚本写法，非常简单好用；QML本身对外部JavaScript的载入和运行机制也不太友好方便，但我也解决了这个问题）；
+14.存储/数据库/缓存：可采用远程Redis、Mysql和本地的Sqlite（未加密）、SQLITECIPHER（加密）、JSON、XML及QML的LocalStorage等；
+15.引入了QML/JavaScript语言 和 所有QML基础组件与QtQuick组件（动画特效、粒子系统、3D等等）：
   a.采用最流行的 JavaScript脚本语言 和 QML/QtQuick环境 开发的游戏的各个编辑器、扩展和游戏脚本；JavaScript是优化过的谷歌v8（非H5）引擎，开发和运行效率都非常高；QML/QtQuick环境用来写界面非常简单高效；
   b.主流的图片、音乐、视频播放器 和 文本编辑器；
   c.Android内置一个Webview浏览器内核，桌面端可以选带一个Webkit浏览器内核；
-14.游戏引擎支持插件开发和下载（使用QML/JavaScript），官方已经开发了多种功能的插件（甚至包括两款游戏脚本引擎）：
+16.游戏引擎支持插件开发和下载（使用QML/JavaScript），官方已经开发了多种功能的插件（甚至包括两款游戏脚本引擎）：
   资源打包；
   离线加解密；
   网络服务（包括实时连接、弱网、卡密验证等）；
   Pymo（AVG）游戏引擎工程兼容；
   BBKRPG（RPG）游戏引擎脚本兼容；
   游戏扩展（包括升级链、公告、场景切换、场景消息、三方的可视化指令、战斗人物、背包、交易、系统菜单、宠物、任务、对话）等；
-15.框架集成其他三方库和SDK：
+17.框架集成其他三方库和SDK：
   已集成资源打包（Qt的rcc程序的功能：将QRC和各种资源文件打包为RCC），同时支持解包；
   已集成Box2D-qml和Bacon2D库，QML可使用物理引擎来做插件、游戏等；
   （安卓）已集成Tap实名认证，完美支持上架Tap（侠道仙缘已上架到Tap和OpenKylin应用商店）；
@@ -213,12 +215,12 @@ Item {
   已集成QextSerialPort插件库；
   已集成SDL3插件库（很不错的一款跨平台游戏开发库）；
   以上功能大都已封装完成并提供给QML或JavaScript来使用。感谢以上框架、库、SDK、扩展的作者、组织和公司。
-16.可开发类型：
+18.可开发类型：
   游戏：理论上几乎支持所有2D游戏类型(比如已有的RPG和放置、ARPG、AVG、即时战略、战棋、棋牌等等)的网络/单机游戏，3D的可用QML3D或opengl来自行学习和设计（但我对3D不熟悉）；
   引擎：鹰歌游戏引擎GameMaker和编辑器，就是基于鹰歌框架完成的，采用QML/JavaScript和一些系统函数编写，所以也能开发其他类型的游戏引擎（比如已经用插件实现和适配的BBKRPG和Pymo游戏引擎）；
   软件：鹰歌框架引擎封装了很多基础和底层的功能（文件、网络等等），加上QML的易用性，所以也很适合开发各种行业应用软件、系统软件、工具、爬虫等；
   其他：还可以增强鹰歌本身的功能，比如用QML的插件机制来编写QML扩展、编写QML组件、游戏插件，还能载入用本地语言开发的动态链接库来调用系统功能等等；
-17.其他：
+19.其他：
   Android：
     能使用文件管理器选择鹰歌打开任何文件（可以作为万能播放器使用）/夹，QML文件默认直接运行；
     能使用Scheme URL（比如用链接来传递数据）；
@@ -226,6 +228,9 @@ Item {
     支持安卓的一些本地功能，比如小窗/画中画、消息、服务等；
   Windows/Linux/MacOS：
     支持拖动文件到窗口进行处理（可以作为万能播放器使用），QML文件默认直接运行；
+    支持命令行；
+  所有平台：
+    完美支持多窗口：可以多开 小程序、游戏引擎和游戏插件 窗口，长按列表项即可打开，桌面端为打开新窗口，手机端为应用内多窗口，多窗口支持拖动、缩放、旋转等；
 
 
   架构设计：

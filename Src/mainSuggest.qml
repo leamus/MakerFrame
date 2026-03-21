@@ -54,14 +54,14 @@ Item {
     //focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -87,7 +87,7 @@ Item {
             placeholderText: '请输入内容'
 
             textArea.color: 'white'
-            //textArea.color: Global.style.foreground
+            //textArea.color: $Global.style.foreground
             //textArea.enabled: false
             //textArea.readOnly: true
 
@@ -106,8 +106,8 @@ Item {
                 //implicitHeight: 40
                 color: '#80000000'
                 //color: 'transparent'
-                //color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -180,7 +180,6 @@ Item {
 
                     buttonSubmit.enabled = false;
 
-                    //访问应用信息
                     $CommonLibJS.request({
                         Url: suggestUrl,
                         Method: 'POST',

@@ -70,14 +70,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -118,7 +118,7 @@ Item {
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textMapRID;
                 }
@@ -156,7 +156,7 @@ Item {
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textRoleRID;
                 }
@@ -281,7 +281,7 @@ Item {
         anchors.fill: parent
 
         //source: ''
-        asynchronous: true
+        //asynchronous: true
 
 
 
@@ -321,53 +321,58 @@ Item {
         onLoaded: {
             console.debug('[mainGameTest]loaderGameScene onLoaded');
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            forceActiveFocus();
 
 
-                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strMapDirName + GameMakerGlobal.separator + item + GameMakerGlobal.separator + 'map.json';
-                //let cfg = File.read(filePath);
-                let cfg = $Frame.sl_fileRead(filePath);
-                //console.debug('cfg', cfg, filePath);
+            /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item + '/map.json';
+            //let cfg = File.read(filePath);
+            let cfg = $Frame.sl_fileRead(filePath);
+            //console.debug('cfg', cfg, filePath);
 
-                if(!cfg)
-                    return false;
-                cfg = JSON.parse(cfg);
-                //console.debug('cfg', cfg);
-                //loaderGameScene.load('./MapEditor_1.qml', {});
-                loaderGameScene.item.openMap(cfg);
-                */
+            if(!cfg)
+                return false;
+            cfg = JSON.parse(cfg);
+            //console.debug('cfg', cfg);
+            //loaderGameScene.load('./MapEditor_1.qml', {});
+            loaderGameScene.item.openMap(cfg);
+            */
 
 
-                //item.testFresh();
-                item.bTest = true;
-                //item.openMap(item);
-                const tScript = function*() {
-                    yield game.msg('欢迎来到鹰歌Maker世界！');
-                    yield game.loadmap(textMapRID.text);
-                    if(textRoleRID.text.trim()) {
-                        game.createhero(textRoleRID.text);
-                        game.movehero(isNaN(parseInt(textMapBlockX.text)) ? 0 : parseInt(textMapBlockX.text), isNaN(parseInt(textMapBlockY.text)) ? 0 : parseInt(textMapBlockY.text));
-                    }
-                    game.interval(16);
-                    game.goon();
+            //item.testFresh();
+            item.bTest = true;
+            //item.openMap(item);
+            const roleRID = textRoleRID.text.trim();
+            const x = textMapBlockX.text.trim();
+            const y = textMapBlockY.text.trim();
+            const tScript = `(function*() {
+                yield game.msg('欢迎来到鹰歌Maker世界！');
+                yield game.loadmap('${textMapRID.text.trim()}');
+                if('${roleRID}') {
+                    game.createhero('${roleRID}');
+                    game.movehero(isNaN(${x}) ? 0 : ${x}, isNaN(${y}) ? 0 : ${y});
                 }
+                game.interval(16);
+                game.goon();
+            })`
 
-
-                //if(item.$load)
-                    item.$load(tScript, true);
-
-                visible = true;
+            //if(item.$load)
+            try {
+                item.$load(tScript, true);
             }
             catch(e) {
                 loaderGameScene.close();
                 _private.gameSceneClose();
-                throw e;
+
+                return $CommonLibJS.printException(e);
+                //console.warn('[!mainGameTest]', e);
+                //throw e;
             }
             finally {
             }
+
+            visible = true;
         }
     }
 
@@ -385,8 +390,8 @@ Item {
         //width: parent.width
         //height: parent.height
 
-        color: Global.style.backgroundColor
-        colorText: Global.style.primaryTextColor
+        color: $Global.style.backgroundColor
+        colorText: $Global.style.primaryTextColor
 
         removeButtonVisible: false
 
@@ -430,7 +435,7 @@ Item {
 
             buttonStart.enabled = false;
 
-            loaderGameScene.load('./Core/GameScene.qml');
+            loaderGameScene.load(Qt.resolvedUrl('./Core/GameScene.qml'));
         }
 
 

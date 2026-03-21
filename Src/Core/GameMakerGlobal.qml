@@ -1,4 +1,4 @@
-pragma Singleton
+//pragma Singleton
 
 import QtQuick 2.14
 import Qt.labs.settings 1.1
@@ -14,9 +14,11 @@ import _Global 1.0
 
 import 'qrc:/QML'
 
+import 'Singleton'
 
-import 'GameMakerGlobal.js' as GameMakerGlobalJS
 
+//import 'GameMakerGlobal.js' as GameMakerGlobalJS
+//import 'Config.js' as Config
 //import 'File.js' as File
 
 
@@ -25,57 +27,47 @@ QtObject {
     id: root
     objectName: 'GameMakerGlobal'
 
+
     //引擎版本
     readonly property string version: '1.15.3.250209'
 
+    //！！！兼容旧代码
     readonly property string separator: $Platform.sl_separator(true)
 
     //保存 Component 附加组件
     //单例的一个BUG：使用单例对象无法访问到Component，但内部使用root可以访问到；
     readonly property var $component: Component //root.Component
 
+    //readonly property var $GameMakerGlobalJS: GameMakerGlobalJS
 
 
-    //可存储配置
-    //  目前存储：Projects/工程名（game.cd引擎变量，用到了$sys_sound）、$RunTimes、$RunDuration
-    readonly property Settings settings: Settings {
-        id: settings
-        category: 'GameMaker'    //类别
-        //fileName: 'GameMaker.ini'
-        //fileName: parseInt($Frame.sl_configValue('RunType')) === 0 ? '' : 'GameMaker.ini'
-
-        //当前工程
-        property string $CurrentProjectName: ''  //'Project'
-        property int $RunTimes: 0
-        property int $RunDuration: 0
-    }
-
+    readonly property var settings: GameMakerSingleton.settings
 
 
     readonly property QtObject config: QtObject { //配置
         //调试（游戏显示一些调试功能，比如存档不检测、游戏场景显示FPS、战场上显示调试按钮）
-        //property bool bDebug: Global.frameConfig.$sys.debug === 0 ? false : true
+        //property bool bDebug: $Global.frameConfig.$sys.debug === 0 ? false : true
         //property bool bDebug: parseInt($Frame.config.Debug) === 0 ? false : true
         //property bool bDebug: parseInt($Frame.sl_configValue('Debug', 0)) === 0 ? false : true
         property bool bDebug: true
 
 
         //当前项目名称
-        property alias strCurrentProjectName: settings.$CurrentProjectName    //'Project'
+        property string strCurrentProjectName: 'Project'
 
         //引擎工作目录
         property string strWorkPath: {
             switch(Qt.platform.os) {
             case 'android':
             case 'openharmony':
-                return $Platform.externalDataPath + separator + 'GameMaker' + separator;
+                return $Platform.externalDataPath + '/GameMaker/';
                 //return 'assets:/';   //'./'  //':/'
             case 'windows':
                 //if($Platform.compileType === 'debug')
                 //    return 'F:/_Projects/Pets/MakerFrame/GameMaker/';
-                //return $Platform.externalDataPath + separator + 'GameMaker' + separator;
+                //return $Platform.externalDataPath + '/GameMaker/';
             default:
-                return $Platform.externalDataPath + separator + 'GameMaker' + separator;
+                return $Platform.externalDataPath + '/GameMaker/';
                 //return './';
             }
         }
@@ -83,23 +75,35 @@ QtObject {
         //项目根目录
         property string strProjectRootPath: {
             return strWorkPath + 'Projects/';
+
+            /*switch(Qt.platform.os) {
+            case 'android':
+                //return 'assets:/';   //'./'  //':/'
+            case 'openharmony':
+                //return 'rawfile:/';
+            case 'windows':
+                //return './';
+            default:
+                //return './';
+                return $Platform.sl_readOnlyPath();
+            }
+            */
         }
 
         //存档目录
         property string strSaveDataPath: {
             switch(Qt.platform.os) {
             case 'android':
-                return strWorkPath + 'SaveData' + separator + strCurrentProjectName + separator;
-                //return $Platform.externalDataPath + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData' + separator;
-                //return $Platform.sl_getSdcardPath() + separator + 'Leamus' + separator + 'Games' + separator + strCurrentProjectName + separator + 'SaveData' + separator;
+            case 'openharmony':
+                return strWorkPath + 'SaveData/' + strCurrentProjectName + '/';
+                //return $Platform.externalDataPath + '/Games/' + strCurrentProjectName + '/SaveData/';
+                //return $Platform.sl_getSdcardPath() + '/Leamus/Games/' + strCurrentProjectName + '/SaveData/';
             case 'windows':
             default:
-                return strWorkPath + 'SaveData' + separator + strCurrentProjectName + separator;
-                //return 'SaveData' + separator;
+                return strWorkPath + 'SaveData/' + strCurrentProjectName + '/';
+                //return 'SaveData/';
             }
         }
-
-        property url urlGameMakerCorePath: Qt.resolvedUrl('..')
 
 
         //数据文件存储 目录名
@@ -113,18 +117,18 @@ QtObject {
 
         //资源 目录名
         property string strResourceDirName: 'Resources'
-        property string strMapResourceDirName: strResourceDirName + separator + 'Maps'
-        property string strSpriteResourceDirName: strResourceDirName + separator + 'Sprites'
-        property string strGoodsResourceDirName: strResourceDirName + separator + 'Goods'
-        property string strImageResourceDirName: strResourceDirName + separator + 'Images'
-        property string strMusicResourceDirName: strResourceDirName + separator + 'Music'
-        property string strSoundResourceDirName: strResourceDirName + separator + 'Sounds'
-        property string strVideoResourceDirName: strResourceDirName + separator + 'Videos'
+        property string strMapResourceDirName: strResourceDirName + '/Maps'
+        property string strSpriteResourceDirName: strResourceDirName + '/Sprites'
+        property string strGoodsResourceDirName: strResourceDirName + '/Goods'
+        property string strImageResourceDirName: strResourceDirName + '/Images'
+        property string strMusicResourceDirName: strResourceDirName + '/Music'
+        property string strSoundResourceDirName: strResourceDirName + '/Sounds'
+        property string strVideoResourceDirName: strResourceDirName + '/Videos'
 
 
         //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
-        //readonly property string strTDSClientID: ''
-        //readonly property string strTDSClientToken: ''
+        //readonly property string strTDSClientID: Config.TapInfo.TDSClientID //''
+        //readonly property string strTDSClientToken: Config.TapInfo.TDSClientToken //''
     }
 
 
@@ -133,23 +137,23 @@ QtObject {
 
     function mapResourceURL(filepath) {return $GlobalJS.toURL(mapResourcePath(filepath));}
     function mapResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strMapResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMapResourceDirName;
         if(filepath)
-            return ret + separator + filepath;
+            return ret + '/' + filepath;
         return ret;
     }
     function spriteResourceURL(filepath) {return $GlobalJS.toURL(spriteResourcePath(filepath));}
     function spriteResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strSpriteResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSpriteResourceDirName;
         if(filepath)
-            return ret + separator + filepath;
+            return ret + '/' + filepath;
         return ret;
     }
     function goodsResourceURL(filepath) {return $GlobalJS.toURL(goodsResourcePath(filepath));}
     function goodsResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strGoodsResourceDirName;
+        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strGoodsResourceDirName;
         if(filepath)
-            return ret + separator + filepath;
+            return ret + '/' + filepath;
         return ret;
     }
 
@@ -164,9 +168,9 @@ QtObject {
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strSoundResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSoundResourceDirName;
             if(filepath)
-                return ret + separator + filepath;
+                return ret + '/' + filepath;
             return ret;
         }
     }
@@ -181,9 +185,9 @@ QtObject {
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strMusicResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMusicResourceDirName;
             if(filepath)
-                return ret + separator + filepath;
+                return ret + '/' + filepath;
             return ret;
         }
     }
@@ -198,9 +202,9 @@ QtObject {
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strImageResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strImageResourceDirName;
             if(filepath)
-                return ret + separator + filepath;
+                return ret + '/' + filepath;
             return ret;
         }
     }
@@ -215,57 +219,33 @@ QtObject {
             return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + separator + config.strVideoResourceDirName;
+            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strVideoResourceDirName;
             if(filepath)
-                return ret + separator + filepath;
+                return ret + '/' + filepath;
             return ret;
         }
     }
 
 
 
-    //使用时长
-    readonly property Timer timer: Timer {
-        //id: timer
-
-        property var nLastTime: new Date().getTime()
-
-        repeat: true
-        interval: 6000
-        triggeredOnStart: false
-        running: true
-        onRunningChanged: {
-            //if(running === true)
-            //    nLastTime = new Date().getTime();
-        }
-
-        onTriggered: {
-            let now = new Date().getTime();
-            settings.$RunDuration += parseInt((now - nLastTime) / 1000);
-            nLastTime = now;
-        }
-    }
-
-
-
     Component.onCompleted: {
-        let gameMakerGlobal;
+        let gameMakerGlobal = root;
         //!!解决 assets BUG
         if(Qt.resolvedUrl('.').startsWith('file:assets:/')) {
-            gameMakerGlobal = root;
+            //gameMakerGlobal = root;
             console.info('[GameMakerGlobal]file:assets:/ 开头，需额外处理');
             if(Qt.platform.os !== 'android')
                 console.warn('[!GameMakerGlobal]非安卓环境？');
             //return;
         }
-        else
-            gameMakerGlobal = GameMakerGlobal;
+        //else
+        //    gameMakerGlobal = GameMakerGlobal;
 
-        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
+        /*if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
             const msg = '已存在不同GameMakerGlobal单例类，请重启框架或返回原引擎，否则数据出错';
             console.warn('[!GameMakerGlobal]' + msg);
 
-            Global.globalData.$components.dialog.show({
+            $Global.globalData.$components.dialog.show({
                 Msg: msg,
                 //Buttons: 0,
                 OnAccepted: function() {
@@ -280,6 +260,7 @@ QtObject {
         $Frame.sl_globalObject().GameMakerGlobal = gameMakerGlobal;
         $Frame.sl_globalObject().$GameMakerGlobalJS = GameMakerGlobalJS;
         $Frame.sl_globalObject().GameMakerGlobalJS = GameMakerGlobalJS;
+        */
 
 
 
@@ -294,11 +275,14 @@ QtObject {
 
 
 
-        $Frame.sl_addImportPath(config.urlGameMakerCorePath);
+        //if(root.settings.$CurrentProjectName)
+            config.strCurrentProjectName = root.settings.$CurrentProjectName;
+
+        ++GameMakerSingleton.nOpenCount;
 
 
 
-        console.debug('[GameMakerGlobal]Component.onCompleted:', gameMakerGlobal, GameMakerGlobalJS/*, $window*/, gameMakerGlobal.Component, root.Component, gameMakerGlobal === root, Qt.resolvedUrl('.'), );
+        console.debug('[GameMakerGlobal]Component.onCompleted:', gameMakerGlobal/*, GameMakerGlobalJS*//*, $window*/, gameMakerGlobal.Component, root.Component, gameMakerGlobal === root, Qt.resolvedUrl('.'), );
     }
     Component.onDestruction: {
         let gameMakerGlobal;
@@ -311,7 +295,7 @@ QtObject {
         else
             gameMakerGlobal = GameMakerGlobal;
 
-        if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
+        /*if($Frame.sl_globalObject().GameMakerGlobal && $Frame.sl_globalObject().GameMakerGlobal !== gameMakerGlobal) {
             console.warn('[!GameMakerGlobal]已存在不同单例类');
             return;
         }
@@ -320,6 +304,11 @@ QtObject {
         delete $Frame.sl_globalObject().$GameMakerGlobalJS;
         delete $Frame.sl_globalObject().GameMakerGlobal;
         delete $Frame.sl_globalObject().$GameMakerGlobal;
+        */
+
+
+
+        --GameMakerSingleton.nOpenCount;
 
 
 

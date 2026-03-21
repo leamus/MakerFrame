@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrVideos = $Frame.sl_dirList(GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrVideos = $Frame.sl_dirList($GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainVideoEditor]_private.arrVideos', JSON.stringify(_private.arrVideos))
         _private.refresh();
     }
@@ -52,14 +52,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -73,8 +73,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            color: Global.style.backgroundColor
-            colorText: Global.style.primaryTextColor
+            color: $Global.style.backgroundColor
+            colorText: $Global.style.primaryTextColor
 
             bHighLightSelected: true
 
@@ -107,7 +107,7 @@ Item {
                     OnAccepted: function() {
                         //root.forceActiveFocus();
 
-                        $Frame.sl_fileDelete(GameMakerGlobal.videoResourcePath(item));
+                        $Frame.sl_fileDelete($GameMakerGlobal.videoResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -191,10 +191,10 @@ Item {
                                 //$dialog.forceActiveFocus();
                             }
                             else {
-                                let ret = $Frame.sl_fileRename(GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename($GameMakerGlobal.videoResourcePath(oldFileName), $GameMakerGlobal.videoResourcePath(newFileName));
                                 if(ret <= 0) {
                                     $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
-                                    console.error('[!mainVideoEditor]RenameFile ERROR:', GameMakerGlobal.videoResourcePath(oldFileName), GameMakerGlobal.videoResourcePath(newFileName));
+                                    console.error('[!mainVideoEditor]RenameFile ERROR:', $GameMakerGlobal.videoResourcePath(oldFileName), $GameMakerGlobal.videoResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -244,7 +244,7 @@ Item {
         //opacity: 0
         anchors.fill: parent
 
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
 
 
@@ -398,10 +398,10 @@ Item {
                         //$dialog.forceActiveFocus();
                     }
                     else {
-                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), $GameMakerGlobal.videoResourcePath(newFileName), true);
                         if(ret <= 0) {
                             $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainVideoEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.videoResourcePath(newFileName));
+                            console.error('[!mainVideoEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), $GameMakerGlobal.videoResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -439,7 +439,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrVideos = listview.show(GameMakerGlobal.videoResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrVideos = listview.show($GameMakerGlobal.videoResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrVideos.length === 0)
                 listview.listview.currentIndex = -1;
@@ -461,13 +461,13 @@ Item {
             mediaPlayer.stop();
             itemVideo.visible = false;
             mediaPlayer.source = '';
-            //mediaPlayer.source = GameMakerGlobal.videoResourceURL(textVideoResourceName.text);
+            //mediaPlayer.source = $GameMakerGlobal.videoResourceURL(textVideoResourceName.text);
 
             root.forceActiveFocus();
         }
 
         function playOrPause() {
-            mediaPlayer.source = GameMakerGlobal.videoResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
+            mediaPlayer.source = $GameMakerGlobal.videoResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
             if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                 mediaPlayer.pause();
             else
@@ -477,8 +477,8 @@ Item {
             sliderMovie.forceActiveFocus();
 
             //console.debug('video:', textVideoName.text, mediaPlayer.source);
-            //console.debug('resolve:', Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl(GameMakerGlobal.videoResourcePath(textVideoName.text)))
-            //console.debug('file:', GameMakerGlobal.videoResourceURL(textVideoName.text), $Frame.sl_fileExists(GameMakerGlobal.videoResourcePath(textVideoName.text)));
+            //console.debug('resolve:', Qt.resolvedUrl(textVideoName.text), Qt.resolvedUrl($GameMakerGlobal.videoResourcePath(textVideoName.text)))
+            //console.debug('file:', $GameMakerGlobal.videoResourceURL(textVideoName.text), $Frame.sl_fileExists($GameMakerGlobal.videoResourcePath(textVideoName.text)));
         }
     }
 

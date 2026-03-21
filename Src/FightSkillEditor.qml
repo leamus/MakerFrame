@@ -35,7 +35,7 @@ Item {
     function init(fightSkillName) {
 
         if(fightSkillName) {
-            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + fightSkillName + GameMakerGlobal.separator + 'fight_skill.js';
+            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.js';
             //const data = File.read(filePath);
             //console.debug('[FightSkillEditor]filePath：', filePath);
 
@@ -218,14 +218,14 @@ const data = (function() {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -311,7 +311,7 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_skill.vjs';
+                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + _private.strSavedName + '/fight_skill.vjs';
 
                     fightSkillVisualEditor.forceActiveFocus();
                     fightSkillVisualEditor.visible = true;
@@ -353,8 +353,8 @@ const data = (function() {
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    color: $Global.style.backgroundColor
+                    border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                     border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
@@ -470,16 +470,16 @@ const data = (function() {
                 return false;
             }
 
-            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.js', 0);
+                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'fight_skill.vjs';
+                    const oldFilePath = path + '/' + _private.strSavedName + '/fight_skill.vjs';
                     if(textFightSkillName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textFightSkillName.text + GameMakerGlobal.separator + 'fight_skill.vjs', true);
+                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textFightSkillName.text + '/fight_skill.vjs', true);
                     }
                 }
 
@@ -489,7 +489,7 @@ const data = (function() {
                 //root.forceActiveFocus();
             }
 
-            if(textFightSkillName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textFightSkillName.text)) {
+            if(textFightSkillName.text !== _private.strSavedName && $Frame.sl_dirExists(path + '/' + textFightSkillName.text)) {
                 $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

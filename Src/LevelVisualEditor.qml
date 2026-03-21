@@ -50,7 +50,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -89,16 +89,17 @@ Item {
                         let data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
                                     ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
 
-                        $list.open({
+                        const list = $showList({
                             Data: data[0],
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -124,16 +125,17 @@ Item {
                         let data = [['加减：1','倍率：2','设置：3'],
                                     ['1','2','3']];
 
-                        $list.open({
+                        const list = $showList({
                             Data: data[0],
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -159,16 +161,17 @@ Item {
                         /*let data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
-                        $list.open({
+                        const list = $showList({
                             Data: data[0],
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -236,16 +239,17 @@ Item {
                         let data = [['一段血','二段血','三段血','一段MP','二段MP','攻击','防御','速度','幸运','灵力'],
                                     ['HP,0','HP,1','HP,2','MP,0','MP,1','attack','defense','speed','luck','power']];
 
-                        $list.open({
+                        const list = $showList({
                             Data: data[0],
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -271,16 +275,17 @@ Item {
                         /*let data = [['固定值（整数）：20','倍率（小数）：2.0'],
                                     ['20','2.0']];
 
-                        $list.open({
+                        const list = $showList({
                             Data: data[0],
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = data[1][index];
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -318,7 +323,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -536,7 +541,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -550,7 +555,7 @@ Item {
 
                                 text: '*@属性'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -558,7 +563,7 @@ Item {
 
                                 text: '*值'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -609,18 +614,19 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightSkillDirName;
+                                let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
 
-                                $list.open({
+                                const list = $showList({
                                     Data: path,
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -649,7 +655,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -663,7 +669,7 @@ Item {
 
                                 text: '*@属性'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -671,7 +677,7 @@ Item {
 
                                 text: '*@类型'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -679,7 +685,7 @@ Item {
 
                                 text: '*值'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 

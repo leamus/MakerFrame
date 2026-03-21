@@ -21,7 +21,7 @@ import './Core'
 //import 'Core/GameComponents'
 
 
-import 'GameVisualScript.js' as GameVisualScriptJS
+//import 'GameVisualScript.js' as GameVisualScriptJS
 //import 'File.js' as File
 
 
@@ -35,7 +35,7 @@ Item {
 
 
     function $load(...params) {
-        let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator;
+        let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/';
 
         /*if($Frame.sl_fileExists(path + 'main.js')) {
             _private.strMainJSName = 'main.js';
@@ -82,7 +82,7 @@ game.goon();
 
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -108,11 +108,11 @@ game.goon();
 
         visualScriptEditor.strTitle: strTitle
 
-        visualScriptEditor.arrMajorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
-        visualScriptEditor.arrMinorSearchPaths: [GameMakerGlobal.config.strWorkPath + 'Plugins', GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
+        visualScriptEditor.arrMajorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins/$Leamus/$VisualScripts', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/$Leamus/$VisualScripts']
+        visualScriptEditor.arrMinorSearchPaths: [$GameMakerGlobal.config.strWorkPath + 'Plugins', $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins']
 
-        visualScriptEditor.defaultCommandsInfo: GameVisualScriptJS.data.commandsInfo
-        visualScriptEditor.defaultCommandGroupsInfo: GameVisualScriptJS.data.groupsInfo
+        visualScriptEditor.defaultCommandsInfo: $GameVisualScriptJS.fnCommandsInfo()
+        visualScriptEditor.defaultCommandGroupsInfo: $GameVisualScriptJS.fnGroupsInfo()
         visualScriptEditor.defaultCommandTemplate: [{'command':'函数/生成器{','params':['*$start',''],'status':{'enabled':true}},{'command':'块结束}','params':[],'status':{'enabled':true}}]
 
 

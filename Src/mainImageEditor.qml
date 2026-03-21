@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrImages = $Frame.sl_dirList(GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrImages = $Frame.sl_dirList($GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
         //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();
     }
@@ -52,14 +52,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -73,8 +73,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            color: Global.style.backgroundColor
-            colorText: Global.style.primaryTextColor
+            color: $Global.style.backgroundColor
+            colorText: $Global.style.primaryTextColor
 
             bHighLightSelected: true
 
@@ -90,7 +90,7 @@ Item {
             }
 
             onSg_doubleClicked: {
-                imageReview.source = GameMakerGlobal.imageResourceURL(item);
+                imageReview.source = $GameMakerGlobal.imageResourceURL(item);
 
                 _private.setImageVisible(true);
 
@@ -109,7 +109,7 @@ Item {
                     OnAccepted: function() {
                         //root.forceActiveFocus();
 
-                        $Frame.sl_fileDelete(GameMakerGlobal.imageResourcePath(item));
+                        $Frame.sl_fileDelete($GameMakerGlobal.imageResourcePath(item));
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -193,10 +193,10 @@ Item {
                                 //$dialog.forceActiveFocus();
                             }
                             else {
-                                let ret = $Frame.sl_fileRename(GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
+                                let ret = $Frame.sl_fileRename($GameMakerGlobal.imageResourcePath(oldFileName), $GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
                                     $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
-                                    console.error('[!mainImageEditor]RenameFile ERROR:', GameMakerGlobal.imageResourcePath(oldFileName), GameMakerGlobal.imageResourcePath(newFileName));
+                                    console.error('[!mainImageEditor]RenameFile ERROR:', $GameMakerGlobal.imageResourcePath(oldFileName), $GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
                                 _private.refresh();
@@ -219,13 +219,13 @@ Item {
                     if(listview.listview.currentIndex < 0)
                         return;
 
-                    imageReview.source = GameMakerGlobal.imageResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
+                    imageReview.source = $GameMakerGlobal.imageResourceURL(listview.listview.model.get(listview.listview.currentIndex).Name);
 
                     _private.setImageVisible(true);
 
                     //console.debug('image:', textImageName.text, imageReview.source);
-                    //console.debug('resolve:', Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl(GameMakerGlobal.imageResourcePath(textImageName.text)))
-                    //console.debug('file:', GameMakerGlobal.imageResourceURL(textImageName.text), $Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textImageName.text)));
+                    //console.debug('resolve:', Qt.resolvedUrl(textImageName.text), Qt.resolvedUrl($GameMakerGlobal.imageResourcePath(textImageName.text)))
+                    //console.debug('file:', $GameMakerGlobal.imageResourceURL(textImageName.text), $Frame.sl_fileExists($GameMakerGlobal.imageResourcePath(textImageName.text)));
                 }
             }
         }
@@ -242,7 +242,7 @@ Item {
         height: parent.height
 
         //color: 'transparent'
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
 
 
@@ -371,10 +371,10 @@ Item {
                         //$dialog.forceActiveFocus();
                     }
                     else {
-                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName), true);
+                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), $GameMakerGlobal.imageResourcePath(newFileName), true);
                         if(ret <= 0) {
                             $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), GameMakerGlobal.imageResourcePath(newFileName));
+                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), $GameMakerGlobal.imageResourcePath(newFileName));
                             return;
                         }
                         _private.refresh();
@@ -412,7 +412,7 @@ Item {
         function refresh() {
             let index = listview.listview.currentIndex;
 
-            let arrImages = listview.show(GameMakerGlobal.imageResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
+            let arrImages = listview.show($GameMakerGlobal.imageResourcePath(), [], /*0x001 | */0x002 | 0x2000 | 0x4000);
 
             if(arrImages.length === 0)
                 listview.listview.currentIndex = -1;

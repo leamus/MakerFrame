@@ -40,14 +40,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -70,7 +70,7 @@ Item {
             text: ''
 
             textArea.color: 'white'
-            //textArea.color: Global.style.foreground
+            //textArea.color: $Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -89,8 +89,8 @@ Item {
                 //implicitHeight: 40
                 color: '#80000000'
                 //color: 'transparent'
-                //color: Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }

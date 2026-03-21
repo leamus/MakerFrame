@@ -15,8 +15,7 @@ FightScene 1.0 FightScene.qml
 #FightSceneJS 1.0 FightScene.js
 
 
-##GameMakerGlobalJS 1.0 GameMakerGlobal.js
-
-
+GameMakerGlobalJS 1.0 GameMakerGlobal.js
 
 #singleton GameMakerGlobal 1.0 GameMakerGlobal.qml
+GameMakerGlobal 1.0 GameMakerGlobal.qml

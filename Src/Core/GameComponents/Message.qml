@@ -147,7 +147,7 @@ Notepad {
     //textArea.enabled: false
     textArea.readOnly: true
     textArea.color: 'white'
-    //textArea.color: Global.style.foreground
+    //textArea.color: $Global.style.foreground
     textArea.wrapMode: TextArea.WrapAnywhere
 
     //textArea.horizontalAlignment: TextArea.AlignLeft //TextArea.AlignHCenter //TextArea.AlignJustify
@@ -168,8 +168,8 @@ Notepad {
 
     textArea.background: Rectangle {
         color: 'transparent'
-        //color: Global.style.backgroundColor
-        //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+        //color: $Global.style.backgroundColor
+        //border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
         //border.width: parent.parent.textArea.activeFocus ? 2 : 1
     }
 

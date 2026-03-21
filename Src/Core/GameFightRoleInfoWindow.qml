@@ -65,7 +65,7 @@ Item {
 
     function refresh() {
         let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
-        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName) + '/';
         textFightRoleName.text = $CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(conbatant, {avatar: true, color: true}));
 
 
@@ -146,7 +146,7 @@ Item {
 
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: '#7FFFFFFF'
         //radius: 9
 
@@ -262,7 +262,7 @@ Item {
             //textArea.enabled: false
             textArea.readOnly: true
 
-            textArea.color: 'white' //Global.style.foreground
+            textArea.color: 'white' //$Global.style.foreground
 
             textArea.wrapMode: TextArea.WrapAnywhere
             textArea.horizontalAlignment: TextArea.AlignJustify
@@ -275,8 +275,8 @@ Item {
 
             textArea.background: Rectangle {
                 color: 'transparent'
-                //color: Global.style.backgroundColor
-                //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                //border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 //border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -392,7 +392,7 @@ Item {
 
             //textArea.enabled: false
             textArea.readOnly: true
-            textArea.color: 'white' //Global.style.foreground
+            textArea.color: 'white' //$Global.style.foreground
 
             textArea.wrapMode: TextArea.WrapAnywhere
             textArea.horizontalAlignment: TextArea.AlignJustify
@@ -405,8 +405,8 @@ Item {
 
             textArea.background: Rectangle {
                 color: 'transparent'
-                //color: Global.style.backgroundColor
-                //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                //border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 //border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }

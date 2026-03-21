@@ -1,4 +1,4 @@
-.pragma library
+//.pragma library
 
 
 
@@ -292,14 +292,21 @@ function* $gameInit(newGame) {
     game.gf.$plugins = {};
 
     //载入项目的 game.js 的所有变量和函数复制给 game.gf，并调用其 $init
-    if($Frame.sl_fileExists($GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + 'game.js'))) {
-        let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(game.$projectpath + GameMakerGlobal.separator + 'game.js'));
+    if($Frame.sl_fileExists(game.$projectpath + '/game.js')) {
+        let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(game.$projectpath + '/game.js'));
         if(gameJS) {
             Object.assign(game.gf, gameJS);
             if(gameJS.$init) {
-                let r = gameJS.$init(newGame);
-                if($CommonLibJS.isGenerator(r))r = yield* r;
-                //game.run(gameJS.$init(newGame) ?? null);
+                try {
+                    let r = gameJS.$init(newGame);
+                    if($CommonLibJS.isGenerator(r))r = yield* r;
+                    //game.run(gameJS.$init(newGame) ?? null);
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    console.warn('[!GameMakerGlobalJS]game.js的$init函数调用错误');
+                    //throw e;
+                }
             }
         }
     }
@@ -309,9 +316,9 @@ function* $gameInit(newGame) {
         game.gf.$plugins[tp0] = {};
         for(let tp1 in plugins[tp0]) {
             game.gf.$plugins[tp0][tp1] = {};
-            let gameJSPath = game.$projectpath + GameMakerGlobal.separator + 'Plugins' + GameMakerGlobal.separator + tp0 + GameMakerGlobal.separator + tp1 + GameMakerGlobal.separator + 'Components';
-            if($Frame.sl_fileExists($GlobalJS.toPath(gameJSPath + GameMakerGlobal.separator + 'game.js'))) {
-                let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(gameJSPath + GameMakerGlobal.separator + 'game.js'));
+            let gameJSPath = game.$projectpath + '/Plugins/' + tp0 + '/' + tp1 + '/Components';
+            if($Frame.sl_fileExists(gameJSPath + '/game.js')) {
+                let gameJS = game.$sys.caches.jsLoader.load($GlobalJS.toURL(gameJSPath + '/game.js'));
                 if(gameJS) {
                     Object.assign(game.gf.$plugins[tp0][tp1], gameJS);
                     if(gameJS.$init) {
@@ -364,9 +371,16 @@ function* $gameInit(newGame) {
 function* $gameRelease(gameExit) {
     //调用项目的 game.js 的 $release
     if(game.gf.$release) {
-        let r = game.gf.$release(gameExit);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        //game.run(game.gf.$release(gameExit) ?? null);
+        try {
+            let r = game.gf.$release(gameExit);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            //game.run(game.gf.$release(gameExit) ?? null);
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!GameMakerGlobalJS]game.js的$release函数调用错误');
+            //throw e;
+        }
     }
 
     /*/载入所有插件的 game.js 的 $release
@@ -707,12 +721,12 @@ function $showGoodsName(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName) + GameMakerGlobal.separator;
+        //let goodsPath = game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName + '/';
 
         //$CommonLibJS.showRichTextImage();
         tstr = ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
-            //arg(goodsPath + goods.$rid + GameMakerGlobal.separator + goods.$image).
-            arg(GameMakerGlobal.imageResourceURL(goods.$image)).
+            //arg(goodsPath + goods.$rid + '/' + goods.$image).
+            arg($GameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
     }
@@ -756,7 +770,7 @@ function $showGoodsName(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 function $showCombatantName(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = $GlobalJS.toPath(game.$projectpath + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName) + GameMakerGlobal.separator;
+    //let fightRolePath = game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/';
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -764,8 +778,8 @@ function $showCombatantName(combatant, flags=null) {
     if(flags['avatar'] && combatant.$avatar) {
         //$CommonLibJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
-            //arg(fightRolePath + combatant.$rid + GameMakerGlobal.separator + combatant.$avatar).
-            arg(GameMakerGlobal.imageResourceURL(combatant.$avatar)).
+            //arg(fightRolePath + combatant.$rid + '/' + combatant.$avatar).
+            arg($GameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
     }
@@ -952,9 +966,17 @@ function* $commonUseScript(goods, combatant, params=1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, goods, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, goods, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!GameMakerGlobalJS]commonUseScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -1001,9 +1023,17 @@ function* $commonEquipScript(goods, combatant, params=1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, goods, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, goods, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!GameMakerGlobalJS]commonEquipScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -1103,9 +1133,17 @@ function* $commonUnloadScript(positionName, combatant, params=-1) {
 
         //yield* eval(`(function*(){${params}})()`);
 
-        let r = params.call(goods, positionName, combatant);
-        if($CommonLibJS.isGenerator(r))r = yield* r;
-        return r;
+        try {
+            let r = params.call(goods, positionName, combatant);
+            if($CommonLibJS.isGenerator(r))r = yield* r;
+            return r;
+        }
+        catch(e) {
+            $CommonLibJS.printException(e);
+            console.warn('[!GameMakerGlobalJS]commonUnloadScript函数调用错误');
+            //throw e;
+            return null;
+        }
     }
     else if($CommonLibJS.isValidNumber(params, 0b1)) {
         count = parseInt(params);
@@ -1816,6 +1854,12 @@ function* combatantRoundEffects(combatant, round, stage) {
 
 
 
+//通用技能播放函数：如果技能的$playScript不为函数，则调用
+function* $commonPlayScript(fightSkill, combatant, ...params) {
+
+}
+
+
 //检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
 //返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
 //stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
@@ -2354,6 +2398,12 @@ function $readSavesInfo(count=3) {
 
 //type：true表示保持宽高缩放到适合窗口；false：拉伸到满窗口；数字：缩放倍数；数组：x、y方向缩放倍数；且默认居中窗口；
 function setSceneSize(width, height, type=true) {
+    /*console.debug('[GameMakerGlobalJS]setSceneSize:', width, height,
+        game.$sys.screen.width, game.$sys.screen.height,
+        game.$sys.scene.width, game.$sys.scene.height,
+        game.$sys.scene.parent.width, game.$sys.scene.parent.height,
+    );*/
+
     const xScale = game.$sys.screen.width / width;
     const yScale = game.$sys.screen.height / height;
 
@@ -3504,33 +3554,52 @@ function commonLevelAlgorithm(combatant, targetLevel) {
 
 
 
-//载入特效；
-function loadSpriteEffect(spriteName, spriteEffectComp, jsLoader) {
-    //console.debug('[FightScene]getSpriteEffect0');
-
+//获取 Sprite 资源
+function getSpriteResource(spriteName, jsLoader=null) {
     //读特效信息
-    let spriteDirPath = $GlobalJS.toPath(GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName + GameMakerGlobal.separator + spriteName);
+    const spriteDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + spriteName; //game.$projectpath
 
-    let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + GameMakerGlobal.separator + 'sprite.json');
+    let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + '/sprite.json');
     if(spriteResourceInfo)
         spriteResourceInfo = JSON.parse(spriteResourceInfo);
-    else
-        return false;
-
-    let script;
-
-    if($Frame.sl_fileExists(spriteDirPath + GameMakerGlobal.separator + 'sprite.js')) {
-        jsLoader.clear();
-        script = jsLoader.load($GlobalJS.toURL(spriteDirPath + GameMakerGlobal.separator + 'sprite.js'));
+    if(!spriteResourceInfo) {
+        console.warn('[!GameMakerGlobal]getSpriteResource ERROR:', spriteName);
+        return null;
     }
 
+    if(jsLoader && $Frame.sl_fileExists(spriteDirPath + '/sprite.js')) {
+        //jsLoader.clear();
+        spriteResourceInfo.$script = jsLoader.load($GlobalJS.toURL(spriteDirPath + '/sprite.js'));
+    }
 
-    spriteEffectComp.nSpriteType = spriteResourceInfo.SpriteType;
+    console.debug('[GameMakerGlobal]getSpriteResource:', spriteName);
+    return spriteResourceInfo;
+}
+
+//载入特效；
+function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, jsLoader=null) {
+    //console.debug('[GameMakerGlobalJS]getSpriteEffect:', spriteEffectParams, spriteEffectComp, newParams, jsLoader);
+
+    const spriteResourceInfo = $CommonLibJS.isString(spriteEffectParams) ? getSpriteResource(spriteEffectParams, jsLoader) : spriteEffectParams;
+    if(!spriteResourceInfo) {
+        console.exception('[!GameMakerGlobal]getSpriteEffect FAIL:', spriteEffectParams);
+        return null;
+    }
+
+    /*if(!spriteEffectComp) {
+        //spriteEffectComp = compCacheSpriteEffect.createObject(parent);
+        let bNew;
+        [spriteEffectComp, bNew] = _private.cacheSprites.get(parent);
+        //spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
+    }
+    else { //if(spriteEffectComp.bRunning === true)
+        //spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType;
+        //spriteEffectComp.sprite.stop();
+    }
+    */
+
+    spriteEffectComp.nSpriteType = newParams.SpriteType ?? spriteResourceInfo.SpriteType ?? 1;
     spriteEffectComp.sprite.stop();
-
-
-    //spriteEffectComp.$info = spriteResourceInfo;
-    //spriteEffectComp.$script = spriteResourceInfo.$script;
 
 
     /*switch(spriteResourceInfo.SpriteType) {
@@ -3544,74 +3613,287 @@ function loadSpriteEffect(spriteName, spriteEffectComp, jsLoader) {
     */
 
 
-    spriteEffectComp.strSource = GameMakerGlobal.spriteResourceURL(spriteResourceInfo.Image);
+    spriteEffectComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? spriteResourceInfo.Image);
 
     //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
     //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
-    spriteEffectComp.rXOffset = spriteResourceInfo.XOffset ?? 0;
-    spriteEffectComp.rYOffset = spriteResourceInfo.YOffset ?? 0;
-    spriteEffectComp.opacity = spriteResourceInfo.Opacity ?? 1;
-    spriteEffectComp.rXScale = spriteResourceInfo.XScale ?? 1;
-    spriteEffectComp.rYScale = spriteResourceInfo.YScale ?? 1;
+    spriteEffectComp.rXOffset = newParams.XOffset ?? spriteResourceInfo.XOffset ?? 0;
+    spriteEffectComp.rYOffset = newParams.YOffset ?? spriteResourceInfo.YOffset ?? 0;
+    spriteEffectComp.opacity = newParams.Opacity ?? spriteResourceInfo.Opacity ?? 1;
+    spriteEffectComp.rXScale = newParams.XScale ?? spriteResourceInfo.XScale ?? 1;
+    spriteEffectComp.rYScale = newParams.YScale ?? spriteResourceInfo.YScale ?? 1;
 
-    spriteEffectComp.strSoundeffectName = spriteResourceInfo.Sound ?? '';
+    spriteEffectComp.strSoundeffectName = newParams.Sound ?? spriteResourceInfo.Sound ?? '';
 
-    spriteEffectComp.nSoundeffectDelay = spriteResourceInfo.SoundDelay ?? 0;
+    spriteEffectComp.nSoundeffectDelay = newParams.SoundDelay ?? spriteResourceInfo.SoundDelay ?? 0;
 
-    spriteEffectComp.nLoops = -1;
+    spriteEffectComp.nLoops = newParams.Loops ?? newParams.$loops/* ?? spriteResourceInfo.Loops*/ ?? 1; //AnimatedSprite.Infinite
     //spriteEffectComp.restart();
 
-    let t = spriteResourceInfo.SpriteSize;
-    spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
-    spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
+    let t = newParams.SpriteSize ?? spriteResourceInfo.SpriteSize;
+    if($CommonLibJS.isArray(t) && t[0] >= 0)
+        spriteEffectComp.width = parseInt((t && t[0]) ? t[0] : 0);
+    else
+        spriteEffectComp.width = Qt.binding(()=>(spriteEffectComp.parent ? spriteEffectComp.parent.width : 0));
+    if($CommonLibJS.isArray(t) && t[1] >= 0)
+        spriteEffectComp.height = parseInt((t && t[1]) ? t[1] : 0);
+    else
+        spriteEffectComp.height = Qt.binding(()=>(spriteEffectComp.parent ? spriteEffectComp.parent.height : 0));
+    //spriteEffect.sprite.width = (info.SpriteSize[0]);
+    //spriteEffect.sprite.height = (info.SpriteSize[1]);
+    //spriteEffect.implicitWidth = (info.SpriteSize[0]);
+    //spriteEffect.implicitHeight = (info.SpriteSize[1]);
 
 
-    //！！！兼容旧代码
+    //！！！兼容旧代码2个
     if(spriteEffectComp.nSpriteType === 1) {
         spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameCount'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameCount'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameCount'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
             $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameCount'),
         0);
         spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameInterval'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameInterval'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
             $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameInterval'),
         0);
 
         //注意这个放在 spriteEffectComp.sprite.width 和 spriteEffectComp.sprite.height 之前
         let t = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameSize'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameSize'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameSize'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameSize'),
             $CommonLibJS.getObjectValue(spriteResourceInfo, 'FrameSize'),
         );
         spriteEffectComp.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
 
         t = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'OffsetIndex'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'OffsetIndex'),
+            $CommonLibJS.getObjectValue(newParams, 'OffsetIndex'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'OffsetIndex'),
             $CommonLibJS.getObjectValue(spriteResourceInfo, 'OffsetIndex'),
         );
         spriteEffectComp.sprite.pointOffsetIndex = Qt.point((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
     }
     else if(spriteEffectComp.nSpriteType === 2) {
-        let t = spriteResourceInfo.FrameData;
+        //let t = newParams.FrameInfo ?? spriteResourceInfo.FrameInfo ?? spriteResourceInfo.FrameData;
 
-        //！！！兼容旧代码
+        //！！！兼容旧代码2个
         spriteEffectComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameCount'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameCount'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameCount'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameCount'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '1'),
         0);
         spriteEffectComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameInterval'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameInterval'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameInterval'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '2'),
         0);
         spriteEffectComp.sprite.nFrameStartIndex = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(spriteResourceInfo.FrameInfo, 'FrameStartIndex'),
+            //$CommonLibJS.getObjectValue(newParams.FrameData, 'FrameStartIndex'),
+            $CommonLibJS.getObjectValue(newParams, 'FrameStartIndex'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, 'FrameStartIndex'),
             $CommonLibJS.getObjectValue(spriteResourceInfo.FrameData, '0'),
         0);
-
-
-        if(script)
-            spriteEffectComp.sprite.fnRefresh = script.$refresh;
     }
+
+
+    if(spriteEffectComp.hasOwnProperty('$info'))
+        spriteEffectComp.$info = spriteResourceInfo;
+
+
+    let script = newParams.$script ?? spriteResourceInfo.$script ?? newParams.Script ?? spriteResourceInfo.Script;
+    if($CommonLibJS.isString(script)) { //如果是字符串，则载入js文件
+        const spriteDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + script; //game.$projectpath
+        if(jsLoader && $Frame.sl_fileExists(spriteDirPath + '/sprite.js')) {
+            //jsLoader.clear();
+            script = jsLoader.load($GlobalJS.toURL(spriteDirPath + '/sprite.js'));
+        }
+        else
+            script = null;
+    }
+    if(script) {
+        spriteEffectComp.sprite.fnRefresh = script.$refresh;
+        if(spriteEffectComp.hasOwnProperty('$script'))
+            spriteEffectComp.$script = script;
+    }
+
     //spriteEffectComp.start();
+
+    return true;
+}
+
+//获取 Role 资源
+function getRoleResource(roleName, jsLoader=null) {
+    //读角色信息
+    const roleDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleName; //game.$projectpath
+
+    let roleResourceInfo = $Frame.sl_fileRead(roleDirPath + '/role.json');
+    if(roleResourceInfo)
+        roleResourceInfo = JSON.parse(roleResourceInfo);
+    if(!roleResourceInfo) {
+        console.warn('[!GameMakerGlobal]getRoleResource ERROR:', roleName);
+        return null;
+    }
+
+    if(jsLoader && $Frame.sl_fileExists(roleDirPath + '/role.js')) {
+        //jsLoader.clear();
+        roleResourceInfo.$script = jsLoader.load($GlobalJS.toURL(roleDirPath + '/role.js'));
+    }
+
+    console.debug('[GameMakerGlobal]getRoleResource:', roleName);
+    return roleResourceInfo;
+}
+
+//载入角色，返回角色对象；
+//roleParams是 角色的资源名（会读取对应角色的信息）或 角色的信息（不会再次读取）；
+//如果 roleComp 为null，则 创建1个 roleComp 组件并返回；
+function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSpriteResourceCallback=null) {
+    //console.debug('[GameScene]createRole:', roleParams, roleComp, newParams, jsLoader);
+
+    const roleResourceInfo = $CommonLibJS.isString(roleParams) ? getRoleResource(roleParams, jsLoader) : roleParams;
+    if(!roleResourceInfo) {
+        console.exception('[!GameMakerGlobal]createRole FAIL:', roleParams);
+        return null;
+    }
+
+    /*if(!roleComp) {
+        roleComp = compRole.createObject(parent);
+    }
+    */
+
+    roleComp.nSpriteType = newParams.SpriteType ?? roleResourceInfo.SpriteType ?? 1;
+    if(roleComp.nSpriteType === 0) { //特效选择
+        let t = newParams.FrameInfo ?? roleResourceInfo.FrameInfo ??
+            newParams.FrameIndex ?? roleResourceInfo.FrameIndex; //兼容旧代码！！！
+        for(let ta in t) {
+            const info = (getSpriteResourceCallback ?? getSpriteResource)(t[ta][0]);
+            roleComp.objActionsInfo[ta] = {Info: info, Script: info.$script};
+        }
+    }
+    else if(roleComp.nSpriteType === 1) { //经典行列图
+        roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
+
+        //！！！兼容旧代码2个
+        roleComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(newParams.FrameInfo, 'FrameCount'),
+            //$CommonLibJS.getObjectValue(newParams, 'FrameCount'),
+            $CommonLibJS.getObjectValue(roleResourceInfo.FrameInfo, 'FrameCount'),
+            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameCount'),
+        0);
+        roleComp.nInterval = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(newParams.FrameInfo, 'FrameInterval'),
+            //$CommonLibJS.getObjectValue(newParams, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(roleResourceInfo.FrameInfo, 'FrameInterval'),
+            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameInterval'),
+        0);
+
+        //注意这个放在 roleComp.sprite.sprite.width 和 roleComp.sprite.sprite.height 之前
+        let t = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(newParams.FrameInfo, 'FrameSize'),
+            //$CommonLibJS.getObjectValue(newParams, 'FrameSize'),
+            $CommonLibJS.getObjectValue(roleResourceInfo.FrameInfo, 'FrameSize'),
+            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameSize'),
+        );
+        roleComp.sprite.sprite.sizeFrame = Qt.size((t && t[0]) ? t[0] : 0, (t && t[1]) ? t[1] : 0);
+
+        //roleComp.implicitWidth = roleResourceInfo.RoleSize[0];
+        //roleComp.implicitHeight = roleResourceInfo.RoleSize[1];
+        //roleComp.width = roleResourceInfo.RoleSize[0];
+        //roleComp.height = roleResourceInfo.RoleSize[1];
+        t = newParams.RoleSize ?? roleResourceInfo.RoleSize;
+        roleComp.width = (t && t[0]) ? t[0] : 0;
+        roleComp.height = (t && t[1]) ? t[1] : 0;
+        t = newParams.RoleOffset ?? roleResourceInfo.RoleOffset;
+        roleComp.rXOffset = (t && t[0]) ? t[0] : 0;
+        roleComp.rYOffset = (t && t[1]) ? t[1] : 0;
+        t = newParams.Scale ?? roleResourceInfo.Scale;
+        roleComp.rXScale = (t && t[0]) ? t[0] : 1;
+        roleComp.rYScale = (t && t[1]) ? t[1] : 1;
+
+        const offsetIndex = $CommonLibJS.shortCircuit(0b1,
+            $CommonLibJS.getObjectValue(newParams.FrameInfo, 'OffsetIndex'),
+            //$CommonLibJS.getObjectValue(newParams, 'OffsetIndex'),
+            $CommonLibJS.getObjectValue(roleResourceInfo.FrameInfo, 'OffsetIndex'),
+            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameIndex'),
+        );
+        if($CommonLibJS.isArray(offsetIndex))
+            roleComp.objActionsInfo = {'$Up': offsetIndex[0], '$Right': offsetIndex[1], '$Down': offsetIndex[2], '$Left': offsetIndex[3]};
+        else if($CommonLibJS.isObject(offsetIndex))
+            roleComp.objActionsInfo = offsetIndex;
+    }
+    else if(roleComp.nSpriteType === 2) { //文件夹
+        roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
+
+        //roleComp.implicitWidth = roleResourceInfo.RoleSize[0];
+        //roleComp.implicitHeight = roleResourceInfo.RoleSize[1];
+        //roleComp.width = roleResourceInfo.RoleSize[0];
+        //roleComp.height = roleResourceInfo.RoleSize[1];
+        let t = newParams.RoleSize ?? roleResourceInfo.RoleSize;
+        roleComp.width = (t && t[0]) ? t[0] : 0;
+        roleComp.height = (t && t[1]) ? t[1] : 0;
+        t = newParams.RoleOffset ?? roleResourceInfo.RoleOffset;
+        roleComp.rXOffset = (t && t[0]) ? t[0] : 0;
+        roleComp.rYOffset = (t && t[1]) ? t[1] : 0;
+        t = newParams.Scale ?? roleResourceInfo.Scale;
+        roleComp.rXScale = (t && t[0]) ? t[0] : 1;
+        roleComp.rYScale = (t && t[1]) ? t[1] : 1;
+
+
+        //roleComp.sprite.strOffsetPositionsFile = $GameMakerGlobal.spriteResourcePath(roleResourceInfo.Image + '/' + roleResourceInfo.OffsetPositionsFile);
+        roleComp.objActionsInfo = newParams.FrameInfo ?? roleResourceInfo.FrameInfo ??
+            newParams.FrameIndex ?? roleResourceInfo.FrameIndex; //兼容旧代码！！！
+        /*nFrameStartIndex = ;
+        fGetImageName = ;
+        fGetImageFixPosition = ;
+        fGetImageFixPositions = ;
+        */
+    }
+    let t = newParams.RealOffset ?? roleResourceInfo.RealOffset;
+    roleComp.x1 = (t && t[0]) ? t[0] : 0;
+    roleComp.y1 = (t && t[1]) ? t[1] : 0;
+    t = newParams.RealSize ?? roleResourceInfo.RealSize;
+    roleComp.width1 = (t && t[0]) ? t[0] : 0;
+    roleComp.height1 = (t && t[1]) ? t[1] : 0;
+    roleComp.rectShadow.opacity = newParams.ShadowOpacity ?? roleResourceInfo.ShadowOpacity ?? 0.3;
+
+    //roleComp.bTest = true;
+
+
+    if(roleComp.hasOwnProperty('$info'))
+        roleComp.$info = roleResourceInfo;
+    roleComp.$script = newParams.$script ?? roleResourceInfo.$script;
+
+
+    let script = newParams.$script ?? roleResourceInfo.$script ?? newParams.Script ?? roleResourceInfo.Script;
+    if($CommonLibJS.isString(script)) { //如果是字符串，则载入js文件
+        const roleDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + script; //game.$projectpath
+        if(jsLoader && $Frame.sl_fileExists(roleDirPath + '/role.js')) {
+            //jsLoader.clear();
+            script = jsLoader.load($GlobalJS.toURL(roleDirPath + '/role.js'));
+        }
+        else
+            script = null;
+    }
+    if(script && roleComp.sprite.sprite) { //只有1和2有 sprite.fnRefresh，0使用特效的$script
+        roleComp.sprite.sprite.fnRefresh = script.$refresh;
+        if(roleComp.hasOwnProperty('$script'))
+            roleComp.$script = script;
+    }
+
+
+    roleComp.reset(2);
 
     return true;
 }

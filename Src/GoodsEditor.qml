@@ -35,7 +35,7 @@ Item {
     function init(goodsName) {
 
         if(goodsName) {
-            const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + goodsName + GameMakerGlobal.separator + 'goods.js';
+            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName + '/' + goodsName + '/goods.js';
             //const data = File.read(filePath);
             //console.debug('[GoodsEditor]filePath：', filePath);
 
@@ -207,14 +207,14 @@ const data = (function() {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -299,7 +299,7 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
+                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName + '/' + _private.strSavedName + '/goods.vjs';
 
                     goodsVisualEditor.forceActiveFocus();
                     goodsVisualEditor.visible = true;
@@ -342,8 +342,8 @@ const data = (function() {
 
                 textArea.background: Rectangle {
                     //color: 'transparent'
-                    color: Global.style.backgroundColor
-                    border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                    color: $Global.style.backgroundColor
+                    border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                     border.width: parent.parent.textArea.activeFocus ? 2 : 1
                 }
 
@@ -459,16 +459,16 @@ const data = (function() {
                 return false;
             }
 
-            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strGoodsDirName;
+            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.js', 0);
+                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + '/' + textGoodsName.text + '/goods.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
-                    const oldFilePath = path + GameMakerGlobal.separator + _private.strSavedName + GameMakerGlobal.separator + 'goods.vjs';
+                    const oldFilePath = path + '/' + _private.strSavedName + '/goods.vjs';
                     if(textGoodsName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + GameMakerGlobal.separator + textGoodsName.text + GameMakerGlobal.separator + 'goods.vjs', true);
+                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textGoodsName.text + '/goods.vjs', true);
                     }
                 }
 
@@ -478,7 +478,7 @@ const data = (function() {
                 //root.forceActiveFocus();
             }
 
-            if(textGoodsName.text !== _private.strSavedName && $Frame.sl_dirExists(path + GameMakerGlobal.separator + textGoodsName.text)) {
+            if(textGoodsName.text !== _private.strSavedName && $Frame.sl_dirExists(path + '/' + textGoodsName.text)) {
                 $dialog.show({
                     Msg: '目标已存在，强行覆盖吗？',
                     Buttons: Dialog.Yes | Dialog.No,

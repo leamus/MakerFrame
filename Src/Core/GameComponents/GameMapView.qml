@@ -44,7 +44,7 @@ Item {
         //如果需要载入（这里其实可以废弃了）
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + GameMakerGlobal.separator + 'map.json'));
+            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + '/map.json'));
             //console.debug('cfg', cfg, mapPath);
 
             if(!tmapInfo) {
@@ -98,7 +98,7 @@ Item {
             itemFrontMapContainer.arrCanvas[tc].unloadImage(imageMapBlock.source);
         }
 
-        imageMapBlock.source = GameMakerGlobal.mapResourceURL(mapInfo.MapBlockImage[0]);
+        imageMapBlock.source = $GameMakerGlobal.mapResourceURL(mapInfo.MapBlockImage[0]);
 
         //载入新地图块图片
         for(let tc in itemBackMapContainer.arrCanvas) {
@@ -476,7 +476,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: '#00000000'
         //radius: 9
     }

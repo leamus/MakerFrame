@@ -15,8 +15,4 @@ module Singleton_GameMakerGlobal
 #      即使没有实际代码依赖，qmldir 定义的同一模块内的单例和其他组件会被视为相互关联
 
 
-#GameMakerGlobalJS 1.0 GameMakerGlobal.js
-
-
-singleton GameMakerGlobal 1.0 GameMakerGlobal.qml
-#GameMakerGlobal 1.0 GameMakerGlobal.qml
+singleton GameMakerSingleton 1.0 GameMakerSingleton.qml

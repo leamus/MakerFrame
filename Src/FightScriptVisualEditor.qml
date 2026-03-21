@@ -56,7 +56,7 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
@@ -98,18 +98,19 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+                        const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
 
-                        $list.open({
+                        const list = $showList({
                             Data: path,
+                            Parent: root,
                             OnClicked: (index, item)=>{
                                 text = item;
 
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                             OnCanceled: ()=>{
-                                $list.close();
+                                list.close();
                                 //root.forceActiveFocus();
                             },
                         });
@@ -161,7 +162,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -239,7 +240,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'images.json';
+                                /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/images.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = $Frame.sl_fileRead(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
@@ -247,19 +248,20 @@ Item {
                                 if(!cfg)
                                     return false;
 
-                                console.debug('!!!', JSON.stringify(JSON.parse(cfg)['List']))
+                                console.debug(JSON.stringify(JSON.parse(cfg)['List']))
                                 */
 
-                                $list.open({
-                                    Data: GameMakerGlobal.imageResourcePath(),
+                                const list = $showList({
+                                    Data: $GameMakerGlobal.imageResourcePath(),
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = item;
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -273,9 +275,9 @@ Item {
                             source: {
                                 if(textBackground.text.length === 0)
                                     return '';
-                                if(!$Frame.sl_fileExists(GameMakerGlobal.imageResourcePath(textBackground.text)))
+                                if(!$Frame.sl_fileExists($GameMakerGlobal.imageResourcePath(textBackground.text)))
                                     return '';
-                                return GameMakerGlobal.imageResourceURL(textBackground.text);
+                                return $GameMakerGlobal.imageResourceURL(textBackground.text);
                             }
                         }
                     }
@@ -302,7 +304,7 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                /*let filePath = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + 'music.json';
+                                /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/music.json';
                                 //let cfg = File.read(filePath);
                                 let cfg = $Frame.sl_fileRead(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
@@ -311,16 +313,17 @@ Item {
                                     return false;
                                 */
 
-                                $list.open({
-                                    Data: GameMakerGlobal.musicResourcePath(),
+                                const list = $showList({
+                                    Data: $GameMakerGlobal.musicResourcePath(),
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         textMusic.text = item;
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -334,8 +337,8 @@ Item {
                                     mediaPlayer.stop();
                                 else {
                                     let music = textMusic.text.trim();
-                                    if(music.length !== 0 && $Frame.sl_fileExists(GameMakerGlobal.musicResourcePath(music))) {
-                                        mediaPlayer.source = GameMakerGlobal.musicResourceURL(music);
+                                    if(music.length !== 0 && $Frame.sl_fileExists($GameMakerGlobal.musicResourcePath(music))) {
+                                        mediaPlayer.source = $GameMakerGlobal.musicResourceURL(music);
                                         mediaPlayer.play();
                                     }
                                 }
@@ -368,16 +371,17 @@ Item {
                                 const data = [['百分比，比如0.1', '调用系统算法'],
                                             ['0.1', 'true']];
 
-                                $list.open({
+                                const list = $showList({
                                     Data: data[0],
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -410,16 +414,17 @@ Item {
                                 const data = [['随机1-3个(m, n)', '顺序2个(n)', '全部顺序出现(true)'],
                                             ['1, 3', '2', 'true']];
 
-                                $list.open({
+                                const list = $showList({
                                     Data: data[0],
+                                    Parent: root,
                                     OnClicked: (index, item)=>{
                                         text = data[1][index];
 
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                     OnCanceled: ()=>{
-                                        $list.close();
+                                        list.close();
                                         //root.forceActiveFocus();
                                     },
                                 });
@@ -470,7 +475,7 @@ Item {
                                 $CommonLibJS.setTimeout([function() {
                                     if(flickable.contentHeight > flickable.height)
                                         flickable.contentY = flickable.contentHeight - flickable.height;
-                                    }, 1, root, ''], 1);
+                                    }, 1, '', ], 1);
 
                             }
                         }
@@ -484,7 +489,7 @@ Item {
 
                                 text: '*@敌人角色'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                             Label {
                                 Layout.preferredWidth: 1
@@ -492,7 +497,7 @@ Item {
 
                                 text: '参数（可省略）'
                                 font.pointSize: _private.config.nLabelFontSize
-                                color: Global.style.color(Global.style.Orange)
+                                color: $Global.style.color($Global.style.Orange)
                             }
                         }
 
@@ -534,18 +539,19 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            const path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strFightRoleDirName;
+                                            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
 
-                                            $list.open({
+                                            const list = $showList({
                                                 Data: path,
+                                                Parent: root,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
 
-                                                    $list.close();
+                                                    list.close();
                                                     //root.forceActiveFocus();
                                                 },
                                                 OnCanceled: ()=>{
-                                                    $list.close();
+                                                    list.close();
                                                     //root.forceActiveFocus();
                                                 },
                                             });
@@ -844,7 +850,7 @@ Item {
             return [true, data, null];
         }
 
-        function compileAndShowResult() {
+        function compileAndShowResult(showSuccess=true) {
             const result = _private.compile(true);
             let errorMsg;
 
@@ -861,9 +867,9 @@ Item {
                 errorMsg = '错误：' + result[2].toString() + '<BR>请检查各参数';
             }
 
-            if(errorMsg)
+            if(showSuccess || errorMsg)
                 $dialog.show({
-                    Msg: errorMsg,
+                    Msg: errorMsg ?? '编译完成',
                     Buttons: Dialog.Yes,
                     OnAccepted: function() {
                         //root.forceActiveFocus();
@@ -890,7 +896,7 @@ Item {
                 Msg: '退出前需要编译和保存吗？',
                 Buttons: Dialog.Yes | Dialog.No | Dialog.Discard,
                 OnAccepted: function() {
-                    const result = _private.compileAndShowResult();
+                    const result = _private.compileAndShowResult(false);
                     if(result[0] === false)
                         return;
 

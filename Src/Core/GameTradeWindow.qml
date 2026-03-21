@@ -102,7 +102,7 @@ Item {
     Mask {
         anchors.fill: parent
         //opacity: 0
-        //color: Global.style.backgroundColor
+        //color: $Global.style.backgroundColor
         color: '#7FFFFFFF'
         //radius: 9
     }
@@ -334,7 +334,7 @@ Item {
 
             color: 'darkblue'
 
-            textArea.color: 'white' //Global.style.foreground
+            textArea.color: 'white' //$Global.style.foreground
             //textArea.enabled: false
             textArea.readOnly: true
 
@@ -349,8 +349,8 @@ Item {
 
             textArea.background: Rectangle {
                 color: 'transparent'
-                //color: Global.style.backgroundColor
-                //border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
+                //color: $Global.style.backgroundColor
+                //border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
                 //border.width: parent.parent.textArea.activeFocus ? 2 : 1
             }
         }
@@ -399,8 +399,8 @@ Item {
                 background: Rectangle {
                     color: '#EE00CC99'
                     implicitHeight: 0
-                    //color: Global.style.backgroundColor
-                    //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    //color: $Global.style.backgroundColor
+                    //border.color: debugMsg.textArea.focus ? $Global.style.accent : $Global.style.hintTextColor
                     //border.width: debugMsg.textArea.focus ? 2 : 1
                 }
             }
@@ -450,8 +450,8 @@ Item {
                 background: Rectangle {
                     color: '#FF0035A8'
                     implicitHeight: 0
-                    //color: Global.style.backgroundColor
-                    //border.color: debugMsg.textArea.focus ? Global.style.accent : Global.style.hintTextColor
+                    //color: $Global.style.backgroundColor
+                    //border.color: debugMsg.textArea.focus ? $Global.style.accent : $Global.style.hintTextColor
                     //border.width: debugMsg.textArea.focus ? 2 : 1
                 }
 

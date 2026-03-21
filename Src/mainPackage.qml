@@ -40,14 +40,14 @@ Item {
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
+    //color: $Global.style.backgroundColor
 
 
 
     Mask {
         anchors.fill: parent
         //opacity: 0
-        color: Global.style.backgroundColor
+        color: $Global.style.backgroundColor
         //radius: 9
     }
 
@@ -100,7 +100,7 @@ Item {
                 return;
                 */
 
-                loader.load('PackageWindows.qml');
+                loader.load(Qt.resolvedUrl('PackageWindows.qml'));
             }
         }
 
@@ -112,7 +112,7 @@ Item {
 
             text: '打包Android'
             onClicked: {
-                loader.load('PackageAndroid.qml');
+                loader.load(Qt.resolvedUrl('PackageAndroid.qml'));
             }
         }
     }
@@ -130,7 +130,7 @@ Item {
         anchors.fill: parent
 
         //source: ''
-        asynchronous: true
+        //asynchronous: true
 
 
 
@@ -166,21 +166,25 @@ Item {
         onLoaded: {
             console.debug('[mainPackage]loader onLoaded');
 
-            try {
-                //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
-                ///focus = true;
-                forceActiveFocus();
+            //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
+            ///focus = true;
+            forceActiveFocus();
 
-                //if(item.$load)
-                //    item.$load();
+            /*if(item.$load) {
+                try {
+                    item.$load();
+                }
+                catch(e) {
+                    $CommonLibJS.printException(e);
+                    //console.warn('[!mainPackage]', e);
+                    //throw e;
+                }
+                finally {
+                }
+            }
+            */
 
-                visible = true;
-            }
-            catch(e) {
-                throw e;
-            }
-            finally {
-            }
+            visible = true;
         }
     }
 

@@ -23,15 +23,16 @@ Item {
 
 
     //刷新重建
-    function reset() {
-        changeAction(2);
+    function reset(action=-1) {
+        if(action >= 0)
+            changeAction(action);
         spriteEffect.reset();
     }
 
     //删除
     function unload() {
         nSpriteType = -1;
-        spriteEffect.nSpriteType = 0;
+        spriteEffect.nSpriteType = -1;
 
         //if(root.sprite) {
             //root.sprite.nSpriteType = 0;
@@ -141,68 +142,50 @@ Item {
         }
 
 
-        if(!objActionsData[actionName])
+        if(!objActionsInfo[actionName])
             return false;
 
 
         if(root.nSpriteType === 0) {
             //读特效信息
-            //let path = GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.config.strCurrentProjectName + GameMakerGlobal.separator + GameMakerGlobal.config.strSpriteDirName;
-            //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + GameMakerGlobal.separator + objActionsData[actionName] + GameMakerGlobal.separator + 'sprite.json'));
+            //let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
+            //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + '/' + objActionsInfo[actionName] + '/sprite.json'));
             //if(info)
             //    info = JSON.parse(info);
             //else
             //    return false;
 
-            const info = objActionsData[actionName].Info;
+            const info = objActionsInfo[actionName].Info;
             if(!info)
                 return false;
-            const script = objActionsData[actionName].Script;
+            const script = objActionsInfo[actionName].Script;
 
-            spriteEffect.nSpriteType = info.SpriteType ?? 1;
-
-            spriteEffect.strSource = GameMakerGlobal.spriteResourceURL(info.Image);
-
-            if(spriteEffect.nSpriteType === 1) {
-                spriteEffect.nFrameCount = $CommonLibJS.getObjectValue(info.FrameData, 'FrameCount') ?? info.FrameCount;
-                spriteEffect.nInterval = $CommonLibJS.getObjectValue(info.FrameData, 'FrameInterval') ?? info.FrameInterval;
-
-                //注意这个放在 spriteEffect.sprite.width 和 spriteEffect.sprite.height 之前
-                let t = $CommonLibJS.getObjectValue(info.FrameData, 'FrameSize') ?? info.FrameSize;
-                spriteEffect.sprite.sizeFrame = Qt.size(t[0], t[1]);
-
-                t = $CommonLibJS.getObjectValue(info.FrameData, 'OffsetIndex') ?? info.OffsetIndex;
-                spriteEffect.sprite.pointOffsetIndex = Qt.point(t[0], t[1]);
-            }
-            else if(spriteEffect.nSpriteType === 2) {
-                spriteEffect.nFrameCount = info.FrameData.FrameCount ?? info.FrameData[1];
-                spriteEffect.nInterval = info.FrameData.FrameInterval ?? info.FrameData[2];
-                spriteEffect.sprite.nFrameStartIndex = info.FrameData.FrameStartIndex ?? info.FrameData[0];
-
-                spriteEffect.sprite.fnRefresh = script ? script.$refresh : null;
-            }
+            $GameMakerGlobalJS.getSpriteEffect(Object.assign({Script: script}, info, )/*{
+                SpriteType: info.SpriteType ?? 1,
+                Image: info.Image,
+                XOffset: info.XOffset,
+                YOffset: info.YOffset,
+                Opacity: info.Opacity,
+                XScale: info.XScale,
+                YScale: info.YScale,
+                Sound: info.Sound,
+                SoundDelay: info.SoundDelay,
+                SpriteSize: info.SpriteSize,
+                FrameInfo: { //info.FrameInfo,
+                    FrameCount: parseInt(textSpriteFrameCount.text),
+                    FrameInterval: parseInt(textSpriteFrameInterval.text),
+                    FrameSize: [parseInt(textSpriteFrameWidth.text), parseInt(textSpriteFrameHeight.text)],
+                    OffsetIndex: [parseInt(textSpriteFrameOffsetColumn.text), parseInt(textSpriteFrameOffsetRow.text)],
+                    FrameStartIndex: parseInt(textSpriteFrameStartIndex.text),
+                },
+                Script: script,
+            }*/, spriteEffect, {Loops: spriteEffect.nLoops/*AnimatedSprite.Infinite*/, SpriteSize: [-1, -1], }, /*_private.jsLoader*/);
 
             //!只有这个类型是从 特效配置中读取大小并设置，其他类型是从 角色中读取大小并设置
             //root.width = Qt.binding(()=>spriteEffect.width);
             //root.height = Qt.binding(()=>spriteEffect.height);
             root.width = parseInt(info.SpriteSize[0]);
             root.height = parseInt(info.SpriteSize[1]);
-            //spriteEffect.implicitWidth = (info.SpriteSize[0]);
-            //spriteEffect.implicitHeight = (info.SpriteSize[1]);
-            spriteEffect.rXOffset = info.XOffset !== undefined ? (info.XOffset) : 0;
-            spriteEffect.rYOffset = info.YOffset !== undefined ? (info.YOffset) : 0;
-            spriteEffect.opacity = (info.Opacity);
-            spriteEffect.rXScale = (info.XScale);
-            spriteEffect.rYScale = (info.YScale);
-
-            if(info.Sound) {
-                spriteEffect.strSoundeffectName = info.Sound;
-            }
-            else {
-                spriteEffect.strSoundeffectName = '';
-            }
-            //console.warn('!!!', info.Sound, strSoundeffectName)
-            spriteEffect.nSoundeffectDelay = (info.SoundDelay);
 
 
             //nLoops = loops;
@@ -211,9 +194,9 @@ Item {
         else if(root.nSpriteType === 1) {
             //width = root.width;
             //height = root.height;
-            //walkSprite.animatedsprite.frameX = objActionsData[actionName][0] * root.sizeFrame.width;
-            //walkSprite.animatedsprite.frameY = objActionsData[actionName][1] * root.sizeFrame.height;     //起始位置
-            spriteEffect.sprite.pointOffsetIndex = Qt.point(objActionsData[actionName][0], objActionsData[actionName][1]);
+            //walkSprite.animatedsprite.frameX = objActionsInfo[actionName][0] * root.sizeFrame.width;
+            //walkSprite.animatedsprite.frameY = objActionsInfo[actionName][1] * root.sizeFrame.height;     //起始位置
+            spriteEffect.sprite.pointOffsetIndex = Qt.point(objActionsInfo[actionName][0], objActionsInfo[actionName][1]);
             //walkSprite.strSource = root.strSource;
             //walkSprite.nFrameCount = root.nFrameCount;       //帧的个数
             //walkSprite.animatedsprite.frameWidth = root.sizeFrame.width;
@@ -223,9 +206,9 @@ Item {
             //spriteEffect.nCurrentFrame = 0;
         }
         else if(root.nSpriteType === 2) {
-            spriteEffect.sprite.nFrameStartIndex = objActionsData[actionName][0];
-            spriteEffect.nFrameCount = objActionsData[actionName][1];
-            spriteEffect.nInterval = objActionsData[actionName][2];
+            spriteEffect.sprite.nFrameStartIndex = objActionsInfo[actionName][0];
+            spriteEffect.nFrameCount = objActionsInfo[actionName][1];
+            spriteEffect.nInterval = objActionsInfo[actionName][2];
 
             //changeAction(actionName);
         }
@@ -306,12 +289,12 @@ Item {
             spriteEffect.nSpriteType = 2;
             break;
         default:
-            //spriteEffect.nSpriteType = 0;
+            spriteEffect.nSpriteType = -1;
         }
         spriteEffect.strSource = '';
         spriteEffect.nFrameCount = 0;
         spriteEffect.nInterval = 100;
-        spriteEffect.nLoops = -1;
+        spriteEffect.nLoops = AnimatedSprite.Infinite;
         spriteEffect.rXScale = 1;
         spriteEffect.rYScale = 1;
         spriteEffect.rXOffset = 0;
@@ -321,7 +304,7 @@ Item {
 
         //spriteEffect.bSmooth = false;
 
-        objActionsData = {};
+        objActionsInfo = {};
         //spriteEffect.bTest = false;
     }
 
@@ -346,10 +329,10 @@ Item {
     //  nSpriteType为0时，{'动作名': {Info: 特效信息, Script: 脚本}。。。}
     //  nSpriteType为1时，{'动作名': [0,0]。。。}  //上右下左 的 行、列 偏移
     //  nSpriteType为2时，{'动作名': [帧起始号, 帧数, 帧速度]。。。}
-    property var objActionsData: ({})
+    property var objActionsInfo: ({})
 
 
-    property string strActionName: ''
+    property string strActionName: '' //正在播放的动作名
 
     property alias rectShadow: rectShadow   //真实占用大小（影子）
 
