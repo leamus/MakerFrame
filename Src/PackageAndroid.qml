@@ -591,29 +591,36 @@ Item {
 
         //生成
         function make() {
-            let path = $Platform.externalDataPath + '/GameMaker/Games';
+            const path = $Platform.externalDataPath + '/GameMaker/Games';
 
-            let zipFiles = $Frame.sl_dirList(path, ['MakerFrame_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
-            zipFiles.sort();
-            console.debug('[PackageAndroid]make zip files:', zipFiles);
-
-            /*let needFilesName = ['Android_Package_', 'Android_MakerFrame_GameRuntime_'];
-            let needFilesIndex = [];
-            for(let fileName in zipFiles) {
-                for(let needFileName in needFilesName) {
-                    if(zipFiles[fileName].includes(needFilesName[needFileName])) {
-                        needFilesIndex[needFileName] = fileName;
-                        break;
-                    }
-                }
-            }
-            */
 
             let missingFiles = '';
-            if(!zipFiles[0] || !zipFiles[0].includes('MakerFrame_GameRuntime_Android_'))
-                missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
-            if(!zipFiles[1] || !zipFiles[1].includes('MakerFrame_Package_Android_'))
+
+            const zipFiles = []; //需要解压的文件（后者会覆盖前者的同名文件）
+            const needFilesName = ['MakerFrame_Package_Android_*.zip', 'MakerFrame_GameRuntime_Android_*.zip'];
+            for(const needFileName of needFilesName) {
+                const zipFile = $Frame.sl_dirList(path, [needFileName], 0x002 | 0x2000 | 0x4000, 0);
+                if(!zipFile[0])
+                    missingFiles += needFileName + ',';
+                else
+                    zipFiles.push(zipFile[0]);
+            }
+
+            /*
+            const zipFiles = [];
+            let zipFile;
+
+            zipFile = $Frame.sl_dirList(path, ['MakerFrame_Package_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            if(!zipFile[0])
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
+            else
+                zipFiles.push(zipFile[0]);
+            zipFile = $Frame.sl_dirList(path, ['MakerFrame_GameRuntime_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            if(!zipFile[0])
+                missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
+            else
+                zipFiles.push(zipFile[0]);
+            */
 
 
             //let strPackageDir = path + '/' + $GameMakerGlobal.config.strCurrentProjectName;

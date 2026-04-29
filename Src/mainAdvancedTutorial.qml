@@ -72,7 +72,7 @@ Item {
             textArea.color: 'white'
             //textArea.color: $Global.style.foreground
             //textArea.enabled: false
-            textArea.readOnly: true
+            //textArea.readOnly: true
 
             textArea.wrapMode: TextArea.WrapAnywhere
             textArea.horizontalAlignment: TextArea.AlignJustify
@@ -105,6 +105,10 @@ Item {
             onClicked: {
                 sg_close();
             }
+            /*onPressAndHold: {
+                notepad.textArea.selectByMouse = !notepad.textArea.selectByMouse;
+            }
+            */
         }
     }
 
@@ -562,19 +566,19 @@ Item {
     b.data;
     b.sl_deleteLater();
 
-14、简单打包流程（详细见官网教程）
+14、简单打包应用流程（详细见官网教程）
     1、win下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Win_xxxxxx.rar） 和 Qt框架库（QtEnv_Win_xxxxxx.rar），解压放在一起，将工程改名为Project复制到目录下即可；
     2、安卓下需要下载 鹰歌环境文件（MakerFrame_GameRuntime_Android_ALL_xxxxxx.rar） 和 Qt框架库（MakerFrame_Package_Android_ALL_xxxxxx.rar），解压放在特定目录下，将工程改名为Project复制到目录下，使用鹰歌的打包功能进行配置，然后用APKTools打包即可；
     3、如果是安卓打包apk，打开 APKTool M，找到第一步解压的文件夹，打开，点“编译此项目”，即可生成APK；
     4、如果是win打包apk，安装Java并下载我集成好的打包环境，将工程拖动到 _打包.bat 即可生成APK；
-    5、配置：鹰歌自带的打包可以简单的配置（Config.js文件中）诸如游戏名、应用名、图标等一些简单常用的选项，如果要详细配置，可以手动修改GameMakerSingleton.qml、GameMakerGlobal.qml、AndroidManifest.xml（包括 图标、包名、应用名、权限等）、Privacy.txt（隐私协议）、Config.cfg（框架配置）、LGlobal（框架配置）、GameRuntime（引擎核心文件）、隐私样式文件（privacy_button_shape.xml、privacy_dialog_shape.xml、privacy_activity_main.xml、privacy_dialog_show.xml）、手动打包x86或x64库 等，打包APK后还可以编辑信息（点击APK文件->快速编辑 或 详情）。
+    5、配置：鹰歌自带的打包可以进行简单的配置（Config.js和AndroidManifest.xml文件中）诸如游戏名、应用名、图标等一些简单常用的选项，如果要更详细更高级配置，可以手动修改GameMakerSingleton.qml（单例组件）、GameMakerGlobal.qml（游戏全局组件）、main.qml（应用载入组件）、AndroidManifest.xml（包括 图标、包名、应用名、权限等）、Privacy.txt（隐私协议）、Config.cfg（框架配置）、LGlobal（框架全局组件）、GameRuntime（引擎核心文件）、隐私样式文件（privacy_button_shape.xml、privacy_dialog_shape.xml、privacy_activity_main.xml、privacy_dialog_show.xml）、手动打包x86或x64库 等；打包APK后还可以编辑信息（点击APK文件->快速编辑 或 详情）。
     APKTool M切换中文：右上角菜单->第一个选项->第一个菜单->倒数第5个 就是选语言。
 
 15、其他（详细见官网教程）
     a、文件、文件夹操作；
     b、压缩解压（zip）操作；
     c、剪切板操作（$Frame.sl_setClipboardText）；
-    d、动态载入卸载RCC资源：$Frame.sl_registerResource、$Frame.sl_unRegisterResource；
+    d、动态载入卸载RCC资源：$Frame.sl_registerResource、$Frame.sl_unregisterResource；
     e、登录、联机、弱网等；
     f、本地系统信息和功能（二维码、摄像头、GPS、屏幕旋转、屏幕常亮、请求权限等）；
     g、播放音频视频；

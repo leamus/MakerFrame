@@ -33,13 +33,8 @@ Item {
 
 
     function init(fightSkillName) {
-
         if(fightSkillName) {
-            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.js';
-            //const data = File.read(filePath);
-            //console.debug('[FightSkillEditor]filePath：', filePath);
-
-            const data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_fileRead($GameMakerGlobal.fightSkillPath(fightSkillName) + '/fight_skill.js');
 
             if(data) {
                 _private.strSavedName = textFightSkillName.text = fightSkillName;
@@ -311,11 +306,10 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + _private.strSavedName + '/fight_skill.vjs';
 
                     fightSkillVisualEditor.forceActiveFocus();
                     fightSkillVisualEditor.visible = true;
-                    fightSkillVisualEditor.init(filePath);
+                    fightSkillVisualEditor.init($GameMakerGlobal.fightSkillPath(_private.strSavedName) + '/fight_skill.vjs');
                 }
             }
         }
@@ -470,7 +464,7 @@ const data = (function() {
                 return false;
             }
 
-            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
+            const path = $GameMakerGlobal.fightSkillPath();
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0);

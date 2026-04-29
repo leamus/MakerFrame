@@ -614,10 +614,8 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
-
                                 const list = $showList({
-                                    Data: path,
+                                    Data: $GameMakerGlobal.fightSkillPath(),
                                     Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';

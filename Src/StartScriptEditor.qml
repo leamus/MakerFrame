@@ -69,9 +69,8 @@ game.goon();
             PathText: 0b0,
             RunButton: 0b0,
             Default: defaultCode,
-            //Focus: true,
+            Focus: true,
         });
-        scriptEditor.editor.forceActiveFocus();
     }
 
 

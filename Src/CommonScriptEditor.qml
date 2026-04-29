@@ -685,11 +685,9 @@ function $showGoodsName(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName + '/';
-
         //$CommonLibJS.showRichTextImage();
         tstr = ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(goodsPath + goods.$rid + '/' + goods.$image).
+            //arg($GameMakerGlobal.goodsPath(goods.$rid) + '/' + goods.$image).
             arg($GameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
@@ -734,7 +732,6 @@ function $showGoodsName(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 function $showCombatantName(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/';
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -742,7 +739,7 @@ function $showCombatantName(combatant, flags=null) {
     if(flags['avatar'] && combatant.$avatar) {
         //$CommonLibJS.showRichTextImage();
         name += ' <img src=\"%1\" width=\"%2\" height=\"%3\" style=\"vertical-align: top;\">  '.
-            //arg(fightRolePath + combatant.$rid + '/' + combatant.$avatar).
+            //arg($GameMakerGlobal.fightRolePath(combatant.$rid) + '/' + combatant.$avatar).
             arg($GameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
@@ -1143,36 +1140,63 @@ function $commonRunAwayAlgorithm(team, index) {
 }
 
 
-//一个战斗回合内，返回每次回合的战斗人物数组
-//返回数字表示延迟多久ms再继续
-//返回null表示战斗回合结束
-function* $fightRolesRound(round) {
-    //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
-    //yield* $GameMakerGlobalJS.fightRolesRound1(round, '$speed');
+//检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
+//返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
+//stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
+//会检测技能、道具的相关函数并调用返回；
+function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
+    //！！！鹰250927：这里新修改：道具脚本的$checkScript调用时只会传递Skill，所以这里改为$objectType，且下面不用判断为道具了吧；
+    let choiceType = fightSkillOrGoods.$objectType; //combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
+    //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
+    let goods = null;
+    let fightSkill = null;
 
-
-    //所有的战斗人物
-    let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
-
-    //计算 攻击 顺序
-    arrTempLoopedAllFightRoles.sort(function(a, b) {
-        if(a.$$propertiesWithExtra.speed > b.$$propertiesWithExtra.speed)return -1;
-        if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
-        if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
-    });
-    //console.debug('all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
-
-
-    //循环每个战斗人物
-    for(let c of arrTempLoopedAllFightRoles) {
-        //如果在场且HP[0] > 0，则进行战斗人物回合
-        if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
-            yield [c];
+    //如果选择的是技能
+    if(choiceType === 3) {
+        fightSkill = fightSkillOrGoods;
+        //skill = combatant.$$fightData.$choice.$attack;
+    }
+    //如果选择的是道具
+    else if(choiceType === 2) {
+        goods = fightSkillOrGoods;
+        fightSkill = fightSkillOrGoods.$fight[0];
     }
 
-    //战斗回合结束
-    return null;
+
+    let buffs = combatant.$$fightData.$buffs;
+    /*if(buffs['$$Sleep']) {
+        return 你已经被[眠]';
+    }
+
+    if(buffs['$$Sealing'] && fightSkill.$type === 1) {
+        return '你已经被[封]';
+    }
+
+    if(buffs['$$Confusion']) {
+        return '你已经被[乱]';
+    }*/
+
+
+    //遍历所有的buff
+    for(let tbuffsIndex in buffs) {
+        let tbuff = buffs[tbuffsIndex];
+        //如果是 毒乱封眠
+        if(tbuff.flags & 0b0001) {
+            //if(stage === 1)
+                return '你已经被[眠]';
+        }
+        else if((tbuff.flags & 0b0010) && choiceType === 3 && fightSkill.$type === 1) {   //选择的是 技能
+            return '你已经被[封]';
+        }
+        else if(tbuff.flags & 0b0100) {
+            if((stage === 0 || stage === 1) && fightSkill.$type === 1)   //只能选择 普通攻击
+                return '你已经被[乱]';
+        }
+    }
+
+    return true;
 }
+
 
 
 //战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
@@ -1229,6 +1253,39 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
 
     //console.debug('damage1');
     return [{HP: [harm, Math.floor(harm / 4)], Target: targetCombatant}];
+}
+
+
+
+//一个战斗回合内，返回每次回合的战斗人物数组
+//返回数字表示延迟多久ms再继续
+//返回null表示战斗回合结束
+function* $fightRolesRound(round) {
+    //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
+    //yield* $GameMakerGlobalJS.fightRolesRound1(round, '$speed');
+
+
+    //所有的战斗人物
+    let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
+
+    //计算 攻击 顺序
+    arrTempLoopedAllFightRoles.sort(function(a, b) {
+        if(a.$$propertiesWithExtra.speed > b.$$propertiesWithExtra.speed)return -1;
+        if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
+        if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
+    });
+    //console.debug('all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
+
+
+    //循环每个战斗人物
+    for(let c of arrTempLoopedAllFightRoles) {
+        //如果在场且HP[0] > 0，则进行战斗人物回合
+        if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
+            yield [c];
+    }
+
+    //战斗回合结束
+    return null;
 }
 
 
@@ -1686,71 +1743,6 @@ function* combatantRoundEffects(combatant, round, stage) {
     }
 
     return null;
-}
-
-
-
-//通用技能播放函数：如果技能的$playScript不为函数，则调用
-function* $commonPlayScript(fightSkill, combatant, ...params) {
-
-}
-
-
-//检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
-//返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
-//stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
-//会检测技能、道具的相关函数并调用返回；
-function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
-    //！！！鹰250927：这里新修改：道具脚本的$checkScript调用时只会传递Skill，所以这里改为$objectType，且下面不用判断为道具了吧；
-    let choiceType = fightSkillOrGoods.$objectType; //combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
-    //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
-    let goods = null;
-    let fightSkill = null;
-
-    //如果选择的是技能
-    if(choiceType === 3) {
-        fightSkill = fightSkillOrGoods;
-        //skill = combatant.$$fightData.$choice.$attack;
-    }
-    //如果选择的是道具
-    else if(choiceType === 2) {
-        goods = fightSkillOrGoods;
-        fightSkill = fightSkillOrGoods.$fight[0];
-    }
-
-
-    let buffs = combatant.$$fightData.$buffs;
-    /*if(buffs['$$Sleep']) {
-        return 你已经被[眠]';
-    }
-
-    if(buffs['$$Sealing'] && fightSkill.$type === 1) {
-        return '你已经被[封]';
-    }
-
-    if(buffs['$$Confusion']) {
-        return '你已经被[乱]';
-    }*/
-
-
-    //遍历所有的buff
-    for(let tbuffsIndex in buffs) {
-        let tbuff = buffs[tbuffsIndex];
-        //如果是 毒乱封眠
-        if(tbuff.flags & 0b0001) {
-            //if(stage === 1)
-                return '你已经被[眠]';
-        }
-        else if((tbuff.flags & 0b0010) && choiceType === 3 && fightSkill.$type === 1) {   //选择的是 技能
-            return '你已经被[封]';
-        }
-        else if(tbuff.flags & 0b0100) {
-            if((stage === 0 || stage === 1) && fightSkill.$type === 1)   //只能选择 普通攻击
-                return '你已经被[乱]';
-        }
-    }
-
-    return true;
 }
 
 
@@ -2232,9 +2224,8 @@ function $readSavesInfo(count=3) {
             PathText: 0b0,
             RunButton: 0b0,
             Default: defaultCode,
-            //Focus: true,
+            Focus: true,
         });
-        scriptEditor.editor.forceActiveFocus();
     }
 
 

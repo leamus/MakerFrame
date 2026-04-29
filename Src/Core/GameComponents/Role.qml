@@ -24,6 +24,7 @@ Item {
 
     //刷新重建
     function reset(action=-1) {
+        console.debug('[Role]reset:', action);
         if(action >= 0)
             changeAction(action);
         spriteEffect.reset();
@@ -31,8 +32,11 @@ Item {
 
     //删除
     function unload() {
+        console.debug('[Role]unload:', );
+
         nSpriteType = -1;
         spriteEffect.nSpriteType = -1;
+        strActionName = '';
 
         //if(root.sprite) {
             //root.sprite.nSpriteType = 0;
@@ -42,7 +46,7 @@ Item {
     }
 
     //开始播放动画（和方向有关）
-    function start(taction, loops=AnimatedSprite.Infinite) {
+    function start(taction, loops=AnimatedSprite.Infinite, forceRestart=false) {
         //if(root.sprite === undefined)
         //    return;
         //root.changeAction(d);
@@ -62,10 +66,10 @@ Item {
 
         spriteEffect.nLoops = loops ?? AnimatedSprite.Infinite;
 
-        if(strActionName === tstrActionName)
-            spriteEffect.start();
-        else
+        if(strActionName !== tstrActionName || forceRestart)
             spriteEffect.restart();
+        else
+            spriteEffect.start();
 
         //静态换方向
         /*if(root.sprite.sprite.running === false) {
@@ -145,10 +149,13 @@ Item {
         if(!objActionsInfo[actionName])
             return false;
 
+        if(strActionName === actionName)
+            return true;
+
 
         if(root.nSpriteType === 0) {
             //读特效信息
-            //let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
+            //let path = $GameMakerGlobal.spritePath();
             //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + '/' + objActionsInfo[actionName] + '/sprite.json'));
             //if(info)
             //    info = JSON.parse(info);

@@ -39,6 +39,9 @@ Item {
 
 
 
+    property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+
+
     //width: 600
     //height: 800
     anchors.fill: parent
@@ -90,19 +93,19 @@ Item {
             }
     
             onSg_removeClicked: {
-                if(index === 0) {
-                    return;
-                }
+                //if(index === 0)
+                //    return;
     
     
-                let dirUrl = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item;
+                const dirPath = $GameMakerGlobal.mapPath(item);
+                console.debug('[mainMapEditor]删除：', dirPath, $Frame.sl_dirExists(dirPath), );
     
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
-                    Buttons: Dialog.Yes | Dialog.Cancel,
-                    OnAccepted: ()=>{
-                        console.debug('[mainMapEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                        removeItem(index);
+                    Buttons: Dialog.Ok | Dialog.Cancel,
+                    OnAccepted: function() {
+                        if($Frame.sl_removeRecursively(dirPath))
+                            removeItem(index);
     
                         //l_listMaps.forceActiveFocus();
                     },
@@ -136,14 +139,24 @@ Item {
     Dialog {
         id: dialogMapData
 
+
+        function _reset() {
+            textMapBlockImageURL.text = '';
+            textMapBlockImageURL.enabled = false;
+            textMapBlockResourceName.text = '';
+            textMapBlockResourceName.enabled = true;
+
+            labelDialogTips.text = '';
+
+        }
+
+
         //1新建；2打开
         property int nCreateMapType: 1
         //1图片，2素材
         //property int nChoiceType: 0
 
         property var mapData: ({})
-
-
 
         anchors.centerIn: parent
         width: parent.width * 0.9
@@ -152,7 +165,6 @@ Item {
         title: '地图数据'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
-
 
 
         ColumnLayout {
@@ -318,6 +330,7 @@ Item {
             }
         }
 
+
         onAccepted: {
             //地图块路径 操作
 
@@ -339,7 +352,6 @@ Item {
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                //filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapResourceDirName + '/' + textMapBlockResourceName.text;
                 let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
@@ -373,16 +385,11 @@ Item {
 
 
 
-            loader.load(Qt.resolvedUrl('MapEditor.qml'));
+            //loader.load(Qt.resolvedUrl('MapEditor.qml'));
+            loader.active = true;
         }
         onRejected: {
-            textMapBlockImageURL.text = '';
-            textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.text = '';
-            textMapBlockResourceName.enabled = true;
-
-            labelDialogTips.text = '';
-
+            _reset();
 
             l_listMaps.forceActiveFocus();
 
@@ -412,6 +419,14 @@ Item {
             }*/
         }
 
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
+        }
     }
 
 
@@ -486,8 +501,6 @@ Item {
 
 
         onSg_clicked: {
-            //let filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapResourceDirName + '/' + item;
-
             textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(item);
             textMapBlockResourceName.text = item;
             //console.debug('[mainMapEditor]List Clicked::', textMapBlockImageURL.text)
@@ -529,14 +542,15 @@ Item {
         }
 
         onSg_removeClicked: {
-            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Resources/Maps/' + item;
+            const filepath = $GameMakerGlobal.mapResourcePath(item);
+            console.debug('[mainMapEditor]删除：', filepath, $Frame.sl_fileExists(filepath), );
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[mainMapEditor]删除地图资源：' + path, Qt.resolvedUrl(path), $Frame.sl_fileDelete(path));
-                    removeItem(index);
+                    if($Frame.sl_fileDelete(filepath) >= 0)
+                        removeItem(index);
 
                     //l_listMapBlockResource.forceActiveFocus();
                 },
@@ -551,48 +565,27 @@ Item {
 
     /*Dialog1.Dialog {
         id: fileDialogSave
+
         visible: false
-          title: 'Choose a date'
-          standardButtons: Dialog1.StandardButton.Save | Dialog1.StandardButton.Cancel
 
-          onAccepted: console.log('Saving the date ')
+        title: 'Choose a date'
+        standardButtons: Dialog1.StandardButton.Save | Dialog1.StandardButton.Cancel
 
-      }*/
+        onAccepted: console.log('Saving the date ')
+
+    }*/
 
     /*Dialog {
         id: dialogMapName
-        title: '请输入地图数据'
+
+        anchors.centerIn: parent
         width: 300
         height: 200
+
+        title: '请输入地图数据'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
-        anchors.centerIn: parent
-
-        onAccepted: {
-            loader.visible = true;
-            //loader.focus = true;
-            //loader.item.focus = true;
-            loader.item.forceActiveFocus();
-
-
-            //let cfg = File.read(fileUrl.toString());
-            let cfg = $Frame.sl_fileRead(fileUrl.toString());
-            //console.debug('cfg', cfg);
-
-            if(!cfg)
-                return false;
-            cfg = JSON.parse(cfg);
-            //console.debug('cfg', cfg);
-            loader.load('./MapEditor.qml', {});
-            loader.item.openMap(cfg);
-        }
-        onRejected: {
-            root.forceActiveFocus();
-
-
-            //console.log('Cancel clicked');
-        }
 
         ColumnLayout {
             width: parent.width
@@ -661,12 +654,49 @@ Item {
                 }
             }
         }
+
+
+        onAccepted: {
+            loader.visible = true;
+            //loader.focus = true;
+            //loader.item.focus = true;
+            loader.item.forceActiveFocus();
+
+
+            //let cfg = File.read(fileUrl.toString());
+            let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //console.debug('cfg', cfg);
+
+            if(!cfg)
+                return false;
+            cfg = JSON.parse(cfg);
+            //console.debug('cfg', cfg);
+            loader.load('./MapEditor.qml', {});
+            loader.item.openMap(cfg);
+        }
+        onRejected: {
+            root.forceActiveFocus();
+
+
+            //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
+        }
     }*/
 
 
 
     /*Dialog1.FileDialog {
         id: filedialogOpenMap
+        visible: false
+
         title: '选择地图文件'
         selectMultiple: false
         //folder: shortcuts.home
@@ -674,7 +704,7 @@ Item {
         nameFilters: [ 'Json files (*.json *.map *.jsn)', 'All files (*)' ]
         selectExisting: true
         selectFolder: false
-        visible: false
+
         onAccepted: {
             loader.visible = true;
             //loader.focus = true;
@@ -713,7 +743,8 @@ Item {
 
         anchors.fill: parent
 
-        //source: './MapEditor.qml'
+        active: false
+        source: /*Qt.resolvedUrl*/('MapEditor.qml')
         //asynchronous: true
 
 
@@ -727,7 +758,8 @@ Item {
                 //!!!!!!作用：绕过 多次载入地图编辑器时黑屏 的问题
                 //  经详细排查，貌似是内存不足（创建新图层引起的），但奇怪的是，即使destroy成功，内存也不会释放，但这个Loader释放后就正常了。
                 //  游戏中因为没有创建新图层所以不会有问题。
-                loader.close();
+                //loader.close();
+                loader.active = false;
             }
         }
 
@@ -738,7 +770,8 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
-                close();
+                //close();
+                active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -802,15 +835,9 @@ Item {
                 dialogMapData.mapData.MapBlockImage[0] = textMapBlockResourceName.text;
 
                 loader.item.openMap(dialogMapData.mapData, _private.strMapRID);
-
             }
 
-            textMapBlockImageURL.text = '';
-            textMapBlockImageURL.enabled = false;
-            textMapBlockResourceName.text = '';
-            textMapBlockResourceName.enabled = true;
-
-            labelDialogTips.text = '';
+            dialogMapData._reset();
 
 
 
@@ -840,17 +867,17 @@ Item {
             //filedialogOpenMap.open();
 
 
-            //console.debug($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/')
+            //console.debug($GameMakerGlobal.mapPath())
 
-            //l_listMaps.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/', [], 0x001 | 0x2000, 0x00);
-            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/', [], 0x001 | 0x2000 | 0x4000, 0x00);
+            //l_listMaps.show($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建地图】');
             //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
             //l_listMaps.visible = true;
             //l_listMaps.focus = true;
 
-            //console.debug('path:', $GlobalJS.toReadWriteURL($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName))
+            //console.debug('path:', $GlobalJS.toReadWriteURL($GameMakerGlobal.mapPath()))
             //console.debug('path:', Qt.resolvedUrl($Platform.externalDataPath));
             //console.debug('path:', Qt.resolvedUrl($GlobalJS.toReadWriteURL($Platform.externalDataPath)));
         }
@@ -883,7 +910,7 @@ Item {
                 _private.strMapRID = item;
 
 
-                const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item + '/map.json';
+                const filePath = $GameMakerGlobal.mapPath(item) + '/map.json';
                 //let cfg = File.read(filePath);
                 let cfg = $Frame.sl_fileRead(filePath);
                 //console.debug('[mainMapEditor]filePath：', filePath);

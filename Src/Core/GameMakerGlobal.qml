@@ -1,7 +1,7 @@
 //pragma Singleton
 
 import QtQuick 2.14
-import Qt.labs.settings 1.1
+//import Qt.labs.settings 1.1
 
 
 //引入Qt定义的类
@@ -14,11 +14,11 @@ import _Global 1.0
 
 import 'qrc:/QML'
 
-import 'Singleton'
+//import 'Singleton'
 
 
 //import 'GameMakerGlobal.js' as GameMakerGlobalJS
-//import 'Config.js' as Config
+//import '../Config.js' as Config
 //import 'File.js' as File
 
 
@@ -53,7 +53,7 @@ QtObject {
 
 
         //当前项目名称
-        property string strCurrentProjectName: 'Project'
+        property string strCurrentProjectName: $GameMakerGlobal.settings.value('$CurrentProjectName') //GameMakerSingleton.settings.$CurrentProjectName
 
         //引擎工作目录
         property string strWorkPath: {
@@ -108,8 +108,8 @@ QtObject {
 
         //数据文件存储 目录名
         property string strMapDirName: 'Maps'
-        property string strRoleDirName: 'Roles'
         property string strSpriteDirName: 'Sprites'
+        property string strRoleDirName: 'Roles'
         property string strGoodsDirName: 'Goods'
         property string strFightRoleDirName: 'FightRoles'
         property string strFightSkillDirName: 'FightSkills'
@@ -117,79 +117,90 @@ QtObject {
 
         //资源 目录名
         property string strResourceDirName: 'Resources'
-        property string strMapResourceDirName: strResourceDirName + '/Maps'
-        property string strSpriteResourceDirName: strResourceDirName + '/Sprites'
-        property string strGoodsResourceDirName: strResourceDirName + '/Goods'
-        property string strImageResourceDirName: strResourceDirName + '/Images'
-        property string strMusicResourceDirName: strResourceDirName + '/Music'
-        property string strSoundResourceDirName: strResourceDirName + '/Sounds'
-        property string strVideoResourceDirName: strResourceDirName + '/Videos'
-
-
-        //TapTap 开发者中心对应 ClientID和ClientToken，为空表示不使用tap验证
-        //readonly property string strTDSClientID: Config.TapInfo.TDSClientID //''
-        //readonly property string strTDSClientToken: Config.TapInfo.TDSClientToken //''
+        property string strMapResourceDirName: 'Maps'
+        property string strSpriteResourceDirName: 'Sprites'
+        property string strGoodsResourceDirName: 'Goods'
+        property string strImageResourceDirName: 'Images'
+        property string strMusicResourceDirName: 'Music'
+        property string strSoundResourceDirName: 'Sounds'
+        property string strVideoResourceDirName: 'Videos'
     }
 
 
 
-    //下面函数是返回 某类型资源 的绝对路径（参数都是可选）
+    //下面函数是返回 数据/资源 的绝对路径（参数都是可选）
+
+    function mapURL(filepath) {return $GlobalJS.toURL(mapPath(filepath));}
+    function mapPath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMapDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function spriteURL(filepath) {return $GlobalJS.toURL(spritePath(filepath));}
+    function spritePath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSpriteDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function roleURL(filepath) {return $GlobalJS.toURL(rolePath(filepath));}
+    function rolePath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strRoleDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function goodsURL(filepath) {return $GlobalJS.toURL(goodsPath(filepath));}
+    function goodsPath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strGoodsDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function fightRoleURL(filepath) {return $GlobalJS.toURL(fightRolePath(filepath));}
+    function fightRolePath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightRoleDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function fightSkillURL(filepath) {return $GlobalJS.toURL(fightSkillPath(filepath));}
+    function fightSkillPath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightSkillDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+    function fightScriptURL(filepath) {return $GlobalJS.toURL(fightScriptPath(filepath));}
+    function fightScriptPath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightScriptDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
+    }
+
 
     function mapResourceURL(filepath) {return $GlobalJS.toURL(mapResourcePath(filepath));}
-    function mapResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMapResourceDirName;
-        if(filepath)
-            return ret + '/' + filepath;
-        return ret;
+    function mapResourcePath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strMapResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
     function spriteResourceURL(filepath) {return $GlobalJS.toURL(spriteResourcePath(filepath));}
-    function spriteResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSpriteResourceDirName;
-        if(filepath)
-            return ret + '/' + filepath;
-        return ret;
+    function spriteResourcePath(filepath='') {
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strSpriteResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
     function goodsResourceURL(filepath) {return $GlobalJS.toURL(goodsResourcePath(filepath));}
-    function goodsResourcePath(filepath) {
-        let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strGoodsResourceDirName;
-        if(filepath)
-            return ret + '/' + filepath;
-        return ret;
-    }
-
-
-    function soundResourceURL(filepath) {return $GlobalJS.toURL(soundResourcePath(filepath));}
-    function soundResourcePath(filepath='') {
-        // /开始的目录，则相对于项目根路径
+    function goodsResourcePath(filepath='') {
         if(filepath.startsWith('/'))
             return config.strProjectRootPath + config.strCurrentProjectName + filepath;
-        //绝对目录
-        else if(filepath.includes(':'))
-            return $GlobalJS.toPath(filepath);
-        //相对目录
-        else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSoundResourceDirName;
-            if(filepath)
-                return ret + '/' + filepath;
-            return ret;
-        }
-    }
-
-    function musicResourceURL(filepath) {return $GlobalJS.toURL(musicResourcePath(filepath));}
-    function musicResourcePath(filepath='') {
-        // /开始的目录，则相对于项目根路径
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
-        //绝对目录
-        else if(filepath.includes(':'))
-            return $GlobalJS.toPath(filepath);
-        //相对目录
-        else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMusicResourceDirName;
-            if(filepath)
-                return ret + '/' + filepath;
-            return ret;
-        }
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strGoodsResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
 
     function imageResourceURL(filepath) {return $GlobalJS.toURL(imageResourcePath(filepath));}
@@ -198,31 +209,50 @@ QtObject {
         if(filepath.startsWith('/'))
             return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        else if(filepath.includes(':'))
-            return $GlobalJS.toPath(filepath);
+        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strImageResourceDirName;
-            if(filepath)
-                return ret + '/' + filepath;
-            return ret;
+            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strImageResourceDirName;
+            return filepath ? (ret + '/' + filepath) : ret;
         }
     }
-
+    function soundResourceURL(filepath) {return $GlobalJS.toURL(soundResourcePath(filepath));}
+    function soundResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        //相对目录
+        else {
+            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strSoundResourceDirName;
+            return filepath ? (ret + '/' + filepath) : ret;
+        }
+    }
+    function musicResourceURL(filepath) {return $GlobalJS.toURL(musicResourcePath(filepath));}
+    function musicResourcePath(filepath='') {
+        // /开始的目录，则相对于项目根路径
+        if(filepath.startsWith('/'))
+            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        //相对目录
+        else {
+            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strMusicResourceDirName;
+            return filepath ? (ret + '/' + filepath) : ret;
+        }
+    }
     function videoResourceURL(filepath) {return $GlobalJS.toURL(videoResourcePath(filepath));}
     function videoResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
         if(filepath.startsWith('/'))
             return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        else if(filepath.includes(':'))
-            return $GlobalJS.toPath(filepath);
+        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
         //相对目录
         else {
-            let ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strVideoResourceDirName;
-            if(filepath)
-                return ret + '/' + filepath;
-            return ret;
+            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strVideoResourceDirName;
+            return filepath ? (ret + '/' + filepath) : ret;
         }
     }
 
@@ -264,19 +294,8 @@ QtObject {
 
 
 
-        if($Platform.compileType === 'release') {
-            //提交访问信息
-            $GlobalJS.sendUsage({
-                Times: settings.$RunTimes,
-                Duration: settings.$RunDuration,
-                Product: `${settings.category}_${$Platform.sysInfo.buildCpuArchitecture}_${version}(${$Platform.compileType})`,
-            });
-        }
-
-
-
-        //if(root.settings.$CurrentProjectName)
-            config.strCurrentProjectName = root.settings.$CurrentProjectName;
+        ////if(root.settings.$CurrentProjectName)
+            //config.strCurrentProjectName = root.settings.$CurrentProjectName;
 
         ++GameMakerSingleton.nOpenCount;
 

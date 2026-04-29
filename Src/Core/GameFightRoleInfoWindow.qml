@@ -65,7 +65,6 @@ Item {
 
     function refresh() {
         let conbatant = game.gd[strTeamName][root.nFightRoleIndex];
-        //let fightRolePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName) + '/';
         textFightRoleName.text = $CommonLibJS.convertToHTML(game.$sys.resources.commonScripts.$showCombatantName(conbatant, {avatar: true, color: true}));
 
 

@@ -72,7 +72,7 @@ Item {
             textArea.color: 'white'
             //textArea.color: $Global.style.foreground
             //textArea.enabled: false
-            textArea.readOnly: true
+            //textArea.readOnly: true
 
             textArea.wrapMode: TextArea.WrapAnywhere
             textArea.horizontalAlignment: TextArea.AlignJustify
@@ -105,6 +105,10 @@ Item {
             onClicked: {
                 sg_close();
             }
+            /*onPressAndHold: {
+                notepad.textArea.selectByMouse = !notepad.textArea.selectByMouse;
+            }
+            */
         }
     }
 

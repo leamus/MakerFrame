@@ -15,7 +15,7 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-//import './Core'
+import './Core'
 
 ////import GameComponents 1.0
 //import 'Core/GameComponents'
@@ -27,6 +27,7 @@ import 'qrc:/QML'
 
 Item {
     id: root
+    objectName: 'GameTest'
 
 
     signal sg_close();
@@ -57,6 +58,10 @@ Item {
 
 
 
+    property var $eval: (loaderGameScene.item ? loaderGameScene.item.$eval : null) ?? (()=>(c)=>eval(c))()
+
+    readonly property alias $GameMakerGlobal: gameMakerGlobal
+
     property alias textMapRID: textMapRID.text
     property alias textRoleRID: textRoleRID.text
     property alias textMapBlockX: textMapBlockX.text
@@ -82,6 +87,13 @@ Item {
     }
 
 
+    //不能定义，否则 手机端离线引擎使用MapEditor打开时 会有奇怪的警告（很多组件的parent丢失）
+    //  且多窗口时可能和它所属的MapEditor的工程不一致（其他窗口切换工程会导致）
+    GameMakerGlobal {
+        id: gameMakerGlobal
+    }
+
+
     ColumnLayout {
         height: parent.height * 0.8
         width: parent.width * 0.8
@@ -98,7 +110,7 @@ Item {
                 Layout.preferredHeight: 50
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-                placeholderText: '选择地图'
+                placeholderText: '*选择地图'
 
                 //selectByKeyboard: true
                 selectByMouse: true
@@ -111,14 +123,14 @@ Item {
                 //Layout.preferredHeight: 50
                 Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
 
-                text: '选择地图'
+                text: '*选择地图'
 
                 onClicked: {
 
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textMapRID;
                 }
@@ -156,7 +168,7 @@ Item {
                     l_listChoice.visible = true;
                     //l_listChoice.focus = true;
                     //l_listChoice.forceActiveFocus();
-                    l_listChoice.show($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000, 0x00);
+                    l_listChoice.show($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000, 0x00);
 
                     l_listChoice.choicedComponent = textRoleRID;
                 }
@@ -169,7 +181,7 @@ Item {
             Layout.maximumWidth: parent.width
 
             Label {
-                text: qsTr('地图块坐标：')
+                text: qsTr('*地图块坐标：')
             }
 
             TextField {
@@ -272,15 +284,17 @@ Item {
     //关闭时会释放，这样如果有资源释放失败（GameScene的ReleaseResource）也没问题；
     L_Loader {
         id: loaderGameScene
+        objectName: 'GameSceneLoader'
 
 
         visible: false
         //focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
-        //source: ''
+        active: false
+        source: /*Qt.resolvedUrl*/('./Core/GameScene.qml')
         //asynchronous: true
 
 
@@ -291,8 +305,7 @@ Item {
             ignoreUnknownSignals: true
 
             function onSg_close() {
-                loaderGameScene.close();
-                _private.gameSceneClose();
+                _private.close();
             }
         }
 
@@ -303,16 +316,17 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
-                close();
+                //close();
+                //active = false;
+
+
+                _private.close();
             }
             else if(status === Loader.Null) {
                 visible = false;
 
                 //root.focus = true;
                 root.forceActiveFocus();
-
-
-                _private.gameSceneClose();
             }
             else if(status === Loader.Loading) {
             }
@@ -326,7 +340,7 @@ Item {
             forceActiveFocus();
 
 
-            /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item + '/map.json';
+            /*let filePath = $GameMakerGlobal.mapPath(item) + '/map.json';
             //let cfg = File.read(filePath);
             let cfg = $Frame.sl_fileRead(filePath);
             //console.debug('cfg', cfg, filePath);
@@ -344,8 +358,8 @@ Item {
             item.bTest = true;
             //item.openMap(item);
             const roleRID = textRoleRID.text.trim();
-            const x = textMapBlockX.text.trim();
-            const y = textMapBlockY.text.trim();
+            const x = textMapBlockX.text.trim() || 0;
+            const y = textMapBlockY.text.trim() || 0;
             const tScript = `(function*() {
                 yield game.msg('欢迎来到鹰歌Maker世界！');
                 yield game.loadmap('${textMapRID.text.trim()}');
@@ -362,8 +376,7 @@ Item {
                 item.$load(tScript, true);
             }
             catch(e) {
-                loaderGameScene.close();
-                _private.gameSceneClose();
+                _private.close();
 
                 return $CommonLibJS.printException(e);
                 //console.warn('[!mainGameTest]', e);
@@ -435,12 +448,19 @@ Item {
 
             buttonStart.enabled = false;
 
-            loaderGameScene.load(Qt.resolvedUrl('./Core/GameScene.qml'));
+            //loaderGameScene.load(Qt.resolvedUrl('./Core/GameScene.qml'));
+            loaderGameScene.active = true;
         }
 
 
-        function gameSceneClose() {
+        function close() {
             buttonStart.enabled = true;
+
+            //loaderGameScene.close();
+            loaderGameScene.active = false;
+
+
+            root.forceActiveFocus();
         }
     }
 

@@ -33,13 +33,8 @@ Item {
 
 
     function init(goodsName) {
-
         if(goodsName) {
-            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName + '/' + goodsName + '/goods.js';
-            //const data = File.read(filePath);
-            //console.debug('[GoodsEditor]filePath：', filePath);
-
-            const data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_fileRead($GameMakerGlobal.goodsPath(goodsName) + '/goods.js');
 
             if(data) {
                 _private.strSavedName = textGoodsName.text = goodsName;
@@ -299,11 +294,10 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName + '/' + _private.strSavedName + '/goods.vjs';
 
                     goodsVisualEditor.forceActiveFocus();
                     goodsVisualEditor.visible = true;
-                    goodsVisualEditor.init(filePath);
+                    goodsVisualEditor.init($GameMakerGlobal.goodsPath(_private.strSavedName) + '/goods.vjs');
                 }
             }
 
@@ -459,7 +453,7 @@ const data = (function() {
                 return false;
             }
 
-            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
+            const path = $GameMakerGlobal.goodsPath();
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + '/' + textGoodsName.text + '/goods.js', 0);

@@ -87,6 +87,7 @@ Item {
 
         anchors.fill: parent
 
+        //active: false
         //source: ''
         //asynchronous: true
 
@@ -109,7 +110,8 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
-                //close();
+                close();
+                //active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -131,7 +133,7 @@ Item {
             ///focus = true;
             forceActiveFocus();
 
-            /*if(item.$load) {
+            if(item.$load) {
                 try {
                     item.$load();
                 }
@@ -143,7 +145,6 @@ Item {
                 finally {
                 }
             }
-            */
 
             visible = true;
         }
@@ -184,7 +185,14 @@ Item {
                     RunExtendCallback: function(url, type) {
                         if(type === 1) { //长按
                             //if(!$CommonLibJS.isMobile()) {
-                                const win = $openQML(url, -2);
+                                //注意（使用Extend.js时的上下文 2/3）：组件绑定了mainGameMaker的环境上下文；写成Qt.create...退出PluginsManager时会出错！
+                                if(!$CommonLibJS.isComponent(url)) url = $createComponent(url); //如果是路径，则使用$createComponent绑定上下文；
+                                const win = $openQML(url, {Type: -3,
+                                    //注意（使用Extend.js时的上下文 3/3）：窗口的parent（Qt）设置为mainGameMaker，确保组件退出上下文时全部释放；
+                                    Parent: $CommonLibJS.isComponent(url) ? rootGameMaker : null, //如果是Component，则可能绑定了上下文，所以设置Parent控制生命周期；
+                                    //Container: arrExtendsContainer, //将创建的窗口放在指定容器
+                                    //HotLoaderParams: {},
+                                });
                                 return [/*win.bMainWindow ? 0 : 1*/1, win.$loader];
                             //}
                         }
@@ -223,12 +231,15 @@ Item {
             //id: _config
         }
 
-        readonly property var $extends: $Extends.create()
+        //注意（使用Extend.js时的上下文 1/3）：js脚本和jsQtObject绑定了mainGameMaker的环境上下文；写成Qt.create...退出PluginsManager时会出错！
+        readonly property var $extends: $Extends.create((...params)=>$createQmlObject(...params))
 
-        //property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>Qt.createQmlObject(...params)*/)
+        //property var jsLoader: new $CommonLibJS.JSLoader(root, /*(...params)=>$createQmlObject(...params)*/)
 
 
         property int nType: -1
+
+        //property var arrExtendsContainer: []
     }
 
 
@@ -265,6 +276,11 @@ Item {
     }
     Component.onDestruction: {
         console.debug('[PluginsManager]Component.onDestruction');
+
+        /*for(const te of _private.arrExtendsContainer) {
+            te.destroy();
+        }
+        */
 
         //$$eval = null;
     }

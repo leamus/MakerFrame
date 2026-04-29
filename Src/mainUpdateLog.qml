@@ -72,7 +72,7 @@ Item {
             textArea.color: 'white'
             //textArea.color: $Global.style.foreground
             //textArea.enabled: false
-            textArea.readOnly: true
+            //textArea.readOnly: true
 
             textArea.wrapMode: TextArea.WrapAnywhere
             textArea.horizontalAlignment: TextArea.AlignJustify
@@ -105,6 +105,10 @@ Item {
             onClicked: {
                 sg_close();
             }
+            /*onPressAndHold: {
+                notepad.textArea.selectByMouse = !notepad.textArea.selectByMouse;
+            }
+            */
         }
     }
 
@@ -306,7 +310,18 @@ Item {
 149、新增：$showList函数，用来新建列表组件并显示；
 150、优化：Sprite和Role的创建函数合并，修改保存的json的FrameInfo字段（兼容旧格式）；
 151、新增：封装了QNetworkReply和NetworkRequest，可以直接操控它们（之前的sl_request仍然能用，是一种新的使用方式），优化了相关代码；
-152、其他：优化调整很多代码和细节，修复一些Bugs；
+152、新增：控制台加入了监视对象和数组内容功能和界面，调试更方便！
+153、新增：QTextDocument、QDir封装类 和 QVariant、Qt的一些函数；
+154、新增：首页增加代码编辑器，且代码编辑器可以直接运行qml、js、json文件；
+155、修复：弱网交互服务插件的一个Bug（Qt.md5的一个坑）；
+156、修复：sl_fileWrite写入错误；
+157、修复：异步加载时地图编辑器无法显示地图的Bug；
+158、修复：网络服务插件和加密插件的一个Bug；
+159、修复：打包安卓时底层文件覆盖框架引擎文件的Bug；
+160、修改：融合APP和游戏打包环境；
+162、修复：Extends的焦点等诸多Bugs；
+163、修复：应用退出释放插件时奔溃的Bug；
+164、其他：优化调整很多代码和细节，修复一些Bugs；
 
 2025/2/2：发布 1.15.2.250202 版本（框架 1.6.5.250202版本）
 1、新增：安卓画中画模式、后台服务运行线程；

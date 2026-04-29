@@ -90,14 +90,15 @@ Item {
             }
 
             onSg_removeClicked: {
-                let dirUrl = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + item;
+                const dirPath = $GameMakerGlobal.fightScriptPath(item);
+                console.debug('[mainFightScriptEditor]删除：', dirPath, $Frame.sl_dirExists(dirPath), );
 
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
                     Buttons: Dialog.Ok | Dialog.Cancel,
                     OnAccepted: function() {
-                        console.debug('[mainFightScriptEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                        removeItem(index);
+                        if($Frame.sl_removeRecursively(dirPath))
+                            removeItem(index);
 
                         //l_listFightScript.forceActiveFocus();
                     },
@@ -137,9 +138,9 @@ Item {
                         OnAccepted: function() {
                             //l_listFightScript.forceActiveFocus();
                             let count = 0;
-                            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightScriptDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
-                            for(let tn of list) {
-                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + tn + '/';
+                            const list = $Frame.sl_dirList($GameMakerGlobal.fightScriptPath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
+                            for(const tn of list) {
+                                const path = $GameMakerGlobal.fightScriptPath(tn) + '/';
                                 if(!$Frame.sl_fileExists(path + 'fight_script.vjs')) {
                                     console.info('[mainFightScriptEditor]没有可视化文件:', tn);
                                     continue;
@@ -184,6 +185,7 @@ Item {
 
         anchors.fill: parent
 
+        //active: false
         source: './FightScriptEditor.qml'
         //asynchronous: true
 
@@ -211,6 +213,7 @@ Item {
             }
             else if(status === Loader.Error) {
                 //close();
+                //active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -285,7 +288,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightScriptDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.fightScriptPath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
             //list.unshift('【新建战斗脚本】');
             //l_listFightScript.removeButtonVisible = {0: false, '-1': true};
             l_listFightScript.show(list);
@@ -311,7 +314,7 @@ Item {
 
 
             /*
-            let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + item + '/fight_script.json';
+            let filePath = $GameMakerGlobal.fightScriptPath(item) + '/fight_script.json';
 
             console.debug('[mainFightScriptEditor]filePath：', filePath);
 

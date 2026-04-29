@@ -275,7 +275,7 @@ Loader {
     smooth: false
 
 
-    asynchronous: false
+    //asynchronous: true
 
     sourceComponent: {
         switch(nSpriteType) {

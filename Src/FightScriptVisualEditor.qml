@@ -98,10 +98,8 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
-
                         const list = $showList({
-                            Data: path,
+                            Data: $GameMakerGlobal.fightRolePath(),
                             Parent: root,
                             OnClicked: (index, item)=>{
                                 text = item;
@@ -539,10 +537,8 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
-
                                             const list = $showList({
-                                                Data: path,
+                                                Data: $GameMakerGlobal.fightRolePath(),
                                                 Parent: root,
                                                 OnClicked: (index, item)=>{
                                                     text = item;

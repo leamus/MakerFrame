@@ -721,11 +721,9 @@ function $showGoodsName(goods, flags=null) {
 
 
     if(flags['Image'] && goods.$image) {
-        //let goodsPath = game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName + '/';
-
         //$CommonLibJS.showRichTextImage();
         tstr = ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
-            //arg(goodsPath + goods.$rid + '/' + goods.$image).
+            //arg($GameMakerGlobal.goodsPath(goods.$rid) + '/' + goods.$image).
             arg($GameMakerGlobal.imageResourceURL(goods.$image)).
             arg(goods.$size[0]).
             arg(goods.$size[1]);
@@ -770,7 +768,6 @@ function $showGoodsName(goods, flags=null) {
 //flags：avatar、color分别表示是否显示头像、颜色
 function $showCombatantName(combatant, flags=null) {
     let name = '';
-    //let fightRolePath = game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/';
 
     if(flags === undefined || flags === null)
         flags = {avatar: true, color: true};
@@ -778,7 +775,7 @@ function $showCombatantName(combatant, flags=null) {
     if(flags['avatar'] && combatant.$avatar) {
         //$CommonLibJS.showRichTextImage();
         name += ' <img src="%1" width="%2" height="%3" style="vertical-align: top;">  '.
-            //arg(fightRolePath + combatant.$rid + '/' + combatant.$avatar).
+            //arg($GameMakerGlobal.fightRolePath(combatant.$rid) + '/' + combatant.$avatar).
             arg($GameMakerGlobal.imageResourceURL(combatant.$avatar)).
             arg(combatant.$size[0]).
             arg(combatant.$size[1]);
@@ -1179,36 +1176,63 @@ function $commonRunAwayAlgorithm(team, index) {
 }
 
 
-//一个战斗回合内，返回每次回合的战斗人物数组
-//返回数字表示延迟多久ms再继续
-//返回null表示战斗回合结束
-function* $fightRolesRound(round) {
-    //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
-    //yield* $GameMakerGlobalJS.fightRolesRound1(round, '$speed');
+//检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
+//返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
+//stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
+//会检测技能、道具的相关函数并调用返回；
+function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
+    //！！！鹰250927：这里新修改：道具脚本的$checkScript调用时只会传递Skill，所以这里改为$objectType，且下面不用判断为道具了吧；
+    let choiceType = fightSkillOrGoods.$objectType; //combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
+    //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
+    let goods = null;
+    let fightSkill = null;
 
-
-    //所有的战斗人物
-    let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
-
-    //计算 攻击 顺序
-    arrTempLoopedAllFightRoles.sort(function(a, b) {
-        if(a.$$propertiesWithExtra.speed > b.$$propertiesWithExtra.speed)return -1;
-        if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
-        if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
-    });
-    //console.debug('all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
-
-
-    //循环每个战斗人物
-    for(let c of arrTempLoopedAllFightRoles) {
-        //如果在场且HP[0] > 0，则进行战斗人物回合
-        if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
-            yield [c];
+    //如果选择的是技能
+    if(choiceType === 3) {
+        fightSkill = fightSkillOrGoods;
+        //skill = combatant.$$fightData.$choice.$attack;
+    }
+    //如果选择的是道具
+    else if(choiceType === 2) {
+        goods = fightSkillOrGoods;
+        fightSkill = fightSkillOrGoods.$fight[0];
     }
 
-    //战斗回合结束
-    return null;
+
+    let buffs = combatant.$$fightData.$buffs;
+    /*if(buffs['$$Sleep']) {
+        return 你已经被[眠]';
+    }
+
+    if(buffs['$$Sealing'] && fightSkill.$type === 1) {
+        return '你已经被[封]';
+    }
+
+    if(buffs['$$Confusion']) {
+        return '你已经被[乱]';
+    }*/
+
+
+    //遍历所有的buff
+    for(let tbuffsIndex in buffs) {
+        let tbuff = buffs[tbuffsIndex];
+        //如果是 毒乱封眠
+        if(tbuff.flags & 0b0001) {
+            //if(stage === 1)
+                return '你已经被[眠]';
+        }
+        else if((tbuff.flags & 0b0010) && choiceType === 3 && fightSkill.$type === 1) {   //选择的是 技能
+            return '你已经被[封]';
+        }
+        else if(tbuff.flags & 0b0100) {
+            if((stage === 0 || stage === 1) && fightSkill.$type === 1)   //只能选择 普通攻击
+                return '你已经被[乱]';
+        }
+    }
+
+    return true;
 }
+
 
 
 //战斗技能算法（可以实现其他功能并返回一个值，比如显示战斗文字、返回通用伤害值等）
@@ -1267,20 +1291,21 @@ function $fightSkillAlgorithm(combatant, targetCombatant, Params) {
     return [{HP: [harm, Math.floor(harm / 4)], Target: targetCombatant}];
 }
 
-//通用技能播放脚本
+/*/通用技能播放脚本
 function* $commonSkillPlayScript(skill, combatant) {
+    //使用的技能对象（可以用技能的数据）
+    //let skill = combatant.$$fightData.$choice.$attack;
+
+    //返回战斗算法结果
+    let SkillEffectResult;
+    let effect;
+
     //普通攻击
     if(skill.$type === 0) {
         //单体
         if(skill.$targetCount === 1) {
-            //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$fightData.$choice.$attack;
             //目标战斗人物
             const targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
-
-            //返回战斗算法结果
-            let SkillEffectResult;
-            let effect;
 
 
             //Normal 动作特效，无限循环动画、500ms结束、对方面前
@@ -1290,7 +1315,7 @@ function* $commonSkillPlayScript(skill, combatant) {
             //kill 动作特效，1次，等待播放结束
             yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant});
             //kill 特效，1次，等待播放结束，特效ID，对方和位置
-            yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'kill', Combatant: targetCombatant, Position: 1});
+            yield ({Type: 20, Name: skill.visualInfo.skilleffect, Loops: 1, Interval: 0, ID: skill.visualInfo.skilleffect, Combatant: targetCombatant, Position: 1});
             //效果，Skill：KillType：
             //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
             SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
@@ -1300,37 +1325,12 @@ function* $commonSkillPlayScript(skill, combatant) {
             yield ({Type: 1});
             //显示文字，同步播放、红色、内容、大小、对方和位置
             yield ({Type: 30, Interval: 0, Color: 'red', Text: -effect[0], FontSize: 20, Combatant: targetCombatant, Position: undefined});
-
-
-
-if(Math.random() < 0.5) {
-game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(2, 3), HarmType: 1, HarmValue: 0});
-yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});
-}
-if(Math.random() < 0.5) {
-game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(2, 3), Properties: [['attack', 0, 1]]});
-yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Combatant: targetCombatant});
-}
-
-
-            //Normal 动作特效，无限循环动画、500ms结束、原位置
-            yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500, Run: 0});
-            //yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500});
-
-            //技能结束，必须返回null
-            return null;
         }
         //全体
         else if(skill.$targetCount === -1) {
-            //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$fightData.$choice.$attack;
             //目标战斗人物
             //let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
             const targetCombatants = combatant.$$fightData.$info.$teams[1];
-
-            //返回战斗算法结果
-            let SkillEffectResult;
-            let effect;
 
 
             //Normal 动作特效，无限循环动画、500ms结束、对方面前
@@ -1346,7 +1346,7 @@ yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Comb
                     continue;
 
                 //kill 特效，1次，同步播放，对方位置，特效ID
-                yield ({Type: 20, Name: 'kill', Loops: 1, Interval: 0, ID: 'kill'+ti, Combatant: targetCombatant, Position: 1});
+                yield ({Type: 20, Name: skill.visualInfo.skilleffect, Loops: 1, Interval: 0, ID: skill.visualInfo.skilleffect+ti, Combatant: targetCombatant, Position: 1});
             }
             //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
@@ -1362,15 +1362,58 @@ yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Comb
                 //显示文字，同步播放、对方位置、红色、内容、大小
                 yield ({Type: 30, Interval: 0, Color: 'red', Text: -effect[0], FontSize: 20, Combatant: targetCombatant, Position: undefined});
             }
+        }
+    }
+    //技能
+    else {
+        //单体
+        if(skill.$targetCount === 1) {
+        {
+            //目标战斗人物
+            let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
 
 
+            //Skill 动作特效，1次，等待播放结束
+            yield ({Type: 10, Name: 'Skill', Loops: 1, Interval: -1});
+
+            //kill 特效，1次，等待播放结束，对方位置，特效ID
+            yield ({Type: 20, Name: skill.visualInfo.skilleffect, Loops: 1, Interval: -1, ID: skill.visualInfo.skilleffect, Combatant: targetCombatant, Position: 1});
+            //game.addprops(targetCombatant, {'$$property$$': $$effect$$});
+$$addprops$$
+
+        }
+        //全体
+        else if(skill.$targetCount === -1) {
+            //目标战斗人物
+            //let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
+            let targetCombatants = combatant.$$fightData.$info.$teams[skill.$targetFlag === 1 ? 0 : 1];
 
 
-            //每个被攻击Buffs
+            //Skill 动作特效，1次，等待播放结束
+            yield ({Type: 10, Name: 'Skill', Loops: 1, Interval: -1});
+
+            yield ({Type: 20, Name: skill.visualInfo.skilleffect, Loops: 1, Interval: -1, ID: skill.visualInfo.skilleffect, Position: 2, Target: 1});
+
+            //每个被攻击计算并显示伤害
             for(let ti in targetCombatants) {
                 let targetCombatant = targetCombatants[ti];
                 if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
                     continue;
+                //kill 特效，1次，等待播放结束，对方位置，特效ID
+                //yield ({Type: 20, Name: skill.visualInfo.skilleffect, Loops: 1, Interval: 100, ID: skill.visualInfo.skilleffect+ti, Combatant: targetCombatant, Position: 1});
+$$addprops$$
+            }
+        }
+    }
+
+
+
+
+    //每个被攻击Buffs
+    for(let ti in targetCombatants) {
+        let targetCombatant = targetCombatants[ti];
+        if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
+            continue;
 if(Math.random() < 0.5) {
 game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(2, 3), HarmType: 1, HarmValue: 0});
 yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});
@@ -1380,19 +1423,65 @@ game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', 
 yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Combatant: targetCombatant});
 }
 
-            }
-
-            //Normal 动作特效，无限循环动画、500ms结束、原位置
-            yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500, Run: 0});
-            //yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500});
-
-            //技能结束，必须返回null
-            return null;
-        }
     }
-    //技能
-    else {
+
+
+
+
+
+
+if(Math.random() < 0.5) {
+game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(2, 3), HarmType: 1, HarmValue: 0});
+yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});
+}
+if(Math.random() < 0.5) {
+game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(2, 3), Properties: [['attack', 0, 1]]});
+yield ({Type: 30, Interval: 500, Color: 'white', Text: '攻', FontSize: 20, Combatant: targetCombatant});
+}
+
+
+
+
+    //Normal 动作特效，无限循环动画、500ms结束、原位置
+    yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500, Run: 0});
+    //yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500});
+
+    //技能结束，必须返回null
+    return null;
+}
+*/
+
+
+
+//一个战斗回合内，返回每次回合的战斗人物数组
+//返回数字表示延迟多久ms再继续
+//返回null表示战斗回合结束
+function* $fightRolesRound(round) {
+    //使用按某属性的比率来进行战斗人物回合（取消了大回合和回合事件）
+    //yield* $GameMakerGlobalJS.fightRolesRound1(round, '$speed');
+
+
+    //所有的战斗人物
+    let arrTempLoopedAllFightRoles = fight.myCombatants.concat(fight.enemies);
+
+    //计算 攻击 顺序
+    arrTempLoopedAllFightRoles.sort(function(a, b) {
+        if(a.$$propertiesWithExtra.speed > b.$$propertiesWithExtra.speed)return -1;
+        if(a.$$propertiesWithExtra.speed < b.$$propertiesWithExtra.speed)return 1;
+        if(a.$$propertiesWithExtra.speed === b.$$propertiesWithExtra.speed)return 0;
+    });
+    //console.debug('all', arrTempLoopedAllFightRoles.length, JSON.stringify(arrTempLoopedAllFightRoles));
+
+
+    //循环每个战斗人物
+    for(let c of arrTempLoopedAllFightRoles) {
+        //如果在场且HP[0] > 0，则进行战斗人物回合
+        if(c.$$fightData.$info.$index >= 0 && c.$$propertiesWithExtra.HP[0] > 0)
+            yield [c];
     }
+
+    //战斗回合结束
+    return null;
 }
 
 
@@ -1850,71 +1939,6 @@ function* combatantRoundEffects(combatant, round, stage) {
     }
 
     return null;
-}
-
-
-
-//通用技能播放函数：如果技能的$playScript不为函数，则调用
-function* $commonPlayScript(fightSkill, combatant, ...params) {
-
-}
-
-
-//检查技能、道具是否可在战斗中使用（有4个阶段会调用：见stage）；
-//返回：true表示可以使用；字符串和数组表示不能使用并提示的信息（只有选择时）；
-//stage为0表示我方刚选择技能时，为1表示我方选择技能的步骤完毕，为10表示战斗中我方或敌方刚选择技能时，为11表示战斗中我方或敌方选择技能的步骤完毕（可在阶段11减去MP，道具的技能可单独设置）；
-//会检测技能、道具的相关函数并调用返回；
-function $commonCheckScript(fightSkillOrGoods, combatant, stage) {
-    //！！！鹰250927：这里新修改：道具脚本的$checkScript调用时只会传递Skill，所以这里改为$objectType，且下面不用判断为道具了吧；
-    let choiceType = fightSkillOrGoods.$objectType; //combatant.$$fightData.$choice.$type; //choiceType为3、2分别表示使用技能和道具（此时相应的fightSkill也为道具）；
-    //let targetCombatants = combatant.$$fightData.$choice.$targets[0];
-    let goods = null;
-    let fightSkill = null;
-
-    //如果选择的是技能
-    if(choiceType === 3) {
-        fightSkill = fightSkillOrGoods;
-        //skill = combatant.$$fightData.$choice.$attack;
-    }
-    //如果选择的是道具
-    else if(choiceType === 2) {
-        goods = fightSkillOrGoods;
-        fightSkill = fightSkillOrGoods.$fight[0];
-    }
-
-
-    let buffs = combatant.$$fightData.$buffs;
-    /*if(buffs['$$Sleep']) {
-        return 你已经被[眠]';
-    }
-
-    if(buffs['$$Sealing'] && fightSkill.$type === 1) {
-        return '你已经被[封]';
-    }
-
-    if(buffs['$$Confusion']) {
-        return '你已经被[乱]';
-    }*/
-
-
-    //遍历所有的buff
-    for(let tbuffsIndex in buffs) {
-        let tbuff = buffs[tbuffsIndex];
-        //如果是 毒乱封眠
-        if(tbuff.flags & 0b0001) {
-            //if(stage === 1)
-                return '你已经被[眠]';
-        }
-        else if((tbuff.flags & 0b0010) && choiceType === 3 && fightSkill.$type === 1) {   //选择的是 技能
-            return '你已经被[封]';
-        }
-        else if(tbuff.flags & 0b0100) {
-            if((stage === 0 || stage === 1) && fightSkill.$type === 1)   //只能选择 普通攻击
-                return '你已经被[乱]';
-        }
-    }
-
-    return true;
 }
 
 
@@ -2396,7 +2420,8 @@ function $readSavesInfo(count=3) {
 
 //下面是专有
 
-//type：true表示保持宽高缩放到适合窗口；false：拉伸到满窗口；数字：缩放倍数；数组：x、y方向缩放倍数；且默认居中窗口；
+//width、height：设置场景大小（像素）；
+//type：可以控制窗口类型：true表示保持宽高比缩放到适合窗口；false：拉伸到铺满窗口；数字：缩放倍数；数组：x、y方向缩放倍数；且默认居中窗口；
 function setSceneSize(width, height, type=true) {
     /*console.debug('[GameMakerGlobalJS]setSceneSize:', width, height,
         game.$sys.screen.width, game.$sys.screen.height,
@@ -3557,7 +3582,7 @@ function commonLevelAlgorithm(combatant, targetLevel) {
 //获取 Sprite 资源
 function getSpriteResource(spriteName, jsLoader=null) {
     //读特效信息
-    const spriteDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + spriteName; //game.$projectpath
+    const spriteDirPath = $GameMakerGlobal.spritePath(spriteName);
 
     let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + '/sprite.json');
     if(spriteResourceInfo)
@@ -3613,7 +3638,8 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, jsL
     */
 
 
-    spriteEffectComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? spriteResourceInfo.Image);
+    if(newParams.Image ?? spriteResourceInfo.Image)
+        spriteEffectComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? spriteResourceInfo.Image);
 
     //spriteEffectComp.sprite.width = parseInt(spriteResourceInfo.SpriteSize[0]);
     //spriteEffectComp.sprite.height = parseInt(spriteResourceInfo.SpriteSize[1]);
@@ -3715,7 +3741,7 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, jsL
 
     let script = newParams.$script ?? spriteResourceInfo.$script ?? newParams.Script ?? spriteResourceInfo.Script;
     if($CommonLibJS.isString(script)) { //如果是字符串，则载入js文件
-        const spriteDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + script; //game.$projectpath
+        const spriteDirPath = $GameMakerGlobal.spritePath(script);
         if(jsLoader && $Frame.sl_fileExists(spriteDirPath + '/sprite.js')) {
             //jsLoader.clear();
             script = jsLoader.load($GlobalJS.toURL(spriteDirPath + '/sprite.js'));
@@ -3723,8 +3749,9 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, jsL
         else
             script = null;
     }
-    if(script) {
-        spriteEffectComp.sprite.fnRefresh = script.$refresh;
+    if(script && spriteEffectComp.sprite) {
+        if(spriteEffectComp.sprite.hasOwnProperty('fnRefresh'))
+            spriteEffectComp.sprite.fnRefresh = script.$refresh;
         if(spriteEffectComp.hasOwnProperty('$script'))
             spriteEffectComp.$script = script;
     }
@@ -3737,7 +3764,7 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, jsL
 //获取 Role 资源
 function getRoleResource(roleName, jsLoader=null) {
     //读角色信息
-    const roleDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleName; //game.$projectpath
+    const roleDirPath = $GameMakerGlobal.rolePath(roleName);
 
     let roleResourceInfo = $Frame.sl_fileRead(roleDirPath + '/role.json');
     if(roleResourceInfo)
@@ -3778,12 +3805,13 @@ function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSprite
         let t = newParams.FrameInfo ?? roleResourceInfo.FrameInfo ??
             newParams.FrameIndex ?? roleResourceInfo.FrameIndex; //兼容旧代码！！！
         for(let ta in t) {
-            const info = (getSpriteResourceCallback ?? getSpriteResource)(t[ta][0]);
+            const info = (getSpriteResourceCallback ?? getSpriteResource)(t[ta][0], jsLoader);
             roleComp.objActionsInfo[ta] = {Info: info, Script: info.$script};
         }
     }
     else if(roleComp.nSpriteType === 1) { //经典行列图
-        roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
+        if(newParams.Image ?? roleResourceInfo.Image)
+            roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
 
         //！！！兼容旧代码2个
         roleComp.nFrameCount = $CommonLibJS.shortCircuit(0b1,
@@ -3824,9 +3852,9 @@ function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSprite
 
         const offsetIndex = $CommonLibJS.shortCircuit(0b1,
             $CommonLibJS.getObjectValue(newParams.FrameInfo, 'OffsetIndex'),
-            //$CommonLibJS.getObjectValue(newParams, 'OffsetIndex'),
+            //$CommonLibJS.getObjectValue(newParams, 'FrameIndex'),
             $CommonLibJS.getObjectValue(roleResourceInfo.FrameInfo, 'OffsetIndex'),
-            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameIndex'),
+            $CommonLibJS.getObjectValue(roleResourceInfo, 'FrameIndex'), //兼容旧代码！！！
         );
         if($CommonLibJS.isArray(offsetIndex))
             roleComp.objActionsInfo = {'$Up': offsetIndex[0], '$Right': offsetIndex[1], '$Down': offsetIndex[2], '$Left': offsetIndex[3]};
@@ -3834,7 +3862,8 @@ function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSprite
             roleComp.objActionsInfo = offsetIndex;
     }
     else if(roleComp.nSpriteType === 2) { //文件夹
-        roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
+        if(newParams.Image ?? roleResourceInfo.Image)
+            roleComp.strSource = $GameMakerGlobal.spriteResourceURL(newParams.Image ?? roleResourceInfo.Image);
 
         //roleComp.implicitWidth = roleResourceInfo.RoleSize[0];
         //roleComp.implicitHeight = roleResourceInfo.RoleSize[1];
@@ -3878,7 +3907,7 @@ function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSprite
 
     let script = newParams.$script ?? roleResourceInfo.$script ?? newParams.Script ?? roleResourceInfo.Script;
     if($CommonLibJS.isString(script)) { //如果是字符串，则载入js文件
-        const roleDirPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + script; //game.$projectpath
+        const roleDirPath = $GameMakerGlobal.rolePath(script);
         if(jsLoader && $Frame.sl_fileExists(roleDirPath + '/role.js')) {
             //jsLoader.clear();
             script = jsLoader.load($GlobalJS.toURL(roleDirPath + '/role.js'));
@@ -3887,7 +3916,8 @@ function createRole(roleParams, roleComp, newParams={}, jsLoader=null, getSprite
             script = null;
     }
     if(script && roleComp.sprite.sprite) { //只有1和2有 sprite.fnRefresh，0使用特效的$script
-        roleComp.sprite.sprite.fnRefresh = script.$refresh;
+        if(roleComp.sprite.sprite.hasOwnProperty('fnRefresh'))
+            roleComp.sprite.sprite.fnRefresh = script.$refresh;
         if(roleComp.hasOwnProperty('$script'))
             roleComp.$script = script;
     }

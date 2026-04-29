@@ -13,9 +13,10 @@ FightScriptVisualEditor 1.0 FightScriptVisualEditor.qml
 
 SpriteEditor 1.0 SpriteEditor.qml
 RoleEditor 1.0 RoleEditor.qml
-GoodsEditor 1.0 GoodsEditor.qml
+
 MapEditor 1.0 MapEditor.qml
 
+GoodsEditor 1.0 GoodsEditor.qml
 FightRoleEditor 1.0 FightRoleEditor.qml
 FightScriptEditor 1.0 FightScriptEditor.qml
 FightSkillEditor 1.0 FightSkillEditor.qml

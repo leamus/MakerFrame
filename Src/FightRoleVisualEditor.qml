@@ -137,10 +137,8 @@ Item {
                 //wrapMode: TextEdit.Wrap
 
                 onPressAndHold: {
-                    const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
-
                     const list = $showList({
-                        Data: path,
+                        Data: $GameMakerGlobal.spritePath(),
                         Parent: root,
                         OnClicked: (index, item)=>{
                             text = item;
@@ -548,10 +546,8 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightSkillDirName;
-
                                 const list = $showList({
-                                    Data: path,
+                                    Data: $GameMakerGlobal.fightSkillPath(),
                                     Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
@@ -590,10 +586,8 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
-
                                 const list = $showList({
-                                    Data: path,
+                                    Data: $GameMakerGlobal.goodsPath(),
                                     Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
@@ -632,10 +626,8 @@ Item {
                             //wrapMode: TextEdit.Wrap
 
                             onPressAndHold: {
-                                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strGoodsDirName;
-
                                 const list = $showList({
-                                    Data: path,
+                                    Data: $GameMakerGlobal.goodsPath(),
                                     Parent: root,
                                     OnClicked: (index, item)=>{
                                         text += item + ',';
@@ -830,10 +822,8 @@ Item {
                                         //wrapMode: TextEdit.Wrap
 
                                         onPressAndHold: {
-                                            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
-
                                             const list = $showList({
-                                                Data: path,
+                                                Data: $GameMakerGlobal.spritePath(),
                                                 Parent: root,
                                                 OnClicked: (index, item)=>{
                                                     text = item;
@@ -1391,7 +1381,7 @@ const data = (function() {
 
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
-        const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        const levelChain = game.$sys.caches.jsLoader.load(Qt.resolvedUrl('./level_chain.js'));
         if(levelChain && levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
         if(levelChain && levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }

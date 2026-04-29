@@ -1,4 +1,4 @@
-module Singleton_GameMakerGlobal
+module GameMakerSingleton
 #module名字可以随意取（纯QML组件的识别方式是 含qmldir的文件夹名）
 
 
@@ -13,6 +13,7 @@ module Singleton_GameMakerGlobal
 #    网络加载的验证过程：
 #      远程加载时引擎会严格验证组件依赖图
 #      即使没有实际代码依赖，qmldir 定义的同一模块内的单例和其他组件会被视为相互关联
+#鹰（260318）：将Global和Singleton分离后，警告又出现了，不过貌似是误报，忽略即可；
 
 
-singleton GameMakerSingleton 1.0 GameMakerSingleton.qml
+#singleton GameMakerSingleton 1.0 GameMakerSingleton.qml

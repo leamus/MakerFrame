@@ -2089,81 +2089,10 @@ $$checkScript$$
 `
 
         //普通攻击单体
-        property string strTemplate1playScript: `
-            //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$fightData.$choice.$attack;
-            //目标战斗人物
-            let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
-
-            //返回战斗算法结果
-            let SkillEffectResult;
-            let effect;
-
-
-            //Normal 动作特效，无限循环动画、500ms结束、对方面前
-            yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500, Combatant: combatant, Target: targetCombatant, Run: 1});
-
-
-            //kill 动作特效，1次，等待播放结束
-            yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1, Combatant: combatant});
-            //kill 特效，1次，等待播放结束，特效ID，对方和位置
-            yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, ID: '$$skilleffect$$', Combatant: targetCombatant, Position: 1});
-            //效果，Skill：KillType：
-            //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
-            SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
-            effect = SkillEffectResult.shift().HP;
-            game.addprops(targetCombatant, {'HP': [-effect[0], -effect[1]]});
-            //刷新人物信息
-            yield ({Type: 1});
-            //显示文字，同步播放、红色、内容、大小、对方和位置
-            yield ({Type: 30, Interval: 0, Color: 'red', Text: -effect[0], FontSize: 20, Combatant: targetCombatant, Position: undefined});
-
-`
+        property string strTemplate1playScript: `$$skilleffect$$`
 
         //普通攻击全体
-        property string strTemplate2playScript: `
-            //使用的技能对象（可以用技能的数据）
-            //let skill = combatant.$$fightData.$choice.$attack;
-            //目标战斗人物
-            //let targetCombatant = combatant.$$fightData.$choice.$targets[0][0];
-            let targetCombatants = combatant.$$fightData.$info.$teams[1];
-
-            //返回战斗算法结果
-            let SkillEffectResult;
-            let effect;
-
-
-            //Normal 动作特效，无限循环动画、500ms结束、对方面前
-            yield ({Type: 10, Name: 'Normal', Loops: -1, Interval: 500, Target: 1, Run: 2});
-            //kill 动作特效，1次，等待播放结束
-            yield ({Type: 10, Name: 'Kill', Loops: 1, Interval: -1});
-
-
-            //每个被攻击显示 kill 特效
-            for(let ti in targetCombatants) {
-                let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
-                    continue;
-
-                //kill 特效，1次，同步播放，对方位置，特效ID
-                yield ({Type: 20, Name: '$$skilleffect$$', Loops: 1, Interval: 0, ID: '$$skilleffect$$'+ti, Combatant: targetCombatant, Position: 1});
-            }
-            //每个被攻击计算并显示伤害
-            for(let ti in targetCombatants) {
-                let targetCombatant = targetCombatants[ti];
-                if(targetCombatant.$$propertiesWithExtra.HP[0] <= 0)
-                    continue;
-                //Params：传递给通用算法的参数
-                //SkillEffectResult = yield ({Type: 3, Target: targetCombatant, Params: {}});
-                SkillEffectResult = game.$sys.resources.commonScripts.$fightSkillAlgorithm(combatant, targetCombatant, {});
-                effect = SkillEffectResult.shift().HP;
-                game.addprops(targetCombatant, {'HP': [-effect[0], -effect[1]]});
-                yield ({Type: 1});
-                //显示文字，同步播放、对方位置、红色、内容、大小
-                yield ({Type: 30, Interval: 0, Color: 'red', Text: -effect[0], FontSize: 20, Combatant: targetCombatant, Position: undefined});
-            }
-
-`
+        property string strTemplate2playScript: `$$skilleffect$$`
 
         //技能单体
         property string strTemplate3playScript: `

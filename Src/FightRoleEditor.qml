@@ -33,10 +33,8 @@ Item {
 
 
     function init(fightRoleName) {
-
         if(fightRoleName) {
-            const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + fightRoleName + '/fight_role.js';
-            const data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_fileRead($GameMakerGlobal.fightRolePath(fightRoleName) + '/fight_role.js');
 
             if(data) {
                 _private.strSavedName = textFightRoleName.text = fightRoleName;
@@ -124,7 +122,7 @@ const data = (function() {
 
     /*/方法1：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.js')))) {
-        const levelChain = game.$sys.caches.jsLoader.load($GlobalJS.toURL(Qt.resolvedUrl('./level_chain.js')));
+        const levelChain = game.$sys.caches.jsLoader.load(Qt.resolvedUrl('./level_chain.js'));
         if(levelChain && levelChain.levelUpScript)$commons.levelUpScript = levelChain.levelUpScript;
         if(levelChain && levelChain.levelAlgorithm)$commons.levelAlgorithm = levelChain.levelAlgorithm;
     }
@@ -251,11 +249,10 @@ const data = (function() {
                         });
                         return;
                     }
-                    const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + _private.strSavedName + '/fight_role.vjs';
 
                     fightRoleVisualEditor.forceActiveFocus();
                     fightRoleVisualEditor.visible = true;
-                    fightRoleVisualEditor.init(filePath);
+                    fightRoleVisualEditor.init($GameMakerGlobal.fightRolePath(_private.strSavedName) + '/fight_role.vjs');
                 }
             }
         }
@@ -398,7 +395,7 @@ const data = (function() {
                 return false;
             }
 
-            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strFightRoleDirName;
+            const path = $GameMakerGlobal.fightRolePath();
 
             function fnSave() {
                 let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0);

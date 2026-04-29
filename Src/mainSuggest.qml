@@ -43,8 +43,8 @@ Item {
 
 
 
-    property string suggestUrl: 'http://makerframe.leamus.cn/api/v1/suggest/suggest'
-    property string captchaUrl: 'http://makerframe.leamus.cn/api/v1/suggest/getCaptcha'
+    property string suggestUrl: 'http://MakerFrame.Leamus.cn/api/v1/suggest/suggest'
+    property string captchaUrl: 'http://MakerFrame.Leamus.cn/api/v1/suggest/getCaptcha'
 
 
     //width: 600
@@ -197,7 +197,7 @@ Item {
                         infoCallback(xhr);
                     }).$$catch((xhr)=>{
                         buttonSubmit.enabled = true;
-                        console.warn('[!Suggest]', xhr);
+                        console.warn('[!mainSuggest]', xhr);
                     });
 
                     function infoCallback(xhr) {
@@ -207,11 +207,11 @@ Item {
                         }
                         catch(e) {
                             //labelError.text = xhr.responseText + `(${xhr.status})`;
-                            console.warn('[!Suggest]', xhr.responseText + `(${xhr.status})`);
+                            console.warn('[!mainSuggest]', xhr.responseText + `(${xhr.status})`);
                         }
 
                         if(xhr.status === 200 && data.code === 0) {
-                            console.debug('[Suggest]', JSON.stringify(data));
+                            console.debug('[mainSuggest]', JSON.stringify(data));
 
                             $dialog.show({
                                 Msg: '感谢建议',
@@ -225,11 +225,8 @@ Item {
                             });
                         }
                         else {
-                            console.warn('[!Suggest]', JSON.stringify(data));
-
                             _private.refresh();
-                            //labelError.text = data.msg + `(${data.code})`;
-                            //console.warn('[!Suggest]', data.msg + `(${data.code})`);
+
                             $dialog.show({
                                 Msg: '错误：' + data.msg + `(${data.code})`,
                                 Buttons: Dialog.Ok,
@@ -238,6 +235,10 @@ Item {
                                 OnRejected: ()=>{
                                 },
                             });
+
+                            //labelError.text = data.msg + `(${data.code})`;
+                            //console.warn('[!mainSuggest]', data.msg + `(${data.code})`);
+                            console.warn('[!mainSuggest]', JSON.stringify(data));
                         }
                     }
                 }
@@ -294,11 +295,14 @@ Item {
                 }
 
                 if(xhr.status === 200 && data.code === 0) {
+                    if(!root)
+                        return;
+
                     _private.strKey = data.data.key;
                     imageCaptcha.source = 'data:image/png;base64,' + data.data.img;
                 }
                 else {
-                    console.warn('[!Suggest]', JSON.stringify(data));
+                    console.warn('[!mainSuggest]', JSON.stringify(data));
 
 
                     //labelError.text = data.msg + `(${data.code})`;

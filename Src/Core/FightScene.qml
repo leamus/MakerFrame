@@ -44,6 +44,7 @@ import 'FightScene.js' as FightSceneJS
 
 Item {
     id: rootFightScene
+    objectName: 'FightScene'
 
 
     signal sg_fightOver();
@@ -197,7 +198,7 @@ Item {
         let data;
         if(fightScriptData) {
 
-            let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + fightScript + '/fight_script.json');
+            let filePath = $GameMakerGlobal.fightScriptPath(fightScript) + '/fight_script.json';
             //let data = File.read(filePath);
             //console.debug('[GameFightScript]filePath：', filePath);
 
@@ -213,7 +214,7 @@ Item {
             return;
         */
 
-        //let data = game.loadjson($GameMakerGlobal.config.strFightScriptDirName + '/' + fightScript + '/fight_script.js');
+        //let data = game.loadjson($GameMakerGlobal.fightScriptPath(fightScript) + '/fight_script.js');
         //if(!data)
         //    return;
 
@@ -502,6 +503,8 @@ Item {
 
 
     property QtObject fight: QtObject {
+        objectName: 'fight'
+
         //我方和敌方
         property var myCombatants: []
         property var enemies: []
@@ -1364,7 +1367,7 @@ Item {
                             height: _private.config.barHeight
 
                             sourceComponent: compBar
-                            asynchronous: false
+                            //asynchronous: false
                         }
                         */
                     }
@@ -1574,7 +1577,7 @@ Item {
                             height: _private.config.barHeight
 
                             sourceComponent: compBar
-                            asynchronous: false
+                            //asynchronous: false
                         }
                         */
                     }
@@ -1635,7 +1638,7 @@ Item {
         //z: 6
 
         sourceComponent: compGameMsg
-        asynchronous: false
+        //asynchronous: false
 
         Connections {
             target: dialogFightMsg.item
@@ -1665,7 +1668,7 @@ Item {
         //z: 6
 
         sourceComponent: compGameMenu
-        asynchronous: false
+        //asynchronous: false
 
         /*Connections {
             target: loaderFightMenu.item
@@ -2065,14 +2068,15 @@ Item {
     Dialog {
         id: dialogScript
 
-        title: '执行脚本'
+        visible: false
+        anchors.centerIn: parent
         width: parent.width * 0.9
         height: Math.max(200, Math.min(parent.height, textScript.implicitHeight + 160))
+
+        title: '执行脚本'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
-        visible: false
 
-        anchors.centerIn: parent
 
         TextArea {
             id: textScript
@@ -2086,6 +2090,7 @@ Item {
             selectByMouse: true
         }
 
+
         onAccepted: {
             //gameMap.focus = true;
             rootFightScene.forceActiveFocus();
@@ -2097,6 +2102,15 @@ Item {
             //gameMap.focus = true;
             rootFightScene.forceActiveFocus();
             //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }
 

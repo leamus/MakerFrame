@@ -90,14 +90,15 @@ Item {
             }
 
             onSg_removeClicked: {
-                let dirUrl = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + item;
+                const dirPath = $GameMakerGlobal.rolePath(item);
+                console.debug('[mainRoleEditor]删除：', dirPath, $Frame.sl_dirExists(dirPath), );
 
                 $dialog.show({
                     Msg: '确认删除 <font color="red">' + item + '</font> ？',
                     Buttons: Dialog.Ok | Dialog.Cancel,
                     OnAccepted: function() {
-                        console.debug('[mainRoleEditor]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), $Frame.sl_removeRecursively(dirUrl));
-                        removeItem(index);
+                        if($Frame.sl_removeRecursively(dirPath))
+                            removeItem(index);
 
                         //l_listRole.forceActiveFocus();
                     },
@@ -116,9 +117,10 @@ Item {
             Button {
                 id: buttonCreate
 
-                //Layout.preferredWidth: 60
+                Layout.preferredWidth: root.width * 0.9
+                //Layout.fillWidth: true
 
-                text: '新建'
+                text: '新　建'
                 onClicked: {
                     _private.openItem(null);
                 }
@@ -136,8 +138,9 @@ Item {
         focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
+        //active: false
         source: './RoleEditor.qml'
         //asynchronous: true
 
@@ -165,6 +168,7 @@ Item {
             }
             else if(status === Loader.Error) {
                 //close();
+                //active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;
@@ -212,7 +216,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName, [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建角色】');
             //l_listRole.removeButtonVisible = {0: false, '-1': true};
             l_listRole.show(list);

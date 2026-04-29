@@ -965,13 +965,14 @@ Item {
 
         property alias textGameMsg: textGameMsg.text
 
-        title: ''
+        anchors.centerIn: parent
         width: 300
         height: 200
+
+        title: ''
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
-        anchors.centerIn: parent
 
         Text {
             id: textGameMsg
@@ -999,6 +1000,15 @@ Item {
             if(_private.config.bPauseGame)
                 game.goon();
             //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }*/
 

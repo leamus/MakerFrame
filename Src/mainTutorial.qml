@@ -33,6 +33,9 @@ Item {
 
 
 
+    property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+
+
     //width: 600
     //height: 800
     anchors.fill: parent
@@ -192,11 +195,11 @@ Item {
                 onClicked: {
                     if($Platform.compileType === 'debug') {
                         loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
-                        //userMainProject.source = 'mainMapEditor.qml';
+                        //loader.source = 'mainMapEditor.qml';
                     }
                     else {
                         loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/PaintView.qml'));
-                        //userMainProject.source = 'mainMapEditor.qml';
+                        //loader.source = 'mainMapEditor.qml';
                     }
                 }
             }
@@ -214,11 +217,11 @@ Item {
                 onClicked: {
                     if($Platform.compileType === 'debug') {
                         loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
-                        //userMainProject.source = 'mainMapEditor.qml';
+                        //loader.source = 'mainMapEditor.qml';
                     }
                     else {
                         loader.load($GlobalJS.toURL($Frame.sl_configValue('PluginPath', 'Plugins', 0).trim() + '/Qt/$QNanoPainter/QML/NanoPaintView.qml'));
-                        //userMainProject.source = 'mainMapEditor.qml';
+                        //loader.source = 'mainMapEditor.qml';
                     }
                 }
             }
@@ -577,8 +580,9 @@ Item {
         focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
+        //active: false
         //source: ''
         //asynchronous: true
 
@@ -612,7 +616,8 @@ Item {
                     },
                 });
 
-                //close();
+                close();
+                //active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;

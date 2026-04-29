@@ -127,8 +127,9 @@ Item {
         focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
+        //active: false
         //source: ''
         //asynchronous: true
 
@@ -152,6 +153,7 @@ Item {
             }
             else if(status === Loader.Error) {
                 //close();
+                //active = false;
             }
             else if(status === Loader.Null) {
                 visible = false;

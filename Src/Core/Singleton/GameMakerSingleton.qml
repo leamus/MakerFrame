@@ -3,10 +3,11 @@ pragma Singleton
 import QtQuick 2.14
 import Qt.labs.settings 1.1
 
-import '../Config.js' as Config
+//import '../../Config.js' as Config
 
 QtObject {
     id: root
+    objectName: 'GameMakerSingleton'
 
 
     //本路径的引擎打开多少次（1个应用内）
@@ -17,14 +18,15 @@ QtObject {
     //  目前存储：Projects/工程名（game.cd引擎变量，用到了$sys_sound）、$RunTimes、$RunDuration
     readonly property Settings settings: Settings {
         id: settings
-        category: Config.AppName //'GameMaker' //应用名 或 类别
-        //fileName: Config.AppName + '.ini' //'GameMaker.ini'
-        //fileName: parseInt($Frame.sl_configValue('RunType')) === 0 ? '' : Config.AppName + '.ini'
+        category: parseInt($Frame.sl_configValue('RunType')) === 0 ? 'GameMaker' : 'Game' //应用名 或 类别
+        fileName: parseInt($Frame.sl_configValue('RunType')) === 0 ? '' : 'Game.ini' //'GameMaker.ini'
 
-        //当前工程
-        property string $CurrentProjectName: 'Project'
+        //运行信息：
         property int $RunTimes: 0
         property int $RunDuration: 0
+
+        //其他（动态）：
+        //property string $CurrentProjectName: 'Project' //当前工程
     }
 
 
@@ -44,7 +46,7 @@ QtObject {
         }
 
         onTriggered: {
-            console.debug('[GameMakerSingleton]onTriggered');
+            //console.debug('[GameMakerSingleton]onTriggered');
 
             let now = new Date().getTime();
             settings.$RunDuration += parseInt((now - nLastTime) / 1000);
@@ -63,6 +65,9 @@ QtObject {
         if($Global.globalData.$GameMakerSingleton.$$keys.length > 1) {
             console.info('[GameMakerSingleton]建议不要多开不同路径的游戏引擎:', $Global.globalData.$GameMakerSingleton.$$keys);
         }
+
+
+        //++settings.$RunTimes; //外部自增
 
 
 

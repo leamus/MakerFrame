@@ -105,7 +105,7 @@ function resetFightRole(fightRole, fightRoleComp, index, teamID) {
         }
     }
     else
-        console.warn('[!FightScene]载入战斗精灵失败：' + fightRole.$rid);
+        console.warn('[!FightScene]载入战斗精灵失败：', fightRole.$rid);
     */
 
 
@@ -1047,7 +1047,7 @@ function refreshFightRoleAction(fightrole, action='Normal', loop=1) {
     let spriteEffect = fightrole.$$fightData.$info.$spriteEffect;
 
     if(!game.$sys.getSpriteEffect(actions[action], spriteEffect, {Loops: loop})) {
-        console.warn('[!FightScene]载入战斗精灵动作失败：' + action);
+        console.warn('[!FightScene]载入战斗精灵动作失败：', action);
         return false;
     }
 
@@ -1171,7 +1171,8 @@ function* fnRound() {
                     //得到技能生成器函数
                     const genActionAndSprite = $CommonLibJS.checkCallable(fightSkillInfo.$commons.$playScript) ?
                         fightSkillInfo.$commons.$playScript.call(fightSkill, fightSkill, combatant) :
-                        game.$resources.commonScripts.$commonPlayScript.call(fightSkill, fightSkill, combatant, fightSkillInfo.$commons.$playScript);
+                         null //game.$resources.commonScripts.$commonPlayScript.call(fightSkill, fightSkill, combatant, fightSkillInfo.$commons.$playScript)
+                    ;
                     //const ret1 = _private.scriptQueue.create([fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, -1, true, '$playScript'], );
                     ///$GlobalJS.createScript(_private.scriptQueue, {Type: 0, Priority: -1, Script: fightSkillInfo.$commons.$playScript(fightSkill, combatant) ?? null, Tips: '$playScript'}, );
 
@@ -1812,10 +1813,10 @@ function readFightRole(role) {
         return true;
     }
     else
-        console.warn('[!FightScene]载入战斗精灵失败：' + role.$rid);
+        console.warn('[!FightScene]载入战斗精灵失败：', role.$rid);
 
 
-    /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + role.$rid + '/fight_role.json');
+    /*let filePath = $GameMakerGlobal.fightRolePath(role.$rid) + '/fight_role.json';
 
     //console.debug('[FightScene]filePath：', filePath);
 
@@ -1834,7 +1835,7 @@ function readFightRole(role) {
         return true;
     }
     else
-        console.warn('[!FightScene]载入战斗精灵失败：' + filePath);
+        console.warn('[!FightScene]载入战斗精灵失败：', filePath);
 
     return false;
     * /
@@ -1849,7 +1850,7 @@ function loadFightSkillInfo(fightSkillName) {
 
     /*if(fightSkillName) {
 
-        /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.json');
+        /*let filePath = $GameMakerGlobal.fightSkillPath(fightSkillName) + '/fight_skill.json');
         //let data = File.read(filePath);
         //console.debug('[GameFightSkill]filePath：', filePath);
 
@@ -1870,7 +1871,7 @@ function loadFightSkillInfo(fightSkillName) {
         else
             console.warn('[!FightScene]Load Skill Fail:', filePath);
         * /
-        let data = game.loadjson($GameMakerGlobal.config.strFightSkillDirName + '/' + fightSkillName + '/fight_skill.json');
+        let data = game.loadjson($GameMakerGlobal.fightSkillPath(fightSkillName) + '/fight_skill.json');
         if(data) {
             return $eval(data.FightSkill);
         }

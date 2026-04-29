@@ -69,7 +69,7 @@ function* loadResources() {
 
 
     //读通用脚本
-    if($Frame.sl_fileExists($GlobalJS.toPath(game.$projectpath + '/common_script.js')))
+    if($Frame.sl_fileExists(game.$projectpath + '/common_script.js'))
         game.$userscripts = _private.jsLoader.load($GlobalJS.toURL(game.$projectpath + '/common_script.js'));
     if(game.$userscripts) {
         _private.objCommonScripts = Object.assign({}, $GameMakerGlobalJS, game.$userscripts);
@@ -86,7 +86,7 @@ function* loadResources() {
     //起始脚本
     /*if(!_private.objCommonScripts['$gameStart']) */{
         let ts;
-        if($Frame.sl_fileExists($GlobalJS.toPath(game.$projectpath + '/main.js'))) {
+        if($Frame.sl_fileExists(game.$projectpath + '/main.js')) {
             ts = _private.jsLoader.load($GlobalJS.toURL(game.$projectpath + '/main.js'));
         }
         if(ts) {
@@ -325,27 +325,27 @@ function* loadResources() {
 
 //各资源
 
-    let path;
-    let items;
-
 
     if(_private.config.nLoadAllResources) {
-        //读道具信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        //let path;
+        let items;
 
-        for(let item of items) {
-            let info = getGoodsResource(item, true);
+
+        //读道具信息
+        items = $Frame.sl_dirList($GameMakerGlobal.goodsPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+
+        for(const item of items) {
+            const info = getGoodsResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入Goods', item);
+                //console.debug('[GameScene]载入Goods：', item);
             }
             else {
-                //console.warn('[!GameScene]载入Goods ERROR', item);
+                //console.warn('[!GameScene]载入Goods ERROR：', item);
             }
 
 
             /*let filePath = path + '/' + item + '/goods.json';
-            //console.debug(path, items, item, filePath)
+            //console.debug(items, item, filePath)
             let info = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
 
             if(info) {
@@ -354,28 +354,25 @@ function* loadResources() {
                 if(t) {
                     _private.goodsResource[item] = t;
                     _private.goodsResource[item].$rid = item;
-                    console.debug('[GameScene]载入Goods', item);
+                    console.debug('[GameScene]载入Goods：', item);
                 }
             }
             if(!info)
-                console.warn('[!GameScene]载入Goods ERROR', item);
+                console.warn('[!GameScene]载入Goods ERROR：', item);
             */
         }
-    }
 
 
-    if(_private.config.nLoadAllResources) {
         //读技能信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightSkillDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            let info = getSkillResource(item, true);
+        for(const item of items) {
+            const info = getSkillResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入FightSkill', item);
+                //console.debug('[GameScene]载入FightSkill：', item);
             }
             else {
-                //console.warn('[!GameScene]载入FightSkill ERROR', item);
+                //console.warn('[!GameScene]载入FightSkill ERROR：', item);
             }
 
 
@@ -389,47 +386,40 @@ function* loadResources() {
                 if(t) {
                     _private.skillsResource[item] = t;
                     _private.skillsResource[item].$rid = item;
-                    console.debug('[GameScene]载入FightSkill', item);
+                    console.debug('[GameScene]载入FightSkill：', item);
                 }
             }
             if(!info)
-                console.warn('[!GameScene]载入FightSkill ERROR', item);
+                console.warn('[!GameScene]载入FightSkill ERROR：', item);
             */
         }
-    }
 
 
-    if(_private.config.nLoadAllResources) {
         //读战斗脚本信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightScriptDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.fightScriptPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            let info = getFightScriptResource(item, true);
+        for(const item of items) {
+            const info = getFightScriptResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入FightScript', item);
+                //console.debug('[GameScene]载入FightScript：', item);
             }
             else {
-                //console.warn('[!GameScene]载入FightScript ERROR', item);
+                //console.warn('[!GameScene]载入FightScript ERROR：', item);
             }
 
         }
-    }
 
 
-
-    if(_private.config.nLoadAllResources) {
         //读战斗角色信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            let info = getFightRoleResource(item, true);
+        for(const item of items) {
+            const info = getFightRoleResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入FightRole Script', item);
+                //console.debug('[GameScene]载入FightRole Script：', item);
             }
             else {
-                //console.warn('[!GameScene]载入FightRole Script ERROR', item);
+                //console.warn('[!GameScene]载入FightRole Script ERROR：', item);
             }
 
 
@@ -442,66 +432,60 @@ function* loadResources() {
 
                 //_private.fightRolesResource[item] = info;
                 _private.fightRolesResource[item].ActionData = info.ActionData;
-                console.debug('[GameScene]载入FightRole', item);
+                console.debug('[GameScene]载入FightRole：', item);
             }
             else {
-                console.warn('[!GameScene]载入FightRole ERROR：' + item);
+                console.warn('[!GameScene]载入FightRole ERROR：', item);
                 continue;
             }
             */
 
         }
-    }
 
 
 
-    if(_private.config.nLoadAllResources) {
         //读特效信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strSpriteDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.spritePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            //console.debug(path, items, item)
-            let info = getSpriteResource(item, true);
+        for(const item of items) {
+            //console.debug(items, item)
+            const info = getSpriteResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入Sprite', item);
+                //console.debug('[GameScene]载入Sprite：', item);
             }
             else {
-                //console.warn('[!GameScene]载入Sprite ERROR', item);
+                //console.warn('[!GameScene]载入Sprite ERROR：', item);
             }
         }
-    }
 
-    if(_private.config.nLoadAllResources) {
+
         //读角色信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strRoleDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            //console.debug(path, items, item)
+        for(const item of items) {
+            //console.debug(items, item)
             let info = getRoleResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入Role', item);
+                //console.debug('[GameScene]载入Role：', item);
             }
             else {
-                //console.warn('[!GameScene]载入Role ERROR', item);
+                //console.warn('[!GameScene]载入Role ERROR：', item);
             }
         }
-    }
 
-    if(_private.config.nLoadAllResources) {
+
+
         //读地图信息
-        path = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strMapDirName);
-        items = $Frame.sl_dirList(path, [], 0x001 | 0x2000 | 0x4000, 0x00);
+        items = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
-        for(let item of items) {
-            //console.debug(path, items, item)
-            let info = getMapResource(item, true);
+        for(const item of items) {
+            //console.debug(items, item)
+            const info = getMapResource(item, true);
             if(info) {
-                //console.debug('[GameScene]载入Map', item);
+                //console.debug('[GameScene]载入Map：', item);
             }
             else {
-                //console.warn('[!GameScene]载入Map ERROR', item);
+                //console.warn('[!GameScene]载入Map ERROR：', item);
             }
         }
     }
@@ -511,7 +495,7 @@ function* loadResources() {
     //let info;
 
     /*/读图片信息
-    filePath = $GlobalJS.toPath(game.$projectpath + '/images.json');
+    filePath = game.$projectpath + '/images.json';
     //let cfg = File.read(filePath);
     info = $Frame.sl_fileRead(filePath);
     //console.debug('info', filePath, info)
@@ -526,7 +510,7 @@ function* loadResources() {
     }
 
     //读音乐信息
-    filePath = $GlobalJS.toPath(game.$projectpath + '/music.json');
+    filePath = game.$projectpath + '/music.json';
     //let cfg = File.read(filePath);
     info = $Frame.sl_fileRead(filePath);
     //console.debug('info', filePath, info)
@@ -541,7 +525,7 @@ function* loadResources() {
     }
 
     //读视频信息
-    filePath = $GlobalJS.toPath(game.$projectpath + '/videos.json');
+    filePath = game.$projectpath + '/videos.json';
     //let cfg = File.read(filePath);
     info = $Frame.sl_fileRead(filePath);
     //console.debug('info', filePath, info)
@@ -565,7 +549,7 @@ function* loadResources() {
 
 
     /*/读升级链
-    filePath = $GlobalJS.toPath(game.$projectpath + '/');
+    filePath = game.$projectpath + '/';
     let tlevelChainScript;
     if($Frame.sl_fileExists(filePath + 'level_chain.js'))
         tlevelChainScript = _private.jsLoader.load($GlobalJS.toURL(filePath + 'level_chain.js'));
@@ -619,14 +603,14 @@ function* loadResources() {
 //载入扩展 插件/组件
     function* loadPlugins(pluginPath) {
         //循环三方根目录
-        for(const tc0 of $Frame.sl_dirList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0)) {
+        for(const tc0 of $Frame.sl_dirList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0x0)) {
             //if(tc0 === '$Leamus')
             //    continue;
 
             //循环三方插件目录
-            for(const tc1 of $Frame.sl_dirList(pluginPath + tc0 + '/', [], 0x001 | 0x2000 | 0x4000, 0)) {
+            for(const tc1 of $Frame.sl_dirList(pluginPath + tc0 + '/', [], 0x001 | 0x2000 | 0x4000, 0x0)) {
                 if($CommonLibJS.getObjectValue(_private.objPlugins, tc0, tc1) !== undefined) {
-                    console.debug('[GameScene]已经载入相同插件，跳过:', tc0, tc1);
+                    console.debug('[GameScene]已经载入相同插件，跳过：', tc0, tc1);
                     continue;
                 }
 
@@ -796,9 +780,7 @@ function getGoodsResource(item, forceLoad=false) {
 
 
     //读道具信息
-    let path = $GlobalJS.toURL(game.$projectpath + '/' + $GameMakerGlobal.config.strGoodsDirName + '/' + item + '/goods.js');
-
-    let ts = _private.jsLoader.load(path);
+    const ts = _private.jsLoader.load($GameMakerGlobal.goodsURL(item) + '/goods.js');
     //写入
     if(ts && ts.data) {
         _private.goodsResource[item] = ts.data;
@@ -830,9 +812,7 @@ function getSkillResource(item, forceLoad=false) {
 
 
     //读技能信息
-    let path = $GlobalJS.toURL(game.$projectpath + '/' + $GameMakerGlobal.config.strFightSkillDirName + '/' + item + '/fight_skill.js');
-
-    let ts = _private.jsLoader.load(path);
+    const ts = _private.jsLoader.load($GameMakerGlobal.fightSkillURL(item) + '/fight_skill.js');
     //写入
     if(ts && ts.data) {
         _private.skillsResource[item] = ts.data;
@@ -864,9 +844,7 @@ function getFightScriptResource(item, forceLoad=false) {
 
 
     //读战斗脚本信息
-    let path = $GlobalJS.toURL(game.$projectpath + '/' + $GameMakerGlobal.config.strFightScriptDirName + '/' + item + '/fight_script.js');
-
-    let ts = _private.jsLoader.load(path);
+    const ts = _private.jsLoader.load($GameMakerGlobal.fightScriptURL(item) + '/fight_script.js');
     //写入
     if(ts && ts.data) {
         _private.fightScriptsResource[item] = ts.data;
@@ -898,9 +876,7 @@ function getFightRoleResource(item, forceLoad=false) {
 
 
     //读战斗角色信息
-    let path = $GlobalJS.toURL(game.$projectpath + '/' + $GameMakerGlobal.config.strFightRoleDirName + '/' + item + '/fight_role.js');
-
-    let ts = _private.jsLoader.load(path);
+    const ts = _private.jsLoader.load($GameMakerGlobal.fightRoleURL(item) + '/fight_role.js');
     //写入
     if(ts && ts.data) {
         //_private.fightRolesResource[item].$createData = ts.$createData;
@@ -938,7 +914,7 @@ function getSpriteResource(item, forceLoad=false) {
 
 
     /*/读特效信息
-    let spriteDirPath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + item);
+    let spriteDirPath = $GameMakerGlobal.spritePath(item);
 
     let info = $Frame.sl_fileRead(spriteDirPath + '/sprite.json');
     if(info)
@@ -998,7 +974,7 @@ function getRoleResource(item, forceLoad=false) {
 
 
     /*/读角色信息
-    let roleDirPath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + item);
+    let roleDirPath = $GameMakerGlobal.rolePath(item);
 
     let info = $Frame.sl_fileRead(roleDirPath + '/role.json');
     if(info)
@@ -1032,7 +1008,7 @@ function getMapResource(item, forceLoad=false) {
 
 
     //读地图信息
-    let mapDirPath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strMapDirName + '/' + item);
+    let mapDirPath = $GameMakerGlobal.mapPath(item);
 
     let info = $Frame.sl_fileRead(mapDirPath + '/map.json');
     if(info)
@@ -1438,7 +1414,7 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, par
         spriteEffectParams = {RID: spriteEffectParams};
     spriteEffectParams.RID = spriteEffectParams.RID ?? spriteEffectParams.RID ?? spriteEffectParams.RId;
 
-    /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strSpriteDirName + '/' + spriteEffectParams + '/sprite.json');
+    /*let filePath = $GameMakerGlobal.spritePath(spriteEffectParams) + '/sprite.json');
     //console.debug('[GameScene]filePath2：', filePath);
     let spriteResourceInfo = $Frame.sl_fileRead(filePath);
     * /
@@ -1485,7 +1461,7 @@ function putSpriteEffect(spriteEffectComp) {
 function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.itemRoleContainer) {
     //console.debug('[GameScene]createRole:', roleParams);
 
-    /*let filePath = $GlobalJS.toPath(game.$projectpath + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleParams + '/role.json');
+    /*let filePath = $GameMakerGlobal.rolePath(roleParams) + '/role.json';
     //console.debug('[GameScene]filePath2：', filePath);
     let roleResourceInfo = $Frame.sl_fileRead(filePath);
     */
@@ -1500,7 +1476,10 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
         roleComp = compRole.createObject(parent);
     }
 
-    if($GameMakerGlobalJS.createRole(roleResourceInfo, roleComp, newParams, GameSceneJS.getSpriteResource))
+    if($GameMakerGlobalJS.createRole(roleResourceInfo, roleComp, newParams, _private.jsLoader,
+        function(spriteName, jsLoader) {
+            return GameSceneJS.getSpriteResource(spriteName);
+        }))
         return roleComp;
     else
         return null;
@@ -1512,7 +1491,7 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
 function openMap(map, forceRepaint=false) {
     game.d['$sys_map'] = {};
 
-    let mapPath = game.$projectpath + '/' + $GameMakerGlobal.config.strMapDirName + '/' + map.$rid;
+    let mapPath = $GameMakerGlobal.mapPath(map.$rid);
 
     //如果强制绘制、或地图名称不同、或没有载入过地图，则绘制
     if(forceRepaint || game.gd['$sys_map'].$rid !== map.$rid || !itemViewPort.mapInfo) {

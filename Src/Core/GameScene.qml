@@ -129,6 +129,7 @@ import 'GameScene.js' as GameSceneJS
 
 Item {
     id: rootGameScene
+    objectName: 'GameScene'
 
 
     //关闭退出
@@ -289,11 +290,11 @@ Item {
             /*
             let filePath = game.$projectpath + '/main.js';
             //let cfg = File.read(filePath);
-            let data = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
-            //if(!data)
+            let text = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
+            //if(!text)
             //    return false;
-            if(_private.scriptQueue.create([eval(data) ?? null, 0, true, ''], ) === 0)
-            ///if($GlobalJS.createScript(_private.scriptQueue, 0, 0, eval(data)) === 0)
+            if(_private.scriptQueue.create([eval(text) ?? null, 0, true, ''], ) === 0)
+            ///if($GlobalJS.createScript(_private.scriptQueue, 0, 0, eval(text)) === 0)
                 _private.scriptQueue.run(_private.scriptQueue.lastEscapeValue);
             */
 
@@ -630,10 +631,11 @@ Item {
 
 
     //readonly property var $GameMakerGlobal: GameMakerGlobal
-    readonly property var $GameMakerGlobalJS: GameMakerGlobalJS
+    readonly property var $GameMakerGlobalJS: GameMakerGlobalJS //因为用到了game、fight，所以要在这里定义而不是使用父级的
     property var fight: loaderFightScene.fight
     property alias g: rootGameScene.game
     property QtObject game: QtObject {
+        objectName: 'game'
 
         //功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
         //参数：
@@ -680,7 +682,7 @@ Item {
 
                     //执行之前地图的 $end 函数
                     if(game.d['$sys_map'] && game.d['$sys_map'].$rid) {
-                        //const ts = _private.jsLoader.load($GlobalJS.toURL(game.$projectpath + '/' + $GameMakerGlobal.config.strMapDirName + '/' + game.d['$sys_map'].$rid + '/map.js'));
+                        //const ts = _private.jsLoader.load($GameMakerGlobal.mapURL(game.d['$sys_map'].$rid) + '/map.js');
                         //if(ts.$end) { //$CommonLibJS.checkCallable
                         if(itemViewPort.mapScript && itemViewPort.mapScript.$end) {
                             let r = itemViewPort.mapScript.$end(...userData);
@@ -4667,7 +4669,7 @@ Item {
                 //压缩
                 if(data.Type === 1) {
                     //debug下不检测存档
-                    if($GameMakerGlobal.config.bDebug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + data.Data)) {
+                    if($GameMakerGlobal.config.bDebug === false && data.Verify !== $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + data.Data)) {
                         return false;
                     }
                     try {
@@ -4687,7 +4689,7 @@ Item {
                 }
                 else {
                     //debug下不检测存档
-                    if($GameMakerGlobal.config.bDebug === false && data.Verify !== Qt.md5(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
+                    if($GameMakerGlobal.config.bDebug === false && data.Verify !== $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
                         return false;
                     }
 
@@ -4761,13 +4763,13 @@ Item {
                     if(compressionLevel !== 0) {    //压缩
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
                         outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 1).toString();
-                        outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + outputData.Data);
+                        outputData.Verify = $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + outputData.Data);
                         fileData = JSON.stringify(outputData, fSaveFilter);
                     }
                     else {
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
                         outputData.Data = game.gd;
-                        outputData.Verify = Qt.md5(_private.config.strSaveDataSalt + GlobalDataString);
+                        outputData.Verify = $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + GlobalDataString);
                         fileData = JSON.stringify(outputData, fSaveFilter);
                     }
 
@@ -5039,7 +5041,7 @@ Item {
 
             if(filePath.startsWith('/'))
                 filePath = game.$projectpath + '/' + filePath;
-            
+
             const data = $Frame.sl_fileRead(filePath);
             if(!data) {
                 console.warn('[!GameScene]loadjson FAIL:', filePath);
@@ -5275,8 +5277,8 @@ Item {
 
         //运行代码；
         //在这里执行会有上下文环境
-        readonly property var evalcode: function(data, filePath='', envs={}) {
-            return $eval(data, filePath, envs);
+        readonly property var evalcode: function(cmd, filePath='', envs={}) {
+            return $eval(cmd, filePath, envs);
         }
 
         //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
@@ -5294,12 +5296,12 @@ Item {
             if(!$Frame.sl_fileExists(filePath))
                 throw new Error('不存在文件:' + filePath);
 
-            const data = $Frame.sl_fileRead(filePath);
+            const text = $Frame.sl_fileRead(filePath);
             //const cfg = File.read(filePath);
 
-            //if(!data)
+            //if(!text)
             //    return false;
-            return $eval(data, envs);
+            return $eval(text, envs);
         }
 
         //用C++执行脚本；已注入game和fight环境
@@ -5756,7 +5758,8 @@ Item {
                 if(!$CommonLibJS.objectIsEmpty(_private.config.objPauseNames))
                     return;
 
-                if(pressed === false) {
+                if(pressed === false) { //离开
+                    _private.pointWalkDeviation = Qt.point(0, 0);
                     _private.stopMove(0);
                 }
                 //console.debug('[GameScene]Joystick onPressedChanged:', pressed)
@@ -5773,7 +5776,7 @@ Item {
                 if(!pressed)    //如果没按下
                     return;
 
-                if(mainRole.$$nActionType === -1)
+                if(mainRole.$$nActionType === -1) //禁止操作
                     return;
 
 
@@ -5874,7 +5877,7 @@ Item {
         id: loaderFightScene
 
         source: './FightScene.qml'
-        asynchronous: false
+        //asynchronous: false
 
 
     */
@@ -6114,7 +6117,7 @@ Item {
         z: 6
 
         sourceComponent: compGameMsg
-        asynchronous: false
+        //asynchronous: false
 
         /*Connections {
             target: loaderGameMsg.item
@@ -6885,6 +6888,7 @@ Item {
             selectByMouse: true
         }
 
+
         onAccepted: {
             console.debug(eval(textScript.text));
             //$GlobalJS.runScript(_private.scriptQueue, 0, textScript.text);
@@ -6895,6 +6899,15 @@ Item {
             //console.log('Cancel clicked');
 
             rootGameScene.forceActiveFocus();
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }
 
