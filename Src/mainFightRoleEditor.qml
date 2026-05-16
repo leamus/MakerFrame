@@ -119,7 +119,7 @@ Item {
 
                 //Layout.preferredWidth: 60
 
-                text: '新建'
+                text: '新　建'
                 onClicked: {
                     _private.openItem(null);
                 }
@@ -137,12 +137,16 @@ Item {
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
                             //l_listFightRole.forceActiveFocus();
-                            let count = 0;
-                            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
+                            //let count = 0;
+                            const successed = [];
+                            const failed = [];
+                            const noCompile = [];
+                            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
                             for(const tn of list) {
                                 const path = $GameMakerGlobal.fightRolePath(tn) + '/';
                                 if(!$Frame.sl_fileExists(path + 'fight_role.vjs')) {
-                                    console.info('[mainFightRoleEditor]没有可视化文件:', tn);
+                                    //console.debug('[mainFightRoleEditor]没有可视化文件:', tn);
+                                    noCompile.push(tn);
                                     continue;
                                 }
 
@@ -151,18 +155,23 @@ Item {
                                 console.debug('[mainFightRoleEditor]result:', result);
                                 if(result[1]) {
                                     $Frame.sl_fileWrite(result[1], path + 'fight_role.js', 0);
-                                    ++count;
+                                    //++count;
+                                    successed.push(tn);
                                 }
-                                else
+                                else {
+                                    failed.push(tn);
                                     console.warn('[!mainFightRoleEditor]ERROR:', result[2].toString());
+                                }
                             }
 
                             $dialog.show({
-                                Msg: '成功编译 %1 个脚本'.arg(count),
+                                Msg: '编译成功%1个脚本，失败%2个脚本，没有编译%3个脚本'
+                                    .arg(successed.length).arg(failed.length).arg(noCompile.length),
                                 Buttons: Dialog.Ok,
                                 OnRejected: ()=>{
                                 },
                             });
+                            console.info('[mainFightRoleEditor]编译成功：%1，失败：%2，没有编译：%3'.arg(successed).arg(failed).arg(noCompile));
                         },
                         OnRejected: ()=>{
                             //l_listFightRole.forceActiveFocus();
@@ -183,7 +192,7 @@ Item {
         focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
         //active: false
         source: './FightRoleEditor.qml'
@@ -288,7 +297,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建战斗角色】');
             //l_listFightRole.removeButtonVisible = {0: false, '-1': true};
             l_listFightRole.show(list);

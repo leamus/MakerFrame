@@ -53,7 +53,7 @@ QtObject {
 
 
         //当前项目名称
-        property string strCurrentProjectName: $GameMakerGlobal.settings.value('$CurrentProjectName') //GameMakerSingleton.settings.$CurrentProjectName
+        property string strCurrentProjectName: $GameMakerGlobal.settings.value('$CurrentProjectName') ?? '' //GameMakerSingleton.settings.$CurrentProjectName
 
         //引擎工作目录
         property string strWorkPath: {

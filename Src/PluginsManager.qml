@@ -44,7 +44,7 @@ Item {
     function $load(type) {
         _private.nType = type;
 
-        if(type === 2)
+        if(_private.nType === 2)
             _private.showInstallPlugins();
         else
             _private.showPlugins();
@@ -75,17 +75,30 @@ Item {
 
 
 
-    //用来载入main.qml
+    Item { //用来挂载list
+        id: itemList
+        anchors.fill: parent
+    }
+
+    Mask { //扩展背景
+        visible: loaderExtends.status === Loader.Ready
+
+        anchors.fill: parent
+        //opacity: 0
+        color: $Global.style.backgroundColor
+        //radius: 9
+    }
+
     L_Loader {
         id: loaderExtends
-        objectName: 'PluginsManagerLoader'
+        objectName: 'PluginsManagerExtendsLoader'
 
 
-        visible: false
+        visible: status === Loader.Ready //false
         //focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
         //active: false
         //source: ''
@@ -100,6 +113,7 @@ Item {
 
             function onSg_close() {
                 loaderExtends.close();
+                //_private.showPlugins();
             }
         }
 
@@ -112,15 +126,14 @@ Item {
             else if(status === Loader.Error) {
                 close();
                 //active = false;
+
+                //_private.showPlugins();
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
 
                 //root.focus = true;
-                root.forceActiveFocus();
-
-
-                _private.showPlugins();
+                //root.forceActiveFocus();
             }
             else if(status === Loader.Loading) {
             }
@@ -135,7 +148,7 @@ Item {
 
             if(item.$load) {
                 try {
-                    item.$load();
+                    item.$load(...vExtraData);
                 }
                 catch(e) {
                     $CommonLibJS.printException(e);
@@ -146,7 +159,7 @@ Item {
                 }
             }
 
-            visible = true;
+            //visible = true;
         }
 
 
@@ -155,12 +168,14 @@ Item {
             event.accepted = true;
 
             close();
+            //_private.showPlugins();
         }
         Keys.onBackPressed: function(event) {
             console.debug('[PluginsManager]Keys.onBackPressed:loaderExtends');
             event.accepted = true;
 
             close();
+            //_private.showPlugins();
         }
     }
 
@@ -182,26 +197,55 @@ Item {
                 ///JSExtendRootItem: itemExtendsRoot,
                 Callbacks: {
                     CloseCallback: ()=>sg_close(),
-                    RunExtendCallback: function(url, type) {
+                    RunExtendCallback: function(url, type, createCallback, destroyCallback) {
+                        let params = [];
+                        if($CommonLibJS.isArray(url)) {
+                            params = url;
+                            url = url.shift();
+                        }
+
                         if(type === 1) { //长按
-                            //if(!$CommonLibJS.isMobile()) {
+                            //if(!$CommonLibJS.isSingleWindow()) {
                                 //注意（使用Extend.js时的上下文 2/3）：组件绑定了mainGameMaker的环境上下文；写成Qt.create...退出PluginsManager时会出错！
                                 if(!$CommonLibJS.isComponent(url)) url = $createComponent(url); //如果是路径，则使用$createComponent绑定上下文；
-                                const win = $openQML(url, {Type: -3,
+                                const win = $openQML(url, {Type: -4,
                                     //注意（使用Extend.js时的上下文 3/3）：窗口的parent（Qt）设置为mainGameMaker，确保组件退出上下文时全部释放；
                                     Parent: $CommonLibJS.isComponent(url) ? rootGameMaker : null, //如果是Component，则可能绑定了上下文，所以设置Parent控制生命周期；
                                     //Container: arrExtendsContainer, //将创建的窗口放在指定容器
+                                    CreateCallback: createCallback,
+                                    DestroyCallback: destroyCallback,
                                     //HotLoaderParams: {},
-                                });
-                                return [/*win.bMainWindow ? 0 : 1*/1, win.$loader];
+                                }, ...params);
+                                return /*win.bMainWindow ? 0 : 1*/1;
                             //}
                         }
-                        const res = loaderExtends.load(url);
-                        return [0, loaderExtends];
+                        function fnLoaderStatusChanged() {
+                            switch(loaderExtends.status) {
+                            case Loader.Ready:
+                                loaderExtends.item.Component.destruction.connect(function() {
+                                    if(destroyCallback)
+                                        destroyCallback(loaderExtends.item);
+                                });
+                                if(createCallback)
+                                    createCallback(loaderExtends.item);
+                                break;
+                            case Loader.Error:
+                                if(createCallback)
+                                    createCallback(null);
+                                break;
+                            case Loader.Loading:
+                                return;
+                            }
+                            loaderExtends.statusChanged.disconnect(fnLoaderStatusChanged);
+                        }
+                        loaderExtends.statusChanged.connect(fnLoaderStatusChanged);
+                        const res = loaderExtends.load(url, undefined, undefined, ...params);
+
+                        return 0;
                     },
                     //UninstallCallback: function(extendsRootPath, rpath, type) {},
                 },
-                Parent: root,
+                Parent: itemList,
             });
         }
 
@@ -221,7 +265,7 @@ Item {
                     //InstallCallback: function(cacheExtendRootPath, extendsRootPath, rpath) {},
                     //UninstallCallback: function(extendsRootPath, rpath, type) {},
                 },
-                Parent: root,
+                Parent: itemList,
             });
         }
 
@@ -249,14 +293,14 @@ Item {
         console.debug('[PluginsManager]Keys.onEscapePressed');
         event.accepted = true;
 
-        $list.close();
+        //$list.close();
         sg_close();
     }
     Keys.onBackPressed: function(event) {
         console.debug('[PluginsManager]Keys.onBackPressed');
         event.accepted = true;
 
-        $list.close();
+        //$list.close();
         sg_close();
     }
     Keys.onPressed: function(event) {

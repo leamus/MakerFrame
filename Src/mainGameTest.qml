@@ -287,7 +287,7 @@ Item {
         objectName: 'GameSceneLoader'
 
 
-        visible: false
+        visible: status === Loader.Ready //false
         //focus: true
         clip: true
 
@@ -323,7 +323,7 @@ Item {
                 _private.close();
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
 
                 //root.focus = true;
                 root.forceActiveFocus();
@@ -385,7 +385,7 @@ Item {
             finally {
             }
 
-            visible = true;
+            //visible = true;
         }
     }
 

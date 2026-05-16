@@ -123,7 +123,7 @@ Item {
         id: loader
 
 
-        visible: false
+        visible: status === Loader.Ready //false
         focus: true
         clip: true
 
@@ -156,7 +156,7 @@ Item {
                 //active = false;
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
 
                 //root.focus = true;
                 root.forceActiveFocus();
@@ -186,7 +186,7 @@ Item {
             }
             */
 
-            visible = true;
+            //visible = true;
         }
     }
 

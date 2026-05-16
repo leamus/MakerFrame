@@ -141,8 +141,8 @@ Item {
 
 
         function _reset() {
-            textMapBlockImageURL.text = '';
-            textMapBlockImageURL.enabled = false;
+            textMapBlockImagePath.text = '';
+            textMapBlockImagePath.enabled = false;
             textMapBlockResourceName.text = '';
             textMapBlockResourceName.enabled = true;
 
@@ -249,7 +249,7 @@ Item {
                 }
 
                 TextField {
-                    id: textMapBlockImageURL
+                    id: textMapBlockImagePath
                     Layout.fillWidth: true
                     placeholderText: ''
 
@@ -293,7 +293,40 @@ Item {
                     text: '选择Tile文件'
                     onClicked: {
                         //dialogMapData.nChoiceType = 1;
-                        filedialogOpenMapBlock.open();
+
+                        $fileDialog.show({
+                            Title: '选择地图块文件',
+                            //Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                            NameFilters: [ 'Image files (*.jpg *.jpeg *.bmp *.gif *.png)', 'All files (*)' ],
+                            SelectMultiple: false,
+                            SelectExisting: true,
+                            SelectFolder: false,
+                            //ConvertURL: false,
+                            OnAccepted: function(url, urls) {
+                                //loader.focus = true;
+                                //loader.forceActiveFocus();
+                                //root.focus = true;
+                                //root.forceActiveFocus();
+
+                                textMapBlockImagePath.text = $GlobalJS.toPath(url);
+                                textMapBlockResourceName.text = textMapBlockImagePath.text.slice(textMapBlockImagePath.text.lastIndexOf('/') + 1);
+
+
+                                textMapBlockImagePath.enabled = true;
+                                textMapBlockResourceName.enabled = true;
+
+
+                                checkboxSaveResource.checked = true;
+                                checkboxSaveResource.enabled = false;
+
+
+                                //鹰（Image的BUG）：3/3改这里
+                                //canvasMapBlock.loadImage(url.toString());
+                                ////canvasMapBlock.requestPaint(); //重新绘图
+
+                            },
+                        });
+
                         //root.forceActiveFocus();
                     }
                 }
@@ -334,11 +367,11 @@ Item {
         onAccepted: {
             //地图块路径 操作
 
-            /*if(textMapBlockImageURL.text.length === 0) {
+            /*if(textMapBlockImagePath.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = '路径不能为空';
-                $Platform.sl_showToast('路径不能为空');
+                $showToast('路径不能为空');
                 return;
             }
             */
@@ -346,40 +379,40 @@ Item {
                 open();
                 //visible = true;
                 labelDialogTips.text = '资源名不能为空';
-                $Platform.sl_showToast('资源名不能为空');
+                $showToast('资源名不能为空');
                 return;
             }
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = $Frame.sl_fileCopy($GlobalJS.toPath(textMapBlockImageURL.text), $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
+                let ret = $Frame.sl_fileCopy(textMapBlockImagePath.text, $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝到资源目录失败';
-                    $Platform.sl_showToast('拷贝到资源目录失败');
+                    $showToast('拷贝到资源目录失败');
                     //console.debug('[mainMapEditor]Copy ERROR:', filepath);
 
                     //root.forceActiveFocus();
                     return;
                 }
 
-                //textMapBlockImageURL.text = $GlobalJS.toURL(filepath);
+                //textMapBlockImagePath.text = $GlobalJS.toPath(filepath);
             }
             else {  //资源图库
                 //console.debug('ttt2:', filepath);
 
-                //textMapBlockImageURL.text = filepath;
+                //textMapBlockImagePath.text = filepath;
 
-                //console.debug('ttt', textMapBlockImageURL.text, Qt.resolvedUrl(textMapBlockImageURL.text))
+                //console.debug('ttt', textMapBlockImagePath.text, Qt.resolvedUrl(textMapBlockImagePath.text))
             }
 
-            textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(textMapBlockResourceName.text);
+            textMapBlockImagePath.text = $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text);
 
-            if(!$Frame.sl_fileExists($GlobalJS.toPath(textMapBlockImageURL.text))) {
+            if(!$Frame.sl_fileExists(textMapBlockImagePath.text)) {
                 open();
                 //visible = true;
-                labelDialogTips.text = '图块路径错误或文件不存在:' + $GlobalJS.toPath(textMapBlockImageURL.text);
-                $Platform.sl_showToast('图块路径错误或文件不存在');
+                labelDialogTips.text = '图块路径错误或文件不存在:' + textMapBlockImagePath.text;
+                $showToast('图块路径错误或文件不存在');
                 return;
             }
 
@@ -430,64 +463,6 @@ Item {
     }
 
 
-    Dialog1.FileDialog {
-        id: filedialogOpenMapBlock
-
-        visible: false
-
-        title: '选择地图块文件'
-        //folder: shortcuts.home
-        nameFilters: [ 'Image files (*.jpg *.png *.bmp)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: false
-
-        onAccepted: {
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-            //root.focus = true;
-            //root.forceActiveFocus();
-
-            console.debug('[mainMapEditor]You chose:', fileUrl, fileUrls);
-
-
-            if(Qt.platform.os === 'android')
-                textMapBlockImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
-            else
-                textMapBlockImageURL.text = $Frame.sl_urlDecode(fileUrl.toString());
-
-            textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
-
-
-            textMapBlockImageURL.enabled = true;
-            textMapBlockResourceName.enabled = true;
-
-
-            checkboxSaveResource.checked = true;
-            checkboxSaveResource.enabled = false;
-
-
-            //鹰（Image的BUG）：3/3改这里
-            //canvasMapBlock.loadImage(fileUrl.toString());
-            ////canvasMapBlock.requestPaint(); //重新绘图
-
-
-            //console.log('You chose:', fileDialog.fileUrls);
-        }
-        onRejected: {
-            console.debug('[mainMapEditor]onRejected');
-            //root.forceActiveFocus();
-
-
-            //sg_close();
-        }
-        Component.onCompleted: {
-            //visible = true;
-        }
-    }
-
-
     L_List {
         id: l_listMapBlockResource
 
@@ -501,11 +476,11 @@ Item {
 
 
         onSg_clicked: {
-            textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(item);
+            textMapBlockImagePath.text = $GameMakerGlobal.mapResourcePath(item);
             textMapBlockResourceName.text = item;
-            //console.debug('[mainMapEditor]List Clicked::', textMapBlockImageURL.text)
+            //console.debug('[mainMapEditor]List Clicked:', textMapBlockImagePath.text)
 
-            textMapBlockImageURL.enabled = false
+            textMapBlockImagePath.enabled = false;
             textMapBlockResourceName.enabled = true;
 
 
@@ -526,7 +501,7 @@ Item {
             //root.focus = true;
             //root.forceActiveFocus();
 
-            console.debug('[mainMapEditor]filepath', textMapBlockImageURL.text);
+            console.debug('[mainMapEditor]filepath:', textMapBlockImagePath.text);
         }
 
         onSg_canceled: {
@@ -737,11 +712,11 @@ Item {
         id: loader
 
 
-        visible: false
+        //visible: false
         focus: true
         clip: true
 
-        anchors.fill: parent
+        //anchors.fill: parent
 
         active: false
         source: /*Qt.resolvedUrl*/('MapEditor.qml')
@@ -774,7 +749,7 @@ Item {
                 active = false;
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
 
                 //root.focus = true;
                 root.forceActiveFocus();
@@ -807,7 +782,7 @@ Item {
             }
             */
 
-            visible = true;
+            //visible = true;
 
 
             //_private.refresh();
@@ -870,7 +845,7 @@ Item {
             //console.debug($GameMakerGlobal.mapPath())
 
             //l_listMaps.show($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000, 0x00);
-            const list = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x00);
+            const list = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建地图】');
             //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);
@@ -893,7 +868,7 @@ Item {
             }*/
 
 
-            textMapBlockImageURL.enabled = false;
+            textMapBlockImagePath.enabled = false;
             textMapBlockResourceName.enabled = true;
 
             if(!item) {
@@ -931,9 +906,9 @@ Item {
                 textMapHeight.text = cfg.MapSize[1];
                 textBlockWidth.text = cfg.MapBlockSize[0];
                 textBlockHeight.text = cfg.MapBlockSize[1];
-                textMapBlockImageURL.text = $GameMakerGlobal.mapResourceURL(cfg.MapBlockImage[0]);
+                textMapBlockImagePath.text = $GameMakerGlobal.mapResourcePath(cfg.MapBlockImage[0]);
                 textMapBlockResourceName.text = cfg.MapBlockImage[0];
-                //textMapBlockResourceName.text = textMapBlockImageURL.text.slice(textMapBlockImageURL.text.lastIndexOf('/') + 1);
+                //textMapBlockResourceName.text = textMapBlockImagePath.text.slice(textMapBlockImagePath.text.lastIndexOf('/') + 1);
 
                 root.forceActiveFocus(); //对话框关闭时不要跳回搜索框（否则键盘会显示一下）
                 dialogMapData.open();

@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrImages = $Frame.sl_dirList($GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x00);
+        //_private.arrImages = $Frame.sl_dirList($GameMakerGlobal.imageResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x0);
         //console.debug('[mainImageEditor]_private.arrImages', JSON.stringify(_private.arrImages))
         _private.refresh();
     }
@@ -109,7 +109,7 @@ Item {
                     OnAccepted: function() {
                         //root.forceActiveFocus();
 
-                        $Frame.sl_fileDelete($GameMakerGlobal.imageResourcePath(item));
+                        $Frame.sl_fileDelete($GameMakerGlobal.imageResourcePath(item) > 0);
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -157,7 +157,50 @@ Item {
 
                 text: '添加'
                 onClicked: {
-                    filedialog.open();
+                    $fileDialog.show({
+                        Title: '选择图片文件',
+                        //Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                        NameFilters: [ 'Image files (*.jpg *.jpeg *.bmp *.gif *.png)', 'All files (*)' ],
+                        SelectMultiple: false,
+                        SelectExisting: true,
+                        SelectFolder: false,
+                        //ConvertURL: false,
+                        OnAccepted: function(url, urls) {
+                            const path = $GlobalJS.toPath(url);
+                            const filename = path.slice(path.lastIndexOf('/') + 1);
+
+
+                            $dialog.show({
+                                Msg: '请输入新文件名',
+                                Input: filename,
+                                Buttons: Dialog.Save | Dialog.Cancel,
+                                OnAccepted: function() {
+                                    //root.forceActiveFocus();
+
+                                    const newFileName = $dialog.input.trim();
+                                    //if(_private.arrImages.includes(newFileName)) {
+                                    if(listview.listData.includes(newFileName)) {
+                                        $dialog.msg = '文件名重复，请重新输入';
+                                        //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
+                                        $dialog.show();
+                                        //$dialog.forceActiveFocus();
+                                    }
+                                    else {
+                                        const ret = $Frame.sl_fileCopy(path, $GameMakerGlobal.imageResourcePath(newFileName), true);
+                                        if(ret <= 0) {
+                                            $showToast('拷贝资源失败，是否目录不可写？' + newFileName);
+                                            console.error('[!mainImageEditor]Copy ERROR:', url, path, $GameMakerGlobal.imageResourcePath(newFileName));
+                                            return;
+                                        }
+                                        _private.refresh();
+                                    }
+                                },
+                                OnRejected: ()=>{
+                                    //root.forceActiveFocus();
+                                },
+                            });
+                        },
+                    });
                 }
             }
 
@@ -171,8 +214,8 @@ Item {
                     if(listview.listview.currentIndex < 0)
                         return;
 
-                    let oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
-                    //let oldFileName = _private.arrImages[listview.listview.currentIndex];
+                    const oldFileName = listview.listview.model.get(listview.listview.currentIndex).Name;
+                    //const oldFileName = _private.arrImages[listview.listview.currentIndex];
 
                     $dialog.show({
                         Msg: '请输入新文件名',
@@ -181,7 +224,7 @@ Item {
                         OnAccepted: function() {
                             //root.forceActiveFocus();
 
-                            let newFileName = $dialog.input.trim();
+                            const newFileName = $dialog.input.trim();
                             //if(_private.arrImages.includes(newFileName)) {
                             if(listview.listData.includes(newFileName)) {
                                 if(newFileName === oldFileName)
@@ -193,9 +236,9 @@ Item {
                                 //$dialog.forceActiveFocus();
                             }
                             else {
-                                let ret = $Frame.sl_fileRename($GameMakerGlobal.imageResourcePath(oldFileName), $GameMakerGlobal.imageResourcePath(newFileName));
+                                const ret = $Frame.sl_fileRename($GameMakerGlobal.imageResourcePath(oldFileName), $GameMakerGlobal.imageResourcePath(newFileName));
                                 if(ret <= 0) {
-                                    $Platform.sl_showToast('重命名资源失败，请检查是否名称已存在或目录不可写' + newFileName);
+                                    $showToast('重命名资源失败，请检查是否名称已存在或目录不可写:' + newFileName);
                                     console.error('[!mainImageEditor]RenameFile ERROR:', $GameMakerGlobal.imageResourcePath(oldFileName), $GameMakerGlobal.imageResourcePath(newFileName));
                                     return;
                                 }
@@ -308,90 +351,6 @@ Item {
                 _private.setImageVisible(false);
                 event.accepted = true;
             }
-        }
-    }
-
-
-
-    Dialog1.FileDialog {
-        id: filedialog
-
-        visible: false
-
-        title: '选择图片文件'
-        //folder: shortcuts.home
-        nameFilters: [ 'Image files (*.jpg *.jpeg *.bmp *.gif *.png)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: false
-
-        onAccepted: {
-            console.debug('[mainImageEditor]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
-            /*let strFileUrl = fileUrl.toString();
-
-            if(Qt.platform.os === 'android') {
-                if(strFileUrl.includes('primary')) {
-                    textImageResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
-                }
-                else if(strFileUrl.includes('document/')) {
-                    let tt = strFileUrl.indexOf('%3A');
-                    textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
-                }
-                else
-                    textImageResourceName.text = fileUrl.toString();
-            }
-            else
-                textImageResourceName.text = fileUrl.toString();
-            */
-
-            let path;
-            if(Qt.platform.os === 'android')
-                path = $Platform.sl_getRealPathFromURI(fileUrl.toString());
-            else
-                path = $Frame.sl_urlDecode(fileUrl.toString());
-
-            let tIndex = path.lastIndexOf('/');
-            let filename = tIndex > 0 ? path.slice(tIndex + 1) : '';
-
-
-            $dialog.show({
-                Msg: '请输入新文件名',
-                Input: filename,
-                Buttons: Dialog.Save | Dialog.Cancel,
-                OnAccepted: function() {
-                    //root.forceActiveFocus();
-
-                    let newFileName = $dialog.input.trim();
-                    //if(_private.arrImages.includes(newFileName)) {
-                    if(listview.listData.includes(newFileName)) {
-                        $dialog.msg = '文件名重复，请重新输入';
-                        //$dialog.standardButtons = Dialog.Yes | Dialog.Cancel;
-                        $dialog.show();
-                        //$dialog.forceActiveFocus();
-                    }
-                    else {
-                        let ret = $Frame.sl_fileCopy($GlobalJS.toPath(path), $GameMakerGlobal.imageResourcePath(newFileName), true);
-                        if(ret <= 0) {
-                            $Platform.sl_showToast('拷贝资源失败，是否目录不可写？' + newFileName);
-                            console.error('[!mainImageEditor]Copy ERROR:', fileUrl, path, $GlobalJS.toPath(path), $GameMakerGlobal.imageResourcePath(newFileName));
-                            return;
-                        }
-                        _private.refresh();
-                    }
-                },
-                OnRejected: ()=>{
-                    //root.forceActiveFocus();
-                },
-            });
-        }
-
-        onRejected: {
-            console.debug('[mainImageEditor]onRejected');
-            //gameMap.forceActiveFocus();
-        }
-        Component.onCompleted: {
-            //visible = true;
         }
     }
 
