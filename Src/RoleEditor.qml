@@ -39,7 +39,7 @@ Item {
 
 
         _private.strRoleRID = '';
-        _private.strTextBackupRoleImageURL = '';
+        _private.strTextBackupRoleImagePath = '';
         _private.strTextBackupRoleImageResourceName = '';
 
 
@@ -64,7 +64,7 @@ Item {
         textRoleRID.text = '';
         textRoleName.text = '';
 
-        textRoleImageURL.text = '';
+        textRoleImagePath.text = '';
         textRoleImageResourceName.text = '';
 //        textRoleFrameWidth.text = info.FrameSize[0].toString();
 //        textRoleFrameHeight.text = info.FrameSize[1].toString();
@@ -96,7 +96,7 @@ Item {
 
 
     function openRole(roleRID) {
-        const filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/role.json';
+        const filePath = $GameMakerGlobal.rolePath(roleRID) + '/role.json';
 
         let info = $Frame.sl_fileRead(filePath);
         //let info = File.read(filePath);
@@ -138,10 +138,10 @@ Item {
 
 
         if(comboType.currentIndex === 0) {
-            //textRoleImageURL.text = info.Image;
-            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
+            //textRoleImagePath.text = info.Image;
+            //textRoleImageResourceName.text = textRoleImagePath.text.slice(textRoleImagePath.text.lastIndexOf('/') + 1);
             textRoleImageResourceName.text = info.Image;
-            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(info.Image);
+            textRoleImagePath.text = $GameMakerGlobal.spriteResourcePath(info.Image);
 
             //！！！兼容旧代码
             const frameInfo = info.FrameInfo ?? info;
@@ -160,22 +160,22 @@ Item {
             textRoleFrameXScale.text = ((info.Scale && info.Scale[0] !== undefined) ? info.Scale[0].toString() : '1');
             textRoleFrameYScale.text = ((info.Scale && info.Scale[1] !== undefined) ? info.Scale[1].toString() : '1');
 
-            const frameIndex = frameInfo.FrameIndex;
-            //textRoleFangXiangIndex.text = frameIndex.toString();
-            textRoleUpIndexX.text = frameIndex[0][0].toString();
-            textRoleUpIndexY.text = frameIndex[0][1].toString();
-            textRoleRightIndexX.text = frameIndex[1][0].toString();
-            textRoleRightIndexY.text = frameIndex[1][1].toString();
-            textRoleDownIndexX.text = frameIndex[2][0].toString();
-            textRoleDownIndexY.text = frameIndex[2][1].toString();
-            textRoleLeftIndexX.text = frameIndex[3][0].toString();
-            textRoleLeftIndexY.text = frameIndex[3][1].toString();
+            const offsetIndex = frameInfo.OffsetIndex ?? frameInfo.FrameIndex; //兼容旧代码！！！
+            //textRoleFangXiangIndex.text = offsetIndex.toString();
+            textRoleUpIndexX.text = offsetIndex[0][0].toString();
+            textRoleUpIndexY.text = offsetIndex[0][1].toString();
+            textRoleRightIndexX.text = offsetIndex[1][0].toString();
+            textRoleRightIndexY.text = offsetIndex[1][1].toString();
+            textRoleDownIndexX.text = offsetIndex[2][0].toString();
+            textRoleDownIndexY.text = offsetIndex[2][1].toString();
+            textRoleLeftIndexX.text = offsetIndex[3][0].toString();
+            textRoleLeftIndexY.text = offsetIndex[3][1].toString();
         }
         else if(comboType.currentIndex === 1) {
-            //textRoleImageURL.text = info.Image;
-            //textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
+            //textRoleImagePath.text = info.Image;
+            //textRoleImageResourceName.text = textRoleImagePath.text.slice(textRoleImagePath.text.lastIndexOf('/') + 1);
             textRoleImageResourceName.text = info.Image;
-            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(info.Image);
+            textRoleImagePath.text = $GameMakerGlobal.spriteResourcePath(info.Image);
 
             const frameInfo = info.FrameInfo ?? info.FrameIndex; //兼容旧代码！！！
             for(let tt in frameInfo) {
@@ -282,7 +282,6 @@ Item {
 
                 TextField {
                     id: ttextActionName
-
                     objectName: 'ActionName'
 
                     Layout.fillWidth: true
@@ -305,7 +304,6 @@ Item {
 
                 TextField {
                     id: ttextSpriteName
-
                     objectName: 'SpriteName'
 
                     Layout.fillWidth: true
@@ -320,7 +318,7 @@ Item {
                     //wrapMode: TextEdit.Wrap
 
                     onPressAndHold: {
-                        const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strSpriteDirName;
+                        const path = $GameMakerGlobal.spritePath();
 
                         const list = $showList({
                             Data: path,
@@ -409,7 +407,6 @@ Item {
 
                 TextField {
                     id: ttextActionName
-
                     objectName: 'ActionName'
 
                     Layout.fillWidth: true
@@ -432,7 +429,6 @@ Item {
 
                 TextField {
                     id: ttextFrameStartIndex
-
                     objectName: 'FrameStartIndex'
 
                     Layout.fillWidth: true
@@ -455,7 +451,6 @@ Item {
 
                 TextField {
                     id: ttextFrameCount
-
                     objectName: 'FrameCount'
 
                     Layout.fillWidth: true
@@ -478,7 +473,6 @@ Item {
 
                 TextField {
                     id: ttextFrameInterval
-
                     objectName: 'FrameInterval'
 
                     Layout.fillWidth: true
@@ -1797,7 +1791,6 @@ Item {
                         text: '编辑脚本'
 
                         onClicked: {
-
                             if(!_private.strRoleRID) {
                                 $dialog.show({
                                     Msg: '请先保存角色',
@@ -1816,13 +1809,12 @@ Item {
 
                             //_private.loadScript(textRoleRID.text);
                             if(!scriptEditor.text &&
-                                    !$Frame.sl_fileExists($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.js')) {
+                                    !$Frame.sl_fileExists($GameMakerGlobal.rolePath(_private.strRoleRID) + '/role.js')) {
                                 if(comboType.currentIndex === 1)
                                     scriptEditor.text = _private.strTemplateCode0;
                                 else
                                     scriptEditor.text = '';
                             }
-
 
                             scriptEditor.visible = true;
                             scriptEditor.editor.forceActiveFocus();
@@ -1940,7 +1932,7 @@ Item {
             Joystick {
                 id: joystick
 
-                property var nLastDirection: null
+                //property var nLastDirection: null
 
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
@@ -1953,7 +1945,7 @@ Item {
 
                 onPressedChanged: {
                     if(pressed === false) {
-                        nLastDirection = null;
+                        //nLastDirection = null;
                         _private.stopAction(0);
                     }
                     else
@@ -1984,10 +1976,10 @@ Item {
                             direction = Qt.Key_Up;
                     }
 
-                    if(direction !== nLastDirection) {
+                    //if(direction !== nLastDirection) {
                         _private.doAction(0, direction);
-                        nLastDirection = direction;
-                    }
+                    //    nLastDirection = direction;
+                    //}
 
                     //console.debug('[RoleEditor]onPointInputChanged', pointInput);
                 }
@@ -2142,9 +2134,9 @@ Item {
                 font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
-                    textRoleImageURL.enabled = false;
+                    textRoleImagePath.enabled = false;
                     textRoleImageResourceName.enabled = true;
-                    _private.strTextBackupRoleImageURL = textRoleImageURL.text;
+                    _private.strTextBackupRoleImagePath = textRoleImagePath.text;
                     _private.strTextBackupRoleImageResourceName = textRoleImageResourceName.text;
                     dialogRoleData.open();
                 }
@@ -2194,7 +2186,7 @@ Item {
                 font.pointSize: _private.config.nButtonFontSize
 
                 onClicked: {
-                    if(textRoleImageURL.text)
+                    if(textRoleImagePath.text)
                         _private.showImage();
                 }
             }
@@ -2295,77 +2287,22 @@ Item {
 
 
 
-
-
-
-    Dialog1.FileDialog {
-        id: filedialogOpenRoleImage
-
-        title: '选择角色图片'
-        //folder: shortcuts.home
-        nameFilters: [ 'Image files (*.jpg *.png *.bmp)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: false
-
-        visible: false
-        onAccepted: {
-            //root.focus = true;
-            //root.forceActiveFocus();
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-
-
-            console.debug('[RoleEditor]You chose:', fileUrl, fileUrls);
-
-
-            if(Qt.platform.os === 'android')
-                textRoleImageURL.text = $Platform.sl_getRealPathFromURI(fileUrl.toString());
-            else
-                textRoleImageURL.text = $Frame.sl_urlDecode(fileUrl.toString());
-
-            textRoleImageResourceName.text = textRoleImageURL.text.slice(textRoleImageURL.text.lastIndexOf('/') + 1);
-
-
-            textRoleImageURL.enabled = true;
-            textRoleImageResourceName.enabled = true;
-
-
-            checkboxSaveResource.checked = true;
-            checkboxSaveResource.enabled = false;
-
-
-            //console.log('You chose:', fileDialog.fileUrls);
-        }
-        onRejected: {
-            console.debug('[RoleEditor]onRejected');
-            //root.forceActiveFocus();
-        }
-        Component.onCompleted: {
-            //visible = true;
-
-        }
-    }
-
-
     Dialog {
         id: dialogRoleData
 
         //1图片，2素材
         //property int nChoiceType: 0
 
-
-        title: '角色图片数据'
+        anchors.centerIn: parent
         width: parent.width * 0.9
         //height: 600
 
+        title: '角色图片数据'
         modal: true
         //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
         //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
         standardButtons: Dialog.Ok | Dialog.Cancel
 
-        anchors.centerIn: parent
 
         ColumnLayout {
             width: parent.width
@@ -2379,7 +2316,7 @@ Item {
                 }
 
                 TextField {
-                    id: textRoleImageURL
+                    id: textRoleImagePath
 
                     Layout.fillWidth: true
 
@@ -2416,7 +2353,6 @@ Item {
             }
 
 
-
             RowLayout {
                 Layout.preferredWidth: parent.width * 0.6
                 Layout.alignment: Qt.AlignHCenter
@@ -2428,7 +2364,35 @@ Item {
 
                     onClicked: {
                         //dialogRoleData.nChoiceType = 1;
-                        filedialogOpenRoleImage.open();
+
+                        $fileDialog.show({
+                            Title: '选择图片文件',
+                            //Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                            NameFilters: [ 'Image files (*.jpg *.jpeg *.bmp *.gif *.png)', 'All files (*)' ],
+                            SelectMultiple: false,
+                            SelectExisting: true,
+                            SelectFolder: false,
+                            //ConvertURL: false,
+                            OnAccepted: function(url, urls) {
+                                //root.focus = true;
+                                //root.forceActiveFocus();
+                                //loader.focus = true;
+                                //loader.forceActiveFocus();
+
+
+                                textRoleImagePath.text = $GlobalJS.toPath(url);
+                                textRoleImageResourceName.text = textRoleImagePath.text.slice(textRoleImagePath.text.lastIndexOf('/') + 1);
+
+
+                                textRoleImagePath.enabled = true;
+                                textRoleImageResourceName.enabled = true;
+
+
+                                checkboxSaveResource.checked = true;
+                                checkboxSaveResource.enabled = false;
+                            },
+                        });
+
                         //root.forceActiveFocus();
                     }
                 }
@@ -2469,32 +2433,33 @@ Item {
             }
         }
 
+
         onAccepted: {
             //路径 操作
 
-            /*if(textRoleImageURL.text.length === 0) {
+            /*if(textRoleImagePath.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = '路径不能为空';
-                $Platform.sl_showToast('路径不能为空');
+                $showToast('路径不能为空');
                 return;
             }*/
             if(textRoleImageResourceName.text.length === 0) {
                 open();
                 //visible = true;
                 labelDialogTips.text = '资源名不能为空';
-                $Platform.sl_showToast('资源名不能为空');
+                $showToast('资源名不能为空');
                 return;
             }
             //系统图片
             //if(dialogRoleData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                const ret = $Frame.sl_fileCopy($GlobalJS.toPath(textRoleImageURL.text), $GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
+                const ret = $Frame.sl_fileCopy(textRoleImagePath.text, $GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
-                    $Platform.sl_showToast('拷贝资源失败，是否重名或目录不可写？');
-                    //console.debug('[RoleEditor]Copy ERROR:', textRoleImageURL.text);
+                    $showToast('拷贝资源失败，是否重名或目录不可写？');
+                    //console.debug('[RoleEditor]Copy ERROR:', textRoleImagePath.text);
 
                     //root.forceActiveFocus();
                     return;
@@ -2505,28 +2470,28 @@ Item {
 
                 //console.debug('ttt2:', filepath);
 
-                //console.debug('ttt', textRoleImageURL.text, Qt.resolvedUrl(textRoleImageURL.text))
+                //console.debug('ttt', textRoleImagePath.text, Qt.resolvedUrl(textRoleImagePath.text))
             }
 
-            //textRoleImageURL.text = textRoleImageResourceName.text;
-            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(textRoleImageResourceName.text);
+            //textRoleImagePath.text = textRoleImageResourceName.text;
+            textRoleImagePath.text = $GameMakerGlobal.spriteResourcePath(textRoleImageResourceName.text);
 
 
             if(comboType.currentIndex === 0) {
-                if(!$Frame.sl_fileExists($GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!$Frame.sl_fileExists(textRoleImagePath.text)) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = '路径错误或文件不存在:' + $GlobalJS.toPath(textRoleImageURL.text);
-                    $Platform.sl_showToast('路径错误或文件不存在' + $GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件不存在:' + textRoleImagePath.text;
+                    $showToast('路径错误或文件不存在:' + textRoleImagePath.text);
                     return;
                 }
             }
             else if(comboType.currentIndex === 1) {
-                if(!$Frame.sl_dirExists($GlobalJS.toPath(textRoleImageURL.text))) {
+                if(!$Frame.sl_dirExists(textRoleImagePath.text)) {
                     open();
                     //visible = true;
-                    labelDialogTips.text = '路径错误或文件夹不存在:' + $GlobalJS.toPath(textRoleImageURL.text);
-                    $Platform.sl_showToast('路径错误或文件夹不存在' + $GlobalJS.toPath(textRoleImageURL.text));
+                    labelDialogTips.text = '路径错误或文件夹不存在:' + textRoleImagePath.text;
+                    $showToast('路径错误或文件夹不存在:' + textRoleImagePath.text);
                     return;
                 }
             }
@@ -2536,7 +2501,7 @@ Item {
 
 
 
-            textRoleImageURL.enabled = false;
+            textRoleImagePath.enabled = false;
             textRoleImageResourceName.enabled = true;
 
 
@@ -2545,7 +2510,7 @@ Item {
 
             labelDialogTips.text = '';
             /*
-            textRoleImageURL.text = '';
+            textRoleImagePath.text = '';
             textRoleImageResourceName.text = '';
             textRoleImageResourceName.enabled = true;
             */
@@ -2561,13 +2526,13 @@ Item {
             //console.log('Ok clicked');
         }
         onRejected: {
-            textRoleImageURL.text = _private.strTextBackupRoleImageURL;
+            textRoleImagePath.text = _private.strTextBackupRoleImagePath;
             textRoleImageResourceName.text = _private.strTextBackupRoleImageResourceName;
 
 
             labelDialogTips.text = '';
             /*
-            textRoleImageURL.text = '';
+            textRoleImagePath.text = '';
             textRoleImageResourceName.text = '';
             textRoleImageResourceName.enabled = true;
             */
@@ -2600,6 +2565,15 @@ Item {
                 p = p.parent;
             }*/
         }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
+        }
     }
 
 
@@ -2618,10 +2592,10 @@ Item {
 
 
         onSg_clicked: {
-            textRoleImageURL.text = $GameMakerGlobal.spriteResourceURL(item);
+            textRoleImagePath.text = $GameMakerGlobal.spriteResourcePath(item);
             textRoleImageResourceName.text = item;
 
-            textRoleImageURL.enabled = false;
+            textRoleImagePath.enabled = false;
             textRoleImageResourceName.enabled = true;
 
 
@@ -2640,7 +2614,7 @@ Item {
             //root.focus = true;
             root.forceActiveFocus();
 
-            console.debug('[RoleEditor]Role image file URL:', textRoleImageURL.text);
+            console.debug('[RoleEditor]Role image file Path:', textRoleImagePath.text);
         }
 
         onSg_canceled: {
@@ -2655,13 +2629,14 @@ Item {
 
         onSg_removeClicked: {
             const filepath = $GameMakerGlobal.spriteResourcePath(item);
+            console.debug('[RoleEditor]删除：', filepath, $Frame.sl_fileExists(filepath), );
 
             $dialog.show({
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    console.debug('[RoleEditor]删除:' + filepath, Qt.resolvedUrl(filepath), $Frame.sl_fileExists(filepath), $Frame.sl_fileDelete(filepath));
-                    removeItem(index);
+                    if($Frame.sl_fileDelete(filepath) >= 0)
+                        removeItem(index);
 
                     //l_listRoleResource.forceActiveFocus();
                 },
@@ -2680,79 +2655,15 @@ Item {
     //导出对话框
     Dialog {
         id: dialogSaveRole
-        title: '请输入名称'
+
+        anchors.centerIn: parent
         width: parent.width * 0.9
         //height: 200
+
+        title: '请输入名称'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
-        anchors.centerIn: parent
-
-        onAccepted: {
-            const ret = _private.checkExport();
-            if(ret !== true) {
-                //$Platform.sl_showToast('资源名不能为空');
-                textDialogMsg.text = ret;
-                open();
-                return;
-            }
-
-            const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text;
-
-            function fnSave() {
-                if(_private.exportRole()) {
-                    //第一次保存，重新刷新
-                    if(_private.strRoleRID === '') {
-                        _private.loadScript(textRoleRID.text);
-                        _private.refreshRole();
-                    }
-
-                    _private.strRoleRID = textRoleRID.text;
-
-                    textDialogMsg.text = '';
-
-                    //root.focus = true;
-                    root.forceActiveFocus();
-                }
-                else {
-                    open();
-                }
-            }
-
-            if(textRoleRID.text !== _private.strRoleRID && $Frame.sl_dirExists(path)) {
-                $dialog.show({
-                    Msg: '目标已存在，强行覆盖吗？',
-                    Buttons: Dialog.Yes | Dialog.No,
-                    OnAccepted: function() {
-                        fnSave();
-                    },
-                    OnRejected: ()=>{
-                        textRoleRID.text = _private.strRoleRID;
-
-                        textDialogMsg.text = '';
-
-                        //root.forceActiveFocus();
-                    },
-                    /*OnDiscarded: ()=>{
-                        $dialog.close();
-                        //root.forceActiveFocus();
-                    },*/
-                });
-            }
-            else
-                fnSave();
-        }
-        onRejected: {
-            textRoleRID.text = _private.strRoleRID;
-
-            textDialogMsg.text = '';
-
-
-            //root.focus = true;
-            root.forceActiveFocus();
-
-            //console.log('Cancel clicked');
-        }
 
         ColumnLayout {
             width: parent.width
@@ -2801,6 +2712,80 @@ Item {
                 color: 'red'
             }
         }
+
+
+        onAccepted: {
+            const ret = _private.checkExport();
+            if(ret !== true) {
+                //$showToast('资源名不能为空');
+                textDialogMsg.text = ret;
+                open();
+                return;
+            }
+
+            function fnSave() {
+                if(_private.exportRole()) {
+                    //第一次保存，重新刷新
+                    if(_private.strRoleRID === '') {
+                        _private.loadScript(textRoleRID.text);
+                        _private.refreshRole();
+                    }
+
+                    _private.strRoleRID = textRoleRID.text;
+
+                    textDialogMsg.text = '';
+
+                    //root.focus = true;
+                    root.forceActiveFocus();
+                }
+                else {
+                    open();
+                }
+            }
+
+            if(textRoleRID.text !== _private.strRoleRID && $Frame.sl_dirExists($GameMakerGlobal.rolePath(textRoleRID.text))) {
+                $dialog.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textRoleRID.text = _private.strRoleRID;
+
+                        textDialogMsg.text = '';
+
+                        //root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        $dialog.close();
+                        //root.forceActiveFocus();
+                    },*/
+                });
+            }
+            else
+                fnSave();
+        }
+        onRejected: {
+            textRoleRID.text = _private.strRoleRID;
+
+            textDialogMsg.text = '';
+
+
+            //root.focus = true;
+            root.forceActiveFocus();
+
+            //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
+        }
     }
 
 
@@ -2809,13 +2794,14 @@ Item {
     Dialog {
         id: dialogDebugScript
 
-        title: '执行脚本'
+        anchors.centerIn: parent
         width: 300
         height: 200
+
+        title: '执行脚本'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
-        anchors.centerIn: parent
 
         TextArea {
             id: textScript
@@ -2828,6 +2814,7 @@ Item {
             selectByMouse: true
         }
 
+
         onAccepted: {
             //root.focus = true;
             root.forceActiveFocus();
@@ -2837,6 +2824,15 @@ Item {
             //root.focus = true;
             root.forceActiveFocus();
             //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }
 
@@ -2890,7 +2886,7 @@ Item {
         property int nColumnHeight: 50
 
         property string strRoleRID: ''
-        property string strTextBackupRoleImageURL
+        property string strTextBackupRoleImagePath
         property string strTextBackupRoleImageResourceName
 
         property var jsLoader: new $CommonLibJS.JSLoader(root, (...params)=>Qt.createQmlObject(...params))
@@ -2900,10 +2896,10 @@ Item {
 let imageFixPositions;
 
 //刷新图片和偏移坐标
-function $refresh(index, imageAnimate, path) {
+function $refresh(index, imageAnimate, url) {
     if(imageFixPositions === undefined) {
         //读取坐标偏移文件并保存
-        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(path) + '/x.txt');
+        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(url) + '/x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
@@ -2911,7 +2907,7 @@ function $refresh(index, imageAnimate, path) {
     }
 
     //设置图片路径（注意图片名字的生成，默认是 index序号+1，保留5位不足的补0，格式为png），请自行按需修改；
-    imageAnimate.source = path + '/' + String(index+1).padStart(5, '0') + '.png';
+    imageAnimate.source = url + '/' + String(index+1).padStart(5, '0') + '.png';
     //从坐标偏移数据中读取坐标偏移并设置（默认index就是行数）；
     let [tx, ty] = imageFixPositions ? imageFixPositions[index].split(' ') : [0, 0];
     imageAnimate.rXOffset += parseInt(tx);
@@ -2927,7 +2923,7 @@ function $refresh(index, imageAnimate, path) {
 
 
         function showImage() {
-            image.source = textRoleImageURL.text;
+            image.source = $GlobalJS.toURL(textRoleImagePath.text);
             rectImage.visible = true;
             rectImage.forceActiveFocus();
         }
@@ -3042,7 +3038,7 @@ function $refresh(index, imageAnimate, path) {
                 return;
             }
 
-            //const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/';
+            //const path = $GameMakerGlobal.rolePath(roleRID) + '/';
             //if($Frame.sl_fileExists(path + 'role.js')) {
             //File.read(path + 'role.js');
             scriptEditor.init({
@@ -3051,7 +3047,7 @@ function $refresh(index, imageAnimate, path) {
                 ChoiceButton: 0b0,
                 PathText: 0b0,
                 RunButton: 0b0,
-                //Focus: false,
+                //Focus: true,
             });
             //scriptEditor.editor.forceActiveFocus();
             //scriptEditor.text = $Frame.sl_fileRead(path + 'role.js') || '';
@@ -3068,13 +3064,13 @@ function $refresh(index, imageAnimate, path) {
                 else
                     scriptEditor.text = '';
 
-                const path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text;
+                const path = $GameMakerGlobal.rolePath(textRoleRID.text);
                 const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/role.js', 0);
             }
             else if(textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) { //另存为
-                const oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.js';
+                const oldFilePath = $GameMakerGlobal.rolePath(_private.strRoleRID) + '/role.js';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text + '/role.js';
+                    const newFilePath = $GameMakerGlobal.rolePath(textRoleRID.text) + '/role.js';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3087,9 +3083,9 @@ function $refresh(index, imageAnimate, path) {
         function copyVJS() {
             //如果路径不为空，且是另存为，则复制vjs文件
             if(_private.strRoleRID !== '' && textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) {
-                const oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + _private.strRoleRID + '/role.vjs';
+                const oldFilePath = $GameMakerGlobal.rolePath(_private.strRoleRID) + '/role.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    const newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + textRoleRID.text + '/role.vjs';
+                    const newFilePath = $GameMakerGlobal.rolePath(textRoleRID.text) + '/role.vjs';
                     const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3107,7 +3103,7 @@ function $refresh(index, imageAnimate, path) {
 
             const roleRID = textRoleRID.text;
             const roleName = textRoleName.text || roleRID;
-            const filepath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strRoleDirName + '/' + roleRID + '/role.json';
+            const filepath = $GameMakerGlobal.rolePath(roleRID) + '/role.json';
 
             /*//if(!$Frame.sl_dirExists(path))
                 $Frame.sl_dirCreate(path);
@@ -3348,7 +3344,7 @@ function $refresh(index, imageAnimate, path) {
                 OnAccepted: function() {
                     const ret = _private.checkExport();
                     if(ret !== true) {
-                        //$Platform.sl_showToast('资源名不能为空');
+                        //$showToast('资源名不能为空');
                         textDialogMsg.text = ret;
                         dialogSaveRole.open();
                         return;

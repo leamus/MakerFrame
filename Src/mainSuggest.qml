@@ -192,12 +192,12 @@ Item {
                             userID: $globalData.$userData.info.id, account: $globalData.$userData.info.account,
                         },
                         Gzip: [1, 1024],
-                    }).$$then((xhr)=>{
+                    }, 2).$$then((xhr)=>{
                         buttonSubmit.enabled = true;
                         infoCallback(xhr);
-                    }).$$catch((xhr)=>{
+                    }).$$catch((e)=>{
                         buttonSubmit.enabled = true;
-                        console.warn('[!mainSuggest]', xhr);
+                        console.warn('[!mainSuggest]错误：', e);
                     });
 
                     function infoCallback(xhr) {
@@ -280,9 +280,10 @@ Item {
                 //Data: {},
                 //Gzip: [1, 1024],
                 //Headers: {},
-            }).$$then((xhr)=>{
+            }, 2).$$then((xhr)=>{
                 infoCallback(xhr);
-            }).$$catch((xhr)=>{
+            }).$$catch((e)=>{
+                console.warn('[!mainSuggest]错误：', e);
             });
 
             function infoCallback(xhr) {

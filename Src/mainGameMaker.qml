@@ -18,7 +18,7 @@ import _Global.Button 1.0
 import 'qrc:/QML'
 
 
-import 'Core/Singleton'
+//import 'Core/Singleton'
 import './Core'
 
 ////import GameComponents 1.0
@@ -29,6 +29,7 @@ import './Core'
 //import '../../_Global/Global.js' as GlobalJS
 import './Core/GameMakerGlobal.js' as GameMakerGlobalJS
 import 'GameVisualScript.js' as GameVisualScriptJS
+import 'BuildDateTime.js' as BuildDateTime
 //import 'File.js' as File
 
 
@@ -47,8 +48,11 @@ Item {
 
 
 
-    property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+    readonly property var $eval: (loader.item ? loader.item.$eval : null) ?? (()=>(c)=>eval(c))()
+    readonly property var $createComponent: (...params)=>Qt.createComponent(...params)
+    readonly property var $createQmlObject: (...params)=>Qt.createQmlObject(...params)
 
+    readonly property var $GameMakerSingleton: GameMakerSingleton
     readonly property alias $GameMakerGlobal: gameMakerGlobal
     readonly property var $GameMakerGlobalJS: GameMakerGlobalJS
     readonly property var $GameVisualScriptJS: GameVisualScriptJS
@@ -77,7 +81,7 @@ Item {
             //height: parent.height
 
             //strBasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName
-            //strTitle: '脚本编辑'
+            //strTitle: '代码编辑'
             /*fnAfterCompile: function(code) {return code;}*/
 
             //visualScriptEditor.strTitle: strTitle
@@ -186,7 +190,7 @@ Item {
                 Layout.fillHeight: true
 
                 text: 'Test'
-                onClicked: menuTest.open();
+                onClicked: menuTest.open(); //.popup(...args);
 
                 Menu {
                     id: menuTest
@@ -239,8 +243,7 @@ Item {
                 font.pointSize: _private.config.nButtonTextSize
 
                 onClicked: {
-                    menuProjectManager.open();
-                    menuProjectManager.enabled = true;
+                    menuProjectManager.open(); //.popup(...args);
                 }
 
                 Menu {
@@ -334,8 +337,11 @@ Item {
                     */
 
 
+                    onAboutToShow: {
+                        enabled = true;
+                    }
                     onAboutToHide: {
-                        enabled = false;
+                        enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
                     }
                     //onClosed: {
                     //}
@@ -364,8 +370,7 @@ Item {
                     if(!_private.checkCurrentProjectName()) {
                         return;
                     }
-                    menuGameEditor.open();
-                    menuGameEditor.enabled = true;
+                    menuGameEditor.open(); //.popup(...args);
                 }
 
                 Menu {
@@ -453,7 +458,7 @@ Item {
                         }
                     }
                     MenuItem {
-                        text: '脚本编辑器'
+                        text: '代码编辑'
                         height: _private.config.nMenuItemHeight
                         onClicked: {
                             $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
@@ -471,8 +476,11 @@ Item {
                     }
 
 
+                    onAboutToShow: {
+                        enabled = true;
+                    }
                     onAboutToHide: {
-                        enabled = false;
+                        enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
                     }
                     //onClosed: {
                     //}
@@ -501,8 +509,7 @@ Item {
                     if(!_private.checkCurrentProjectName()) {
                         return;
                     }
-                    menuResourceManager.open();
-                    menuResourceManager.enabled = true;
+                    menuResourceManager.open(); //.popup(...args);
                 }
 
                 Menu {
@@ -557,8 +564,11 @@ Item {
                     */
 
 
+                    onAboutToShow: {
+                        enabled = true;
+                    }
                     onAboutToHide: {
-                        enabled = false;
+                        enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
                     }
                     //onClosed: {
                     //}
@@ -587,8 +597,7 @@ Item {
                     if(!_private.checkCurrentProjectName()) {
                         return;
                     }
-                    menuPluginsManager.open();
-                    menuPluginsManager.enabled = true;
+                    menuPluginsManager.open(); //.popup(...args);
                 }
 
                 Menu {
@@ -601,7 +610,7 @@ Item {
                     y: Qt.platform.os === 'android' ? -130 : 0
 
                     MenuItem {
-                        text: '插件管理'
+                        text: `<font color="${$Global.style.color($Global.style.Red)}"><b>插件管理@</b></font>`
                         height: _private.config.nMenuItemHeight
                         onClicked: {
                             $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
@@ -621,7 +630,7 @@ Item {
                     MenuSeparator { }
 
                     MenuItem {
-                        text: '全局插件'
+                        text: `<font color="${$Global.style.color($Global.style.Red)}"><b>全局插件@</b></font>`
                         height: _private.config.nMenuItemHeight
                         onClicked: {
                             $Frame.sl_objectParent(this).parent.forceActiveFocus(); //Menu的父级获取焦点
@@ -630,8 +639,11 @@ Item {
                     }
 
 
+                    onAboutToShow: {
+                        enabled = true;
+                    }
                     onAboutToHide: {
-                        enabled = false;
+                        enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
                     }
                     //onClosed: {
                     //}
@@ -682,8 +694,7 @@ Item {
                 font.pointSize: _private.config.nButtonTextSize
 
                 onClicked: {
-                    menuDocuments.open();
-                    menuDocuments.enabled = true;
+                    menuDocuments.open(); //.popup(...args);
                 }
 
                 Menu {
@@ -735,10 +746,31 @@ Item {
                             _private.suggest();
                         }
                     }
+                    MenuItem {
+                        text: '编译时间'
+                        height: _private.config.nMenuItemHeight
+                        onClicked: {
+                            let msg = '';
+                            msg += 'GameMaker打包时间：%1'.arg(new Date(BuildDateTime.buildDateTime).$$format1('yyyy-MM-dd hh:mm:ss.zzz'));
+                            $dialog.show({
+                                Msg: msg,
+                                Buttons: Dialog.Yes,
+                                OnAccepted: function() {
+                                    //root.forceActiveFocus();
+                                },
+                                OnRejected: ()=>{
+                                    //root.forceActiveFocus();
+                                },
+                            });
+                        }
+                    }
 
 
+                    onAboutToShow: {
+                        enabled = true;
+                    }
                     onAboutToHide: {
-                        enabled = false;
+                        enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
                     }
                     //onClosed: {
                     //}
@@ -1178,14 +1210,10 @@ Item {
 
                     text: '关于'
                     onClicked: {
-                        if($Platform.compileType === 'debug') {
+                        //if($Platform.compileType === 'debug') {
                             loader.loadModule('mainAbout.qml');
-                            //userMainProject.source = 'mainAbout.qml';
-                        }
-                        else {
-                            loader.loadModule('mainAbout.qml');
-                            //userMainProject.source = 'mainAbout.qml';
-                        }
+                            //loader.source = 'mainAbout.qml';
+                        //}
                     }
                 }
                 * /
@@ -1285,7 +1313,7 @@ Item {
 
 
                     font.pointSize: 12
-                    text: qsTr('<a href="http://makerframe.leamus.cn/Privacy.html">隐私政策</a>')
+                    text: qsTr('<a href="http://MakerFrame.Leamus.cn/Privacy.html">隐私政策</a>')
 
                     horizontalAlignment: Label.AlignHCenter
                     verticalAlignment: Label.AlignVCenter
@@ -1378,36 +1406,39 @@ Item {
 
 
         //载入模块
-        function loadModule(url=null, ...params) {
-            //console.debug('loadModule:', url, params);
+        function loadModule(url=null, properties, forceFlags, ...params) {
+            //console.debug('[mainGameMaker]loadModule:', properties, forceFlags, url, params);
 
 
             //if(url.length !== 0 && !checkCurrentProjectName())
             //    return false;
 
 
-            if(status === Loader.Loading)
-                vInitParamsBackup = params;
+            /*if(status === Loader.Loading)
+                vLoadParamsBackup = params;
             else
-                vInitParams = params;
-            return load($CommonLibJS.isString(url) ? Qt.resolvedUrl(url) : url, undefined, );
+                vLoadParams = params;
+            */
+            return load($CommonLibJS.isString(url) ? Qt.resolvedUrl(url) : url, properties, forceFlags, ...params);
         }
 
-        fnCustomLoad: function(url, properties) {
-            loadModule(url, ...vInitParamsBackup);
-            vInitParamsBackup = null;
+        /*fnCustomLoad: function(url, properties) {
+            loadModule(url, properties, undefined, ...vLoadParamsBackup);
+            vLoadParamsBackup = null;
         }
+        */
 
 
-        property var vInitParams: [] //调用item.$init时给的参数
-        property var vInitParamsBackup: [] //调用item.$init时给的参数 备份
+        //property var vLoadParams: [] //调用item.$load时给的参数
+        //property var vLoadParamsBackup: [] //调用item.$load时给的参数 备份
 
-        visible: false
+        visible: status === Loader.Ready //false
         focus: true
         clip: true
 
         //anchors.fill: parent
 
+        //active: false
         //source: ''
         //asynchronous: true
 
@@ -1431,10 +1462,11 @@ Item {
             if(status === Loader.Ready) {
             }
             else if(status === Loader.Error) {
-                //close();
+                close();
+                //active = false;
             }
             else if(status === Loader.Null) {
-                visible = false;
+                //visible = false;
 
                 //rootGameMaker.focus = true;
                 rootGameMaker.forceActiveFocus();
@@ -1444,7 +1476,7 @@ Item {
         }
 
         onLoaded: {
-            console.debug('[mainGameMaker]loader onLoaded:', vInitParams);
+            console.debug('[mainGameMaker]loader onLoaded:', /*vLoadParams*/);
 
             //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
             ///focus = true;
@@ -1452,7 +1484,7 @@ Item {
 
             if(item.$load) {
                 try {
-                    item.$load(...vInitParams);
+                    item.$load(...vExtraData);
                 }
                 catch(e) {
                     $CommonLibJS.printException(e);
@@ -1463,7 +1495,7 @@ Item {
                 }
             }
 
-            visible = true;
+            //visible = true;
         }
     }
 
@@ -1561,7 +1593,7 @@ Item {
                     textArea.color: 'white'
                     //textArea.color: $Global.style.foreground
                     //textArea.enabled: false
-                    textArea.readOnly: true
+                    //textArea.readOnly: true
 
                     textArea.wrapMode: TextArea.WrapAnywhere
                     textArea.horizontalAlignment: TextArea.AlignJustify
@@ -1599,6 +1631,10 @@ Item {
                     onClicked: {
                         rectHelpWindow.close();
                     }
+                    /*onPressAndHold: {
+                        textHelpInfo.textArea.selectByMouse = !textHelpInfo.textArea.selectByMouse;
+                    }
+                    */
                 }
             }
 
@@ -1632,7 +1668,8 @@ Item {
         //切换工程，转移和检查工程引擎变量
         function changeProject(newProject='', oldProject=null) {
             newProject = newProject.trim();
-            $GameMakerGlobal.config.strCurrentProjectName = newProject;
+            //$GameMakerGlobal.settings.$CurrentProjectName = $GameMakerGlobal.config.strCurrentProjectName = newProject;
+            $GameMakerGlobal.settings.setValue('$CurrentProjectName', $GameMakerGlobal.config.strCurrentProjectName = newProject);
             if(newProject.length === 0)
                 return;
 
@@ -1749,15 +1786,15 @@ Item {
                     //rootGameMaker.forceActiveFocus();
                 },
                 OnRemoveClicked: (index, item)=>{
-                    let dirUrl = $GameMakerGlobal.config.strProjectRootPath + item;
+                    const dirPath = $GameMakerGlobal.config.strProjectRootPath + item;
+                    console.debug('[mainGameMaker]删除：', dirPath, $Frame.sl_dirExists(dirPath), );
 
                     $dialog.show({
                         Msg: '确认删除 <font color="red">' + item + '</font> ?',
                         Buttons: Dialog.Ok | Dialog.Cancel,
                         OnAccepted: function() {
-                            console.debug('[mainGameMaker]删除：' + dirUrl, Qt.resolvedUrl(dirUrl), $Frame.sl_dirExists(dirUrl), );
 
-                            if(!$Frame.sl_removeRecursively(dirUrl)) {
+                            if(!$Frame.sl_removeRecursively(dirPath)) {
                                 $dialog.show({
                                     Msg: '删除失败',
                                     Buttons: Dialog.Yes,
@@ -1774,7 +1811,8 @@ Item {
                             list.removeItem(index);
 
                             $GameMakerGlobal.settings.setValue('Projects/' + item, undefined);
-                            _private.changeProject('');
+                            if(item === $GameMakerGlobal.config.strCurrentProjectName)
+                                _private.changeProject('');
 
                             //$list.close();
                         },
@@ -1835,158 +1873,97 @@ Item {
         }
 
         function mapEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainMapEditor.qml');
-                //userMainProject.source = 'mainMapEditor.qml';
-            }
-            else {
-                loader.loadModule('mainMapEditor.qml');
-                //userMainProject.source = 'mainMapEditor.qml';
-            }
+                //loader.source = 'mainMapEditor.qml';
+            //}
         }
         function roleEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainRoleEditor.qml');
-                //userMainProject.source = 'eventMaker.qml';
-            }
-            else {
-                loader.loadModule('mainRoleEditor.qml');
-                //userMainProject.source = 'eventMaker.qml';
-            }
+                //loader.source = 'eventMaker.qml';
+            //}
         }
         function spriteEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainSpriteEditor.qml');
-                //userMainProject.source = 'eventMaker.qml';
-            }
-            else {
-                loader.loadModule('mainSpriteEditor.qml');
-                //userMainProject.source = 'eventMaker.qml';
-            }
+                //loader.source = 'eventMaker.qml';
+            //}
         }
         function goodsEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainGoodsEditor.qml');
-                //userMainProject.source = 'mainGoodsEditor.qml';
-            }
-            else {
-                loader.loadModule('mainGoodsEditor.qml');
-                //userMainProject.source = 'mainGoodsEditor.qml';
-            }
+                //loader.source = 'mainGoodsEditor.qml';
+            //}
         }
         function fightRoleEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainFightRoleEditor.qml');
-                //userMainProject.source = 'mainFightRoleEditor.qml';
-            }
-            else {
-                loader.loadModule('mainFightRoleEditor.qml');
-                //userMainProject.source = 'mainFightRoleEditor.qml';
-            }
+                //loader.source = 'mainFightRoleEditor.qml';
+            //}
         }
         function fightSkillEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainFightSkillEditor.qml');
-                //userMainProject.source = 'mainFightSkillEditor.qml';
-            }
-            else {
-                loader.loadModule('mainFightSkillEditor.qml');
-                //userMainProject.source = 'mainFightSkillEditor.qml';
-            }
+                //loader.source = 'mainFightSkillEditor.qml';
+            //}
         }
         function fightScriptEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainFightScriptEditor.qml');
-                //userMainProject.source = 'mainFightScriptEditor.qml';
-            }
-            else {
-                loader.loadModule('mainFightScriptEditor.qml');
-                //userMainProject.source = 'mainFightScriptEditor.qml';
-            }
+                //loader.source = 'mainFightScriptEditor.qml';
+            //}
         }
         function startScriptEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('StartScriptEditor.qml');
-                //userMainProject.source = 'StartScriptEditor.qml';
-            }
-            else {
-                loader.loadModule('StartScriptEditor.qml');
-                //userMainProject.source = 'StartScriptEditor.qml';
-            }
+                //loader.source = 'StartScriptEditor.qml';
+            //}
         }
         function commonScriptEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('CommonScriptEditor.qml');
-                //userMainProject.source = 'CommonScriptEditor.qml';
-            }
-            else {
-                loader.loadModule('CommonScriptEditor.qml');
-                //userMainProject.source = 'CommonScriptEditor.qml';
-            }
+                //loader.source = 'CommonScriptEditor.qml';
+            //}
         }
         function scriptEditor() {
-            if($Platform.compileType === 'debug') {
-                loader.loadModule(compScriptEditor, {
-                    BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName,
+            //if($Platform.compileType === 'debug') {
+                loader.loadModule(compScriptEditor, undefined, undefined, {
+                    BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
                     //RelativePath: '',
                     //ChoiceButton: 0b11,
                     //PathText: 0b11,
-                    RunButton: 0b11,
+                    //RunButton: 0b11,
+                    //Default: defaultCode,
+                    Focus: true,
                 });
                 //loader.loadModule('ScriptEditor.qml');
-                //userMainProject.source = 'ScriptEditor.qml';
-            }
-            else {
-                loader.loadModule(compScriptEditor, {
-                    BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName,
-                    //RelativePath: '',
-                    //ChoiceButton: 0b11,
-                    //PathText: 0b11,
-                    RunButton: 0b11,
-                });
-                //loader.loadModule('ScriptEditor.qml');
-                //userMainProject.source = 'ScriptEditor.qml';
-            }
+                //loader.source = 'ScriptEditor.qml';
+            //}
         }
         function pluginsManage() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainPlugins.qml');
-                //userMainProject.source = 'mainPlugins.qml';
-            }
-            else {
-                loader.loadModule('mainPlugins.qml');
-                //userMainProject.source = 'mainPlugins.qml';
-            }
+                //loader.source = 'mainPlugins.qml';
+            //}
         }
         function imageEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainImageEditor.qml');
-                //userMainProject.source = 'mainImageEditor.qml';
-            }
-            else {
-                loader.loadModule('mainImageEditor.qml');
-                //userMainProject.source = 'mainImageEditor.qml';
-            }
+                //loader.source = 'mainImageEditor.qml';
+            //}
         }
         function musicEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainMusicEditor.qml');
-                //userMainProject.source = 'mainMusicEditor.qml';
-            }
-            else {
-                loader.loadModule('mainMusicEditor.qml');
-                //userMainProject.source = 'mainMusicEditor.qml';
-            }
+                //loader.source = 'mainMusicEditor.qml';
+            //}
         }
         function videoEditor() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainVideoEditor.qml');
-                //userMainProject.source = 'mainVideoEditor.qml';
-            }
-            else {
-                loader.loadModule('mainVideoEditor.qml');
-                //userMainProject.source = 'mainVideoEditor.qml';
-            }
+                //loader.source = 'mainVideoEditor.qml';
+            //}
         }
         function compressDir() {
         }
@@ -1994,57 +1971,37 @@ Item {
         }
 
         function pluginsManager(type) {
-            if($Platform.compileType === 'debug') {
-                loader.loadModule('PluginsManager.qml', type);
-                //userMainProject.source = 'PluginsManager.qml';
-            }
-            else {
-                loader.loadModule('PluginsManager.qml', type);
-                //userMainProject.source = 'PluginsManager.qml';
-            }
+            //if($Platform.compileType === 'debug') {
+                loader.loadModule('PluginsManager.qml', undefined, undefined, type);
+                //loader.source = 'PluginsManager.qml';
+            //}
         }
 
         /*function pluginsDownload() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('PluginsDownload.qml');
-                //userMainProject.source = 'PluginsDownload.qml';
-            }
-            else {
-                loader.loadModule('PluginsDownload.qml');
-                //userMainProject.source = 'PluginsDownload.qml';
-            }
+                //loader.source = 'PluginsDownload.qml';
+            //}
         }
         */
 
         function gameStart() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('Core/GameScene.qml');
-                //userMainProject.source = 'Core/GameScene.qml';
-            }
-            else {
-                loader.loadModule('Core/GameScene.qml');
-                //userMainProject.source = 'Core/GameScene.qml';
-            }
+                //loader.source = 'Core/GameScene.qml';
+            //}
         }
         function gameTest() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainGameTest.qml');
-                //userMainProject.source = 'mainGameTest.qml';
-            }
-            else {
-                loader.loadModule('mainGameTest.qml');
-                //userMainProject.source = 'mainGameTest.qml';
-            }
+                //loader.source = 'mainGameTest.qml';
+            //}
         }
         function gamePackage() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainPackage.qml');
-                //userMainProject.source = 'mainPackage.qml';
-            }
-            else {
-                loader.loadModule('mainPackage.qml');
-                //userMainProject.source = 'mainPackage.qml';
-            }
+                //loader.source = 'mainPackage.qml';
+            //}
         }
         function future() {
             $dialog.show({
@@ -2187,44 +2144,28 @@ Item {
         }
 
         function about() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainAbout.qml');
-                //userMainProject.source = 'mainAbout.qml';
-            }
-            else {
-                loader.loadModule('mainAbout.qml');
-                //userMainProject.source = 'mainAbout.qml';
-            }
+                //loader.source = 'mainAbout.qml';
+            //}
         }
         function tutorial() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainTutorial.qml');
-                //userMainProject.source = 'mainTutorial.qml';
-            }
-            else {
-                loader.loadModule('mainTutorial.qml');
-                //userMainProject.source = 'mainTutorial.qml';
-            }
+                //loader.source = 'mainTutorial.qml';
+            //}
         }
         function agreement() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainAgreement.qml');
-                //userMainProject.source = 'mainAgreement.qml';
-            }
-            else {
-                loader.loadModule('mainAgreement.qml');
-                //userMainProject.source = 'mainAgreement.qml';
-            }
+                //loader.source = 'mainAgreement.qml';
+            //}
         }
         function updateLog() {
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainUpdateLog.qml');
-                //userMainProject.source = 'mainUpdateLog.qml';
-            }
-            else {
-                loader.loadModule('mainUpdateLog.qml');
-                //userMainProject.source = 'mainUpdateLog.qml';
-            }
+                //loader.source = 'mainUpdateLog.qml';
+            //}
         }
         function suggest() {
             if($globalData.$userData === undefined) {
@@ -2239,14 +2180,10 @@ Item {
                 return;
             }
 
-            if($Platform.compileType === 'debug') {
+            //if($Platform.compileType === 'debug') {
                 loader.loadModule('mainSuggest.qml');
-                //userMainProject.source = 'mainSuggest.qml';
-            }
-            else {
-                loader.loadModule('mainSuggest.qml');
-                //userMainProject.source = 'mainSuggest.qml';
-            }
+                //loader.source = 'mainSuggest.qml';
+            //}
         }
 
         function unzipProjectPackage(fURL) {
@@ -2367,7 +2304,6 @@ Item {
             if(!$Frame.sl_dirExists(dirPath))
                 $Frame.sl_dirCreate(dirPath);
             const ret = $Frame.sl_extractDir(/*$GlobalJS.toPath*/(filePath), dirPath);
-
             if(ret.length > 0) {
                 //_private.changeProject($Frame.sl_completeBaseName(filePath));
 
@@ -2498,13 +2434,23 @@ Item {
 
         if($GameMakerGlobal.settings.$RunTimes === 0) {
         //if($GameMakerGlobal.settings.value('$RunTimes', 0) === 0) {
-            rectHelpWindow.showMsg('<font size=6>初来乍到，请阅读并同意<a href="http://makerframe.leamus.cn/Privacy.html">隐私政策</a>。<br>进入 教程 先来了解一下引擎吧，或者在 导入工程 里下载示例 试玩。</font>');
+            rectHelpWindow.showMsg('<font size=6>初来乍到，请阅读并同意<a href="http://MakerFrame.Leamus.cn/Privacy.html">隐私政策</a>。<br>进入 教程 先来了解一下引擎吧，或者在 导入工程 里下载示例 试玩。</font>');
             //$GameMakerGlobal.settings.setValue('$RunTimes', 1);
         }
         else {
             //$GameMakerGlobal.settings.setValue('$RunTimes', parseInt($GameMakerGlobal.settings.value('$RunTimes', 0)) + 1);
         }
         ++$GameMakerGlobal.settings.$RunTimes;
+
+        if($Platform.compileType === 'release') {
+            //提交访问信息
+            $GlobalJS.sendUsage({
+                Times: $GameMakerGlobal.settings.$RunTimes,
+                Duration: $GameMakerGlobal.settings.$RunDuration,
+                Product: `${$GameMakerGlobal.settings.category}_${$Platform.sysInfo.buildCpuArchitecture}_${$GameMakerGlobal.version}(${$Platform.compileType})`,
+            });
+        }
+
 
         //if($GameMakerGlobal.settings.value('$ProjectName'))
         //    $GameMakerGlobal.config.strCurrentProjectName = $GameMakerGlobal.settings.value('$ProjectName');
@@ -2548,7 +2494,7 @@ Item {
 
 
 
-        $GameMakerGlobal.settings.$CurrentProjectName = $GameMakerGlobal.config.strCurrentProjectName;
+        ///$GameMakerGlobal.settings.$CurrentProjectName = $GameMakerGlobal.config.strCurrentProjectName;
 
 
 

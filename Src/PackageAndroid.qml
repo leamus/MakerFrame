@@ -81,7 +81,27 @@ Item {
             Button {
                 text: '选择'
                 onClicked: {
-                    filedialog.open();
+                    $fileDialog.show({
+                        Title: '选择文件夹',
+                        Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                        //NameFilters: [ 'zip files (*.zip)', 'All files (*)' ],
+                        SelectMultiple: false,
+                        SelectExisting: true,
+                        SelectFolder: true,
+                        //ConvertURL: false,
+                        OnAccepted: function(url, urls) {
+                            const path = $GlobalJS.toPath(url);
+
+                            //loader.focus = true;
+                            //loader.forceActiveFocus();
+                            //root.focus = true;
+                            //root.forceActiveFocus();
+
+                            textPackageDirPath.text = url;
+
+                            root.forceActiveFocus();
+                        },
+                    });
                 }
             }
         }
@@ -143,7 +163,7 @@ Item {
                 //wrapMode: TextField.Wrap
 
                 onTextChanged: {
-                    imageIcon.source = textIconPath.text;
+                    imageIcon.source = $GlobalJS.toURL(textIconPath.text);
                 }
             }
 
@@ -161,14 +181,25 @@ Item {
             Button {
                 text: '选择'
                 onClicked: {
-                    filedialogIcon.open();
+                    $fileDialog.show({
+                        Title: '选择图标文件',
+                        Folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath), //shortcuts.home
+                        NameFilters: [ 'PNG files (*.png)', 'All files (*)' ],
+                        SelectMultiple: false,
+                        SelectExisting: true,
+                        SelectFolder: false,
+                        //ConvertURL: false,
+                        OnAccepted: function(url, urls) {
+                            textIconPath.text = $GlobalJS.toPath(url);
+                        },
+                    });
                 }
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            visible: _private.nPackageType !== 1
+            //visible: _private.nPackageType !== 1
 
             Label {
                 text: 'Tap Client ID：'
@@ -189,7 +220,7 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            visible: _private.nPackageType !== 1
+            //visible: _private.nPackageType !== 1
 
             Label {
                 text: 'Tap Client Token：'
@@ -295,110 +326,10 @@ Item {
 
 
 
-    //打开工程 对话框
-    Dialog1.FileDialog {
-        id: filedialog
-
-        visible: false
-
-        title: '选择文件夹'
-        //folder: shortcuts.home
-        folder: $GlobalJS.toURL($GameMakerGlobal.config.strProjectRootPath)
-        //nameFilters: [ 'zip files (*.zip)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: true
-
-        onAccepted: {
-            //loader.focus = true;
-            //loader.forceActiveFocus();
-            //root.focus = true;
-            //root.forceActiveFocus();
-
-            console.debug('[PackageAndroid]You chose:', fileUrl, fileUrls);
-
-
-            let fUrl;
-            if(Qt.platform.os === 'android')
-                //注意：content://com.android.externalstorage.documents/tree转换真实路径时会报错：
-                fUrl = $GlobalJS.toPath($Platform.sl_getRealPathFromURI(fileUrl.toString().replace('content://com.android.externalstorage.documents/tree', 'content://com.android.externalstorage.documents/document')));
-            else
-                fUrl = $GlobalJS.toPath($Frame.sl_urlDecode(fileUrl.toString()));
-
-            textPackageDirPath.text = fUrl;
-
-            root.forceActiveFocus();
-        }
-        onRejected: {
-            console.debug('[PackageAndroid]onRejected');
-            //root.forceActiveFocus();
-
-
-            //sg_close();
-        }
-        Component.onCompleted: {
-            //visible = true;
-        }
-    }
-
-    Dialog1.FileDialog {
-        id: filedialogIcon
-
-        visible: false
-
-        title: '选择图标文件'
-        //folder: shortcuts.home
-        nameFilters: [ 'PNG files (*.png)', 'All files (*)' ]
-
-        selectMultiple: false
-        selectExisting: true
-        selectFolder: false
-
-        onAccepted: {
-            console.debug('[PackageAndroid]You chose:', fileUrl, fileUrls, typeof(fileUrl), JSON.stringify(fileUrl));
-            /*let strFileUrl = fileUrl.toString();
-
-            if(Qt.platform.os === 'android') {
-                if(strFileUrl.includes('primary')) {
-                    textImageResourceName.text = 'file:/storage/emulated/0/' + strFileUrl.substr(strFileUrl.indexOf('%3A')+3);
-                }
-                else if(strFileUrl.includes('document/')) {
-                    let tt = strFileUrl.indexOf('%3A');
-                    textImageResourceName.text = 'file:/storage/' + strFileUrl.slice(strFileUrl.indexOf('/document/') + '/document/'.length, tt) + '/' + strFileUrl.slice(tt + 3);
-                }
-                else
-                    textImageResourceName.text = fileUrl.toString();
-            }
-            else
-                textImageResourceName.text = fileUrl.toString();
-            */
-
-            let path;
-            if(Qt.platform.os === 'android')
-                path = $Platform.sl_getRealPathFromURI(fileUrl.toString());
-            else
-                path = $Frame.sl_urlDecode(fileUrl.toString());
-
-            textIconPath.text = $GlobalJS.toURL(path);
-        }
-
-        onRejected: {
-            console.debug('[PackageAndroid]onRejected');
-
-            //gameMap.forceActiveFocus();
-        }
-        Component.onCompleted: {
-            //visible = true;
-        }
-    }
-
-
-
     QObject {
         id: _private
 
-        property int nPackageType: 0 //1为app；2为Game
+        //property int nPackageType: 0 //1为app；2为Game
 
         //property string strPackageDir: 'D:/Documents/Desktop/QtEnv/_MakerFrame/Packages/Android/MakerFrame_鹰歌软件框架游戏引擎_ALL_Qt5.15.2'
         property alias strPackageDir: textPackageDirPath.text
@@ -428,30 +359,28 @@ Item {
             imageIcon.source = $GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/Config.js');
             if(!content) {
-                nPackageType = 1;
-                textResult.append('没有 Config.js 文件，打包为 鹰歌框架APP');
-                //++error;
+                //nPackageType = 1;
+                textResult.append('读取 Config.js 失败');
+                ++error;
             }
             else {
-                nPackageType = 2;
-                textResult.append('打包为 鹰歌引擎Game');
+                //nPackageType = 2;
+                //textResult.append('打包为 鹰歌引擎Game');
 
-                //不用Config.js，因为有可能是打包App
-                /*/regExp = /category: '(\S*)'/g;
-                regExp = /AppName = '(\S*)'/g;
+                //regExp = /category: '(\S*)'/g;
+                regExp = /appName = '(\S*)'/g;
                 res = regExp.exec(content);
                 textAPPName.text = res[1];
-                */
 
                 //regExp = /property string strTDSClientID: '(\w*)'/g;
-                regExp = /TDSClientID: '(\w*)'/g;
+                regExp = /tdsClientID: '(\w*)'/g;
                 res = regExp.exec(content);
                 textTapClientID.text = res[1];
 
                 //regExp = /property string strTDSClientToken: '(\w*)'/g;
-                regExp = /TDSClientToken: '(\w*)'/g;
+                regExp = /tdsClientToken: '(\w*)'/g;
                 res = regExp.exec(content);
                 textTapClientToken.text = res[1];
             }
@@ -463,9 +392,10 @@ Item {
                 ++error;
             }
             else {
-                regExp = /android:label="(\S*)"/g;
+                /*regExp = /android:label="(\S*)"/g;
                 res = regExp.exec(content);
                 textAPPName.text = res[1];
+                */
 
                 regExp = /package="(\S*)"/g;
                 res = regExp.exec(content);
@@ -486,25 +416,25 @@ Item {
             textResult.text = '';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
+            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/Config.js');
             if(!content) {
-                textResult.append('读取 Config.js 失败，打包的可能是App');
+                textResult.append('读取 Config.js 失败');
             }
             else {
                 //regExp = /(category: ')\S*(')/g;
-                regExp = /(AppName = ')\S*(')/g;
+                regExp = /(appName = ')\S*(')/g;
                 content = content.replace(regExp, '$1' + textAPPName.text + '$2');
 
                 //regExp = /(property string strTDSClientID: ')\w*(')/g;
-                regExp = /(TDSClientID: ')\w*(')/g;
+                regExp = /(tdsClientID: ')\w*(')/g;
                 content = content.replace(regExp, '$1' + textTapClientID.text + '$2');
 
                 //regExp = /(property string strTDSClientToken: ')\w*(')/g;
-                regExp = /(TDSClientToken: ')\w*(')/g;
+                regExp = /(tdsClientToken: ')\w*(')/g;
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/GameRuntime/Config.js');
+                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/Config.js');
                 if(res === 0) {
                     textResult.append('写入 Config.js 成功');
                 }
@@ -578,14 +508,15 @@ Item {
             }
 
 
+            textIconPath.text = textIconPath.text.trim();
             //复制 icon
-            if(textIconPath.text.trim() && $Frame.sl_fileExists($GlobalJS.toPath(textIconPath.text))) {
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-hdpi/icon.png', true);
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-ldpi/icon.png', true);
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-mdpi/icon.png', true);
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xhdpi/icon.png', true);
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
-                $Frame.sl_fileCopy($GlobalJS.toPath(textIconPath.text), strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
+            if(textIconPath.text && $Frame.sl_fileExists(textIconPath.text)) {
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-hdpi/icon.png', true);
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-ldpi/icon.png', true);
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-mdpi/icon.png', true);
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xhdpi/icon.png', true);
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
+                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
             }
         }
 
@@ -599,7 +530,7 @@ Item {
             const zipFiles = []; //需要解压的文件（后者会覆盖前者的同名文件）
             const needFilesName = ['MakerFrame_Package_Android_*.zip', 'MakerFrame_GameRuntime_Android_*.zip'];
             for(const needFileName of needFilesName) {
-                const zipFile = $Frame.sl_dirList(path, [needFileName], 0x002 | 0x2000 | 0x4000, 0);
+                const zipFile = $Frame.sl_dirList(path, [needFileName], 0x002 | 0x2000 | 0x4000, 0x0);
                 if(!zipFile[0])
                     missingFiles += needFileName + ',';
                 else
@@ -610,12 +541,12 @@ Item {
             const zipFiles = [];
             let zipFile;
 
-            zipFile = $Frame.sl_dirList(path, ['MakerFrame_Package_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            zipFile = $Frame.sl_dirList(path, ['MakerFrame_Package_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
             if(!zipFile[0])
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
             else
                 zipFiles.push(zipFile[0]);
-            zipFile = $Frame.sl_dirList(path, ['MakerFrame_GameRuntime_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0);
+            zipFile = $Frame.sl_dirList(path, ['MakerFrame_GameRuntime_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
             if(!zipFile[0])
                 missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
             else

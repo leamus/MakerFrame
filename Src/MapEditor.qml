@@ -119,6 +119,9 @@ Item {
         ////_private.createCanvasMap(-1);
         _private.createCanvasMap(_private.initMapData([], [-1,-1,-1]));
 
+        objMapEventsData = {};
+        objMapBlockSpecialData = {};
+
 
         _private.loadScript();
     }
@@ -222,7 +225,6 @@ Item {
         //事件、系统事件 和 特殊图块
         objMapEventsData = cfg.MapEventData || {};
         //objSystemEventsData = cfg.SystemEventData || {};
-
         objMapBlockSpecialData = cfg.MapBlockSpecialData || {};
 
 
@@ -245,9 +247,29 @@ Item {
         }
 
 
-        //这里不能立即绘制，等available为true才行
-        //canvasEvent.rePaint();
-        //canvasBlockSpecial.rePaint();
+        //等available为true才能绘制
+
+        if(canvasEvent.available)
+            canvasEvent.rePaint();
+        /*else {
+            function repaint() {
+                canvasEvent.rePaint();
+                canvasEvent.availableChanged.disconnect(repaint());
+            }
+            canvasEvent.availableChanged.connect(repaint());
+        }
+        */
+
+        if(canvasBlockSpecial.available)
+            canvasBlockSpecial.rePaint();
+        /*else {
+            function repaint() {
+                canvasBlockSpecial.rePaint();
+                canvasBlockSpecial.availableChanged.disconnect(repaint());
+            }
+            canvasBlockSpecial.availableChanged.connect(repaint());
+        }
+        */
 
 
 
@@ -261,12 +283,15 @@ Item {
 
 
 
+    property var $eval: /*(loader.item ? loader.item.$eval : null) ?? */(()=>(c)=>eval(c))()
+
+
     //地图 数据
     property var arrMapData: [] //地图数据
-    property var arrMapBlockImageURL: []    //地图块图片URL
+    property var arrMapBlockImageURL: [] //地图块图片URL
 
-    property var objMapBlockSpecialData: ({})   //地图特殊图块数据（{坐标: 数据代码}）
-    property var objMapEventsData: ({}) //地图事件数据（{坐标: 事件名}）
+    property var objMapBlockSpecialData: null //({}) //地图特殊图块数据（{坐标: 数据代码}）
+    property var objMapEventsData: null //({}) //地图事件数据（{坐标: 事件名}）
     //property var objEventsData: ({}) //事件数据（{事件名: 事件代码}）
     //property var objSystemEventsData: ({}) //系统事件数据（{事件名: 事件代码}）
 
@@ -457,6 +482,10 @@ Item {
             }
 
             Button {
+                property string strMapRID
+                property string strRoleRID
+                property var arrPosition
+
                 //Layout.minimumWidth: 60
                 Layout.maximumWidth: implicitWidth
                 //Layout.preferredWidth: implicitWidth
@@ -471,7 +500,37 @@ Item {
                 onClicked: {
                     //loaderTestMap.item.init({Map: _private.strMapRID});
                     //loaderTestMap.show();
-                    hotLoader.reload(Qt.resolvedUrl('mainGameTest.qml'));
+
+                    //hotLoader.reload(Qt.resolvedUrl('mainGameTest.qml'));
+                    $openQML(/*Qt.createComponent*/(Qt.resolvedUrl('mainGameTest.qml')), {
+                        Type: -12, Parent: root, /*Container: arrContainer, */HotLoaderParams: {
+                            //CreateComponent: (...params)=>Qt.createComponent(...params),
+                            //CreateQmlObject: (...params)=>Qt.createQmlObject(...params),
+                            CloseCallback: function() {
+                                root.forceActiveFocus();
+                            },
+                            ReleaseCallback: function(qmlObject) {
+                                strMapRID = qmlObject.textMapRID;
+                                strRoleRID = qmlObject.textRoleRID;
+                                arrPosition = [qmlObject.textMapBlockX, qmlObject.textMapBlockY];
+                            },
+                            ReloadedCallback: function(code, data) {
+                                const qmlObject = data;
+
+                                if(code === 0) {
+                                    qmlObject.init({Map: _private.strMapRID, Role: strRoleRID, Position: arrPosition});
+                                }
+                                else if(code > 0) {
+                                    qmlObject.init({Map: strMapRID, Role: strRoleRID, Position: arrPosition});
+                                    qmlObject.start();
+                                }
+                                else {
+                                }
+
+                                //qmlObject.forceActiveFocus();
+                            },
+                        },
+                    });
                 }
             }
 
@@ -559,7 +618,7 @@ Item {
                 font.pointSize: _private.config.nFontPointSize
                 text: '调试'
                 onClicked: {
-                    dialogRunScript.open();
+                    dialogDebugScript.open();
 
                     //console.debug('canvasMapContainer.nCurrentCanvasMap', canvasMapContainer.nCurrentCanvasMap);
                     //console.debug(arrMapData[canvasMapContainer.nCurrentCanvasMap][0][0]);
@@ -579,8 +638,7 @@ Item {
                     //for(let j in cfg.MapData[k]) {
                     //arrMapData[k] = cfg.MapData[k];
                     */
-                    console.debug('[MapEditor]focus:', root.focus, rootFocusScopeScaled.focus, loaderUserMainProject.focus, $window.focus);
-                    console.debug('[MapEditor]', filedialogOpenMapBlock.folder);
+                    console.debug('[MapEditor]filedialogOpenMapBlock.folder:', filedialogOpenMapBlock.folder);
 
                     console.debug('[MapEditor]imageMapBlock:', itemMapBlockContainer.currentMapBlock.imageMapBlock.source);
 
@@ -1140,7 +1198,7 @@ Item {
                     //图片缓存
                     Image {
                         id: imageMapBlock1
-                        asynchronous: false
+                        //asynchronous: false
 
                         //source: strBlockImagePath
                         visible: false
@@ -1695,8 +1753,10 @@ Item {
 
 
                         onAvailableChanged: {
-                            console.debug('[MapEditor]canvasBlockSpecial available', available);
-                            rePaint();
+                            console.debug('[MapEditor]canvasBlockSpecial onAvailableChanged:', available, objMapBlockSpecialData);
+
+                            if(objMapBlockSpecialData)
+                                rePaint();
                         }
                     }
 
@@ -1767,8 +1827,10 @@ Item {
 
 
                         onAvailableChanged: {
-                            console.debug('[MapEditor]canvasEvent available', available);
-                            rePaint();
+                            console.debug('[MapEditor]canvasEvent onAvailableChanged:', available, objMapEventsData);
+
+                            if(objMapEventsData)
+                                rePaint();
                         }
                     }
 
@@ -1983,7 +2045,7 @@ Item {
                             rectPaste.visible = true;
                             textTips.refresh(bx, by);
 
-                            //$Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
+                            //$showToast('%1,%2'.arg(bx).arg(by));
                             //console.debug(bx, by);
                         }
                         onPositionChanged: {
@@ -2458,7 +2520,7 @@ Item {
                     rectPaste.visible = true;
                     textTips.refresh(bx, by);
 
-                    //$Platform.sl_showToast('%1,%2'.arg(bx).arg(by));
+                    //$showToast('%1,%2'.arg(bx).arg(by));
                 }
 
                 onDoubleClicked: {
@@ -2584,81 +2646,15 @@ Item {
     //导出对话框
     Dialog {
         id: dialogSave
-        title: '请输入名称'
+
+        anchors.centerIn: parent
         width: parent.width * 0.9
         //height: 200
+
+        title: '请输入名称'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
 
-        anchors.centerIn: parent
-
-        onAccepted: {
-            textMapRID.text = textMapRID.text.trim();
-            textMapName.text = textMapName.text.trim();
-            if(textMapRID.text.length === 0 || textMapName.text.length === 0) {
-                //$Platform.sl_showToast('名称不能为空');
-                textDialogMsg.text = '资源ID和名称不能为空';
-                open();
-                return;
-            }
-
-            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
-
-            function fnSave() {
-                if(_private.exportMap(null)) {
-                    //第一次保存，重新刷新
-                    if(_private.strMapRID === '')
-                        _private.loadScript(textMapRID.text);
-
-                    _private.strMapRID = textMapRID.text;
-                    //_private.strMapName = textMapName.text;
-
-                    textDialogMsg.text = '';
-
-                    //root.focus = true;
-                    //root.forceActiveFocus();
-                }
-                else {
-                    open();
-                }
-            }
-
-            if(textMapRID.text !== _private.strMapRID && $Frame.sl_dirExists(path)) {
-                $dialog.show({
-                    Msg: '目标已存在，强行覆盖吗？',
-                    Buttons: Dialog.Yes | Dialog.No,
-                    OnAccepted: function() {
-                        fnSave();
-                    },
-                    OnRejected: ()=>{
-                        textMapRID.text = _private.strMapRID;
-
-                        textDialogMsg.text = '';
-
-
-                        //root.forceActiveFocus();
-                    },
-                    /*OnDiscarded: ()=>{
-                        $dialog.close();
-                        root.forceActiveFocus();
-                    },*/
-                });
-            }
-            else
-                fnSave();
-
-        }
-        onRejected: {
-            textMapRID.text = _private.strMapRID;
-
-            textDialogMsg.text = '';
-
-
-            //root.focus = true;
-            root.forceActiveFocus();
-
-            //console.log('Cancel clicked');
-        }
 
         ColumnLayout {
             width: parent.width
@@ -2730,6 +2726,81 @@ Item {
                 color: 'red'
             }
         }
+
+
+        onAccepted: {
+            textMapRID.text = textMapRID.text.trim();
+            textMapName.text = textMapName.text.trim();
+            if(textMapRID.text.length === 0 || textMapName.text.length === 0) {
+                //$showToast('名称不能为空');
+                textDialogMsg.text = '资源ID和名称不能为空';
+                open();
+                return;
+            }
+
+            function fnSave() {
+                if(_private.exportMap(null)) {
+                    //第一次保存，重新刷新
+                    if(_private.strMapRID === '')
+                        _private.loadScript(textMapRID.text);
+
+                    _private.strMapRID = textMapRID.text;
+                    //_private.strMapName = textMapName.text;
+
+                    textDialogMsg.text = '';
+
+                    //root.focus = true;
+                    //root.forceActiveFocus();
+                }
+                else {
+                    open();
+                }
+            }
+
+            if(textMapRID.text !== _private.strMapRID && $Frame.sl_dirExists($GameMakerGlobal.mapPath(textMapRID.text))) {
+                $dialog.show({
+                    Msg: '目标已存在，强行覆盖吗？',
+                    Buttons: Dialog.Yes | Dialog.No,
+                    OnAccepted: function() {
+                        fnSave();
+                    },
+                    OnRejected: ()=>{
+                        textMapRID.text = _private.strMapRID;
+
+                        textDialogMsg.text = '';
+
+
+                        //root.forceActiveFocus();
+                    },
+                    /*OnDiscarded: ()=>{
+                        $dialog.close();
+                        root.forceActiveFocus();
+                    },*/
+                });
+            }
+            else
+                fnSave();
+        }
+        onRejected: {
+            textMapRID.text = _private.strMapRID;
+
+            textDialogMsg.text = '';
+
+
+            //root.focus = true;
+            root.forceActiveFocus();
+
+            //console.log('Cancel clicked');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
+        }
     }
 
 
@@ -2741,12 +2812,11 @@ Item {
         property int nEventIndex: -1
 
         visible: false
-        title: '请输入事件名'
+        anchors.centerIn: parent
         width: parent.width * 0.9
         //height: parent.height * 0.9
-        anchors.centerIn: parent
 
-
+        title: '请输入事件名'
         modal: true
         //modality: Qt.WindowModal   //Qt.NonModal、Qt.WindowModal、Qt.ApplicationModal
         //standardButtons: Dialog1.StandardButton.Ok | Dialog1.StandardButton.Cancel
@@ -2771,11 +2841,10 @@ Item {
 
 
         onAccepted: {
-
             if(textEventName.text.length === 0) {
                 open();
                 //visible = true;
-                $Platform.sl_showToast('事件名不能为空');
+                $showToast('事件名不能为空');
                 return;
             }
 
@@ -2786,7 +2855,7 @@ Item {
                 if(listmodelEventsData.get(i)['EventName'] === textEventName.text) {
                     open();
                     //visible = true;
-                    $Platform.sl_showToast('事件名不能重复');
+                    $showToast('事件名不能重复');
                     return;
                 }
             }
@@ -2844,6 +2913,15 @@ Item {
             root.forceActiveFocus();
 
             //console.debug('[MapEditor]onRejected');
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }
 
@@ -2997,16 +3075,17 @@ Item {
 
     //测试脚本对话框
     Dialog {
-        id: dialogRunScript
+        id: dialogDebugScript
 
-        title: '执行脚本'
+        visible: false
+        anchors.centerIn: parent
         width: 300
         height: 200
+
+        title: '执行脚本'
         standardButtons: Dialog.Ok | Dialog.Cancel
         modal: true
-        visible: false
 
-        anchors.centerIn: parent
 
         TextArea {
             id: textScript
@@ -3019,6 +3098,7 @@ Item {
             selectByMouse: true
         }
 
+
         onAccepted: {
             console.info(eval(textScript.text));
 
@@ -3030,6 +3110,15 @@ Item {
 
             //root.focus = true;
             root.forceActiveFocus();
+        }
+
+        onAboutToShow: { //也可以放在onClosed里
+            enabled = true;
+            closePolicy = Popup.CloseOnEscape | Popup.CloseOnPressOutside;
+        }
+        onAboutToHide: {
+            enabled = false; //准备隐藏时置enabled为false，否则隐藏动画期间可以多次点击
+            closePolicy = Popup.NoAutoClose; // 上面可以禁用按钮点击（鼠标交互），这里禁用Esc键响应（键盘交互）
         }
     }
 
@@ -3052,7 +3141,7 @@ Item {
         visible: false
 
         source: './mainGameTest.qml'
-        asynchronous: false
+        //asynchronous: false
 
 
         Connections {
@@ -3068,7 +3157,7 @@ Item {
         }
     }
     */
-    HotLoader {
+    /*HotLoader {
         id: hotLoader
 
 
@@ -3123,7 +3212,7 @@ Item {
             qmlObject.forceActiveFocus();
         }
 
-        /*//HotLoader可自动链接 sg_close
+        /* //HotLoader可自动链接 sg_close
         Connections {
             target: hotLoader.qmlObject
             //忽略没有的信号
@@ -3137,8 +3226,9 @@ Item {
                 //root.forceActiveFocus();
             }
         }
-        */
+        * /
     }
+    */
 
 
 
@@ -3266,16 +3356,16 @@ Item {
                 return;
             }
 
-            //let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + mapRID + '/';
+            //let path = $GameMakerGlobal.mapPath(mapRID) + '/';
             //if($Frame.sl_fileExists(path + 'map.js')) {
             //File.read(path + 'map.js');
             scriptEditor.init({
-                BasePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + mapRID + '/',
+                BasePath: $GameMakerGlobal.mapPath(mapRID) + '/',
                 RelativePath: 'map.js',
                 ChoiceButton: 0b11,
                 PathText: 0b11,
                 RunButton: 0b0,
-                //Focus: false,
+                //Focus: true,
             });
             //scriptEditor.editor.forceActiveFocus();
             //scriptEditor.text = $Frame.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
@@ -3357,16 +3447,16 @@ Item {
             if(_private.strRoleRID === '') {
             }*/
 
-            let path = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
+            let path = $GameMakerGlobal.mapPath(textMapRID.text);
             let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0);
         }
         //复制可视化
         function copyVJS() {
             //如果路径不为空，且是另存为，则赋值vjs文件
             if(_private.strMapRID !== '' && textMapRID.text !== '' && _private.strMapRID !== textMapRID.text) {
-                let oldFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + _private.strMapRID + '/map.vjs';
+                let oldFilePath = $GameMakerGlobal.mapPath(_private.strMapRID) + '/map.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
-                    let newFilePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text + '/map.vjs';
+                    let newFilePath = $GameMakerGlobal.mapPath(textMapRID.text) + '/map.vjs';
                     let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
                 }
             }
@@ -3377,7 +3467,7 @@ Item {
             if(textMapRID.text.length === 0 || textMapName.text.length === 0)
                 return false;
 
-            let newPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + $GameMakerGlobal.config.strMapDirName + '/' + textMapRID.text;
+            let newPath = $GameMakerGlobal.mapPath(textMapRID.text);
 
             //if(!$Frame.sl_dirExists(newPath))
                 $Frame.sl_dirCreate(newPath);
