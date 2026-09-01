@@ -174,48 +174,49 @@ Item {
   整个鹰歌软件框架是采用Qt（C++）、QML（JS）Java为主要语言，游戏引擎为纯QML（JS）编写，所以支持JavaScript（ES6标准）语言来编写脚本，不仅支持所有JS内置对象，也有鹰歌框架封装的很多高级对象和功能。
   首先注意的是，脚本的符号全部用的是半角英文符号，不可出现中文或全角的符号（字符串除外），否则会报错。
 
+
 目前支持（已封装）的脚本命令（中括号[]为可选参数）：
 
-
+命令：<font color='yellow'>yield game.loadmap(map, flags=0b10, ...userData)</font>
 功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
 参数：
   map：地图资源名，或对象（属性有RID、$name、$scale）；
   flags：从右到左：是否强制重绘（如果map与已载入的相同，则不重绘）；是否清空所有npc；
-  userData是用户传入数据，后期调用的钩子函数会传入；
-返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），携带值为地图信息；
-示例：yield game.loadmap('地图资源名');
-<font color='yellow'>yield game.loadmap(map, flags=0b10, ...userData)</font>
+  userData：用户传入数据，后期调用的钩子函数会传入；
+返回：Promise对象（异步返回值为地图信息；出错会抛出错误）；
+示例：yield game.loadmap('地图资源名')
 
+命令：<font color='yellow'>[yield] game.msg(msg='', interval=20, pretext='', keeptime=0, style={}, pauseGame=true, callback=true, p=null);</font>
 功能：在屏幕中间显示提示信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：msg为提示文字，支持HTML标签；
   interval为文字显示间隔，为0则不使用；
   pretext为预显示的文字；
   keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
-  style为样式；
-    如果为数字，则含义为Type，表示自适应宽高（0b1为宽，0b10为高），否则固定大小；
-    如果为对象，则可以修改BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Type；
-      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间；
+  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、MinWidth、MaxWidth、MinHeight、MaxHeight属性；
   pauseGame为显示时是否暂停游戏（游戏主循环暂停，并暂停产生游戏事件）；值为true、false或字符串。如果为true或字符串则游戏会暂停（字符串表示暂停值，不同的暂停值互不影响，只要有暂停值游戏就会暂停；true表示给个随机暂停值）；
-  callback是结束时回调函数，如果为非函数则表示让系统自动处理（销毁组件并继续游戏）；
-    如果是自定义函数，参数为cb, ...params，cb表示系统处理（销毁组件并继续游戏），请在合适的地方调用 cb(...params)；
-返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-示例：yield game.msg('你好，鹰歌');
-<font color='yellow'>[yield] game.msg(msg='', interval=20, pretext='', keeptime=0, style={Type: 0b10}, pauseGame=true, callback=true);</font>
+  callback是结束时回调函数，如果为非函数则表示让系统默认处理（销毁组件并继续游戏）；
+    如果是自定义函数，参数为cb, ...params，cb表示系统默认处理（销毁组件并继续游戏），请在合适的地方调用 cb(...params)；
+      params为code, rootGameMsgDialog；
+  p为父组件，默认挂在系统提供的组件上（itemGameMsgs）；
+返回：Promise对象（异步返回值为回调函数的第一个参数；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+示例：yield game.msg('你好，鹰歌')
 
+命令：<font color='yellow'>[yield] game.talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null);</font>
 功能：在屏幕下方显示对话信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：role为角色名或角色对象（会显示名字和头像），可以为null（不显示名字和头像）；
   msg同命令msg的参数；
   interval同命令msg的参数；
   pretext同命令msg的参数；
   keeptime同命令msg的参数；
-  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、Name、Avatar；
-    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、自适应类型、持续时间、是否显示名字、是否显示头像；
+  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、MinWidth、MaxWidth、MinHeight、MaxHeight、Name、Avatar；
+    分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、最小/大高度（为小数则百分比）、是否显示名字、是否显示头像；
   pauseGame同命令msg的参数；
-  callback同命令msg的参数；
+  callback同命令msg的参数；回调函数的params为code, rootRoleMsg；
+  p为父组件，默认挂在系统提供的组件上（itemRoleMsgs）；
 返回：同命令msg的返回值；
-示例：yield game.talk('你好，鹰歌')；
-<font color='yellow'>[yield] game.talk(role=null, msg='', interval=20, pretext='', keeptime=0, style={}, pauseGame=true, callback=true);</font>
+示例：yield game.talk('你好，鹰歌')
 
+命令：<font color='yellow'>game.say(role, msg, interval=60, pretext='', keeptime=1000, style={});</font>
 功能：角色头顶显示文字信息。
 参数：role为角色名或角色对象；
   msg同命令msg的参数；
@@ -225,129 +226,130 @@ Item {
   style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor；
     分别表示 背景色、边框色、字体颜色、字体大小；
 返回：角色组件对象；
-示例：game.say('角色名', '你好')；
-<font color='yellow'>game.say(role, msg, interval=60, pretext='', keeptime=1000, style={});</font>
+示例：game.say('角色名', '你好')
 
+命令：<font color='yellow'>yield game.menu(title='', items=[], style={}, pauseGame=true, callback=true, p=null);</font>
 功能：显示一个菜单；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：title为显示文字；
   items为选项数组；
   style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
   pauseGame同命令msg的参数；
-  callback同命令msg的参数；
+  callback同命令msg的参数；回调函数的params为index, rootGameMenu；
+  p为父组件，默认挂在系统提供的组件上（itemGameMenus）；
 返回：Promise对象（完全运行完毕后状态改变；携带值为选择的下标，0起始；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])；
-<font color='yellow'>yield game.menu(title='', items=[], style={}, pauseGame=true, callback=true);</font>
+示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])
 
+命令：<font color='yellow'>yield game.input(title='', pretext='', style={}, pauseGame=true, callback=true, p=null);</font>
 功能：显示一个输入框；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
 参数：title为显示文字；
   pretext为预设文字；
   style为自定义样式；
   pauseGame同msg的参数；
-  callback同msg的参数；
+  callback同命令msg的参数；回调函数的params为text, rootGameInput；
+  p为父组件，默认挂在系统提供的组件上（itemGameInputs）；
 返回：Promise对象（完全运行完毕后状态改变；携带值为输入的字符串；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-示例：let inputText = yield game.input('标题')；
-<font color='yellow'>yield game.input(title='', pretext='', style={}, pauseGame=true, callback=true);</font>
+示例：let inputText = yield game.input('标题')
 
 
 
+命令：<font color='yellow'>game.createhero(role={});</font>
 功能：创建地图主角。
 参数：
   role为 角色资源名 或 标准创建格式的对象。
-    参数对象属性：$id、$name、$showName、$scale、$speed、$penetrate、$realSize、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto；
+    参数对象属性：$id、$name、$showName、$scale、$speed、$penetrate、$realSize、$avatar、$avatarSize、$x、$y、$bx、$by、$direction、$frame、$action、$targetBx、$targetBy、$targetX、$targetY、$targetBlocks、$targetPositions、$targetBlockAuto；
     RID为要创建的角色资源名；
     $id为角色对象id（默认为$name值），id存在则会复用组件；$name为游戏显示名（默认为RID值）；
     $showName为是否头顶显示名字；$scale为缩放倍率数组（横竖坐标轴方向）；$speed为移动速度；$penetrate为是否可穿透；$realSize为影子大小；$avatar为头像文件名；$avatarSize为头像大小；这几个属性会替换已设置好的角色资源的属性；
-    $x、$y是像素坐标；$bx、$by是地图块坐标（像素坐标和块坐标设置二选一）；
+    $x、$y是像素坐标；$bx、$by是地图块坐标（像素坐标和块坐标设置二选一）；此种坐标设置自动会将角色阴影的中心点放在对应坐标上；
     $direction表示面向方向（0、1、2、3分别表示上右下左）；
+    $frame表示第几帧（0起始）；
     $action：
       为0表示暂时静止；为1表示随机移动；为-1表示禁止移动和操作；
       为2表示定向移动；此时（用其中一个即可）：
-        $targetBx、$targetBy为定向的地图块坐标
+        $targetBx、$targetBy为定向的地图块坐标；
         $targetX、$targetY为定向的像素坐标；
-        $targetBlocks为定向的地图块坐标数组;
-        $targetPositions为定向的像素坐标数组;
+        $targetBlocks为定向的地图块坐标数组；
+        $targetPositions为定向的像素坐标数组；
         $targetBlockAuto为定向的地图块自动寻路坐标数组；
     $start表示角色是否自动动作（true或false)；
-返回：成功为组件对象，失败为false。
-示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性});
-  let h = game.createhero('角色资源名');   //全部使用默认属性；
-<font color='yellow'>game.createhero(role={});</font>
+返回：成功为组件对象，失败为false；
+示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性})
+  let h = game.createhero('角色资源名');   //全部使用默认属性
 
-
+命令：<font color='yellow'>game.hero(hero=-1, props={});</font>
 功能：返回/修改 地图主角组件对象。
 参数：hero可以是下标，或字符串（主角的$id），或主角组件对象，-1表示返回所有主角组件对象数组；
   props：hero不是-1时，为修改单个主角的属性，同 createhero 的第二个参数对象；
 返回：经过props修改的 主角 或 所有主角的列表；如果没有则返回null；出错返回false；
-示例：let h = game.hero('主角名');
-  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
-<font color='yellow'>game.hero(hero=-1, props={});</font>
+示例：let h = game.hero('主角名')
+  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})
 
+命令：<font color='yellow'>game.delhero(hero=-1)</font>
 功能：删除地图主角；
 参数：hero可以是下标，或主角的$id，或主角组件对象，-1表示所有主角；
 返回：删除成功返回true；没有或错误返回false；
-示例：game.delhero('地图主角名');
-<font color='yellow'>game.delhero(hero=-1)</font>
+示例：game.delhero('地图主角名')
 
-功能：将主角移动到地图 bx、by 位置。
+命令：<font color='yellow'>game.movehero(bx, by, index=0)</font>
+功能：将主角index移动到地图 bx、by 位置。
 参数：bx、by为目标地图块；如果超出地图，则自动调整；
-示例：game.movehero(6,6);
-<font color='yellow'>game.movehero(bx, by)</font>
+示例：game.movehero(6,6)
 
 
+命令：<font color='yellow'>game.createrole(role={});</font>
 功能：创建地图NPC。
 参数：role为 角色资源名 或 标准创建格式的对象（RID为角色资源名）；
   参数对象属性：同createhero参数；
 成功为组件对象，失败为false。
-<font color='yellow'>game.createrole(role={});</font>
 
+命令：<font color='yellow'>game.role(role=-1, props={});</font>
 功能：返回/修改 地图NPC组件对象。
 参数：role可以是字符串（NPC的$id），或NPC组件对象，-1表示返回所有NPC组件对象数组；
   props：role不是-1时，为修改单个NPC的属性，同 createhero 的第二个参数对象；
 返回：经过props修改的 NPC 或 所有NPC的列表；如果没有则返回null；出错返回false；
-示例：let h = game.role('NPC的$id');
-  let h = game.role('NPC的$id', {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
-<font color='yellow'>game.role(role, props={});</font>
+示例：let h = game.role('NPC的$id')
+  let h = game.role('NPC的$id', {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})
 
+命令：<font color='yellow'>game.delrole(role=-1);</font>
 功能：删除地图NPC；
 参数：role可以是NPC的$id，或NPC组件对象，-1表示当前地图所有NPC；
 返回：删除成功返回true；没有或错误返回false；
-示例：game.delhero('地图NPC的$id');
-<font color='yellow'>game.delrole(role=-1);</font>
+示例：game.delhero('地图NPC的$id')
 
+命令：<font color='yellow'>game.moverole(role, bx, by)</font>
 功能：将NPC移动到地图 bx、by 位置。
 参数：bx、by为目标地图块；如果超出地图，则自动调整；
-示例：game.moverole('NPC的$id',6,6);
-<font color='yellow'>game.moverole(role, bx, by)</font>
+示例：game.moverole('NPC的$id',6,6)
 
+命令：<font color='yellow'>game.rolepos(role, pos=null);</font>
 功能：返回角色的各种坐标，或判断是否在某个地图块坐标上；
 参数：
   role为角色组件（可用hero和role命令返回的组件）；
     如果为数字或空，则是主角；如果是字符串表示$id，会在 主角和NPC 中查找；
   pos为[bx,by]，返回角色是否在这个地图块坐标上；如果为空则表示返回角色中心所在各种坐标；
-返回：如果是判断，返回true或false；如果返回是坐标，则包括x、y（实际坐标）、bx、by（地图块坐标）、cx、cy（中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
-<font color='yellow'>game.rolepos(role, pos=null);</font>
+返回：如果是判断，返回true或false；如果返回是坐标，则包括bx、by（地图块坐标）、cx、cy（或x、y，中心坐标）、rx1、ry2、rx2、ry2（影子的左上和右下坐标）、sx、sy（视窗中的坐标）；出错返回false；
 
 
+命令：<font color='yellow'>game.createfighthero(fightrole);</font>
 功能：创建一个战斗主角，并放入我方战斗队伍。
 参数：fightrole为战斗主角资源名 或 标准创建格式的参数对象（具有RID、Params和其他属性）。
 返回：战斗主角对象。
-示例：game.createfighthero('战斗角色1'); game.createfighthero({RID: '战斗角色2', Params: {级别: 6}, $name: '鹰战士'});
-<font color='yellow'>game.createfighthero(fightrole);</font>
+示例：game.createfighthero('战斗角色1'); game.createfighthero({RID: '战斗角色2', Params: {级别: 6}, $name: '鹰战士'})
 
+命令：<font color='yellow'>game.delfighthero(fighthero)</font>
 功能：删除我方战斗队伍中的一个战斗主角。
 参数：fighthero为下标，或战斗角色的$name，或战斗角色对象，或-1（删除所有战斗主角）。
 返回：成功返回true；错误或没找到返回false。
-示例：game.delfighthero(0); game.delfighthero('鹰战士');
-<font color='yellow'>game.delfighthero(fighthero)</font>
+示例：game.delfighthero(0); game.delfighthero('鹰战士')
 
+命令：<font color='yellow'>game.fighthero(fighthero=-1, type=0)</font>
 功能：返回我方战斗队伍中的战斗主角；
-参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或-1（返回所有战斗主角）；
+参数：fighthero为下标，或战斗角色$id，或战斗角色对象，或-1（返回所有战斗主角）；
   type为0表示返回 对象，为1表示只返回名字（可用作选择组件）；
 返回：战斗角色对象、名字字符串或数组；false表示没找到或出错；
-示例：let h = game.fighthero('鹰战士');
-  let h = game.fighthero(0);
-  let arrNames = game.fighthero(-1, 1);
-<font color='yellow'>game.fighthero(fighthero=-1, type=1)</font>
+示例：let h = game.fighthero('鹰战士')
+  let h = game.fighthero(0)
+  let arrNames = game.fighthero(-1, 1)
 
 //获得技能；
 //fighthero为下标，或战斗角色的name，或战斗角色对象；
@@ -355,9 +357,9 @@ Item {
 //skillIndex为替换到第几个（如果为-1或大于已有技能数，则追加）；
 //copyedNewProps是 从skills复制的创建的新技能的属性（如果skills为技能对象，会复制一个新技能，然后再复制copyedNewProps属性）；
 //成功返回true。
-<font color='yellow'>game.getskill(fighthero, skill, skillIndex=-1, copyedNewProps={})</font>：
-<font color='yellow'>game.removeskill(fighthero, skill=-1, filters={})</font>：移除技能；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回skill对象的数组；失败返回false。
-<font color='yellow'>game.skill(fighthero, skill=-1, type=-1)</font>：返回技能信息；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回 技能数组。
+命令：<font color='yellow'>game.getskill(fighthero, skill, skillIndex=-1, copyedNewProps={})</font>：
+命令：<font color='yellow'>game.removeskill(fighthero, skill=-1, filters={})</font>：移除技能；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回skill对象的数组；失败返回false。
+命令：<font color='yellow'>game.skill(fighthero, skill=-1, type=-1)</font>：返回技能信息；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回 技能数组。
 
 //战斗角色修改属性；
 //  fighthero为下标，或战斗角色的name，或战斗角色对象；

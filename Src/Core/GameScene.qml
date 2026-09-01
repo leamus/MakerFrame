@@ -642,8 +642,8 @@ Item {
         //  map：地图资源名，或对象（属性有RID、$name、$scale）；
         //  flags：从右到左：是否强制重绘（如果map与已载入的相同，则不重绘）；是否清空所有npc；
         //  userData：用户传入数据，后期调用的钩子函数会传入；
-        //返回：Promise对象（完全运行完毕后状态改变；携带值为地图信息；出错会抛出错误）；
-        //示例：yield game.loadmap('地图资源名')；
+        //返回：Promise对象（异步返回值为地图信息；出错会抛出错误）；
+        //示例：yield game.loadmap('地图资源名')
         function loadmap(map, flags=0b10, ...userData) {
             if(flags === true) //兼容旧代码forceRepaint
                 flags = 0b11;
@@ -670,7 +670,7 @@ Item {
                     if(!map || !map.$rid) {
                         //scriptQueue.runNextEventLoop('loadmap');
                         console.exception('[!GameScene]loadmap FAIL:', map.$rid);
-                        return reject('loadmap FAIL');
+                        return reject('loadmap FAIL:', map.$rid);
                     }
 
 
@@ -791,7 +791,7 @@ Item {
         //  interval为文字显示间隔，为0则不使用；
         //  pretext为预显示的文字；
         //  keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
-        //  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、MinWidth、MaxWidth、MinHeight、MaxHeight；
+        //  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor、MaskColor、MinWidth、MaxWidth、MinHeight、MaxHeight属性；
         //      分别表示 背景色、边框色、字体颜色、字体大小、遮盖色、最小/大宽度、最小/大高度（为小数则百分比）；
         //  pauseGame为显示时是否暂停游戏（游戏主循环暂停，并暂停产生游戏事件）；值为true、false或字符串。如果为true或字符串则游戏会暂停（字符串表示暂停值，不同的暂停值互不影响，只要有暂停值游戏就会暂停；true表示给个随机暂停值）；
         //  callback是结束时回调函数，如果为非函数则表示让系统默认处理（销毁组件并继续游戏）；
@@ -799,8 +799,8 @@ Item {
         //      params为code, rootGameMsgDialog；
         ////  buttonNum为按钮数量（0-2，目前没用）；
         //  p为父组件，默认挂在系统提供的组件上（itemGameMsgs）；
-        //返回：Promise对象（完全运行完毕后状态改变；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-        //示例：yield game.msg('你好，鹰歌')；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //示例：yield game.msg('你好，鹰歌')
         function msg(msg='', interval=20, pretext='', keeptime=0, style={}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
 
             const itemGameMsg = compGameMsg.createObject(p || itemGameMsgs, {nIndex: itemGameMsgs.nIndex});
@@ -874,7 +874,7 @@ Item {
         //  callback同命令msg的参数；回调函数的params为code, rootRoleMsg；
         //  p为父组件，默认挂在系统提供的组件上（itemRoleMsgs）；
         //返回：同命令msg的返回值；
-        //示例：yield game.talk('你好，鹰歌')；
+        //示例：yield game.talk('你好，鹰歌')
         function talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, pauseGame=true, callback=true, p=null) {
 
             const itemRoleMsg = compRoleMsg.createObject(p || itemRoleMsgs, {nIndex: itemRoleMsgs.nIndex});
@@ -931,7 +931,7 @@ Item {
         //  style为样式，包括BackgroundColor、BorderColor、FontSize、FontColor；
         //    分别表示 背景色、边框色、字体颜色、字体大小；
         //返回：角色组件对象；
-        //示例：game.say('角色名', '你好')；
+        //示例：game.say('角色名', '你好')
         function say(role, msg, interval=60, pretext='', keeptime=1000, style={}) {
             if(!role)
                 return false;
@@ -988,7 +988,7 @@ Item {
         //  callback同命令msg的参数；回调函数的params为index, rootGameMenu；
         //  p为父组件，默认挂在系统提供的组件上（itemGameMenus）；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为选择的下标，0起始；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-        //示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])；
+        //示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])
         function menu(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
 
             const itemMenu = compGameMenu.createObject(p || itemGameMenus, {nIndex: itemGameMenus.nIndex});
@@ -1049,7 +1049,7 @@ Item {
         //  callback同命令msg的参数；回调函数的params为text, rootGameInput；
         //  p为父组件，默认挂在系统提供的组件上（itemGameInputs）；
         //返回：Promise对象（完全运行完毕后状态改变；携带值为输入的字符串；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
-        //示例：let inputText = yield game.input('标题')；
+        //示例：let inputText = yield game.input('标题')
         function input(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
 
             const itemGameInput = compGameInput.createObject(p || itemGameInputs, {nIndex: itemGameInputs.nIndex});
@@ -1111,15 +1111,15 @@ Item {
         //    $action：
         //      为0表示暂时静止；为1表示随机移动；为-1表示禁止移动和操作；
         //      为2表示定向移动；此时（用其中一个即可）：
-        //        $targetBx、$targetBy为定向的地图块坐标
+        //        $targetBx、$targetBy为定向的地图块坐标；
         //        $targetX、$targetY为定向的像素坐标；
         //        $targetBlocks为定向的地图块坐标数组；
         //        $targetPositions为定向的像素坐标数组；
         //        $targetBlockAuto为定向的地图块自动寻路坐标数组；
         //    $start表示角色是否自动动作（true或false)；
         //返回：成功为组件对象，失败为false；
-        //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性})；
-        //  let h = game.createhero('角色资源名');   //全部使用默认属性；
+        //示例：let h = game.createhero({RID: '角色资源名', 。。。其他属性})
+        //  let h = game.createhero('角色资源名');   //全部使用默认属性
         function createhero(role={}) {
             if($CommonLibJS.isString(role)) {
                 role = {RID: role, $id: role};
@@ -1228,8 +1228,8 @@ Item {
         //参数：hero可以是下标，或字符串（主角的$id），或主角组件对象，-1表示返回所有主角组件对象数组；
         //  props：hero不是-1时，为修改单个主角的属性，同 createhero 的第二个参数对象；
         //返回：经过props修改的 主角 或 所有主角的列表；如果没有则返回null；出错返回false；
-        //示例：let h = game.hero('主角名')；
-        //  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})；
+        //示例：let h = game.hero('主角名')
+        //  let h = game.hero(0, {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})
         function hero(hero=-1, props={}) {
             if(hero === -1)
                 return _private.arrMainRoles;
@@ -1430,7 +1430,7 @@ Item {
         //功能：删除地图主角；
         //参数：hero可以是下标，或主角的$id，或主角组件对象，-1表示所有主角；
         //返回：删除成功返回true；没有或错误返回false；
-        //示例：game.delhero('地图主角名');
+        //示例：game.delhero('地图主角名')
         function delhero(hero=-1) {
 
             const tmpDelHero = function(mainRole) {
@@ -1540,14 +1540,16 @@ Item {
             return true;
         }
 
-        //功能：将主角移动到地图 bx、by 位置。
+        //功能：将主角index移动到地图 bx、by 位置。
         //参数：bx、by为目标地图块；如果超出地图，则自动调整；
-        //示例：game.movehero(6,6);
-        function movehero(...args) {
-            if(args.length === 3)
+        //示例：game.movehero(6,6)
+        function movehero(bx, by, index=0) {
+            /*if(args.length === 3)
                 setMainRolePos(args[1], args[2], args[0]);
             else if(args.length === 2)
                 setMainRolePos(args[0], args[1]);
+            */
+            return setMainRolePos(bx, by, index);
         }
 
         /*readonly property var movehero: function(bx, by, index=0) {
@@ -1636,8 +1638,8 @@ Item {
         //参数：role可以是字符串（NPC的$id），或NPC组件对象，-1表示返回所有NPC组件对象数组；
         //  props：role不是-1时，为修改单个NPC的属性，同 createhero 的第二个参数对象；
         //返回：经过props修改的 NPC 或 所有NPC的列表；如果没有则返回null；出错返回false；
-        //示例：let h = game.role('NPC的$id');
-        //  let h = game.role('NPC的$id', {$bx: 10, $by: 10, $showName: 0, 。。。其他属性});
+        //示例：let h = game.role('NPC的$id')
+        //  let h = game.role('NPC的$id', {$bx: 10, $by: 10, $showName: 0, 。。。其他属性})
         function role(role=-1, props={}) {
             if(role === -1/* || role === undefined || role === null*/)
                 return _private.objRoles;
@@ -1826,7 +1828,7 @@ Item {
         //功能：删除地图NPC；
         //参数：role可以是NPC的$id，或NPC组件对象，-1表示当前地图所有NPC；
         //返回：删除成功返回true；没有或错误返回false；
-        //示例：game.delhero('地图NPC的$id');
+        //示例：game.delhero('地图NPC的$id')
         function delrole(role=-1) {
             if(role === -1) {
                 for(let r in _private.objRoles) {
@@ -1874,7 +1876,7 @@ Item {
 
         //功能：将NPC移动到地图 bx、by 位置。
         //参数：bx、by为目标地图块；如果超出地图，则自动调整；
-        //示例：game.moverole('NPC的$id',6,6);
+        //示例：game.moverole('NPC的$id',6,6)
         function moverole(role, bx, by) {
 
             if($CommonLibJS.isNumber(role))
@@ -2016,7 +2018,7 @@ Item {
         //功能：创建一个战斗主角，并放入我方战斗队伍。
         //参数：fightrole为战斗主角资源名 或 标准创建格式的参数对象（具有RID、Params和其他属性）。
         //返回：战斗主角对象。
-        //示例：game.createfighthero('战斗角色1'); game.createfighthero({RID: '战斗角色2', Params: {级别: 6}, $name: '鹰战士'});
+        //示例：game.createfighthero('战斗角色1'); game.createfighthero({RID: '战斗角色2', Params: {级别: 6}, $name: '鹰战士'})
         function createfighthero(fightrole) {
             if(game.gd['$sys_fight_heros'] === undefined)
                 game.gd['$sys_fight_heros'] = [];
@@ -2036,7 +2038,7 @@ Item {
         //功能：删除我方战斗队伍中的一个战斗主角。
         //参数：fighthero为下标，或战斗角色的$name，或战斗角色对象，或-1（删除所有战斗主角）。
         //返回：成功返回true；错误或没找到返回false。
-        //示例：game.delfighthero(0); game.delfighthero('鹰战士');
+        //示例：game.delfighthero(0); game.delfighthero('鹰战士')
         function delfighthero(fighthero) {
 
             if(fighthero === -1) {
@@ -2081,10 +2083,10 @@ Item {
         //参数：fighthero为下标，或战斗角色$id，或战斗角色对象，或-1（返回所有战斗主角）；
         //  type为0表示返回 对象，为1表示只返回名字（可用作选择组件）；
         //返回：战斗角色对象、名字字符串或数组；false表示没找到或出错；
-        //示例：let h = game.fighthero('鹰战士');
-        //  let h = game.fighthero(0);
-        //  let arrNames = game.fighthero(-1, 1);
-        readonly property var fighthero: function(fighthero=-1, type=0) {
+        //示例：let h = game.fighthero('鹰战士')
+        //  let h = game.fighthero(0)
+        //  let arrNames = game.fighthero(-1, 1)
+        function fighthero(fighthero=-1, type=0) {
             if(game.gd['$sys_fight_heros'] === undefined || game.gd['$sys_fight_heros'] === null)
                 return false;
 
