@@ -2141,13 +2141,14 @@ Item {
 
         }
 
-        //获得技能；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
-        //skillIndex为替换到第几个（如果为-1或大于已有技能数，则追加）；
-        //copyedNewProps是 从skills复制的创建的新技能的属性（skills为技能对象才有效，复制一个新技能同时再复制copyedNewProps属性）；
-        //成功返回true；
-        readonly property var getskill: function(fighthero, skill, skillIndex=-1, copyedNewProps={}) {
+        //功能：获得技能；
+        //参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
+        //  skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
+        //  skillIndex为插入到第几个（如果为-1或大于已有技能数，则追加到末尾）；
+        //  copyedNewProps是 从skills复制的创建的新技能的属性（skills为技能对象才有效，复制一个新技能同时再复制copyedNewProps属性）；
+        //返回：成功返回true；
+        //示例：let skill = game.getskill('鹰战士', '新技能')
+        function getskill(fighthero, skill, skillIndex=-1, copyedNewProps={}) {
             if(skillIndex === undefined || skillIndex === null)
                 skillIndex = -1;
 
@@ -2171,17 +2172,18 @@ Item {
                 fighthero.$skills.push(skill);
             else
                 //fighthero.$skills[skillIndex].$rid = skillRID;
-                fighthero.$skills.splice(skillIndex, 0, skill);   //插入
+                fighthero.$skills.splice(skillIndex, 0, skill); //插入
 
             return true;
         }
 
-        //移除技能；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //skill：技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；
-        //filters：技能条件筛选；
-        //成功返回skill对象的数组；失败返回false；
-        readonly property var removeskill: function(fighthero, skill=-1, filters={}) {
+        //功能：移除技能；
+        //参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
+        //  skill技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；
+        //  filters：技能条件筛选对象（key-value）；
+        //返回：成功返回skill对象的数组；失败返回false；
+        //示例：let skill = game.removeskill('鹰战士', '新技能')
+        function removeskill(fighthero, skill=-1, filters={}) {
             if(skill === undefined || skill === null)
                 skill = -1;
             //if(skillIndex >= objFightRoles.$skills.length || fightheroIndex < 0)
@@ -2252,12 +2254,13 @@ Item {
         }
 
 
-        //返回技能信息；
-        //fighthero为下标，或战斗角色的$id，或战斗角色对象；
-        //skill：技能下标（-1为所有 并符合filters 的 技能），或 技能$id（并符合filters 的 技能）；
-        //filters：技能条件筛选；
-        //成功返回 技能数组；
-        readonly property var skill: function(fighthero, skill=-1, filters={}) {
+        //功能：返回技能信息；
+        //参数：fighthero为下标，或战斗角色的$id，或战斗角色对象；
+        //  skill技能下标（-1为所有 并符合filters 的 技能），或 技能$id（并符合filters 的 技能）；
+        //  filters：技能条件筛选的对象（key-value）；
+        //返回：成功返回 技能数组，失败返回false或null；
+        //示例：let skill = game.skill('鹰战士', '新技能1')
+        function skill(fighthero, skill=-1, filters={}) {
             if(skill === undefined || skill === null)
                 skill = -1;
             //if(type === undefined || type === null)
@@ -2325,15 +2328,15 @@ Item {
         }
 
 
-        //战斗角色修改属性；
-        //  fighthero为下标，或战斗角色的name，或战斗角色对象；
+        //功能：战斗角色修改属性；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
         //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
         //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
         //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
         //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
         //  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
-        //  成功返回战斗角色对象；失败返回false；
-        readonly property var addprops: function(fighthero, props={}, type=[1,1], flags=0b11) {
+        //返回：成功返回战斗角色对象；失败返回false；
+        function addprops(fighthero, props={}, type=[1,1], flags=0b11) {
             if(fighthero >= 0 || $CommonLibJS.isString(fighthero) || $CommonLibJS.isObject(fighthero))
                 fighthero = game.fighthero(fighthero);
             else
@@ -2387,11 +2390,11 @@ Item {
             return fighthero;
         }
 
-        //从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误。
-        //goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
+        //功能：从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误；
+        //参数：goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
         //  如果为 下标，则直接加减；如果为 字符串（默认1个数量）、对象（数量要提供），则获取道具对象后，从这个对象中转移；
-        //count为>0表示转移个数，为0表示返回数量；<0（或非数字）表示将goods的$count全部转移（默认）。
-        readonly property var getgoods: function(goods, count) {
+        //返回：count为>0表示转移个数，为0表示返回数量；<0（或非数字）表示将goods的$count全部转移（默认）；
+        function getgoods(goods, count) {
             if(!$CommonLibJS.isNumber(count))
                 count = $CommonLibJS.shortCircuit(0b1, $CommonLibJS.getObjectValue(goods, '$count'), -1);
 
@@ -2481,12 +2484,12 @@ Item {
             return goods.$count;
         }
 
-        //背包内 减去count个道具，返回背包中 改变后 道具个数；
-        //goods可以为 道具资源名、道具对象 和 下标；
-        //count为个数，如果为true则表示道具的所有；
-        //如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
-        //返回 false 表示错误；
-        readonly property var removegoods: function(goods, count=1) {
+        //功能：背包内 减去 count 个 goods 道具；
+        //参数：goods可以为 道具资源名、道具对象 和 下标；
+        //  count为个数，如果为true则表示道具的所有数量；
+        //  如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
+        //返回：返回背包中 改变后 道具个数，返回 false 表示错误；
+        function removegoods(goods, count=1) {
             if(!$CommonLibJS.isValidNumber(count) || count < 0)   //如果直接是数字
                 return false;
 
@@ -2577,13 +2580,13 @@ Item {
             //return -tCount;
         }
 
-        //获得背包中某项道具信息；
+        //功能：获得背包中 goods 道具的信息；
         //参数：
         //  goodsFilter为-1表示返回所有道具的数组；
         //  goodsFilter为数字（下标），则返回单个道具信息的数组；
         //  goodsFilter为字符串（道具$id），返回所有符合道具信息的数组；
         //  goodsFilter为对象：1、如果是道具对象，则查找是否在背包中，2、如果是普通对象，则goodsFilter为过滤条件（可判断$rid、$id、$name等所有道具属性）；
-        //返回格式：道具数组、null（不存在）或false（错误）；
+        //返回：道具数组、null（不存在）或false（错误）；
         function goods(goodsFilter=-1) {
             if(goodsFilter === -1)
                 return game.gd['$sys_goods'];
@@ -2632,12 +2635,12 @@ Item {
             return ret;
         }
 
-        //使用道具（会执行道具$useScript）；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
-        //goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
-        //params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+        //功能：使用道具（会执行道具脚本的$useScript函数）；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
+        //  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
+        //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
         //返回：脚本的返回值（为受影响的 战斗角色数组）；false表示错误；null表示脚本不存在；
-        //示例：yield usegoods(0, '道具');
+        //示例：yield usegoods(0, '道具')
         function usegoods(fighthero, goods, params=1) {
             //let _resolve, _reject;
 
@@ -2763,12 +2766,12 @@ Item {
             return ret;
         }
 
-        //装备道具（会执行道具的$equipScript）；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
-        //goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
-        //params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+        //功能：装备道具（会执行道具脚本的$equipScript函数）；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
+        //  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
+        //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
         //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
-        //示例：yield equip(0, '道具');
+        //示例：yield equip(0, '道具')
         function equip(fighthero, goods, params=1) {
             //let _resolve, _reject;
 
@@ -2882,12 +2885,12 @@ Item {
             return ret;
         }
 
-        //卸下某装备（所有个数）；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //positionName为部位名称；
-        //params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+        //功能：卸下某装备（所有的数量；会执行道具脚本的$unloadScript函数）；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+        //  positionName为部位名称；
+        //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
         //返回：脚本的返回值（默认为旧装备或undefined）；false表示错误；null表示脚本不存在；
-        //示例：yield unload(0, '部位');
+        //示例：yield unload(0, '部位')
         function unload(fighthero, positionName, params=-1) {
             //let _resolve, _reject;
 
@@ -2949,10 +2952,11 @@ Item {
             return ret;
         }
 
-        //返回某 fighthero 的 positionName 部位的 装备；如果positionName为null，则返回所有装备的数组；
-        //fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //返回格式：全部装备的数组 或 某一个位置的装备；错误返回false。
-        readonly property var equipment: function(fighthero, positionName=null) {
+        //功能：返回 fighthero 的 positionName 部位装备的 道具；如果positionName为null，则返回所有装备道具的数组；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+        //  positionName为部位名称；
+        //返回：全部装备的数组 或 某一个位置的装备；错误返回false；
+        function equipment(fighthero, positionName=null) {
             if(fighthero >= 0 || $CommonLibJS.isString(fighthero) || $CommonLibJS.isObject(fighthero))
                 fighthero = game.fighthero(fighthero);
             else
@@ -2981,13 +2985,12 @@ Item {
             return fighthero.$equipment[positionName];
         }
 
-        //进入交易界面；
-        //goods为买的物品rid列表；
-        //mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
-        //callback为交易结束后的脚本。
-        //callback同命令msg的参数；回调函数的params为dialogTrade；
-        //pauseGame同msg的参数；
-        readonly property var trade: function(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
+        //功能：进入交易界面；
+        //参数：goods为购买交易的道具RID列表；
+        //  mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
+        //  pauseGame同msg的参数；
+        //  callback为交易结束后的脚本。参数同命令msg的参数；回调函数的params为dialogTrade；
+        function trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
             let ret = dialogTrade;
 
@@ -3028,8 +3031,10 @@ Item {
             //return yield ret;
         }
 
-        //获得金钱；返回金钱数目；
-        readonly property var money: function(m) {
+        //功能：获得金钱；
+        //参数：m为增加的钱数；
+        //返回：目前金钱数；
+        function money(m) {
             if(!game.gd['$sys_money']) {
                 game.gd['$sys_money'] = 0;
             }
@@ -3039,14 +3044,15 @@ Item {
         }
 
 
-        //创建定时器；
-        //timerName：定时器名称；
-        //interval：定时器间隔；times：触发次数（-1为无限）；
-        //flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列（scriptQueue）里运行（否则在game.async）；
-        //params：为自定义参数（回调时传入）；
-        //  回调函数参数：realinterval, ...params，this为[interval, times, flags, interval, params]；
-        //成功返回true；如果已经有定时器则返回false；
-        readonly property var addtimer: function(timerName, interval, times=1, flags=0b10, ...params) {
+        //功能：创建定时器；
+        //参数：timerName：定时器名称；
+        //  interval：定时器间隔；
+        //  times：触发次数（-1为无限）；
+        //  flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列（scriptQueue）里运行（否则在game.async）；
+        //  params：为自定义参数（回调时传入）；
+        //回调函数：参数：realinterval, ...params；this为[interval, times, flags, interval, params]（0：剩余时长（每帧减）；1：剩余次数（每次减）；2：flags；3：时长（备份）；4：回调参数）；
+        //返回：成功true；如果已经有定时器则false；
+        function addtimer(timerName, interval, times=1, flags=0b10, ...params) {
             //！！兼容旧代码
             if(flags === true)
                 flags = 0b11;
@@ -3071,10 +3077,11 @@ Item {
             return true;
         }
 
-        //删除定时器；
-        //flags：从右到左，是否是全局定时器（否则地图定时器）；
-        //成功返回true；如果没有则返回false；
-        readonly property var deltimer: function(timerName, flags=0b0) {
+        //功能：删除定时器；
+        //参数：timerName：定时器名称；
+        //  flags：从右到左，是否是全局定时器（否则地图定时器）；
+        //返回：成功true；如果没有则false；
+        function deltimer(timerName, flags=0b0) {
             //！！兼容旧代码
             if(flags === true)
                 flags = 0b1;

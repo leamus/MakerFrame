@@ -351,87 +351,122 @@ Item {
   let h = game.fighthero(0)
   let arrNames = game.fighthero(-1, 1)
 
-//获得技能；
-//fighthero为下标，或战斗角色的name，或战斗角色对象；
-//skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
-//skillIndex为替换到第几个（如果为-1或大于已有技能数，则追加）；
-//copyedNewProps是 从skills复制的创建的新技能的属性（如果skills为技能对象，会复制一个新技能，然后再复制copyedNewProps属性）；
-//成功返回true。
 命令：<font color='yellow'>game.getskill(fighthero, skill, skillIndex=-1, copyedNewProps={})</font>：
-命令：<font color='yellow'>game.removeskill(fighthero, skill=-1, filters={})</font>：移除技能；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回skill对象的数组；失败返回false。
-命令：<font color='yellow'>game.skill(fighthero, skill=-1, type=-1)</font>：返回技能信息；fighthero为下标，或战斗角色的name，或战斗角色对象；skill：技能下标（-1为所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；filters：技能条件筛选；成功返回 技能数组。
+功能：获得技能；
+参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
+  skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
+  skillIndex为插入到第几个（如果为-1或大于已有技能数，则追加到末尾）；
+  copyedNewProps是 从skills复制的创建的新技能的属性（skills为技能对象才有效，复制一个新技能同时再复制copyedNewProps属性）；
+返回：成功返回true；
+示例：let skill = game.getskill('鹰战士', '新技能')
 
-//战斗角色修改属性；
-//  fighthero为下标，或战斗角色的name，或战斗角色对象；
-//  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
-//    支持格式：{HP: 6, HP: [6,6,6], 'HP,3': 6}
-//  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
-//  成功返回战斗角色对象；失败返回false；
-<font color='yellow'>game.addprops(fighthero, props={}, type=1);</font>
-<font color='yellow'>game.levelup(fighthero)</font>：直接升一级。fighthero为下标，或战斗角色的name，或战斗角色对象；
+命令：<font color='yellow'>game.removeskill(fighthero, skill=-1, filters={})</font>
+功能：移除技能；
+参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
+  skill技能下标（-1为删除所有 符合filters 的 技能），或 技能资源名（符合filters 的 技能）；
+  filters：技能条件筛选对象（key-value）；
+返回：成功返回skill对象的数组；失败返回false；
+示例：let skill = game.removeskill('鹰战士', '新技能')
 
-//背包内 获得 count个道具；返回背包中 改变后 道具个数，返回false表示错误。
-//goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
-//count为0表示使用goods内的$count；
-<font color='yellow'>game.getgoods(goods, count);</font>
+命令：<font color='yellow'>game.skill(fighthero, skill=-1, type=-1)</font>
+功能：返回技能信息；
+参数：fighthero为下标，或战斗角色的$id，或战斗角色对象；
+  skill技能下标（-1为所有 并符合filters 的 技能），或 技能$id（并符合filters 的 技能）；
+  filters：技能条件筛选的对象（key-value）；
+返回：成功返回 技能数组，失败返回false或null；
+示例：let skill = game.skill('鹰战士', '新技能1')
 
-//背包内 减去count个道具，返回背包中 改变后 道具个数；
-//goods可以为 道具资源名、道具对象 和 下标；
-//如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
-//返回 false 表示错误。
-<font color='yellow'>game.removegoods(goods, count=1);</font>
+命令：<font color='yellow'>game.addprops(fighthero, props={}, type=[1,1], flags=0b11);</font>
+功能：战斗角色修改属性；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
+    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
+  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
+  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
+  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
+返回：成功返回战斗角色对象；失败返回false；
 
-//获得道具列表中某项道具信息；
-//参数：
-//  goodsFilter为-1表示返回所有道具的数组；
-//  goodsFilter为数字（下标），则返回单个道具信息的数组；
-//  goodsFilter为字符串（道具$id），返回所有符合道具信息的数组；
-//  goodsFilter为对象：1、如果是道具对象，则查找是否在道具列表中，如果是普通对象，则goodsFilter为过滤条件（可判断$rid、$id、$name等所有道具属性）；
-//返回格式：道具数组、道具（goodsFilter为下标）、null（不存在）或false（错误）；
-<font color='yellow'>game.goods(goodsFilter=-1)</font>
-<font color='yellow'>yield game.usegoods(goods, fighthero, params)</font>：使用道具（会执行道具use脚本）；fighthero为下标，或战斗角色的name，或战斗角色对象，也可以为null或undefined；goods可以为 道具资源名、道具对象 和 下标。
+命令：<font color='yellow'>game.getgoods(goods, count);</font>
+功能：从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误；
+参数：goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
+  如果为 下标，则直接加减；如果为 字符串（默认1个数量）、对象（数量要提供），则获取道具对象后，从这个对象中转移；
+返回：count为>0表示转移个数，为0表示返回数量；<0（或非数字）表示将goods的$count全部转移（默认）。
 
-//直接装备一个道具（不是从背包中）；
-//fighthero为下标，或战斗角色的name，或战斗角色对象；
-//goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
-//newPosition：如果为空，则使用 goods 的 position 属性来装备；
-//copyedNewProps是 从goods复制的创建的新道具的属性（如果goods为道具对象，会复制一个新道具，然后再复制copyedNewProps属性，比如$count、$position）；
-//返回null表示错误；
-//注意：会将目标装备移除，需要保存则先unload到getgoods。
-<font color='yellow'>yield game.equip(fighthero, goods, newPosition=undefined, copyedNewProps={$count: 1});</font>
+命令：<font color='yellow'>game.removegoods(goods, count=1);</font>
+功能：背包内 减去 count 个 goods 道具；
+参数：goods可以为 道具资源名、道具对象 和 下标；
+  count为个数，如果为true则表示道具的所有数量；
+  如果 装备数量不够，则返回<0（相差数），原道具数量不变化；
+返回：返回背包中 改变后 道具个数，返回 false 表示错误；
 
-<font color='yellow'>yield game.unload(fighthero, positionName)</font>：卸下某装备（所有个数），返回装备对象，没有返回undefined；fighthero为下标，或战斗角色的name，或战斗角色对象；返回旧装备；
-<font color='yellow'>game.equipment(fighthero, positionName=null)</font>：返回某 fighthero 的装备；如果positionName为null，则返回所有装备；fighthero为下标，或战斗角色的name，或战斗角色对象；返回格式：单个：装备对象，多个：单个的数组；错误返回null。
+命令：<font color='yellow'>game.goods(goodsFilter=-1)</font>
+功能：获得背包中 goods 道具的信息；
+参数：
+  goodsFilter为-1表示返回所有道具的数组；
+  goodsFilter为数字（下标），则返回单个道具信息的数组；
+  goodsFilter为字符串（道具$id），返回所有符合道具信息的数组；
+  goodsFilter为对象：1、如果是道具对象，则查找是否在背包中，2、如果是普通对象，则goodsFilter为过滤条件（可判断$rid、$id、$name等所有道具属性）；
+返回：道具数组、null（不存在）或false（错误）；
 
-<font color='yellow'>[yield] game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>：进入交易界面；goods为买的物品RID列表；mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；callback为交易结束后的脚本。
-<font color='yellow'>game.money(m=0)</font>：获得金钱；返回金钱数目；
+命令：<font color='yellow'>yield game.usegoods(goods, fighthero, params)</font>
+功能：使用道具（会执行道具脚本的$useScript函数）；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
+  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
+  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+返回：脚本的返回值（为受影响的 战斗角色数组）；false表示错误；null表示脚本不存在；
+示例：yield usegoods(0, '道具')
 
-//载入 fightScript 脚本 并进入战斗；
-//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
-//params是给战斗脚本$createData的参数。
-<font color='yellow'>fight.fighting(fightScript);</font>
+命令：<font color='yellow'>yield game.equip(fighthero, goods, params=1);</font>
+功能：装备道具（会执行道具脚本的$unloadScript函数）；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
+  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
+  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
+示例：yield equip(0, '道具')
 
-//载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
-//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
-//flag：0b1为行动时遇敌，0b10为静止时遇敌；
-//params是给战斗脚本$createData的参数；
-//会覆盖之前的fighton；
-<font color='yellow'>fight.fighton(fightScript, probability=5, flag=3, interval=1000);</font>
+命令：<font color='yellow'>yield game.unload(fighthero, positionName, params=-1)</font>
+功能：卸下某装备（所有的数量；会执行道具脚本的$unloadScript函数）；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+  positionName为部位名称；
+  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
+返回：脚本的返回值（默认为旧装备或undefined）；false表示错误；null表示脚本不存在；
+示例：yield unload(0, '部位')
 
-<font color='yellow'>fight.fightoff()</font>：关闭随机战斗。
+命令：<font color='yellow'>game.equipment(fighthero, positionName=null)</font>
+功能：返回 fighthero 的 positionName 部位装备的 道具；如果positionName为null，则返回所有装备道具的数组；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+  positionName为部位名称；
+返回：全部装备的数组 或 某一个位置的装备；错误返回false；
 
-//创建定时器；
-//timerName：定时器名称；
-//interval：定时器间隔；times：触发次数（-1为无限）；
-//flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列里运行（否则在game.async）；
-//params为自定义参数（回调时传入）；
-//成功返回true；如果已经有定时器则返回false；
-<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, ...params);</font>
-//删除定时器；
-//flags：从右到左，是否是全局定时器（否则地图定时器）；
-//成功返回true；如果没有则返回false；
-<font color='yellow'>game.deltimer(timerName, flags=0b0)</font>：
-  如果是局部定时器，则触发的脚本在 地图脚本 或 game.f[定时器名] 中定义；如果是全局，则触发的脚本在 game.gf[定时器名] 中定义。
+命令：<font color='yellow'>[yield] game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true)</font>
+功能：进入交易界面；
+参数：goods为购买交易的道具RID列表；
+  mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
+  pauseGame同msg的参数；
+  callback为交易结束后的脚本。参数同命令msg的参数；回调函数的params为dialogTrade；
+
+命令：<font color='yellow'>game.money(m=0)</font>：获得金钱；返回金钱数目；
+功能：获得金钱；
+参数：m为增加的钱数；
+返回：目前金钱数；
+
+命令：<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, ...params);</font>
+功能：创建定时器；
+参数：timerName：定时器名称；
+  interval：定时器间隔；
+  times：触发次数（-1为无限）；
+  flags：从右到左，是否是全局定时器（否则地图定时器），是否在脚本队列（scriptQueue）里运行（否则在game.async）；
+  params：为自定义参数（回调时传入）；
+回调函数：参数：realinterval, ...params；this为[interval, times, flags, interval, params]（0：剩余时长（每帧减）；1：剩余次数（每次减）；2：flags；3：时长（备份）；4：回调参数）；
+返回：成功true；如果已经有定时器则false；
+
+命令：<font color='yellow'>game.deltimer(timerName, flags=0b0)</font>
+功能：删除定时器；
+参数：timerName：定时器名称；
+  flags：从右到左，是否是全局定时器（否则地图定时器）；
+返回：成功true；如果没有则false；
+
+注意：如果是局部定时器，则触发的脚本在 地图脚本 或 game.f[定时器名] 中定义；如果是全局，则触发的脚本在 game.gf[定时器名] 中定义。
 
 //播放音乐；
 //music为音乐名；
@@ -530,6 +565,20 @@ Item {
 <font color='yellow'>game.evaluateFile</font>：用C++执行脚本文件（类似runfile）；在初始化时已注入game上下文环境；优点是异常时可提供文件路径；初学者不要用。
 <font color='yellow'>game.importModule</font>：用C++导入一个脚本（脚本可以使用import和export指令，但只能导入一次，也不能卸载，所以不方便调试）；初学者不要用。
 
+
+//载入 fightScript 脚本 并进入战斗；
+//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+//params是给战斗脚本$createData的参数。
+<font color='yellow'>fight.fighting(fightScript);</font>
+
+//载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
+//fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+//flag：0b1为行动时遇敌，0b10为静止时遇敌；
+//params是给战斗脚本$createData的参数；
+//会覆盖之前的fighton；
+<font color='yellow'>fight.fighton(fightScript, probability=5, flag=3, interval=1000);</font>
+
+<font color='yellow'>fight.fightoff()</font>：关闭随机战斗。
 
 战斗脚本（战斗脚本可以使用game属性）：
 <font color='yellow'>fight.over(r=0)</font>：结束战斗；-1为失败并调用战斗结束脚本，1为胜利并调用战斗结束脚本，0为平局并调用战斗结束脚本。
