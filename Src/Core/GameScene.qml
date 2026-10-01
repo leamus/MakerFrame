@@ -787,7 +787,7 @@ Item {
         }*/
 
         //功能：在屏幕中间显示提示信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
-        //参数：msg为提示文字，支持HTML标签；
+        //参数：msg为提示文字，支持HTML标签，如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //  interval为文字显示间隔，为0则不使用；
         //  pretext为预显示的文字；
         //  keeptime：如果为-1，表示点击后对话框会立即显示全部，为0表示等待显示完毕，为>0表示显示完毕后再延时KeepTime毫秒然后自动消失；
@@ -799,7 +799,7 @@ Item {
         //      params为code, rootGameMsgDialog；
         ////  buttonNum为按钮数量（0-2，目前没用）；
         //  p为父组件，默认挂在系统提供的组件上（itemGameMsgs）；
-        //返回：Promise对象（异步返回值为回调函数的第一个参数；出错会抛出错误），$params属性为消息框组件对象；如果参数msg为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误），$params属性为消息框组件对象；如果第一个参数为true，则返回创建的组件对象；
         //示例：yield game.msg('你好，鹰歌')
         function msg(msg='', interval=20, pretext='', keeptime=0, style={}, pauseGame=true/*, buttonNum=0*/, callback=true, p=null) {
 
@@ -863,7 +863,7 @@ Item {
         }
 
         //功能：在屏幕下方显示对话信息；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
-        //参数：role为角色名或角色对象（会显示名字和头像），可以为null（不显示名字和头像）；
+        //参数：role为角色名或角色对象（会显示名字和头像），可以为null（不显示名字和头像），如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //  msg同命令msg的参数；
         //  interval同命令msg的参数；
         //  pretext同命令msg的参数；
@@ -981,13 +981,13 @@ Item {
 
 
         //功能：显示一个菜单；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
-        //参数：title为显示文字；
+        //参数：title为显示文字，如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //  items为选项数组；
         //  style为样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor、ItemHeight、TitleHeight；
         //  pauseGame同命令msg的参数；
         //  callback同命令msg的参数；回调函数的params为index, rootGameMenu；
         //  p为父组件，默认挂在系统提供的组件上（itemGameMenus）；
-        //返回：Promise对象（完全运行完毕后状态改变；携带值为选择的下标，0起始；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //返回：Promise对象（异步返回值为选择的下标，0起始，出错会抛出错误），$params属性为消息框组件对象；如果第一个参数为true，则返回创建的组件对象；
         //示例：let choiceIndex = yield game.menu('标题', ['选项A', '选项B'])
         function menu(title='', items=[], style={}, pauseGame=true, callback=true, p=null) {
 
@@ -1042,13 +1042,13 @@ Item {
         }
 
         //功能：显示一个输入框；命令用yield关键字修饰表示命令完全运行完毕后再进行下一步。
-        //参数：title为显示文字；
+        //参数：title为显示文字，如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //  pretext为预设文字；
         //  style为自定义样式；
         //  pauseGame同msg的参数；
         //  callback同命令msg的参数；回调函数的params为text, rootGameInput；
         //  p为父组件，默认挂在系统提供的组件上（itemGameInputs）；
-        //返回：Promise对象（完全运行完毕后状态改变；携带值为输入的字符串；出错会抛出错误），$params属性为消息框组件对象；如果参数title为true，则直接创建组件对象并返回（需要自己调用显示函数）；
+        //返回：Promise对象（异步返回值为输入的字符串，出错会抛出错误），$params属性为消息框组件对象；如果第一个参数为true，则返回创建的组件对象；
         //示例：let inputText = yield game.input('标题')
         function input(title='', pretext='', style={}, pauseGame=true, callback=true, p=null) {
 
@@ -2639,7 +2639,7 @@ Item {
         //参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
         //  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
         //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
-        //返回：脚本的返回值（为受影响的 战斗角色数组）；false表示错误；null表示脚本不存在；
+        //返回：Promise对象（异步返回值为受影响的 战斗角色数组，false表示错误，null表示脚本不存在，出错会抛出错误）；
         //示例：yield usegoods(0, '道具')
         function usegoods(fighthero, goods, params=1) {
             //let _resolve, _reject;
@@ -2770,7 +2770,7 @@ Item {
         //参数：fighthero为下标，或战斗角色的name，或战斗角色对象，或战斗对象数组，也可以为null或undefined；
         //  goods可以为 道具id、筛选对象、背包下标（这三种会从背包筛选） 或 标准创建格式的对象（必须带有RID、Params，其他属性可选）、道具对象（这两种会直接使用不从背包筛选）；如果筛选出多个，按第一个找到的来；
         //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
-        //返回：脚本的返回值（默认为true）；false表示错误；null表示脚本不存在；
+        //返回：Promise对象（异步返回值为脚本的返回值（默认为true），false表示错误，null表示脚本不存在，出错会抛出错误）；
         //示例：yield equip(0, '道具')
         function equip(fighthero, goods, params=1) {
             //let _resolve, _reject;
@@ -2889,7 +2889,7 @@ Item {
         //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
         //  positionName为部位名称；
         //  params是给$useScript的自定义参数，默认功能是 回调函数 或 减去的数量（数字）；
-        //返回：脚本的返回值（默认为旧装备或undefined）；false表示错误；null表示脚本不存在；
+        //返回：Promise对象（异步返回值为脚本的返回值（默认为旧装备或undefined），false表示错误，null表示脚本不存在，出错会抛出错误）；
         //示例：yield unload(0, '部位')
         function unload(fighthero, positionName, params=-1) {
             //let _resolve, _reject;
@@ -2986,10 +2986,11 @@ Item {
         }
 
         //功能：进入交易界面；
-        //参数：goods为购买交易的道具RID列表；
+        //参数：goods为购买交易的道具RID列表，如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
         //  mygoodsinclude为true表示可卖背包内所有物品，为数组则为数组中可交易的物品列表；
         //  pauseGame同msg的参数；
         //  callback为交易结束后的脚本。参数同命令msg的参数；回调函数的params为dialogTrade；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误），$params属性为交易组件对象；如果第一个参数为true，则返回创建的组件对象；
         function trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true) {
 
             let ret = dialogTrade;
@@ -3107,27 +3108,30 @@ Item {
         }
 
 
-        //播放音乐；
-        //musicParams是音乐名或对象（包含RID）；为空表示开始播放之前停止的；
-        //  musicParams为对象包含两个属性：
-        //    $loops为循环次数，空或0表示无限循环；
+        //功能：播放音乐；
+        //参数：
+        //  musicParams是 音乐名字符串 或 对象（包含RID） 或 true（开始播放之前停止的） 或  false（或其他值，表示停止）；
+        //  musicParams为对象时额外包含两个属性：
+        //    $loops为循环次数；<0表示无限循环，为空表示不变；
         //    $callback为状态回调函数；
-        //成功返回true；
-        readonly property var playmusic: function(musicParams) {
+        //返回：成功true；失败false；
+        function playmusic(musicParams) {
             if($CommonLibJS.isString(musicParams)) {
                 musicParams = {RID: musicParams};
             }
             else if($CommonLibJS.isObject(musicParams)) {
 
             }
-            else {
+            else if(musicParams === true) {
                 return itemBackgroundMusic.play();
             }
+            else
+                return stopmusic();
 
             musicParams.$rid = musicParams.RID ?? musicParams.RId;
 
 
-            let fileURL = $GameMakerGlobal.musicResourceURL(musicParams.$rid);
+            const fileURL = $GameMakerGlobal.musicResourceURL(musicParams.$rid);
             //if(!$Frame.sl_fileExists($GlobalJS.toPath(fileURL))) {
             //    console.warn('[!GameScene]video no exist：', video, fileURL)
             //    return false;
@@ -3139,7 +3143,7 @@ Item {
             //console.debug('~~~:', _private.objMusic[musicRID], $GameMakerGlobal.musicResourceURL(_private.objMusic[musicRID]));
             //console.debug('~~~:', audioBackgroundMusic.source, audioBackgroundMusic.source.toString());
 
-            const res = itemBackgroundMusic.play(fileURL, musicParams.$loops || Audio.Infinite);
+            const res = itemBackgroundMusic.play(fileURL, musicParams.$loops < 0 ? Audio.Infinite : musicParams.$loops);
             if(res) {
                 itemBackgroundMusic.fStateCallback = musicParams.$stateCallback;
                 //itemBackgroundMusic.fCallback = musicParams.$callback;
@@ -3149,30 +3153,30 @@ Item {
             return res;
         }
 
-        //停止音乐；
-        readonly property var stopmusic: function() {
+        //功能：停止音乐；
+        function stopmusic() {
             itemBackgroundMusic.stop();
             itemBackgroundMusic.arrMusicStack = [];
         }
 
-        //暂停音乐；
-        //参数name为暂停名称；如果为true，表示引擎级关闭音乐；如果为false，表示存档级关闭音乐；
+        //功能：暂停音乐；
+        //参数：name为暂停名称；如果为true，表示引擎级关闭音乐；如果为false，表示存档级关闭音乐；
         function pausemusic(name='$user') {
             itemBackgroundMusic.pause(name);
         }
 
-        //恢复播放音乐；
-        //参数name为恢复名称；如果为true，表示引擎级恢复播放音乐；如果为false，表示存档级恢复播放音乐；如果为-1，打开全部强制恢复；
+        //功能：恢复播放音乐；
+        //参数：name为恢复名称；如果为true，表示引擎级恢复播放音乐；如果为false，表示存档级恢复播放音乐；如果为-1，打开全部强制恢复；
         function resumemusic(name='$user') {
             itemBackgroundMusic.resume(name);
         }
-        //将音乐暂停并存栈；一般用在需要播放战斗音乐前；
-        readonly property var pushmusic: function() {
+        //功能：将音乐暂停并存栈；一般用在需要播放战斗音乐前（默认$commonFightInitScript已调用）；
+        function pushmusic() {
             itemBackgroundMusic.arrMusicStack.push([game.gd['$sys_music'], audioBackgroundMusic.position]);
             itemBackgroundMusic.stop();
         }
-        //播放上一次存栈的音乐；一般用在战斗结束后（$commonFightEndScript已调用，不用写在战斗结束脚本中）；
-        readonly property var popmusic: function() {
+        //功能：播放上一次存栈的音乐；一般用在战斗结束后（默认$commonFightEndScript已调用）；
+        function popmusic() {
             if(itemBackgroundMusic.arrMusicStack.length === 0)
                 return;
             let m = itemBackgroundMusic.arrMusicStack.pop();
@@ -3184,13 +3188,13 @@ Item {
             //else
             //    itemBackgroundMusic.stop();
         }
-        //跳到播放进度（毫秒）；
-        readonly property var seekmusic: function(offset=0) {
+        //功能：跳到播放进度（毫秒）；
+        function seekmusic(offset=0) {
             return audioBackgroundMusic.seek(offset);
         }
-        //音乐音量大小；
-        //volume为0~1的浮点数，如果非数字则不变；
-        //返回当前音量大小；
+        //功能：音乐音量大小；
+        //参数：volume为0~1的浮点数，如果非数字则不变；
+        //返回：当前音量大小；
         function musicvolume(volume=null) {
             if($CommonLibJS.isValidNumber(volume, 0b1))
                 audioBackgroundMusic.volume = parseFloat(volume);
@@ -3198,11 +3202,12 @@ Item {
             return audioBackgroundMusic.volume;
         }
 
-        //状态；
-        readonly property var musicplaying: function() {
+        //功能：音乐是否为播放状态；
+        function musicplaying() {
             return audioBackgroundMusic.isPlaying();
         }
-        readonly property var musicpausing: function() {
+        //功能：音乐是否为暂停状态；
+        function musicpausing() {
             //return itemBackgroundMusic.objMusicPause[$name] !== undefined;
             if($CommonLibJS.objectIsEmpty(itemBackgroundMusic.objMusicPause) &&
                 //!$GameMakerGlobal.settings.value('$PauseMusic') &&
@@ -3215,34 +3220,37 @@ Item {
         }
 
 
-        //播放音效；
-        //参数：channel为通道（目前0~9，-1为随机挑选没有播放的通道，如果没有则返回；-2为随机挑选没有播放的通道，如果没有则随机强制选择一个）；
-        function playsoundeffect(soundeffectName, channel=-1, loops=1, forcePlay=false) {
+        //功能：播放音效（支持任何音频，推荐wav）；
+        //参数：channel为通道（目前0~9，true为随机挑选没有播放的通道，如果没有则随机强制选择一个；false为随机挑选没有播放的通道，如果没有则返回；）；
+        //返回：Promise对象（异步返回值为播放文件路径），$params属性为音频组件对象；
+        function playsoundeffect(soundeffectName, channel=false, loops=1, forcePlay=false) {
             if(!forcePlay && game.soundeffectpausing())
                 return -10;
 
             return rootSoundEffect.play($GameMakerGlobal.soundResourceURL(soundeffectName), channel, loops);
         }
 
+        //功能：停止播放音效；
+        //参数：channel为通道（目前0~9，-1为全部）；
         function stopsoundeffect(channel=-1) {
             return rootSoundEffect.stop(channel);
         }
 
-        //暂停音效；
-        //参数name为暂停名称；如果为true，表示引擎级关闭音效；如果为false，表示存档级关闭音效；
+        //功能：暂停整个音效；
+        //参数：name为暂停名称；如果为true，表示引擎级关闭音效；如果为false，表示存档级关闭音效；
         function pausesoundeffect(name='$user') {
             rootSoundEffect.pause(name);
         }
 
-        //恢复播放音效；
-        //参数name为恢复名称；如果为true，表示引擎级恢复播放音效；如果为false，表示存档级恢复播放音效；如果为-1，打开全部强制恢复；
+        //功能：恢复整个音效；
+        //参数：name为恢复名称；如果为true，表示引擎级恢复播放音效；如果为false，表示存档级恢复播放音效；如果为-1，打开全部强制恢复；
         function resumesoundeffect(name='$user') {
             rootSoundEffect.resume(name);
         }
 
-        //音乐音量大小；
-        //volume为0~1的浮点数，如果非数字则不变；
-        //返回当前音量大小；
+        //功能：音效音量大小；
+        //参数：volume为0~1的浮点数，如果非数字则不变；
+        //返回：当前音量大小；
         function soundeffectvolume(volume=null) {
             if($CommonLibJS.isValidNumber(volume, 0b1))
                 rootSoundEffect.rVolume = parseFloat(volume);
@@ -3250,7 +3258,8 @@ Item {
             return rootSoundEffect.rVolume;
         }
 
-        readonly property var soundeffectpausing: function() {
+        //功能：音效是否暂停状态
+        function soundeffectpausing() {
             //return _private.config.nSoundConfig !== 0;
             if($CommonLibJS.objectIsEmpty(rootSoundEffect.objSoundEffectPause) &&
                 //!$GameMakerGlobal.settings.value('$PauseSound') &&
@@ -3262,13 +3271,16 @@ Item {
         }
 
 
-        //播放视频；
-        //videoParams是视频名或对象（包含RID）；
-        //  videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer；
-        //  也可以修改 $x、$y、$width、$height。
-        //pauseGame同msg的参数；
-        //$callback同命令msg的参数；回调函数的params为code, itemVideo；
-        readonly property var playvideo: function(videoParams, pauseGame=true) {
+        //功能：播放视频；
+        //参数：
+        //  videoParams是 视频名 或 对象（包含RID）；
+        //    videoParams为对象包含两个属性：$videoOutput（包括x、y、width、height等） 和 $mediaPlayer，分别会给videoOutput、mediaPlayer两个对象的属性赋值；
+        //      属性中可以用$width、$height，不设置表示使用视频的宽高，-1表示全屏，具体数字为pixelDensity的倍数。
+        //    $stateCallback（参数为playbackState, mediaPlayer, videoOutput）和$callback（参数为callback, code, itemVideo）为回调函数；
+        //  pauseGame同msg的参数；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误），$params属性为视频组件对象；
+        //示例：yield playvideo('视频')
+        function playvideo(videoParams, pauseGame=true) {
             let ret = videoOutput;
 
             if($CommonLibJS.isString(videoParams)) {
@@ -3366,26 +3378,27 @@ Item {
             //console.debug(itemViewPort.gameScene.color)
             //console.debug(itemViewPort.gameScene.color==='#ccffffff');
         }
-        //结束播放；
-        //code为-1表示释放退出；为0表示播放结束；为1表示用户退出；
-        readonly property var stopvideo: function(code=1) {
+        //功能：结束播放视频；
+        //返回：code为-1表示释放退出；为0表示播放结束；为1表示用户退出；
+        function stopvideo(code=1) {
             itemVideo.stop(code);
         }
 
-        //显示图片；
-        //imageParams为图片名或对象（包含RID）；
-        //imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold 事件的回调函数；
-        //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
-        //    不带$表示按像素；
-        //    带$的属性有以下几种格式：
-        //      $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度，为5表示居中父组件后偏移多少父组件的百分比；为6、7、8表示右、下对其后偏移多少像素、固定长度、父组件百分比；为9表示使用虚拟坐标系；
-        //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；4表示显示在地图地板层上；字符串表示显示在某个角色上；也可以是一个组件对象；
-        //  $id为标识（用来控制、删除和重用）；
-        //  $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
-        readonly property var showimage: function(imageParams, id=undefined) { //id可以删掉，直接用$id
+        //功能：显示图片；
+        //参数：imageParams为图片名或对象（包含RID）；
+        //  imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold 事件的回调函数；
+        //    x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
+        //      不带$表示按像素；
+        //      带$的属性有以下几种格式：
+        //        $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
+        //          如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度，为5表示居中父组件后偏移多少父组件的百分比；为6、7、8表示右、下对其后偏移多少像素、固定长度、父组件百分比；为9表示使用虚拟坐标系；
+        //        $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
+        //          如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
+        //    $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；4表示显示在地图地板层上；字符串表示显示在某个角色上；也可以是一个组件对象；
+        //    $id为标识（用来控制、删除和重用）；
+        //    $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
+        //返回：成功返回图片组件；失败返回false；
+        function showimage(imageParams, id=undefined) { //id可以删掉，直接用$id
             if($CommonLibJS.isString(imageParams)) {
                 imageParams = {RID: imageParams};
             }
@@ -3757,9 +3770,10 @@ Item {
 
             return tmp;
         }
-        //删除图片；
-        //idParams：-1：屏幕上的全部图片组件（包含图片和特效等）；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id（-1表示全部图片组件）和$parent属性（同showimage）；
-        readonly property var delimage: function(idParams=-1) {
+        //功能：删除图片；
+        //参数：idParams：-1：屏幕上的全部图片组件（包含图片和特效等）；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id（-1表示全部图片组件）和$parent属性（同showimage）；
+        //返回：true为成功，false为失败；
+        function delimage(idParams=-1) {
             let parent;
             let collection;
             let tmpImage;
@@ -3873,20 +3887,21 @@ Item {
             return false;
         }
 
-        //显示特效；
-        //spriteParams为特效名或对象（包含RID）；
-        //spriteParams为对象：包含 SpriteEffect组件 的所有属性、$x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold、$looped、$finished 事件的回调函数；
-        //  x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
-        //    不带$表示按像素；
-        //    带$的属性有以下几种格式：
-        //      $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度，为5表示居中父组件后偏移多少父组件的百分比；为6、7、8表示右、下对其后偏移多少像素、固定长度、父组件百分比；为9表示使用虚拟坐标系；
-        //      $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
-        //        如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
-        //  $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；4表示显示在地图地板层上；字符串表示显示在某个角色上；也可以是一个组件对象；
-        //  $id为标识（用来控制、删除和重用）；
-        //  $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
-        readonly property var showsprite: function(spriteParams, id=undefined) { //id可以删掉，直接用$id
+        //功能：显示特效；
+        //参数：spriteParams为特效名或对象（包含RID）；
+        //  spriteParams为对象：包含 SpriteEffect组件 的所有属性、$x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold、$looped、$finished 事件的回调函数；
+        //    x、y、width、height 和 $x、$y、$width、$height 是坐标和宽高，每组（带$和不带$）只需填一种；
+        //      不带$表示按像素；
+        //      带$的属性有以下几种格式：
+        //        $x、$y：如果为数字，则表示坐标是按固定长度（厘米）为单位的长度（跨平台用）；
+        //          如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填x、y 和 $x、$y 作用相同；为2表示父组件的百分比；为3表示居中父组件后偏移多少像素，为4表示居中父组件后偏移多少固定长度，为5表示居中父组件后偏移多少父组件的百分比；为6、7、8表示右、下对其后偏移多少像素、固定长度、父组件百分比；为9表示使用虚拟坐标系；
+        //        $width、$height：如果为数字，则表示按固定长度（厘米）为单位的长度（跨平台用）；
+        //          如果为 数组[n, t]，则n表示值，t表示类型：t为0、1分别和直接填width、height 和 $width、$height 作用 相同；为2表示父组件的多少倍；为3表示自身的多少倍；为4表示是 固定宽高比 的多少倍；
+        //    $parent：0表示显示在屏幕上（默认）；1表示显示在视窗上；2表示显示在场景上（受scale影响）；3表示显示在地图上；4表示显示在地图地板层上；字符串表示显示在某个角色上；也可以是一个组件对象；
+        //    $id为标识（用来控制、删除和重用）；
+        //    $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
+        //返回：成功返回特效组件；失败返回false；
+        function showsprite(spriteParams, id=undefined) { //id可以删掉，直接用$id
             if($CommonLibJS.isString(spriteParams)) {
                 spriteParams = {RID: spriteParams};
             }
@@ -4272,9 +4287,10 @@ Item {
             return sprite;
         }
 
-        //删除特效；
-        //idParams：-1：屏幕上的全部特效组件（包含图片和特效等）；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id（-1表示全部特效组件）和$parent属性（同showsprite）；
-        readonly property var delsprite: function(idParams=-1) {
+        //功能：删除特效；
+        //参数：idParams：-1：屏幕上的全部特效组件（包含图片和特效等）；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id（-1表示全部特效组件）和$parent属性（同showsprite）；
+        //返回：true为成功，false为失败；
+        function delsprite(idParams=-1) {
             let parent;
             let collection;
             let tmpSprites;
@@ -4390,7 +4406,7 @@ Item {
         }
 
 
-        //设置操作（遥感可用和可见、键盘可用）；
+        //功能：设置操作（遥感可用和可见、键盘可用）；
         //参数$gamepad的$visible和$enabled，$keyboard的$enabled；
         //  也可以是 二进制数字
         //参数为空则返回遥感组件，可自定义；
@@ -4592,6 +4608,7 @@ Item {
         //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
         //pauseGame同msg的参数；
         //callback同命令msg的参数；回调函数的params为gameMenuWindow；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误）；如果为关闭窗口，则返回窗口组件对象；
         readonly property var window: function(params=null, style={}, pauseGame=true, callback=true) {
             if($CommonLibJS.isValidNumber(params))
                 params = {$id: params, $visible: true};
@@ -4720,6 +4737,7 @@ Item {
         //compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
         //成功返回 存档序列化字符串，失败返回false；
         //game.async(function*(){game.save('存档3')})
+        //返回：Promise对象（异步返回值为存档内容，出错会返回false）；
         readonly property var save: function(fileName='autosave', showName='', compressionLevel=-1) {
             //scriptQueue.runNextEventLoop('save');
 
@@ -4834,7 +4852,7 @@ Item {
 
         //读档（读取数据到 game.gd）；
         //data为字符串（本地存档文件路径）或对象；
-        //成功返回true（生成器返回true），失败返回false。
+        //返回：Promise对象（异步返回值为true，出错会返回false）；
         readonly property var load: function(data='autosave') {
             //let _resolve, _reject;
 
@@ -4952,6 +4970,7 @@ Item {
 
         //返回插件
         //参数0是组织/开发者名，参数1是插件名
+        //返回：Promise对象（异步返回值为插件对象，出错会抛出错误）；
         readonly property var plugin: function(...params) {
             //let _resolve, _reject;
 
@@ -6599,14 +6618,15 @@ Item {
 
 
         //播放音效；
-        //参数：完整URL；index为通道（目前0~9，-1为随机挑选没有播放的通道，如果没有则返回；-2为随机挑选没有播放的通道，如果没有则随机强制选择一个）；
-        function play(playSoundEffectURL=undefined, index=-1, loops=1) {
+        //参数：完整URL；index为通道（目前0~9，true为随机挑选没有播放的通道，如果没有则随机强制选择一个；false为随机挑选没有播放的通道，如果没有则返回；）；
+        //返回：Promise对象（异步返回值为播放文件路径），$params属性为音频组件对象；
+        function play(playSoundEffectURL=undefined, index=false, loops=1) {
             if(!$Frame.sl_fileExists($GlobalJS.toPath(playSoundEffectURL))) {
                 console.warn('[!GameScene]音效文件不存在：', playSoundEffectURL);
                 return -1;
             }
 
-            if(index < 0) {
+            if(!$CommonLibJS.isValidNumber(index)) {
                 for(let ti = 0; ti < arrCacheSoundEffects.length; ++ti) {
                     const se = arrCacheSoundEffects[ti];
                     if(se.isPlaying())
@@ -6614,14 +6634,14 @@ Item {
                     index = ti;
                     break;
                 }
-            }
-            //如果index === -1，且都在播放，则返回
-            if(index === -1)
-                return -2;
-            //如果如果index < -1，且都在播放，则任选一个强制播放
-            else if(index < -1)
-                index = $CommonLibJS.random(0, arrCacheSoundEffects.length);
 
+                //如果如果index === true，且都在播放，则任选一个强制播放
+                if(index === true)
+                    index = $CommonLibJS.random(0, arrCacheSoundEffects.length);
+                //如果index 不为数字，且都在播放，则返回
+                else if(!$CommonLibJS.isValidNumber(index))
+                    return -2;
+            }
             const se = arrCacheSoundEffects[index];
             if(!se)
                 return -3;
