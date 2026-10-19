@@ -2141,6 +2141,70 @@ Item {
 
         }
 
+
+        //功能：战斗角色修改属性；
+        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+        //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
+        //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
+        //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
+        //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
+        //  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
+        //返回：成功返回战斗角色对象；失败返回false；
+        function addprops(fighthero, props={}, type=[1,1], flags=0b11) {
+            if(fighthero >= 0 || $CommonLibJS.isString(fighthero) || $CommonLibJS.isObject(fighthero))
+                fighthero = game.fighthero(fighthero);
+            else
+                fighthero = null;
+            if(!fighthero)
+                return false;
+
+
+            //先刷新一次（主要是$$propertiesWithExtra）
+            if(flags & 0b1)
+                _private.objCommonScripts.$refreshCombatant(fighthero, false);
+
+            //参考属性（乘以比例时的参考属性）
+            let propertyFlag;
+            if($CommonLibJS.isNumber(type)) {
+                //properties2 = fighthero.$properties; //fighthero.$$propertiesWithExtra;
+                propertyFlag = false;
+            }
+            else {
+                if(type[1] === 1)
+                    //properties2 = fighthero.$$propertiesWithExtra;
+                    propertyFlag = true;
+                else
+                    //properties2 = fighthero.$properties;
+                    propertyFlag = false;
+
+                type = type[0];
+            }
+
+            $GameMakerGlobalJS.addProps(fighthero, props, type, propertyFlag);
+
+            /*if(fighthero.$properties.healthHP > fighthero.$$propertiesWithExtra.HP)
+                fighthero.$properties.healthHP = fighthero.$$propertiesWithExtra.HP;
+            if(fighthero.$properties.healthHP < 0)
+                fighthero.$properties.healthHP = 0;
+            if(fighthero.$properties.remainHP > fighthero.$$propertiesWithExtra.healthHP)
+                fighthero.$properties.remainHP = fighthero.$$propertiesWithExtra.healthHP;
+            if(fighthero.$properties.remainHP < 0)
+                fighthero.$properties.remainHP = 0;
+
+            if(tKeys.includes('remainMP') && tKeys.includes('MP'))
+                if(fighthero.$properties.remainMP > fighthero.$$propertiesWithExtra.MP)
+                    fighthero.$properties.remainMP = fighthero.$$propertiesWithExtra.MP;
+            */
+
+            //再刷新一次
+            if(flags & 0b1)
+                _private.objCommonScripts.$refreshCombatant(fighthero, !!(flags & 0b10));
+
+
+            return fighthero;
+        }
+
+        
         //功能：获得技能；
         //参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
         //  skill为技能资源名，或 标准创建格式的对象（带有RID、Params和其他属性），或技能本身（带有$rid）；
@@ -2327,68 +2391,6 @@ Item {
 
         }
 
-
-        //功能：战斗角色修改属性；
-        //参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
-        //  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
-        //    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
-        //  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
-        //  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
-        //  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
-        //返回：成功返回战斗角色对象；失败返回false；
-        function addprops(fighthero, props={}, type=[1,1], flags=0b11) {
-            if(fighthero >= 0 || $CommonLibJS.isString(fighthero) || $CommonLibJS.isObject(fighthero))
-                fighthero = game.fighthero(fighthero);
-            else
-                fighthero = null;
-            if(!fighthero)
-                return false;
-
-
-            //先刷新一次（主要是$$propertiesWithExtra）
-            if(flags & 0b1)
-                _private.objCommonScripts.$refreshCombatant(fighthero, false);
-
-            //参考属性（乘以比例时的参考属性）
-            let propertyFlag;
-            if($CommonLibJS.isNumber(type)) {
-                //properties2 = fighthero.$properties; //fighthero.$$propertiesWithExtra;
-                propertyFlag = false;
-            }
-            else {
-                if(type[1] === 1)
-                    //properties2 = fighthero.$$propertiesWithExtra;
-                    propertyFlag = true;
-                else
-                    //properties2 = fighthero.$properties;
-                    propertyFlag = false;
-
-                type = type[0];
-            }
-
-            $GameMakerGlobalJS.addProps(fighthero, props, type, propertyFlag);
-
-            /*if(fighthero.$properties.healthHP > fighthero.$$propertiesWithExtra.HP)
-                fighthero.$properties.healthHP = fighthero.$$propertiesWithExtra.HP;
-            if(fighthero.$properties.healthHP < 0)
-                fighthero.$properties.healthHP = 0;
-            if(fighthero.$properties.remainHP > fighthero.$$propertiesWithExtra.healthHP)
-                fighthero.$properties.remainHP = fighthero.$$propertiesWithExtra.healthHP;
-            if(fighthero.$properties.remainHP < 0)
-                fighthero.$properties.remainHP = 0;
-
-            if(tKeys.includes('remainMP') && tKeys.includes('MP'))
-                if(fighthero.$properties.remainMP > fighthero.$$propertiesWithExtra.MP)
-                    fighthero.$properties.remainMP = fighthero.$$propertiesWithExtra.MP;
-            */
-
-            //再刷新一次
-            if(flags & 0b1)
-                _private.objCommonScripts.$refreshCombatant(fighthero, !!(flags & 0b10));
-
-
-            return fighthero;
-        }
 
         //功能：从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误；
         //参数：goods可以为 道具资源名、 或 标准创建格式的对象（带有RID、Params和其他属性），或道具本身（带有$rid），或 下标；
@@ -3025,6 +3027,66 @@ Item {
 
                 dialogTrade.show(goods, mygoodsinclude, pauseGame, _callback);
             }
+
+            return ret;
+
+            //！如果定义为生成器的写法：
+            //return yield ret;
+        }
+
+        //功能：显示游戏系统窗口；
+        //参数：
+        //  params：
+        //    $id：0b1为主菜单；0b10为战斗人物信息；0b100为道具信息；0b1000为系统菜单；
+        //    $visible：为false表示关闭窗口；
+        //    $value：战斗人物信息（0b10）时为下标；
+        //  style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
+        //  pauseGame同msg的参数；
+        //  callback同命令msg的参数；回调函数的params为gameMenuWindow；
+        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误）；如果为关闭窗口（$visible为false），则返回窗口组件对象；
+        function window(params=null, style={}, pauseGame=true, callback=true) {
+            if($CommonLibJS.isValidNumber(params))
+                params = {$id: params, $visible: true};
+            else if(!params) {
+                params = {$id: 0b1111, $visible: true};
+            }
+
+
+            let ret = gameMenuWindow;
+
+            //显示
+            if(params.$visible !== false) {
+                /*if(callback === true || callback === 1)
+                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
+                    callback = function(cb, ...params) {
+                        if(cb(...params)) {
+                            game.run(true);
+                        }
+                    }
+                */
+
+                //let _resolve, _reject;
+                let _callback;
+                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
+                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                    //_resolve = resolve; _reject = reject;
+                    _callback = (cb, ...params)=>{
+                        if($CommonLibJS.isFunction(callback))
+                            callback(cb, ...params);
+                        else
+                            cb(...params);
+                        resolve(params[0]);
+                        //reject(params[0]);
+                    };
+                });
+                //ret.$resolve = _resolve; ret.$reject = _reject;
+                ret.$params = gameMenuWindow;
+
+                gameMenuWindow.show(params.$id, params.$value, style, pauseGame, _callback);
+            }
+            else
+                gameMenuWindow.closeWindow(params.$id);
+
 
             return ret;
 
@@ -4407,14 +4469,14 @@ Item {
 
 
         //功能：设置操作（遥感可用和可见、键盘可用）；
-        //参数$gamepad的$visible和$enabled，$keyboard的$enabled；
-        //  也可以是 二进制数字
-        //参数为空则返回遥感组件，可自定义；
-        readonly property var control: function(config={}) {
+        //参数：config包含$gamepad和$keyboard分别为屏幕摇杆和键盘，$gamepad包含$visible和$enabled，$keyboard包含$enabled；
+        //  $gamepad和$keyboard也可以是 二进制数字（标记）；
+        //返回：返回遥感组件（可自定义）；
+        function control(config={}) {
             if(!config)
                 return itemGamePad;
 
-            if(config && config.$gamepad !== undefined) {
+            if(config.$gamepad !== undefined) {
                 if($CommonLibJS.isNumber(config.$gamepad)) {
                     itemGamePad.enabled = config.$gamepad & 0b1;
                     itemGamePad.visible = config.$gamepad & 0b10;
@@ -4426,17 +4488,20 @@ Item {
                         itemGamePad.visible = config.$gamepad.$visible;
                 }
             }
-            if(config && config.$keyboard !== undefined) {
+            if(config.$keyboard !== undefined) {
                 if($CommonLibJS.isNumber(config.$keyboard)) {
                     _private.config.bKeyboard = config.$keyboard & 0b1;
                 }
                 else if(config.$keyboard.$enabled !== undefined)
                     _private.config.bKeyboard = config.$keyboard.$enabled;
             }
+            return itemGamePad;
         }
 
-        //将场景缩放n倍；可以是小数。
-        readonly property var scale: function(n) {
+        //功能：将场景缩放n倍；
+        //参数：n是数字或其他值（不作更改）；
+        //返回：当前场景缩放值；
+        function scale(n) {
             if($CommonLibJS.isValidNumber(n)) {
                 game.gd['$sys_scale'] = itemViewPort.gameScene.scale = parseFloat(n);
                 setSceneToRole();
@@ -4444,9 +4509,9 @@ Item {
             return game.gd['$sys_scale'];
         }
 
-        //场景跟随某个角色 或 自由移动
-        //r为字符串表示跟随角色；为数字，则表示进入自由移动地图模式且设置为速度
-        readonly property var setscenerole: function(r=0.2) {
+        //功能：场景跟随某个角色 或 自由移动；
+        //参数：r为字符串表示跟随角色；为数字，则表示进入自由移动地图模式且设置为移动速度；
+        function setscenerole(r=0.2) {
             let role;
 
             if($CommonLibJS.isString(r)) {
@@ -4471,8 +4536,10 @@ Item {
                 _private.sceneRole = null;
         }
 
-        //暂停游戏。
-        readonly property var pause: function(name='$user_pause', times=1) {
+        //功能：暂停游戏；
+        //参数：name为暂停名称（不同名称需要对应的恢复）、true或false/null；times为暂停多少次（也需要对应恢复多少次）；
+        //返回：name为false/null返回是否暂停状态，name为true，返回系统中所有暂停的数据，否则返回name对应的times暂停次数；
+        function pause(name='$user_pause', times=1) {
             if(name === false || name === null)
                 return !$CommonLibJS.objectIsEmpty(_private.config.objPauseNames);
             if(name === true)
@@ -4511,16 +4578,24 @@ Item {
 
             //joystick.enabled = false;
             //buttonA.enabled = false;
+
+            return _private.config.objPauseNames[name];
         }
-        //继续游戏。
-        readonly property var goon: function(name='$user_pause', times=-1) {
+        //功能：继续游戏；
+        //参数：name为暂停名称（不同名称需要对应的恢复）、true或false/null，如果为true表示清空所有name；
+        //  times为暂停多少次（也需要对应恢复多少次），-1为清空该name；
+        //返回：如果name为true返回true，如果为false/null表示返回是否继续状态，否则返回name对应的times；
+        function goon(name='$user_pause', times=-1) {
             //战斗模式不能设置
             //if(_private.nStatus === 1)
             //    return;
 
 
+            let ret;
+
             if(name === true) {
                 _private.config.objPauseNames = {};
+                ret = true;
             }
             else if(name === false || name === null)
                 return $CommonLibJS.objectIsEmpty(_private.config.objPauseNames);
@@ -4530,10 +4605,12 @@ Item {
                         _private.config.objPauseNames[name] -= times;
                     else
                         _private.config.objPauseNames[name] = 0;
+                    ret = _private.config.objPauseNames[name];
                     if(_private.config.objPauseNames[name] <= 0)
                         delete _private.config.objPauseNames[name];
                 }
                 else {
+                    ret = 0;
                     //rootGameScene.forceActiveFocus();
                     //return;
                 }
@@ -4565,10 +4642,14 @@ Item {
             //buttonA.enabled = true;
 
             //rootGameScene.forceActiveFocus();
+
+            return ret;
         }
 
-        //设置游戏刷新率（interval毫秒）。
-        readonly property var interval: function(interval=16) {
+        //功能：设置游戏刷新率；
+        //参数：interval为整数（毫秒）、其他值（不做更改），如果小于0则设置为默认的16；
+        //返回：当前游戏刷新率；
+        function interval(interval=16) {
             if($CommonLibJS.isValidNumber(interval)) {
                 _private.config.nInterval = interval;
             }
@@ -4579,10 +4660,14 @@ Item {
                 _private.config.nInterval = 16;
             timer.interval = _private.config.nInterval;
             game.gd['$sys_fps'] = _private.config.nInterval;
+
+            return game.gd['$sys_fps'];
         }
 
-        //暂停time毫秒。
-        readonly property var wait: function(ms) {
+        //功能：脚本暂停；
+        //参数：ms为毫秒；
+        //返回：Promise对象；
+        function wait(ms) {
 
             /*if(callback === true || callback === 1)
                 _private.scriptQueue.wait(ms);
@@ -4595,79 +4680,24 @@ Item {
             //return yield ret;
         }
 
-        //返回start~end之间的随机整数（包含start，不包含end）。
-        readonly property var rnd: function(start, end) {
+        //功能：生成随机整数；
+        //参数：start~end之间（包含start，不包含end）；
+        //返回：随机整数。
+        function rnd(start, end) {
             return $CommonLibJS.random(start, end);
         }
 
-        //显示窗口；
-        //params：
-        //  $id：0b1为主菜单；0b10为战斗人物信息；0b100为道具信息；0b1000为系统菜单；
-        //  $visible：为false表示关闭窗口；
-        //  $value：战斗人物信息（0b10）时为下标；
-        //style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
-        //pauseGame同msg的参数；
-        //callback同命令msg的参数；回调函数的params为gameMenuWindow；
-        //返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误）；如果为关闭窗口，则返回窗口组件对象；
-        readonly property var window: function(params=null, style={}, pauseGame=true, callback=true) {
-            if($CommonLibJS.isValidNumber(params))
-                params = {$id: params, $visible: true};
-            else if(!params) {
-                params = {$id: 0b1111, $visible: true};
-            }
-
-
-            let ret = gameMenuWindow;
-
-            //显示
-            if(params.$visible !== false) {
-                /*if(callback === true || callback === 1)
-                    //cb为默认回调函数，params为cb所需的参数，cb返回true表示有暂停；
-                    callback = function(cb, ...params) {
-                        if(cb(...params)) {
-                            game.run(true);
-                        }
-                    }
-                */
-
-                //let _resolve, _reject;
-                let _callback;
-                //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
-                    //_resolve = resolve; _reject = reject;
-                    _callback = (cb, ...params)=>{
-                        if($CommonLibJS.isFunction(callback))
-                            callback(cb, ...params);
-                        else
-                            cb(...params);
-                        resolve(params[0]);
-                        //reject(params[0]);
-                    };
-                });
-                //ret.$resolve = _resolve; ret.$reject = _reject;
-                ret.$params = gameMenuWindow;
-
-                gameMenuWindow.show(params.$id, params.$value, style, pauseGame, _callback);
-            }
-            else
-                gameMenuWindow.closeWindow(params.$id);
-
-
-            return ret;
-
-            //！如果定义为生成器的写法：
-            //return yield ret;
-        }
-
-        //检测存档是否存在 且 验证是否正确；
-        //data为字符串（本地存档文件路径）或存档数据（对象，此时仅验证和解压Data字段）；
-        //失败返回false；成功返回 存档对象（包含Name和解压后的Data）。
-        readonly property var checksave: function(data) {
+        //功能：检测存档是否存在 且 验证是否正确；
+        //参数：data为字符串（本地存档文件路径）或对象（存档数据，此时仅验证和解压Data字段）；
+        //返回：失败返回false；成功返回 存档对象（包含Name和解压后的Data）；
+        function checksave(data) {
             if($CommonLibJS.isString(data)) {
                 data = data.trim();
                 let filePath = $GlobalJS.toPath($GameMakerGlobal.config.strSaveDataPath + data + '.json');
-                if(!$Frame.sl_fileExists(filePath))
+                if(!$Frame.sl_fileExists(filePath)) {
+                    console.warn('[!GameScene]checksave:文件不存在：', data);
                     return false;
+                }
 
                 data = $Frame.sl_fileRead(filePath);
                 //let cfg = File.read(filePath);
@@ -4679,7 +4709,7 @@ Item {
                         data = JSON.parse(data);
                     }
                     catch(e) {
-                        console.warn('[!GameScene]checksave:', data, data.$$type, e);
+                        console.warn('[!GameScene]checksave:存档错误：', data, data.$$type, e);
                         return false;
                     }
                 }
@@ -4691,7 +4721,6 @@ Item {
             }
 
             if(data) {
-
                 //压缩
                 if(data.Type === 1) {
                     //debug下不检测存档
@@ -4731,14 +4760,13 @@ Item {
             return false;
         }
 
-        //存档（将game.gd存为 文件，开头为 $$ 的键不会保存；同时保存 引擎变量）
-        //fileName为字符串（本地存档文件路径）或true（返回存档字符串数据）；
-        //showName为显示名；
-        //compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
-        //成功返回 存档序列化字符串，失败返回false；
-        //game.async(function*(){game.save('存档3')})
-        //返回：Promise对象（异步返回值为存档内容，出错会返回false）；
-        readonly property var save: function(fileName='autosave', showName='', compressionLevel=-1) {
+        //功能：存档（将game.gd存为 文件），注意：1、开头为 $$ 的键不会保存；2、会调用通用脚本的 $beforeSave 和 $afterSave 函数/生成器；3、会覆盖已有存档文件；
+        //参数：fileName为字符串（本地存档文件路径）或true（不保存，只接受返回结果）；
+        //  showName为游戏中存档显示名；
+        //  compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
+        //返回：Promise对象（异步返回值为存档数据字符串，出错返回false）；
+        //示例：yield game.save('存档1')
+        function save(fileName='autosave', showName='', compressionLevel=-1) {
             //scriptQueue.runNextEventLoop('save');
 
             //let _resolve, _reject;
@@ -4850,10 +4878,16 @@ Item {
             return ret;
         }
 
-        //读档（读取数据到 game.gd）；
-        //data为字符串（本地存档文件路径）或对象；
+        //功能：写入引擎变量（退出游戏时会自动写入）；
+        function savecd() {
+            $GameMakerGlobal.settings.setValue('Projects/' + $GameMakerGlobal.config.strCurrentProjectName, game.cd);
+            //return true;
+        }
+
+        //功能：读档（读取数据到 game.gd），注意：会调用通用脚本的 $beforeLoad 和 $afterLoad 函数/生成器；
+        //参数：data为字符串（本地存档文件路径）或对象（存档数据）；
         //返回：Promise对象（异步返回值为true，出错会返回false）；
-        readonly property var load: function(data='autosave') {
+        function load(data='autosave') {
             //let _resolve, _reject;
 
             //执行顺序：game.run(game.load())->load()->new Promise(_load)->_load()->$CommonLibJS.asyncScript()的函数（因为是生成器，所以直接进入运行）->...->release()->game.run()（将init等代码放入队列第一个）->resolve(true)->进入game.run()执行队列第一个脚本（也就是init等代码）运行完毕->队列第二个脚本继续（game.run(game.load())下一条指令）。。。
@@ -4877,8 +4911,8 @@ Item {
                         return resolve(false);
 
 
-                    let ret = checksave(data);
-                    if(!ret) {
+                    data = checksave(data);
+                    if(!data) {
                         //scriptQueue.runNextEventLoop('game.load');
                         return resolve(false);
                     }
@@ -4903,7 +4937,7 @@ Item {
 
                     yield* release(false);
                     game.run({Script: function*() { //这样写是因为要把下面代码放入系统scriptQueue中运行（不是必须但我建议这样），且放在队列最前面，运行完毕后再进行下一个脚本（因为要求load要运行完毕）；
-                        yield* init(false, false, ret['Data']);
+                        yield* init(false, false, data['Data']);
 
 
 
@@ -4968,10 +5002,11 @@ Item {
         }
 
 
-        //返回插件
-        //参数0是组织/开发者名，参数1是插件名
-        //返回：Promise对象（异步返回值为插件对象，出错会抛出错误）；
-        readonly property var plugin: function(...params) {
+        //功能：返回插件对象（如果没有加载和初始化，则会调用插件的 加载$load 和 初始化$init 函数，一般插件在游戏启动时会自动加载，只有标记为手动加载的插件才会调用时加载，称为懒加载）；
+        //参数：params是两个字符串参数（组织/开发者名 和 插件名） 或 小于两个参数；
+        //返回：Promise对象（异步返回值为插件对象，出错返回null），如果params小于两个参数则返回所有插件的对象；
+        //示例：yield game.plugin('作者名', '模块名')
+        function plugin(...params) {
             //let _resolve, _reject;
 
             //！如果定义为生成器格式，则将 resolve 和 reject 删除即可（用return返回数据）；
@@ -4985,7 +5020,6 @@ Item {
                         //scriptQueue.runNextEventLoop('plugin');
                         return resolve(_private.objPlugins);
                     }
-
 
                     //const plugin = _private.objPlugins[params[0]][params[1]];
                     const plugin = $CommonLibJS.getObjectValue(_private.objPlugins, params[0], params[1]);
@@ -5033,11 +5067,11 @@ Item {
                     else {
                         if(!plugin) {
                             console.warn('[!GameScene]No Plugin:', params[0], params[1], Object.keys(_private.objPlugins), _private.objPlugins[params[0]] ? Object.keys(_private.objPlugins[params[0]]) : '');
-                            return reject('No Plugin');
+                            //return reject('No Plugin');
+                            return resolve(null);
                         }
                         //scriptQueue.runNextEventLoop('plugin');
                     }
-
 
                     return resolve(plugin);
 
@@ -5050,19 +5084,19 @@ Item {
             return ret;
         }
 
-
-        //设置游戏阶段（地图0、战斗1），内部使用
-        readonly property var status: function(s=null) {
+        //功能：设置游戏阶段（地图0、战斗1），内部使用；可以获取当前游戏状态；
+        //参数：s为要设置的值；
+        //返回：系统当前状态；
+        function status(s=null) {
             if(s === undefined || s === null)
                 return _private.nStatus;
             return (_private.nStatus = s);
         }
 
-
-
-        //读取json文件，返回解析后对象
-        //filePath为 绝对或相对路径 的文件名，如果filePath以/开头，则相对于本项目根路径；
-        readonly property var loadjson: function(filePath) {
+        //功能：读取json文件并解析；
+        //参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+        //返回：对象或数组，失败返回null；
+        function loadjson(filePath) {
             filePath = filePath.trim();
             if(!filePath)
                 return null;
@@ -5080,7 +5114,9 @@ Item {
         }
 
 
-        //异步脚本（协程运行）
+        //功能：异步脚本（协程运行）；
+        //参数：
+        //返回：
         //readonly property var async: $CommonLibJS.asyncScript
         function async(...params) {return _private.asyncScript.async(...params);}
 
@@ -5098,10 +5134,11 @@ Item {
         //      ScriptQueue：脚本队列，缺省 本脚本队列；
         //      Tips：简要说明 或 文件路径；
         //    如果为数组（下标0为Script脚本时，下标1为Tips，是null或true时为给_private.scriptQueue.lastEscapeValue值）；
-        //  如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(n);
+        //  params：给调用Script脚本时的参数；
+        //注意：如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(n);
         //返回：-9<ret<9：run的返回值；其他为scriptQueue.create的返回值+-10；
         //  1：立刻运行了；2：下一次事件循环中运行；0：只是加入；null、undefined：没有作用；-1：参数错误；
-        readonly property var run: function(scriptInfo, ...params) {
+        function run(scriptInfo, ...params) {
             /*if($CommonLibJS.isValidNumber(scriptInfo)) {   //如果是数字，则默认是优先级
                 scriptInfo = {Priority: scriptInfo};
             }
@@ -5223,7 +5260,7 @@ Item {
 
                 //scriptInfo.Script = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/' + scriptInfo.Script;
                 //此脚本所在路径 注入到全局上下文环境（如果使用evaluateFile只能这样全局上下文环境，目前再没有给evaluate传递上下文环境的办法）
-                $Frame.sl_globalObject().evaluateFilePath = $Frame.sl_absolutePath(scriptInfo.Script);
+                //$Frame.sl_globalObject().evaluateFilePath = $Frame.sl_absolutePath(scriptInfo.Script);
                 //执行脚本，必须返回3种类型之一
                 scriptInfo.Script = $Frame.sl_evaluateFile(scriptInfo.Script); //!!用这个好处是自带提供错误的文件路径（我做的Eval也可以了）
 
@@ -5298,45 +5335,53 @@ Item {
         }
         */
 
-        //脚本上次返回的值
-        readonly property var lastreturn: ()=>_private.scriptQueue.lastReturnedValue
-        //脚本上次返回的值（return+yield）
-        readonly property var lastvalue: ()=>_private.scriptQueue.lastEscapeValue
+        //功能：game.run执行的脚本上次返回（return）的值；
+        //readonly property var lastreturn: ()=>_private.scriptQueue.lastReturnedValue
+        //功能：game.run执行的脚本上次返回（return+yield）的值；
+        //readonly property var lastvalue: ()=>_private.scriptQueue.lastEscapeValue
 
-        //运行代码；
-        //在这里执行会有上下文环境
-        readonly property var evalcode: function(cmd, filePath='', envs={}) {
-            return $eval(cmd, filePath, envs);
+        //功能：在游戏场景的上下文环境中执行代码；
+        //返回：eval运行结果；
+        function evalcode(cmd, /*filePath='', envs={}*/) {
+            return $eval(cmd, /*filePath, envs*/);
         }
 
-        //fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径
-        readonly property var evalfile: function(fileName, filePath='', envs={}) {
-            fileName = fileName.trim();
-            if(!filePath)
-                filePath = game.$projectpath + '/' + fileName;
-            else
-                filePath = filePath + '/' + fileName;
-
-
+        //功能：在游戏场景的上下文环境中执行代码；
+        //参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+        //返回：eval运行结果；文件不存在则会抛出错误；
+        function evalfile(filePath, /*envs={}*/) {
             //return $CommonLibJS._evalFile(filePath, envs);
 
+            filePath = filePath.trim();
+            if(!filePath)
+                return null;
 
-            if(!$Frame.sl_fileExists(filePath))
-                throw new Error('不存在文件:' + filePath);
+            if(filePath.startsWith('/'))
+                filePath = game.$projectpath + '/' + filePath;
 
+            if(!$Frame.sl_fileExists(filePath)) {
+                throw new Error('不存在文件：' + filePath);
+                //console.warn('[!GameScene]evalfile:不存在文件：', filePath);
+                //return null;
+            }
+
+            //const text = File.read(filePath);
             const text = $Frame.sl_fileRead(filePath);
-            //const cfg = File.read(filePath);
+            /*if(!text) {
+                console.warn('[!GameScene]evalfile FAIL:', filePath);
+                return false;
+            }
+            */
 
-            //if(!text)
-            //    return false;
-            return $eval(text, envs);
+            return $eval(text, /*envs*/);
         }
 
-        //用C++执行脚本；已注入game和fight环境
-        readonly property var evaluate: function(program, filePath='', lineNumber = 1) {
+        /*/用C++执行program脚本命令（类似runcode）；在初始化时已注入game上下文环境？？？；优点是异常时可提供文件路径；
+        function evaluate(program, filePath='', lineNumber = 1) {
             return $Frame.sl_evaluate(program, filePath, lineNumber);
         }
-        readonly property var evaluateFile: function(file, path, lineNumber = 1) {
+        //用C++执行脚本文件（类似runfile）；在初始化时已注入game上下文环境？？？；优点是异常时可提供文件路径；
+        function evaluateFile(file, path, lineNumber = 1) {
             if(path === undefined) {
                 if($Frame.sl_globalObject().evaluateFilePath === undefined)
                     $Frame.sl_globalObject().evaluateFilePath = game.$projectpath;
@@ -5346,16 +5391,29 @@ Item {
                 $Frame.sl_globalObject().evaluateFilePath = path;
             return $Frame.sl_evaluateFile(path + '/' + file, lineNumber);
         }
-        readonly property var importModule: function(filePath) {
+        //用C++导入一个脚本（脚本可以使用import和export指令，但只能导入一次，也不能卸载，所以不方便调试）；
+        function importModule(filePath) {
             return $Frame.sl_importModule(filePath);
         }
+        */
 
 
-        //手动写入引擎变量（默认退出游戏时写入）
-        function savecd() {
-            $GameMakerGlobal.settings.setValue('Projects/' + $GameMakerGlobal.config.strCurrentProjectName, game.cd);
-            //return true;
+        function request(params={}, verifyType=0, type=1) {
+            return $CommonLibJS.requestEx(params, verifyType, type).catch((e)=>{
+                //throw e;
+                $CommonLibJS.printException(e);
+                return e.$params;
+            });
         }
+        function http() {
+            return new XMLHttpRequest;
+        }
+        function date(...args) {
+            return $CommonLibJS.formatDate(...args);
+        }
+        //readonly property var math: Math
+
+
 
         //局部/全局 数据/方法
         //d和f是地图变量，切换地图时清空；
@@ -5607,19 +5665,6 @@ Item {
         //地图大小和视窗大小
         //readonly property size $mapSize: Qt.size(itemViewPort.itemContainer.width, itemViewPort.itemContainer.height)
         //readonly property size $sceneSize: Qt.size(itemViewPort.width, itemViewPort.height)
-
-
-
-        function request(params={}, verifyType=0, type=1) {
-            return $CommonLibJS.requestEx(params, verifyType, type).catch((e)=>{
-                //throw e;
-                $CommonLibJS.printException(e);
-                return e.$params;
-            });
-        }
-        readonly property var http: ()=>new XMLHttpRequest;
-        readonly property var date: (...args)=>$CommonLibJS.formatDate(...args);
-        //readonly property var math: Math
 
     }
 
@@ -9494,6 +9539,23 @@ Item {
         //$Frame.sl_globalObject().game = game;
         //$Frame.sl_globalObject().g = game;
 
+        Object.defineProperty(game, 'lastreturn', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return _private.scriptQueue.lastReturnedValue;
+            },
+            //set(value) {},
+        });
+        Object.defineProperty(game, 'lastvalue', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return _private.scriptQueue.lastEscapeValue;
+            },
+            //set(value) {},
+        });
+
         Object.defineProperty(game, 'time', {
             enumerable: false,
             configurable: true,
@@ -9514,6 +9576,8 @@ Item {
         */
 
         //console.debug('[GameScene]sl_globalObject：', $Frame.sl_globalObject());
+
+        //_private.scriptQueue.bContinueIfNotYieldPromiseObject = false;
 
         console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'), game, );
     }

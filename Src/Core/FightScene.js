@@ -1755,6 +1755,8 @@ function fightOver(result, force=false) {
         ///}
 
     //}
+
+    fight.fightResult = result;
 }
 
 

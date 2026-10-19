@@ -175,7 +175,7 @@ Item {
   首先注意的是，脚本的符号全部用的是半角英文符号，不可出现中文或全角的符号（字符串除外），否则会报错。
 
 
-目前支持（已封装）的脚本命令（中括号[]为可选参数）：
+地图场景脚本命令（中括号[]为可选参数；yield：加上表示等待命令运行完毕，有些可以省去表示同时执行）：
 
 命令：<font color='yellow'>yield game.loadmap(map, flags=0b10, ...userData);</font>
 功能：载入地图，并执行地图载入事件$start、地图离开事件$end（如果有）、通用脚本的$beforeLoadmap和$afterLoadmap。
@@ -351,6 +351,18 @@ Item {
   let h = game.fighthero(0)
   let arrNames = game.fighthero(-1, 1)
 
+
+命令：<font color='yellow'>game.addprops(fighthero, props={}, type=[1,1], flags=0b11);</font>
+功能：战斗角色修改属性；
+参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
+  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
+    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
+  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
+  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
+  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
+返回：成功返回战斗角色对象；失败返回false；
+
+
 命令：<font color='yellow'>game.getskill(fighthero, skill, skillIndex=-1, copyedNewProps={});</font>：
 功能：获得技能；
 参数：fighthero为下标，或战斗角色$id，或战斗角色对象；
@@ -376,15 +388,6 @@ Item {
 返回：成功返回 技能数组，失败返回false或null；
 示例：let skill = game.skill('鹰战士', '新技能1')
 
-命令：<font color='yellow'>game.addprops(fighthero, props={}, type=[1,1], flags=0b11);</font>
-功能：战斗角色修改属性；
-参数：fighthero为下标，或战斗角色的name，或战斗角色对象；
-  props：对象；Key可以为 属性 或 属性,下标，Value可以为 数字（字符串属性或n段属性都修改） 或 数组（针对n段属性，对应修改）；
-    支持格式：{HP: 6, HP: [6,6,6], 'HP,2': 6}
-  type为1表示加，为2表示乘，为3表示赋值，为0表示将n段值被n+1段值赋值；
-  type如果为数组，第一个值为上面的含义，第二个表示乘的时候 参考属性（0为properties（默认），1为propertiesWithExtra）；
-  flags：从左到右：是否检测升级，是否调用刷新函数（如果修改一些不用刷新的属性，就不用刷新）；
-返回：成功返回战斗角色对象；失败返回false；
 
 命令：<font color='yellow'>game.getgoods(goods, count);</font>
 功能：从 goods 中给 背包 转移 count个道具；返回背包中 改变后 道具个数，返回false表示不够或其他错误；
@@ -438,6 +441,7 @@ Item {
   positionName为部位名称；
 返回：全部装备的数组 或 某一个位置的装备；错误返回false；
 
+
 命令：<font color='yellow'>[yield] game.trade(goods=[], mygoodsinclude=true, pauseGame=true, callback=true);</font>
 功能：进入交易界面；
 参数：goods为购买交易的道具RID列表，如果为true，则直接创建组件对象并返回（需要自己调用显示函数）；
@@ -446,10 +450,24 @@ Item {
   callback为交易结束后的脚本。参数同命令msg的参数；回调函数的params为dialogTrade；
 返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误），$params属性为交易组件对象；如果第一个参数为true，则返回创建的组件对象；
 
+命令：<font color='yellow'>[yield] game.window(params=null, style={}, pauseGame=true);</font>
+功能：显示游戏系统窗口；
+参数：
+  params：
+    $id：0b1为主菜单；0b10为战斗人物信息；0b100为道具信息；0b1000为系统菜单；
+    $visible：为false表示关闭窗口；
+    $value：战斗人物信息（0b10）时为下标；
+  style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
+  pauseGame同msg的参数；
+  callback同命令msg的参数；回调函数的params为gameMenuWindow；
+返回：Promise对象（异步返回值为回调函数的第一个参数，出错会抛出错误）；如果为关闭窗口（$visible为false），则返回窗口组件对象；
+
+
 命令：<font color='yellow'>game.money(m=0);</font>：获得金钱；返回金钱数目；
 功能：获得金钱；
 参数：m为增加的钱数；
 返回：目前金钱数；
+
 
 命令：<font color='yellow'>game.addtimer(timerName, interval, times=1, flags=0b10, ...params);</font>
 功能：创建定时器；
@@ -468,6 +486,7 @@ Item {
 返回：成功true；如果没有则false；
 
 注意：如果是局部定时器，则触发的脚本在 地图脚本 或 game.f[定时器名] 中定义；如果是全局，则触发的脚本在 game.gf[定时器名] 中定义。
+
 
 命令：<font color='yellow'>game.playmusic(musicParams);</font>
 功能：播放音乐；
@@ -509,6 +528,7 @@ Item {
 命令：<font color='yellow'>game.musicpausing();</font>
 功能：音乐是否为暂停状态；
 
+
 命令：<font color='yellow'>[yield] game.playsoundeffect(soundeffectName, channel=-1, loops=1, forcePlay=false);</font>
 功能：播放音效（支持任何音频，推荐wav）；
 参数：channel为通道（目前0~9，true为随机挑选没有播放的通道，如果没有则随机强制选择一个；false为随机挑选没有播放的通道，如果没有则返回；）；
@@ -534,6 +554,7 @@ Item {
 命令：<font color='yellow'>game.soundeffectpausing();</font>
 功能：音效是否暂停状态
 
+
 命令：<font color='yellow'>[yield] game.playvideo(videoParams, pauseGame=true);</font>
 功能：播放视频；
 参数：
@@ -549,7 +570,8 @@ Item {
 功能：结束播放视频；
 返回：code为-1表示释放退出；为0表示播放结束；为1表示用户退出；
 
-<font color='yellow'>game.showimage(imageParams, id=undefined);</font>
+
+命令：<font color='yellow'>game.showimage(imageParams, id=undefined);</font>
 功能：显示图片；
 参数：imageParams为图片名或对象（包含RID）；
   imageParams为对象：包含 Image组件 的所有属性 和 $x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold 事件的回调函数；
@@ -565,12 +587,12 @@ Item {
     $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
 返回：成功返回图片组件；失败返回false；
 
-<font color='yellow'>game.delimage(idParams);</font>
+命令：<font color='yellow'>game.delimage(idParams);</font>
 功能：删除图片；
 参数：idParams：-1：屏幕上的全部图片组件（包含图片和特效等）；数字：屏幕上的图片标识；字符串：角色上的图片标识；对象：包含$id（-1表示全部图片组件）和$parent属性（同showimage）；
 返回：true为成功，false为失败；
 
-<font color='yellow'>game.showsprite(spriteParams, id=undefined);</font>
+命令：<font color='yellow'>game.showsprite(spriteParams, id=undefined);</font>
 功能：显示特效；
 参数：spriteParams为特效名或对象（包含RID）；
   spriteParams为对象：包含 SpriteEffect组件 的所有属性、$x、$y、$width、$height、$parent、$collection、RID、$id 等属性；还包括 $pressed、$released、$clicked、$doubleClicked、$pressAndHold、$looped、$finished 事件的回调函数；
@@ -586,54 +608,207 @@ Item {
     $component：用户自己提供的组件，一般$parent也为组件时使用，由用户自己控制使用。
 返回：成功返回特效组件；失败返回false；
 
-<font color='yellow'>game.delsprite(idParams=-1);</font>
+命令：<font color='yellow'>game.delsprite(idParams=-1);</font>
 功能：删除特效；
 参数：idParams：-1：屏幕上的全部特效组件（包含图片和特效等）；数字：屏幕上的特效标识；字符串：角色上的特效标识；对象：包含$id（-1表示全部特效组件）和$parent属性（同showsprite）；
 返回：true为成功，false为失败；
 
-//设置操作（遥感可用和可见、键盘可用）；
-//参数$gamepad的$visible和$enabled，$keyboard的$enabled；
-//参数为空则返回遥感组件，可自定义；
-<font color='yellow'>game.control(config={});</font>
 
-<font color='yellow'>game.scale(n);</font>：将场景缩放n倍；可以是小数。
-<font color='yellow'>game.setscenerole(r);</font>：场景跟随某个角色。
-<font color='yellow'>game.pause();</font>：暂停游戏。
-<font color='yellow'>game.goon();</font>：继续游戏。
-<font color='yellow'>game.interval(interval);</font>：设置游戏刷新率（interval毫秒）。
+命令：<font color='yellow'>game.control(config={});</font>
+功能：设置操作（遥感可用和可见、键盘可用）；
+参数：config包含$gamepad和$keyboard分别为屏幕摇杆和键盘，$gamepad包含$visible和$enabled，$keyboard包含$enabled；
+  $gamepad和$keyboard也可以是 二进制数字（标记）；
+返回：返回遥感组件（可自定义）；
 
-<font color='yellow'>[yield] game.wait(time);</font>：暂停time毫秒。
-<font color='yellow'>game.rnd(start, end);</font>：返回start~end之间的随机整数（包含start，不包含end）。
+命令：<font color='yellow'>game.scale(n);</font>
+功能：将场景缩放n倍；
+参数：n可以是整数、小数或其他值（不作更改）；
+返回：当前场景缩放值；
 
-//显示窗口；
-//params：
-//  $id：0b1为主菜单；0b10为战斗人物信息；0b100为道具信息；0b1000为系统菜单；
-//  $value：战斗人物信息时为下标；
-//  $visible：为false表示关闭窗口；
-//style：样式，包括MaskColor、BorderColor、BackgroundColor、ItemFontSize、ItemFontColor、ItemBackgroundColor1、ItemBackgroundColor2、TitleFontSize、TitleBackgroundColor、TitleFontColor、ItemBorderColor；
-<font color='yellow'>game.window(params=null, style={}, pauseGame=true);</font>
+命令：<font color='yellow'>game.setscenerole(r=0.2);</font>
+功能：场景跟随某个角色 或 自由移动；
+参数：r为字符串表示跟随角色；为数字，则表示进入自由移动地图模式且设置为移动速度；
 
-<font color='yellow'>game.date();</font>：返回 JS 的 new Date()对象。
+命令：<font color='yellow'>game.pause(name='$user_pause', times=1);</font>
+功能：暂停游戏；
+参数：name为暂停名称（不同名称需要对应的恢复）；times为暂停多少次（也需要对应恢复多少次）；
+返回：name为false或null，返回是否暂停状态；name为true，返回系统中所有暂停的数据；否则返回name对应的times暂停次数；
 
-<font color='yellow'>game.checksave(文件名);</font>：检测存档是否存在且正确，失败返回false，成功返回存档对象（包含Name和Data）。
-<font color='yellow'>yield game.save(文件名, showName="", compressionLevel=-1);</font>：存档（将game.gd存为 文件，开头为 $$ 的键不会保存），showName为显示名，compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；成功返回true 或 存储字符串；
-<font color='yellow'>yield game.load(文件名);</font>：读档（读取数据到 game.gd），成功返回true，失败返回false。
-<font color='yellow'>game.restart(params);</font>：游戏重新开始；
+命令：<font color='yellow'>game.goon(name='$user_pause', times=-1);</font>
+功能：继续游戏；
+参数：name为暂停名称（不同名称需要对应的恢复）、true或false/null，如果为true表示清空所有name；
+  times为暂停多少次（也需要对应恢复多少次），-1为清空该name；
+返回：如果name为true返回true，如果为false/null表示返回是否继续状态，否则返回name对应的times；
 
-<font color='yellow'>game.loadjson(fileName, filePath="");</font>：读取json文件，失败返回null，返回解析后对象；fileName为 绝对或相对路径 的文件名；filePath为文件的绝对路径，如果为空，则 fileName 为相对于本项目根路径。
+命令：<font color='yellow'>game.interval(interval);</font>
+功能：设置游戏刷新率；
+参数：interval为整数（毫秒）、其他值（不做更改），如果小于0则设置为默认的16；
+返回：当前游戏刷新率；
 
-<font color='yellow'>game.run(script, ...params);</font>：执行脚本命令（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）。
-<font color='yellow'>game.script(fileName, filePath);</font>：执行脚本文件（注意：此命令会将脚本放入game系统脚本引擎中等候执行，一般用来在Maker中载入外部脚本文件）；参数同game.loadjson。
-<font color='yellow'>game.lastreturn</font>：脚本上次返回的值；
-<font color='yellow'>game.lastvalue</font>：脚本上次返回的值（return+yield）；
+命令：<font color='yellow'>[yield] game.wait(time);</font>
+功能：脚本暂停；
+参数：ms为毫秒；
+返回：Promise对象；
 
-<font color='yellow'>game.evalcode(data, filePath="", envs={});</font>：立即执行脚本命令，失败返回null，成功返回结果；filePath为异常时提供的文件名（目前不支持字符串中的函数异常），envs是额外的上下文环境；和 game.evaluate 的区别是，这个执行时自带所有的上下文环境。
-<font color='yellow'>game.evalfile(fileName, filePath="", envs={});</font>：立即执行脚本文件，失败返回null，成功返回结果；fileName、filePath参数同game.loadjson，envs参数同game.runcode；和 game.evaluateFile 的区别是，这个执行时自带所有的上下文环境。
+命令：<font color='yellow'>game.rnd(start, end);</font>
+功能：生成随机整数；
+参数：start~end之间（包含start，不包含end）；
+返回：随机整数。
 
-<font color='yellow'>game.evaluate(program, filePath="", lineNumber = 1);</font>：用C++执行program脚本命令（类似runcode）；在初始化时已注入game上下文环境；优点是异常时可提供文件路径；无初学者不要用。
-<font color='yellow'>game.evaluateFile</font>：用C++执行脚本文件（类似runfile）；在初始化时已注入game上下文环境；优点是异常时可提供文件路径；初学者不要用。
-<font color='yellow'>game.importModule</font>：用C++导入一个脚本（脚本可以使用import和export指令，但只能导入一次，也不能卸载，所以不方便调试）；初学者不要用。
 
+命令：<font color='yellow'>game.checksave(data);</font>
+功能：检测存档是否存在 且 验证是否正确；
+参数：data为字符串（本地存档文件路径）或对象（存档数据，此时仅验证和解压Data字段）；
+返回：失败返回false；成功返回 存档对象（包含Name和解压后的Data）；
+
+命令：<font color='yellow'>yield game.save(fileName='autosave', showName='', compressionLevel=-1);</font>
+功能：存档（将game.gd存为 文件），注意：1、开头为 $$ 的键不会保存；2、会调用通用脚本的 $beforeSave 和 $afterSave 函数/生成器；3、会覆盖已有存档文件；
+参数：fileName为字符串（本地存档文件路径）或true（不保存，只接受返回结果）；
+  showName为游戏中存档显示名；
+  compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
+返回：Promise对象（异步返回值为存档数据字符串，出错返回false）；
+示例：yield game.save('存档1')
+
+命令：<font color='yellow'>game.savecd();</font>
+功能：写入引擎变量（退出游戏时会自动写入）；
+
+命令：<font color='yellow'>yield game.load('autosave');</font>
+功能：读档（读取数据到 game.gd），注意：会调用通用脚本的 $beforeLoad 和 $afterLoad 函数/生成器；
+参数：data为字符串（本地存档文件路径）或对象（存档数据）；
+返回：Promise对象（异步返回值为true，出错会返回false）；
+
+
+命令：<font color='yellow'>yield game.plugin(...params);</font>
+功能：返回插件对象（如果没有加载和初始化，则会调用插件的 加载$load 和 初始化$init 函数，一般插件在游戏启动时会自动加载，只有标记为手动加载的插件才会调用时加载，称为懒加载）；
+参数：params是两个字符串参数（组织/开发者名 和 插件名） 或 小于两个参数；
+返回：Promise对象（异步返回值为插件对象，出错返回null），如果params小于两个参数则返回所有插件的对象；
+示例：yield game.plugin('作者名', '模块名')
+
+
+命令：game.status(s=null);
+功能：设置游戏阶段（地图0、战斗1），内部使用；可以获取当前游戏状态；
+参数：s为要设置的值；
+返回：系统当前状态；
+
+
+命令：<font color='yellow'>game.loadjson(filePath);</font>
+功能：读取json文件并解析；
+参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+返回：对象或数组，失败返回null；
+
+
+命令：<font color='yellow'>game.async(scriptInfo, ...params);</font>
+功能：协程函数用法（简单使用）：每次生成一个新协程运行，且生成的协程不可控，只能等待运行完毕；
+参数：func为函数、生成器函数、生成器对象或数组；
+    func为数组时，第0个参数为 函数、生成器函数、生成器对象；第1个参数为tips字符串；第2个参数为运行时机runType；第3个参数为运行完毕后的回调函数；第4个参数为要保存的生成器数组；注意有 运行时机方面 和 This上下文获取 的区别（见上）；
+      简单使用时，除了参数0必填，1、2、3可选，4一般为AsyncScript对象时使用；
+    runType为-1表示时机按默认（生成器立即运行，两个函数下个事件循环运行）；0表示立即运行；1表示下次事件循环时运行；
+返回：0表示下次事件循环再开始运行；/*1表示异步开始并暂停；2表示异步运行了一次就结束了；*/为对象表示封装过的generatorInfo；-1表示func为null；-2表示不能异步（类型不对）；
+
+命令：<font color='yellow'>game.run(scriptInfo, ...params);</font>
+将代码放入 系统脚本引擎（scriptQueue）中 等候执行；
+参数：
+  scriptInfo：
+    如果为Script脚本（字符串、函数、生成器函数、生成器对象都可）；
+    如果为对象，则有以下参数：
+      Script 为脚本，除了上述类型外，还可以：
+        如果为false则表示强制执行队列，为true表示下次js事件循环再运行，为null直接返回，为undefined报错后返回；
+      Priority为优先级；>=0为插入到对应的事件队列下标位置（0为挂到第一个）；-1为追加到队尾（缺省）；-2为立即执行（此时代码前必须有yield）；-3为将此 函数/生成器 执行完毕再返回（注意：代码里yield不能返回到游戏中了，所以最好别用生成器或yield）；
+      Type为运行类型（如果为0（缺省），表示为代码，否则表示Script为JS文件名，而scriptInfo.Path为路径）；
+      Running为0、1、2或-1。表示如果队列里如果为空则：0是不处理；1是立即执行；2是发送一个JS事件在下一个JS事件循环里执行；-1（缺省）是自动选择（函数类是-2，非函数类是1）；但这除了Priority为-2、-3的情况下，如果Priority为-2或-3则都会立刻运行；
+      Value：传递给事件队列的值，缺省上一次的；
+      ScriptQueue：脚本队列，缺省 本脚本队列；
+      Tips：简要说明 或 文件路径；
+    如果为数组（下标0为Script脚本时，下标1为Tips，是null或true时为给_private.scriptQueue.lastEscapeValue值）；
+  params：给调用Script脚本时的参数；
+注意：如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(n);
+返回：-9<ret<9：run的返回值；其他为scriptQueue.create的返回值+-10；
+  1：立刻运行了；2：下一次事件循环中运行；0：只是加入；null、undefined：没有作用；-1：参数错误；
+
+命令：<font color='yellow'>game.lastreturn;</font>
+功能：game.run执行的脚本上次返回（return）的值；
+
+命令：<font color='yellow'>game.lastvalue;</font>
+功能：game.run执行的脚本上次返回（return+yield）的值；
+
+命令：game.evalcode(cmd);
+功能：在游戏场景的上下文环境中执行代码；
+返回：eval运行结果；
+
+命令：game.evalfile(filePath);
+功能：在游戏场景的上下文环境中执行代码；
+参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+返回：eval运行结果；文件不存在则会抛出错误；
+
+
+命令：<font color='yellow'>game.request(params={}, verifyType=0, type=1);</font>
+功能：发送http数据；
+参数：
+  params包括：URL、Method、Headers（对象）、
+    ReceivedCallback（部分数据到达回调，比如Chunk；参数分别是：已收到数据、此次收到数据、HTTPReply对象，如果使用js的XMLHTTPRequest，则只有第1个参数）、
+    Gzip（数组，从左到右为压缩级别和压缩大小阈值）、
+    Data（字符串、非字符串，非字符串自动序列化为JSON字符串）、CustomData（用户自定义数据，只用来传递，貌似没用？）；
+  verifyType：加密方式，目前只有0（不加密）和1（我设计的一种简单的加密方式，只能使用我设计的后端服务来解密，所以一般用0即可）；
+  type：
+    为1表示用QML的XMLHttpRequest（限制比较多，比如不能修改Cookie、User-Agent等头字段）；
+    为2表示使用Qt的QNetworkAccessManager、QNetworkRequest、QNetworkReply封装的，功能更多；
+        此时params还可以设置额外参数：FilePath（保存文件路径） 和 Params（可以设置Timeout、Priority、PeerVerifyName、MaximumRedirectsAllowed）；
+    用法差不多，封装的基本一致；
+返回：Promise对象（异步返回值为网络数据对象；出错会抛出错误）；
+示例：
+  使用回调函数：
+    $CommonLibJS.request({
+        URL: url,
+        Method: 'GET',
+        //Data: {},
+        //Gzip: [1, 1024],
+        //Headers: {},
+        //FilePath: path,
+        //Params: ...,
+        //ReceivedCallback: (allData, data, httpReply)=>{}
+    }, 2).$$then((xhr)=>{
+        console.info(xhr.responseText, xhr.$$json);
+    }).$$catch((e)=>{
+        console.info(e, e.$params.$$json);
+    });
+  或 使用异步：
+    $CommonLibJS.asyncScript(function*() {
+        try {
+            const res = yield $CommonLibJS.request({
+                URL: url,
+                Method: 'GET',
+                //Data: {},
+                //Gzip: [1, 1024],
+                //Headers: {},
+                //FilePath: path,
+                //Params: ,
+                //CustomData: customData,
+            }, 2);
+            console.info(res.responseText, res.$$json);
+        }
+        catch(e) {
+            console.info(e, e.$params.$$json);
+        }
+    });
+
+命令：<font color='yellow'>game.http();</font>
+功能：新建一个XMLHttpRequest对象并返回；
+
+命令：<font color='yellow'>game.date(format='YYYY-mm-dd HH:MM:SS zzz', date=new Date());</font>
+功能：格式化一个时间日期字符串并返回；
+
+
+
+战斗场景脚本命令：
+
+命令：<font color='yellow'>[yield] fight.msg(msg='', interval=20, pretext='', keeptime=0, style={}, callback=true);</font>
+功能：同 game.msg；
+
+命令：<font color='yellow'>[yield] fight.talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, callback=true);</font>
+功能：同 game.talk；
+
+命令：<font color='yellow'>[yield] fight.menu(title, items, style={}, callback=true);</font>
+功能：同 game.menu；
 
 //载入 fightScript 脚本 并进入战斗；
 //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；

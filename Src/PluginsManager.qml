@@ -251,19 +251,39 @@ Item {
 
         function showInstallPlugins() {
             return _private.$extends.showInstallExtends({
-                ExtendsRootPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/',
-                ExtendPathSearchDepth: 2,
-                InstallPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
+                ///ExtendsRootPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/',
+                ///ExtendPathSearchDepth: 2,
+                ///InstallPath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
                 ///JSLoader: _private.jsLoader,
+                CachePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
+                ///CacheExtendRootRelativePath: 'Plugins/',
                 MenuURL: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/menu.js',
                 DownloadURL: 'http://MakerFrame.Leamus.cn/GameMaker/Plugins/%1/%2',
-                CachePath: $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/',
-                CacheExtendRootRelativePath: 'Plugins/',
                 //CustomMenus: [[], []],
                 Callbacks: {
                     CloseCallback: ()=>sg_close(),
-                    //InstallCallback: function(cacheExtendRootPath, extendsRootPath, rpath) {},
-                    //UninstallCallback: function(extendsRootPath, rpath, type) {},
+                    BeforeInstallCallback: function*(zipPaths) {
+                        const res = yield* _private.$extends.installExtends(
+                            $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/Plugins/',
+                            $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/',
+                            zipPaths, $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/~Cache/Plugins/', 'Plugins/', 2,
+                            {
+                                //InstallCallback: function(cacheExtendRootPath, extendsRootPath, rpath) {},
+                                //UninstallCallback: function(extendsRootPath, rpath, type) {},
+                            },
+                        );
+
+                        $dialog.show({
+                            Msg: '安装成功%1个引擎扩展（%2个包），安装失败%3个引擎扩展（%4个包），卸载%5个旧引擎扩展。'.arg(res.successPlugins.length).arg(res.successZips.length).arg(res.failPlugins.length).arg(res.failZips.length).arg(res.uninstallPlugins.length),
+                            Buttons: Dialog.Yes,
+                            OnAccepted: function() {
+                                //root.forceActiveFocus();
+                            },
+                            OnRejected: ()=>{
+                                //root.forceActiveFocus();
+                            },
+                        });
+                    },
                 },
                 Parent: itemList,
             });

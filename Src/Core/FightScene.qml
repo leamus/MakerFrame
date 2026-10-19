@@ -481,6 +481,9 @@ Item {
         rootGameScene.focus = true;
 
 
+        _private.promise.$resolve(fight.fightResult);
+
+
         game.status(0);
         game.goon('$fight');
 
@@ -505,20 +508,19 @@ Item {
     property QtObject fight: QtObject {
         objectName: 'fight'
 
-        //我方和敌方
-        property var myCombatants: []
-        property var enemies: []
+        property alias myCombatants: _private.myCombatants
+        property alias enemies: _private.enemies
 
-        //战斗脚本
-        property var fightScript: null
+        property alias fightScript: _private.fightScript
 
+        property alias nRound: _private.nRound
 
         property alias nAutoAttack: _private.nAutoAttack
 
 
 
-        //同 game.msg
-        readonly property var msg: function(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}/*, buttonNum=0*/, callback=true) {
+        //功能：同 game.msg；
+        function msg(msg, interval=20, pretext='', keeptime=0, style={Type: 0b11}/*, buttonNum=0*/, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
             if($CommonLibJS.isFunction(callback) || !callback) {
@@ -539,8 +541,8 @@ Item {
             //return itemGameMsg;
         }
 
-        //同 game.talk
-        readonly property var talk: function(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, callback=true) {
+        //功能：同 game.talk；
+        function talk(role=null, msg='', interval=20, pretext='', keeptime=0, style=null, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
             if($CommonLibJS.isFunction(callback) || !callback) {
@@ -559,8 +561,8 @@ Item {
             return game.talk(role, msg, interval, pretext, keeptime, style, false, callback, itemTempComponent);
         }
 
-        //同 game.menu
-        readonly property var menu: function(title, items, style={}, callback=true) {
+        //功能：同 game.menu；
+        function menu(title, items, style={}, callback=true) {
 
             /*/调用回调函数 或 不调用回调函数
             if($CommonLibJS.isFunction(callback) || !callback) {
@@ -579,19 +581,23 @@ Item {
             return game.menu(title, items, style, false, callback, itemTempComponent);
         }
 
-        //技能选择菜单
-        readonly property var choicemenu: function(title, items, style={}) {
+        /*/功能：技能选择菜单
+        function choicemenu(title, items, style={}) {
             return menu(title, items, style, );
         }
+        */
 
 
-        //换背景图
-        readonly property var background: function(image='') {
-            //console.debug('image:::', image, $GameMakerGlobal.imageResourceURL(image));
-            imageBackground.source = $GameMakerGlobal.imageResourceURL(image);
+        //功能：换背景图；
+        //参数：imagePath为图片路径（相对于 Resources/Images）；
+        function background(imagePath='') {
+            //console.debug('image', imagePath, $GameMakerGlobal.imageResourceURL(imagePath));
+            imageBackground.source = $GameMakerGlobal.imageResourceURL(imagePath);
         }
 
-        readonly property var runaway: function(value=null) {
+        //功能：逃跑成功概率；
+        //参数：value为概率值（0~1），如果为true则表示调用通用脚本的$commonRunAwayAlgorithm算法；
+        function runaway(value=true) {
             if(value === true)
                 _private.runAwayPercent = value;
             else if($CommonLibJS.isValidNumber(value))
@@ -601,8 +607,9 @@ Item {
         }
 
 
-        //参数同 game.run
-        readonly property var run: function(scriptInfo, ...params) {
+        //功能：运行战斗脚本（与地图场景脚本是两个脚本队列）；
+        //参数：同 game.run；
+        function run(scriptInfo, ...params) {
             if($CommonLibJS.isObject(scriptInfo)) { //如果是参数对象
                 scriptInfo.ScriptQueue = _private.scriptQueue;
             }
@@ -628,26 +635,30 @@ Item {
         }
 
 
-        //载入 fightScript 脚本 并进入战斗；
-        //fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
-        //params是给战斗脚本$createData的参数。
-        readonly property var fighting: function(fightScript) {
+        //功能：载入 fightScript 脚本 并进入战斗，同时会暂停地图场景定时器主循环；
+        //参数：fightScript可以为 战斗脚本资源名、标准创建格式的对象（带有RID、Params和其他属性），或战斗脚本对象本身（带有$rid）；
+        //  params是给战斗脚本$createData的参数。
+        //返回：失败false，成功true；
+        function fighting(fightScript) {
+            let ret = $CommonLibJS.getPromise();
+            //ret.$resolve = _resolve; ret.$reject = _reject;
+
             fightScript = game.$sys.getFightScriptObject(fightScript);
             if(!fightScript) {
                 //console.warn('[!FightScene]没有战斗脚本:', fightScript);
-                return false;
+                return ret.$resolve(false);
             }
 
-            game.run({Script: function*() {
+            fight.run({Script: function*() { //game.run好像不能用，卡住了！！！测一下！！！
                 if(game.status() !== 0)
-                    return false;
+                    return ret.$resolve(false);
 
 
                 let fightHeros = game.fighthero();
                 if(fightHeros.length === 0) {
                     //game.run(function*(){yield game.msg('没有战斗人物', 10);});
                     yield game.msg('没有战斗人物', 10);
-                    return null;
+                    return ret.$resolve(null);
                 }
 
                 game.pause('$fight');
@@ -666,7 +677,8 @@ Item {
 
             }(), Tips: 'FightScene fighting'});
 
-            return true;
+            _private.promise = ret;
+            return ret;
         }
 
         //载入 fightScript 脚本 并开启随机战斗；每过 interval 毫秒执行一次 百分之probability 的概率 是否进入随机战斗；
@@ -703,8 +715,8 @@ Item {
             }
         }
 
-        //关闭随机战斗。
-        readonly property var fightoff: function() {
+        //功能：关闭随机战斗；
+        function fightoff() {
             delete game.gd['$sys_random_fight'];
 
             game.deltimer('$sys_random_fight_timer', true);
@@ -719,28 +731,30 @@ Item {
         //  为 其他值（0平1胜-1败-2逃跑） 结束战斗并执行事件（事件中调用结束信号）；
         //  为 对象 则是 用户自定义的战斗结果（包括 exp、goods、money、result 属性）；
         //流程：手动或自动 游戏结束，调用依次FightSceneJS.fightOver，执行脚本，然后通用战斗结束脚本中结尾调用 fight.over() 来清理战斗即可；
-        readonly property var over: function(result) {
-            if(result === undefined) {
+        function over(result) {
+            if(result === undefined) { //一般放在最后释放资源
                 sg_fightOver();
                 return;
             }
-            else if(result === true)
+            else if(result === true) //直接调用结束脚本（一般直接调用fight.over()来调试）
                 FightSceneJS.fightOver({exp: 0, goods: [], money: 0, result: -2}, true);
-            else if($CommonLibJS.isObject(result))
+            else if($CommonLibJS.isObject(result)) //直接调用结束脚本（一般直接调用fight.over()来调试）
                 FightSceneJS.fightOver(result, true);
-            else {
+            else { //
                 let fightResult = game.$sys.resources.commonScripts.$checkAllCombatants(fight.myCombatants, repeaterMyCombatants, fight.enemies, repeaterEnemies);
-                if(result !== null) {
+                if(result !== null) { //结束并赋值
                     fightResult.result = result;
                     FightSceneJS.fightOver(fightResult, true);
                     return;
                 }
-                else
+                else //只是检测
                     return fightResult;
             }
         }
 
 
+
+        property var fightResult: null //保存结束战斗结果
 
         property var d: ({})
 
@@ -749,7 +763,7 @@ Item {
             screen: rootFightScene,    //固定屏幕上（所有，包含战斗场景）
             viewport: itemFightViewPort,      //战斗视窗
             scene: fightScene,  //容器（包含所有战斗人物）
-            tempComponent: itemTempComponent,  //容器（包含所有战斗人物）
+            tempComponent: itemTempComponent,  //容器（挂载组件）
 
             showSkillsOrGoods: FightSceneJS.showSkillsOrGoods,
             showFightRoleInfo: function(nIndex){FightSceneJS.showFightRoleInfo(nIndex);},
@@ -1619,6 +1633,7 @@ Item {
         }
 
 
+        //容器（挂载组件）
         Item {
             id: itemTempComponent
             width: parent.width
@@ -2147,9 +2162,15 @@ Item {
 
 
 
+        //我方和敌方
+        property var myCombatants: []
+        property var enemies: []
+
+        //战斗脚本
+        property var fightScript: null
+
         //回合
         property int nRound: 0
-
 
         //自动攻击
         property int nAutoAttack: 0
@@ -2171,6 +2192,8 @@ Item {
         property var runAwayPercent
         //逃跑标记（0为没有，n为n次逃跑，-1为一直逃跑）
         property int nRunAwayFlag: 0
+
+        property var promise: null //战斗结束promise
 
 
         //战斗脚本（只用来运行gfFighting；所以也可以直接用Generator对象）
@@ -2261,6 +2284,8 @@ Item {
 
 
         //$Frame.sl_globalObject().fight = fight;
+
+        //_private.scriptQueue.bContinueIfNotYieldPromiseObject = false;
 
         console.debug('[FightScene]Component.onCompleted');
     }
