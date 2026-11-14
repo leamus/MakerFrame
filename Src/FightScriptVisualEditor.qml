@@ -240,7 +240,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/images.json';
                                 //let cfg = File.read(filePath);
-                                let cfg = $Frame.sl_fileRead(filePath);
+                                let cfg = $Frame.sl_readFile(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
@@ -304,7 +304,7 @@ Item {
                             onPressAndHold: {
                                 /*let filePath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName + '/music.json';
                                 //let cfg = File.read(filePath);
-                                let cfg = $Frame.sl_fileRead(filePath);
+                                let cfg = $Frame.sl_readFile(filePath);
                                 //console.debug('[mainImageEditor]filePath:', filePath);
 
                                 if(!cfg)
@@ -702,7 +702,7 @@ Item {
             //data.EnemiesParams = enemiesParams;
 
 
-            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 5, TypeName: 'VisualFightScript', Data: data}), _private.filepath, 0);
 
         }
 
@@ -711,7 +711,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = $Frame.sl_fileRead(filePath);
+            let data = $Frame.sl_readFile(filePath);
             console.debug('[FightScriptVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -812,7 +812,7 @@ Item {
             console.debug('data:', data);
             */
 
-            //let tpl = $Frame.sl_fileRead(filePath);
+            //let tpl = $Frame.sl_readFile(filePath);
             //console.debug('tpl:', tpl);
 
             let enemyCount = textEnemyCount.text.trim().split(',');
@@ -880,7 +880,7 @@ Item {
                 });
 
             if(result[1] !== null)
-                //let ret = $Frame.sl_fileWrite(result, _private.filepath + '.js', 0);
+                //let ret = $Frame.sl_writeFile(result, _private.filepath + '.js', 0);
                 root.sg_compile(result[1]);
 
             return result;

@@ -3030,7 +3030,7 @@ Item {
                 $Frame.sl_dirCreate(path);
 
             canvasExport.save(path + '/' + textMapName.text.trim() + '.png');
-            //$Frame.sl_fileWrite(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
+            //$Frame.sl_writeFile(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
 
             if($CommonLibJS.isFunction(fnExported)) {
@@ -3368,7 +3368,7 @@ Item {
                 //Focus: true,
             });
             //scriptEditor.editor.forceActiveFocus();
-            //scriptEditor.text = $Frame.sl_fileRead(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
+            //scriptEditor.text = $Frame.sl_readFile(path + 'map.js') || ('function* $start(){ //地图载入事件 \r\n}');
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();
             //scriptEditor.visualScriptEditor.loadData(path + 'map.vjs');
@@ -3448,7 +3448,7 @@ Item {
             }*/
 
             let path = $GameMakerGlobal.mapPath(textMapRID.text);
-            let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0);
+            let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0);
         }
         //复制可视化
         function copyVJS() {
@@ -3457,7 +3457,7 @@ Item {
                 let oldFilePath = $GameMakerGlobal.mapPath(_private.strMapRID) + '/map.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
                     let newFilePath = $GameMakerGlobal.mapPath(textMapRID.text) + '/map.vjs';
-                    let ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                    let ret = $Frame.sl_copyFile(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -3528,7 +3528,7 @@ Item {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(path + '/map.json', JSON.stringify(outputData));
-            let ret = $Frame.sl_fileWrite(JSON.stringify(outputData), newPath + '/map.json', 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify(outputData), newPath + '/map.json', 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

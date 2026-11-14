@@ -39,7 +39,7 @@ Item {
             //const data = File.read(filePath);
             //console.debug('[FightScriptEditor]filePath：', filePath);
 
-            const data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_readFile(filePath);
 
             if(data) {
                 _private.strSavedName = textFightScriptName.text = fightScriptName;
@@ -429,13 +429,13 @@ const data = (function() {
             const path = $GameMakerGlobal.fightScriptPath();
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadScript.textDocument), path + '/' + textFightScriptName.text + '/fight_script.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadScript.textDocument), path + '/' + textFightScriptName.text + '/fight_script.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     const oldFilePath = path + '/' + _private.strSavedName + '/fight_script.vjs';
                     if(textFightScriptName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textFightScriptName.text + '/fight_script.vjs', true);
+                        ret = $Frame.sl_copyFile(oldFilePath, path + '/' + textFightScriptName.text + '/fight_script.vjs', true);
                     }
                 }
 

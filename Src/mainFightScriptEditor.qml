@@ -154,7 +154,7 @@ Item {
                                 const result = fightScriptVisualEditor.compile(false);
                                 console.debug('[mainFightScriptEditor]result:', result);
                                 if(result[1]) {
-                                    $Frame.sl_fileWrite(result[1], path + 'fight_script.js', 0);
+                                    $Frame.sl_writeFile(result[1], path + 'fight_script.js', 0);
                                     //++count;
                                     successed.push(tn);
                                 }
@@ -328,7 +328,7 @@ Item {
             console.debug('[mainFightScriptEditor]filePath：', filePath);
 
             //let cfg = File.read(filePath);
-            let cfg = $Frame.sl_fileRead(filePath);
+            let cfg = $Frame.sl_readFile(filePath);
 
             if(cfg) {
                 cfg = JSON.parse(cfg);

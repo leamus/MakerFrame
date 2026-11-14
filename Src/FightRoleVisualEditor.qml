@@ -1080,7 +1080,7 @@ Item {
             data.Actions = actions;
 
 
-            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 4, TypeName: 'VisualFightRole', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1089,7 +1089,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = $Frame.sl_fileRead(filePath);
+            let data = $Frame.sl_readFile(filePath);
             console.debug('[FightRoleVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -1257,7 +1257,7 @@ Item {
                 });
 
             if(result[1] !== null)
-                //let ret = $Frame.sl_fileWrite(result, _private.filepath + '.js', 0);
+                //let ret = $Frame.sl_writeFile(result, _private.filepath + '.js', 0);
                 root.sg_compile(result[1]);
 
             return result;
@@ -1388,7 +1388,7 @@ const data = (function() {
     */
     //方法2：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
-        const levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        const levelInfos = $Frame.sl_readFile($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
         try {
             $commons.levelInfos = JSON.parse(levelInfos);
         }

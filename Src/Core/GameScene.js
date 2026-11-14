@@ -346,7 +346,7 @@ function* loadResources() {
 
             /*let filePath = path + '/' + item + '/goods.json';
             //console.debug(items, item, filePath)
-            let info = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
+            let info = $Frame.sl_readFile($GlobalJS.toPath(filePath));
 
             if(info) {
                 info = JSON.parse(info);
@@ -378,7 +378,7 @@ function* loadResources() {
 
             /*let filePath = path + '/' + item + '/fight_skill.json';
             //console.debug(path, items, item, filePath)
-            let info = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
+            let info = $Frame.sl_readFile($GlobalJS.toPath(filePath));
 
             if(info) {
                 info = JSON.parse(info);
@@ -425,7 +425,7 @@ function* loadResources() {
 
 
             //let info = File.read(filePath);
-            /*let info = $Frame.sl_fileRead($GlobalJS.toPath(path + '/' + item + '/fight_role.json'));
+            /*let info = $Frame.sl_readFile($GlobalJS.toPath(path + '/' + item + '/fight_role.json'));
 
             if(info) {
                 info = JSON.parse(info);
@@ -497,7 +497,7 @@ function* loadResources() {
     /*/读图片信息
     filePath = game.$projectpath + '/images.json';
     //let cfg = File.read(filePath);
-    info = $Frame.sl_fileRead(filePath);
+    info = $Frame.sl_readFile(filePath);
     //console.debug('info', filePath, info)
     //console.debug('cfg', cfg, filePath);
 
@@ -512,7 +512,7 @@ function* loadResources() {
     //读音乐信息
     filePath = game.$projectpath + '/music.json';
     //let cfg = File.read(filePath);
-    info = $Frame.sl_fileRead(filePath);
+    info = $Frame.sl_readFile(filePath);
     //console.debug('info', filePath, info)
     //console.debug('cfg', cfg, filePath);
 
@@ -527,7 +527,7 @@ function* loadResources() {
     //读视频信息
     filePath = game.$projectpath + '/videos.json';
     //let cfg = File.read(filePath);
-    info = $Frame.sl_fileRead(filePath);
+    info = $Frame.sl_readFile(filePath);
     //console.debug('info', filePath, info)
     //console.debug('cfg', cfg, filePath);
 
@@ -916,7 +916,7 @@ function getSpriteResource(item, forceLoad=false) {
     /*/读特效信息
     let spriteDirPath = $GameMakerGlobal.spritePath(item);
 
-    let info = $Frame.sl_fileRead(spriteDirPath + '/sprite.json');
+    let info = $Frame.sl_readFile(spriteDirPath + '/sprite.json');
     if(info)
         info = JSON.parse(info);
     if($Frame.sl_fileExists(spriteDirPath + '/sprite.js')) {
@@ -976,7 +976,7 @@ function getRoleResource(item, forceLoad=false) {
     /*/读角色信息
     let roleDirPath = $GameMakerGlobal.rolePath(item);
 
-    let info = $Frame.sl_fileRead(roleDirPath + '/role.json');
+    let info = $Frame.sl_readFile(roleDirPath + '/role.json');
     if(info)
         info = JSON.parse(info);
     if($Frame.sl_fileExists(roleDirPath + '/role.js')) {
@@ -1010,7 +1010,7 @@ function getMapResource(item, forceLoad=false) {
     //读地图信息
     let mapDirPath = $GameMakerGlobal.mapPath(item);
 
-    let info = $Frame.sl_fileRead(mapDirPath + '/map.json');
+    let info = $Frame.sl_readFile(mapDirPath + '/map.json');
     if(info)
         info = JSON.parse(info);
     if(info) {
@@ -1416,7 +1416,7 @@ function getSpriteEffect(spriteEffectParams, spriteEffectComp, newParams={}, par
 
     /*let filePath = $GameMakerGlobal.spritePath(spriteEffectParams) + '/sprite.json');
     //console.debug('[GameScene]filePath2：', filePath);
-    let spriteResourceInfo = $Frame.sl_fileRead(filePath);
+    let spriteResourceInfo = $Frame.sl_readFile(filePath);
     * /
     let spriteResourceInfo = GameSceneJS.getSpriteResource(spriteEffectParams.RID);
     $CommonLibJS.copyPropertiesToObject(spriteResourceInfo, spriteEffectParams, {onlyCopyExists: true});
@@ -1463,7 +1463,7 @@ function createRole(roleParams, roleComp, newParams={}, parent=itemViewPort.item
 
     /*let filePath = $GameMakerGlobal.rolePath(roleParams) + '/role.json';
     //console.debug('[GameScene]filePath2：', filePath);
-    let roleResourceInfo = $Frame.sl_fileRead(filePath);
+    let roleResourceInfo = $Frame.sl_readFile(filePath);
     */
 
     const roleResourceInfo = $CommonLibJS.isString(roleParams) ? GameSceneJS.getRoleResource(roleParams) : roleParams;

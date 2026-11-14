@@ -222,7 +222,7 @@ Item {
         let data = request.responseText;
         * /
 
-        let data = $Frame.sl_fileRead(path);
+        let data = $Frame.sl_readFile(path);
         if(data)
             return data.split(/\r?\n/);
         return null;

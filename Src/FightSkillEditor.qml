@@ -34,7 +34,7 @@ Item {
 
     function init(fightSkillName) {
         if(fightSkillName) {
-            const data = $Frame.sl_fileRead($GameMakerGlobal.fightSkillPath(fightSkillName) + '/fight_skill.js');
+            const data = $Frame.sl_readFile($GameMakerGlobal.fightSkillPath(fightSkillName) + '/fight_skill.js');
 
             if(data) {
                 _private.strSavedName = textFightSkillName.text = fightSkillName;
@@ -467,13 +467,13 @@ const data = (function() {
             const path = $GameMakerGlobal.fightSkillPath();
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     const oldFilePath = path + '/' + _private.strSavedName + '/fight_skill.vjs';
                     if(textFightSkillName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textFightSkillName.text + '/fight_skill.vjs', true);
+                        ret = $Frame.sl_copyFile(oldFilePath, path + '/' + textFightSkillName.text + '/fight_skill.vjs', true);
                     }
                 }
 

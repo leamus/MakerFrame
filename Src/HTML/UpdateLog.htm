@@ -1,154 +1,3 @@
-﻿import QtQuick 2.14
-import QtQuick.Window 2.14
-import QtQuick.Controls 2.14
-//import QtQuick.Dialogs 1.3 as Dialog1
-import QtQuick.Layouts 1.14
-
-
-//import cn.Leamus.MakerFrame 1.0
-
-
-import _Global 1.0
-import _Global.Button 1.0
-
-
-import 'qrc:/QML'
-
-
-//import './Core'
-
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
-//import 'File.js' as File
-
-
-
-Item {
-    id: root
-
-
-    signal sg_close();
-
-
-
-    //width: 600
-    //height: 800
-    anchors.fill: parent
-
-    focus: true
-    clip: true
-
-    //color: $Global.style.backgroundColor
-
-
-
-    Mask {
-        anchors.fill: parent
-        //opacity: 0
-        color: $Global.style.backgroundColor
-        //radius: 9
-    }
-
-
-    ColumnLayout {
-        width: parent.width * 0.96
-        height: parent.height * 0.96
-        anchors.centerIn: parent
-
-        Notepad {
-            id: notepad
-
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            //Layout.maximumHeight: parent.height
-            Layout.fillHeight: true
-
-
-            text: ''
-
-            textArea.color: 'white'
-            //textArea.color: $Global.style.foreground
-            //textArea.enabled: false
-            //textArea.readOnly: true
-
-            textArea.wrapMode: TextArea.WrapAnywhere
-            textArea.horizontalAlignment: TextArea.AlignJustify
-            //textArea.verticalAlignment: TextArea.AlignVCenter
-
-            //textArea.selectByMouse: false
-
-            textArea.font {
-                pointSize: 15
-            }
-
-            textArea.background: Rectangle {
-                //implicitWidth: 200
-                //implicitHeight: 40
-                color: '#80000000'
-                //color: 'transparent'
-                //color: $Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
-                border.width: parent.parent.textArea.activeFocus ? 2 : 1
-            }
-        }
-
-        Button {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-
-            text: '返　回'
-            onClicked: {
-                sg_close();
-            }
-            /*onPressAndHold: {
-                notepad.textArea.selectByMouse = !notepad.textArea.selectByMouse;
-            }
-            */
-        }
-    }
-
-
-
-    QtObject {
-        id: _private
-
-        readonly property QtObject config: QtObject { //配置
-            //id: _config
-        }
-    }
-
-
-
-    //Keys.forwardTo: []
-    Keys.onEscapePressed: function(event) {
-        console.debug('[mainUpdateLog]Keys.onEscapePressed');
-        event.accepted = true;
-
-        sg_close();
-    }
-    Keys.onBackPressed: function(event) {
-        console.debug('[mainUpdateLog]Keys.onBackPressed');
-        event.accepted = true;
-
-        sg_close();
-    }
-    Keys.onPressed: function(event) {
-        console.debug('[mainUpdateLog]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
-        event.accepted = true;
-    }
-    Keys.onReleased: function(event) {
-        console.debug('[mainUpdateLog]Keys.onReleased:', event.key, event.isAutoRepeat);
-        event.accepted = true;
-    }
-
-
-    Component.onCompleted: {
-        const t = `
 <CENTER><B>更新日志</B></CENTER>
 
 正在开发：无限地图（使用Canvas还是QNanoPainter？）、战旗引擎
@@ -157,6 +6,9 @@ Item {
     A表示大版本，一般情况下不会变化（如果变化表示鹰歌有极大的改动，不会兼容以前工程）；
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽可能的去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
+
+1、新增：整理和补齐QFileInfo、QFile、QDir的函数，并将我封装的简易操作函数名作修改（sl_fileDelete改为sl_removeFile、sl_fileRead改为sl_readFile、sl_fileWrite改为sl_writeFile、sl_fileCopy改为sl_copyFile、sl_fileRename改为sl_renameFile）；
+2、修改：脚本队列新增了配置（遇到非Promise暂停还是继续，默认为继续），支持暂停和强制恢复的Promise；
 
 2026/7/24：
 江湖再见~
@@ -1906,12 +1758,3 @@ Item {
 7、加入了方向遥感速度；
 
 2022/3/23：发布0.2.0版本
-`;
-        notepad.text = $CommonLibJS.convertToHTML(t);
-
-        console.debug('[mainUpdateLog]Component.onCompleted');
-    }
-    Component.onDestruction: {
-        console.debug('[mainUpdateLog]Component.onDestruction');
-    }
-}

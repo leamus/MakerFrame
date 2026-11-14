@@ -359,7 +359,7 @@ Item {
             imageIcon.source = $GlobalJS.toURL(_private.strPackageDir) + '/res/drawable-ldpi/icon.png';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/Config.js');
+            content = $Frame.sl_readFile(_private.strPackageDir + '/assets/QML/Config.js');
             if(!content) {
                 //nPackageType = 1;
                 textResult.append('读取 Config.js 失败');
@@ -386,7 +386,7 @@ Item {
             }
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
+            content = $Frame.sl_readFile(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content) {
                 textResult.append('读取 AndroidManifest.xml 失败');
                 ++error;
@@ -416,7 +416,7 @@ Item {
             textResult.text = '';
 
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/assets/QML/Config.js');
+            content = $Frame.sl_readFile(_private.strPackageDir + '/assets/QML/Config.js');
             if(!content) {
                 textResult.append('读取 Config.js 失败');
             }
@@ -434,7 +434,7 @@ Item {
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/assets/QML/Config.js');
+                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/assets/QML/Config.js');
                 if(res === 0) {
                     textResult.append('写入 Config.js 成功');
                 }
@@ -443,7 +443,7 @@ Item {
                 //console.warn(content);
             }
 
-            content = $Frame.sl_fileRead(_private.strPackageDir + '/AndroidManifest.xml');
+            content = $Frame.sl_readFile(_private.strPackageDir + '/AndroidManifest.xml');
             if(!content) {
                 textResult.append('读取 AndroidManifest.xml 失败');
             }
@@ -498,7 +498,7 @@ Item {
                 content = content.replace(regExp, textPackageName.text);
 
 
-                res = $Frame.sl_fileWrite(content, _private.strPackageDir + '/AndroidManifest.xml');
+                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/AndroidManifest.xml');
                 if(res === 0) {
                     textResult.append('写入 AndroidManifest.xml 成功');
                 }
@@ -511,12 +511,12 @@ Item {
             textIconPath.text = textIconPath.text.trim();
             //复制 icon
             if(textIconPath.text && $Frame.sl_fileExists(textIconPath.text)) {
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-hdpi/icon.png', true);
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-ldpi/icon.png', true);
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-mdpi/icon.png', true);
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xhdpi/icon.png', true);
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
-                $Frame.sl_fileCopy(textIconPath.text, strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-hdpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-ldpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-mdpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-xhdpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-xxhdpi/icon.png', true);
+                $Frame.sl_copyFile(textIconPath.text, strPackageDir + '/res/drawable-xxxhdpi/icon.png', true);
             }
         }
 

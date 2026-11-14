@@ -107,7 +107,7 @@ Item {
                     OnAccepted: function() {
                         //root.forceActiveFocus();
 
-                        $Frame.sl_fileDelete($GameMakerGlobal.videoResourcePath(item) > 0);
+                        $Frame.sl_removeFile($GameMakerGlobal.videoResourcePath(item) > 0);
                         _private.refresh();
                     },
                     OnRejected: ()=>{
@@ -184,7 +184,7 @@ Item {
                                         //$dialog.forceActiveFocus();
                                     }
                                     else {
-                                        const ret = $Frame.sl_fileCopy(path, $GameMakerGlobal.videoResourcePath(newFileName), true);
+                                        const ret = $Frame.sl_copyFile(path, $GameMakerGlobal.videoResourcePath(newFileName), true);
                                         if(ret <= 0) {
                                             $showToast('拷贝资源失败，是否目录不可写？' + newFileName);
                                             console.error('[!mainVideoEditor]Copy ERROR:', url, path, $GameMakerGlobal.videoResourcePath(newFileName));
@@ -234,7 +234,7 @@ Item {
                                 //$dialog.forceActiveFocus();
                             }
                             else {
-                                const ret = $Frame.sl_fileRename($GameMakerGlobal.videoResourcePath(oldFileName), $GameMakerGlobal.videoResourcePath(newFileName));
+                                const ret = $Frame.sl_renameFile($GameMakerGlobal.videoResourcePath(oldFileName), $GameMakerGlobal.videoResourcePath(newFileName));
                                 if(ret <= 0) {
                                     $showToast('重命名资源失败，请检查是否名称已存在或目录不可写:' + newFileName);
                                     console.error('[!mainVideoEditor]RenameFile ERROR:', $GameMakerGlobal.videoResourcePath(oldFileName), $GameMakerGlobal.videoResourcePath(newFileName));

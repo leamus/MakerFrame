@@ -109,7 +109,7 @@ Item {
 
             text: '引擎简易教程'
             onClicked: {
-                loader.load(Qt.resolvedUrl('mainEasyGameMakerTutorial.qml'));
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/EasyGameMakerTutorial.htm');
             }
         }
 
@@ -121,7 +121,43 @@ Item {
 
             text: 'JavaScript简易教程'
             onClicked: {
-                loader.load(Qt.resolvedUrl('mainEasyJavaScriptTutorial.qml'));
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/EasyJavaScriptTutorial.htm');
+            }
+        }
+
+        Button {
+            //Layout.fillWidth: true
+            Layout.preferredWidth: parent.width * 0.69
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            //Layout.preferredHeight: 50
+
+            text: '框架Frame对象教程'
+            onClicked: {
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/FrameTutorial.htm');
+            }
+        }
+
+        Button {
+            //Layout.fillWidth: true
+            Layout.preferredWidth: parent.width * 0.69
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            //Layout.preferredHeight: 50
+
+            text: '框架Platform对象教程'
+            onClicked: {
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/PlatformTutorial.htm');
+            }
+        }
+
+        Button {
+            //Layout.fillWidth: true
+            Layout.preferredWidth: parent.width * 0.69
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            //Layout.preferredHeight: 50
+
+            text: '框架QML底层教程'
+            onClicked: {
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/QMLTutorial.htm');
             }
         }
 
@@ -133,7 +169,7 @@ Item {
 
             text: '高级玩法教程'
             onClicked: {
-                loader.load(Qt.resolvedUrl('mainAdvancedTutorial.qml'));
+                loader.load(Qt.resolvedUrl('mainReader.qml'), undefined, undefined, $gameMakerRootPath + '/HTML/AdvancedTutorial.htm');
             }
         }
 
@@ -574,6 +610,7 @@ Item {
 
     L_Loader {
         id: loader
+        objectName: 'TutorialLoader'
 
 
         visible: status === Loader.Ready //false
@@ -597,6 +634,7 @@ Item {
                 loader.close();
             }
         }
+
 
 
         onStatusChanged: {
@@ -630,15 +668,15 @@ Item {
         }
 
         onLoaded: {
-            console.debug('[mainTutorial]loader onLoaded');
+            console.debug('[mainTutorial]loader onLoaded:', /*vLoadParams*/);
 
             //应用程序失去焦点时，只有loader先获取焦点（必须force），loader里的组件才可以获得焦点（也必须force），貌似loader和它的item的forceFocus没有先后顺序（说明loader设置focus后会自动再次设置它子组件focus为true的组件的focus为true）；
             ///focus = true;
             forceActiveFocus();
 
-            /*if(item.$load) {
+            if(item.$load) {
                 try {
-                    item.$load();
+                    item.$load(...vExtraData);
                 }
                 catch(e) {
                     $CommonLibJS.printException(e);
@@ -648,7 +686,6 @@ Item {
                 finally {
                 }
             }
-            */
 
             //visible = true;
         }

@@ -3584,7 +3584,7 @@ function getSpriteResource(spriteName, jsLoader=null) {
     //读特效信息
     const spriteDirPath = $GameMakerGlobal.spritePath(spriteName);
 
-    let spriteResourceInfo = $Frame.sl_fileRead(spriteDirPath + '/sprite.json');
+    let spriteResourceInfo = $Frame.sl_readFile(spriteDirPath + '/sprite.json');
     if(spriteResourceInfo)
         spriteResourceInfo = JSON.parse(spriteResourceInfo);
     if(!spriteResourceInfo) {
@@ -3766,7 +3766,7 @@ function getRoleResource(roleName, jsLoader=null) {
     //读角色信息
     const roleDirPath = $GameMakerGlobal.rolePath(roleName);
 
-    let roleResourceInfo = $Frame.sl_fileRead(roleDirPath + '/role.json');
+    let roleResourceInfo = $Frame.sl_readFile(roleDirPath + '/role.json');
     if(roleResourceInfo)
         roleResourceInfo = JSON.parse(roleResourceInfo);
     if(!roleResourceInfo) {

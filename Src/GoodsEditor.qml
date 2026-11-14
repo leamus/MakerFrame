@@ -34,7 +34,7 @@ Item {
 
     function init(goodsName) {
         if(goodsName) {
-            const data = $Frame.sl_fileRead($GameMakerGlobal.goodsPath(goodsName) + '/goods.js');
+            const data = $Frame.sl_readFile($GameMakerGlobal.goodsPath(goodsName) + '/goods.js');
 
             if(data) {
                 _private.strSavedName = textGoodsName.text = goodsName;
@@ -456,13 +456,13 @@ const data = (function() {
             const path = $GameMakerGlobal.goodsPath();
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + '/' + textGoodsName.text + '/goods.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadGoodsScript.textDocument), path + '/' + textGoodsName.text + '/goods.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     const oldFilePath = path + '/' + _private.strSavedName + '/goods.vjs';
                     if(textGoodsName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textGoodsName.text + '/goods.vjs', true);
+                        ret = $Frame.sl_copyFile(oldFilePath, path + '/' + textGoodsName.text + '/goods.vjs', true);
                     }
                 }
 

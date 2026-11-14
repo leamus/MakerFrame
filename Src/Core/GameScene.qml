@@ -290,7 +290,7 @@ Item {
             /*
             let filePath = game.$projectpath + '/main.js';
             //let cfg = File.read(filePath);
-            let text = $Frame.sl_fileRead($GlobalJS.toPath(filePath));
+            let text = $Frame.sl_readFile($GlobalJS.toPath(filePath));
             //if(!text)
             //    return false;
             if(_private.scriptQueue.create([eval(text) ?? null, 0, true, ''], ) === 0)
@@ -777,7 +777,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'loadmap'});
             };
 
-            const ret = $CommonLibJS.getPromise(_loadmap);
+            const ret = $CommonLibJS.createPromise(_loadmap);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -836,7 +836,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -898,7 +898,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -1017,7 +1017,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -1073,7 +1073,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -2763,7 +2763,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'usegoods'});
             };
 
-            let ret = $CommonLibJS.getPromise(_usegoods);
+            let ret = $CommonLibJS.createPromise(_usegoods);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -2882,7 +2882,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'equip'});
             };
 
-            let ret = $CommonLibJS.getPromise(_equip);
+            let ret = $CommonLibJS.createPromise(_equip);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -2949,7 +2949,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'unload'});
             };
 
-            let ret = $CommonLibJS.getPromise(_unload);
+            let ret = $CommonLibJS.createPromise(_unload);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -3011,7 +3011,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -3068,7 +3068,7 @@ Item {
                 //let _resolve, _reject;
                 let _callback;
                 //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-                ret = $CommonLibJS.getPromise(function(resolve, reject) {
+                ret = $CommonLibJS.createPromise(function(resolve, reject) {
                     //_resolve = resolve; _reject = reject;
                     _callback = (cb, ...params)=>{
                         if($CommonLibJS.isFunction(callback))
@@ -3413,7 +3413,7 @@ Item {
             //let _resolve, _reject;
             let _callback;
             //如果callback是自定义函数，则调用自定义函数，否则调用默认函数（cb）
-            ret = $CommonLibJS.getPromise(function(resolve, reject) {
+            ret = $CommonLibJS.createPromise(function(resolve, reject) {
                 //_resolve = resolve; _reject = reject;
                 _callback = (cb, ...params)=>{
                     if($CommonLibJS.isFunction(callback))
@@ -4699,7 +4699,7 @@ Item {
                     return false;
                 }
 
-                data = $Frame.sl_fileRead(filePath);
+                data = $Frame.sl_readFile(filePath);
                 //let cfg = File.read(filePath);
                 //console.debug('musicInfo', filePath, musicInfo)
                 //console.debug('cfg', cfg, filePath);
@@ -4836,7 +4836,7 @@ Item {
                         //!!!导出为文件
                         //console.debug(JSON.stringify(outputData));
                         //let ret = File.write(path + '/map.json', JSON.stringify(outputData));
-                        ret = $Frame.sl_fileWrite(fileData, $GlobalJS.toPath(filePath), 0);
+                        ret = $Frame.sl_writeFile(fileData, $GlobalJS.toPath(filePath), 0);
                         //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
                         if(ret < 0) {
                             console.warn('[!GameScene]save ERROR:', fileName, ret);
@@ -4873,7 +4873,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'save'});
             };
 
-            const ret = $CommonLibJS.getPromise(_save);
+            const ret = $CommonLibJS.createPromise(_save);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -4958,7 +4958,7 @@ Item {
                             if($CommonLibJS.isGenerator(r))r = yield* r;
                             //game.run({Script: _private.objCommonScripts.$afterLoad() ?? null, Priority: priority++, Type: 0, Running: 1, Tips: '$afterLoad'});
                         }
-                    }(), Priority: -2, Type: 0, Running: 0, Tips: 'load2'});   //鹰：Priority为0也可以，只是会黑屏一下体验不太好，因为在下一个事件循环中执行代码了
+                    }(), Priority: -2, Type: 0, Running: 0, Tips: 'load2'});   //鹰：Priority为0也可以，只是体验不太好（会黑屏一下，如果是-1则msg会在地图载入前出现），因为在下一个事件循环中执行代码了
 
 
                     return resolve(true);
@@ -4970,7 +4970,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'load'});
             };
 
-            const ret = $CommonLibJS.getPromise(_load);
+            const ret = $CommonLibJS.createPromise(_load);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -5079,7 +5079,7 @@ Item {
                 //}(), Priority: -2, Type: 0, Running: 0, Tips: 'plugin'});
             };
 
-            const ret = $CommonLibJS.getPromise(_plugin);
+            const ret = $CommonLibJS.createPromise(_plugin);
             //ret.$resolve = _resolve; ret.$reject = _reject;
             return ret;
         }
@@ -5104,7 +5104,7 @@ Item {
             if(filePath.startsWith('/'))
                 filePath = game.$projectpath + '/' + filePath;
 
-            const data = $Frame.sl_fileRead(filePath);
+            const data = $Frame.sl_readFile(filePath);
             if(!data) {
                 console.warn('[!GameScene]loadjson FAIL:', filePath);
                 return null;
@@ -5192,8 +5192,7 @@ Item {
                         scriptInfo.ScriptQueue.run(scriptInfo.ScriptQueue.lastEscapeValue);
                     }, 'game.run1']);
                 */
-                scriptInfo.ScriptQueue.lastEscapeValue = scriptInfo.Value;
-                scriptInfo.ScriptQueue.runNextEventLoop(scriptInfo.Tips);
+                scriptInfo.ScriptQueue.runNextEventLoop(scriptInfo.Tips, scriptInfo.Value);
 
                 return 2;
             }
@@ -5305,14 +5304,13 @@ Item {
                             scriptInfo.ScriptQueue.run(scriptInfo.ScriptQueue.lastEscapeValue);
                         }, 'game.run', ]);
                     */
-                    scriptInfo.ScriptQueue.lastEscapeValue = scriptInfo.Value;
-                    scriptInfo.ScriptQueue.runNextEventLoop('runNextEventLoop2:' + scriptInfo.Tips);
+                    scriptInfo.ScriptQueue.runNextEventLoop('runNextEventLoop2:' + scriptInfo.Tips, scriptInfo.Value);
 
                     return 2;
                 }
             }
             else if(ret === 3) {
-                scriptInfo.ScriptQueue.runNextEventLoop('runNextEventLoop3:' + scriptInfo.Tips);
+                scriptInfo.ScriptQueue.runNextEventLoop('runNextEventLoop3:' + scriptInfo.Tips, scriptInfo.Value);
             }
             else if(ret < 0)
                 return ret - 10;
@@ -5366,7 +5364,7 @@ Item {
             }
 
             //const text = File.read(filePath);
-            const text = $Frame.sl_fileRead(filePath);
+            const text = $Frame.sl_readFile(filePath);
             /*if(!text) {
                 console.warn('[!GameScene]evalfile FAIL:', filePath);
                 return false;
@@ -6702,7 +6700,7 @@ Item {
             }
 
             //let _resolve, _reject;
-            const ret = $CommonLibJS.getPromise(function(resolve, reject) {
+            const ret = $CommonLibJS.createPromise(function(resolve, reject) {
                 //_resolve = resolve; _reject = reject;
                 se.fnStoppedCallback = function() {
                     resolve(se.source);
@@ -7644,7 +7642,7 @@ Item {
                 tn = style.MinHeight ?? styleUser.$minHeight ?? styleSystem.$minHeight ?? messageRole.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
-                else if(tn.toString().includes('.'))
+                else if($CommonLibJS.isFloat(tn))
                     //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
                     tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
                 messageRole.rMinHeight = tn;
@@ -7655,7 +7653,7 @@ Item {
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
-                    else if(tn.toString().includes('.'))
+                    else if($CommonLibJS.isFloat(tn))
                         //tn = messageRole.textArea.contentHeight / messageRole.textArea.lineCount * parseFloat(tn) + messageRole.textArea.topPadding + messageRole.textArea.bottomPadding;
                         tn = GlobalJS.getTextAreaLineHeight(messageRole.textArea, tn);
                     messageRole.rMaxHeight = tn;
@@ -7934,7 +7932,7 @@ Item {
                 tn = style.MinHeight ?? styleUser.$minHeight ?? styleSystem.$minHeight ?? messageGame.rMinHeight;
                 if(tn > 0 && tn < 1)
                     tn = tn * parent.height;
-                else if(tn.toString().includes('.'))
+                else if($CommonLibJS.isFloat(tn))
                     //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
                     tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
                 messageGame.rMinHeight = tn;
@@ -7945,7 +7943,7 @@ Item {
                 else {
                     if(tn > 0 && tn < 1)
                         tn = tn * parent.height;
-                    else if(tn.toString().includes('.'))
+                    else if($CommonLibJS.isFloat(tn))
                         //tn = messageGame.textArea.contentHeight / messageGame.textArea.lineCount * parseFloat(tn) + messageGame.textArea.topPadding + messageGame.textArea.bottomPadding;
                         tn = GlobalJS.getTextAreaLineHeight(messageGame.textArea, tn);
                     messageGame.rMaxHeight = tn;
@@ -9539,6 +9537,9 @@ Item {
         //$Frame.sl_globalObject().game = game;
         //$Frame.sl_globalObject().g = game;
 
+        //console.debug('[GameScene]sl_globalObject：', $Frame.sl_globalObject());
+
+
         Object.defineProperty(game, 'lastreturn', {
             enumerable: false,
             configurable: true,
@@ -9575,9 +9576,9 @@ Item {
         });
         */
 
-        //console.debug('[GameScene]sl_globalObject：', $Frame.sl_globalObject());
 
         //_private.scriptQueue.bContinueIfNotYieldPromiseObject = false;
+
 
         console.debug('[GameScene]Component.onCompleted:', Qt.resolvedUrl('.'), game, );
     }

@@ -385,7 +385,7 @@ Item {
             //系统图片
             //if(dialogMapData.nChoiceType === 1) {
             if(checkboxSaveResource.checked) {
-                let ret = $Frame.sl_fileCopy(textMapBlockImagePath.text, $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
+                let ret = $Frame.sl_copyFile(textMapBlockImagePath.text, $GameMakerGlobal.mapResourcePath(textMapBlockResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelDialogTips.text = '拷贝到资源目录失败';
@@ -494,7 +494,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl.toString());
-            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //let cfg = $Frame.sl_readFile(fileUrl.toString());
 
 
             visible = false;
@@ -524,7 +524,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_fileDelete(filepath) >= 0)
+                    if($Frame.sl_removeFile(filepath) >= 0)
                         removeItem(index);
 
                     //l_listMapBlockResource.forceActiveFocus();
@@ -639,7 +639,7 @@ Item {
 
 
             //let cfg = File.read(fileUrl.toString());
-            let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            let cfg = $Frame.sl_readFile(fileUrl.toString());
             //console.debug('cfg', cfg);
 
             if(!cfg)
@@ -688,7 +688,7 @@ Item {
 
 
             let cfg = File.read(fileUrl.toString());
-            //let cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //let cfg = $Frame.sl_readFile(fileUrl.toString());
             console.debug('cfg', cfg, fileUrl);
 
             if(!cfg)
@@ -887,7 +887,7 @@ Item {
 
                 const filePath = $GameMakerGlobal.mapPath(item) + '/map.json';
                 //let cfg = File.read(filePath);
-                let cfg = $Frame.sl_fileRead(filePath);
+                let cfg = $Frame.sl_readFile(filePath);
                 //console.debug('[mainMapEditor]filePath：', filePath);
 
                 if(!cfg)

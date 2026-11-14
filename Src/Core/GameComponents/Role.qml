@@ -156,7 +156,7 @@ Item {
         if(root.nSpriteType === 0) {
             //读特效信息
             //let path = $GameMakerGlobal.spritePath();
-            //let info = $Frame.sl_fileRead($GlobalJS.toPath(path + '/' + objActionsInfo[actionName] + '/sprite.json'));
+            //let info = $Frame.sl_readFile($GlobalJS.toPath(path + '/' + objActionsInfo[actionName] + '/sprite.json'));
             //if(info)
             //    info = JSON.parse(info);
             //else

@@ -730,7 +730,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[GoodsVisualEditor]compile:', _private.filepath, jsScript);
@@ -828,7 +828,7 @@ Item {
 
             data.Properties = properties;
 
-            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
 
         }
 
@@ -837,7 +837,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = $Frame.sl_fileRead(filePath);
+            let data = $Frame.sl_readFile(filePath);
             console.debug('[GoodsVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -975,11 +975,12 @@ Item {
                         else
                             propertyName = propertyName[0].trim();
 
+                        const tvalue = parseFloat(effectTextFields[tt].text);
                         //倍率
-                        if(effectTextFields[tt].text.includes('.'))
-                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += combatant.$$properties.%1 * %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
+                        if($CommonLibJS.isFloat(tvalue))
+                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += combatant.$$properties.%1 * %2;\r\n'.arg(propertyName).arg(tvalue);
                         else
-                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'combatant.$$$$$$$$propertiesWithExtra.%1 += %2;\r\n'.arg(propertyName).arg(tvalue);
                     }
                     equipScript = _private.strTemplateEquipment1.replace(/\$\$equipEffectAlgorithm\$\$/g, strEffects);
                 }
@@ -1006,11 +1007,12 @@ Item {
                         //分隔，看是否多段值
                         let propertyName = propertyTextFields[tt].text.trim();
 
+                        const tvalue = parseFloat(effectTextFields[tt].text);
                         //倍率
-                        if(effectTextFields[tt].text.includes('.'))
-                            strEffects += 'game.addprops(combatant, {"%1": %2}, 1);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
+                        if($CommonLibJS.isFloat(tvalue))
+                            strEffects += 'game.addprops(combatant, {"%1": %2}, 1);\r\n'.arg(propertyName).arg(tvalue);
                         else
-                            strEffects += 'game.addprops(combatant, {"%1": %2}, 2);\r\n'.arg(propertyName).arg(effectTextFields[tt].text.trim());
+                            strEffects += 'game.addprops(combatant, {"%1": %2}, 2);\r\n'.arg(propertyName).arg(tvalue);
                     }
 
                     if(textUseScript.text.trim() !== '')
@@ -1095,7 +1097,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = $Frame.sl_fileWrite(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();

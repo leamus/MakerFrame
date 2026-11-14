@@ -1,154 +1,3 @@
-﻿import QtQuick 2.14
-import QtQuick.Window 2.14
-import QtQuick.Controls 2.14
-//import QtQuick.Dialogs 1.3 as Dialog1
-import QtQuick.Layouts 1.14
-
-
-//import cn.Leamus.MakerFrame 1.0
-
-
-import _Global 1.0
-import _Global.Button 1.0
-
-
-import 'qrc:/QML'
-
-
-//import './Core'
-
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
-//import 'File.js' as File
-
-
-
-Item {
-    id: root
-
-
-    signal sg_close();
-
-
-
-    //width: 600
-    //height: 800
-    anchors.fill: parent
-
-    focus: true
-    clip: true
-
-    //color: $Global.style.backgroundColor
-
-
-
-    Mask {
-        anchors.fill: parent
-        //opacity: 0
-        color: $Global.style.backgroundColor
-        //radius: 9
-    }
-
-
-    ColumnLayout {
-        width: parent.width * 0.96
-        height: parent.height * 0.96
-        anchors.centerIn: parent
-
-        Notepad {
-            id: notepad
-
-            Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-            //Layout.maximumHeight: parent.height
-            Layout.fillHeight: true
-
-
-            text: ''
-
-            textArea.color: 'white'
-            //textArea.color: $Global.style.foreground
-            //textArea.enabled: false
-            //textArea.readOnly: true
-
-            textArea.wrapMode: TextArea.WrapAnywhere
-            textArea.horizontalAlignment: TextArea.AlignJustify
-            //textArea.verticalAlignment: TextArea.AlignVCenter
-
-            //textArea.selectByMouse: false
-
-            textArea.font {
-                pointSize: 15
-            }
-
-            textArea.background: Rectangle {
-                //implicitWidth: 200
-                //implicitHeight: 40
-                color: '#80000000'
-                //color: 'transparent'
-                //color: $Global.style.backgroundColor
-                border.color: parent.parent.textArea.activeFocus ? $Global.style.accent : $Global.style.hintTextColor
-                border.width: parent.parent.textArea.activeFocus ? 2 : 1
-            }
-        }
-
-        Button {
-            //Layout.fillWidth: true
-            //Layout.preferredWidth: parent.width
-            Layout.alignment: Qt.AlignHCenter// | Qt.AlignTop
-            //Layout.preferredHeight: 50
-
-            text: '返　回'
-            onClicked: {
-                sg_close();
-            }
-            /*onPressAndHold: {
-                notepad.textArea.selectByMouse = !notepad.textArea.selectByMouse;
-            }
-            */
-        }
-    }
-
-
-
-    QtObject {
-        id: _private
-
-        readonly property QtObject config: QtObject { //配置
-            //id: _config
-        }
-    }
-
-
-
-    //Keys.forwardTo: []
-    Keys.onEscapePressed: function(event) {
-        console.debug('[mainAdvancedTutorial]Keys.onEscapePressed');
-        event.accepted = true;
-
-        sg_close();
-    }
-    Keys.onBackPressed: function(event) {
-        console.debug('[mainAdvancedTutorial]Keys.onBackPressed');
-        event.accepted = true;
-
-        sg_close();
-    }
-    Keys.onPressed: function(event) {
-        console.debug('[mainAdvancedTutorial]Keys.onPressed:', event, event.key, event.text, event.isAutoRepeat);
-        event.accepted = true;
-    }
-    Keys.onReleased: function(event) {
-        console.debug('[mainAdvancedTutorial]Keys.onReleased:', event.key, event.isAutoRepeat);
-        event.accepted = true;
-    }
-
-
-    Component.onCompleted: {
-        const t = `
 <CENTER><B>高级教程</B></CENTER>
 
 1、精确定时器 //~~~~~~~
@@ -217,7 +66,7 @@ Item {
             //$Frame.sl_objectProperty('属性', networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
             //console.debug(httpReply, $Frame.sl_objectProperty('Data', httpReply.networkReply), Object.keys(httpReply.networkReply));
 
-            $Frame.sl_deleteLater(httpReply);
+            httpReply.sl_deleteLater(); //FrameManager.sl_deleteLater(httpReply);
         });
   c、使用封装的底层C++方案：
     var nr = $Frame.sl_networkRequest('http://leamus.cn')
@@ -504,7 +353,7 @@ Item {
       const ret = scriptQueue.create(genfunc(...) ?? null, ...params); //添加一个脚本（支持 字符串函数、普通函数、生成器和生成器对象）；
       scriptQueue.clear(5);     //清空脚本队列；参数不同效果不同；
       scriptQueue.run(value);   //运行一次脚本队列；参数为给脚本中断的yield返回值；
-      scriptQueue.runNextEventLoop('tips'); //运行一次脚本队列；放在下次事件循环中；
+      scriptQueue.runNextEventLoop(value, 'tips'); //运行一次脚本队列；放在下次事件循环中；
       scriptQueue.lastEscapeValue;  //上次中断时返回值（yield或return）；
       scriptQueue.lastReturnedValue;    //上次返回值（return）；
 
@@ -587,13 +436,4 @@ Item {
     j、扩展自定义可视化命令；
     k、封装了QCoreApplication、QGuiApplication、QApplication、QUrl、QString、IO（QIODevice、QDataStream、QTextStream、QByteArray、QBuffer、QFile）、部分QObject、QMetaObject方法；
     l、Qt和QML插件系统，游戏引擎插件系统；
-    、其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、给QML发送队列事件、模拟键盘和鼠标事件；
-`;
-        notepad.text = $CommonLibJS.convertToHTML(t);
-
-        console.debug('[mainAdvancedTutorial]Component.onCompleted');
-    }
-    Component.onDestruction: {
-        console.debug('[mainAdvancedTutorial]Component.onDestruction');
-    }
-}
+    m、其他：包括URL加密解密、清空QML缓存、HTML/Markdown/TXT格式操作、给QML发送队列事件、模拟键盘和鼠标事件；

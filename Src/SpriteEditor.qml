@@ -1292,7 +1292,7 @@ Item {
             //系统图片
             //if(dialogSpriteImageData.nChoiceType === 1) {
             if(checkboxSaveSpriteImageResource.checked) {
-                const ret = $Frame.sl_fileCopy(textSpriteImagePath.text, $GameMakerGlobal.spriteResourcePath(textSpriteImageResourceName.text), false);
+                const ret = $Frame.sl_copyFile(textSpriteImagePath.text, $GameMakerGlobal.spriteResourcePath(textSpriteImageResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteImageDialogTips.text = '拷贝资源失败，是否重名或目录不可写？';
@@ -1441,7 +1441,7 @@ Item {
 
 
             //const cfg = File.read(fileUrl.toString());
-            //const cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //const cfg = $Frame.sl_readFile(fileUrl.toString());
 
 
             visible = false;
@@ -1469,7 +1469,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_fileDelete(filepath) >= 0)
+                    if($Frame.sl_removeFile(filepath) >= 0)
                         removeItem(index);
 
                     //l_listSpriteImageResource.forceActiveFocus();
@@ -1662,7 +1662,7 @@ Item {
             //音效
             //if(dialogSpriteSoundData.nChoiceType === 1) {
             if(checkboxSaveSpriteSoundResource.checked) {
-                const ret = $Frame.sl_fileCopy(textSpriteSoundPath.text, $GameMakerGlobal.soundResourcePath(textSpriteSoundResourceName.text), false);
+                const ret = $Frame.sl_copyFile(textSpriteSoundPath.text, $GameMakerGlobal.soundResourcePath(textSpriteSoundResourceName.text), false);
                 if(ret <= 0) {
                     open();
                     labelSpriteSoundDialogTips.text = '拷贝到资源目录失败';
@@ -1802,7 +1802,7 @@ Item {
 
 
             //const cfg = File.read(fileUrl.toString());
-            //const cfg = $Frame.sl_fileRead(fileUrl.toString());
+            //const cfg = $Frame.sl_readFile(fileUrl.toString());
 
 
             //root.focus = true;
@@ -1830,7 +1830,7 @@ Item {
                 Msg: '确认删除 <font color="red">' + item + '</font> ？',
                 Buttons: Dialog.Ok | Dialog.Cancel,
                 OnAccepted: function() {
-                    if($Frame.sl_fileDelete(filepath) >= 0)
+                    if($Frame.sl_removeFile(filepath) >= 0)
                         removeItem(index);
 
                     //l_listSpriteSoundResource.forceActiveFocus();
@@ -2091,7 +2091,7 @@ let imageFixPositions;
 function $refresh(index, imageAnimate, url) {
     if(imageFixPositions === undefined) {
         //读取坐标偏移文件并保存
-        imageFixPositions = $Frame.sl_fileRead($GlobalJS.toPath(url) + '/x.txt');
+        imageFixPositions = $Frame.sl_readFile($GlobalJS.toPath(url) + '/x.txt');
         if(imageFixPositions)
             imageFixPositions = imageFixPositions.split(\/\\r\?\\n\/);
         else
@@ -2193,7 +2193,7 @@ function $refresh(index, imageAnimate, url) {
                 //Focus: true,
             });
             //scriptEditor.editor.forceActiveFocus();
-            //scriptEditor.text = $Frame.sl_fileRead(path + 'sprite.js') || '';
+            //scriptEditor.text = $Frame.sl_readFile(path + 'sprite.js') || '';
             //scriptEditor.editor.setPlainText(data);
             //scriptEditor.editor.toBegin();
             //visualScriptEditor.loadData(path + 'sprite.vjs');
@@ -2208,13 +2208,13 @@ function $refresh(index, imageAnimate, url) {
                     scriptEditor.text = '';
 
                 const path = $GameMakerGlobal.spritePath(textSpriteRID.text);
-                const ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/sprite.js', 0);
+                const ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/sprite.js', 0);
             }
             else if(textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) { //另存为
                 const oldFilePath = $GameMakerGlobal.spritePath(_private.strSpriteRID) + '/sprite.js';
                 if($Frame.sl_fileExists(oldFilePath)) {
                     const newFilePath = $GameMakerGlobal.spritePath(textSpriteRID.text) + '/sprite.js';
-                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                    const ret = $Frame.sl_copyFile(oldFilePath, newFilePath, true);
                 }
             }
             else
@@ -2229,7 +2229,7 @@ function $refresh(index, imageAnimate, url) {
                 const oldFilePath = $GameMakerGlobal.spritePath(_private.strSpriteRID) + '/sprite.vjs';
                 if($Frame.sl_fileExists(oldFilePath)) {
                     const newFilePath = $GameMakerGlobal.spritePath(textSpriteRID.text) + '/sprite.vjs';
-                    const ret = $Frame.sl_fileCopy(oldFilePath, newFilePath, true);
+                    const ret = $Frame.sl_copyFile(oldFilePath, newFilePath, true);
                 }
             }
         }
@@ -2289,7 +2289,7 @@ function $refresh(index, imageAnimate, url) {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //const ret = File.write(filepath, JSON.stringify(outputData));
-            const ret = $Frame.sl_fileWrite(JSON.stringify(outputData), filepath, 0);
+            const ret = $Frame.sl_writeFile(JSON.stringify(outputData), filepath, 0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

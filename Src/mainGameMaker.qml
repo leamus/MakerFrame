@@ -57,6 +57,8 @@ Item {
     readonly property var $GameMakerGlobalJS: GameMakerGlobalJS
     readonly property var $GameVisualScriptJS: GameVisualScriptJS
 
+    readonly property string $gameMakerRootPath: $GlobalJS.toPath(Qt.resolvedUrl('.'))
+
 
     readonly property var showMsg: rectHelpWindow.showMsg
 
@@ -1844,7 +1846,7 @@ Item {
                         return;
                     }
 
-                    if($Frame.sl_fileRename($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, $GameMakerGlobal.config.strProjectRootPath + $dialog.input) > 0) {
+                    if($Frame.sl_renameFile($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, $GameMakerGlobal.config.strProjectRootPath + $dialog.input) > 0) {
                         _private.changeProject($dialog.input, $GameMakerGlobal.config.strCurrentProjectName);
                     }
                     else {
@@ -2145,7 +2147,7 @@ Item {
 
         function about() {
             //if($Platform.compileType === 'debug') {
-                loader.loadModule('mainAbout.qml');
+                loader.loadModule('mainReader.qml', undefined, undefined, $gameMakerRootPath + '/HTML/About.htm');
                 //loader.source = 'mainAbout.qml';
             //}
         }
@@ -2157,13 +2159,13 @@ Item {
         }
         function agreement() {
             //if($Platform.compileType === 'debug') {
-                loader.loadModule('mainAgreement.qml');
+                loader.loadModule('mainReader.qml', undefined, undefined, $gameMakerRootPath + '/HTML/Agreement.htm');
                 //loader.source = 'mainAgreement.qml';
             //}
         }
         function updateLog() {
             //if($Platform.compileType === 'debug') {
-                loader.loadModule('mainUpdateLog.qml');
+                loader.loadModule('mainReader.qml', undefined, undefined, $gameMakerRootPath + '/HTML/UpdateLog.htm');
                 //loader.source = 'mainUpdateLog.qml';
             //}
         }
@@ -2245,7 +2247,7 @@ Item {
                 const code = $Frame.sl_objectProperty('Code', networkReply);
                 console.debug('[mainGameMaker]下载完毕', httpReply, networkReply, code, $Frame.sl_objectProperty('Data', networkReply));
 
-                $Frame.sl_deleteLater(httpReply);
+                httpReply.sl_deleteLater(); //FrameManager.sl_deleteLater(httpReply);
 
 
                 $dialog.close();

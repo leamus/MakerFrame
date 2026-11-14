@@ -1487,7 +1487,7 @@ Item {
             data.Effects = effects;
             //data.Attack = textAttack.text.trim();
 
-            let ret = $Frame.sl_fileWrite(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
 
         }
 
@@ -1496,7 +1496,7 @@ Item {
             let filePath = _private.filepath;
 
             //let data = File.read(filePath);
-            let data = $Frame.sl_fileRead(filePath);
+            let data = $Frame.sl_readFile(filePath);
             console.debug('[FightSkillVisualEditor]filePath:', filePath);
             //console.exception('????')
 
@@ -1702,11 +1702,11 @@ Item {
                     else
                         teffectproperty = teffectproperty[0].trim() + '[' + teffectproperty[1].trim() + ']';
 
-                    let tvalue = effectTextFields[tt].text.trim();
+                    let tvalue = parseFloat(effectTextFields[tt].text);
                     let tcombatant = combatantTextFields[tt].text.trim();
 
                     //倍率
-                    if(tvalue.includes('.')) {
+                    if($CommonLibJS.isFloat(tvalue)) {
 
                         let treferenceproperty = propertyTextFields[tt].text.trim().split(',');
                         if(treferenceproperty.length === 1)
@@ -1773,11 +1773,11 @@ Item {
 
                 buffs += `if(Math.random() < ${probabilityTextFields[tt].text.trim()}) {\r\n`;
 
-                let tvalue = effectTextFields[tt].text.trim();
+                let tvalue = parseFloat(effectTextFields[tt].text.trim());
 
                 switch(parseInt(typeTextFields[tt].text)) {
                 case 0:
-                    let ttype = (tvalue.includes('.') ? '2' : '1');
+                    let ttype = ($CommonLibJS.isFloat(tvalue) ? '2' : '1');
                     buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 1, {BuffName: '毒', Round: game.rnd(${tRound[0]}, ${tRound[1]}), HarmType: ${ttype}, HarmValue: ${tvalue}});`;
                     buffs += '\r\n';
                     buffs += `yield ({Type: 30, Interval: 500, Color: 'green', Text: '毒', FontSize: 20, Combatant: targetCombatant});`;
@@ -1802,7 +1802,7 @@ Item {
                     buffs += '\r\n';
                     break;
                 default:
-                    ttype = (tvalue.includes('.') ? '2' : '1');
+                    ttype = ($CommonLibJS.isFloat(tvalue) ? '2' : '1');
                     switch(parseInt(typeTextFields[tt].text)) {
                     case 4:
                         buffs += `game.$sys.resources.commonScripts.getBuff(targetCombatant, 5, {BuffName: '攻', Round: game.rnd(${tRound[0]}, ${tRound[1]}), Properties: [['attack', ${tvalue}, ${ttype}]]});`;
@@ -1917,7 +1917,7 @@ Item {
                 });
 
             if(result[1] !== null)
-                //let ret = $Frame.sl_fileWrite(result, _private.filepath + '.js', 0);
+                //let ret = $Frame.sl_writeFile(result, _private.filepath + '.js', 0);
                 root.sg_compile(result[1]);
 
             return result;

@@ -34,7 +34,7 @@ Item {
 
     function init(fightRoleName) {
         if(fightRoleName) {
-            const data = $Frame.sl_fileRead($GameMakerGlobal.fightRolePath(fightRoleName) + '/fight_role.js');
+            const data = $Frame.sl_readFile($GameMakerGlobal.fightRolePath(fightRoleName) + '/fight_role.js');
 
             if(data) {
                 _private.strSavedName = textFightRoleName.text = fightRoleName;
@@ -129,7 +129,7 @@ const data = (function() {
     */
     //方法2：
     if($Frame.sl_fileExists($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')))) {
-        const levelInfos = $Frame.sl_fileRead($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
+        const levelInfos = $Frame.sl_readFile($GlobalJS.toPath(Qt.resolvedUrl('./level_chain.json')));
         try {
             $commons.levelInfos = JSON.parse(levelInfos);
         }
@@ -398,13 +398,13 @@ const data = (function() {
             const path = $GameMakerGlobal.fightRolePath();
 
             function fnSave() {
-                let ret = $Frame.sl_fileWrite($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0);
 
                 //复制可视化
                 if(_private.strSavedName) {
                     const oldFilePath = path + '/' + _private.strSavedName + '/fight_role.vjs';
                     if(textFightRoleName.text !== _private.strSavedName && $Frame.sl_fileExists(oldFilePath)) {
-                        ret = $Frame.sl_fileCopy(oldFilePath, path + '/' + textFightRoleName.text + '/fight_role.vjs', true);
+                        ret = $Frame.sl_copyFile(oldFilePath, path + '/' + textFightRoleName.text + '/fight_role.vjs', true);
                     }
                 }
 

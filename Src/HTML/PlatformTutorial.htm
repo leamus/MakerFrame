@@ -1,0 +1,624 @@
+<CENTER><B>框架教程--Platform对象</B></CENTER>
+
+说明：Platform全局单例对象是提供跨平台方面的功能，不同平台有不同的功能和表现；QML中使用$Platform来获取使用，Qt插件中使用 qApp->property("$Platform").value<QObject*>() 来获取使用。
+
+一、SysInfo 类（封装 QSysInfo，全平台通用）
+1. 属性（Q_PROPERTY）
+属性	类型	说明
+sizes	int	字长（WordSize），32位平台返回32，64位平台返回64
+buildCpuArchitecture	QString	编译时的CPU架构
+currentCpuArchitecture	QString	运行时的CPU架构（安卓下返回 arm64-v8a、armeabi-v7a 等相关字符串）
+buildAbi	QString	编译时的ABI架构
+kernelType	QString	内核类型（如 winnt、linux、darwin）
+kernelVersion	QString	内核版本号
+productType	QString	产品类型（如 windows、android、macos）
+productVersion	QString	产品版本号
+prettyProductName	QString	产品美观名称
+machineHostName	QString	主机名
+machineUniqueId	QByteArray	机器唯一ID
+bootUniqueId	QByteArray	本次启动的唯一ID
+2. 槽函数（全部为 static，全平台通用）
+命令：<font color='yellow'>static int sl_sizes();</font>
+功能：获取系统字长；
+参数：无；
+返回：字长位数（32或64）。
+
+命令：<font color='yellow'>static QString sl_buildCpuArchitecture();</font>
+功能：获取编译时的CPU架构；
+参数：无；
+返回：架构字符串（如 x86_64、arm64）。
+
+命令：<font color='yellow'>static QString sl_currentCpuArchitecture();</font>
+功能：获取运行时的CPU架构；
+参数：无；
+返回：架构字符串（安卓下返回 arm64-v8a 和 armeabi-v7a 相关字符串）；
+注意：安卓下返回值与编译时架构的写法不同。
+
+命令：<font color='yellow'>static QString sl_buildAbi();</font>
+功能：获取编译时的ABI架构信息；
+参数：无；
+返回：ABI字符串（如 x86_64-little_endian-llp64）。
+
+命令：<font color='yellow'>static QString sl_kernelType();</font>
+功能：获取操作系统内核类型；
+参数：无；
+返回：内核类型字符串（winnt / linux / darwin 等）。
+
+命令：<font color='yellow'>static QString sl_kernelVersion();</font>
+功能：获取操作系统内核版本；
+参数：无；
+返回：版本号字符串。
+
+命令：<font color='yellow'>static QString sl_productType();</font>
+功能：获取产品（操作系统）类型；
+参数：无；
+返回：类型字符串（windows / android / macos 等）。
+
+命令：<font color='yellow'>static QString sl_productVersion();</font>
+功能：获取产品（操作系统）版本号；
+参数：无；
+返回：版本号字符串。
+
+命令：<font color='yellow'>static QString sl_prettyProductName();</font>
+功能：获取产品美观名称（包含类型+版本的组合描述）；
+参数：无；
+返回：描述字符串。
+
+命令：<font color='yellow'>static QString sl_machineHostName();</font>
+功能：获取主机名；
+参数：无；
+返回：主机名字符串。
+
+命令：<font color='yellow'>static QByteArray sl_machineUniqueId();</font>
+功能：获取本机唯一ID；
+参数：无；
+返回：唯一ID字节数组；
+注意：部分平台可能返回空。
+
+命令：<font color='yellow'>static QByteArray sl_bootUniqueId();</font>
+功能：获取本次开机（boot）的唯一ID；
+参数：无；
+返回：唯一ID字节数组；
+注意：部分平台可能返回空。
+
+二、_Platform 类
+1. 通用属性（COMMON_PLATFORM_PROPERTIES，全平台通用）
+属性	类型	读写	通知信号	说明
+sysInfo	SysInfo*	只读（CONSTANT）	无	返回 SysInfo 单例
+compileType	QString	只读（CONSTANT）	无	编译类型（Debug/Release等）？？？
+libType	int	只读（CONSTANT）	无	库类型（B/L/S静态或动态）？？？
+dynamicLibrarySuffixName	QString	只读（CONSTANT）	无	动态库后缀名（dll / so 等）
+separator	QChar	只读（CONSTANT）	无	路径分隔符（win为’\‘，unix为’/'）
+listSeparator	QChar	只读（CONSTANT）	无	路径列表分隔符（win为’;‘，unix为’:'）
+readOnlyPath	QString	只读（CONSTANT）	无	只读路径（资源目录）
+readWritePath	QString	只读（CONSTANT）	无	可读写路径
+resourcePath	QString	只读（CONSTANT）	无	资源路径
+externalDataPath	QString	读写	externalDataPathChanged	外部数据目录（绝对路径）
+logPath	QString	读写	logPathChanged	日志目录（绝对路径）
+2. 通用信号（COMMON_PLATFORM_SIGNALS，全平台通用）
+命令：<font color='yellow'>void externalDataPathChanged(const QString& newData);</font>
+功能：外部数据目录路径改变时发出；
+参数：newData为新的路径字符串。
+
+命令：<font color='yellow'>void logPathChanged(const QString& newData);</font>
+功能：日志路径改变时发出；
+参数：newData为新的路径字符串。
+
+3. 通用槽函数（COMMON_PLATFORM_SLOTS，全平台通用）
+命令：<font color='yellow'>static QChar sl_separator(bool forceUnix=false);</font>
+功能：获取路径分隔符；
+参数：forceUnix为true时强制返回Unix风格分隔符’/'，否则按当前平台返回；
+返回：分隔符字符。
+
+命令：<font color='yellow'>static QChar sl_listSeparator();</font>
+功能：获取路径列表分隔符；
+参数：无；
+返回：分隔符字符（win为’;‘，unix为’:'）。
+
+命令：<font color='yellow'>static QString sl_readOnlyPath(const QString& path="");</font>
+功能：获取只读路径（资源目录）；
+参数：path为附加的子路径（可省略）？？？；
+返回：完整只读路径字符串。
+
+命令：<font color='yellow'>static QString sl_readWritePath(const QString& path="");</font>
+功能：获取可读写路径；
+参数：path为附加的子路径（可省略）？？？；
+返回：完整可读写路径字符串。
+
+命令：<font color='yellow'>static QString sl_resourcePath(const QString& path="");</font>
+功能：获取资源路径；
+参数：path为附加的子路径（可省略）？？？；
+返回：完整资源路径字符串。
+
+命令：<font color='yellow'>static QString sl_writableLocation(QStandardPaths::StandardLocation);</font>
+功能：获取 QStandardPaths 指定标准位置的可写目录；
+参数：QStandardPaths::StandardLocation 标准位置枚举值；
+返回：目录路径字符串（可能为空）。
+
+命令：<font color='yellow'>static QStringList sl_standardLocations(QStandardPaths::StandardLocation);</font>
+功能：获取指定标准位置的所有候选目录；
+参数：QStandardPaths::StandardLocation 标准位置枚举值；
+返回：目录路径字符串列表。
+
+命令：<font color='yellow'>static QString sl_displayName(QStandardPaths::StandardLocation);</font>
+功能：获取指定标准位置的显示名称；
+参数：QStandardPaths::StandardLocation 标准位置枚举值；
+返回：显示名称字符串。
+
+4. Windows（Q_OS_WIN32）、Linux（Q_OS_LINUX）、macOS（Q_OS_MACOS）、iOS（Q_OS_IOS）及默认平台专有槽函数
+命令：<font color='yellow'>static void sl_showToast(const QString& msg);</font>
+功能：显示Toast提示信息；
+参数：msg为提示内容字符串；
+返回：无；
+注意：命令为当前操作系统所支持的，并不统一。
+
+5. Android（Q_OS_ANDROID）专有
+5.1 信号
+命令：<font color='yellow'>void sg_newIntent(const QVariantMap& intentData, bool start);</font>
+功能：安卓的回调函数发送（收到新Intent）；
+参数：intentData为Intent数据；start为是否启动？？？。
+
+命令：<font color='yellow'>void sg_qmlNewIntent(const QVariantMap& intentData, bool start);</font>
+功能：提供给QML（Qt主线程）的新Intent信号（由 sg_newIntent 转发）；
+参数：同上。
+
+命令：<font color='yellow'>void sg_activityResult(int requestCode, int resultCode, const QAndroidJniObject& data);</font>
+功能：安卓的回调函数调用（Activity返回结果）；
+参数：requestCode为请求码；resultCode为结果码；data为返回的Intent数据对象。
+
+命令：<font color='yellow'>void sg_qmlActivityResult(int requestCode, int resultCode);</font>
+功能：提供给QML（Qt主线程）的Activity结果信号（由 sg_activityResult 转发）；
+参数：requestCode为请求码；resultCode为结果码。
+
+命令：<font color='yellow'>void sg_requestPermissionsResult(int requestCode, const QStringList& strlistPermissions, const QList<int>& listGrantResults);</font>
+功能：安卓的回调函数调用（权限请求结果）；
+参数：requestCode为请求码；strlistPermissions为权限名列表；listGrantResults为授权结果列表。
+
+命令：<font color='yellow'>void sg_qmlRequestPermissionsResult(int requestCode, const QStringList& strlistPermissions, const QList<int>& listGrantResults);</font>
+功能：提供给QML（Qt主线程）的权限请求结果信号（由上者转发）；
+参数：同上。
+
+命令：<font color='yellow'>void sg_pictureInPictureModeChanged(bool isInPip);</font>
+功能：安卓的回调函数调用（画中画模式改变）；
+参数：isInPip为是否处于画中画模式。
+
+命令：<font color='yellow'>void sg_qmlPictureInPictureModeChanged(bool isInPip);</font>
+功能：提供给QML（Qt主线程）的画中画模式改变信号（由上者转发）；
+参数：同上。
+
+命令：<font color='yellow'>void sg_qmlRequestExternalStoragePermissionResult(int code);</font>
+功能：提供给QML（Qt主线程）的外置存储权限请求结果信号；
+参数：code为0没有权限；1获取到权限；2已有权限；
+注意：对应的安卓回调信号被注释掉了。
+
+命令：<font color='yellow'>void sg_qmlRequestNotificationPermissionResult(int code);</font>
+功能：提供给QML（Qt主线程）的通知权限请求结果信号；
+参数：code为0没有权限；1获取到权限；2已有权限；
+注意：对应的安卓回调信号被注释掉了。
+
+命令：<font color='yellow'>void sg_serviceCreate();</font>
+功能：后台服务（Service）创建时发出（后台任务开始）；
+参数：无。
+
+命令：<font color='yellow'>void sg_serviceStart(const QVariantMap& intentData, int flags, int startId);</font>
+功能：后台服务（Service）启动时发出；
+参数：intentData为Intent数据；flags为启动标志；startId为服务ID。
+
+命令：<font color='yellow'>void sg_serviceDestroy();</font>
+功能：后台服务（Service）销毁时发出；
+参数：无。
+
+命令：<font color='yellow'>void sg_serviceWork();</font>
+功能：后台服务（Service）工作时发出；
+参数：无。
+
+5.2 槽函数
+命令：<font color='yellow'>static int sl_getScreenOrientation();</font>
+功能：获取当前屏幕方向；
+参数：无；
+返回：0为横屏(顺时针90度)；1为正常（竖屏）；详见源码中 ActivityInfo SCREEN_ORIENTATION_* 注释。
+
+命令：<font color='yellow'>static void sl_setScreenOrientation(int orient);</font>
+功能：设置屏幕方向；
+参数：orient为方向值（同上枚举）；
+返回：无；
+注意：屏幕旋转时Activity会重走生命周期，可在AndroidManifest中设置 android:configChanges="orientation|screenSize|keyboardHidden" 避免。
+
+命令：<font color='yellow'>static void sl_keepScreenWake(bool bOn);</font>
+功能：设置或取消屏幕常亮；
+参数：bOn为true常亮、false取消；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_getSdcardPath();</font>
+功能：获取SD卡路径（内置存储）；
+参数：无；
+返回：路径字符串（一般是 "/storage/emulated/0"）。
+
+命令：<font color='yellow'>static QString sl_getExternalStorageDirectory();</font>
+功能：获取外部存储目录（使用JNI实现）；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static bool sl_hasExternalStorage();</font>
+功能：判断是否存在外部存储；
+参数：无；
+返回：true存在、false不存在。
+
+命令：<font color='yellow'>static QString sl_getDataPath();</font>
+功能：获取Data数据目录路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppPackageResourcePath();</font>
+功能：获取应用包资源路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppDirPath(const QString& name);</font>
+功能：获取应用指定目录路径；
+参数：name为目录名？？？；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppDataPath();</font>
+功能：获取应用Data目录路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppFilesPath();</font>
+功能：获取应用Files目录路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppCachePath();</font>
+功能：获取应用Cache缓存目录路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppExternalCachePath();</font>
+功能：获取应用外部缓存目录路径；
+参数：无；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getAppExternalFilesPath(const QString& name = "");</font>
+功能：获取应用外部Files目录路径；
+参数：name为附加子目录名（可省略）；
+返回：路径字符串。
+
+命令：<font color='yellow'>static QString sl_getNetworkState();</font>
+功能：获取网络状态；
+参数：无；
+返回：网络状态描述字符串？？？。
+
+命令：<font color='yellow'>static QString sl_getDeviceArch();</font>
+功能：获取设备CPU架构；
+参数：无；
+返回：架构字符串。
+
+命令：<font color='yellow'>static QString sl_getSerialNumber(int type = -1);</font>
+功能：获取设备序列号；
+参数：type为0时用getprop ro.boot.serialno；1用mac eth0；2用getAndroidID；-1由程序自动选择合适方式；
+返回：序列号字符串。
+
+命令：<font color='yellow'>static QString sl_getAndroidInfo(int type);</font>
+功能：获取安卓的一些信息；
+参数：type为1-7（具体含义？？？）；
+返回：信息字符串。
+
+命令：<font color='yellow'>static void sl_requestExternalStoragePermission();</font>
+功能：请求外置存储权限；
+参数：无；
+返回：无（结果通过 sg_qmlRequestExternalStoragePermissionResult 信号返回）。
+
+命令：<font color='yellow'>static bool sl_checkExternalStoragePermission();</font>
+功能：检查外置存储权限；
+参数：无；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static void sl_requestNotificationPermission();</font>
+功能：请求通知权限；
+参数：无；
+返回：无（结果通过 sg_qmlRequestNotificationPermissionResult 信号返回）。
+
+命令：<font color='yellow'>static bool sl_checkNotificationPermission();</font>
+功能：检查通知权限；
+参数：无；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static bool sl_checkPermission(const QString& strPermission);</font>
+功能：检查指定权限；
+参数：strPermission为权限字符串（如 "android.permission.CAMERA"）；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static QVariantMap sl_requestPermissions(const QStringList& listPermissions, int timeoutMs = INT_MAX);</font>
+功能：请求多个权限；
+参数：listPermissions为权限名列表；timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：结果QVariantMap（具体格式？？？）。
+
+命令：<font color='yellow'>static bool sl_requestPermission(const QString& strPermission, int timeoutMs = INT_MAX);</font>
+功能：请求单个权限；
+参数：strPermission为权限名；timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：true获取到权限、false未获取（含超时）。
+
+命令：<font color='yellow'>static void sl_requestAllPermissions();</font>
+功能：请求所有（声明的）权限；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_showToast(const QString& msg);</font>
+功能：显示Toast提示（推荐方式）；
+参数：msg为提示内容；
+返回：无；
+注意：要么用runOnAndroidThreadSync，要么Java用 sm_instanceMainActivity.runOnUiThread；在Qt线程中不起作用，使用runOnAndroidThread会闪退。
+
+命令：<font color='yellow'>static void sl_showToast1(const QString& msg);</font>
+功能：显示Toast提示（方式1）？？？；
+参数：msg为提示内容；
+返回：无。
+
+命令：<font color='yellow'>static void sl_showToast2(const QString& msg);</font>
+功能：显示Toast提示（方式2）？？？；
+参数：msg为提示内容；
+返回：无。
+
+命令：<font color='yellow'>static int sl_notification(const QVariant& data);</font>
+功能：发送通知栏通知；
+参数：data为通知配置数据（具体格式？？？）；
+返回：通知ID。
+
+命令：<font color='yellow'>static int sl_notification1(const QVariant& data);</font>
+功能：发送通知栏通知（方式1）？？？；
+参数：data为通知配置数据；
+返回：通知ID。
+
+命令：<font color='yellow'>static void sl_closeNotification(int ID);</font>
+功能：关闭指定通知；
+参数：ID为通知ID；
+返回：无。
+
+命令：<font color='yellow'>static void sl_closeNotification1(int ID);</font>
+功能：关闭指定通知（方式1）？？？；
+参数：ID为通知ID；
+返回：无。
+
+命令：<font color='yellow'>static int sl_testNotification3(const QVariant& data);</font>
+功能：测试通知（方式3，测试用）；
+参数：data为通知配置数据；
+返回：？？？。
+
+命令：<font color='yellow'>static void sl_restartAPP(const int delay = 1000);</font>
+功能：重启App；
+参数：delay为延迟毫秒，默认1000；
+返回：无。
+
+命令：<font color='yellow'>static void sl_restartAPP1(const int delay = 1000);</font>
+功能：重启App（方式1）？？？；
+参数：delay为延迟毫秒，默认1000；
+返回：无。
+
+命令：<font color='yellow'>static void sl_restartAPP2(const int delay = 1000);</font>
+功能：重启App（方式2）？？？；
+参数：delay为延迟毫秒，默认1000；
+返回：无。
+
+命令：<font color='yellow'>static void sl_installApk(const QString& filePath);</font>
+功能：安装APK安装包；
+参数：filePath为APK文件路径；
+返回：无。
+
+命令：<font color='yellow'>static void sl_share(const QString& title, const QString& content);</font>
+功能：调出系统分享；
+参数：title为标题；content为分享内容；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_getRealPathFromURI(const QString& uri);</font>
+功能：把URI转换为真实文件路径；
+参数：uri为内容URI字符串；
+返回：真实路径字符串；
+注意：以下的 sl_getRealPathFromURI1~4、sl_getRealPathFromTreeURI1~2 均注释掉了，不能用。
+
+命令：<font color='yellow'>static int sl_copyURIFile(const QString& srcURI, const QString& dst);</font>
+功能：复制URI指向的文件到目标路径；
+参数：srcURI为源URI；dst为目标路径；
+返回：结果码（0成功？？？）。
+
+命令：<font color='yellow'>static QVariantMap sl_getStartIntentData();</font>
+功能：获取启动Intent的Data数据；
+参数：无；
+返回：Intent数据（QVariantMap）。
+
+命令：<font color='yellow'>static bool sl_isInPictureInPictureMode();</font>
+功能：判断是否处于画中画模式；
+参数：无；
+返回：true处于、false不处于。
+
+命令：<font color='yellow'>static void sl_enterPictureInPictureMode();</font>
+功能：进入画中画模式；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_showFloatingWindow();</font>
+功能：显示悬浮窗；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_launchActivity(const QString& activity = "com.android.settings");</font>
+功能：启动指定Activity（默认打开系统设置）；
+参数：activity为Activity组件名，默认"com.android.settings"；
+返回：无。
+
+命令：<font color='yellow'>static QVariant sl_configService(const QVariant& cfg = QVariant());</font>
+功能：创建/配置Service（用处不大，目前只是创建ServiceThread跑JS代码）；
+参数：cfg为配置数据；不传cfg时为获取配置；
+返回：配置数据QVariant；
+示例：
+Platform.sl_configService({Type: 2, Code: 'let n = 0; timer.timeout.connect(function(){console.info(++n);});timer.interval=1000;timer.start();', Type: -1});
+var service = Platform.sl_configService();  //获取配置
+命令：<font color='yellow'>static void sl_startService(const QVariant& cfg = QVariant(), const QString& jsonString = "{}", const QString& serviceClassName = "cn/Leamus/MainService");</font>
+功能：开始服务（也可以直接把配置放进去）；
+参数：cfg为配置；jsonString为JSON参数字符串？？？；serviceClassName为服务类名；
+返回：无。
+
+命令：<font color='yellow'>static void sl_stopService(const QString& serviceClassName = "cn/Leamus/MainService");</font>
+功能：停止服务；
+参数：serviceClassName为服务类名；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_isServiceRunning(const QString& serviceClassName = "cn/Leamus/MainService");</font>
+功能：判断服务是否在运行；
+参数：serviceClassName为服务类名；
+返回：true运行中、false未运行。
+
+命令：<font color='yellow'>static void sl_testClassLoader(const QString& fileName, const QString& className = "", const QString& funcName = "");</font>
+功能：测试动态加载外部类（dex）；
+参数：fileName为文件名；className为类名（可省）；funcName为函数名（可省）；
+返回：无。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_createClassFromFile(const QString& filePath, const QString& className);</font>
+功能：从文件（dex）创建类（每次重新载入都返回新的）；
+参数：filePath为文件路径；className为类名（含包名前缀）；
+返回：QAndroidJniObject类对象。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_createInstance(const QAndroidJniObject& clazz);</font>
+功能：根据类对象创建实例（每次重新创建）；
+参数：clazz为类对象；
+返回：QAndroidJniObject实例对象。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_loadClassFromFile(const QString& filePath, const QString& className, const QString& prefix="");</font>
+功能：从文件（dex）载入类，多一层缓存（prefix+className是缓存的key）；先get，没有则create并放缓存；
+参数：filePath为文件路径；className为类名；prefix为缓存前缀；
+返回：QAndroidJniObject类对象。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_loadClassInstance(const QString& className, const QString& prefix="");</font>
+功能：载入类实例，多一层缓存（prefix+className是缓存的key）；
+参数：className为类名；prefix为缓存前缀；
+返回：QAndroidJniObject实例对象。
+
+命令：<font color='yellow'>static int sl_createAllClassesFromFile(const QString& filePath, const QString& prefix="");</font>
+功能：载入一个文件（Dex）的所有Class，保存到缓存m_cacheClasses中（prefix+className是缓存的key）；
+参数：filePath为文件路径；prefix为缓存前缀；
+返回：载入的类数量？？？。
+
+命令：<font color='yellow'>static void sl_setClass(const QString& classNameWithPrefix, const QAndroidJniObject& clazz);</font>
+功能：向缓存中存储类；
+参数：classNameWithPrefix为带前缀的类名（缓存key）；clazz为类对象；
+返回：无。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_getClass(const QString& classNameWithPrefix);</font>
+功能：从缓存中获取类；
+参数：classNameWithPrefix为带前缀的类名（缓存key）；
+返回：QAndroidJniObject类对象（无则无效对象）。
+
+命令：<font color='yellow'>static void sl_setInstance(const QString& classNameWithPrefix, const QAndroidJniObject& object);</font>
+功能：向缓存中存储对象；
+参数：classNameWithPrefix为带前缀的类名（缓存key）；object为实例对象；
+返回：无。
+
+命令：<font color='yellow'>static QAndroidJniObject sl_getInstance(const QString& classNameWithPrefix);</font>
+功能：从缓存中获取对象；
+参数：classNameWithPrefix为带前缀的类名（缓存key）；
+返回：QAndroidJniObject实例对象。
+
+命令：<font color='yellow'>static QString sl_callObjectMethod(const QAndroidJniObject& obj, const QString& methodName, const QString& params);</font>
+功能：通用JNI调用对象方法（参数和返回值都是JSON字符串）；调用外部dex需要自己用Java封装一层函数作为中间层；
+参数：obj为对象；methodName为方法名；params为JSON格式的参数字符串；
+返回：JSON格式的返回值字符串。
+
+命令：<font color='yellow'>static QString sl_callStaticObjectMethod(const QString& classNameWithPrefix, const QString& methodName, const QString& params);</font>
+功能：通用JNI调用静态方法（参数和返回值都是JSON字符串）；
+参数：classNameWithPrefix为带前缀的类名；methodName为方法名；params为JSON格式的参数字符串；
+返回：JSON格式的返回值字符串。
+
+命令：<font color='yellow'>static void sl_testCallJavaNative();</font>
+功能：测试调用Java Native方法；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_testUseModule1(const QString& filePath = "/storage/emulated/0/Module.jar", const QString& className = "cn.Leamus.Module");</font>
+功能：测试使用外部Module（方式1）；
+参数：filePath为jar/dex文件路径，默认"/storage/emulated/0/Module.jar"；className为类名，默认"cn.Leamus.Module"；
+返回：无。
+
+命令：<font color='yellow'>static void sl_testUseModule2();</font>
+功能：测试使用外部Module（方式2）？？？；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_runCommand(const QString& cmd);</font>
+功能：运行系统命令；
+参数：cmd为命令字符串；
+返回：输出结果字符串；
+注意：命令为当前操作系统所支持的，并不统一。
+
+命令：<font color='yellow'>static QString sl_rootCommand(const QString& cmd);</font>
+功能：以root权限运行系统命令；
+参数：cmd为命令字符串；
+返回：输出结果字符串；
+注意：需要设备已root。
+
+5.3 Android专有属性（额外）
+属性	类型	说明
+Tap	QObject*	TapSDK相关单例（只读，CONSTANT）？？？
+CSJ	QObject*	穿山甲(CSJ)广告SDK相关单例（只读，CONSTANT）？？？
+Alipay	QObject*	支付宝SDK相关单例（只读，CONSTANT）？？？
+6. OpenHarmony（Q_OS_OPENHARMONY）专有
+6.1 信号
+命令：<font color='yellow'>void sg_backHandle(const QString& info, QPrivateSignal);</font>
+功能：返回键处理信号？？？；
+参数：info为信息字符串；QPrivateSignal为Qt私有信号参数（仅内部使用）。
+
+命令：<font color='yellow'>void sg_setDefaultDisplayInfo(const QVariant& info, QPrivateSignal);</font>
+功能：设置默认DisplayInfo信号？？？；
+参数：info为显示信息；QPrivateSignal为Qt私有信号参数（仅内部使用）。
+
+6.2 槽函数
+命令：<font color='yellow'>static bool sl_requestExternalStoragePermission(int timeoutMs = INT_MAX);</font>
+功能：请求外置存储权限；
+参数：timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：true获取到权限、false未获取（含超时）。
+
+命令：<font color='yellow'>static bool sl_checkExternalStoragePermission();</font>
+功能：检查外置存储权限；
+参数：无；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static bool sl_requestNotificationPermission(int timeoutMs = INT_MAX);</font>
+功能：请求通知权限；
+参数：timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：true获取到权限、false未获取（含超时）。
+
+命令：<font color='yellow'>static bool sl_checkNotificationPermission();</font>
+功能：检查通知权限；
+参数：无；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static bool sl_checkPermission(const QString& strPermission);</font>
+功能：检查指定权限；
+参数：strPermission为权限字符串；
+返回：true已授权、false未授权。
+
+命令：<font color='yellow'>static QVariantMap sl_requestPermissions(const QStringList& listPermissions, int timeoutMs = INT_MAX);</font>
+功能：请求多个权限；
+参数：listPermissions为权限名列表；timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：结果QVariantMap（具体格式？？？）。
+
+命令：<font color='yellow'>static bool sl_requestPermission(const QString& strPermission, int timeoutMs = INT_MAX);</font>
+功能：请求单个权限；
+参数：strPermission为权限名；timeoutMs为超时毫秒（用户没选，超时后会继续运行代码，但返回false）；
+返回：true获取到权限、false未获取（含超时）。
+
+命令：<font color='yellow'>static void sl_showToast(const QString& msg);</font>
+功能：显示Toast提示信息；
+参数：msg为提示内容字符串；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_defaultDisplayInfo();</font>
+功能：获取默认Display信息？？？；
+参数：无；
+返回：信息字符串。
+
+三、备注
+_Platform 为宏定义生成的平台相关单例类，对外使用时通过 Platform 名称访问（由 SINGLETON/LMS_SINGLETON 宏生成）？？？。
+Android 下部分返回 QAndroidJniObject 的函数仅在 Qt6 下映射为 QJniObject（Qt5 下为 QAndroidJniObject）。
+Q_OS_LINUX 的定义在 Android 和 OpenHarmony 下也成立，因此分支判断顺序为：Win32 → Android → OpenHarmony → Linux → macOS → iOS → 默认。
+头文件中还定义了 _Tap（TapSDK登录/实名认证/广告）、_CSJ（穿山甲广告）、_Alipay（支付宝支付）三个单例类及其信号（如 sg_tapLoginDataSignal、sg_tapComplianceDataSignal、sg_tapADDataSignal、sg_csjDataSignal），因不在本次要求范围内（仅提取 SysInfo、_Platform），如需要可另行整理。
+文中所有"？？？"处为无法从头文件确定的细节（如枚举取值含义、返回格式等），请人工补充。

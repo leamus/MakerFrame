@@ -202,7 +202,7 @@ Item {
             //let data = File.read(filePath);
             //console.debug('[GameFightScript]filePath：', filePath);
 
-            data = $Frame.sl_fileRead(filePath);
+            data = $Frame.sl_readFile(filePath);
             if(!data)
                 return;
             data = JSON.parse(data);
@@ -640,7 +640,7 @@ Item {
         //  params是给战斗脚本$createData的参数。
         //返回：失败false，成功true；
         function fighting(fightScript) {
-            let ret = $CommonLibJS.getPromise();
+            let ret = $CommonLibJS.createPromise();
             //ret.$resolve = _resolve; ret.$reject = _reject;
 
             fightScript = game.$sys.getFightScriptObject(fightScript);
@@ -2285,7 +2285,27 @@ Item {
 
         //$Frame.sl_globalObject().fight = fight;
 
+
+        Object.defineProperty(fight, 'lastreturn', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return _private.scriptQueue.lastReturnedValue;
+            },
+            //set(value) {},
+        });
+        Object.defineProperty(fight, 'lastvalue', {
+            enumerable: false,
+            configurable: true,
+            get() {
+                return _private.scriptQueue.lastEscapeValue;
+            },
+            //set(value) {},
+        });
+
+
         //_private.scriptQueue.bContinueIfNotYieldPromiseObject = false;
+
 
         console.debug('[FightScene]Component.onCompleted');
     }

@@ -342,7 +342,7 @@ Item {
 
             /*let filePath = $GameMakerGlobal.mapPath(item) + '/map.json';
             //let cfg = File.read(filePath);
-            let cfg = $Frame.sl_fileRead(filePath);
+            let cfg = $Frame.sl_readFile(filePath);
             //console.debug('cfg', cfg, filePath);
 
             if(!cfg)

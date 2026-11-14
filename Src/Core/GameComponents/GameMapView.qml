@@ -44,7 +44,7 @@ Item {
         //如果需要载入（这里其实可以废弃了）
         if(!tmapInfo) {
             //let cfg = File.read(mapPath);
-            tmapInfo = $Frame.sl_fileRead($GlobalJS.toPath(mapPath + '/map.json'));
+            tmapInfo = $Frame.sl_readFile($GlobalJS.toPath(mapPath + '/map.json'));
             //console.debug('cfg', cfg, mapPath);
 
             if(!tmapInfo) {
@@ -186,14 +186,14 @@ Item {
         //在目标图块最中央的 地图的坐标
         let targetX;
         let targetY;
-        if(dx.toString().includes('.'))
-            targetX = parseInt((bx + parseFloat(dx)) * sizeMapBlockScaledSize.width);
+        if($CommonLibJS.isFloat(dx))
+            targetX = parseInt((bx + /*parseFloat*/(dx)) * sizeMapBlockScaledSize.width);
         else 
-            targetX = parseInt((bx) * sizeMapBlockScaledSize.width) + parseInt(dx);
-        if(dy.toString().includes('.'))
-            targetY = parseInt((by + parseFloat(dy)) * sizeMapBlockScaledSize.height);
+            targetX = parseInt((bx) * sizeMapBlockScaledSize.width) + /*parseInt*/(dx);
+        if($CommonLibJS.isFloat(dy))
+            targetY = parseInt((by + /*parseFloat*/(dy)) * sizeMapBlockScaledSize.height);
         else
-            targetY = parseInt((by) * sizeMapBlockScaledSize.height) + parseInt(dy);
+            targetY = parseInt((by) * sizeMapBlockScaledSize.height) + /*parseInt*/(dy);
 
         //let targetX = role.x + role.x1 + parseInt(role.width1 / 2);
         //let targetY = role.y + role.y1 + parseInt(role.height1 / 2);

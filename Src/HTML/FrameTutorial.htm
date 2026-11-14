@@ -1,0 +1,2454 @@
+<CENTER><B>框架教程--Frame对象</B></CENTER>
+
+说明：Frame全局单例对象是提供框架底层方面的功能（文件、网络、服务、进程、线程、数据库、缓存、编码转换、加解密、压缩解压等），有众多的API槽函数和信号；QML中使用$Frame或FrameManager来获取使用，Qt插件中使用 qApp->property('$Frame').value<QObject*>() 来获取使用。
+
+一、L_LibraryWrapper 类
+
+命令：<font color='yellow'>QVariant sl_runQtFunction(const QString& funtionName, const QVariant& args);</font>
+功能：运行动态库中的Qt函数；
+参数：funtionName为函数名；args为传给函数的QVariant参数；
+返回：QVariant类型，函数返回值；失败返回空QVariant()；
+注意：动态库函数签名须为 QVariant 函数名(QVariant)；调用失败会输出警告并返回QVariant()。
+
+命令：<font color='yellow'>QVariant sl_runFunction(const QString& funtionName, const QString& args);</font>
+功能：运行动态库中的普通函数；
+参数：funtionName为函数名；args为传给函数的字符串参数；
+返回：QVariant类型（实际为QString），函数返回值；失败返回空QVariant()；
+注意：动态库函数签名须为 char* 函数名(const char*)，参数需函数内部自己处理。
+
+二、PreciseTimerThread 类（精确定时器，占用一个线程死循环）：继承自QThread，单例类，使用：$Frame.preciseTimer；
+属性：<font color='yellow'>int interval</font>：当前定时器间隔时间；
+
+信号：<font color='yellow'>void sg_triggered(qint64 timestamp);</font>
+功能：定时器每达到设定间隔时触发（按毫秒时间戳）；
+参数：timestamp为当前毫秒时间戳；
+示例：$Frame.preciseTimer.sg_triggered.connect(function(interval){console.warn(interval)});
+注意：需先调用 sl_start() 启动。
+
+命令：<font color='yellow'>bool sl_start(int interval = 16, QThread::Priority priority = QThread::InheritPriority);</font>
+功能：启动定时器线程；
+参数：interval为定时间隔（毫秒，最小为1）；priority为线程优先级；
+返回：bool类型，true成功；已在运行则返回false。
+示例：$Frame.preciseTimer.sl_start(16);
+
+命令：<font color='yellow'>bool sl_stop();</font>
+功能：停止定时器线程；
+返回：bool类型，true成功；未运行则返回false；
+示例：$Frame.preciseTimer.sl_stop();
+
+三、FrameManager 类
+属性：<font color='yellow'>QVariantMap config</font>：框架配置（从Config.cfg和加密数据库中读取）；
+属性：<font color='yellow'>QString appUID</font>：程序运行的UID，只读；
+属性：<font color='yellow'>_Platform* platform</font>：Platform对象；
+属性：<font color='yellow'>QQmlApplicationEngine* qmlApplicationEngine</font>：QMLApplicationEngine对象；
+属性：<font color='yellow'>PreciseTimerThread* preciseTimer</font>：PreciseTimerThread（精确定时器）对象；
+
+信号：<font color='yellow'>void sg_signal(const QVariant& v);</font>
+功能：给QML发送信号（队列方式）；
+参数：v为传递的数据；
+
+信号：<font color='yellow'>void sg_newArgs(const QStringList& args);</font>
+功能：打开新程序（多开）时传递的参数（新应用关闭，原应用发送此信号）；框架会默认处理；
+参数：args为参数列表；
+
+（一）配置功能（键值对）
+命令：<font color='yellow'>int sl_localDBSaveConfig(const QString& key, const QString& value);</font>
+功能：存储数据key和value到本地加密数据库SQLITECIPHER；
+参数：key为键；value为值；
+返回：int类型，为0表示和原值相同，>0为修改条数，<0表示出错。
+
+命令：<font color='yellow'>int sl_localDBDeleteConfig(const QString& key);</font>
+功能：从本地加密数据库SQLITECIPHER中删除数据key；
+参数：key为键；
+返回：int类型，为0表示不存在key，>0为删除条数，<0表示出错。
+
+命令：<font color='yellow'>static int sl_insertConfig(const QString& k, const QVariant& v);</font>
+功能：临时增加设置项；
+参数：k为键；v为值；
+返回：int类型，为0表示和原值相同，1为增加，2表示覆盖。
+
+命令：<font color='yellow'>static int sl_removeConfig(const QString& k);</font>
+功能：临时删除设置项；
+参数：k为键；
+返回：int类型，删除个数。
+
+命令：<font color='yellow'>static QVariant sl_configValue(const QString& key = '', const QVariant& defaultValue = QVariant(), const QVariant& type = -1);</font>
+功能：获取Config.cfg（包括临时设置项）或SQLITECIPHER的某个值；
+参数：key如果为空，则表示返回整个配置；defaultValue为默认值；type为-1表示从File和Sqlite中搜寻（Sqlite优先），0或"File"是File，1或"Sqlite"是Sqlite；
+返回：QVariant类型，配置值。
+
+（二）包装类（QByteArray / QBuffer / QUrl / QTextDocument）
+命令：<font color='yellow'>static QObject* sl_byteArray(const QByteArray& ba = QByteArray(), int flags = QIODevice::ReadWrite, QObject* parent = nullptr);</font>
+功能：返回一个js可操作的QByteArray包装类对象（和L_Buffer类似，推荐用L_Buffer）；
+参数：ba为初始数据；flags为打开方式（QIODevice::OpenMode）；parent为父对象（默认为null，会随时自动被引擎回收）；
+返回：QObject*类型，L_ByteArrayWrapper对象。
+
+命令：<font color='yellow'>static QObject* sl_buffer(QObject* parent = FrameManager::instance());</font>
+功能：返回一个js可操作的QBuffer包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：parent为父对象；
+返回：QObject*类型，L_Buffer对象。
+
+命令：<font color='yellow'>static QObject* sl_url(const QUrl& url, QObject* parent = FrameManager::instance());</font>
+功能：返回一个js可操作的QUrl包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：url为URL；parent为父对象；
+返回：QObject*类型，L_URLWrapper对象。
+
+命令：<font color='yellow'>static QObject* sl_url(const QString& url, int mode = QUrl::TolerantMode, QObject* parent = FrameManager::instance());</font>
+功能：同上（重载），用字符串构造QUrl包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：url为URL字符串；mode为解析模式（QUrl::ParsingMode）；parent为父对象；
+返回：QObject*类型，L_URLWrapper对象。
+
+命令：<font color='yellow'>static QObject* sl_textDocument(const QString& text = '', QObject* parent = FrameManager::instance());</font>
+功能：返回一个js可操作的QTextDocument包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：text为初始文本；parent为父对象；
+返回：QObject*类型，L_TextDocumentWrapper对象。
+
+命令：<font color='yellow'>static QObject* sl_textDocument(QTextDocument *textDocument, QObject* parent = FrameManager::instance());</font>
+功能：同上（重载），包装已有的QTextDocument（用完需手动释放，如果parent为null则不需要）；
+参数：textDocument为QTextDocument指针；parent为父对象；
+返回：QObject*类型，L_TextDocumentWrapper对象。
+
+命令：<font color='yellow'>static QObject* sl_textDocument(QQuickTextDocument* td, QObject* parent = FrameManager::instance());</font>
+功能：同上（重载），包装QML的QQuickTextDocument内部的QTextDocument（用完需手动释放，如果parent为null则不需要）；
+参数：td为QQuickTextDocument指针；parent为父对象；
+返回：QObject*类型，L_TextDocumentWrapper对象。
+
+（三）QML访问网络/下载文件
+命令：<font color='yellow'>QObject* sl_networkAccessManager();</font>
+功能：返回网络访问管理器QNetworkAccessManager包装类单例对象；
+返回：QObject*类型，NetworkAccessManager单例对象。
+
+命令：<font color='yellow'>QObject* sl_networkRequest(const QUrl& url = QUrl(), QObject* parent = FrameManager::instance());</font>
+功能：创建一个网络请求对象QNetworkRequest包装类对象；
+参数：url为URL；parent为父对象；
+返回：QObject*类型，NetworkRequest对象。
+
+命令：<font color='yellow'>static QObject* sl_request(const QString& url, const QString& verb = 'GET', const QByteArray& baPostData = QByteArray(), const QVariantMap& mapHeaders = QVariantMap(), const QVariant& saveFilePath = QVariant(), const QVariantMap& mapParams = QVariantMap());</font>
+功能：发送HTTP请求（简单方法）；
+参数：url为地址；verb为请求方法（GET/POST等）；baPostData为POST数据；mapHeaders为头信息；
+    saveFilePath为字符串（路径）则保存为文件，为其他类型则保存到内存（QByteArray）；
+    mapParams为其他参数（包含Timeout、Priority、PeerVerifyName、MaximumRedirectsAllowed等，含义见QNetworkRequest）；
+返回：QObject*类型，HTTPReply对象（QNetworkReply的包装类，含sg_received、sg_finished信号和networkReply、io属性等）；失败为nullptr；
+
+命令：<font color='yellow'>static QObject* sl_downloadFile(const QString& url, const QString& filepath, const QVariantMap& mapParams = QVariantMap());</font>
+功能：下载文件（sl_request的简化）；
+参数：url为文件地址；filepath为保存路径；mapParams同上；
+返回：同上。
+示例：
+    const httpReply = FrameManager.sl_request(url, baVerb, baPostData, mapHeaders);
+    const httpReply = FrameManager.sl_downloadFile(url, filepath);
+    if(httpReply)
+        httpReply.sg_finished.connect(function(httpReply) {
+            const networkReply = httpReply.networkReply;
+            //FrameManager.sl_objectProperty("属性", networkReply);  //~ ID（m_mapNetworkReply的ID）、Data（保存的QByteArray数据或QFile指针）、SaveType（保存类型）、Code
+            //console.debug(httpReply, FrameManager.sl_objectProperty("Data", httpReply.networkReply), Object.keys(httpReply.networkReply));
+
+            httpReply.sl_deleteLater(); //FrameManager.sl_deleteLater(httpReply);
+        });
+
+（四）文件（夹）操作
+命令：<font color='yellow'>static QObject* sl_file(const QString& filePath = '', int flags = QIODevice::NotOpen, QObject* parent = FrameManager::instance());</font>
+功能：返回一个js可操作的QFile包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：filePath为文件路径；flags为打开方式；parent为父对象；
+返回：QObject*类型，L_File对象。
+
+命令：<font color='yellow'>static QObject* sl_dir(const QString& path = '', const QString& nameFilter = QString(), int sort = QDir::SortFlags(QDir::Name | QDir::IgnoreCase), int filter = QDir::AllEntries, QObject* parent = FrameManager::instance());</font>
+功能：返回一个js可操作的QDir包装类对象（用完需手动释放，如果parent为null则不需要）；
+参数：path为文件夹路径；nameFilter为名称过滤；sort为排序方式；filter为过滤方式；parent为父对象；
+返回：QObject*类型，L_Dir对象。
+
+命令：<font color='yellow'>static bool sl_isReadable(const QString& filePath);</font>
+功能：检测文件是否可读；
+参数：filePath为文件路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isWritable(const QString& filePath);</font>
+功能：检测文件是否可写；
+参数：filePath为文件路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isExecutable(const QString& filePath);</font>
+功能：检测文件是否可执行；
+参数：filePath为文件路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isHidden(const QString& filePath);</font>
+功能：检测文件是否隐藏；
+参数：filePath为文件路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isNativePath(const QString& filePath);</font>
+功能：检测是否本地路径；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isRelative(const QString& filePath);</font>
+功能：检测是否相对路径；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isAbsolute(const QString& filePath);</font>
+功能：检测是否绝对路径；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_makeAbsolute(const QString& filePath);</font>
+功能：将相对路径转为绝对路径；
+参数：filePath为路径；
+返回：bool类型，是否转换成功。
+
+命令：<font color='yellow'>static bool sl_isFile(const QString& filePath);</font>
+功能：检测是否文件；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isDir(const QString& filePath);</font>
+功能：检测是否文件夹；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isSymLink(const QString& filePath);</font>
+功能：检测是否符号链接（快捷方式等）；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isSymbolicLink(const QString& filePath);</font>
+功能：检测是否符号链接；
+参数：filePath为路径；
+返回：bool类型；
+注意：与 sl_isSymLink 的区别？？？需人工补充。
+
+命令：<font color='yellow'>static bool sl_isShortcut(const QString& filePath);</font>
+功能：检测是否快捷方式（Windows）；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isJunction(const QString& filePath);</font>
+功能：检测是否NTFS junction（Windows）；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isRoot(const QString& filePath);</font>
+功能：检测是否根目录；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isBundle(const QString& filePath);</font>
+功能：检测是否Mac捆包；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static inline QByteArray sl_fileEncodeName(const QString& fileName);</font>
+功能：按本地文件系统编码转换文件名（QString转QByteArray）；
+参数：fileName为文件名；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QString sl_fileDecodeName(const QByteArray& localFileName);</font>
+功能：按本地文件系统编码还原文件名（QByteArray转QString）；
+参数：localFileName为本地编码文件名；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_fileSymLinkTarget(const QString& filePath);</font>
+功能：返回符号链接指向的文件（QFile静态方法）；
+参数：filePath为符号链接路径；
+返回：QString类型，目标路径；非符号链接返回空。
+
+命令：<font color='yellow'>static QString sl_fileSymLinkTarget1(const QString& filePath);</font>
+功能：同上（QFileInfo方法版本）；
+参数：同上；
+返回：同上。
+
+命令：<font color='yellow'>static QString sl_fileOwner(const QString& filePath);</font>
+功能：返回文件所有者；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static uint sl_fileOwnerId(const QString& filePath);</font>
+功能：返回文件所有者ID；
+参数：filePath为路径；
+返回：uint类型。
+
+命令：<font color='yellow'>static QString sl_fileGroup(const QString& filePath);</font>
+功能：返回文件所在组；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static uint sl_fileGroupId(const QString& filePath);</font>
+功能：返回文件所在组ID；
+参数：filePath为路径；
+返回：uint类型。
+
+命令：<font color='yellow'>static bool sl_filePermission(const QString& filePath, int permissions = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+功能：检测文件权限；
+参数：filePath为路径；permissions为要检测的权限组合；
+返回：bool类型，是否具有该权限。
+
+命令：<font color='yellow'>static int sl_filePermissions1(const QString& filePath);</font>
+功能：返回文件完整权限；
+参数：filePath为路径；
+返回：int类型（QFileDevice::Permissions）。
+
+命令：<font color='yellow'>static qint64 sl_fileSize(const QString& filePath);</font>
+功能：返回文件大小（字节）；
+参数：filePath为路径；
+返回：qint64类型。
+
+命令：<font color='yellow'>static bool sl_fileResize(const QString& filePath, qint64 sz);</font>
+功能：调整文件大小；
+参数：filePath为路径；sz为目标大小；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QDateTime sl_fileBirthTime(const QString& filePath);</font>
+功能：返回文件创建时间；
+参数：filePath为路径；
+返回：QDateTime类型。
+
+命令：<font color='yellow'>static QDateTime sl_fileMetadataChangeTime(const QString& filePath);</font>
+功能：返回文件元数据最后修改时间；
+参数：filePath为路径；
+返回：QDateTime类型。
+
+命令：<font color='yellow'>static QDateTime sl_fileLastModified(const QString& filePath);</font>
+功能：返回文件最后修改时间；
+参数：filePath为路径；
+返回：QDateTime类型。
+
+命令：<font color='yellow'>static QDateTime sl_fileLastRead(const QString& filePath);</font>
+功能：返回文件最后读取时间；
+参数：filePath为路径；
+返回：QDateTime类型。
+
+命令：<font color='yellow'>static QDateTime sl_fileFileTime(const QString& filePath, int time);</font>
+功能：返回文件指定类型的时间；
+参数：filePath为路径；time为QFile::FileTime类型枚举值；
+返回：QDateTime类型。
+
+命令：<font color='yellow'>static bool sl_fileCaching(const QString& filePath);</font>
+功能：返回是否启用文件信息缓存；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_fileSetCaching(const QString& filePath, bool on=true);</font>
+功能：设置是否启用文件信息缓存；
+参数：filePath为路径；on为是否启用；
+返回：无。
+
+命令：<font color='yellow'>static void sl_fileRefresh(const QString& filePath);</font>
+功能：刷新文件信息缓存；
+参数：filePath为路径；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_fileExists(const QString& filePath);</font>
+功能：检测文件（夹）是否存在；
+参数：filePath为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static QVariant sl_readFile(const QString& filePath, int readType = 0, const QString& codec = 'UTF-8');</font>
+功能：读文件；所有平台都强制使用utf8（无BOM）；
+参数：filePath为路径；readType为0文本读（codec有用，返回QString）、1二进制读（返回QByteArray）；codec为编码；
+返回：QVariant类型（QString或QByteArray）。
+
+命令：<font color='yellow'>static qint64 sl_writeFile(const QVariant& data, const QString& filePath, int writeFlags = 0, const QString& codec = 'UTF-8');</font>
+功能：写文件；所有平台都强制使用utf8（无BOM）；
+参数：data为写入数据；filePath为路径；writeFlags从右到左：0为WriteOnly，1为Append；0为文本写（QString，codec有用）、1为二进制写；codec为编码；
+返回：qint64类型，写入长度（字节数）。
+
+命令：<font color='yellow'>static int sl_removeFile(const QString& filePath);</font>
+功能：删除文件；
+参数：filePath为路径；
+返回：int类型，0不存在；1成功；-1失败。
+
+命令：<font color='yellow'>static int sl_fileMoveToTrash(const QString& filePath, QString* pathInTrash = nullptr);</font>
+功能：移动文件到回收站；
+参数：filePath为路径；pathInTrash为???（需人工补充）；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_fileLink(const QString& oldname, const QString& newName);</font>
+功能：创建文件链接；
+参数：oldname为源文件；newName为链接名；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_copyFile(const QString& source, const QString& destination, bool force = false);</font>
+功能：复制文件；
+参数：source为源文件；destination为目标；force为是否覆盖；
+返回：int类型，-1复制出错；0没有复制；1复制成功。
+
+命令：<font color='yellow'>static int sl_renameFile(const QString& source, const QString& destination, bool createPath = true);</font>
+功能：重命名文件（支持文件和文件夹）；
+参数：source为源；destination为目标；createPath为是否自动创建路径；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_permissions(const QString& filePath);</font>
+功能：返回文件权限；
+参数：filePath为路径；
+返回：int类型（QFile::Permissions）。
+
+命令：<font color='yellow'>static bool sl_setPermissions(const QString& filePath, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+功能：设置文件权限；
+参数：filePath为路径；permissionSpec为权限组合；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_dirExists(const QString& dirPath);</font>
+功能：检测文件夹是否存在；
+参数：dirPath为文件夹路径；
+返回：bool类型，是否存在。
+
+命令：<font color='yellow'>static int sl_dirCreate(const QString& dirPath, int type = 1);</font>
+功能：创建文件夹；
+参数：dirPath为路径；type含义见GlobalClass（???需人工补充）；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_dirRemove(const QString& dirPath, int type = 0);</font>
+功能：删除文件夹；
+参数：dirPath为路径；type含义见GlobalClass（???需人工补充）；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_dirMove(const QString& sourcePath, const QString& destPath, int flags = 0b01);</font>
+功能：移动文件夹；
+参数：sourcePath为源路径；destPath为目标路径；flags为???（需人工补充）；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static bool sl_removeEmptyDir(const QString& path);</font>
+功能：删除空文件夹；
+参数：path为路径；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static int sl_dirRename(const QString& source, const QString& destination, bool createPath = true);</font>
+功能：重命名文件夹（支持文件和文件夹）；
+参数：source为源；destination为目标；createPath为是否自动创建路径；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static int sl_dirCopy(const QString& source, const QString& destination, bool coverExistFile = false, int permissionType = 1, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+功能：复制文件夹；
+参数：source为源；destination为目标；coverExistFile为是否覆盖已存在文件；permissionType为???（需人工补充）；permissionSpec为权限；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static bool sl_removeRecursively(const QString& fromDir);</font>
+功能：删除某目录及所属所有文件及文件夹（强制删除，要注意!）；
+参数：fromDir为目录路径；
+返回：bool类型，是否成功；
+注意：强制删除，不可恢复!
+
+命令：<font color='yellow'>static QStringList sl_dirNameFiltersFromString(const QString& nameFilter);</font>
+功能：将名称过滤字符串解析为列表；
+参数：nameFilter为过滤字符串；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QStringList sl_dirList(const QString& dirPath, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+功能：列出某个目录的文件（夹），返回名称数组；
+参数：dirPath为目录；filters为过滤（QDir::Filters）；sort为排序（QDir::SortFlags）；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QStringList sl_dirList(const QString& dirPath, const QStringList& nameFilters, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+功能：同上（重载），支持名称过滤列表；
+参数：同上，nameFilters为名称过滤列表；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QStringList sl_dirList1(const QString& dirPath, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+功能：同 sl_dirList（区别为???，需人工补充，推测返回带路径的全名）；
+参数：同 sl_dirList；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QStringList sl_dirList1(const QString& dirPath, const QStringList& nameFilters, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+功能：同上（重载）；
+参数：同上；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QString sl_filePath(const QString& filePath);</font>
+功能：返回文件名（含路径）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_absoluteFilePath(const QString& filePath);</font>
+功能：返回文件（夹）的绝对路径（会自动修复为正规路径）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_canonicalFilePath(const QString& filePath);</font>
+功能：返回规范化的绝对路径（没有符号链接、.或…），不存在返回空；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_fileName(const QString& filePath);</font>
+功能：返回文件名；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_baseName(const QString& filePath);</font>
+功能：返回文件名（无所有后缀名）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_completeBaseName(const QString& filePath);</font>
+功能：返回文件名（无最后一个后缀）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_suffix(const QString& filePath);</font>
+功能：返回后缀名（只保留最后一个）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_completeSuffix(const QString& filePath);</font>
+功能：返回后缀名（保留所有后缀）；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_bundleName(const QString& filePath);</font>
+功能：返回Mac捆包名；
+参数：filePath为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_path(const QString& path);</font>
+功能：返回文件（夹）所在目录的绝对路径（相当于去掉了文件名）；
+参数：path为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_absolutePath(const QString& path);</font>
+功能：返回绝对路径（去掉文件名）；
+参数：path为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_canonicalPath(const QString& path);</font>
+功能：返回规范化路径（去掉文件名）；
+参数：path为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setSearchPaths(const QString& prefix, const QStringList& searchPaths);</font>
+功能：设置QDir搜索路径；
+参数：prefix为前缀；searchPaths为路径列表；
+返回：无。
+
+命令：<font color='yellow'>static void sl_addSearchPath(const QString& prefix, const QString& path);</font>
+功能：添加QDir搜索路径；
+参数：prefix为前缀；path为路径；
+返回：无。
+
+命令：<font color='yellow'>static QStringList sl_searchPaths(const QString& prefix);</font>
+功能：返回QDir搜索路径；
+参数：prefix为前缀；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QString sl_toNativeSeparators(const QString& pathName);</font>
+功能：路径分隔符转为本地风格（win下/转\）；
+参数：pathName为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_fromNativeSeparators(const QString& pathName);</font>
+功能：本地风格路径分隔符转为/；
+参数：pathName为路径；
+返回：QString类型。
+
+命令：<font color='yellow'>static QStringList sl_nameFiltersFromString(const QString& nameFilter);</font>
+功能：同 sl_dirNameFiltersFromString；
+参数：同上；
+返回：同上。
+
+命令：<font color='yellow'>static bool sl_isRelativePath(const QString& path);</font>
+功能：检测是否相对路径；
+参数：path为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>inline static bool sl_isAbsolutePath(const QString& path);</font>
+功能：检测是否绝对路径；
+参数：path为路径；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_setCurrentPath(const QString& path);</font>
+功能：设置当前工作目录；
+参数：path为路径；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QString sl_currentPath();</font>
+功能：返回当前工作目录；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_homePath();</font>
+功能：返回用户主目录；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_rootPath();</font>
+功能：返回根目录；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_tempPath();</font>
+功能：返回临时目录；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static bool sl_match(const QStringList& filters, const QString& fileName);</font>
+功能：文件名是否匹配过滤列表；
+参数：filters为过滤列表；fileName为文件名；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_match(const QString& filter, const QString& fileName);</font>
+功能：同上（重载，单个过滤）；
+参数：filter为过滤串；
+返回：bool类型。
+
+命令：<font color='yellow'>static QString sl_cleanPath(const QString& path);</font>
+功能：规范化路径（去掉冗余的.、…和多余分隔符）；
+参数：path为路径；
+返回：QString类型。
+
+（六）压缩和解压
+命令：<font color='yellow'>static QByteArray sl_gzipCompress(const QByteArray& postBody, int compressionLevel = Z_DEFAULT_COMPRESSION, int type = 0);</font>
+功能：GZip压缩；
+参数：postBody为数据；compressionLevel为压缩级别(1-9，越高越压缩越小越耗CPU，-1默认，0不压缩但加入标志字节)；type为0不转Base64、1转Base64；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_gzipUncompress(const QByteArray& src, int type = 0);</font>
+功能：GZip解压；
+参数：src为数据；type为0非Base64、1为Base64编码；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_compress(const QByteArray& data, int compressionLevel = -1, int type = 0);</font>
+功能：使用Qt自带qCompress压缩；
+参数：data为数据；compressionLevel为压缩级别；type为0不转Base64、1转Base64；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_uncompress(const QByteArray& data, int type = 0);</font>
+功能：使用Qt自带qUncompress解压；
+参数：data为数据；type为0表示data非Base64、1表示data是Base64编码；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static bool sl_compressFile(const QString& fileCompressed, const QString& file, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
+功能：QuaZip压缩单个文件（会覆盖原zip文件）；
+参数：fileCompressed为zip文件名；file为要压缩的文件；strategy为压缩策略；dateTime为???（需人工补充）；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_compressFiles(const QString& fileCompressed, const QStringList& files, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
+功能：QuaZip压缩多个文件（会覆盖原zip文件）；
+参数：fileCompressed为zip文件名；files为文件列表；其余同上；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_compressDir(const QString& fileCompressed, const QString& dir, bool recursive = true, int filters = QDir::Dirs | QDir::Hidden | QDir::System | QDir::AllDirs | QDir::NoDotAndDotDot, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
+功能：QuaZip压缩文件夹（会覆盖原zip文件）；
+参数：fileCompressed为zip文件名；dir为文件夹；recursive为是否递归；filters为过滤；其余同上；
+返回：bool类型，是否成功；
+注意：| QDir::Files 和 recursive = true 不能一起用，否则返回false。
+
+命令：<font color='yellow'>static QString sl_extractFile(const QString& fileCompressed, const QString& fileName, const QString& fileDest = QString());</font>
+功能：QuaZip解压单个文件（会覆盖已存在的文件）；
+参数：fileCompressed为zip文件；fileName为压缩包内文件名；fileDest为目标路径；
+返回：QString类型，???（需人工补充，推测为解压后的文件路径）。
+
+命令：<font color='yellow'>static QStringList sl_extractFiles(const QString& fileCompressed, const QStringList& files, const QString& dir = QString());</font>
+功能：QuaZip解压多个文件（会覆盖已存在的文件）；
+参数：fileCompressed为zip文件；files为文件名列表；dir为目标目录；
+返回：QStringList类型，解压后的文件列表。
+
+命令：<font color='yellow'>static QStringList sl_extractDir(const QString& fileCompressed, const QString& dir = QString(), const QString& fileNameCodec = QString());</font>
+功能：QuaZip解压整个目录（会覆盖已存在的文件）；
+参数：fileCompressed为zip文件；dir为目标目录；fileNameCodec为文件名编码（为空用默认）；
+返回：QStringList类型，解压后的文件列表。
+
+命令：<font color='yellow'>static QStringList sl_getFileList(const QString& fileCompressed);</font>
+功能：获取压缩包内的文件列表；
+参数：fileCompressed为zip文件；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static bool sl_compressFileEx(const QString& file, const QString& password, const QString& zipFile);</font>
+功能：文件压缩到内存buffer（加密zip），zipFile可以使用QBuffer；
+参数：file为源文件；password为密码；zipFile为zip文件（或QBuffer）；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_compressFilesEx(const QStringList& files, const QString& password, const QString& zipFile);</font>
+功能：多文件压缩到内存buffer（加密zip）；
+参数：files为文件列表；password为密码；zipFile为zip文件；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_extractDirEx(const QString& strZipFile, const QString& password, const QString& dirPath = QString());</font>
+功能：解压加密zip到目录；
+参数：strZipFile为zip文件；password为密码；dirPath为目标目录（为空则用zip所在目录）；
+返回：bool类型，是否成功。
+
+（七）编码
+命令：<font color='yellow'>static QString sl_createUUID();</font>
+功能：创建UUID；
+参数：无；
+返回：QString类型（如{xxxxxxxx-xxxx-…}）。
+
+命令：<font color='yellow'>static QByteArray sl_createUUIDToByteArray();</font>
+功能：创建UUID（QByteArray格式）；
+参数：无；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_createUUIDToRfc4122();</font>
+功能：创建UUID（RFC4122二进制格式）；
+参数：无；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_toBase64(const QVariant& data, int options = QByteArray::Base64Encoding);</font>
+功能：转Base64编码；
+参数：data为QString或QByteArray；options为Base64选项；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_fromBase64(const QVariant& data, int options = QByteArray::Base64Encoding);</font>
+功能：从Base64解码；
+参数：data为Base64数据；options为Base64选项；
+返回：QByteArray类型；
+注意：JS的字符串（UCS2）转Qt的QString/QByteArray时，D800-DFFF的代理对会转换错误。
+
+命令：<font color='yellow'>static QByteArray sl_toUTF8(const QString& str);</font>
+功能：QString转UTF8的QByteArray；
+参数：str为字符串；
+返回：QByteArray类型；
+注意：QML的字符串可以给Qt的QByteArray类型传递，会自动转换为utf8编码（无法转换的字符用3F问号代替）；QByteArray也可以给QML环境传递（类型为ArrayBuffer）。
+
+命令：<font color='yellow'>static QString sl_fromUTF8(const QByteArray& ba);</font>
+功能：UTF8的QByteArray转QString；
+参数：ba为数据；
+返回：QString类型。
+
+命令：<font color='yellow'>static QByteArray sl_toLocal8Bit(const QString& str);</font>
+功能：QString转本地编码的QByteArray；
+参数：str为字符串；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QString sl_fromLocal8Bit(const QByteArray& ba);</font>
+功能：本地编码的QByteArray转QString；
+参数：ba为数据；
+返回：QString类型。
+
+命令：<font color='yellow'>static QByteArray sl_toLatin1(const QString& str);</font>
+功能：QString转Latin1的QByteArray；
+参数：str为字符串；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QString sl_fromLatin1(const QByteArray& ba);</font>
+功能：Latin1的QByteArray转QString；
+参数：ba为数据；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_toCodec(const QByteArray& ba, const QString& codecName = 'UTF-8');</font>
+功能：字符编码转换：将ba按codecName编码解析，转换为Qt内部Unicode（QString）；
+参数：ba为数据；codecName为编码名（为空用本地编码）；
+返回：QString类型。
+
+命令：<font color='yellow'>static QByteArray sl_fromCodec(const QString& str, const QString& codecName = 'UTF-8');</font>
+功能：字符编码转换：将str（Qt内部Unicode）转换为codecName编码的QByteArray；
+参数：str为字符串；codecName为编码名（为空用本地编码）；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_encoding(const QString& str, const QString& codecName = 'UTF-8');</font>（仅Qt6）
+功能：Qt6编码转换（QStringEncoder）；
+参数：str为字符串；codecName为编码名；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QString sl_decoding(const QByteArray& ba, const QString& codecName = 'UTF-8');</font>（仅Qt6）
+功能：Qt6解码转换（QStringDecoder）；
+参数：ba为数据；codecName为编码名；
+返回：QString类型。
+
+命令：<font color='yellow'>static uint sl_byteCodeAt(const QString& str, int index, int type=-1);</font>
+功能：获取字符串指定位置的字节/字符值；
+参数：str为字符串；index为索引；type为编码类型：1或默认UTF8、2 UCS4、3 UTF16、4 unicode（带digitValue）、8 Latin1、9 Local8Bit；
+返回：uint类型。
+
+命令：<font color='yellow'>static QByteArray sl_toHex(const QVariant& data, const QChar& separator = ‘\0’);</font>
+功能：转16进制；
+参数：data为QString或QByteArray；separator为分隔符；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_fromHex(const QVariant& data);</font>
+功能：从16进制还原；
+参数：data为16进制数据；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QString sl_toHtmlEscaped(const QString& str);</font>
+功能：转HTML转义字符（如<转<）；
+参数：str为字符串；
+返回：QString类型。
+
+命令：<font color='yellow'>static quint16 sl_crc16(const QVariant& data);</font>
+功能：计算CRC16；
+参数：data为QString或QByteArray；
+返回：quint16类型。
+
+命令：<font color='yellow'>static quint32 sl_crc32(const QVariant& data);</font>
+功能：计算CRC32；
+参数：data为QString或QByteArray；
+返回：quint32类型。
+
+命令：<font color='yellow'>static QByteArray sl_algorithmData(const QByteArray& data, int method = QCryptographicHash::Sha256);</font>
+功能：计算哈希（QCryptographicHash）；
+参数：data为数据；method为哈希算法（QCryptographicHash::Algorithm）；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static int sl_hashLength(int method = QCryptographicHash::Sha256);</font>
+功能：返回哈希算法结果的字节长度；
+参数：method为哈希算法；
+返回：int类型。
+
+（八）AES / RSA / DES 加解密
+命令：<font color='yellow'>static QByteArray sl_aesEncode(const QByteArray& rawText, const QByteArray& key, int level = QAESEncryption::AES_256, int mode = QAESEncryption::CBC, int padding = QAESEncryption::ISO, const QByteArray& iv = QByteArray(), bool* ok = nullptr);</font>
+功能：AES加密；
+参数：rawText为明文；key为密钥；level为AES级别（128/192/256）；mode为模式（CBC/ECB等）；padding为填充方式；iv为初始向量；ok为???（需人工补充）；
+返回：QByteArray类型，密文。
+
+命令：<font color='yellow'>static QByteArray sl_aesDecode(const QByteArray& rawText, const QByteArray& key, int level = QAESEncryption::AES_256, int mode = QAESEncryption::CBC, int padding = QAESEncryption::ISO, const QByteArray& iv = QByteArray(), bool* ok = nullptr);</font>
+功能：AES解密；
+参数：同 sl_aesEncode；
+返回：QByteArray类型，明文。
+
+命令：<font color='yellow'>static QByteArray sl_removePadding(const QByteArray& rawText, int padding = QAESEncryption::ISO, bool* ok = nullptr);</font>
+功能：移除填充；
+参数：rawText为数据；padding为填充方式；ok为???；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_generateKey(const QByteArray& password, const QByteArray &salt, int level, int algo = QCryptographicHash::Sha256, int iterations = 10000);</font>
+功能：生成AES密钥（PBKDF）；
+参数：password为密码；salt为盐；level为密钥长度（???需人工补充）；algo为哈希算法；iterations为迭代次数；
+返回：QByteArray类型，密钥。
+
+命令：<font color='yellow'>static QStringList sl_rsaGenerateKey(int keyLength = 2048);</font>
+功能：创建RSA密钥对；
+参数：keyLength为密钥长度（貌似最小512）；
+返回：QStringList类型，[私钥、公钥]。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPubEncrypt(const QByteArray& data, const QString& pubKey = rsaPublicKey(), int type = 1);</font>
+功能：RSA公钥加密（对长度较短的数据，小于单次处理最大长度）；
+参数：data为数据；pubKey为公钥（默认为内置公钥）；type为公钥格式：0为"-----BEGIN RSA PUBLIC KEY-----'格式、1为'-----BEGIN PUBLIC KEY-----"格式；
+返回：QByteArray类型，密文；
+注意：单次加密数据最大长度：PKCS1填充为RSA_size()-11；OAEP填充为RSA_size()-41；不填充为RSA_size()。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPriDecrypt(const QByteArray& encryptData, const QString& priKey = rsaPrivateKey());</font>
+功能：RSA私钥解密（短数据）；
+参数：encryptData为密文；priKey为私钥；
+返回：QByteArray类型，明文。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPubEncryptEx(const QByteArray& data, const QString& pubKey = rsaPublicKey(), int type = 1);</font>
+功能：RSA公钥加密（数据块较长的数据处理）；
+参数：同 sl_rsaPubEncrypt；
+返回：QByteArray类型，密文。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPriDecryptEx(const QByteArray& encryptData, const QString& priKey = rsaPrivateKey());</font>
+功能：RSA私钥解密（长数据）；
+参数：同 sl_rsaPriDecrypt；
+返回：QByteArray类型，明文。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPriEncrypt(const QByteArray& data, const QString& priKey = rsaPrivateKey());</font>
+功能：RSA私钥加密（短数据，可用于签名场景）；
+参数：data为数据；priKey为私钥；
+返回：QByteArray类型，密文。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPubDecrypt(const QByteArray& encryptData, const QString& pubKey = rsaPublicKey(), int type = 1);</font>
+功能：RSA公钥解密（短数据）；
+参数：encryptData为密文；pubKey为公钥；type同上；
+返回：QByteArray类型，明文。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPriEncryptEx(const QByteArray& data, const QString& priKey = rsaPrivateKey());</font>
+功能：RSA私钥加密（长数据）；
+参数：同 sl_rsaPriEncrypt；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_rsaPubDecryptEx(const QByteArray& encryptData, const QString& pubKey = rsaPublicKey(), int type = 1);</font>
+功能：RSA公钥解密（长数据）；
+参数：同 sl_rsaPubDecrypt；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_rsaGenerateSign(const QByteArray& data, const QString& priKey = rsaPrivateKey());</font>
+功能：通过私钥字符串生成签名；
+参数：data为数据；priKey为私钥；
+返回：QByteArray类型，签名。
+
+命令：<font color='yellow'>static bool sl_rsaVerifySign(const QByteArray& sign, const QByteArray& verifyData, const QString& pubKey = rsaPublicKey());</font>
+功能：通过公钥字符串验证签名；
+参数：sign为签名；verifyData为要验证的数据；pubKey为公钥；
+返回：bool类型，是否验证通过。
+
+命令：<font color='yellow'>static QString sl_md5(const QByteArray& data);</font>
+功能：计算MD5；
+参数：data为数据；
+返回：QString类型（16进制字符串）；
+注意：Qt的md5貌似不支持QByteArray（ArrayBuffer），所以用此自定义实现。
+
+命令：<font color='yellow'>static QString sl_sha256(const QByteArray& data);</font>
+功能：计算SHA256；
+参数：data为数据；
+返回：QString类型。
+
+命令：<font color='yellow'>static QByteArray sl_desECBEncrypt(const QByteArray& data, const QString& strKey = commonKey());</font>
+功能：DES对称加密（ECB模式）；
+参数：data为明文；strKey为密钥（默认内部公共密钥）；
+返回：QByteArray类型，密文。
+
+命令：<font color='yellow'>static QByteArray sl_desECBDecrypt(const QByteArray& encryptData, const QString& strKey = commonKey());</font>
+功能：DES对称解密（ECB模式）；
+参数：encryptData为密文；strKey为密钥；
+返回：QByteArray类型，明文。
+
+（九）URL
+命令：<font color='yellow'>static QByteArray sl_urlEncode(const QVariant& data, const QByteArray& exclude = QByteArray(), const QByteArray& include = QByteArray(), const QChar& percent = ‘%’);</font>
+功能：URL编码（Percent-Encoding）；
+参数：data为QString或QByteArray；exclude为不编码字符集；include为额外编码字符集；percent为百分号字符；
+返回：QByteArray类型；
+注意：不能用toLocal8Bit的原因：win下从QByteArray转回QString时会产生乱码。
+
+命令：<font color='yellow'>static QByteArray sl_urlDecode(const QVariant& data, const QChar& percent = ‘%’);</font>
+功能：URL解码；
+参数：data为编码数据；percent为百分号字符；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QUrl sl_toURL(const QString& path);</font>
+功能：路径转URL；
+参数：path为路径；
+返回：QUrl类型；
+注意：以":/"开头（如qrc）会加qrc前缀；win本地路径或不存在的路径用fromLocalFile处理。
+
+命令：<font color='yellow'>static QString sl_toPath(const QString& strUrl);</font>
+功能：URL转路径；
+参数：strUrl为URL字符串；
+返回：QString类型；file:转换失败时原样返回（去掉qrc前缀）。
+
+命令：<font color='yellow'>static QUrl sl_fromUserInput(const QString& userInput);</font>
+功能：转换用户输入的url；
+参数：userInput为用户输入；
+返回：QUrl类型；空或无效时返回"about:blank"。
+
+（十）TextField / TextArea 文本转换
+命令：<font color='yellow'>static QString sl_toHtml(QQuickTextDocument* td);</font>
+功能：返回文档的HTML格式文本；
+参数：td为QML的TextDocument；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_toRawText(QQuickTextDocument* td);</font>
+功能：返回文档原始文本；
+参数：同上；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_toPlainText(QQuickTextDocument* td);</font>
+功能：返回文档纯文本；
+参数：同上；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_toMarkdown(QQuickTextDocument* td, QTextDocument::MarkdownFeatures features = QTextDocument::MarkdownDialectGitHub);</font>
+功能：返回文档Markdown格式文本；
+参数：td同上；features为Markdown方言；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setHtml(QQuickTextDocument* td, const QString& html);</font>
+功能：设置文档内容为HTML；
+参数：td同上；html为HTML文本；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setPlainText(QQuickTextDocument* td, const QString& text = '');</font>
+功能：设置文档内容为纯文本；
+参数：td同上；text为文本；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setMarkdown(QQuickTextDocument* td, const QString& markdown, QTextDocument::MarkdownFeatures features = QTextDocument::MarkdownDialectGitHub);</font>
+功能：设置文档内容为Markdown；
+参数：td同上；markdown为Markdown文本；
+返回：无。
+
+（十一）QObject 操作
+命令：<font color='yellow'>static bool sl_setObjectProperty(const QString& name, const QVariant& v = QVariant(), QObject* obj = qApp);</font>
+功能：设置对象动态属性；
+参数：name为属性名；v为值；obj为对象（默认qApp）；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QVariant sl_objectProperty(const QString& name, QObject* obj = qApp);</font>
+功能：获取对象动态属性；
+参数：name为属性名；obj为对象；
+返回：QVariant类型。
+
+命令：<font color='yellow'>static QStringList sl_objectDynamicPropertyNames(QObject* obj = qApp);</font>
+功能：获取对象所有动态属性名；
+参数：obj为对象；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static void sl_setObjectParent(QObject* obj, QObject* parent = qApp);</font>
+功能：设置对象的父对象；
+参数：obj为对象；parent为父对象；
+返回：无。
+
+命令：<font color='yellow'>static QObject* sl_objectParent(QObject* obj);</font>
+功能：获取对象的父对象；
+参数：obj为对象；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static void sl_setWindowParent(QWindow* win, QWindow* parent = nullptr);</font>
+功能：设置窗口的父窗口；
+参数：win为窗口；parent为父窗口；
+返回：无。
+
+命令：<font color='yellow'>static QWindow* sl_windowParent(const QWindow* win, QWindow::AncestorMode mode = QWindow::ExcludeTransients);</font>
+功能：获取窗口的父窗口；
+参数：win为窗口；mode为祖先模式；
+返回：QWindow*类型。
+
+命令：<font color='yellow'>static void sl_deleteLater(QObject* obj);</font>
+功能：延迟删除QObject及派生类对象；
+参数：obj为对象；
+返回：无；
+注意：QML环境中不能调用Qt对象的deleteLater，所以由C++提供。
+
+命令：<font color='yellow'>static bool sl_disconnectAll(QObject* obj);</font>
+功能：断开对象的所有信号连接；
+参数：obj为对象；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QString sl_objectName(QObject* obj = qApp);</font>
+功能：获取对象名；
+参数：obj为对象；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setObjectName(const QString& name, QObject* obj = qApp);</font>
+功能：设置对象名；
+参数：name为对象名；obj为对象；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_isWidgetType(QObject* obj = qApp);</font>
+功能：检测对象是否Widget类型；
+参数：obj为对象；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isWindowType(QObject* obj = qApp);</font>
+功能：检测对象是否Window类型；
+参数：obj为对象；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_signalsBlocked(QObject* obj = qApp) noexcept;</font>
+功能：检测对象信号是否被阻塞；
+参数：obj为对象；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_blockSignals(bool b, QObject* obj = qApp) noexcept;</font>
+功能：阻塞/恢复对象的所有信号；
+参数：b为是否阻塞；obj为对象；
+返回：bool类型，???（为之前的阻塞状态）。
+
+命令：<font color='yellow'>static QObject* sl_thread(QObject* obj = qApp);</font>
+功能：获取对象所属线程；
+参数：obj为对象；
+返回：QObject*类型（QThread）。
+
+命令：<font color='yellow'>static void sl_moveToThread(QObject* thread, QObject* obj = qApp);</font>（Qt6.7前）
+命令：<font color='yellow'>static bool sl_moveToThread(QObject* thread, QObject* obj = qApp);</font>（Qt6.7起）
+功能：将对象移动到指定线程；
+参数：thread为线程对象；obj为对象；
+返回：void/bool类型。
+
+命令：<font color='yellow'>static void sl_dumpObjectTree(QObject* obj = qApp);</font>
+功能：输出对象树（调试用）；
+参数：obj为对象；
+返回：无。
+
+命令：<font color='yellow'>static void sl_dumpObjectInfo(QObject* obj = qApp);</font>
+功能：输出对象信号槽连接信息（调试用）；
+参数：obj为对象；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_inherits(const QString& classname, QObject* obj = qApp);</font>
+功能：检测对象是否继承某类；
+参数：classname为类名；obj为对象；
+返回：bool类型。
+
+命令：<font color='yellow'>static QObject* sl_findChild(QObject* obj, const QString& aName = QString(), int options = Qt::FindChildrenRecursively);</font>
+功能：查找子对象（按名称）；
+参数：obj为对象；aName为对象名（空返回???）；options为查找选项；
+返回：QObject*类型；找不到为nullptr。
+
+命令：<font color='yellow'>static QList<QObject*> sl_findChildren(QObject* obj, const QString& aName = QString(), int options = Qt::FindChildrenRecursively);</font>
+功能：查找所有匹配的子对象；
+参数：同上；
+返回：QList<QObject*>类型；
+注意：QList<QObject*>不会被qml改变ownerShip。
+
+命令：<font color='yellow'>static QObjectList sl_objectChildren(QObject* obj = qApp);</font>
+功能：获取对象的子对象列表；
+参数：obj为对象；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static void sl_printObjectChildren(QObject* obj = qApp, int spaceCount = 0);</font>
+功能：打印对象及其所有子对象的类名和对象名（调试用）；
+参数：obj为对象；spaceCount为缩进空格数；
+返回：无。
+
+（十二）QMetaObject 反射
+命令：<font color='yellow'>static QString sl_className(QObject* obj = qApp);</font>
+功能：获取对象的类名；
+参数：obj为对象；
+返回：QString类型。
+
+命令：<font color='yellow'>static QObject* sl_cast(QObject* obj1, QObject* obj = qApp);</font>
+功能：元对象类型转换；
+参数：obj1为???；obj为对象；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static int sl_methodOffset(QObject* obj = qApp);</font>
+功能：获取本类方法的起始索引；
+参数：obj为对象；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_enumeratorOffset(QObject* obj = qApp);</font>
+功能：获取本类枚举的起始索引；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_propertyOffset(QObject* obj = qApp);</font>
+功能：获取本类属性的起始索引；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_classInfoOffset(QObject* obj = qApp);</font>
+功能：获取本类ClassInfo的起始索引；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_constructorCount(QObject* obj = qApp);</font>
+功能：获取构造器数量；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_methodCount(QObject* obj = qApp);</font>
+功能：获取方法数量（含父类）；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_enumeratorCount(QObject* obj = qApp);</font>
+功能：获取枚举数量；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_propertyCount(QObject* obj = qApp);</font>
+功能：获取属性数量；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_classInfoCount(QObject* obj = qApp);</font>
+功能：获取ClassInfo数量；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_indexOfConstructor(const QString& constructor, QObject* obj = qApp);</font>
+功能：获取构造器的索引；
+参数：constructor为构造器签名；obj为对象；
+返回：int类型，索引；不存在返回-1。
+
+命令：<font color='yellow'>static int sl_indexOfMethod(const QString& method, QObject* obj = qApp);</font>
+功能：获取方法的索引；
+参数：method为方法签名；
+返回：int类型，索引；不存在返回-1。
+
+命令：<font color='yellow'>static int sl_indexOfSignal(const QString& signal, QObject* obj = qApp);</font>
+功能：获取信号的索引；
+参数：signal为信号签名；
+返回：int类型，索引。
+
+命令：<font color='yellow'>static int sl_indexOfSlot(const QString& slot, QObject* obj = qApp);</font>
+功能：获取槽的索引；
+参数：slot为槽签名；
+返回：int类型，索引。
+
+命令：<font color='yellow'>static int sl_indexOfEnumerator(const QString& name, QObject* obj = qApp);</font>
+功能：获取枚举的索引；
+参数：name为枚举名；
+返回：int类型，索引。
+
+命令：<font color='yellow'>static int sl_indexOfProperty(const QString& name, QObject* obj = qApp);</font>
+功能：获取属性的索引；
+参数：name为属性名；
+返回：int类型，索引。
+
+命令：<font color='yellow'>static int sl_indexOfClassInfo(const QString& name, QObject* obj = qApp);</font>
+功能：获取ClassInfo的索引；
+参数：name为名称；
+返回：int类型，索引。
+
+命令：<font color='yellow'>static bool sl_checkConnectArgs(const QString& signal, const QString& method);</font>
+功能：检测信号和方法的参数是否匹配（能否connect）；
+参数：signal为信号签名；method为方法签名；
+返回：bool类型。
+
+命令：<font color='yellow'>static QByteArray sl_normalizedSignature(const QString& method);</font>
+功能：获取规范化后的函数签名；
+参数：method为签名；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static QByteArray sl_normalizedType(const QString& type);</font>
+功能：获取规范化后的类型名；
+参数：type为类型名；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static bool sl_disconnect(QObject* sender, int signal_index, QObject* receiver, int method_index);</font>
+功能：按索引断开信号连接；
+参数：sender为发送者；signal_index为信号索引；receiver为接收者；method_index为方法索引；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_disconnectOne(QObject* sender, int signal_index, QObject* receiver, int method_index);</font>
+功能：按索引断开一个信号连接；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_connectSlotsByName(QObject* o);</font>
+功能：按名称自动连接槽；
+参数：o为对象；
+返回：无。
+
+（十三）QVariant
+命令：<font color='yellow'>static int sl_type(const QVariant& v);</font>
+功能：获取QVariant存储类型；
+参数：v为QVariant；
+返回：int类型（Qt5为QVariant::Type，Qt6为typeId）。
+
+命令：<font color='yellow'>static int sl_userType(const QVariant& v);</font>
+功能：获取QVariant的自定义类型ID；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static QString sl_typeName(const QVariant& v);</font>
+功能：获取QVariant类型名；
+参数：同上；
+返回：QString类型。
+
+命令：<font color='yellow'>static bool sl_canConvert(const QVariant& v, int targetTypeId);</font>
+功能：检测QVariant能否转换到目标类型；
+参数：v为QVariant；targetTypeId为目标类型ID；
+返回：bool类型。
+
+命令：<font color='yellow'>static inline bool sl_isValid(const QVariant& v);</font>
+功能：检测QVariant是否有效；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isNull(const QVariant& v);</font>
+功能：检测QVariant是否为null；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static inline bool sl_isDetached(const QVariant& v);</font>
+功能：检测QVariant是否分离（独立数据）；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static QString sl_typeToName(int typeId);</font>
+功能：类型ID转类型名；
+参数：typeId为类型ID；
+返回：QString类型。
+
+命令：<font color='yellow'>static int sl_nameToType(const QString& name);</font>
+功能：类型名转类型ID；
+参数：name为类型名；
+返回：int类型。
+
+（十四）线程
+命令：<font color='yellow'>static qint64 sl_currentThreadID();</font>
+功能：获取当前线程ID；
+参数：无；
+返回：qint64类型。
+
+命令：<font color='yellow'>static QObject* sl_currentThread();</font>
+功能：获取当前线程对象；
+参数：无；
+返回：QObject*类型（QThread）。
+
+命令：<font color='yellow'>static QObject* sl_threadPool();</font>
+功能：返回应用全局线程池（QThreadPool）；
+参数：无；
+返回：QObject*类型；
+示例：FrameManager.sl_threadPool().maxThreadCount = 1
+
+命令：<font color='yellow'>static void sl_initJSEngineEnv(QJSEngine* pJSEngine = nullptr);</font>
+功能：初始化QJSEngine环境（注入全局对象；其他插件导入JS时可能需要用到）；
+参数：pJSEngine为JS引擎（null用默认）；
+返回：无。
+
+命令：<font color='yellow'>static QJSValue sl_runJSEngine(const QString& code, const QVariant& params, int type = -1, QJSEngine* pJSEngine = nullptr);</font>
+功能：用QJSEngine运行JS代码；
+参数：code为js代码或位置；params为如果使用importModule且运行的js使用export default function时调用该function的参数；type为code类型（-1自动判断；0用importModule导入code路径的mjs文件；1运行code路径的js文件；2直接运行code代码）；pJSEngine为引擎；
+返回：QJSValue类型，运行结果。
+
+命令：<font color='yellow'>static QObject* sl_createServiceThread(const QString& code, const QJSValue& params = QJSValue(), int type = -1);</font>
+功能：创建一个服务线程（线程会exec事件循环，区别于一次性Task），会注入一个timer的Timer对象来定时；
+参数：code、params、type见sl_runJSEngine()；
+返回：QObject*类型（ServiceThread）；
+示例：var thread = FrameManager.sl_createServiceThread('let n = 0; timer.timeout.connect(function(){console.info(++n);});timer.interval=1000;timer.start();'); thread.quit();
+
+命令：<font color='yellow'>int sl_insertScriptTask(const QString& code, const QJSValue& params = QJSValue(), int type = -1, QJSValue cb = QJSValue());</font>
+功能：使用自定义线程池创建一个任务（一次性任务，会返回数据结果）；
+参数：code、params、type见sl_runJSEngine()；cb为回调函数（参数为运行结果，如果使用importModule且js使用export default function，参数为该function的返回值）；
+返回：int类型，taskID。
+
+命令：<font color='yellow'>QVariant sl_getScriptTask(int taskID, int flags = 0b11);</font>
+功能：返回ScriptTask的QVariantMap（含Code、Params、Type、Callback、Result、Error（运行错误为1，强制停止为2）、ID、Running（正在运行的线程对象，排队时为nullptr））；
+参数：taskID为任务ID；flags为???（需人工补充）；
+返回：QVariant类型；
+注意：ScriptTask有排队、运行、结束3个状态，且属性不会随状态自动更新（值传递）。
+
+命令：<font color='yellow'>int sl_cancelScriptTask(int taskID = -1, int flags = 0b11);</font>
+功能：停止Task；
+参数：taskID为任务ID（-1为???）；flags同上；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>void sl_setThreadMaxCount(int maxCount);</font>
+功能：设置线程池最大线程数；
+参数：maxCount为最大数；
+返回：无。
+
+命令：<font color='yellow'>QObject* sl_concurrentScript(const QString& code, const QJSValue& params = QJSValue(), QJSValue cb = QJSValue(), int type = -1);</font>
+功能：使用QtConcurrent运行JS脚本（方便，但不能强制停止线程）；
+参数：同sl_runJSEngine；cb为回调；
+返回：QObject*类型，???（需人工补充）。
+
+命令：<font color='yellow'>void sl_concurrentRun(QJSValue fn, QJSValue fnCallback);</font>
+功能：测试用（已失败，一个JS引擎不能在多个线程中使用）；
+参数：fn为函数；fnCallback为回调；
+返回：无。
+
+命令：<font color='yellow'>void sl_concurrentRun1(const QString& code);</font>
+功能：测试用（已失败）；
+参数：code为代码；
+返回：无。
+
+命令：<font color='yellow'>void sl_concurrentRun2(const QString& code);</font>
+功能：测试用（已失败）；
+参数：code为代码；
+返回：无；
+注意：QJSValue和线程有关，绑定了上下文环境，不能跨线程使用（可转QVariant但函数不能用）；FrameManager等也不能跨线程使用。
+
+（十五）qrc、rcc资源
+命令：<font color='yellow'>static QVariantMap sl_registeredResources();</font>
+功能：获取已注册的资源列表；
+参数：无；
+返回：QVariantMap类型。
+
+命令：<font color='yellow'>static int sl_registerResource(const QString& rccFilename, const QString& resourceRoot = QString());</font>
+功能：注册rcc资源文件；
+参数：rccFilename为rcc文件路径；resourceRoot默认""，有值必须"/"开头；
+返回：int类型，???（同Qt的返回值）；
+注意：有resourceRoot时，会将资源挂载到两个根下：qrc的Prefix定义的根和resourceRoot+Prefix组合的根；rcc里可以包含rcc，可以嵌套挂载。
+
+命令：<font color='yellow'>static int sl_registerResource(const QByteArray& rccData, const QString& resourceRoot = QString());</font>
+功能：注册内存中的rcc数据；
+参数：rccData为rcc数据；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_unregisterResource(const QString& rccFilename, const QString& resourceRoot = QString(), bool force = false);</font>
+功能：卸载rcc资源文件；
+参数：rccFilename为rcc文件；resourceRoot同上；force为???（需人工补充）；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_unregisterResource(const QByteArray& rccData, const QString& resourceRoot = QString(), bool force = false);</font>
+功能：卸载内存中的rcc数据；
+参数：同上；
+返回：int类型。
+
+命令：<font color='yellow'>static QVariantMap sl_rcc(const QVariantMap& config);</font>（仅Qt5）
+功能：运行rcc命令（同Qt的rcc）；
+参数：config为配置；
+返回：QVariantMap类型，{code, msg}，code为0成功，<0出错。
+
+（十六）Qt插件
+命令：<font color='yellow'>static QVariantMap sl_getPlugins(int type = 0);</font>
+功能：获取所有Qt插件对象；
+参数：type为???（需人工补充）；
+返回：QVariantMap类型。
+
+命令：<font color='yellow'>static QObject* sl_loadPlugin(const QString& pluginPath = QString(), bool initialize = true);</font>
+功能：加载路径pluginPath的插件；重复的不会重新加载，直接返回；
+参数：pluginPath为插件路径；initialize为是否调用插件的initialize；
+返回：QObject*类型，插件对象。
+
+命令：<font color='yellow'>static QVariant sl_unloadPlugin(const QString& pluginPath = QString(), bool deinitialize = true);</font>
+功能：卸载路径pluginPath的插件；
+参数：pluginPath为插件路径；deinitialize为是否调用插件的deinitialize；
+返回：QVariant类型，???（需人工补充）。
+
+命令：<font color='yellow'>static QObjectList sl_loadPlugins(const QString& pluginsPath, int initializeType = 1);</font>
+功能：自动加载pluginsPath路径下的所有插件（win下会将文件夹加入PATH；插件后缀名为特定名称）；
+参数：pluginsPath为路径；initializeType为0不调用initialize、1加载完所有的插件再调用、2加载完毕立刻调用；
+返回：QObjectList类型，插件对象列表。
+
+命令：<font color='yellow'>static int sl_unloadAllPlugins(int deinitializeType = 1);</font>
+功能：卸载所有的插件；
+参数：deinitializeType为0不调用deinitialize、1先调用完再卸载所有的插件、2每个插件调用完后立刻卸载；
+返回：int类型，???（需人工补充）。
+
+命令：<font color='yellow'>static QObjectList sl_loadDirPlugins(const QString& pluginDirPath = '', int initializeType = 1);</font>
+功能：载入路径下的所有文件夹包含的所有插件（二层文件夹）；
+参数：pluginDirPath为插件目录；initializeType同上（3表示每个文件夹加载完所有的插件再调用）；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static void sl_checkLibrary(const QString& libPath);</font>
+功能：检查动态库；
+参数：libPath为库路径；
+返回：无。
+
+（十七）动态库
+命令：<font color='yellow'>static QObject* sl_loadLibrary(const QString& libName, QObject* parent = FrameManager::instance());</font>
+功能：加载动态库（QLibrary包装类）；
+参数：libName为库名/路径；parent为父对象；
+返回：QObject*类型（L_LibraryWrapper）；失败为nullptr；
+注意：加载后可通过 sl_runQtFunction / sl_runFunction 调用库内函数。
+
+（十八）Javascript扩展
+命令：<font color='yellow'>static QVariant sl_expression(const QString& code, QObject* obj = nullptr, const QString& fileName = 'sl_expression', int line = 1, int column = 0);</font>
+功能：运行表达式code，obj为某个QML组件（表达式中可以访问它的属性、方法和信号上下文）；
+参数：code为表达式；obj为QML组件；fileName、line、column为错误定位信息；
+返回：QVariant类型，运行结果。
+
+命令：<font color='yellow'>static QJSValue sl_evaluate(const QString& program, const QString& fileName = 'sl_evaluate', int lineNumber = 1, QJSEngine* pJSEngine = nullptr);</font>
+功能：运行一个字符串（同eval），返回运行结果；产生异常时fileName是错误文件，lineNumber是偏移行；
+参数：program为代码；fileName为文件名；lineNumber为行号；pJSEngine为引擎；
+返回：QJSValue类型；
+注意：执行后的全局函数和数据都是全局的；可以执行多次；可提供文件名和偏移行号提示错误位置，但错误不能在Debug窗口中点击。
+
+命令：<font color='yellow'>static QJSValue sl_evaluateFile(const QString& fileName, int lineNumber = 1, QJSEngine* pJSEngine = nullptr);</font>
+功能：运行JS文件，其他同sl_evaluate；
+参数：fileName为JS文件；lineNumber为偏移行；pJSEngine为引擎；
+返回：QJSValue类型。
+
+命令：<font color='yellow'>static QJSValue sl_call(QJSValue func, const QJSValue& args = QJSValue(), QJSEngine* pJSEngine = nullptr);</font>
+功能：执行一个JS函数 func(…args)；
+参数：func为函数；args为参数；pJSEngine为引擎；
+返回：QJSValue类型，函数返回值。
+
+命令：<font color='yellow'>static QJSValue sl_importModule(const QString& fileName, QJSEngine* pJSEngine = nullptr);</font>
+功能：导入一个JS模块（可以使用import和export命令）；
+参数：fileName为模块文件；pJSEngine为引擎；
+返回：QJSValue类型；
+注意：有引用错误会停止执行；返回QVariantMap对象存所有导出数据，但toString()总是Type error；只加载1次；模块是单例，直到引擎销毁；多次导入同一文件只加载一次（内部用canonicalFilePath规范化）。
+
+命令：<font color='yellow'>static QJSValue sl_globalObject(QJSEngine* pJSEngine = nullptr);</font>
+功能：返回与脚本引擎关联的全局对象（全局属性可从任何脚本代码访问）；
+参数：pJSEngine为引擎（null用主QML引擎）；
+返回：QJSValue类型；
+示例：FrameManager.sl_globalObject().game = game;
+
+命令：<font color='yellow'>static QJSValue sl_throwJSException(const QJSValue& e, QJSEngine* pJSEngine = nullptr);</font>
+功能：抛出一个JS异常；
+参数：e为异常对象；pJSEngine为引擎；
+返回：QJSValue类型。
+
+命令：<font color='yellow'>static QJSValue sl_throwJSException(const QString& error = QString(), QJSEngine* pJSEngine = nullptr);</font>
+功能：抛出一个JS异常（字符串错误）；
+参数：error为错误字符串；
+返回：QJSValue类型。
+
+命令：<font color='yellow'>static void sl_showJSException(const QJSValue& e);</font>
+功能：显示一个JS异常；
+参数：e为异常对象；
+返回：无。
+
+命令：<font color='yellow'>static void sl_showQMLException(QQmlError e);</font>
+功能：显示一个QML异常；
+参数：e为QML错误对象；
+返回：无。
+
+命令：<font color='yellow'>static void sl_collectGarbage(QJSEngine* pJSEngine = nullptr);</font>
+功能：强制JS垃圾回收；
+参数：pJSEngine为引擎；
+返回：无。
+
+命令：<font color='yellow'>static void sl_installExtensions(int extensions, const QJSValue& object = QJSValue(), QJSEngine* pJSEngine = nullptr);</font>
+功能：安装JS引擎扩展（如翻译、console等）；
+参数：extensions为扩展标志（QJSEngine::Extensions）；object为???；pJSEngine为引擎；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setInterrupted(bool interrupted, QJSEngine* pJSEngine = nullptr);</font>
+功能：设置中断JS执行（可打断死循环脚本）；
+参数：interrupted为是否中断；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_isInterrupted(QJSEngine* pJSEngine = nullptr);</font>
+功能：检测JS执行是否被中断；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static QString sl_uiLanguage(QJSEngine* pJSEngine = nullptr);</font>
+功能：获取界面语言（用于翻译）；
+参数：同上；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setUiLanguage(const QString& language, QJSEngine* pJSEngine = nullptr);</font>
+功能：设置界面语言；
+参数：language为语言；pJSEngine为引擎；
+返回：无。
+
+命令：<font color='yellow'>static QVariant sl_toVariant1(const QJSValue& jsValue);</font>
+功能：将jsValue转换为QVariant（以便跨线程使用）；
+参数：jsValue为JS值；
+返回：QVariant类型；
+注意：有极低概率会卡死闪退（比如ObjectInspector.qml中）。
+
+命令：<font color='yellow'>static QVariant sl_toVariant(const QVariant& v);</font>
+功能：封装QVariant（原样返回）；
+参数：v为QVariant；
+返回：QVariant类型。
+
+命令：<font color='yellow'>static QJSValue sl_toJSValue(const QVariant& v);</font>
+功能：QVariant转QJSValue（没啥用）；
+参数：v为QVariant；
+返回：QJSValue类型。
+
+命令：<font color='yellow'>static QObject* sl_toQObject(const QJSValue& jsValue);</font>
+功能：从JS值提取QObject指针；
+参数：jsValue为JS值；
+返回：QObject*类型；
+注意：单例QML类返回null。
+
+命令：<font color='yellow'>static QObject* sl_toQObject1(const QJSValue& jsValue);</font>
+功能：同上（通过QVariant转换）；
+参数：同上；
+返回：QObject*类型；失败为nullptr。
+
+命令：<font color='yellow'>static bool sl_isQObject1(const QJSValue& jsValue);</font>
+功能：检测JS值是否为QObject；
+参数：jsValue为JS值；
+返回：bool类型。
+
+命令：<font color='yellow'>static const QMetaObject* sl_toQMetaObject(const QJSValue& jsValue);</font>
+功能：从JS值提取元对象；
+参数：jsValue为JS值；
+返回：const QMetaObject*类型。
+
+命令：<font color='yellow'>static bool sl_isQMetaObject(const QJSValue& jsValue);</font>
+功能：检测JS值是否为QMetaObject；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isQObject(const QVariant& obj);</font>
+功能：检测QVariant是否可转换为QObject*；
+参数：obj为QVariant；
+返回：bool类型。
+
+命令：<font color='yellow'>static QVariant sl_convertByteArray(const QVariant& v = QVariant());</font>
+功能：转换QVariant中的QByteArray（Qt5没有直接将QByteArray给QJSValue的方法，通过调用js函数转换）；
+参数：v为数据；
+返回：QVariant类型。
+
+命令：<font color='yellow'>static qint64 sl_toAddress(const QVariant& obj);</font>
+功能：返回对象的内存地址；
+参数：obj为QVariant（QObject*）；
+返回：qint64类型，地址。
+
+（十九）QML引擎（QQmlApplicationEngine）管理
+命令：<font color='yellow'>void sl_clearComponentCache();</font>
+功能：清空QML组件缓存（clear有效，trim貌似无效）；调用后现有对象不变，新建的对象才重新读取；
+参数：无；
+返回：无；
+注意：QML默认将载入过的qml和js文件存入缓存；经常调用貌似会出现卡死闪退的问题（win64位下）。
+
+命令：<font color='yellow'>void sl_trimComponentCache();</font>
+功能：修剪QML组件缓存；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>void sl_clearSingletons();</font>（仅Qt6）
+功能：清空QML单例缓存；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>QStringList sl_importPathList();</font>
+功能：获取QML导入库搜索路径列表（搜索 库名/qmldir 文件）；
+参数：无；
+返回：QStringList类型；
+注意：QML默认也会从qmldir中Qml2Imports定义的路径搜索；如果第一次导入某库不存在时再加入正确路径也一直不存在（有缓存），反之导入成功后删除库文件也正常。
+
+命令：<font color='yellow'>void sl_addImportPath(const QString& path);</font>
+功能：添加QML导入路径；
+参数：path为路径；
+返回：无。
+
+命令：<font color='yellow'>void sl_setImportPathList(const QStringList& paths);</font>
+功能：设置QML导入路径列表；
+参数：paths为路径列表；
+返回：无。
+
+命令：<font color='yellow'>QStringList sl_pluginPathList();</font>
+功能：获取QML插件动态链接库搜索路径列表（默认"."，从qmldir所在目录搜索）；
+参数：无；
+返回：QStringList类型；
+注意：加载不到后面调整还可以再次加载，但加载后动态链接库就被锁定使用了。
+
+命令：<font color='yellow'>void sl_addPluginPath(const QString& path);</font>
+功能：添加QML插件路径；
+参数：path为路径；
+返回：无。
+
+命令：<font color='yellow'>void sl_setPluginPathList(const QStringList& paths);</font>
+功能：设置QML插件路径列表；
+参数：paths为路径列表；
+返回：无。
+
+命令：<font color='yellow'>bool sl_addNamedBundle(const QString& name, const QString& fileName);</font>
+功能：添加命名bundle；
+参数：name为名称；fileName为文件；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>bool sl_importPlugin(const QString& filePath, const QString& uri, QList<QQmlError>* errors);</font>
+功能：导入QML插件；
+参数：filePath为插件文件；uri为模块URI；errors为错误输出；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>QObject* sl_qmlEngineNetworkAccessManager();</font>
+功能：获取QML引擎内置的网络访问管理器；
+参数：无；
+返回：QObject*类型（QNetworkAccessManager）。
+
+命令：<font color='yellow'>void sl_setUrlInterceptor(QQmlAbstractUrlInterceptor* urlInterceptor);</font>
+功能：设置URL拦截器；
+参数：urlInterceptor为拦截器对象；
+返回：无。
+
+命令：<font color='yellow'>QQmlAbstractUrlInterceptor* sl_urlInterceptor();</font>
+功能：获取URL拦截器；
+参数：无；
+返回：QQmlAbstractUrlInterceptor*类型。
+
+命令：<font color='yellow'>void sl_addImageProvider(const QString& id, QQmlImageProviderBase* provider);</font>
+功能：添加图像提供器（如image://memory/xxx用法）；
+参数：id为提供器ID；provider为提供器对象；
+返回：无。
+
+命令：<font color='yellow'>QQmlImageProviderBase* sl_imageProvider(const QString& id);</font>
+功能：获取图像提供器；
+参数：id为ID；
+返回：QQmlImageProviderBase*类型。
+
+命令：<font color='yellow'>void sl_removeImageProvider(const QString& id);</font>
+功能：移除图像提供器；
+参数：id为ID；
+返回：无。
+
+命令：<font color='yellow'>void sl_setIncubationController(QQmlIncubationController* controller);</font>
+功能：设置QML孵化控制器（控制组件异步创建）；
+参数：controller为控制器对象；
+返回：无。
+
+命令：<font color='yellow'>QQmlIncubationController* sl_incubationController();</font>
+功能：获取QML孵化控制器；
+参数：无；
+返回：QQmlIncubationController*类型。
+
+命令：<font color='yellow'>void sl_setOfflineStoragePath(const QString& dir);</font>
+功能：设置QML LocalStorage存储路径（会新建Databases文件夹），可为相对路径；
+参数：dir为路径；
+返回：无；
+注意：安卓上如果设置在sdcard会有警告（setNativeLocks failed: 'Function not implemented'）。
+
+命令：<font color='yellow'>QString sl_offlineStoragePath();</font>
+功能：获取LocalStorage存储路径；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>QString sl_offlineStorageDatabaseFilePath(const QString& databaseName);</font>
+功能：获取LocalStorage数据库文件路径；
+参数：databaseName为数据库名；
+返回：QString类型。
+
+命令：<font color='yellow'>QUrl sl_baseUrl();</font>
+功能：获取QML引擎baseUrl；
+参数：无；
+返回：QUrl类型。
+
+命令：<font color='yellow'>void sl_setBaseUrl(const QUrl& url);</font>
+功能：设置QML引擎baseUrl；
+参数：url为URL；
+返回：无。
+
+命令：<font color='yellow'>bool sl_outputWarningsToStandardError();</font>
+功能：获取是否将QML警告输出到标准错误；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>void sl_setOutputWarningsToStandardError(bool enable);</font>
+功能：设置是否将QML警告输出到标准错误；
+参数：enable为是否启用；
+返回：无。
+
+命令：<font color='yellow'>void sl_retranslate();</font>
+功能：重新翻译（语言切换后刷新QML中的翻译）；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setObjectOwnership(int objectOwnership = QQmlEngine::CppOwnership, QObject* obj = qApp);</font>
+功能：设置QObject对象的QML所有权（CppOwnership或JavaScriptOwnership）；
+参数：objectOwnership为所有权枚举值；obj为对象；
+返回：无。
+
+命令：<font color='yellow'>static int sl_objectOwnership(QObject* obj = qApp);</font>
+功能：获取QObject对象的QML所有权；
+参数：obj为对象；
+返回：int类型。
+
+（二十）QCoreApplication
+命令：<font color='yellow'>static QObject* sl_application();</font>
+功能：获取QCoreApplication实例；
+参数：无；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static void sl_setAttribute(Qt::ApplicationAttribute attribute, bool on = true);</font>
+功能：设置应用属性；
+参数：attribute为属性（Qt::ApplicationAttribute）；on为是否启用；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_testAttribute(Qt::ApplicationAttribute attribute);</font>
+功能：检测应用属性；
+参数：attribute为属性；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_setOrganizationDomain(const QString& orgDomain);</font>
+功能：设置组织域名；
+参数：orgDomain为域名；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_organizationDomain();</font>
+功能：获取组织域名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setOrganizationName(const QString& orgName);</font>
+功能：设置组织名；
+参数：orgName为组织名；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_organizationName();</font>
+功能：获取组织名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setApplicationName(const QString& application);</font>
+功能：设置应用名；
+参数：application为应用名；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_applicationName();</font>
+功能：获取应用名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setApplicationVersion(const QString& version);</font>
+功能：设置应用版本；
+参数：version为版本号；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_applicationVersion();</font>
+功能：获取应用版本；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setSetuidAllowed(bool allow);</font>
+功能：设置是否允许setuid；
+参数：allow为是否允许；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_isSetuidAllowed();</font>
+功能：获取是否允许setuid；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_exit(int retcode=0);</font>
+功能：退出应用事件循环；
+参数：retcode为返回码；
+返回：无。
+
+命令：<font color='yellow'>static void sl_sendKeyEvent(int key, int type = QEvent::KeyPress, int modifiers = Qt::NoModifier, const QString& text = QString(), bool autorep = false, ushort count = 1, QObject* receiver = sm_pQMLMainWindow);</font>
+功能：直接发送（同步）键盘事件（不用用户手动按）；
+参数：key为键值；type为事件类型；modifiers为修饰键；text为文本；autorep是否自动重复；count为重复次数；receiver为接收者（默认主窗口）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_sendMouseEvent(const QPointF& localPos, int button, int buttons, int type = QEvent::MouseButtonPress, int modifiers = Qt::NoModifier, int source = Qt::MouseEventSynthesizedByApplication, const QVariant& vWindowPos = QVariant(), const QVariant& vScreenPos = QVariant(), QObject* receiver = sm_pQMLMainWindow);</font>
+功能：直接发送（同步）鼠标事件；
+参数：localPos为本地坐标；button为按键；buttons为按键组合；type为事件类型；modifiers为修饰键；source为事件来源；vWindowPos为窗口坐标（默认用localPos）；vScreenPos为屏幕坐标（默认用QCursor::pos()）；receiver为接收者；
+返回：无。
+
+命令：<font color='yellow'>static void sl_postKeyEvent(int key, int type = QEvent::KeyPress, int modifiers = Qt::NoModifier, const QString& text = QString(), bool autorep = false, ushort count = 1, QObject* receiver = sm_pQMLMainWindow);</font>
+功能：投递（异步）键盘事件到事件队列；
+参数：同 sl_sendKeyEvent；
+返回：无。
+
+命令：<font color='yellow'>static void sl_postMouseEvent(const QPointF& localPos, int button, int buttons, int type = QEvent::MouseButtonPress, int modifiers = Qt::NoModifier, int source = Qt::MouseEventSynthesizedByApplication, const QVariant& vWindowPos = QVariant(), const QVariant& vScreenPos = QVariant(), QObject* receiver = sm_pQMLMainWindow);</font>
+功能：投递（异步）鼠标事件到事件队列；
+参数：同 sl_sendMouseEvent；
+返回：无。
+
+命令：<font color='yellow'>static void sl_sendPostedEvents(int event_type = 0, QObject* receiver = nullptr);</font>
+功能：立即发送事件队列中所有已投递的事件；
+参数：event_type为事件类型（0为全部）；receiver为接收者（null为全部）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_removePostedEvents(int eventType = 0, QObject* receiver = sm_pQMLMainWindow);</font>
+功能：移除事件队列中已投递的事件；
+参数：eventType为事件类型（0为全部）；receiver为接收者；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_startingUp();</font>
+功能：检测应用是否正在启动；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_closingDown();</font>
+功能：检测应用是否正在关闭；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static QString sl_applicationDirPath();</font>
+功能：获取应用所在目录；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_applicationFilePath();</font>
+功能：获取应用文件完整路径；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static qint64 sl_applicationPid();</font>
+功能：获取应用进程ID；
+参数：无；
+返回：qint64类型。
+
+命令：<font color='yellow'>static void sl_setLibraryPaths(const QStringList& list);</font>
+功能：设置动态库搜索路径列表；
+参数：list为路径列表；
+返回：无。
+
+命令：<font color='yellow'>static QStringList sl_libraryPaths();</font>
+功能：获取动态库搜索路径列表；
+参数：无；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static void sl_addLibraryPath(const QString& path);</font>
+功能：添加动态库搜索路径；
+参数：path为路径；
+返回：无。
+
+命令：<font color='yellow'>static void sl_removeLibraryPath(const QString& path);</font>
+功能：移除动态库搜索路径；
+参数：path为路径；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_installTranslator(const QString& filename, const QString& directory = QString(), const QString& search_delimiters = QString(), const QString& suffix = QString());</font>
+功能：安装翻译文件；
+参数：filename为译文文件；directory为目录；search_delimiters为搜索分隔符；suffix为后缀；
+返回：bool类型，是否成功；
+注意：源码中注释有疑问：局部变量translator的生命周期问题、是否必须在Widget创建前调用等（???需人工补充确认）。
+
+命令：<font color='yellow'>static bool sl_removeTranslator(const QString& filename, const QString& directory = QString(), const QString& search_delimiters = QString(), const QString& suffix = QString());</font>
+功能：移除翻译文件；
+参数：同上；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QString sl_translate(const QString& context, const QString& key, const QString& disambiguation = nullptr, int n = -1);</font>
+功能：翻译文本；
+参数：context为上下文；key为键；disambiguation为消歧义；n为复数形式；
+返回：QString类型，译文。
+
+命令：<font color='yellow'>static bool sl_isQuitLockEnabled();</font>
+功能：获取是否启用退出锁；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_setQuitLockEnabled(bool enabled);</font>
+功能：设置是否启用退出锁（所有窗口关闭后自动退出）；
+参数：enabled为是否启用；
+返回：无。
+
+（二十一）QGuiApplication
+命令：<font color='yellow'>static void sl_setApplicationDisplayName(const QString& name);</font>
+功能：设置应用显示名（窗口标题后缀）；
+参数：name为显示名；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_applicationDisplayName();</font>
+功能：获取应用显示名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setDesktopFileName(const QString& name);</font>
+功能：设置桌面文件名（.desktop）；
+参数：name为文件名；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_desktopFileName();</font>
+功能：获取桌面文件名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QObjectList sl_allWindows();</font>
+功能：获取所有窗口；
+参数：无；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static QObjectList sl_topLevelWindows();</font>
+功能：获取所有顶层窗口；
+参数：无；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static QWindow* sl_guiTopLevelAt(const QPoint& pos);</font>
+功能：获取指定屏幕坐标处的顶层窗口；
+参数：pos为屏幕坐标；
+返回：QWindow*类型。
+
+命令：<font color='yellow'>static void sl_setGuiWindowIcon(const QString& fileName);</font>
+功能：设置窗口图标（QGuiApplication级）；
+参数：fileName为图标文件；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_guiWindowIcon();</font>
+功能：获取窗口图标名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_platformName();</font>
+功能：获取平台插件名（如windows、xcb、android）；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QWindow* sl_modalWindow();</font>
+功能：获取当前模态窗口；
+参数：无；
+返回：QWindow*类型。
+
+命令：<font color='yellow'>static QWindow* sl_focusWindow();</font>
+功能：获取当前键盘焦点窗口；
+参数：无；
+返回：QWindow*类型。
+
+命令：<font color='yellow'>static QObject* sl_focusObject();</font>
+功能：获取当前键盘焦点对象；
+参数：无；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static QObject* sl_primaryScreen();</font>
+功能：获取主屏幕；
+参数：无；
+返回：QObject*类型（QScreen）。
+
+命令：<font color='yellow'>static QObjectList sl_screens();</font>
+功能：获取所有屏幕；
+参数：无；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static QObject* sl_screenAt(const QPoint& point);</font>
+功能：获取指定点所在屏幕；
+参数：point为屏幕坐标；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static qreal sl_devicePixelRatio();</font>
+功能：获取设备像素比；
+参数：无；
+返回：qreal类型。
+
+命令：<font color='yellow'>static int sl_overrideCursor();</font>
+功能：获取当前覆盖光标的形状（QGuiApplication级）；
+参数：无；
+返回：int类型（Qt::CursorShape）。
+
+命令：<font color='yellow'>static void sl_setOverrideCursor(int shape);</font>
+功能：设置覆盖光标；
+参数：shape为光标形状（Qt::CursorShape）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_changeOverrideCursor(int shape);</font>
+功能：更改覆盖光标；
+参数：同上；
+返回：无。
+
+命令：<font color='yellow'>static void sl_restoreOverrideCursor();</font>
+功能：恢复默认光标；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static QFont sl_guiFont();</font>
+功能：获取应用默认字体（QGuiApplication级）；
+参数：无；
+返回：QFont类型。
+
+命令：<font color='yellow'>static void sl_setFont(const QFont& font);</font>
+功能：设置应用默认字体；
+参数：font为字体；
+返回：无。
+
+命令：<font color='yellow'>static QObject* sl_clipboard();</font>
+功能：获取剪贴板对象；
+参数：无；
+返回：QObject*类型（QClipboard）。
+
+命令：<font color='yellow'>static void sl_setClipboardText(const QString& text, int mode = QClipboard::Clipboard);</font>
+功能：复制文字到剪切板；
+参数：text为文本；mode为剪贴板模式（Clipboard/Selection/FindBuffer）；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_getClipboardText(QString subtype = 'plain', int mode = QClipboard::Clipboard);</font>
+功能：获取剪切板文字；
+参数：subtype为类型（如'plain'、'html'）；mode为模式；
+返回：QString类型。
+
+命令：<font color='yellow'>static QPalette sl_palette();</font>
+功能：获取应用调色板（QGuiApplication级）；
+参数：无；
+返回：QPalette类型。
+
+命令：<font color='yellow'>static void sl_setPalette(const QPalette& pal);</font>
+功能：设置应用调色板；
+参数：pal为调色板；
+返回：无。
+
+命令：<font color='yellow'>static int sl_keyboardModifiers();</font>
+功能：获取当前键盘修饰键（事件状态）；
+参数：无；
+返回：int类型（Qt::KeyboardModifiers）。
+
+命令：<font color='yellow'>static int sl_queryKeyboardModifiers();</font>
+功能：实时查询键盘修饰键；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static int sl_mouseButtons();</font>
+功能：获取当前按下的鼠标键；
+参数：无；
+返回：int类型（Qt::MouseButtons）。
+
+命令：<font color='yellow'>static int sl_layoutDirection();</font>
+功能：获取布局方向；
+参数：无；
+返回：int类型（Qt::LayoutDirection）。
+
+命令：<font color='yellow'>static inline bool sl_isRightToLeft();</font>
+功能：检测是否从右到左布局；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static inline bool sl_isLeftToRight();</font>
+功能：检测是否从左到右布局；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static QObject* sl_styleHints();</font>
+功能：获取样式提示对象（双击间隔、光标闪烁等平台特性）；
+参数：无；
+返回：QObject*类型（QStyleHints）。
+
+命令：<font color='yellow'>static void sl_setDesktopSettingsAware(bool on);</font>
+功能：设置是否使用系统桌面设置（字体、图标等）；
+参数：on为是否启用；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_desktopSettingsAware();</font>
+功能：获取是否使用系统桌面设置；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static QObject* sl_inputMethod();</font>
+功能：获取输入法对象；
+参数：无；
+返回：QObject*类型（QInputMethod）。
+
+命令：<font color='yellow'>static QObject* sl_platformNativeInterface();</font>
+功能：获取平台本地接口对象；
+参数：无；
+返回：QObject*类型。
+
+命令：<font color='yellow'>static void sl_setQuitOnLastWindowClosed(bool quit);</font>
+功能：设置最后一个窗口关闭时是否退出应用；
+参数：quit为是否退出；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_quitOnLastWindowClosed();</font>
+功能：获取最后一个窗口关闭时是否退出应用；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static Qt::ApplicationState sl_applicationState();</font>
+功能：获取应用状态（激活、失活等）；
+参数：无；
+返回：Qt::ApplicationState类型。
+
+命令：<font color='yellow'>static void sl_setHighDpiScaleFactorRoundingPolicy(int policy);</font>
+功能：设置高DPI缩放因子舍入策略；
+参数：policy为策略（Qt::HighDpiScaleFactorRoundingPolicy）；
+返回：无。
+
+命令：<font color='yellow'>static int sl_highDpiScaleFactorRoundingPolicy();</font>
+功能：获取高DPI缩放因子舍入策略；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static bool sl_isSessionRestored();</font>
+功能：检测会话是否已恢复；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static QString sl_sessionId();</font>
+功能：获取会话ID；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_sessionKey();</font>
+功能：获取会话Key；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static bool sl_isSavingSession();</font>
+功能：检测是否正在保存会话；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_isFallbackSessionManagementEnabled();</font>
+功能：获取是否启用后备会话管理；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_setFallbackSessionManagementEnabled(bool);</font>
+功能：设置是否启用后备会话管理；
+参数：bool为是否启用（注意源码中始终传true，???需人工确认）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_sync();</font>
+功能：同步所有窗口（刷新绘制）；
+参数：无；
+返回：无。
+
+（二十二）QApplication
+命令：<font color='yellow'>static QObject* sl_style();</font>
+功能：获取应用样式对象；
+参数：无；
+返回：QObject*类型（QStyle）。
+
+命令：<font color='yellow'>static void sl_setStyle(QObject* style);</font>
+功能：设置应用样式（样式对象）；
+参数：style为QStyle对象；
+返回：无。
+
+命令：<font color='yellow'>static QObject* sl_setStyle(const QString& style);</font>
+功能：设置应用样式（按名称，如'Fusion'）；
+参数：style为样式名；
+返回：QObject*类型，???（推测为新的样式对象）。
+
+命令：<font color='yellow'>static QPalette sl_palette(QWidget* widget);</font>
+功能：获取指定Widget的调色板；
+参数：widget为Widget；
+返回：QPalette类型。
+
+命令：<font color='yellow'>static QPalette sl_palette(const QString& className);</font>
+功能：获取指定类名的调色板；
+参数：className为类名；
+返回：QPalette类型。
+
+命令：<font color='yellow'>static void sl_setPalette(const QPalette& palette, const QString& className);</font>
+功能：设置调色板（可指定类）；
+参数：palette为调色板；className为类名（空为全局）；
+返回：无。
+
+命令：<font color='yellow'>static QFont sl_font();</font>
+功能：获取应用默认字体（QApplication级）；
+参数：无；
+返回：QFont类型。
+
+命令：<font color='yellow'>static QFont sl_font(QWidget* widget);</font>
+功能：获取指定Widget的字体；
+参数：widget为Widget；
+返回：QFont类型。
+
+命令：<font color='yellow'>static QFont sl_font(const QString& className);</font>
+功能：获取指定类名的字体；
+参数：className为类名；
+返回：QFont类型。
+
+命令：<font color='yellow'>static void sl_setFont(const QFont& font, const QString& className);</font>
+功能：设置字体（可指定类）；
+参数：font为字体；className为类名（空为全局）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setWindowIcon(const QString& fileName);</font>
+功能：设置窗口图标（QApplication级）；
+参数：fileName为图标文件；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_windowIcon();</font>
+功能：获取窗口图标名；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static QObjectList sl_allWidgets();</font>
+功能：获取所有Widget；
+参数：无；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static QObjectList sl_topLevelWidgets();</font>
+功能：获取所有顶层Widget；
+参数：无；
+返回：QObjectList类型。
+
+命令：<font color='yellow'>static QWidget* sl_desktop();</font>
+功能：获取桌面Widget；
+参数：无；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static QWidget* sl_activePopupWidget();</font>
+功能：获取当前活动的Popup Widget；
+参数：无；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static QWidget* sl_activeModalWidget();</font>
+功能：获取当前活动的模态Widget；
+参数：无；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static QWidget* sl_focusWidget();</font>
+功能：获取当前键盘焦点Widget；
+参数：无；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static QWidget* sl_activeWindow();</font>
+功能：获取当前活动窗口；
+参数：无；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static void sl_setActiveWindow(QWidget* act);</font>
+功能：设置活动窗口；
+参数：act为窗口；
+返回：无。
+
+命令：<font color='yellow'>static QWidget* sl_widgetAt(const QPoint& p);</font>
+功能：获取指定全局坐标处的Widget；
+参数：p为坐标；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static inline QWidget* sl_widgetAt(int x, int y);</font>
+功能：同上（重载，x、y坐标）；
+参数：x、y为坐标；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static QWidget* sl_topLevelAt(const QPoint& p);</font>
+功能：获取指定坐标处的顶层Widget；
+参数：p为坐标；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static inline QWidget* sl_topLevelAt(int x, int y);</font>
+功能：同上（重载）；
+参数：x、y为坐标；
+返回：QWidget*类型。
+
+命令：<font color='yellow'>static void sl_beep();</font>
+功能：发出系统提示音；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_alert(QWidget* widget, int duration = 0);</font>
+功能：使Widget发出注意提示（任务栏闪烁等）；
+参数：widget为Widget；duration为持续时间（0为???）；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setCursorFlashTime(int ms);</font>
+功能：设置光标闪烁间隔；
+参数：ms为毫秒；
+返回：无。
+
+命令：<font color='yellow'>static int sl_cursorFlashTime();</font>
+功能：获取光标闪烁间隔；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static void sl_setDoubleClickInterval(int ms);</font>
+功能：设置鼠标双击间隔；
+参数：ms为毫秒；
+返回：无。
+
+命令：<font color='yellow'>static int sl_doubleClickInterval();</font>
+功能：获取鼠标双击间隔；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static void sl_setKeyboardInputInterval(int ms);</font>
+功能：设置键盘输入间隔；
+参数：ms为毫秒；
+返回：无。
+
+命令：<font color='yellow'>static int sl_keyboardInputInterval();</font>
+功能：获取键盘输入间隔；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static void sl_setWheelScrollLines(int lines);</font>
+功能：设置滚轮滚动行数；
+参数：lines为行数；
+返回：无。
+
+命令：<font color='yellow'>static int sl_wheelScrollLines();</font>
+功能：获取滚轮滚动行数；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static void sl_setStartDragTime(int ms);</font>
+功能：设置开始拖拽的按下时间阈值；
+参数：ms为毫秒；
+返回：无。
+
+命令：<font color='yellow'>static int sl_startDragTime();</font>
+功能：获取开始拖拽时间阈值；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static void sl_setStartDragDistance(int l);</font>
+功能：设置开始拖拽的移动距离阈值；
+参数：l为像素距离；
+返回：无。
+
+命令：<font color='yellow'>static int sl_startDragDistance();</font>
+功能：获取开始拖拽距离阈值；
+参数：无；
+返回：int类型。
+
+命令：<font color='yellow'>static bool sl_isEffectEnabled(int uiEffect);</font>
+功能：检测UI效果是否启用（如动画效果）；
+参数：uiEffect为效果（Qt::UIEffect）；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_setEffectEnabled(int uiEffect, bool enable = true);</font>
+功能：设置UI效果是否启用；
+参数：uiEffect为效果；enable为是否启用；
+返回：无。
+
+命令：<font color='yellow'>static QString sl_styleSheet();</font>
+功能：获取应用级样式表；
+参数：无；
+返回：QString类型。
+
+命令：<font color='yellow'>static void sl_setStyleSheet(const QString& sheet);</font>
+功能：设置应用级样式表；
+参数：sheet为QSS样式表；
+返回：无。
+
+命令：<font color='yellow'>static void sl_setAutoSipEnabled(const bool enabled);</font>
+功能：设置是否自动显示软键盘（SIP，移动端）；
+参数：enabled为是否启用；
+返回：无。
+
+命令：<font color='yellow'>static bool sl_autoSipEnabled();</font>
+功能：获取是否自动显示软键盘；
+参数：无；
+返回：bool类型。
+
+命令：<font color='yellow'>static void sl_closeAllWindows();</font>
+功能：关闭所有窗口；
+参数：无；
+返回：无。
+
+命令：<font color='yellow'>static void sl_aboutQt();</font>
+功能：显示关于Qt对话框；
+参数：无；
+返回：无。
+
+（二十三）模拟鼠标事件（需 QT_TESTLIB_LIB）
+命令：<font color='yellow'>bool sl_simulatedMouseEvent(int action, int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标事件（???需人工补充action取值）；
+参数：action为动作；x、y为坐标；mouseButton为鼠标键；keyboardModifier为修饰键；delay为延迟；obj为目标对象；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>bool sl_simulatedMousePress(int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标按下；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>bool sl_simulatedMouseRelease(int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标抬起；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>bool sl_simulatedMouseClick(int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标点击；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>bool sl_simulatedMouseDClick(int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标双击；
+参数：同上；
+返回：bool类型。
+
+命令：<font color='yellow'>bool sl_simulatedMouseMove(int x, int y, int mouseButton = Qt::LeftButton, int keyboardModifier = Qt::NoModifier, int delay = -1, QObject* obj = sm_pQMLMainWindow);</font>
+功能：模拟鼠标移动；
+参数：同上；
+返回：bool类型。
+
+（二十四）环境变量
+命令：<font color='yellow'>static QByteArray sl_getEnv(const QString& varName);</font>
+功能：获取环境变量；
+参数：varName为变量名；
+返回：QByteArray类型。
+
+命令：<font color='yellow'>static bool sl_putEnv(const QString& varName, const QByteArray& value);</font>
+功能：设置环境变量；
+参数：varName为变量名；value为值；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static bool sl_unsetEnv(const QString& varName);</font>
+功能：删除环境变量；
+参数：varName为变量名；
+返回：bool类型，是否成功。
+
+命令：<font color='yellow'>static QString sl_environmentVariable(const QString& varName);</font>
+功能：获取环境变量（QString版）；
+参数：varName为变量名；
+返回：QString类型。
+
+命令：<font color='yellow'>static QString sl_environmentVariable(const QString& varName, const QString& defaultValue);</font>
+功能：获取环境变量（带默认值重载）；
+参数：varName为变量名；defaultValue为默认值；
+返回：QString类型。
+
+命令：<font color='yellow'>static bool sl_environmentVariableIsEmpty(const QString& varName);</font>
+功能：检测环境变量是否为空；
+参数：varName为变量名；
+返回：bool类型。
+
+命令：<font color='yellow'>static bool sl_environmentVariableIsSet(const QString& varName);</font>
+功能：检测环境变量是否已设置；
+参数：varName为变量名；
+返回：bool类型。
+
+命令：<font color='yellow'>static int sl_environmentVariableIntValue(const QString& varName, bool* ok=nullptr);</font>
+功能：获取环境变量并转为int；
+参数：varName为变量名；ok为???（需人工补充）；
+返回：int类型。
+
+（二十五）Qt辅助
+命令：<font color='yellow'>static QString sl_convertFromPlainText(const QString& plain, int mode = Qt::WhiteSpacePre);</font>
+功能：将纯文本转换为富文本（保留空白/换行为HTML）；
+参数：plain为纯文本；mode为空白模式（Qt::WhiteSpaceMode）；
+返回：QString类型。
+
+命令：<font color='yellow'>static bool sl_mightBeRichText(const QString& text);</font>
+功能：检测文本是否可能是富文本；
+参数：text为文本；
+返回：bool类型。
+
+（二十六）运行外部命令
+命令：<font color='yellow'>static QByteArray sl_exec(const QString& program, const QVariant& arguments = QVariant(), int msecsDelay = 30000, int mode = QIODevice::ReadWrite, int readSize = -1, QJSValue cb = QJSValue());</font>
+功能：运行外部命令并返回输出；
+参数：program为程序名（如果不带参，program不能有空格）；arguments为参数；msecsDelay为超时毫秒；mode为打开方式；readSize为读取大小；cb为???（需人工补充，推测为异步回调）；
+返回：QByteArray类型，命令输出。
+
+（二十七）其他功能
+命令：<font color='yellow'>static QVariant sl_counter(const QString& key, const QVariant& count = QVariant());</font>
+功能：计数器功能（???需人工补充具体逻辑，推测为按键累计计数）；
+参数：key为键；count为???（需人工补充）；
+返回：QVariant类型，???（推测为当前计数值）。
+
+命令：<font color='yellow'>static inline bool sl_fuzzyCompare(double p1, double p2);</font>
+功能：浮点数模糊比较（容差判断相等）；
+参数：p1、p2为两个浮点数；
+返回：bool类型，是否近似相等。
+
+命令：<font color='yellow'>static QStringList sl_networkHardwareAddress(int flags = QNetworkInterface::CanBroadcast);</font>
+功能：获取网络硬件地址（MAC地址）列表；
+参数：flags为网卡过滤标志（QNetworkInterface::InterfaceFlags）；
+返回：QStringList类型。
+
+命令：<font color='yellow'>static QVariantList sl_networkHardware();</font>
+功能：获取网络硬件信息列表；
+参数：无；
+返回：QVariantList类型（???需人工补充每项内容）。
+
+命令：<font color='yellow'>void sl_restart();</font>
+功能：重启程序；
+参数：无；
+返回：无；
+注意：通过startDetached启动自身后调用quit退出当前实例。

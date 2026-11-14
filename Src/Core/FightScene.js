@@ -1110,7 +1110,7 @@ function* fnRound() {
             //暂停时间
             fight.$sys.continueFight(1, tValue);
 
-            yield 1;
+            yield $CommonLibJS.createPromise(function(){this.$pause = true;});
             continue;
         }
 
@@ -1241,7 +1241,7 @@ function* fnRound() {
                             console.timeEnd('SkillSprite');
 
                             if(SkillEffectResult === 1)
-                                yield 0;
+                                yield $CommonLibJS.createPromise(function(){this.$pause = true;});
                             else if(SkillEffectResult === 0) {
 
                             }
@@ -1308,7 +1308,7 @@ function* fnRound() {
                         console.timeEnd('SkillSprite2');
 
                         if(SkillEffectResult === 1)
-                            yield 0;
+                            yield $CommonLibJS.createPromise(function(){this.$pause = true;});
                         else if(SkillEffectResult === 0) {
 
                         }
@@ -1461,7 +1461,7 @@ function* gfFighting() {
 
         //战斗准备中（选择技能）
         if(_private.nRunAwayFlag === 0 && _private.nAutoAttack === 0)
-            yield 11;
+            yield $CommonLibJS.createPromise(function(){this.$pause = true;});
 
         if(_private.nRunAwayFlag !== 0) {
             const ret = yield* runAway();
@@ -1623,7 +1623,7 @@ function* runCombatantRoundScript(combatant, stage) {
             let SkillEffectResult = FightSceneJS.actionSpritePlay(tCombatantActionSpriteData, combatant);
 
             if(SkillEffectResult === 1)
-                yield 0;
+                yield $CommonLibJS.createPromise(function(){this.$pause = true;});
             else if(SkillEffectResult === 0) {
 
             }
@@ -1823,7 +1823,7 @@ function readFightRole(role) {
     //console.debug('[FightScene]filePath：', filePath);
 
     //let data = File.read(filePath);
-    let data = $Frame.sl_fileRead(filePath);
+    let data = $Frame.sl_readFile(filePath);
 
     if(data) {
         data = JSON.parse(data);
@@ -1856,7 +1856,7 @@ function loadFightSkillInfo(fightSkillName) {
         //let data = File.read(filePath);
         //console.debug('[GameFightSkill]filePath：', filePath);
 
-        let data = $Frame.sl_fileRead(filePath);
+        let data = $Frame.sl_readFile(filePath);
 
         if(data) {
             data = JSON.parse(data);
