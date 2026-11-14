@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrMusic = $Frame.sl_dirList($GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x0);
+        //_private.arrMusic = $Frame.sl_dirEntryList($GameMakerGlobal.musicResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x0);
         //console.debug('[mainMusicEditor]_private.arrMusic', JSON.stringify(_private.arrMusic))
         _private.refresh();
     }

@@ -2201,10 +2201,10 @@ var $fightButtons = [
 
 
 //读取存档信息，返回数组
-function $readSavesInfo(count=3) {
+function $readSavesInfo(count=3, showName='存档%1') {
     let arrSave = [];
     for(let i = 0; i < count; ++i) {
-        let ts = game.checksave('存档' + i);
+        let ts = game.checksave(showName.arg(i));
         if(ts) {
             arrSave.push('%1：%2（%3）'.arg(i).arg(ts.Name).arg(ts.Time));
         }

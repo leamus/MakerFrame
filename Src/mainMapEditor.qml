@@ -845,7 +845,7 @@ Item {
             //console.debug($GameMakerGlobal.mapPath())
 
             //l_listMaps.show($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000, 0x00);
-            const list = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+            const list = $Frame.sl_dirEntryList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建地图】');
             //l_listMaps.removeButtonVisible = {0: false, '-1': true};
             l_listMaps.show(list);

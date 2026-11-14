@@ -1708,7 +1708,7 @@ Item {
                     _private.changeProject($dialog.input);
 
                     const projectPath = $GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName;
-                    $Frame.sl_dirCreate(projectPath);
+                    $Frame.sl_createDir(projectPath);
 
 
                     $dialog.show({
@@ -2304,7 +2304,7 @@ Item {
             //console.debug('[mainGameMaker]path:', filePath, dirPath, $Frame.sl_completeBaseName(filePath))
 
             if(!$Frame.sl_dirExists(dirPath))
-                $Frame.sl_dirCreate(dirPath);
+                $Frame.sl_createDir(dirPath);
             const ret = $Frame.sl_extractDir(/*$GlobalJS.toPath*/(filePath), dirPath);
             if(ret.length > 0) {
                 //_private.changeProject($Frame.sl_completeBaseName(filePath));

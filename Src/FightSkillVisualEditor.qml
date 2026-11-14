@@ -1487,7 +1487,7 @@ Item {
             data.Effects = effects;
             //data.Attack = textAttack.text.trim();
 
-            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 3, TypeName: 'VisualFightSkill', Data: data}), _private.filepath, 0b0);
 
         }
 
@@ -1917,7 +1917,7 @@ Item {
                 });
 
             if(result[1] !== null)
-                //let ret = $Frame.sl_writeFile(result, _private.filepath + '.js', 0);
+                //let ret = $Frame.sl_writeFile(result, _private.filepath + '.js', 0b0);
                 root.sg_compile(result[1]);
 
             return result;

@@ -730,7 +730,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0b0);
                     root.sg_compile(jsScript[1]);
 
                     console.debug('[GoodsVisualEditor]compile:', _private.filepath, jsScript);
@@ -828,7 +828,7 @@ Item {
 
             data.Properties = properties;
 
-            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify({Version: '0.6', Type: 2, TypeName: 'VisualGoods', Data: data}), _private.filepath, 0b0);
 
         }
 
@@ -1097,7 +1097,7 @@ Item {
                     if(jsScript === false)
                         return;
 
-                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0);
+                    //let ret = $Frame.sl_writeFile(jsScript, _private.filepath + '.js', 0b0);
                     root.sg_compile(jsScript[1]);
 
                     saveData();

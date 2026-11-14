@@ -146,227 +146,114 @@
             httpReply.sl_deleteLater(); //FrameManager.sl_deleteLater(httpReply);
         });
 
+注意：sl_networkRequest可以实现较复杂的网络请求，sl_request和sl_downloadFile是封装过的简单用法，也可以用继续封装过的且更适合JS的$CommonLibJS.request；
+
 （四）文件（夹）操作
 命令：<font color='yellow'>static QObject* sl_file(const QString& filePath = '', int flags = QIODevice::NotOpen, QObject* parent = FrameManager::instance());</font>
 功能：返回一个js可操作的QFile包装类对象（用完需手动释放，如果parent为null则不需要）；
 参数：filePath为文件路径；flags为打开方式；parent为父对象；
-返回：QObject*类型，L_File对象。
+返回：QObject*类型，L_File对象；
+注意：L_File类封装了QFile的所有相关函数，函数均以sl_开头，名称和功能与原来相同；属性io（L_IODeviceWrapper对象）提供读写功能。
 
 命令：<font color='yellow'>static QObject* sl_dir(const QString& path = '', const QString& nameFilter = QString(), int sort = QDir::SortFlags(QDir::Name | QDir::IgnoreCase), int filter = QDir::AllEntries, QObject* parent = FrameManager::instance());</font>
 功能：返回一个js可操作的QDir包装类对象（用完需手动释放，如果parent为null则不需要）；
 参数：path为文件夹路径；nameFilter为名称过滤；sort为排序方式；filter为过滤方式；parent为父对象；
 返回：QObject*类型，L_Dir对象。
+注意：L_Dir类封装了QDir的所有相关函数，函数均以sl_开头，名称和功能与原来相同。
 
-命令：<font color='yellow'>static bool sl_isReadable(const QString& filePath);</font>
-功能：检测文件是否可读；
-参数：filePath为文件路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isWritable(const QString& filePath);</font>
-功能：检测文件是否可写；
-参数：filePath为文件路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isExecutable(const QString& filePath);</font>
-功能：检测文件是否可执行；
-参数：filePath为文件路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isHidden(const QString& filePath);</font>
-功能：检测文件是否隐藏；
-参数：filePath为文件路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isNativePath(const QString& filePath);</font>
-功能：检测是否本地路径；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isRelative(const QString& filePath);</font>
-功能：检测是否相对路径；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isAbsolute(const QString& filePath);</font>
-功能：检测是否绝对路径；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_makeAbsolute(const QString& filePath);</font>
-功能：将相对路径转为绝对路径；
-参数：filePath为路径；
-返回：bool类型，是否转换成功。
-
-命令：<font color='yellow'>static bool sl_isFile(const QString& filePath);</font>
-功能：检测是否文件；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isDir(const QString& filePath);</font>
-功能：检测是否文件夹；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isSymLink(const QString& filePath);</font>
-功能：检测是否符号链接（快捷方式等）；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isSymbolicLink(const QString& filePath);</font>
-功能：检测是否符号链接；
-参数：filePath为路径；
-返回：bool类型；
-注意：与 sl_isSymLink 的区别？？？需人工补充。
-
-命令：<font color='yellow'>static bool sl_isShortcut(const QString& filePath);</font>
-功能：检测是否快捷方式（Windows）；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isJunction(const QString& filePath);</font>
-功能：检测是否NTFS junction（Windows）；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isRoot(const QString& filePath);</font>
-功能：检测是否根目录；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_isBundle(const QString& filePath);</font>
-功能：检测是否Mac捆包；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static inline QByteArray sl_fileEncodeName(const QString& fileName);</font>
-功能：按本地文件系统编码转换文件名（QString转QByteArray）；
-参数：fileName为文件名；
-返回：QByteArray类型。
-
-命令：<font color='yellow'>static QString sl_fileDecodeName(const QByteArray& localFileName);</font>
-功能：按本地文件系统编码还原文件名（QByteArray转QString）；
-参数：localFileName为本地编码文件名；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_fileSymLinkTarget(const QString& filePath);</font>
-功能：返回符号链接指向的文件（QFile静态方法）；
-参数：filePath为符号链接路径；
-返回：QString类型，目标路径；非符号链接返回空。
-
-命令：<font color='yellow'>static QString sl_fileSymLinkTarget1(const QString& filePath);</font>
-功能：同上（QFileInfo方法版本）；
-参数：同上；
-返回：同上。
-
-命令：<font color='yellow'>static QString sl_fileOwner(const QString& filePath);</font>
-功能：返回文件所有者；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static uint sl_fileOwnerId(const QString& filePath);</font>
-功能：返回文件所有者ID；
-参数：filePath为路径；
-返回：uint类型。
-
-命令：<font color='yellow'>static QString sl_fileGroup(const QString& filePath);</font>
-功能：返回文件所在组；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static uint sl_fileGroupId(const QString& filePath);</font>
-功能：返回文件所在组ID；
-参数：filePath为路径；
-返回：uint类型。
-
-命令：<font color='yellow'>static bool sl_filePermission(const QString& filePath, int permissions = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
-功能：检测文件权限；
-参数：filePath为路径；permissions为要检测的权限组合；
-返回：bool类型，是否具有该权限。
-
-命令：<font color='yellow'>static int sl_filePermissions1(const QString& filePath);</font>
-功能：返回文件完整权限；
-参数：filePath为路径；
-返回：int类型（QFileDevice::Permissions）。
-
-命令：<font color='yellow'>static qint64 sl_fileSize(const QString& filePath);</font>
-功能：返回文件大小（字节）；
-参数：filePath为路径；
-返回：qint64类型。
-
-命令：<font color='yellow'>static bool sl_fileResize(const QString& filePath, qint64 sz);</font>
-功能：调整文件大小；
-参数：filePath为路径；sz为目标大小；
-返回：bool类型，是否成功。
-
-命令：<font color='yellow'>static QDateTime sl_fileBirthTime(const QString& filePath);</font>
-功能：返回文件创建时间；
-参数：filePath为路径；
-返回：QDateTime类型。
-
-命令：<font color='yellow'>static QDateTime sl_fileMetadataChangeTime(const QString& filePath);</font>
-功能：返回文件元数据最后修改时间；
-参数：filePath为路径；
-返回：QDateTime类型。
-
-命令：<font color='yellow'>static QDateTime sl_fileLastModified(const QString& filePath);</font>
-功能：返回文件最后修改时间；
-参数：filePath为路径；
-返回：QDateTime类型。
-
-命令：<font color='yellow'>static QDateTime sl_fileLastRead(const QString& filePath);</font>
-功能：返回文件最后读取时间；
-参数：filePath为路径；
-返回：QDateTime类型。
-
-命令：<font color='yellow'>static QDateTime sl_fileFileTime(const QString& filePath, int time);</font>
-功能：返回文件指定类型的时间；
-参数：filePath为路径；time为QFile::FileTime类型枚举值；
-返回：QDateTime类型。
-
-命令：<font color='yellow'>static bool sl_fileCaching(const QString& filePath);</font>
-功能：返回是否启用文件信息缓存；
-参数：filePath为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static void sl_fileSetCaching(const QString& filePath, bool on=true);</font>
-功能：设置是否启用文件信息缓存；
-参数：filePath为路径；on为是否启用；
-返回：无。
-
-命令：<font color='yellow'>static void sl_fileRefresh(const QString& filePath);</font>
-功能：刷新文件信息缓存；
-参数：filePath为路径；
-返回：无。
-
+1、QFileInfo类的函数封装，功能请查阅官方文档：
 命令：<font color='yellow'>static bool sl_fileExists(const QString& filePath);</font>
-功能：检测文件（夹）是否存在；
-参数：filePath为路径；
-返回：bool类型。
+命令：<font color='yellow'>static QString sl_filePath(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_absoluteFilePath(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_canonicalFilePath(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_fileName(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_baseName(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_completeBaseName(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_bundleName(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_suffix(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_completeSuffix(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_path(const QString& path);</font>
+命令：<font color='yellow'>static QString sl_absolutePath(const QString& path);</font>
+命令：<font color='yellow'>static QString sl_canonicalPath(const QString& path);</font>
+命令：<font color='yellow'>static bool sl_isReadable(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isWritable(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isExecutable(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isHidden(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isNativePath(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isRelative(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isAbsolute(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isFile(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isDir(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isSymLink(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isSymbolicLink(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isShortcut(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isJunction(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isRoot(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_isBundle(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_fileSymLinkTarget1(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_fileOwner(const QString& filePath);</font>
+命令：<font color='yellow'>static uint sl_fileOwnerId(const QString& filePath);</font>
+命令：<font color='yellow'>static QString sl_fileGroup(const QString& filePath);</font>
+命令：<font color='yellow'>static uint sl_fileGroupId(const QString& filePath);</font>
+命令：<font color='yellow'>static bool sl_filePermission(const QString& filePath, int permissions = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+命令：<font color='yellow'>static int sl_filePermissions(const QString& filePath);</font>
+命令：<font color='yellow'>static qint64 sl_fileSize(const QString& filePath);</font>
+命令：<font color='yellow'>static QDateTime sl_fileBirthTime(const QString& filePath);</font>
+命令：<font color='yellow'>static QDateTime sl_fileMetadataChangeTime(const QString& filePath);</font>
+命令：<font color='yellow'>static QDateTime sl_fileLastModified(const QString& filePath);</font>
+命令：<font color='yellow'>static QDateTime sl_fileLastRead(const QString& filePath);</font>
+命令：<font color='yellow'>static QDateTime sl_fileFileTime(const QString& filePath, int time);</font>
 
+2、QFile类的静态函数封装，功能请查阅官方文档：
+命令：<font color='yellow'>static inline QByteArray sl_fileEncodeName(const QString& fileName);</font>
+命令：<font color='yellow'>static QString sl_fileDecodeName(const QByteArray& localFileName);</font>
+命令：<font color='yellow'>static bool sl_fileExists1(const QString& fileName);</font>
+命令：<font color='yellow'>static QString sl_fileSymLinkTarget(const QString& fileName);</font>
+命令：<font color='yellow'>static bool sl_fileRemove(const QString& fileName);</font>
+命令：<font color='yellow'>static bool sl_fileMoveToTrash(const QString& fileName, QString* pathInTrash = nullptr);</font>
+命令：<font color='yellow'>static bool sl_fileRename(const QString& oldName, const QString& newName);</font>
+命令：<font color='yellow'>static bool sl_fileLink(const QString& oldName, const QString& newName);</font>
+命令：<font color='yellow'>static bool sl_fileCopy(const QString& fileName, const QString& newName);</font>
+命令：<font color='yellow'>static bool sl_fileResize(const QString& fileName, qint64 sz);</font>
+命令：<font color='yellow'>static int sl_permissions(const QString& fileName);</font>
+命令：<font color='yellow'>static bool sl_setPermissions(const QString& fileName, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+
+3、QDir类的静态函数封装，功能请查阅官方文档：
+命令：<font color='yellow'>static void sl_setSearchPaths(const QString& prefix, const QStringList& searchPaths);</font>
+命令：<font color='yellow'>static void sl_addSearchPath(const QString& prefix, const QString& path);</font>
+命令：<font color='yellow'>static QStringList sl_searchPaths(const QString& prefix);</font>
+命令：<font color='yellow'>static QString sl_toNativeSeparators(const QString& pathName);</font>
+命令：<font color='yellow'>static QString sl_fromNativeSeparators(const QString& pathName);</font>
+命令：<font color='yellow'>static QStringList sl_nameFiltersFromString(const QString& nameFilter);</font>
+命令：<font color='yellow'>static bool sl_isRelativePath(const QString& path);</font>
+命令：<font color='yellow'>inline static bool sl_isAbsolutePath(const QString& path);</font>
+命令：<font color='yellow'>static QStringList sl_drives();</font>
+命令：<font color='yellow'>Q_DECL_CONSTEXPR static inline QChar listSeparator() noexcept;</font>
+命令：<font color='yellow'>static QChar separator();</font>
+命令：<font color='yellow'>static bool sl_setCurrentPath(const QString& path);</font>
+命令：<font color='yellow'>static QString sl_currentPath();</font>
+命令：<font color='yellow'>static QString sl_homePath();</font>
+命令：<font color='yellow'>static QString sl_rootPath();</font>
+命令：<font color='yellow'>static QString sl_tempPath();</font>
+命令：<font color='yellow'>static bool sl_match(const QStringList& filters, const QString& fileName);</font>
+命令：<font color='yellow'>static bool sl_match(const QString& filter, const QString& fileName);</font>
+命令：<font color='yellow'>static QString sl_cleanPath(const QString& path);</font>
+
+4、文件简易操作：
 命令：<font color='yellow'>static QVariant sl_readFile(const QString& filePath, int readType = 0, const QString& codec = 'UTF-8');</font>
-功能：读文件；所有平台都强制使用utf8（无BOM）；
-参数：filePath为路径；readType为0文本读（codec有用，返回QString）、1二进制读（返回QByteArray）；codec为编码；
+功能：读文件；
+参数：filePath为路径；readType为0文本读（此时参数codec有效，返回QString），1二进制读（返回QByteArray）；codec为编码；
 返回：QVariant类型（QString或QByteArray）。
 
-命令：<font color='yellow'>static qint64 sl_writeFile(const QVariant& data, const QString& filePath, int writeFlags = 0, const QString& codec = 'UTF-8');</font>
-功能：写文件；所有平台都强制使用utf8（无BOM）；
-参数：data为写入数据；filePath为路径；writeFlags从右到左：0为WriteOnly，1为Append；0为文本写（QString，codec有用）、1为二进制写；codec为编码；
+命令：<font color='yellow'>static qint64 sl_writeFile(const QVariant& data, const QString& filePath, int writeFlags = 0b0, const QString& codec = 'UTF-8');</font>
+功能：写文件；
+参数：data为写入数据（QByteArray或QString类型）；filePath为路径；writeFlags从右到左：0为文本写（QString，codec有用），1为二进制写；0为WriteOnly，1为Append；codec为编码；
 返回：qint64类型，写入长度（字节数）。
 
 命令：<font color='yellow'>static int sl_removeFile(const QString& filePath);</font>
 功能：删除文件；
 参数：filePath为路径；
 返回：int类型，0不存在；1成功；-1失败。
-
-命令：<font color='yellow'>static int sl_fileMoveToTrash(const QString& filePath, QString* pathInTrash = nullptr);</font>
-功能：移动文件到回收站；
-参数：filePath为路径；pathInTrash为???（需人工补充）；
-返回：int类型，???（需人工补充）。
-
-命令：<font color='yellow'>static int sl_fileLink(const QString& oldname, const QString& newName);</font>
-功能：创建文件链接；
-参数：oldname为源文件；newName为链接名；
-返回：int类型，???（需人工补充）。
 
 命令：<font color='yellow'>static int sl_copyFile(const QString& source, const QString& destination, bool force = false);</font>
 功能：复制文件；
@@ -376,289 +263,125 @@
 命令：<font color='yellow'>static int sl_renameFile(const QString& source, const QString& destination, bool createPath = true);</font>
 功能：重命名文件（支持文件和文件夹）；
 参数：source为源；destination为目标；createPath为是否自动创建路径；
-返回：int类型，???（需人工补充）。
+返回：int类型，1重命名文件成功，2重命名文件夹成功，<0出错。
 
-命令：<font color='yellow'>static int sl_permissions(const QString& filePath);</font>
-功能：返回文件权限；
-参数：filePath为路径；
-返回：int类型（QFile::Permissions）。
-
-命令：<font color='yellow'>static bool sl_setPermissions(const QString& filePath, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
-功能：设置文件权限；
-参数：filePath为路径；permissionSpec为权限组合；
-返回：bool类型，是否成功。
-
+5、文件夹简易操作：
 命令：<font color='yellow'>static bool sl_dirExists(const QString& dirPath);</font>
 功能：检测文件夹是否存在；
 参数：dirPath为文件夹路径；
 返回：bool类型，是否存在。
 
-命令：<font color='yellow'>static int sl_dirCreate(const QString& dirPath, int type = 1);</font>
+命令：<font color='yellow'>static int sl_createDir(const QString& dirPath, int type = 1);</font>
 功能：创建文件夹；
-参数：dirPath为路径；type含义见GlobalClass（???需人工补充）；
-返回：int类型，???（需人工补充）。
+参数：dirPath为路径；type为1表示创建该文件夹及其路径的所有文件夹，0表示只创建该文件夹；
+返回：int类型，0目标目录存在，1文件夹创建成功，2文件夹路径创建成功，<0出错。
 
-命令：<font color='yellow'>static int sl_dirRemove(const QString& dirPath, int type = 0);</font>
+命令：<font color='yellow'>static int sl_removeDir(const QString& dirPath, int type = 0);</font>
 功能：删除文件夹；
-参数：dirPath为路径；type含义见GlobalClass（???需人工补充）；
-返回：int类型，???（需人工补充）。
+参数：dirPath为路径；type为1表示删除该文件夹及其路径的所有文件夹，0表示只删除该文件夹；
+返回：int类型，0目标目录不存在，1文件夹删除成功，2文件夹路径删除成功，<0出错。
 
-命令：<font color='yellow'>static int sl_dirMove(const QString& sourcePath, const QString& destPath, int flags = 0b01);</font>
+命令：<font color='yellow'>static int sl_moveDir(const QString& sourcePath, const QString& destPath, int flags = 0b01);</font>
 功能：移动文件夹；
-参数：sourcePath为源路径；destPath为目标路径；flags为???（需人工补充）；
-返回：int类型，???（需人工补充）。
+参数：sourcePath为源路径；destPath为目标路径；flags从右到左：路径不存在时是否自行创建路径，是否覆盖替换已存在文件；
+返回：int类型，0直接移动成功，1移动覆盖成功，<0出错。
 
 命令：<font color='yellow'>static bool sl_removeEmptyDir(const QString& path);</font>
-功能：删除空文件夹；
+功能：删除path下的所有子孙空文件夹；
 参数：path为路径；
 返回：bool类型，是否成功。
 
-命令：<font color='yellow'>static int sl_dirRename(const QString& source, const QString& destination, bool createPath = true);</font>
+命令：<font color='yellow'>static int sl_renameDir(const QString& source, const QString& destination, bool createPath = true);</font>
 功能：重命名文件夹（支持文件和文件夹）；
 参数：source为源；destination为目标；createPath为是否自动创建路径；
-返回：int类型，???（需人工补充）。
+返回：int类型，1重命名文件成功，2重命名文件夹成功，<0出错。
 
-命令：<font color='yellow'>static int sl_dirCopy(const QString& source, const QString& destination, bool coverExistFile = false, int permissionType = 1, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
-功能：复制文件夹；
-参数：source为源；destination为目标；coverExistFile为是否覆盖已存在文件；permissionType为???（需人工补充）；permissionSpec为权限；
-返回：int类型，???（需人工补充）。
+命令：<font color='yellow'>static int sl_copyDir(const QString& source, const QString& destination, bool coverExistFile = false, int permissionType = 1, int permissionSpec = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);</font>
+功能：递归、循环的复制文件夹；
+参数：source为源；destination为目标；coverExistFile为是否覆盖已存在文件；permissionType为0表示不设置权限，为1表示设置为permissionSpec，为2表示设置为源文件的权限；permissionSpec为权限；
+返回：int类型，复制文件个数，<0出错。
 
-命令：<font color='yellow'>static bool sl_removeRecursively(const QString& fromDir);</font>
+命令：<font color='yellow'>static bool sl_removeRecursively(const QString& dirPath);</font>
 功能：删除某目录及所属所有文件及文件夹（强制删除，要注意!）；
-参数：fromDir为目录路径；
+参数：dirPath为目录路径；
 返回：bool类型，是否成功；
 注意：强制删除，不可恢复!
 
-命令：<font color='yellow'>static QStringList sl_dirNameFiltersFromString(const QString& nameFilter);</font>
-功能：将名称过滤字符串解析为列表；
-参数：nameFilter为过滤字符串；
-返回：QStringList类型。
-
-命令：<font color='yellow'>static QStringList sl_dirList(const QString& dirPath, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
-功能：列出某个目录的文件（夹），返回名称数组；
+命令：<font color='yellow'>static QStringList sl_dirEntryList(const QString& dirPath, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+功能：列出某个目录下的所有文件（夹），返回名称数组；
 参数：dirPath为目录；filters为过滤（QDir::Filters）；sort为排序（QDir::SortFlags）；
 返回：QStringList类型。
 
-命令：<font color='yellow'>static QStringList sl_dirList(const QString& dirPath, const QStringList& nameFilters, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
+命令：<font color='yellow'>static QStringList sl_dirEntryList(const QString& dirPath, const QStringList& nameFilters, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
 功能：同上（重载），支持名称过滤列表；
 参数：同上，nameFilters为名称过滤列表；
 返回：QStringList类型。
 
-命令：<font color='yellow'>static QStringList sl_dirList1(const QString& dirPath, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
-功能：同 sl_dirList（区别为???，需人工补充，推测返回带路径的全名）；
-参数：同 sl_dirList；
-返回：QStringList类型。
-
-命令：<font color='yellow'>static QStringList sl_dirList1(const QString& dirPath, const QStringList& nameFilters, int filters = QDir::NoFilter, int sort = QDir::NoSort);</font>
-功能：同上（重载）；
-参数：同上；
-返回：QStringList类型。
-
-命令：<font color='yellow'>static QString sl_filePath(const QString& filePath);</font>
-功能：返回文件名（含路径）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_absoluteFilePath(const QString& filePath);</font>
-功能：返回文件（夹）的绝对路径（会自动修复为正规路径）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_canonicalFilePath(const QString& filePath);</font>
-功能：返回规范化的绝对路径（没有符号链接、.或…），不存在返回空；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_fileName(const QString& filePath);</font>
-功能：返回文件名；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_baseName(const QString& filePath);</font>
-功能：返回文件名（无所有后缀名）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_completeBaseName(const QString& filePath);</font>
-功能：返回文件名（无最后一个后缀）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_suffix(const QString& filePath);</font>
-功能：返回后缀名（只保留最后一个）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_completeSuffix(const QString& filePath);</font>
-功能：返回后缀名（保留所有后缀）；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_bundleName(const QString& filePath);</font>
-功能：返回Mac捆包名；
-参数：filePath为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_path(const QString& path);</font>
-功能：返回文件（夹）所在目录的绝对路径（相当于去掉了文件名）；
-参数：path为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_absolutePath(const QString& path);</font>
-功能：返回绝对路径（去掉文件名）；
-参数：path为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_canonicalPath(const QString& path);</font>
-功能：返回规范化路径（去掉文件名）；
-参数：path为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static void sl_setSearchPaths(const QString& prefix, const QStringList& searchPaths);</font>
-功能：设置QDir搜索路径；
-参数：prefix为前缀；searchPaths为路径列表；
-返回：无。
-
-命令：<font color='yellow'>static void sl_addSearchPath(const QString& prefix, const QString& path);</font>
-功能：添加QDir搜索路径；
-参数：prefix为前缀；path为路径；
-返回：无。
-
-命令：<font color='yellow'>static QStringList sl_searchPaths(const QString& prefix);</font>
-功能：返回QDir搜索路径；
-参数：prefix为前缀；
-返回：QStringList类型。
-
-命令：<font color='yellow'>static QString sl_toNativeSeparators(const QString& pathName);</font>
-功能：路径分隔符转为本地风格（win下/转\）；
-参数：pathName为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_fromNativeSeparators(const QString& pathName);</font>
-功能：本地风格路径分隔符转为/；
-参数：pathName为路径；
-返回：QString类型。
-
-命令：<font color='yellow'>static QStringList sl_nameFiltersFromString(const QString& nameFilter);</font>
-功能：同 sl_dirNameFiltersFromString；
-参数：同上；
-返回：同上。
-
-命令：<font color='yellow'>static bool sl_isRelativePath(const QString& path);</font>
-功能：检测是否相对路径；
-参数：path为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>inline static bool sl_isAbsolutePath(const QString& path);</font>
-功能：检测是否绝对路径；
-参数：path为路径；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_setCurrentPath(const QString& path);</font>
-功能：设置当前工作目录；
-参数：path为路径；
-返回：bool类型，是否成功。
-
-命令：<font color='yellow'>static QString sl_currentPath();</font>
-功能：返回当前工作目录；
-参数：无；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_homePath();</font>
-功能：返回用户主目录；
-参数：无；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_rootPath();</font>
-功能：返回根目录；
-参数：无；
-返回：QString类型。
-
-命令：<font color='yellow'>static QString sl_tempPath();</font>
-功能：返回临时目录；
-参数：无；
-返回：QString类型。
-
-命令：<font color='yellow'>static bool sl_match(const QStringList& filters, const QString& fileName);</font>
-功能：文件名是否匹配过滤列表；
-参数：filters为过滤列表；fileName为文件名；
-返回：bool类型。
-
-命令：<font color='yellow'>static bool sl_match(const QString& filter, const QString& fileName);</font>
-功能：同上（重载，单个过滤）；
-参数：filter为过滤串；
-返回：bool类型。
-
-命令：<font color='yellow'>static QString sl_cleanPath(const QString& path);</font>
-功能：规范化路径（去掉冗余的.、…和多余分隔符）；
-参数：path为路径；
-返回：QString类型。
-
-（六）压缩和解压
-命令：<font color='yellow'>static QByteArray sl_gzipCompress(const QByteArray& postBody, int compressionLevel = Z_DEFAULT_COMPRESSION, int type = 0);</font>
+（五）压缩和解压
+命令：<font color='yellow'>static QByteArray sl_gzipCompress(const QByteArray& postBody, int compressionLevel = Z_DEFAULT_COMPRESSION, int base64Option = -1);</font>
 功能：GZip压缩；
-参数：postBody为数据；compressionLevel为压缩级别(1-9，越高越压缩越小越耗CPU，-1默认，0不压缩但加入标志字节)；type为0不转Base64、1转Base64；
+参数：postBody为数据；compressionLevel为压缩级别(1-9，越高越压缩越小越耗CPU，-1默认)；base64Option为-1不转Base64，为>0转Base64（QByteArray::Base64Options）；
 返回：QByteArray类型。
 
-命令：<font color='yellow'>static QByteArray sl_gzipUncompress(const QByteArray& src, int type = 0);</font>
+命令：<font color='yellow'>static QByteArray sl_gzipUncompress(const QByteArray& src, int base64Option = -1);</font>
 功能：GZip解压；
 参数：src为数据；type为0非Base64、1为Base64编码；
 返回：QByteArray类型。
 
-命令：<font color='yellow'>static QByteArray sl_compress(const QByteArray& data, int compressionLevel = -1, int type = 0);</font>
+命令：<font color='yellow'>static QByteArray sl_compress(const QByteArray& data, int compressionLevel = -1, int base64Option = -1);</font>
 功能：使用Qt自带qCompress压缩；
-参数：data为数据；compressionLevel为压缩级别；type为0不转Base64、1转Base64；
+参数：data为数据；compressionLevel为压缩级别；base64Option为-1不转Base64，为>0转Base64（QByteArray::Base64Options）；
 返回：QByteArray类型。
 
-命令：<font color='yellow'>static QByteArray sl_uncompress(const QByteArray& data, int type = 0);</font>
+命令：<font color='yellow'>static QByteArray sl_uncompress(const QByteArray& data, int base64Option = -1);</font>
 功能：使用Qt自带qUncompress解压；
-参数：data为数据；type为0表示data非Base64、1表示data是Base64编码；
+参数：data为数据；base64Option为-1表示data非Base64编码，为>0表示data是Base64（QByteArray::Base64Options）；
 返回：QByteArray类型。
 
 命令：<font color='yellow'>static bool sl_compressFile(const QString& fileCompressed, const QString& file, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
-功能：QuaZip压缩单个文件（会覆盖原zip文件）；
-参数：fileCompressed为zip文件名；file为要压缩的文件；strategy为压缩策略；dateTime为???（需人工补充）；
+功能：封装QuaZip的compressFile，压缩单个文件（会覆盖原zip文件）；
+参数：fileCompressed为zip文件名；file为要压缩的文件；strategy为压缩策略；dateTime为？？？；
 返回：bool类型，是否成功。
 
 命令：<font color='yellow'>static bool sl_compressFiles(const QString& fileCompressed, const QStringList& files, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
-功能：QuaZip压缩多个文件（会覆盖原zip文件）；
+功能：封装QuaZip的compressFiles，压缩多个文件（会覆盖原zip文件）；
 参数：fileCompressed为zip文件名；files为文件列表；其余同上；
 返回：bool类型，是否成功。
 
 命令：<font color='yellow'>static bool sl_compressDir(const QString& fileCompressed, const QString& dir, bool recursive = true, int filters = QDir::Dirs | QDir::Hidden | QDir::System | QDir::AllDirs | QDir::NoDotAndDotDot, const JlCompress::Options::CompressionStrategy& strategy = JlCompress::Options::Default, const QDateTime& dateTime = QDateTime());</font>
-功能：QuaZip压缩文件夹（会覆盖原zip文件）；
+功能：封装QuaZip的compressDir，压缩文件夹（会覆盖原zip文件）；
 参数：fileCompressed为zip文件名；dir为文件夹；recursive为是否递归；filters为过滤；其余同上；
 返回：bool类型，是否成功；
 注意：| QDir::Files 和 recursive = true 不能一起用，否则返回false。
 
 命令：<font color='yellow'>static QString sl_extractFile(const QString& fileCompressed, const QString& fileName, const QString& fileDest = QString());</font>
-功能：QuaZip解压单个文件（会覆盖已存在的文件）；
+功能：封装QuaZip的extractFile，解压单个文件（会覆盖已存在的文件）；
 参数：fileCompressed为zip文件；fileName为压缩包内文件名；fileDest为目标路径；
-返回：QString类型，???（需人工补充，推测为解压后的文件路径）。
+返回：QString类型，解压后的文件列表。
 
 命令：<font color='yellow'>static QStringList sl_extractFiles(const QString& fileCompressed, const QStringList& files, const QString& dir = QString());</font>
-功能：QuaZip解压多个文件（会覆盖已存在的文件）；
+功能：封装QuaZip的extractFiles，解压多个文件（会覆盖已存在的文件）；
 参数：fileCompressed为zip文件；files为文件名列表；dir为目标目录；
 返回：QStringList类型，解压后的文件列表。
 
 命令：<font color='yellow'>static QStringList sl_extractDir(const QString& fileCompressed, const QString& dir = QString(), const QString& fileNameCodec = QString());</font>
-功能：QuaZip解压整个目录（会覆盖已存在的文件）；
+功能：封装QuaZip的extractDir，解压整个目录（会覆盖已存在的文件）；
 参数：fileCompressed为zip文件；dir为目标目录；fileNameCodec为文件名编码（为空用默认）；
 返回：QStringList类型，解压后的文件列表。
 
 命令：<font color='yellow'>static QStringList sl_getFileList(const QString& fileCompressed);</font>
-功能：获取压缩包内的文件列表；
+功能：封装QuaZip的getFileList，获取压缩包内的文件列表；
 参数：fileCompressed为zip文件；
 返回：QStringList类型。
 
 命令：<font color='yellow'>static bool sl_compressFileEx(const QString& file, const QString& password, const QString& zipFile);</font>
-功能：文件压缩到内存buffer（加密zip），zipFile可以使用QBuffer；
-参数：file为源文件；password为密码；zipFile为zip文件（或QBuffer）；
+功能：文件压缩到内存buffer（加密zip）；
+参数：file为源文件；password为密码；zipFile为zip文件路径；
 返回：bool类型，是否成功。
 
 命令：<font color='yellow'>static bool sl_compressFilesEx(const QStringList& files, const QString& password, const QString& zipFile);</font>
 功能：多文件压缩到内存buffer（加密zip）；
-参数：files为文件列表；password为密码；zipFile为zip文件；
+参数：files为文件列表；password为密码；zipFile为zip文件路径；
 返回：bool类型，是否成功。
 
 命令：<font color='yellow'>static bool sl_extractDirEx(const QString& strZipFile, const QString& password, const QString& dirPath = QString());</font>

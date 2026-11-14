@@ -38,7 +38,7 @@ Item {
 
 
     function $load(...params) {
-        //_private.arrVideos = $Frame.sl_dirList($GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x0);
+        //_private.arrVideos = $Frame.sl_dirEntryList($GameMakerGlobal.videoResourcePath(), [], 0x001 | 0x002 | 0x2000 | 0x4000, 0x0);
         //console.debug('[mainVideoEditor]_private.arrVideos', JSON.stringify(_private.arrVideos))
         _private.refresh();
     }

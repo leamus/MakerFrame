@@ -141,7 +141,7 @@ Item {
                             const successed = [];
                             const failed = [];
                             const noCompile = [];
-                            const list = $Frame.sl_dirList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+                            const list = $Frame.sl_dirEntryList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
                             for(const tn of list) {
                                 const path = $GameMakerGlobal.fightSkillPath(tn) + '/';
                                 if(!$Frame.sl_fileExists(path + 'fight_skill.vjs')) {
@@ -154,7 +154,7 @@ Item {
                                 const result = fightSkillVisualEditor.compile(false);
                                 console.debug('[mainFightSkillEditor]result:', result);
                                 if(result[1]) {
-                                    $Frame.sl_writeFile(result[1], path + 'fight_skill.js', 0);
+                                    $Frame.sl_writeFile(result[1], path + 'fight_skill.js', 0b0);
                                     //++count;
                                     successed.push(tn);
                                 }
@@ -297,7 +297,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+            const list = $Frame.sl_dirEntryList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建技能】');
             //l_listFightSkill.removeButtonVisible = {0: false, '-1': true};
             l_listFightSkill.show(list);

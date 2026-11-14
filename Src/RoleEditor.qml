@@ -3065,7 +3065,7 @@ function $refresh(index, imageAnimate, url) {
                     scriptEditor.text = '';
 
                 const path = $GameMakerGlobal.rolePath(textRoleRID.text);
-                const ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/role.js', 0);
+                const ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/role.js', 0b0);
             }
             else if(textRoleRID.text !== '' && _private.strRoleRID !== textRoleRID.text) { //另存为
                 const oldFilePath = $GameMakerGlobal.rolePath(_private.strRoleRID) + '/role.js';
@@ -3106,7 +3106,7 @@ function $refresh(index, imageAnimate, url) {
             const filepath = $GameMakerGlobal.rolePath(roleRID) + '/role.json';
 
             /*//if(!$Frame.sl_dirExists(path))
-                $Frame.sl_dirCreate(path);
+                $Frame.sl_createDir(path);
             */
 
             const outputData = {};
@@ -3220,7 +3220,7 @@ function $refresh(index, imageAnimate, url) {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //const ret = File.write(filepath, JSON.stringify(outputData));
-            const ret = $Frame.sl_writeFile(JSON.stringify(outputData), filepath, 0);
+            const ret = $Frame.sl_writeFile(JSON.stringify(outputData), filepath, 0b0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

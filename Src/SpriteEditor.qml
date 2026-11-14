@@ -2208,7 +2208,7 @@ function $refresh(index, imageAnimate, url) {
                     scriptEditor.text = '';
 
                 const path = $GameMakerGlobal.spritePath(textSpriteRID.text);
-                const ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/sprite.js', 0);
+                const ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/sprite.js', 0b0);
             }
             else if(textSpriteRID.text !== '' && _private.strSpriteRID !== textSpriteRID.text) { //另存为
                 const oldFilePath = $GameMakerGlobal.spritePath(_private.strSpriteRID) + '/sprite.js';
@@ -2248,7 +2248,7 @@ function $refresh(index, imageAnimate, url) {
             const filepath = $GameMakerGlobal.spritePath(spriteRID) + '/sprite.json';
 
             /*//if(!$Frame.sl_dirExists(path))
-                $Frame.sl_dirCreate(path);
+                $Frame.sl_createDir(path);
             */
 
             const outputData = {};
@@ -2289,7 +2289,7 @@ function $refresh(index, imageAnimate, url) {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //const ret = File.write(filepath, JSON.stringify(outputData));
-            const ret = $Frame.sl_writeFile(JSON.stringify(outputData), filepath, 0);
+            const ret = $Frame.sl_writeFile(JSON.stringify(outputData), filepath, 0b0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

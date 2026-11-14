@@ -1072,7 +1072,7 @@ Item {
                 true)
 
             onSg_playSoundEffect: {
-                game.playsoundeffect(soundeffectSource, -1);
+                game.playsoundeffect(soundeffectSource, true);
             }
         }
     }*/
@@ -1335,7 +1335,7 @@ Item {
                         }
 
                         onSg_playSoundEffect: {
-                            game.playsoundeffect(soundeffectSource, -1);
+                            game.playsoundeffect(soundeffectSource, true);
                         }
                     }
 
@@ -1545,7 +1545,7 @@ Item {
                         }
 
                         onSg_playSoundEffect: {
-                            game.playsoundeffect(soundeffectSource, -1);
+                            game.playsoundeffect(soundeffectSource, true);
                         }
                     }
 

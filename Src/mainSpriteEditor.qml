@@ -216,7 +216,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.spritePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+            const list = $Frame.sl_dirEntryList($GameMakerGlobal.spritePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建特效】');
             //l_listSprite.removeButtonVisible = {0: false, '-1': true};
             l_listSprite.show(list);

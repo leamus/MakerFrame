@@ -467,7 +467,7 @@ const data = (function() {
             const path = $GameMakerGlobal.fightSkillPath();
 
             function fnSave() {
-                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightSkillScript.textDocument), path + '/' + textFightSkillName.text + '/fight_skill.js', 0b0);
 
                 //复制可视化
                 if(_private.strSavedName) {

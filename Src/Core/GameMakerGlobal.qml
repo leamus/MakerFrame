@@ -132,50 +132,71 @@ QtObject {
 
     function mapURL(filepath) {return $GlobalJS.toURL(mapPath(filepath));}
     function mapPath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strMapDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function spriteURL(filepath) {return $GlobalJS.toURL(spritePath(filepath));}
     function spritePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strSpriteDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function roleURL(filepath) {return $GlobalJS.toURL(rolePath(filepath));}
     function rolePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strRoleDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function goodsURL(filepath) {return $GlobalJS.toURL(goodsPath(filepath));}
     function goodsPath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strGoodsDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function fightRoleURL(filepath) {return $GlobalJS.toURL(fightRolePath(filepath));}
     function fightRolePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightRoleDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function fightSkillURL(filepath) {return $GlobalJS.toURL(fightSkillPath(filepath));}
     function fightSkillPath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightSkillDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function fightScriptURL(filepath) {return $GlobalJS.toURL(fightScriptPath(filepath));}
     function fightScriptPath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strFightScriptDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
@@ -183,22 +204,31 @@ QtObject {
 
     function mapResourceURL(filepath) {return $GlobalJS.toURL(mapResourcePath(filepath));}
     function mapResourcePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strMapResourceDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function spriteResourceURL(filepath) {return $GlobalJS.toURL(spriteResourcePath(filepath));}
     function spriteResourcePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strSpriteResourceDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
     function goodsResourceURL(filepath) {return $GlobalJS.toURL(goodsResourcePath(filepath));}
     function goodsResourcePath(filepath='') {
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //绝对目录
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strGoodsResourceDirName;
         return filepath ? (ret + '/' + filepath) : ret;
     }
@@ -206,54 +236,50 @@ QtObject {
     function imageResourceURL(filepath) {return $GlobalJS.toURL(imageResourcePath(filepath));}
     function imageResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         //相对目录
-        else {
-            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strImageResourceDirName;
-            return filepath ? (ret + '/' + filepath) : ret;
-        }
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strImageResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
     function soundResourceURL(filepath) {return $GlobalJS.toURL(soundResourcePath(filepath));}
     function soundResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         //相对目录
-        else {
-            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strSoundResourceDirName;
-            return filepath ? (ret + '/' + filepath) : ret;
-        }
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strSoundResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
     function musicResourceURL(filepath) {return $GlobalJS.toURL(musicResourcePath(filepath));}
     function musicResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         //相对目录
-        else {
-            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strMusicResourceDirName;
-            return filepath ? (ret + '/' + filepath) : ret;
-        }
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strMusicResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
     function videoResourceURL(filepath) {return $GlobalJS.toURL(videoResourcePath(filepath));}
     function videoResourcePath(filepath='') {
         // /开始的目录，则相对于项目根路径
-        if(filepath.startsWith('/'))
-            return config.strProjectRootPath + config.strCurrentProjectName + filepath;
+        //if(filepath.startsWith('/'))
+        //    return config.strProjectRootPath + config.strCurrentProjectName + filepath;
         //绝对目录
-        //else if(filepath.includes(':')) return $GlobalJS.toPath(filepath);
+        if($Frame.sl_isAbsolutePath(filepath))
+            return $GlobalJS.toPath(filepath);
         //相对目录
-        else {
-            const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strVideoResourceDirName;
-            return filepath ? (ret + '/' + filepath) : ret;
-        }
+        const ret = config.strProjectRootPath + config.strCurrentProjectName + '/' + config.strResourceDirName + '/' + config.strVideoResourceDirName;
+        return filepath ? (ret + '/' + filepath) : ret;
     }
 
 

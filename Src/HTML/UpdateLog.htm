@@ -7,8 +7,9 @@
     B表示小版本，一般对兼容旧工程上有少量的破坏性更改，工程需要手动去修正（更新日志前面标注*号的项，一般鹰歌会尽可能的去兼容旧工程）；
     C表示Bug修复或新增功能，完全兼容旧工程；
 
-1、新增：整理和补齐QFileInfo、QFile、QDir的函数，并将我封装的简易操作函数名作修改（sl_fileDelete改为sl_removeFile、sl_fileRead改为sl_readFile、sl_fileWrite改为sl_writeFile、sl_fileCopy改为sl_copyFile、sl_fileRename改为sl_renameFile）；
+1、新增：整理和补齐QFileInfo、QFile、QDir的函数，并将我封装的简易操作函数名作修改（sl_fileDelete改为sl_removeFile、sl_fileRead改为sl_readFile、sl_fileWrite改为sl_writeFile、sl_fileCopy改为sl_copyFile、sl_fileRename改为sl_renameFile、sl_dirCreate改为sl_createDir、sl_dirRemove改为sl_removeDir、sl_dirMove改为sl_moveDir、sl_dirRename改为sl_renameDir、sl_dirCopy改为sl_copyDir、sl_dirList改为sl_dirEntryList）；
 2、修改：脚本队列新增了配置（遇到非Promise暂停还是继续，默认为继续），支持暂停和强制恢复的Promise；
+3、修改：将RCC分离作为插件提供；
 
 2026/7/24：
 江湖再见~
@@ -311,7 +312,7 @@
 3、修复：一些 枚举 没有注册到 QML 的问题；
 *4、增强：game.role、game.hero 的搜索对象功能；
 *5、新增：战斗人物、道具、技能 的 $id，默认为$rid（参数为字符串时）或 $rid + 随机字符（参数为对象时），且字符串搜索时按$id；
-6、新增：game.playsoundeffect(soundeffectName, channel=-1)命令，可以异步调用；
+6、新增：game.playsoundeffect命令，可以异步调用；
 *7、增强：game.pausesoundeffect、game.resumesoundeffect命令，使之支持单个音频channel的暂停和继续；
 8、修改：创建音频播放通道（目前9个），将所有待播放音频，根据规则放入到这9个通道中播放；
 9、增强：广告插件函数改为可异步写法；

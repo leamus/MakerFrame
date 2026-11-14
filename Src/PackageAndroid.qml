@@ -434,7 +434,7 @@ Item {
                 content = content.replace(regExp, '$1' + textTapClientToken.text + '$2');
 
 
-                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/assets/QML/Config.js');
+                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/assets/QML/Config.js', 0b0);
                 if(res === 0) {
                     textResult.append('写入 Config.js 成功');
                 }
@@ -498,7 +498,7 @@ Item {
                 content = content.replace(regExp, textPackageName.text);
 
 
-                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/AndroidManifest.xml');
+                res = $Frame.sl_writeFile(content, _private.strPackageDir + '/AndroidManifest.xml', 0b0);
                 if(res === 0) {
                     textResult.append('写入 AndroidManifest.xml 成功');
                 }
@@ -530,7 +530,7 @@ Item {
             const zipFiles = []; //需要解压的文件（后者会覆盖前者的同名文件）
             const needFilesName = ['MakerFrame_Package_Android_*.zip', 'MakerFrame_GameRuntime_Android_*.zip'];
             for(const needFileName of needFilesName) {
-                const zipFile = $Frame.sl_dirList(path, [needFileName], 0x002 | 0x2000 | 0x4000, 0x0);
+                const zipFile = $Frame.sl_dirEntryList(path, [needFileName], 0x002 | 0x2000 | 0x4000, 0x0);
                 if(!zipFile[0])
                     missingFiles += needFileName + ',';
                 else
@@ -541,12 +541,12 @@ Item {
             const zipFiles = [];
             let zipFile;
 
-            zipFile = $Frame.sl_dirList(path, ['MakerFrame_Package_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
+            zipFile = $Frame.sl_dirEntryList(path, ['MakerFrame_Package_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
             if(!zipFile[0])
                 missingFiles += 'MakerFrame_Package_Android_xxx.zip,';
             else
                 zipFiles.push(zipFile[0]);
-            zipFile = $Frame.sl_dirList(path, ['MakerFrame_GameRuntime_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
+            zipFile = $Frame.sl_dirEntryList(path, ['MakerFrame_GameRuntime_Android_*.zip'], 0x002 | 0x2000 | 0x4000, 0x0);
             if(!zipFile[0])
                 missingFiles += 'MakerFrame_GameRuntime_Android_xxx.zip,';
             else
@@ -580,14 +580,14 @@ Item {
                             ret = $Frame.sl_extractDir(path + '/' + zipFiles[0], strPackageDir);
                             ret = $Frame.sl_extractDir(path + '/' + zipFiles[1], strPackageDir);
 
-                            ret = $Frame.sl_dirCopy($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
+                            ret = $Frame.sl_copyDir($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
 
                             modifyConfig();
                         }
                         else if(packageType === 1) { //只是工程
                             $Frame.sl_removeRecursively(strPackageDir + '/assets/Project');
 
-                            ret = $Frame.sl_dirCopy($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
+                            ret = $Frame.sl_copyDir($GameMakerGlobal.config.strProjectRootPath + $GameMakerGlobal.config.strCurrentProjectName, strPackageDir + '/assets/Project', true, 0);
                         }
                         else
                             modifyConfig();

@@ -141,7 +141,7 @@ Item {
                             const successed = [];
                             const failed = [];
                             const noCompile = [];
-                            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+                            const list = $Frame.sl_dirEntryList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
                             for(const tn of list) {
                                 const path = $GameMakerGlobal.fightRolePath(tn) + '/';
                                 if(!$Frame.sl_fileExists(path + 'fight_role.vjs')) {
@@ -154,7 +154,7 @@ Item {
                                 const result = fightRoleVisualEditor.compile(false);
                                 console.debug('[mainFightRoleEditor]result:', result);
                                 if(result[1]) {
-                                    $Frame.sl_writeFile(result[1], path + 'fight_role.js', 0);
+                                    $Frame.sl_writeFile(result[1], path + 'fight_role.js', 0b0);
                                     //++count;
                                     successed.push(tn);
                                 }
@@ -297,7 +297,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+            const list = $Frame.sl_dirEntryList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建战斗角色】');
             //l_listFightRole.removeButtonVisible = {0: false, '-1': true};
             l_listFightRole.show(list);

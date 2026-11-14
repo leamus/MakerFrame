@@ -3283,9 +3283,10 @@ Item {
 
 
         //功能：播放音效（支持任何音频，推荐wav）；
-        //参数：channel为通道（目前0~9，true为随机挑选没有播放的通道，如果没有则随机强制选择一个；false为随机挑选没有播放的通道，如果没有则返回；）；
+        //参数：channel为通道（目前0~9，true为随机挑选没有播放的通道，如果没有则随机强制选择一个；false为随机挑选没有播放的通道，如果没有则返回）；
         //返回：Promise对象（异步返回值为播放文件路径），$params属性为音频组件对象；
-        function playsoundeffect(soundeffectName, channel=false, loops=1, forcePlay=false) {
+        function playsoundeffect(soundeffectName, channel=true, loops=1, forcePlay=false) {
+            console.debug('[GameScene]playsoundeffect:', arguments.$$json);
             if(!forcePlay && game.soundeffectpausing())
                 return -10;
 
@@ -4688,15 +4689,16 @@ Item {
         }
 
         //功能：检测存档是否存在 且 验证是否正确；
-        //参数：data为字符串（本地存档文件路径）或对象（存档数据，此时仅验证和解压Data字段）；
-        //返回：失败返回false；成功返回 存档对象（包含Name和解压后的Data）；
+        //参数：data为字符串（本地存档文件相对或绝对路径）或对象（存档数据，此时仅验证和解压Data字段）；
+        //返回：不存在返回null；出错返回false；成功返回 存档对象（包含Name和解压后的Data）；
         function checksave(data) {
             if($CommonLibJS.isString(data)) {
-                data = data.trim();
-                let filePath = $GlobalJS.toPath($GameMakerGlobal.config.strSaveDataPath + data + '.json');
+                let filePath = data.trim();
+                if($Frame.sl_isRelativePath(filePath))
+                    filePath = $GlobalJS.toPath($GameMakerGlobal.config.strSaveDataPath + filePath + '.json');
                 if(!$Frame.sl_fileExists(filePath)) {
-                    console.warn('[!GameScene]checksave:文件不存在：', data);
-                    return false;
+                    console.debug('[GameScene]checksave:文件不存在：', data, filePath);
+                    return null;
                 }
 
                 data = $Frame.sl_readFile(filePath);
@@ -4714,21 +4716,16 @@ Item {
                     }
                 }
             }
-            else if($CommonLibJS.isObject(data)) {
-            }
-            else {
-                return false;
-            }
 
-            if(data) {
+            if($CommonLibJS.isObject(data)) {
                 //压缩
                 if(data.Type === 1) {
-                    //debug下不检测存档
+                    //非debug下才检测存档
                     if($GameMakerGlobal.config.bDebug === false && data.Verify !== $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + data.Data)) {
                         return false;
                     }
                     try {
-                        data.Data = JSON.parse($Frame.sl_uncompress(data.Data, 1).toString());
+                        data.Data = JSON.parse($Frame.sl_uncompress(data.Data, 0).toString());
                     }
                     catch(e) {
                         return false;
@@ -4743,7 +4740,7 @@ Item {
                     return data;
                 }
                 else {
-                    //debug下不检测存档
+                    //非debug下才检测存档
                     if($GameMakerGlobal.config.bDebug === false && data.Verify !== $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + JSON.stringify(data.Data))) {
                         return false;
                     }
@@ -4761,7 +4758,7 @@ Item {
         }
 
         //功能：存档（将game.gd存为 文件），注意：1、开头为 $$ 的键不会保存；2、会调用通用脚本的 $beforeSave 和 $afterSave 函数/生成器；3、会覆盖已有存档文件；
-        //参数：fileName为字符串（本地存档文件路径）或true（不保存，只接受返回结果）；
+        //参数：fileName为字符串（本地存档文件相对或绝对路径）或true（不保存，只接受返回结果）；
         //  showName为游戏中存档显示名；
         //  compressionLevel为压缩级别（1-9，-1为默认，0为不压缩）；
         //返回：Promise对象（异步返回值为存档数据字符串，出错返回false）；
@@ -4779,9 +4776,6 @@ Item {
                 game.async([function*() { //效果和run一样，但使用async能更好的在async函数里使用；
 
                     if($CommonLibJS.isString(fileName)) {
-                        fileName = fileName.trim();
-                        if(!fileName)
-                            fileName = 'autosave';
                     }
                     else if(fileName === true) {
 
@@ -4817,7 +4811,7 @@ Item {
                     outputData.Time = $CommonLibJS.formatDate('YYYY-mm-dd HH:MM:SS'); //'YYYY-mm-dd HH:MM:SS zzz'
                     if(compressionLevel !== 0) {    //压缩
                         const GlobalDataString = JSON.stringify(game.gd, fSaveFilter);
-                        outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 1).toString();
+                        outputData.Data = $Frame.sl_compress(GlobalDataString, compressionLevel, 0).toString();
                         outputData.Verify = $Frame.sl_md5/*Qt.md5*/(_private.config.strSaveDataSalt + outputData.Data);
                         fileData = JSON.stringify(outputData, fSaveFilter);
                     }
@@ -4831,15 +4825,19 @@ Item {
 
                     let ret;
                     if($CommonLibJS.isString(fileName)) {
-                        const filePath = $GameMakerGlobal.config.strSaveDataPath + fileName + '.json';
+                        let filePath = fileName.trim();
+                        if(!filePath)
+                            filePath = 'autosave';
+                        if($Frame.sl_isRelativePath(filePath))
+                            filePath = $GlobalJS.toPath($GameMakerGlobal.config.strSaveDataPath + filePath + '.json');
 
                         //!!!导出为文件
                         //console.debug(JSON.stringify(outputData));
                         //let ret = File.write(path + '/map.json', JSON.stringify(outputData));
-                        ret = $Frame.sl_writeFile(fileData, $GlobalJS.toPath(filePath), 0);
+                        ret = $Frame.sl_writeFile(fileData, filePath, 0b0);
                         //console.debug(itemViewPort.itemContainer.arrCanvasMap[2].toDataURL())
                         if(ret < 0) {
-                            console.warn('[!GameScene]save ERROR:', fileName, ret);
+                            console.warn('[!GameScene]save ERROR:', fileName, filePath, ret);
                             return resolve(false);
                         }
                         ret = fileData;
@@ -4885,7 +4883,7 @@ Item {
         }
 
         //功能：读档（读取数据到 game.gd），注意：会调用通用脚本的 $beforeLoad 和 $afterLoad 函数/生成器；
-        //参数：data为字符串（本地存档文件路径）或对象（存档数据）；
+        //参数：data为字符串（本地存档文件相对或绝对路径）或对象（存档数据）；
         //返回：Promise对象（异步返回值为true，出错会返回false）；
         function load(data='autosave') {
             //let _resolve, _reject;
@@ -5094,14 +5092,14 @@ Item {
         }
 
         //功能：读取json文件并解析；
-        //参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+        //参数：filePath为 绝对或相对路径 的文件名，如果filePath是相对路径，则相对于本项目根路径；
         //返回：对象或数组，失败返回null；
         function loadjson(filePath) {
             filePath = filePath.trim();
             if(!filePath)
                 return null;
 
-            if(filePath.startsWith('/'))
+            if($Frame.sl_isRelativePath(filePath))
                 filePath = game.$projectpath + '/' + filePath;
 
             const data = $Frame.sl_readFile(filePath);
@@ -5136,6 +5134,7 @@ Item {
         //    如果为数组（下标0为Script脚本时，下标1为Tips，是null或true时为给_private.scriptQueue.lastEscapeValue值）；
         //  params：给调用Script脚本时的参数；
         //注意：如果需要清空 异步脚本队列：game.$caches.scriptQueue.clear(n);
+        //  如果要暂停队列，在Script脚本中yield一个有$pause属性的Promise对象，下次再运行run函数时会强制继续执行队列；
         //返回：-9<ret<9：run的返回值；其他为scriptQueue.create的返回值+-10；
         //  1：立刻运行了；2：下一次事件循环中运行；0：只是加入；null、undefined：没有作用；-1：参数错误；
         function run(scriptInfo, ...params) {
@@ -5345,7 +5344,7 @@ Item {
         }
 
         //功能：在游戏场景的上下文环境中执行代码；
-        //参数：filePath为 绝对或相对路径 的文件名，如果filePath以 / 开头，则相对于本项目根路径；
+        //参数：filePath为 绝对或相对路径 的文件名，如果filePath是相对路径，则相对于本项目根路径；
         //返回：eval运行结果；文件不存在则会抛出错误；
         function evalfile(filePath, /*envs={}*/) {
             //return $CommonLibJS._evalFile(filePath, envs);
@@ -5354,7 +5353,7 @@ Item {
             if(!filePath)
                 return null;
 
-            if(filePath.startsWith('/'))
+            if($Frame.sl_isRelativePath(filePath))
                 filePath = game.$projectpath + '/' + filePath;
 
             if(!$Frame.sl_fileExists(filePath)) {
@@ -6669,6 +6668,8 @@ Item {
                 return -1;
             }
 
+            if(index < 0)
+                index = true;
             if(!$CommonLibJS.isValidNumber(index)) {
                 for(let ti = 0; ti < arrCacheSoundEffects.length; ++ti) {
                     const se = arrCacheSoundEffects[ti];
@@ -7129,7 +7130,7 @@ Item {
             $create: function(p) {
                 let o = compCacheSpriteEffect.createObject(p);
                 /*o.sg_playSoundEffect.connect(function(soundeffectSource) {
-                    game.playsoundeffect(soundeffectSource, -1);
+                    game.playsoundeffect(soundeffectSource, true);
                 });
                 */
                 return o;
@@ -9023,7 +9024,7 @@ Item {
             }
 
             sprite.onSg_playSoundEffect: {
-                game.playsoundeffect(soundeffectSource, -1);
+                game.playsoundeffect(soundeffectSource, true);
             }
             //mainRole.customSprite.sg_playSoundEffect.connect(tf);
 
@@ -9274,7 +9275,7 @@ Item {
 
 
             onSg_playSoundEffect: {
-                game.playsoundeffect(soundeffectSource, -1);
+                game.playsoundeffect(soundeffectSource, true);
             }
 
             Component.onCompleted: {

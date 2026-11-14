@@ -216,7 +216,7 @@ Item {
 
 
         function refresh() {
-            const list = $Frame.sl_dirList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+            const list = $Frame.sl_dirEntryList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
             //list.unshift('【新建角色】');
             //l_listRole.removeButtonVisible = {0: false, '-1': true};
             l_listRole.show(list);

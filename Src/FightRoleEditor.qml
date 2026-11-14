@@ -398,7 +398,7 @@ const data = (function() {
             const path = $GameMakerGlobal.fightRolePath();
 
             function fnSave() {
-                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0);
+                let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(notepadFightRoleProperty.textDocument), path + '/' + textFightRoleName.text + '/fight_role.js', 0b0);
 
                 //复制可视化
                 if(_private.strSavedName) {

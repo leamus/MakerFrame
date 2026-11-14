@@ -332,7 +332,7 @@ function* loadResources() {
 
 
         //读道具信息
-        items = $Frame.sl_dirList($GameMakerGlobal.goodsPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.goodsPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             const info = getGoodsResource(item, true);
@@ -364,7 +364,7 @@ function* loadResources() {
 
 
         //读技能信息
-        items = $Frame.sl_dirList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.fightSkillPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             const info = getSkillResource(item, true);
@@ -396,7 +396,7 @@ function* loadResources() {
 
 
         //读战斗脚本信息
-        items = $Frame.sl_dirList($GameMakerGlobal.fightScriptPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.fightScriptPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             const info = getFightScriptResource(item, true);
@@ -411,7 +411,7 @@ function* loadResources() {
 
 
         //读战斗角色信息
-        items = $Frame.sl_dirList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.fightRolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             const info = getFightRoleResource(item, true);
@@ -445,7 +445,7 @@ function* loadResources() {
 
 
         //读特效信息
-        items = $Frame.sl_dirList($GameMakerGlobal.spritePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.spritePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             //console.debug(items, item)
@@ -460,7 +460,7 @@ function* loadResources() {
 
 
         //读角色信息
-        items = $Frame.sl_dirList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.rolePath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             //console.debug(items, item)
@@ -476,7 +476,7 @@ function* loadResources() {
 
 
         //读地图信息
-        items = $Frame.sl_dirList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
+        items = $Frame.sl_dirEntryList($GameMakerGlobal.mapPath(), [], 0x001 | 0x2000 | 0x4000, 0x0);
 
         for(const item of items) {
             //console.debug(items, item)
@@ -603,12 +603,12 @@ function* loadResources() {
 //载入扩展 插件/组件
     function* loadPlugins(pluginPath) {
         //循环三方根目录
-        for(const tc0 of $Frame.sl_dirList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0x0)) {
+        for(const tc0 of $Frame.sl_dirEntryList(pluginPath, [], 0x001 | 0x2000 | 0x4000, 0x0)) {
             //if(tc0 === '$Leamus')
             //    continue;
 
             //循环三方插件目录
-            for(const tc1 of $Frame.sl_dirList(pluginPath + tc0 + '/', [], 0x001 | 0x2000 | 0x4000, 0x0)) {
+            for(const tc1 of $Frame.sl_dirEntryList(pluginPath + tc0 + '/', [], 0x001 | 0x2000 | 0x4000, 0x0)) {
                 if($CommonLibJS.getObjectValue(_private.objPlugins, tc0, tc1) !== undefined) {
                     console.debug('[GameScene]已经载入相同插件，跳过：', tc0, tc1);
                     continue;

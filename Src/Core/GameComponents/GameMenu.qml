@@ -66,11 +66,11 @@ Rectangle {
             return;
 
         //如果第一个参数为数组
-        if(/*arguments.length === 1 && */Object.prototype.toString.call(arguments[0]) === '[object Array]') {
+        if(/*arguments.length === 1 && */$CommonLibJS.isArray(arguments[0])) {
             arrList = arguments[0];
         }
         //如果是字符串，则用 , 分割
-        else if(Object.prototype.toString.call(arguments[0]) === '[object String]')
+        else if($CommonLibJS.isString(arguments[0]))
             arrList = arguments[0].split(',');
 
 

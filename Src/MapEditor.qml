@@ -3027,10 +3027,10 @@ Item {
             path = path.replace('file:/', '').replace('//', '');
 
             //if(!$Frame.sl_dirExists(path))
-                $Frame.sl_dirCreate(path);
+                $Frame.sl_createDir(path);
 
             canvasExport.save(path + '/' + textMapName.text.trim() + '.png');
-            //$Frame.sl_writeFile(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0);
+            //$Frame.sl_writeFile(canvasExport.toDataURL('image/png'), strOutputPath + '/output_map.png', 0b0);
             //console.debug('canvasExport ok', strOutputPath + '/output_map.png', Qt.resolvedUrl(strOutputPath + '/output_map.png'));
 
             if($CommonLibJS.isFunction(fnExported)) {
@@ -3448,7 +3448,7 @@ Item {
             }*/
 
             let path = $GameMakerGlobal.mapPath(textMapRID.text);
-            let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0);
+            let ret = $Frame.sl_writeFile($Frame.sl_toPlainText(scriptEditor.editor.textDocument), path + '/map.js', 0b0);
         }
         //复制可视化
         function copyVJS() {
@@ -3470,7 +3470,7 @@ Item {
             let newPath = $GameMakerGlobal.mapPath(textMapRID.text);
 
             //if(!$Frame.sl_dirExists(newPath))
-                $Frame.sl_dirCreate(newPath);
+                $Frame.sl_createDir(newPath);
 
 
             //绘制所有 0层及以上 canvas
@@ -3528,7 +3528,7 @@ Item {
             //!!!导出为文件
             //console.debug(JSON.stringify(outputData));
             //let ret = File.write(path + '/map.json', JSON.stringify(outputData));
-            let ret = $Frame.sl_writeFile(JSON.stringify(outputData), newPath + '/map.json', 0);
+            let ret = $Frame.sl_writeFile(JSON.stringify(outputData), newPath + '/map.json', 0b0);
             //console.debug(canvasMapContainer.arrCanvasMap[2].toDataURL())
 
 

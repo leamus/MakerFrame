@@ -1715,7 +1715,7 @@ function* runAway() {
 
 
 //调用脚本
-function fightOver(result, force=false) {
+function fightOver(result, force=false) { //261111：force好像没用？
     if(force) {
         timerRoleSprite.stop();
         //_private.scriptQueueFighting.clear(3);
